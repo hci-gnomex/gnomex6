@@ -8,22 +8,20 @@
 
     </div>
     <div class="flex-container-row">
-        <mat-form-field class="formField">
-            <input #requestInput matInput placeholder="Request #" aria-label="Request #" [matAutocomplete]="autoRequest"
-                   [(ngModel)]="workItem" (keyup.enter)="chooseFirstRequestOption()"
-                   (keyup)="highlightFirstRequestOption($event)">
-            <mat-autocomplete #autoRequest="matAutocomplete">
-                <mat-option (onSelectionChange)="selectRequestOption($event)"
-                            *ngFor="let request of filterRequests(this.workItem)"
-                            [value]="request.requestNumber">{{request.requestNumber}}</mat-option>
-            </mat-autocomplete>
-        </mat-form-field>
-        <mat-form-field class="formField">
-            <mat-select (selectionChange)="selectCodeOption($event)" [(ngModel)]="codeStepNext" placeholder="Experiment Type" [compareWith]="compareByID">
-                <mat-option *ngFor="let code of this.codeStepArray"
-                            [value]="code.codeStepNext">{{code.label}}</mat-option>
-            </mat-select>
-        </mat-form-field>
+        <div class="formField">
+            <custom-combo-box placeholder="Request #" (optionSelected)="selectRequestOption()"
+                              [options]="this.requestIds" displayField="requestNumber" valueField="requestNumber"
+                              [(ngModel)]="workItem" [allowNone]="false">
+            </custom-combo-box>
+        </div>
+        <div class="formField">
+            <custom-combo-box placeholder="Experiment Type"
+                              valueField="codeStepNext" displayField="label"
+                              [options]="this.codeStepArray"
+                              [(ngModel)]="codeStepNext"
+                              (optionSelected)="selectCodeOption()">
+            </custom-combo-box>
+        </div>
     </div>
     <div class="flex-grow">
         <ag-grid-angular class="ag-theme-balham full-height"

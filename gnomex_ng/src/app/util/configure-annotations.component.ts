@@ -1,4 +1,4 @@
-import {Component, Input} from "@angular/core";
+import {Component, Inject, OnInit} from "@angular/core";
 import {Response, URLSearchParams} from "@angular/http";
 import {DictionaryService} from "../services/dictionary.service";
 import {PropertyService} from "../services/property.service";
@@ -6,17 +6,18 @@ import {ActivatedRoute, Params} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ConstantsService} from "../services/constants.service";
-import {DialogsService} from "./popup/dialogs.service";
-import {MatSnackBar} from "@angular/material";
+import {DialogsService, DialogType} from "./popup/dialogs.service";
+import {MAT_DIALOG_DATA, MatDialogRef, MatSnackBar} from "@angular/material";
 import {ExperimentPlatformService} from "../services/experiment-platform.service";
 import {first, take} from "rxjs/operators";
+import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
 
 @Component({
     selector: 'configure-annotations',
     templateUrl: "./configure-annotations.component.html",
 })
 
-export class ConfigureAnnotationsComponent {
+export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog implements OnInit {
     public readonly SHOW_FOR_SAMPLES: string = "s";
     public readonly SHOW_FOR_ANALYSIS: string = "a";
     public readonly SHOW_FOR_DATA_TRACKS: string = "dt";
@@ -27,7 +28,8 @@ export class ConfigureAnnotationsComponent {
     public readonly TYPE_OPTION: string = "OPTION";
     public readonly TYPE_MULTI_OPTION: string = "MOPTION";
     public experimentPlatformMode:boolean = false;
-    @Input() public orderType: string = "";
+    public orderType: string = "";
+    public isDialog: boolean = false;
     public listOrganism: any[] = [];
     public idOrganism: string;
     public listExperimentPlatform: any[] = [];
@@ -107,7 +109,17 @@ export class ConfigureAnnotationsComponent {
                 private constantsService: ConstantsService,
                 private dialogsService: DialogsService,
                 private snackBar: MatSnackBar,
-                private expPlatformService:ExperimentPlatformService) {
+                private expPlatformService: ExperimentPlatformService,
+                private dialogRef: MatDialogRef<ConfigureAnnotationsComponent>,
+                @Inject(MAT_DIALOG_DATA) private data: any) {
+        super();
+    }
+
+    ngOnInit(): void {
+        if(this.data && Object.keys(this.data).length > 0) {
+                this.isDialog = this.data.isDialog;
+                this.orderType = this.data.orderType;
+            }
         this.annotGridColumnDefs = [
             {headerName: "Annotation", field: "name", width: 100, valueFormatter: this.annotFormatter},
         ];
@@ -137,7 +149,7 @@ export class ConfigureAnnotationsComponent {
             {headerName: "User", field: "display", width: 10},
         ];
 
-        route.params.subscribe((params: Params) => {
+        this.route.params.subscribe((params: Params) => {
             if (params && params["idCoreFacility"]) {
                 this.idCoreFacility = params["idCoreFacility"];
             }
@@ -189,6 +201,9 @@ export class ConfigureAnnotationsComponent {
         this.appliesToPlatform.valueChanges.subscribe(() => {
             this.refreshListFilteredApplication();
         });
+        this.formGroup.markAsPristine();
+        this.primaryDisable = (action) => (this.formGroup.invalid || !this.selectedProperty) && !this.formGroup.dirty;
+        this.dirty = () => this.formGroup.dirty;
     }
 
     private annotFormatter(params: any) {
@@ -251,13 +266,13 @@ export class ConfigureAnnotationsComponent {
             }
 
 
-            if (this.idOrganism && this.idOrganism != "" && !ConfigureAnnotationsComponent.hasMatchInList(this.idOrganism, prop.appliesToOrganism)) {
+            if (this.idOrganism && this.idOrganism !== "" && !ConfigureAnnotationsComponent.hasMatchInList(this.idOrganism, prop.appliesToOrganism)) {
                 return false;
             }
-            if (this.idAnalysisType && this.idAnalysisType != "" && !ConfigureAnnotationsComponent.hasMatchInList(this.idAnalysisType, prop.appliesToAnalysisType)) {
+            if (this.idAnalysisType && this.idAnalysisType !== "" && !ConfigureAnnotationsComponent.hasMatchInList(this.idAnalysisType, prop.appliesToAnalysisType)) {
                 return false;
             }
-            if (this.requestCategory && this.requestCategory != "" && !ConfigureAnnotationsComponent.hasMatchInList(this.requestCategory, prop.appliesToRequestCategory)) {
+            if (this.requestCategory && this.requestCategory !== "" && !ConfigureAnnotationsComponent.hasMatchInList(this.requestCategory, prop.appliesToRequestCategory)) {
                 return false;
             }
 
@@ -554,23 +569,23 @@ export class ConfigureAnnotationsComponent {
             let propName: string = this.nameFC.value;
             propName = propName.trim().toLowerCase();
             if (!propName) {
-                this.dialogsService.confirm("Please enter a name", null);
+                this.dialogsService.alert("Please enter a name", null, DialogType.VALIDATION);
                 return;
             }
             for (let reservedName of this.constantsService.RESERVED_SAMPLE_SHEET_COL_NAMES) {
                 if (reservedName.toLowerCase() === propName) {
-                    this.dialogsService.confirm("Please enter a different name, '" + propName + "' is reserved", null);
+                    this.dialogsService.alert("Please enter a different name, '" + propName + "' is reserved", null, DialogType.VALIDATION);
                     return;
                 }
             }
 
             if (!this.forAnalysisFC.value && !this.forDataTrackFC.value && !this.forSampleFC.value && !this.forRequestFC.value) {
-                this.dialogsService.confirm("Please choose the object(s) the annotation applies to", null);
+                this.dialogsService.alert("Please choose the object(s) the annotation applies to", null, DialogType.VALIDATION);
                 return;
             }
 
             if (this.forRequestFC.value && this.currentPlatforms.length < 1) {
-                this.dialogsService.confirm("Annotations for experiment requests require at least 1 experiment platform", null);
+                this.dialogsService.alert("Annotations for experiment requests require at least 1 experiment platform", null, DialogType.VALIDATION);
                 return;
             }
         }
@@ -609,7 +624,7 @@ export class ConfigureAnnotationsComponent {
                         duration: 2000,
                     });
                     if (responseJSON.inactivate === "true") {
-                        this.dialogsService.confirm("Certan options were inactivated instead of deleted because they are associated with existing samples", null);
+                        this.dialogsService.alert("Certan options were inactivated instead of deleted because they are associated with existing samples", null, DialogType.WARNING);
                     }
                     this.selectedProperty = null;
                     this.refreshPropertyList();
@@ -620,7 +635,7 @@ export class ConfigureAnnotationsComponent {
                 error = true;
             }
             if (error) {
-                this.dialogsService.confirm("An error occurred while saving the annotation", null);
+                this.dialogsService.error("An error occurred while saving the annotation");
             }
             this.showSpinner = false;
         });
@@ -659,7 +674,7 @@ export class ConfigureAnnotationsComponent {
 
     public deleteAnnotation(): void {
         if (this.selectedProperty && this.selectedProperty.canDelete === "Y" && this.selectedProperty.idProperty) {
-            this.dialogsService.confirm("Are you sure you want to remove annotation '" + this.selectedProperty.name + "'?", " ").subscribe((result: boolean) => {
+            this.dialogsService.confirm("Are you sure you want to remove annotation '" + this.selectedProperty.name + "'?").subscribe((result: boolean) => {
                 if (result) {
                     let params: URLSearchParams = new URLSearchParams();
                     params.set("idProperty", this.selectedProperty.idProperty);
@@ -683,7 +698,7 @@ export class ConfigureAnnotationsComponent {
                                 let associatedWarningMessage = "This annotation is associated with " + sampleCount + " sample(s), " +
                                     analysisCount + " analys(es), and " + dataTrackCount + " data track(s).";
                                 if (deleteAllowed) {
-                                    this.dialogsService.confirm(associatedWarningMessage + " Are you sure you want to delete?", " ").subscribe((answer: boolean) => {
+                                    this.dialogsService.confirm(associatedWarningMessage + " Are you sure you want to delete?").subscribe((answer: boolean) => {
                                         if (answer) {
                                             let params2: URLSearchParams = new URLSearchParams();
                                             params2.set("idProperty", responseJSON.idProperty);
@@ -705,7 +720,7 @@ export class ConfigureAnnotationsComponent {
                                                     error2 = true;
                                                 }
                                                 if (error2) {
-                                                    this.dialogsService.confirm("An error occurred while deleting the annotation", null);
+                                                    this.dialogsService.error("An error occurred while deleting the annotation");
                                                 }
                                             });
                                         } else {
@@ -714,8 +729,8 @@ export class ConfigureAnnotationsComponent {
                                         }
                                     });
                                 } else {
-                                    this.dialogsService.confirm(associatedWarningMessage
-                                        + "Please contact an administrator if you would like to delete the annotation and all its associated values", null);
+                                    this.dialogsService.alert(associatedWarningMessage
+                                        + "Please contact an administrator if you would like to delete the annotation and all its associated values", null, DialogType.FAILED);
                                 }
                             } else {
                                 error = true;
@@ -724,7 +739,7 @@ export class ConfigureAnnotationsComponent {
                             error = true;
                         }
                         if (error) {
-                            this.dialogsService.confirm("An error occurred while deleting the annotation", null);
+                            this.dialogsService.error("An error occurred while deleting the annotation");
                         }
                     });
                 }
@@ -754,10 +769,6 @@ export class ConfigureAnnotationsComponent {
 
     public onCriteriaChange(): void {
         this.updateDisplayedProperties();
-    }
-
-    private compareCorefn(core1,core2){
-        return core1 && core2 && core1 === core2;
     }
 
     externallyResizeGrid(){

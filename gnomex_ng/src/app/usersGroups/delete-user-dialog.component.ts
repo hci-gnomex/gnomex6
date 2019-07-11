@@ -1,28 +1,29 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
-import {Component, Inject, OnInit} from '@angular/core';
-import {Response, URLSearchParams} from "@angular/http";
+import {Component, Inject, OnInit} from "@angular/core";
+import {URLSearchParams} from "@angular/http";
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {UserService} from "../services/user.service";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
-    selector: 'new-user-dialog',
-    templateUrl: "./delete-user-dialog.html",
+    selector: "delete-user-dialog",
+    template: `
+        <div class="padded">
+            <p>Delete {{userName}}?</p>
+        </div>
+    `,
 })
 
-export class DeleteUserDialogComponent implements OnInit{
-    public rebuildUsers: boolean = false;
-    public showSpinner: boolean = false;
-    private idAppUser: string = "";
-    private userName: string = "";
+export class DeleteUserDialogComponent extends BaseGenericContainerDialog implements OnInit {
+
+    public userName: string = "";
+    private readonly idAppUser: string = "";
 
     constructor(public dialogRef: MatDialogRef<DeleteUserDialogComponent>,
                 private dialogsService: DialogsService,
                 private userService: UserService,
-                @Inject(MAT_DIALOG_DATA) private data: any,
-    ) {
+                @Inject(MAT_DIALOG_DATA) private data: any) {
+        super();
         this.idAppUser = data.idAppUser;
         this.userName = data.userName;
     }
@@ -36,8 +37,8 @@ export class DeleteUserDialogComponent implements OnInit{
         params.set("idAppUser", this.idAppUser);
 
         this.userService.deleteAppUser(params).subscribe((response: Response) => {
-            this.rebuildUsers = true;
-            this.dialogRef.close();
+            this.showSpinner = false;
+            this.dialogRef.close(true);
         });
     }
 

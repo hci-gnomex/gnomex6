@@ -8,23 +8,23 @@ import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode, SelectionChangedEvent} from "ag-grid-community";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
     selector: 'price-sheet-view',
     templateUrl: "./price-sheet-view.component.html",
     styles: [`
         div.grid-div {
-            height: 300px;
-            width: 400px;
+            height: 15em;
+            width: 100%;
         }
     `]
 })
 
-export class PriceSheetViewComponent implements OnInit {
-
+export class PriceSheetViewComponent extends BaseGenericContainerDialog implements OnInit {
     private allExperimentPlatforms: any[];
 
-    public title: string = "Price Sheet";
+    public innerTitle: string = "Price Sheet";
     public form: FormGroup;
     private idPriceSheet: string = "0";
 
@@ -39,6 +39,7 @@ export class PriceSheetViewComponent implements OnInit {
                 private billingService: BillingService,
                 private dialogsService: DialogsService,
                 private dictionaryService: DictionaryService) {
+        super();
 
         this.allExperimentPlatforms = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY);
         this.gridColDefs = [
@@ -59,7 +60,7 @@ export class PriceSheetViewComponent implements OnInit {
             this.billingService.getPriceSheet(this.data.idPriceSheet).subscribe((result: any) => {
                 if (result && result.PriceSheet) {
                     let priceSheet: any = result.PriceSheet;
-                    this.title += " " + priceSheet.name;
+                    this.innerTitle += " " + priceSheet.name;
                     this.idPriceSheet = priceSheet.idPriceSheet;
                     this.form.controls['name'].setValue(priceSheet.name);
                     this.form.controls['active'].setValue(priceSheet.isActive === 'Y');
@@ -70,7 +71,7 @@ export class PriceSheetViewComponent implements OnInit {
                     if (result && result.message) {
                         message = ": " + result.message;
                     }
-                    this.dialogsService.confirm("An error occurred while retrieving the price sheet" + message, null);
+                    this.dialogsService.error("An error occurred while retrieving the price sheet" + message);
                 }
             });
         }
@@ -124,7 +125,7 @@ export class PriceSheetViewComponent implements OnInit {
                 if (result && result.message) {
                     message = ": " + result.message;
                 }
-                this.dialogsService.confirm("An error occurred while saving the price sheet" + message, null);
+                this.dialogsService.error("An error occurred while saving the price sheet" + message);
             }
         });
     }

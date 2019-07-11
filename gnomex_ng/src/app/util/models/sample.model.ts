@@ -1,8 +1,13 @@
+import {OnDestroy} from "@angular/core";
+import {BehaviorSubject} from "rxjs";
+
 import {DictionaryService} from "../../services/dictionary.service";
 import {Experiment} from "./experiment.model";
 import {GnomexService} from "../../services/gnomex.service";
+import {PropertyService} from "../../services/property.service";
+import {UtilService} from "../../services/util.service";
 
-export class Sample {
+export class Sample implements OnDestroy {
     public idSample:                        string = ''; // "Sample0";
     public name:                            string = ''; // "asdffdsa";
     public number:                          string = ''; // "asdffdsa";
@@ -30,7 +35,45 @@ export class Sample {
     public qualFragmentSizeTo:              string = '';
     public qualStatus:                      string = '';
     public seqPrepStatus:                   string = '';
-    public numberSequencingLanes:           string = ''; // "1";
+    public sequenceLaneCount:               string = ''; // "1";
+
+    public get numberSequencingLanes(): string {
+        return this._numberSequencingLanes;
+    }
+    public set numberSequencingLanes(value: string) {
+        this._numberSequencingLanes = value ? value : '';
+
+        this.onChange_numberSequencingLanes.next(this.numberSequencingLanes);
+    }
+    public _numberSequencingLanes:           string = ''; // "1";
+    public onChange_numberSequencingLanes:   BehaviorSubject<string> = new BehaviorSubject(this._numberSequencingLanes);
+
+
+    public createSequenceLane(): any {
+        return {
+            idSequenceLane:                  "SequenceLane",
+            notes:                           this.notes                           ? this.notes                           : "",
+            idSeqRunType:                    this.idSeqRunType                    ? this.idSeqRunType                    : "",
+            idNumberSequencingCycles:        this.idNumberSequencingCycles        ? this.idNumberSequencingCycles        : "",
+            idNumberSequencingCyclesAllowed: this.idNumberSequencingCyclesAllowed ? this.idNumberSequencingCyclesAllowed : "",
+            idSample:                        this.idSample                        ? this.idSample                        : "",
+            idGenomeBuildAlignTo:            this.idGenomeBuildAlignTo            ? this.idGenomeBuildAlignTo            : "",
+            idOrganism:                      this.idOrganism                      ? this.idOrganism                      : "",
+            organism:                        this.organism                        ? this.organism                        : "",
+        };
+    }
+
+    public createAllSequenceLanes(): any[] {
+        let result: any[] = [];
+
+        for (let i: number = 0; i < (this._numberSequencingLanes ? +this._numberSequencingLanes: 0); i++) {
+            result.push(this.createSequenceLane());
+        }
+
+        return result;
+    }
+
+
     public codeConcentrationUnit:           string = ''; // "ng/ul";
     public idSampleType:                    string = ''; // "1";
 
@@ -68,7 +111,10 @@ export class Sample {
             this._organism = value;
             this.idOrganism = value.idOrganism;
         }
+
+        this.onChange_organism.next(this.organism);
     }
+    public onChange_organism: BehaviorSubject<any> = new BehaviorSubject<any>(this.organism);
 
     private _sequencingOption: any;
     public get sequencingOption(): any {
@@ -103,7 +149,42 @@ export class Sample {
         }
     }
 
+    public get experiment(): Experiment {
+        return this._experiment;
+    }
+
+    public set experiment(value: Experiment) {
+        this._experiment = value;
+
+        this._protocols = [];
+        if (this._experiment.protocols) {
+            this._protocols = this._experiment.protocols
+        }
+
+        this.application_object = this._experiment.application;
+
+        UtilService.safelyUnsubscribe(this.onChange_codeApplication_subscription);
+
+        this.onChange_codeApplication_subscription = this._experiment.onChange_codeApplication.subscribe((value: string) => {
+            let lookup;
+
+            if (value) {
+                lookup = this.dictionaryService.getProtocolFromApplication(value);
+            }
+
+            this.application_object = lookup;
+        });
+    }
+
+    private _experiment: Experiment;
+    private _protocols: any[];
+
+
     constructor(private dictionaryService: DictionaryService) { }
+
+    ngOnDestroy(): void {
+        UtilService.safelyUnsubscribe(this.onChange_codeApplication_subscription);
+    }
 
     public static createSampleObjectFromAny(dictionaryService: DictionaryService, source: any): Sample {
         let sample: Sample = new Sample(dictionaryService);
@@ -137,6 +218,7 @@ export class Sample {
         sample.cloneProperty("qualStatus", source);
         sample.cloneProperty("seqPrepStatus", source);
         sample.cloneProperty("numberSequencingLanes", source);
+        sample.cloneProperty("sequenceLaneCount", source);
         sample.cloneProperty("codeConcentrationUnit", source);
         sample.cloneProperty("idSampleType", source);
         sample.cloneProperty("sampleType", source);
@@ -171,9 +253,18 @@ export class Sample {
         return sample;
     }
 
-    public static createNewSamplesForExperiment(experiment: Experiment, dictionaryService: DictionaryService, gnomexService: GnomexService): void {
+    public static createNewSamplesForExperiment(experiment: Experiment, dictionaryService: DictionaryService, propertyService: PropertyService, gnomexService: GnomexService): void {
         if (!experiment) {
             return;
+        }
+
+        let defaultValue_multiplexGroupNumber_property = propertyService.getProperty(PropertyService.PROPERTY_DEFAULT_VALUE_MULTIPLEX_LANE_COLUMN, experiment.idCoreFacility, experiment.codeRequestCategory);
+        let defaultValue_multiplexGroupNumber: string;
+
+        if (defaultValue_multiplexGroupNumber_property && defaultValue_multiplexGroupNumber_property.propertyValue) {
+            defaultValue_multiplexGroupNumber = defaultValue_multiplexGroupNumber_property.propertyValue;
+        } else {
+            defaultValue_multiplexGroupNumber = null;
         }
 
         if (experiment && experiment.numberOfSamples) {
@@ -231,7 +322,13 @@ export class Sample {
 
                     obj.index = experiment.samples.length + 1;
                     obj.idSample = 'Sample' + Sample.getNextSampleId(experiment).toString();
-                    obj.multiplexGroupNumber = "";
+
+                    if (defaultValue_multiplexGroupNumber) {
+                        obj.multiplexGroupNumber = "" + defaultValue_multiplexGroupNumber;
+                    } else {
+                        obj.multiplexGroupNumber = "";
+                    }
+
                     obj.name = "";
                     obj.canChangeSampleName = 'Y';
                     obj.canChangeSampleType = 'Y';
@@ -314,6 +411,7 @@ export class Sample {
             qualStatus:                      this.qualStatus,
             seqPrepStatus:                   this.seqPrepStatus,
             numberSequencingLanes:           this.numberSequencingLanes,
+            sequenceLaneCount:               this.sequenceLaneCount,
             codeConcentrationUnit:           this.codeConcentrationUnit,
             idSampleType:                    this.idSampleType,
             idSampleSource:                  this.idSampleSource,

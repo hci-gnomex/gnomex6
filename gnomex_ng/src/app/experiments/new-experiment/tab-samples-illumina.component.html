@@ -34,7 +34,7 @@
                     <img class="icon" [src]="constService.ICON_DOWNLOAD">
                     Download Sample Sheet
                 </button>
-                <mat-checkbox *ngIf="(_state === this.STATE_NEW || (_state === this.STATE_EDIT && this.showCcCheckbox)) && experiment?.isExternal !== 'Y'" #ccCheckbox class="double-left-padded" (change)="toggleCC($event)">Enter CC Numbers</mat-checkbox>
+                <mat-checkbox *ngIf="this.showCcCheckbox" #ccCheckbox class="double-left-padded" (change)="toggleCC($event)">Enter CC Numbers</mat-checkbox>
             </div>
             <div class="full-width flex-grow">
                 <div #oneEmWidth class="no-height single-em"></div>

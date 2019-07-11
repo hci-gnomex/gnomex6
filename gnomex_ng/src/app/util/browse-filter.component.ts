@@ -3,7 +3,6 @@ import {URLSearchParams} from "@angular/http";
 
 import {LabListService} from "../services/lab-list.service";
 import {GetLabService} from "../services/get-lab.service";
-import {jqxComboBox} from "jqwidgets-framework";
 import {AppUserListService} from "../services/app-user-list.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {ExperimentsService} from "../experiments/experiments.service";
@@ -18,6 +17,7 @@ import {UserPreferencesService} from "../services/user-preferences.service";
 import {HttpParams} from "@angular/common/http";
 import {UtilService} from "../services/util.service";
 import {PropertyService} from "../services/property.service";
+import {ConstantsService} from "../services/constants.service";
 
 @Component({
     selector: 'browse-filter',
@@ -27,11 +27,9 @@ import {PropertyService} from "../services/property.service";
             background: gainsboro;
         }
 
-        div.filter {
+        .filter {
             font-size: 12px;
-            float: left;
             width: 100%;
-            vertical-align: center;
             border: 1px solid grey;
             background-color: white;
         }
@@ -68,10 +66,6 @@ import {PropertyService} from "../services/property.service";
             padding-left: 0.5em;
         }
 
-        jqxComboBox.inlineComboBox {
-            display: inline-block;
-        }
-
         div.divider {
             display: inline;
             border-left: 1px solid lightgrey;
@@ -97,6 +91,17 @@ import {PropertyService} from "../services/property.service";
 
         label.following-label {
             margin-left: 0.3em;
+        }
+        .padding-right {
+            padding-right: 1em;
+        }
+        .collapse-expand-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .collapse-expand-icon {
+            height: 1.5em;
         }
     `]
 })
@@ -154,8 +159,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     private idGenomeBuildString: string;
     private genomeBuildList: any[] = [];
 
-    private showCCNumberInput: boolean = false;
-    private ccNumberString: string;
+    public showCCNumberInput: boolean = false;
+    public ccNumberString: string;
 
     private showExperimentsRadioGroup: boolean = false;
     private experimentsRadioString: string;
@@ -205,11 +210,13 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
 
     private labListSubscription: Subscription;
 
+    public isCollapsed: boolean = false;
+
     constructor(private labListService: LabListService, private getLabService: GetLabService,
                 private appUserListService: AppUserListService, private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private experimentsService: ExperimentsService, private analysisService: AnalysisService, private dataTrackService: DataTrackService,
                 private dictionaryService: DictionaryService, private billingService: BillingService,
-                private dialogService: DialogsService,
+                private dialogService: DialogsService, public constantsService: ConstantsService,
                 private propertyService: PropertyService,
                 public prefService: UserPreferencesService) {
         this.showMore = false;
@@ -221,6 +228,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         let isBillingAdminState: boolean = this.createSecurityAdvisorService.isBillingAdmin;
         let isGuestState: boolean = this.createSecurityAdvisorService.isGuest;
         if (this.mode === this.EXPERIMENT_BROWSE) {
+            let isBSTLinkageSupported: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_BST_LINKAGE_SUPPORTED);
+            let canAccessBSTX: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_ACCESS_BSTX);
             if (isAdminState) {
                 this.showAllCheckbox = true;
                 this.showLabComboBox = true;
@@ -230,11 +239,11 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showExternalExperimentsCheckbox = true;
                 this.showCoreFacilityComboBox = true;
                 this.showRequestCategoryComboBox = true;
-                this.showCCNumberInput = true;
+                this.showCCNumberInput = isBSTLinkageSupported && canAccessBSTX;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
-                    this.labList = response;
-                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
+                    this.labList = response
+                        .sort(this.prefService.createLabDisplaySortFunction());
                 });
             } else if (isGuestState) {
                 this.showMoreSwitch = true;
@@ -247,11 +256,12 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showLabMembersComboBox = true;
                 this.showCoreFacilityComboBox = true;
                 this.showRequestCategoryComboBox = true;
-                this.showCCNumberInput = true;
+                this.showCCNumberInput = isBSTLinkageSupported && canAccessBSTX;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
-                    this.labList = response.filter(lab => lab.isMyLab === 'Y');
-                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
+                    this.labList = response
+                        .filter(lab => lab.isMyLab === 'Y')
+                        .sort(this.prefService.createLabDisplaySortFunction());
                     if (this.labList.length > 1) {
                         this.showLabComboBox = true;
                     }
@@ -290,8 +300,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showMore = true;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
-                    this.labList = response;
-                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
+                    this.labList = response
+                        .sort(this.prefService.createLabDisplaySortFunction());
                 });
             } else if (isGuestState) {
                 this.showDateRangePicker = true;
@@ -307,8 +317,9 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showMoreSwitch = true;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
-                    this.labList = response.filter(lab => lab.isMyLab === 'Y');
-                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
+                    this.labList = response
+                        .filter(lab => lab.isMyLab === 'Y')
+                        .sort(this.prefService.createLabDisplaySortFunction());
                     if (this.labList.length > 1) {
                         this.showLabComboBox = true;
                     }
@@ -326,8 +337,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showVisibilityCheckboxes = true;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
-                    this.labList = response;
-                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
+                    this.labList = response
+                        .sort(this.prefService.createLabDisplaySortFunction());
                 });
             } else if (isGuestState) {
                 this.showOrganismComboBox = true;
@@ -338,8 +349,9 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showVisibilityCheckboxes = true;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
-                    this.labList = response.filter(lab => lab.isMyLab === 'Y');
-                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
+                    this.labList = response
+                        .filter(lab => lab.isMyLab === 'Y')
+                        .sort(this.prefService.createLabDisplaySortFunction());
                     if (this.labList.length > 1) {
                         this.showLabComboBox = true;
                     }
@@ -448,76 +460,57 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     }
 
     onLabSelect(event: any): void {
-        if (event.args) {
-            if (event.args.item && event.args.item.value) {
-                this.idLabString = event.args.item.value;
-                if (this.showOwnerComboBox) {
-                    this.getLabService.getLabByIdOnlyForHistoricalOwnersAndSubmitters(this.idLabString).subscribe((response: any) => {
-                        if (response.Lab.historicalOwnersAndSubmitters) {
-                            this.ownerList = UtilService.getJsonArray(response.Lab.historicalOwnersAndSubmitters, response.Lab.historicalOwnersAndSubmitters.AppUser)
-                                .sort(this.prefService.createUserDisplaySortFunction());
-                        } else {
-                            this.ownerList = [];
-                        }
-                    });
-                }
-                if (this.showBillingAccountComboBox && this.mode === this.BILLING_BROWSE) {
-                    this.getLabService.getLabBillingAccounts(this.idLabString).subscribe((response: any) => {
-                        let allBillingAccounts: any[] = response.Lab.billingAccounts;
-                        this.billingAccountList = allBillingAccounts.filter(account => {
-                            return account.idCoreFacility === this.idCoreFacilityString;
-                        });
-                    });
-                }
-            } else {
-                this.resetLabSelection();
+        if (event) {
+            this.idLabString = event;
+            if (this.showOwnerComboBox) {
+                this.getLabService.getLabByIdOnlyForHistoricalOwnersAndSubmitters(this.idLabString).subscribe((response: any) => {
+                    if (response.Lab.historicalOwnersAndSubmitters) {
+                        this.ownerList = UtilService.getJsonArray(response.Lab.historicalOwnersAndSubmitters, response.Lab.historicalOwnersAndSubmitters.AppUser)
+                            .sort(this.prefService.createUserDisplaySortFunction());
+                    } else {
+                        this.ownerList = [];
+                    }
+                });
             }
+            if (this.showBillingAccountComboBox && this.mode === this.BILLING_BROWSE) {
+                this.getLabService.getLabBillingAccounts(this.idLabString).subscribe((response: any) => {
+                    let allBillingAccounts: any[] = response.Lab.billingAccounts;
+                    this.billingAccountList = allBillingAccounts.filter(account => {
+                        return account.idCoreFacility === this.idCoreFacilityString;
+                    });
+                });
+            }
+        } else {
+            this.resetLabSelection();
         }
     }
 
-    onLabUnselect(): void {
-        this.resetLabSelection();
-    }
-
-    onMultiLabSelect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
-            this.multiSelectIdLabs.add(event.args.item.value);
-        }
-    }
-
-    onMultiLabUnselect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
-            this.multiSelectIdLabs.delete(event.args.item.value);
+    onMultiLabChange(labs: any[]): void {
+        this.multiSelectIdLabs.clear();
+        for (let lab of labs) {
+            this.multiSelectIdLabs.add(lab);
         }
     }
 
     onAppUserSelect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
-            this.idAppUserString = event.args.item.value;
+        if (event) {
+            this.idAppUserString = event;
         } else {
             this.idAppUserString = "";
         }
     }
 
-    onAppUserUnselect(): void {
-        this.idAppUserString = "";
-    }
-
     onBillingAccountSelect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
-            this.idBillingAccountString = event.args.item.value;
+        if (event) {
+            this.idBillingAccountString = event;
         } else {
             this.idBillingAccountString = "";
         }
     }
 
-    onBillingAccountUnselect(): void {
-        this.idBillingAccountString = "";
-    }
-
     onCoreFacilitySelect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
-            this.idCoreFacilityString = event.args.item.value;
+        if (event) {
+            this.idCoreFacilityString = event;
             if (this.showRequestCategoryComboBox) {
                 let requestCategories = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY);
                 this.requestCategoryList = requestCategories.filter(cat => {
@@ -529,29 +522,26 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
             }
             if (this.mode === this.BILLING_BROWSE) {
                 this.labListSubscription = this.labListService.getLabList().subscribe((response: any[]) => {
-                    this.labList = response.filter(lab => {
-                        if (lab.coreFacilities.length === undefined && !(lab.coreFacilities.CoreFacility === undefined)) {
-                            return lab.coreFacilities.CoreFacility.idCoreFacility === this.idCoreFacilityString;
-                        } else if (!(lab.coreFacilities.length === undefined)) {
-                            let index: number;
-                            for (index = 0; index < lab.coreFacilities.length; index++) {
-                                if (lab.coreFacilities[index].idCoreFacility === this.idCoreFacilityString) {
-                                    return true;
+                    this.labList = response
+                        .filter(lab => {
+                            if (lab.coreFacilities.length === undefined && !(lab.coreFacilities.CoreFacility === undefined)) {
+                                return lab.coreFacilities.CoreFacility.idCoreFacility === this.idCoreFacilityString;
+                            } else if (!(lab.coreFacilities.length === undefined)) {
+                                let index: number;
+                                for (index = 0; index < lab.coreFacilities.length; index++) {
+                                    if (lab.coreFacilities[index].idCoreFacility === this.idCoreFacilityString) {
+                                        return true;
+                                    }
                                 }
                             }
-                        }
-                        return false;
-                    });
-                    this.labList.sort(this.prefService.createLabDisplaySortFunction());
+                            return false;
+                        })
+                        .sort(this.prefService.createLabDisplaySortFunction());
                 });
             }
         } else {
             this.resetCoreFacilitySelection();
         }
-    }
-
-    onCoreFacilityUnselect(): void {
-        this.resetCoreFacilitySelection();
     }
 
     resetCoreFacilitySelection(): void {
@@ -566,8 +556,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     }
 
     onOrganismSelect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
-            this.idOrganismString = event.args.item.value;
+        if (event) {
+            this.idOrganismString = event;
             if (this.showGenomeBuildComboBox) {
                 let genomeBuilds = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.GENOME_BUILD);
                 this.genomeBuildList = genomeBuilds.filter(gen => {
@@ -582,10 +572,6 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         }
     }
 
-    onOrganismUnselect(): void {
-        this.resetOrganismSelection();
-    }
-
     resetOrganismSelection(): void {
         this.idOrganismString = "";
         this.idGenomeBuildString = "";
@@ -593,27 +579,19 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     }
 
     onGenomeBuildSelect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
-            this.idGenomeBuildString = event.args.item.value;
+        if (event) {
+            this.idGenomeBuildString = event;
         } else {
             this.idGenomeBuildString = "";
         }
     }
 
-    onGenomeBuildUnselect(): void {
-        this.idGenomeBuildString = "";
-    }
-
     onRequestCategorySelect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
-            this.codeRequestCategoryString = event.args.item.value;
+        if (event) {
+            this.codeRequestCategoryString = event;
         } else {
             this.codeRequestCategoryString = "";
         }
-    }
-
-    onRequestCategoryUnselect(): void {
-        this.codeRequestCategoryString = "";
     }
 
     onExperimentsRadioGroupChange(): void {
@@ -914,6 +892,11 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
             });
         }
     }
+
+    public toggleCollapseExpand(): void {
+        this.isCollapsed = !this.isCollapsed;
+    }
+
     ngOnDestroy(){
         if(this.labListSubscription){
             this.labListSubscription.unsubscribe();

@@ -6,14 +6,14 @@ import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
 import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
 import {Subscription} from "rxjs";
 import {IRelatedObject} from "../../util/interfaces/related-objects.model";
-import {MatDialog, MatDialogConfig, MatDialogRef, MatTabChangeEvent} from "@angular/material";
+import {MatDialog, MatDialogConfig, MatTabChangeEvent} from "@angular/material";
 import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
 import {ConstantsService} from "../../services/constants.service";
 import {LinkToExperimentDialogComponent} from "./index";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
 import {PropertyService} from "../../services/property.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {DataTrackService} from "../../services/data-track.service";
 import {ManagePedFileWindowComponent} from "./manage-ped-file-window.component";
 import {FormGroup} from "@angular/forms";
@@ -21,6 +21,7 @@ import {HttpParams} from "@angular/common/http";
 import {first} from "rxjs/operators";
 import {GnomexService} from "../../services/gnomex.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 
 @Component({
@@ -62,7 +63,6 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
 
     public analysisTreeNode: any;
     private analysisTreeNodeSubscription: Subscription;
-    private linkExpDialogRef: MatDialogRef<LinkToExperimentDialogComponent>;
 
 
 
@@ -88,8 +88,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
 
         this.route.data.forEach((data: any) => {
             this.analysisService.analysisOverviewForm.reset();
-            this.analysis = data.analysis.Analysis;
-            this.lab = data.analysis.Lab;
+            this.analysis = data.analysis ? data.analysis.Analysis : null;
             if(this.analysis) {
                 let annots = this.analysis.AnalysisProperties;
                 this.showRelatedDataTab = this.initRelatedData(this.analysis);
@@ -170,13 +169,20 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
 
     makeLinkToExperiment() {
         let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "56em";
         config.panelClass = "no-padding-dialog";
+        config.autoFocus = false;
+        config.disableClose = true;
         config.data = {
             idAnalysis : this.analysis ? this.analysis.idAnalysis : "",
             idLab: this.analysis ? this.analysis.idLab : ""
         };
 
-        this.linkExpDialogRef = this.dialog.open(LinkToExperimentDialogComponent, config );
+        this.dialogsService.genericDialogContainer(LinkToExperimentDialogComponent, "Link to Experiment", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_LINK, name: "Link", internalAction: "linkAnalysis"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]});
 
     }
 
@@ -186,11 +192,13 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
         configuration.panelClass = "no-padding-dialog";
         configuration.autoFocus = false;
         configuration.data = {
-            name:   "Analysis",
             number: this.analysis ? this.analysis.number : "",
             type:   "analysisNumber"
         };
-        this.dialog.open(ShareLinkDialogComponent, configuration);
+        this.dialogsService.genericDialogContainer(ShareLinkDialogComponent,
+            "Web Link for Analysis " + (this.analysis ? this.analysis.number : ""), null, configuration,
+            {actions: [{type: ActionType.PRIMARY, name: "Copy To Clipboard", internalAction: "copyToClipboard"}
+                ]});
     }
 
     public autoDistributeDataTracks(): void {
@@ -198,7 +206,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
             let genomeBuilds: any[] = this.analysis.genomeBuilds ? (Array.isArray(this.analysis.genomeBuilds) ? this.analysis.genomeBuilds : [this.analysis.genomeBuilds.GenomeBuild]) : [];
             let genomeBuild: any = genomeBuilds.length > 0 ? genomeBuilds[0] : null;
             if (!genomeBuild || !genomeBuild.isActive || genomeBuild.isActive !== "Y") {
-                this.dialogsService.alert("An active genome build is required to create data tracks");
+                this.dialogsService.alert("An active genome build is required to create data tracks", "Invalid");
                 return;
             }
 
@@ -208,7 +216,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
                 if (result && result.result && result.result === "SUCCESS") {
 
                     // TODO refresh download list of analysis files
-                    this.dialogsService.alert("Data tracks created for all applicable files");
+                    this.dialogsService.alert("Data tracks created for all applicable files", null, DialogType.SUCCESS);
                 }
             }, (err: IGnomexErrorResponse) => {
             });
@@ -217,10 +225,16 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
 
     public showManagePEDFileWindow(): void {
         let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = "52.5em";
+        configuration.maxWidth = "52.5em";
+        configuration.height = "30.5em";
+        configuration.panelClass = "no-padding-dialog";
+        configuration.autoFocus = true;
+        configuration.disableClose = true;
         configuration.data = {
             idAnalysis: this.analysis && this.analysis.idAnalysis ? this.analysis.idAnalysis : ""
         };
-        this.dialog.open(ManagePedFileWindowComponent, configuration);
+        this.dialogsService.genericDialogContainer(ManagePedFileWindowComponent, null, null, configuration);
     }
 
     save() {
@@ -267,7 +281,11 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
     editButtonClicked(element: Element) {
         if(this.isEditMode && this.analysisService.analysisOverviewForm.dirty) {
             let warningMessage: string = "Your changes haven't been saved. Continue anyway?";
-            this.dialogsService.yesNoDialog(warningMessage, this, "changeEditMode", null, "Changing EditMode");
+            this.dialogsService.confirm(warningMessage).subscribe((result: any) => {
+                if(result) {
+                    this.changeEditMode();
+                }
+            });
         } else {
             this.changeEditMode();
         }

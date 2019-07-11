@@ -1,17 +1,19 @@
-import {Component, Input, OnDestroy, OnInit} from "@angular/core";
+import {Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from "@angular/core";
 import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {LabListService} from "../../services/lab-list.service";
 import {GetLabService} from "../../services/get-lab.service";
 import {Subscription, throwError} from "rxjs";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {PropertyService} from "../../services/property.service";
 import {ConstantsService} from "../../services/constants.service";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
 import {ExperimentsService} from "../experiments.service";
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {UtilService} from "../../services/util.service";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 
 @Component({
@@ -127,8 +129,10 @@ import {UtilService} from "../../services/util.service";
         }
 
     `]
-}) export class ExperimentOverviewTabComponent implements OnInit, OnDestroy {
+}) export class ExperimentOverviewTabComponent implements OnInit, OnDestroy, OnChanges {
     private labListSubscription: Subscription;
+
+    @Input() editMode: boolean;
 
     @Input('experiment') set experiment(experiment: any) {
         this.isReady_filteredApplicationDictionary = false;
@@ -137,10 +141,12 @@ import {UtilService} from "../../services/util.service";
             this.dialogService.startDefaultSpinnerDialog();
         });
 
+        this.labListService.getLabList_FromBackEnd();
+
         this._experiment = experiment;
 
         if (!experiment) {
-            this.dialogService.alert("Cannot load experiment data");
+            this.dialogService.alert("Cannot load experiment data", null, DialogType.FAILED);
             throwError(new Error("Cannot load experiment data"));
             return;
         }
@@ -302,11 +308,11 @@ import {UtilService} from "../../services/util.service";
                     this.processedWorkflowSteps.push(tempCopy);
                 }
             }
-
             this.updateCollaboratorsDisplay();
         });
     };
 
+    public overviewTabForm: FormGroup;
     public _experiment: any = {};
 
     public lab: any;
@@ -421,10 +427,7 @@ import {UtilService} from "../../services/util.service";
     public get isAdmin(): boolean {
         return this.secAdvisor.isAdmin;
     }
-    
-    public get isEditMode(): boolean {
-        return this.experimentsService.getEditMode();
-    }
+
 
     constructor(private constantsService: ConstantsService,
                 public secAdvisor: CreateSecurityAdvisorService,
@@ -432,10 +435,10 @@ import {UtilService} from "../../services/util.service";
                 private dictionaryService: DictionaryService,
                 private getLabService: GetLabService,
                 private labListService: LabListService,
-                private matDialog: MatDialog,
                 private experimentsService: ExperimentsService,
                 private propertyService: PropertyService,
-                public prefService: UserPreferencesService) { }
+                public prefService: UserPreferencesService,
+                private fb: FormBuilder) { }
 
     public get selectedExperimentCategory(): string {
         if (!this._experiment || !this._experiment.experimentCategoryName) {
@@ -455,6 +458,15 @@ import {UtilService} from "../../services/util.service";
         setTimeout(() => {
             this.dialogService.startDefaultSpinnerDialog();
         });
+        
+        this.overviewTabForm = this.fb.group({
+            idLab: [{value: "", disabled: true}, Validators.required],
+            idProject: [{value: "", disabled: true}],
+            codeApplication: [{value: "", disabled: true}],
+            idAppUser: [{value: "", disabled: true}, Validators.required],
+            idSubmitter: [{value: "", disabled: true}],
+        });
+        this.experimentsService.addExperimentOverviewFormMember(this.overviewTabForm, this.constructor.name);
 
         this.applicationDictionary     = this.dictionaryService.getEntries('hci.gnomex.model.Application');
         this.coreFacilitiesDictionary  = this.dictionaryService.getEntries('hci.gnomex.model.CoreFacility');
@@ -480,6 +492,8 @@ import {UtilService} from "../../services/util.service";
 
             this.filterLabDictionary();
         });
+
+        this.labListService.getLabList_FromBackEnd();
 
         if (this._experiment && this._experiment.idLab && !this.labSubscription) {
             this.labSubscription = this.getLabService.getLabById(this._experiment.idLab).subscribe((result) => {
@@ -536,6 +550,14 @@ import {UtilService} from "../../services/util.service";
         } else {
             this.privacyExp = null;
         }
+
+        this.updateForm();
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (this.overviewTabForm) {
+            this.updateForm();
+        }
     }
 
     ngOnDestroy(): void {
@@ -544,6 +566,35 @@ import {UtilService} from "../../services/util.service";
         }
         if(this.labListSubscription){
             this.labListSubscription.unsubscribe();
+        }
+    }
+
+    updateForm() {
+        this.overviewTabForm.get("idLab").setValue(this._experiment.idLab);
+        this.overviewTabForm.get("idProject").setValue(this._experiment.idProject);
+        this.overviewTabForm.get("idAppUser").setValue(this._experiment.idAppUser);
+        if(!this.editMode || !(this.isAdmin || this._experiment.canUpdate === "Y")) {
+            this.overviewTabForm.get("idLab").disable();
+            this.overviewTabForm.get("idProject").disable();
+            this.overviewTabForm.get("idAppUser").disable();
+        } else {
+            this.overviewTabForm.get("idLab").enable();
+            this.overviewTabForm.get("idProject").enable();
+            this.overviewTabForm.get("idAppUser").enable();
+        }
+
+        this.overviewTabForm.get("codeApplication").setValue(this._experiment.codeApplication);
+        if(!this.editMode || !(this.isAdmin || (this._experiment.canUpdate === "Y" && this._experiment.isExternal === "Y"))) {
+            this.overviewTabForm.get("codeApplication").disable();
+        } else {
+            this.overviewTabForm.get("codeApplication").enable();
+        }
+
+        this.overviewTabForm.get("idSubmitter").setValue(this._experiment.idSubmitter);
+        if(!this.editMode || !this.isAdmin) {
+            this.overviewTabForm.get("idSubmitter").disable();
+        } else {
+            this.overviewTabForm.get("idSubmitter").enable();
         }
     }
 
@@ -564,6 +615,8 @@ import {UtilService} from "../../services/util.service";
         configuration.height = '33em';
         configuration.width  = '44em';
         configuration.panelClass = 'no-padding-dialog';
+        configuration.disableClose = true;
+        configuration.autoFocus = false;
 
         configuration.data = {
             currentCollaborators:  this._experiment.collaborators,
@@ -572,37 +625,40 @@ import {UtilService} from "../../services/util.service";
             idFieldValue: this._experiment.idRequest
         };
 
-        let collaboratorsDialogReference = this.matDialog.open(CollaboratorsDialogComponent, configuration);
-
-        collaboratorsDialogReference.afterClosed().subscribe(result => {
-            if (result) {
+        this.dialogService.genericDialogContainer(CollaboratorsDialogComponent,
+            "Collaborators for Experiment " + this._experiment.number,
+            this.constantsService.ICON_GROUP, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Update", internalAction: "onClickUpdate"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]}).subscribe((result: any) => {
+            if(result) {
                 this._experiment.collaborators = result;
             }
-
             this.updateCollaboratorsDisplay();
         });
     }
 
 
     public onChange_lab(event: any): void {
-        if (event && event.value) {
+        if (event) {
             let temp: any[] = this.filteredLabDictionary.filter((a) => {
-                return a.idLab === event.value;
+                return a.idLab === event;
             });
 
             this._experiment.labName          = temp && temp.length === 1 ? temp[0].display : '';
             this._experiment.truncatedLabName = '';
 
-             this.getLabService.getLabById(this._experiment.idLab).subscribe((result: any) => {
-                 this.lab = result.Lab;
+            this.getLabService.getLabById(this._experiment.idLab).subscribe((result: any) => {
+                this.lab = result.Lab;
             });
         }
     }
 
     public onChange_application(event: any): void {
-        if (event && event.value) {
+        if (event) {
             let temp: any[] = this.filteredApplicationDictionary.filter((a) => {
-                return a.codeApplication === event.value;
+                return a.codeApplication === event;
             });
 
             this._experiment.application.Application = temp && temp.length === 1 ? temp[0] : null;
@@ -610,9 +666,9 @@ import {UtilService} from "../../services/util.service";
     }
 
     public onChange_project(event: any): void {
-        if (event && event.value) {
+        if (event) {
             let temp: any[] = this.projectsDictionary.filter((a) => {
-                return a.idProject === event.value;
+                return a.idProject === event;
             });
 
             this._experiment.project.Project = temp && temp.length === 1 ? temp[0] : null;
@@ -624,12 +680,12 @@ import {UtilService} from "../../services/util.service";
             return;
         }
 
-        if (event && event.value) {
+        if (event) {
             let temp: any[] = this.possibleOwnersForLabDictionary.filter((a) => {
-                return a.idAppUser === event.value;
+                return a.idAppUser === event;
             });
 
-            this._experiment.ownerName = temp && temp.length === 1 ? temp[0].firstLastDisplayName : '';
+            this._experiment.ownerName = temp && temp.length === 1 ? temp[0][this.prefService.userDisplayField] : '';
         }
     }
 
@@ -638,9 +694,9 @@ import {UtilService} from "../../services/util.service";
             return;
         }
 
-        if (event && event.value) {
+        if (event) {
             let temp: any[] = this.possibleSubmittersForLabDictionary.filter((a) => {
-                return a.idAppUser === event.value;
+                return a.idAppUser === event;
             });
 
             this._experiment.submitterName = temp && temp.length === 1 ? temp[0].firstLastDisplayName : '';

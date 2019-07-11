@@ -1,73 +1,82 @@
-import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
+import {Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 
 import {EmailRelatedUsersService} from "./email-related-users.service";
 import {Subscription} from "rxjs";
-import {DialogsService} from "../popup/dialogs.service";
+import {DialogsService, DialogType} from "../popup/dialogs.service";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import {BaseGenericContainerDialog} from "../popup/base-generic-container-dialog";
+import {GDAction} from "../interfaces/generic-dialog-action.model";
+import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
 
 @Component({
 	selector: "emailRelatedUsersPopup",
-	templateUrl: "email-related-users-popup.component.html",
+	template: `
+        <div class="full-height full-width padded">
+            <mat-form-field class="full-width">
+                <input matInput
+                       class="full-width"
+                       [(ngModel)]="subject"
+                       placeholder="Subject"/>
+            </mat-form-field>
+			<label class="label" for="emailEditor">Email Body:</label>
+			<angular-editor #emailEditorRef class="full-width" [(ngModel)]="body"
+							[config]="editorConfig" id="emailEditor">
+			</angular-editor>
+        </div>
+	`,
 	styles: [`
-		
-		img { margin-right:0.2em; }
+        :host /deep/ angular-editor#emailEditor #editor {
+            resize: none;
+        }
 
-        .popup-body { 
-			background-color: #eeeeeb;
-			height: 15em;
-		}
-		
-		.no-padding { padding: 0; }
-		.no-margin  { margin:  0; }
-
-        .block { display: block; }
-			
-		.t  { display: table;      }
-		.tr { display: table-row;  }
-		.td { display: table-cell; }
-			
-		.full-width  { width: 100%;  }
-		.full-height { height: 100%; }
-		
-		.button-container { padding: 0.2em 0 0.2em 0.6em; }
-			
-		.align-center-center {
-			text-align: center;
-			vertical-align: middle;
-		}
-		.right-align { text-align: right; }
-		
-		.plain-background { background-color: white; }
-
-		.bordered { border: 1px solid #b7babc; }
-		
-		.top-bottom-padded   { padding:0.4rem 0; }
-        
-		.padded { padding:0.4rem; }
-		
-		.header {
-            background-color: #88b47c; 
-			color: #ffffff;
-			padding: 0.4rem 0.8rem;
-		}
-		
+        :host /deep/ angular-editor#emailEditor .angular-editor-button[title="Insert Image"],
+        :host /deep/ angular-editor#emailEditor .angular-editor-button[title="Unlink"],
+        :host /deep/ angular-editor#emailEditor .angular-editor-button[title="Horizontal Line"],
+        :host /deep/ angular-editor#emailEditor #strikeThrough-emailEditor,
+        :host /deep/ angular-editor#emailEditor #subscript-emailEditor,
+        :host /deep/ angular-editor#emailEditor #superscript-emailEditor,
+        :host /deep/ angular-editor#emailEditor #link-emailEditor,
+        :host /deep/ angular-editor#emailEditor #underline-emailEditor,
+        :host /deep/ angular-editor#emailEditor #justifyLeft-emailEditor,
+        :host /deep/ angular-editor#emailEditor #justifyCenter-emailEditor,
+        :host /deep/ angular-editor#emailEditor #justifyRight-emailEditor,
+        :host /deep/ angular-editor#emailEditor #justifyFull-emailEditor,
+        :host /deep/ angular-editor#emailEditor #foregroundColorPicker-emailEditor,
+        :host /deep/ angular-editor#emailEditor #backgroundColorPicker-emailEditor,
+        :host /deep/ angular-editor#emailEditor #toggleEditorMode-emailEditor,
+        :host /deep/ angular-editor#emailEditor #customClassSelector-emailEditor {
+            display: none;
+        }
 	`]
 })
-export class EmailRelatedUsersPopupComponent implements OnInit, OnDestroy {
+export class EmailRelatedUsersPopupComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
-	protected subject: string = '';
-	protected body: string = '';
+	@ViewChild("emailEditorRef") emailEditor: AngularEditorComponent;
+	public primaryDisable: (action?: GDAction) => boolean;
+	protected subject: string = "";
+	protected body: string = "";
 
-	private disableSendEmailButton = false;
+    editorConfig: AngularEditorConfig = {
+        height: "15em",
+        minHeight: "5em",
+        maxHeight: "15em",
+        width: "100%",
+        minWidth: "5em",
+        editable: true,
+        defaultFontName: "Arial",
+        defaultFontSize: "2",
+	};
 
 	private idRequests: number[] = null;
 
-	private emailRelatedUsersSubscription:Subscription;
+	private emailRelatedUsersSubscription: Subscription;
 
 	constructor(private dialogService: DialogsService,
-				private emailRelatedUsersService:EmailRelatedUsersService,
+				private emailRelatedUsersService: EmailRelatedUsersService,
 				private dialogRef: MatDialogRef<EmailRelatedUsersPopupComponent>,
-				@Inject(MAT_DIALOG_DATA) public data: any) { }
+				@Inject(MAT_DIALOG_DATA) public data: any) {
+		super();
+	}
 
 	ngOnInit(): void {
 		this.emailRelatedUsersSubscription = this.emailRelatedUsersService.getEmailSentSubscription().subscribe((response) => {
@@ -81,6 +90,10 @@ export class EmailRelatedUsersPopupComponent implements OnInit, OnDestroy {
 				this.dialogRef.close();
 			});
 		}
+
+		this.primaryDisable = () => {
+			return !(this.subject && this.body);
+		};
 	}
 
 	ngOnDestroy(): void {
@@ -91,28 +104,14 @@ export class EmailRelatedUsersPopupComponent implements OnInit, OnDestroy {
 		this.emailRelatedUsersService.sendEmailToRequestRelatedUsers(this.idRequests, this.subject, this.body);
 	}
 
-	cancelButtonClicked(): void {
-		this.dialogRef.close();
-	}
-
-	private onEmailServiceResponse(response:boolean) {
+	private onEmailServiceResponse(response: boolean) {
 		if(response) {
-			this.dialogService.alert('Email sent!').subscribe(() => {
+			this.dialogService.alert("Email sent!", null, DialogType.SUCCESS).subscribe(() => {
                 this.dialogRef.close();
 			});
 		} else {
-            this.dialogService.alert('Error : There was a problem sending the email.');
+            this.dialogService.error("There was a problem sending the email.");
 		}
 	}
 
-	protected emailIsInvalid(): boolean {
-        if(this.subject
-			&& this.subject !== ""
-			&& this.body
-			&& this.body !== "") {
-            return false;
-        } else {
-            return true;
-        }
-	}
 }

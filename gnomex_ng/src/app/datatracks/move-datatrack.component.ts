@@ -1,81 +1,85 @@
-import {Component, Inject} from '@angular/core';
-import {Response, URLSearchParams} from "@angular/http";
-import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
+import {Component, Inject} from "@angular/core";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {DataTrackService} from "../services/data-track.service";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {HttpParams} from "@angular/common/http";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
-    selector: 'move-data-track',
-    templateUrl: "./move-datatrack-dialog.html",
+    selector: "move-data-track",
+    template: `
+        <div class="flex-container-col full-width full-height">
+            <div class="full-width full-height double-padded">
+                Do you want to move or copy items to {{targetFolder}}?
+            </div>
+            <div class="flex-container-row justify-flex-end generic-dialog-footer-colors">
+                <save-footer (saveClicked)="doMoveCopy('M')" name="Move"></save-footer>
+                <save-footer (saveClicked)="doMoveCopy('C')" name="Copy"></save-footer>
+                <save-footer [actionType]="actionType" (saveClicked)="doCancel()" name="Cancel"></save-footer>
+            </div>
+        </div>
+    `,
 })
 
-export class MoveDataTrackComponent {
-    private selectedItem: ITreeNode;
-    public title: string = "";
-    private idGenomeBuild: string = "";
+export class MoveDataTrackComponent extends BaseGenericContainerDialog {
 
-    public folderName: string = "";
-    public idLab: string = "";
-    public currentItem: any;
-    public targetItem: any;
-    public showSpinner: boolean = false;
-    public items: any[] = [];
-    public noButton: boolean = true;
-    private targetFolder: any;
+    public actionType: any = ActionType.SECONDARY ;
+    public targetFolder: any;
+    private currentItem: any;
+    private targetItem: any;
 
     constructor(public dialogRef: MatDialogRef<MoveDataTrackComponent>,
                 private dataTrackService: DataTrackService,
                 private dialogsService: DialogsService,
                 @Inject(MAT_DIALOG_DATA) private data: any) {
+        super();
 
+        if(this.data) {
             this.currentItem = data.currentItem;
             this.targetItem = data.targetItem;
             this.targetFolder = this.targetItem.label;
             if (this.targetItem.idGenomeBuild !== this.currentItem.idGenomeBuild) {
-                this.dialogsService.confirm("Cannot move data track to a different genome build", "");
+                this.dialogsService.alert("Cannot move data track to a different genome build", "", DialogType.WARNING);
                 this.doCancel();
-                this.dialogRef.close();
             }
+        }
     }
 
     public doCancel(): void {
-        this.noButton = true;
+        this.dialogRef.close(false);
     }
 
     public doMoveCopy(mode: any): void {
         this.showSpinner = true;
-        this.noButton = false;
         let params: HttpParams = new HttpParams();
         params = params.set("idGenomeBuild", this.currentItem.idGenomeBuild);
-        if (mode ==="M") {
+        if (mode === "M") {
             params = params.set("isMove", "Y");
-        }
-        else {
+        } else {
             params = params.set("isMove", "N");
         }
         if (this.currentItem.isDataTrackFolder) {
             params = params.set("idDataTrackFolder", this.currentItem.idDataTrackFolder);
             params = params.set("idParentDataTrackFolder", this.targetItem.idDataTrackFolder);
             params = params.set("name", "DataTrackFolder");
-            this.dataTrackService.moveDataTrackFolder(params).subscribe((response: Response) => {
+            this.dataTrackService.moveDataTrackFolder(params).subscribe((response: any) => {
                 this.showSpinner = false;
-                this.dialogRef.close();
+                this.dialogRef.close(true);
                 this.dataTrackService.refreshDatatracksList_fromBackend();
-            },(err:IGnomexErrorResponse) =>{
+            }, (err: IGnomexErrorResponse) => {
                 this.showSpinner = false;
             });
         } else {
             params = params.set("idDataTrack", this.currentItem.idDataTrack);
             params = params.set("idDataTrackFolder", this.targetItem.idDataTrackFolder);
             params = params.set("idDataTrackFolderOld", this.currentItem.idDataTrackFolder);
-            this.dataTrackService.moveDataTrack(params).subscribe((response: Response) => {
+            this.dataTrackService.moveDataTrack(params).subscribe((response: any) => {
                 this.showSpinner = false;
-                this.dialogRef.close();
+                this.dialogRef.close(true);
                 this.dataTrackService.refreshDatatracksList_fromBackend();
-            },(err:IGnomexErrorResponse) =>{
+            }, (err: IGnomexErrorResponse) => {
                 this.showSpinner = false;
             });
         }

@@ -29,13 +29,9 @@
                 <img [src]="constService.ICON_FOLDER_DELETE" >
                 Remove/Unlink
             </button>
-
-
         </div>
-
     </div>
-
-    <div class="full-width flex-row-container flex-grow overflow-auto">
+    <div class="full-width flex-container-row flex-grow overflow-auto">
         <as-split > <!-- split  mat-tabs have issues -->
             <as-split-area [size]="this.expTreeSplitSize">
                 <div class="full-width full-height max-height flex-container-col border-subtle"><!-- start tree container -->
@@ -65,10 +61,7 @@
                     </div>
 
                 </div> <!-- end tree container are you working-->
-
             </as-split-area>
-
-
             <as-split-area  [size]="100 - this.expTreeSplitSize">
                 <div class="full-width full-height max-height flex-container-col border-subtle">
                     <div class="full-width flex-grow left-right-padded overflow-auto">
@@ -86,15 +79,11 @@
                     </div>
                 </div>
             </as-split-area>
-
         </as-split>
     </div>
-    <div class="flex-container-row align-center">
-        <div class="flex-grow">
-            <save-footer (saveClicked)="requestSave()" [dirty]="formGroup.dirty"></save-footer>
-        </div>
-        <button mat-button color="primary" (click)="requestToCloseDialog()" >  Close </button>
-
+    <div class="flex-container-row justify-flex-end generic-dialog-footer-colors">
+        <save-footer (saveClicked)="requestSave()" [dirty]="formGroup.dirty"></save-footer>
+        <save-footer [actionType]="actionType" (saveClicked)="requestToCloseDialog()" name="Close"></save-footer>
     </div>
 </div>
 

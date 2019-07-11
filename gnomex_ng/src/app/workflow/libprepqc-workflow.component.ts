@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
 import { URLSearchParams } from "@angular/http";
-import {MatAutocomplete, MatAutocompleteTrigger, MatInput, MatOption, MatSidenav} from "@angular/material";
+import {MatSidenav} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
 import {GridOptions, GridApi} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
@@ -17,19 +17,12 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 @Component({
     selector: 'libprepqc-workflow',
     templateUrl: 'libprepqc-workflow.html',
-    styles: [`
-        .flex-column-container-workflow {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            height: 94%;
-            width: 100%;
-        }
+    styles: [`        
         .flex-row-container {
             display: flex;
             flex-direction: row;
         }
-        mat-form-field.formField {
+        .formField {
             width: 20%;
             margin: 0 0.5%;
         }
@@ -46,11 +39,8 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 })
 
 export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
-    @ViewChild("autoRequest") autoRequestComplete: MatAutocomplete;
     @ViewChild("requestInput") requestInput: ElementRef;
     @ViewChild("coreFacility") coreFacilityInput: ElementRef;
-    @ViewChild("autoCore") autoCoreComplete: MatAutocomplete;
-    @ViewChild("autoRequest") trigger: MatAutocompleteTrigger;
     @ViewChild('sidenav') sidenav: MatSidenav;
 
     private workItemList: any[] = [];
@@ -62,7 +52,6 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
     private dirty: boolean = false;
     private showSpinner: boolean = false;
     private workItem: any;
-    private previousRequestMatOption: MatOption;
     private gridApi:GridApi;
     private gridColumnApi;
     private label: string = "Illumina Library Prep QC";
@@ -185,51 +174,11 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
         return items;
     }
 
-
-    chooseFirstRequestOption() {
-        if (this.autoRequestComplete.options.first) {
-            this.autoRequestComplete.options.first.select();
-        }
+    selectRequestOption() {
+        this.workingWorkItemList = this.filterWorkItems();
     }
 
-
-    filterRequests(name: any): any[] {
-        let fRequests: any[];
-        if (name) {
-            fRequests = this.requestIds.filter(request =>
-                request.requestNumber.indexOf(name) >= 0);
-            return fRequests;
-        } else {
-            return this.requestIds;
-        }
-    }
-
-
-    highlightFirstRequestOption(event) {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.autoRequestComplete.options.first) {
-            if (this.previousRequestMatOption) {
-                this.previousRequestMatOption.setInactiveStyles();
-            }
-            this.autoRequestComplete.options.first.setActiveStyles();
-            this.previousRequestMatOption = this.autoRequestComplete.options.first;
-        }
-    }
-
-    compareByID(rc1,rc2) {
-        return rc1 && rc2 && rc1.codeNextStep == rc2.codeNextStep;
-    }
-
-    selectRequestOption(event) {
-        if (event.source.selected) {
-            this.workItem = event.source.value;
-            this.workingWorkItemList = this.filterWorkItems();
-        }
-    }
-
-    selectCodeOption(event) {
+    selectCodeOption() {
         this.initialize();
     }
 

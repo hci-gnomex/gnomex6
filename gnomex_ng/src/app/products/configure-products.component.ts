@@ -3,37 +3,23 @@ import {ITreeOptions, TreeComponent, TreeModel} from "angular-tree-component";
 import {ProductsService} from "../services/products.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {HttpParams} from "@angular/common/http";
-import {MatDialog, MatDialogRef, MatSnackBar} from "@angular/material";
+import {MatDialogConfig, MatSnackBar} from "@angular/material";
 import {ConfigureProductTypesComponent} from "./configure-product-types.component";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {UtilService} from "../services/util.service";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../services/constants.service";
 
 @Component({
     selector: 'configure-products',
     templateUrl: "./configure-products.component.html",
     styles: [`
-        div.flex-container-row {
-            display: flex;
-            flex-direction: row;
-        }
-        div.flex-container-col {
-            display: flex;
-            flex-direction: column;
-        }
-        .full-width {
-            width: 100%;
-        }
-        .half-width {
-            width: 50%;
-        }
         .margin-right {
             margin-right: 2rem;
-        }
-        .align-center {
-            align-items: center;
         }
         .justify-end {
             justify-content: flex-end;
@@ -85,7 +71,7 @@ export class ConfigureProductsComponent implements OnInit {
                 private dialogsService: DialogsService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private snackBar: MatSnackBar,
-                private dialog: MatDialog,
+                private constService: ConstantsService,
                 @Inject(FormBuilder) private fb: FormBuilder) {
         this.productForm = fb.group({
             name: ['', [Validators.required, Validators.maxLength(200)]],
@@ -118,8 +104,8 @@ export class ConfigureProductsComponent implements OnInit {
         this.products = [];
         this.nodes = [];
         this.productsService.getProductList().subscribe((response: any) => {
-            if (response && Array.isArray(response)) {
-                this.products = response;
+            if (response && (Array.isArray(response) || response.Product)) {
+                this.products = UtilService.getJsonArray(response, response.Product);
                 this.productTypes = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.PRODUCT_TYPE).filter((type: any) => {
                     return type.value && type.idCoreFacility && this.createSecurityAdvisorService.isCoreFacilityIManage(type.idCoreFacility);
                 });
@@ -142,7 +128,7 @@ export class ConfigureProductsComponent implements OnInit {
                 if (response && response.message) {
                     message = ": " + response.message;
                 }
-                this.dialogsService.confirm("An error occurred while retrieving the product list" + message, null);
+                this.dialogsService.error("An error occurred while retrieving the product list" + message);
             }
         }, (err:IGnomexErrorResponse) =>{
         });
@@ -226,14 +212,14 @@ export class ConfigureProductsComponent implements OnInit {
                             duration: 2000,
                         });
                         if (response.message) {
-                            this.dialogsService.confirm(response.message, null);
+                            this.dialogsService.alert(response.message, null, DialogType.SUCCESS);
                         }
                     } else {
                         let message: string = "";
                         if (response && response.message) {
                             message = ": " + response.message;
                         }
-                        this.dialogsService.confirm("An error occurred while deleting the product" + message, null);
+                        this.dialogsService.error("An error occurred while deleting the product" + message);
                     }
                     this.loadProducts();
                 });
@@ -244,13 +230,15 @@ export class ConfigureProductsComponent implements OnInit {
     }
 
     public openEditProductTypes(): void {
-        let productTypeEditorDialogRef: MatDialogRef<ConfigureProductTypesComponent> =
-            this.dialog.open(ConfigureProductTypesComponent, {
-                width: '1000px',
-            });
-
-        productTypeEditorDialogRef.afterClosed().subscribe(() => {
-            this.loadProducts();
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "60em";
+        config.autoFocus = false;
+        this.dialogsService.genericDialogContainer(ConfigureProductTypesComponent, "Configure Product Types", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe(() => {
+                    this.loadProducts();
         });
     }
 
@@ -284,7 +272,7 @@ export class ConfigureProductsComponent implements OnInit {
                     if (response && response.message) {
                         message = ": " + response.message;
                     }
-                    this.dialogsService.confirm("An error occurred while saving the product" + message, null);
+                    this.dialogsService.error("An error occurred while saving the product" + message);
                 }
                 this.showSpinner = false;
                 this.loadProducts();

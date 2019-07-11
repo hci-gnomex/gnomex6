@@ -10,7 +10,6 @@ import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {AngularSplitModule} from "angular-split";
 import {ServicesModule} from "../services/services.module";
 import {UtilModule} from "../util/util.module";
-import {WindowModule} from "../../modules/window.module";
 
 import {UPLOAD_ROUTING} from "./upload.routes";
 
@@ -42,7 +41,6 @@ import {SampleUploadService} from "./sample-upload.service";
         ReactiveFormsModule,
         ServicesModule,
         UtilModule,
-        WindowModule,
         AngularMaterialModule,
         AgGridEditorModule,
         AgGridRendererModule,

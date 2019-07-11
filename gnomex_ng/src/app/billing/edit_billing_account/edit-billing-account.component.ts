@@ -1,23 +1,26 @@
-import { Component, OnDestroy, OnInit, Inject } from "@angular/core";
-import { Router } from "@angular/router";
-import { FormControl, FormGroupDirective, NgForm, Validators } from "@angular/forms";
+import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
+import {Router} from "@angular/router";
+import {FormControl, FormGroupDirective, NgForm, Validators} from "@angular/forms";
 
-import {MatDialogRef, MatDialog, ErrorStateMatcher, MatDialogConfig, MAT_DIALOG_DATA} from "@angular/material";
+import {ErrorStateMatcher, MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {Subscription} from "rxjs";
 
-import { EditBillingAccountErrorDialogComponent } from "./dialogs/edit-billing-account-error-dialog.component";
-import { EditBillingAccountSuccessDialogComponent } from "./dialogs/edit-billing-account-success-dialog.component";
+import {EditBillingAccountErrorDialogComponent} from "./dialogs/edit-billing-account-error-dialog.component";
 
-import { BillingUsersSelectorComponent } from "../../usersGroups/billingAccountTab/billingUsersSelector/billing-users-selector.component";
+import {BillingUsersSelectorComponent} from "../../usersGroups/billingAccountTab/billingUsersSelector/billing-users-selector.component";
 
-import { DateParserComponent } from "../../util/parsers/date-parser.component";
+import {DateParserComponent} from "../../util/parsers/date-parser.component";
 
-import { AccountFieldsConfigurationService } from "../../services/account-fields-configuration.service";
-import { DictionaryService } from "../../services/dictionary.service";
-import { LabListService } from "../../services/lab-list.service";
-import { PropertyService } from "../../services/property.service";
+import {AccountFieldsConfigurationService} from "../../services/account-fields-configuration.service";
+import {DictionaryService} from "../../services/dictionary.service";
+import {LabListService} from "../../services/lab-list.service";
+import {PropertyService} from "../../services/property.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {UserPreferencesService} from "../../services/user-preferences.service";
+import {DialogsService} from "../../util/popup/dialogs.service";
+import {ConstantsService} from "../../services/constants.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 
 
 @Component({
@@ -27,18 +30,24 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
 })
 export class EditBillingAccountLauncher {
 
-	constructor(private dialog: MatDialog,
+	constructor(private dialogsService: DialogsService, private constService: ConstantsService,
 				private router: Router) {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = '60em';
-        configuration.panelClass = 'no-padding-dialog';
+        configuration.autoFocus = false;
 
-		let dialogRef = this.dialog.open(EditBillingAccountComponent, configuration);
-
-		dialogRef.afterClosed().subscribe((result) => {
-			// After closing the dialog, route away from this component so that the dialog could
-			// potentially be reopened.
-			this.router.navigate([{ outlets: {modal: null}}]);
+		this.dialogsService.genericDialogContainer(EditBillingAccountComponent,
+			"Edit Billing Account", this.constService.ICON_WORK_AUTH_FORM, configuration,
+			{actions: [
+					{type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Update", internalAction: "onUpdateButtonClicked"},
+					{type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+				]}).subscribe((result: any) => {
+					if(result) {
+						// TODO: Verify if the data is updated and success pop-up may needed here
+                        // After closing the dialog, route away from this component so that the dialog could
+                        // potentially be reopened.
+                        this.router.navigate([{ outlets: {modal: null}}]);
+					}
 		});
 	}
 }
@@ -52,116 +61,116 @@ export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
 @Component({
 	selector: "edit-billing-account-window",
 	templateUrl: "./edit-billing-account.component.html",
-	styles: [`		
-		.mat-dialog-title {  
-			margin: 0;  
-			padding: 0;  
-		}  
-		.mat-dialog-content {  
-			margin: 0;  
-			padding: 0;  
-		}  
-		.mat-dialog-actions {  
-			margin: 0;  
-			padding: 0;  
+	styles: [`
+		.mat-dialog-title {
+			margin: 0;
+			padding: 0;
+		}
+		.mat-dialog-content {
+			margin: 0;
+			padding: 0;
+		}
+		.mat-dialog-actions {
+			margin: 0;
+			padding: 0;
 		}
 		
-		div.t  { display: table; }  
-		div.tr { display: table-row; }  
+		div.t  { display: table; }
+		div.tr { display: table-row; }
 		div.td { display: table-cell; }
 		
 		p { margin: 1em 0.5em; }
 		
-		.full-height { height: 100%; }  
+		.full-height { height: 100%; }
 		.full-width  { width: 100%;  }
 		
 		.center { text-align: center; }
 		
 		.font-small { font-size: small; }
 		
-		.cell-label {  
-			width: 8rem;  
-			height: 2.6em;  
-			vertical-align: middle;  
-			font-style: italic;  
-			font-size: x-small;  
-			color: #1601db;  
+		.cell-label {
+			width: 8rem;
+			height: 2.6em;
+			vertical-align: middle;
+			font-style: italic;
+			font-size: small;
+			color: #1601db;
 		}
 		
-		.radio-button {  
-			margin: 0 4em 0 0;  
-			padding: 0;  
+		.radio-button {
+			margin: 0 4em 0 0;
+			padding: 0;
 		}
 		
-		.background {  
-			display: block;  
-			position: relative;  
-			background-color: white;  
+		.background {
+			display: block;
+			position: relative;
+			background-color: white;
 			border: #d2d2d2 solid 1px;
 			
-			width: calc(100% - 8px);  
-			margin: 3px 4px;  
-		}  
-		.background-sideless {  
-			display: block;  
-			position: relative;  
-			background-color: white;  
-			border-color: #d2d2d2;  
-			border-style: solid;  
-			border-top-width: 1px;  
-			border-bottom-width: 1px;  
-			border-left-width: 0;  
-			border-right-width: 0;  
+			width: calc(100% - 8px);
+			margin: 3px 4px;
+		}
+		.background-sideless {
+			display: block;
+			position: relative;
+			background-color: white;
+			border-color: #d2d2d2;
+			border-style: solid;
+			border-top-width: 1px;
+			border-bottom-width: 1px;
+			border-left-width: 0;
+			border-right-width: 0;
 		}
 		
-		.padded {  
-			position:relative;  
-			width:calc(100% - 1.6em);  
-			margin:0.4em 0.8em;  
+		.padded {
+			position:relative;
+			width:calc(100% - 1.6em);
+			margin:0.4em 0.8em;
 		}
 		
-		.inline-block { display: inline-block; }  
-		.top-vertical-align    { vertical-align: top; }  
+		.inline-block { display: inline-block; }
+		.top-vertical-align    { vertical-align: top; }
 		.center-vertical-align { vertical-align: middle; }
 		
-		.row-spacer {  
-			height: 0.7em;  
+		.row-spacer {
+			height: 0.7em;
 		}
 		
-		.checkbox-container {  
-			display: inline-block;  
-			vertical-align: middle;  
-			width: fit-content;  
+		.checkbox-container {
+			display: inline-block;
+			vertical-align: middle;
+			width: fit-content;
 		}
 		
-		.horizontal-break {  
-			display: inline-block;  
-			vertical-align: middle;  
-			height: 3em;  
-			width: 1px;  
-			background-color: #c4cccc;  
-			margin: 0.5em 0.5em 0.5em 0.5em;  
+		.horizontal-break {
+			display: inline-block;
+			vertical-align: middle;
+			height: 3em;
+			width: 1px;
+			background-color: #c4cccc;
+			margin: 0.5em 0.5em 0.5em 0.5em;
 		}
 		
-		.mat-dialog-content {  
-			background-color: #eeeeeb;  
-			overflow: auto;  
-			font-size: small;  
+		.mat-dialog-content {
+			background-color: #eeeeeb;
+			overflow: auto;
+			font-size: small;
 		}
-	  
+	 
 		.long-input    { width: 100%; }
 		.medium-input  { width: 18em; }
 		.short-input   { width: 4.5rem; }
 		.shorter-input { width: 3rem; }
 		
 		.button-container {
-            text-align:right; 
+            text-align:right;
 			padding:0.4em;
 		}
 		
 		.header {
-            background-color: #84b278; 
-			color: white; 
+            background-color: #84b278;
+			color: white;
 		}
 		
 		.header-image {
@@ -179,10 +188,10 @@ export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
 		
 		.date-horizontal-spacer {
             width:7em;
-		}  
+		}
 	`]
 })
-export class EditBillingAccountComponent implements OnInit, OnDestroy {
+export class EditBillingAccountComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
 	readonly CHARTFIELD:  string = 'chartfield';
 	readonly PO:          string = 'po';
@@ -357,6 +366,7 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 
 	constructor(private accountFieldsConfigurationService: AccountFieldsConfigurationService,
 				private dialog: MatDialog,
+				private dialogsService: DialogsService,
 				private dialogRef: MatDialogRef<EditBillingAccountComponent>,
 				private dictionaryService: DictionaryService,
 				private labListService: LabListService,
@@ -364,8 +374,11 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
                 public createSecurityAdvisorService: CreateSecurityAdvisorService,
                 public prefService: UserPreferencesService,
                 @Inject(MAT_DIALOG_DATA) private data) {
+		super();
         if (data) {
             this.labActiveSubmitters = data.labActiveSubmitters;
+            this._rowData = data.rowData;
+            this.applyRowData();
 		}
 	}
 
@@ -573,7 +586,7 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			accountNumberAccount = this.accountNumberAccount_Chartfield;
 		}
 
-		if (this.selectedCoreFacilities != undefined && this.selectedCoreFacilities != null) {
+		if (this.selectedCoreFacilities.length) {
 			for (let i: number = 0; i < this.selectedCoreFacilities.length; i++) {
 				let coreFacility: any = {
 					idCoreFacility: this.selectedCoreFacilities[i].idCoreFacility,
@@ -659,7 +672,7 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please select a Lab\n';
 		}
-		if (!(this.selectedCoreFacilities.length > 0)) {
+		if (!this.selectedCoreFacilities.length) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please select one or more Core Facilities\n';
 		}
@@ -766,7 +779,7 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 		let custom2: string = '';
 		let custom3: string = '';
 
-		if (this.selectedCoreFacilities != undefined && this.selectedCoreFacilities != null) {
+		if (this.selectedCoreFacilities.length) {
 			for (let i: number = 0; i < this.selectedCoreFacilities.length; i++) {
 				let coreFacility: any = {
 					idCoreFacility: this.selectedCoreFacilities[i].idCoreFacility,
@@ -845,7 +858,7 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please select a Lab\n';
 		}
-		if (!(this.selectedCoreFacilities.length > 0)) {
+		if (!this.selectedCoreFacilities.length) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please select one or more Core Facilities\n';
 		}
@@ -912,7 +925,7 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 		let custom3: string = '';
 
 
-		if (this.selectedCoreFacilities != undefined && this.selectedCoreFacilities != null) {
+		if (this.selectedCoreFacilities.length) {
 			for (let i: number = 0; i < this.selectedCoreFacilities.length; i++) {
 				let coreFacility: any = {
 					idCoreFacility: this.selectedCoreFacilities[i].idCoreFacility,
@@ -993,7 +1006,7 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please select a Lab\n';
 		}
-		if (!(this.selectedCoreFacilities.length > 0)) {
+		if (!this.selectedCoreFacilities.length) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please select one or more Core Facilities\n';
 		}
@@ -1090,46 +1103,31 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 		}
 	}
 
-	private onCoreFacilitiesSelected(event: any): void {
-		if (event && event.value && event.value.length > 0) {
-			this.showFundingAgencies = false;
-			// Look through for core facilities which use funding agencies, if there are any, show that dropdown
-			for (let i: number = 0; i < event.value.length; i++) {
-				let showFundingAgency = this.propertyService.getExactProperty(this.propertyService.SHOW_FUNDING_AGENCY, event.value[i].idCoreFacility);
-				if (!!showFundingAgency && showFundingAgency.propertyValue === 'Y') {
-					this.showFundingAgencies = true;
-					break;
-				}
-			}
-		} else {
-			this.showFundingAgencies = false;
+	private onCoreFacilitiesSelected(): void {
+        this.showFundingAgencies = false;
+        if (this.selectedCoreFacilities.length) {
+            // Look through for core facilities which use funding agencies, if there are any, show that dropdown
+            for (let cf of this.selectedCoreFacilities) {
+                let showFundingAgency: boolean = this.propertyService.getPropertyAsBoolean(this.propertyService.SHOW_FUNDING_AGENCY, cf.idCoreFacility);
+                if (showFundingAgency) {
+                    this.showFundingAgencies = true;
+                    break;
+                }
+            }
 		}
 	}
 
-	private onCancelButtonClicked(): void {
-		this.dialogRef.close();
-	}
-
-	private openSuccessDialog(): void {
-        let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.width = '60em';
-        configuration.panelClass = 'no-padding-dialog';
-        configuration.data = { successMessage: this.successMessage };
-
-		let successDialogReference = this.dialog.open(EditBillingAccountSuccessDialogComponent, configuration);
-
-		successDialogReference.afterClosed().subscribe(() => {
-			this.dialogRef.close();
-		});
-	}
-
 	private openErrorDialog(): void {
+		//TODO: This will be gone when we accomplish the alert pop-up wrapper
         let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.width = '60em';
-        configuration.panelClass = 'no-padding-dialog';
+        configuration.width = '40em';
+        configuration.autoFocus = false;
         configuration.data = { errorMessage: this.errorMessage };
 
-		let errorDialogReference = this.dialog.open(EditBillingAccountErrorDialogComponent, configuration);
+		this.dialogsService.genericDialogContainer(EditBillingAccountErrorDialogComponent, "Validation Error", null, configuration,
+            {actions: [
+                    {type: ActionType.SECONDARY, name: "OK", internalAction: "onClose"}
+                ]});
 	}
 
 	private clearAccountNumberActivity(): void {
@@ -1144,15 +1142,6 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
 			this.accountNumberProject_Chartfield = '';
 			this.isActivity = true;
 		}
-	}
-
-	set rowData(rowData: any) {
-		this._rowData = rowData;
-		this.applyRowData();
-	}
-
-	get rowData(): any {
-		return this._rowData;
 	}
 
 	set approvedUsersValue(approvedUsersValue: string) {
@@ -1360,25 +1349,23 @@ export class EditBillingAccountComponent implements OnInit, OnDestroy {
     }
 
     private onClickApprovedUsers(): void {
-		let data = {
-			options: this.labActiveSubmitters,
-			optionName: "Users",
-			value: this.approvedUsersValue,
-			valueField: "value",
-			displayField: "display"
-		};
 
 		let configuration: MatDialogConfig = new MatDialogConfig();
 		configuration.width = '60em';
-		configuration.height = '45em';
-		configuration.panelClass = 'no-padding-dialog';
-		configuration.data = data;
+		configuration.height = '40em';
+		configuration.autoFocus = false;
+		configuration.data = {
+            options: this.labActiveSubmitters,
+            optionName: "Users",
+            value: this.approvedUsersValue,
+            valueField: "value",
+            displayField: "display"
+		};
 
-		let dialogRef = this.dialog.open(BillingUsersSelectorComponent, configuration);
-
-		dialogRef.afterClosed().subscribe((result) => {
-			if (dialogRef && dialogRef.componentInstance) {
-				this.approvedUsersValue = !!dialogRef.componentInstance.value ? dialogRef.componentInstance.value : '';
+		this.dialogsService.genericDialogContainer(BillingUsersSelectorComponent, null, null, configuration)
+			.subscribe((result: any) => {
+			if (result) {
+				this.approvedUsersValue = result;
 			}
 		});
 	}

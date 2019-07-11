@@ -1,7 +1,6 @@
 import {NgModule} from "@angular/core";
 import {REPORTS_ROUTING} from "./reports.routes";
 import {AnnotationProgressReportComponent} from "./annotation-progress-report.component";
-import {ComboBoxModule} from "../../modules/combobox.module";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {ProjectExperimentReportComponent} from "./project-experiment-report.component";
 import {CommonModule} from "@angular/common";
@@ -14,12 +13,13 @@ import {ChartsModule} from "ng2-charts";
 import {EmailAllUsersComponent} from "./email-all-users.component";
 import {EmailAllUsersLauncherComponent} from "./email-all-users-launcher.component";
 import {AngularEditorModule} from "@kolkov/angular-editor";
+import {AngularSplitModule} from "angular-split";
+import {TrackUsageDetailComponent} from "./track-usage-detail.component";
 
 @NgModule({
     imports: [
         REPORTS_ROUTING,
         CommonModule,
-        ComboBoxModule,
         AngularMaterialModule,
         FormsModule,
         UtilModule,
@@ -27,6 +27,7 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         ChartsModule,
         ReactiveFormsModule,
         AngularEditorModule,
+        AngularSplitModule,
     ],
     declarations: [
         AnnotationProgressReportComponent,
@@ -35,6 +36,7 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         TrackUsageComponent,
         EmailAllUsersComponent,
         EmailAllUsersLauncherComponent,
+        TrackUsageDetailComponent,
     ],
     exports: [
         AnnotationProgressReportComponent,
@@ -42,9 +44,11 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         AnnotationReportComponent,
         TrackUsageComponent,
         EmailAllUsersComponent,
+        TrackUsageDetailComponent,
     ],
     entryComponents: [
         EmailAllUsersComponent,
+        TrackUsageDetailComponent,
     ],
 })
 

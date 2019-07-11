@@ -1,7 +1,6 @@
-<h6 mat-dialog-title>Delete Analysis</h6>
-<div mat-dialog-content>
+<div class="full-height full-width flex-container-col double-padded">
     <p>The following items will be deleted:<br>
-        {{_nodesString}}
+        <b>{{_nodesString}}</b>
     </p>
     <div *ngIf="hasAnalysisGroup">
         <p>One or more analysis groups have been selected.
@@ -13,8 +12,3 @@
         Continue?
     </div>
 </div>
-<mat-dialog-actions>
-    <button *ngIf="!showSpinner" mat-raised-button color="primary" (click)="deleteAnalysisYesButtonClicked()" tabindex="2">Yes</button>
-    <button *ngIf="!showSpinner" mat-raised-button color="accent" mat-dialog-close tabindex="-1">No</button>
-    <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-</mat-dialog-actions>

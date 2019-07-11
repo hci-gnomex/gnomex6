@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {ActivatedRoute, Router} from "@angular/router";
 
 import {ITreeOptions, TreeComponent, TreeModel} from "angular-tree-component";
@@ -11,6 +11,8 @@ import {DictionaryService} from "../services/dictionary.service";
 import {ProtocolService} from "../services/protocol.service";
 import {CreateProtocolDialogComponent} from "./create-protocol-dialog.component";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../services/constants.service";
 
 @Component({
     selector: 'manage-protocols',
@@ -104,13 +106,13 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
     public disableDelete: boolean = true;
     public disableNew: boolean = true;
 
-    constructor(private dialog: MatDialog,
-                private dialogService: DialogsService,
+    constructor(private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private protocolService: ProtocolService,
                 private route: ActivatedRoute,
                 private router: Router,
-                private createSecurityAdvisorService: CreateSecurityAdvisorService) { }
+                private createSecurityAdvisorService: CreateSecurityAdvisorService,
+                private constService: ConstantsService) { }
 
     ngOnInit(): void {
         this.treeModel = this.treeComponent.treeModel;
@@ -291,34 +293,29 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
     private onNewProtocolButtonClicked() {
 
         let data: any = {
-            protocolType: '',
-            protocolClassName : ''
+            protocolType: "",
+            protocolClassName : ""
         };
 
-        if (!!this.mostRecentlySelectedTreeItem) {
+        if (this.mostRecentlySelectedTreeItem) {
             data.protocolType      = this.mostRecentlySelectedTreeItem.protocolType;
             data.protocolClassName = this.mostRecentlySelectedTreeItem.protocolClassName;
         }
 
         let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.width = '30em';
-        configuration.panelClass = 'no-padding-dialog';
+        configuration.width = "30em";
         configuration.data = data;
 
-        let dialogReference = this.dialog.open(CreateProtocolDialogComponent, configuration);
-
-        dialogReference.afterClosed().subscribe((result) => {
-            if (result
-                && result.reloadTree
-                && result.idProtocol
-                && result.protocolClassName) {
-
-                this.mostRecentlyDisplayedProtocolId = result.idProtocol;
-                this.mostRecentlyDisplayedProtocolProtocolClassName = result.protocolClassName;
-                this.refresh();
-            } else {
-                // Assume that the popup closed by cancelling. Do nothing.
-            }
+        this.dialogService.genericDialogContainer(CreateProtocolDialogComponent, null, null, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Create Protocol", internalAction: "onClickCreateProtocolButton"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if(result && result.reloadTree && result.idProtocol && result.protocolClassName) {
+                        this.mostRecentlyDisplayedProtocolId = result.idProtocol;
+                        this.mostRecentlyDisplayedProtocolProtocolClassName = result.protocolClassName;
+                        this.refresh();
+                    }
         });
     }
 
@@ -327,12 +324,15 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
             && this.mostRecentlyDisplayedProtocolProtocolClassName) {
 
             let lines: string[] = [
-                "Are you sure you want to delete the ",
-                "" + this.protocolType + ":",
+                "Are you sure you want to delete the " + this.protocolType + ":",
                 "" + this.protocolName + "?"
             ];
 
-            this.dialogService.yesNoDialog(lines, this, "onConfirmDelete");
+            this.dialogService.confirm(lines).subscribe((result: any) => {
+                if(result) {
+                    this.onConfirmDelete();
+                }
+            });
         }
     }
 
@@ -344,7 +344,7 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
                 this.protocolService.deleteProtocol(this.mostRecentlyDisplayedProtocolId, this.mostRecentlyDisplayedProtocolProtocolClassName);
             });
         } else {
-            this.dialogService.alert("Error : No selected protocol");
+            this.dialogService.alert("No selected protocol");
         }
     }
 

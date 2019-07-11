@@ -2,6 +2,7 @@ import {Routes, RouterModule} from "@angular/router";
 import {HomeComponent} from "./home/home.component";
 import {AuthRouteGuardService} from "./services/route-guards/auth-route-guard.service";
 import {DirectLoginComponent} from "./auth/directlogin.component";
+import {LogoutComponent} from "./header/logout.component";
 
 /**
  * A file defining and exporting the router configuration for the seed application.
@@ -16,6 +17,6 @@ export const ROUTES: Routes = [
 ];
 
 export const APP_ROUTING = RouterModule.forRoot(ROUTES,{onSameUrlNavigation:'reload'});
-// specifying 'reload' alone won't make all routes when routing to same URl,  you have specify for the specific routes.
+// specifying 'reload' alone won't make all routes reload when routing to same URl,  you have specify for the specific routes.
 
 

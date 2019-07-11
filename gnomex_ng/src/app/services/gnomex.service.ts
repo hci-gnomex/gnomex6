@@ -3,21 +3,19 @@ import {DictionaryService} from "./dictionary.service";
 import {CreateSecurityAdvisorService} from "./create-security-advisor.service";
 import {PropertyService} from "./property.service";
 import {LabListService} from "./lab-list.service";
-import {forkJoin, Subject} from "rxjs";
-import {Subscription} from "rxjs";
+import {BehaviorSubject, forkJoin, Observable, Subject, Subscription, throwError} from "rxjs";
 import {ProgressService} from "../home/progress.service";
-import {Observable} from "rxjs";
-import {HttpClient, HttpParams, HttpResponse} from "@angular/common/http";
+import {HttpClient, HttpParams} from "@angular/common/http";
 import {LaunchPropertiesService} from "./launch-properites.service";
-import {BehaviorSubject} from "rxjs";
 import {Router} from "@angular/router";
 import {ProjectService} from "./project.service";
 import {AppUserListService} from "./app-user-list.service";
 import {AuthenticationService} from "../auth/authentication.service";
-import {first} from "rxjs/operators";
+import {catchError, first} from "rxjs/operators";
 import {UserPreferencesService} from "./user-preferences.service";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {UtilService} from "./util.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 const CAN_ADMINISTER_ALL_CORE_FACILITIES: string = "canAdministerAllCoreFacilities";
 const CAN_ADMINISTER_USERS: string = "canAdministerUsers";
@@ -716,7 +714,7 @@ export class GnomexService {
                         forkJoin(this.appUserListService.getFullAppUserList(),this.labListService.getLabList())
                             .pipe(first()).subscribe((response: any[]) => {
                             this.progressService.displayLoader(45);
-                            this.appUserList = UtilService.getJsonArray(response[0], response[0].AppUser);
+                            this.appUserList = UtilService.getJsonArray(response[0], response[0] ? response[0].AppUser : []);
                             this.labList = response[1];
                             this.progressService.displayLoader(60);
                             this.myCoreFacilities = this.dictionaryService.coreFacilities();
@@ -764,7 +762,7 @@ export class GnomexService {
     initGuestApp() {
 
         let params:URLSearchParams = new URLSearchParams();
-        params.set("idCoreFacility",null)
+        params.set("idCoreFacility",null);
         this.createSecurityAdvisorService.createGuestSecurityAdvisor(params).pipe(first()).subscribe(response => {
             this.progressService.displayLoader(15);
             this.dictionaryService.load(() => {
@@ -804,7 +802,11 @@ export class GnomexService {
 
 
     public getOrderFromNumber(p:HttpParams) : Observable<any> {
-        return this.http.get("/gnomex/GetGNomExOrderFromNumberServlet.gx",{params:p});
+        return this.http.get("/gnomex/GetGNomExOrderFromNumberServlet.gx",{params:p})
+            .pipe(catchError((err:IGnomexErrorResponse) => {
+                this.router.navigateByUrl("/home");
+                return throwError(err)
+            }));
     }
 
     public makeURL(orderInfo:any ):string{
@@ -954,7 +956,7 @@ export class GnomexService {
 
             }
         }else{
-            this.dialogService.alert("Lookup ID is Invalid");
+            this.dialogService.alert("Lookup ID is Invalid", null, DialogType.VALIDATION);
         }
     }
 
@@ -970,9 +972,8 @@ export class GnomexService {
             let url = this.makeURL(this.orderInitObj);
             this.router.navigateByUrl(url);
             initOrderSubject.next(this.orderInitObj);
-
-        },err =>{
-
+        },(err:IGnomexErrorResponse) =>{
+            console.debug(err);
         });
     }
 
@@ -1017,5 +1018,9 @@ export class GnomexService {
             }
         });
     }
+    public getLoginPropertiesObservable(): Observable<any> {
+        return this.http.get("/gnomex/GetLoginProperties.gx");
+    }
+
 
 }

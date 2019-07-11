@@ -24,7 +24,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
             errorMessage  ="Client side Error: " +  error.error.message;
             error.gError = {message: errorMessage};
             console.error(error);
-            this.dialogService.alert(errorMessage, null);
+            this.dialogService.error(errorMessage);
 
         }else if(error.error && !error.gError){
             errorMessage  = `Server Side Error: ${error.status}\nMessage: ${error.message}`;
@@ -35,12 +35,12 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
                 url: error.url
             };
             console.error(error);
-            this.dialogService.alert(errorMessage, null);
+            this.dialogService.error(errorMessage);
 
         }else{
             errorMessage = error.gError.message;
             console.warn(error.gError);
-            this.dialogService.alert(errorMessage, error.gError.result)
+            this.dialogService.error(errorMessage, error.gError.result);
         }
 
         return throwError(error);

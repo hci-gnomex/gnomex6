@@ -17,6 +17,7 @@ import {BillingService} from "../services/billing.service";
 import {WorkAuthorizationTypeSelectorDialogComponent} from "./work-authorization-type-selector-dialog.component";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'order-products',
@@ -90,7 +91,8 @@ export class OrderProductsComponent implements OnInit {
                 private router: Router,
                 private dialog: MatDialog,
                 private billingService: BillingService,
-                public prefService: UserPreferencesService) {
+                public prefService: UserPreferencesService,
+                private constantsService: ConstantsService) {
     }
 
     ngOnInit() {
@@ -266,7 +268,7 @@ export class OrderProductsComponent implements OnInit {
                     if (response && response.message) {
                         message = ": " + response.message;
                     }
-                    this.dialogsService.confirm("An error occurred while submitting the product order" + message, null);
+                    this.dialogsService.error("An error occurred while submitting the product order" + message);
                     this.enableSubmit = true;
                 }
             });
@@ -278,13 +280,14 @@ export class OrderProductsComponent implements OnInit {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width  = "40em";
         configuration.height = "30em";
-        configuration.panelClass = 'no-padding-dialog';
+        configuration.autoFocus = false;
         configuration.data = { idLab: "" + this.idLab };
 
-        let dialogRef: MatDialogRef<WorkAuthorizationTypeSelectorDialogComponent> = this.dialog.open(WorkAuthorizationTypeSelectorDialogComponent, configuration);
-
-        dialogRef.afterClosed().subscribe(() => {
-            this.onLabChange();
+        this.dialogsService.genericDialogContainer(WorkAuthorizationTypeSelectorDialogComponent, "New Billing Account (Choose Type)", null, configuration,
+            {actions: [
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe(() => {
+                    this.onLabChange();
         });
     }
 
@@ -295,16 +298,20 @@ export class OrderProductsComponent implements OnInit {
             params.billingTemplate = this.billingTemplate;
         }
         let config: MatDialogConfig = new MatDialogConfig();
+        config.autoFocus = false;
         config.data = {
             params: params
         };
 
-        let dialogRef: MatDialogRef<BillingTemplateWindowComponent> = this.dialog.open(BillingTemplateWindowComponent, config);
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
-                this.billingTemplate = result as BillingTemplate;
-                this.idBillingAccount = "";
-            }
+        this.dialogsService.genericDialogContainer(BillingTemplateWindowComponent, "Billing Template", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "promptToSave"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"},
+                ]}).subscribe((result: any) => {
+                    if (result) {
+                        this.billingTemplate = result as BillingTemplate;
+                        this.idBillingAccount = "";
+                    }
         });
     }
 

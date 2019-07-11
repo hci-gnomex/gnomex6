@@ -5,38 +5,23 @@ import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {DictionaryService} from "../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {ProductsService} from "../services/products.service";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {PropertyService} from "../services/property.service";
 import {HttpParams} from "@angular/common/http";
 import {MatSnackBar} from "@angular/material";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {UtilService} from "../services/util.service";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
     selector: 'configure-product-types',
     templateUrl: "./configure-product-types.component.html",
     styles: [`
-        div.flex-container-row {
-            display: flex;
-            flex-direction: row;
-        }
-        div.flex-container-col {
-            display: flex;
-            flex-direction: column;
-        }
-        .full-width {
-            width: 100%;
-        }
-        .half-width {
-            width: 50%;
-        }
         .margin-right {
             margin-right: 2rem;
         }
         .margin-bottom {
             margin-bottom: 2rem;
-        }
-        .align-center {
-            align-items: center;
         }
         .justify-end {
             justify-content: flex-end;
@@ -72,7 +57,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
         }
     `]
 })
-export class ConfigureProductTypesComponent implements OnInit {
+export class ConfigureProductTypesComponent extends BaseGenericContainerDialog implements OnInit {
     public form: FormGroup;
     public selectedProductType;
     public showSpinner: boolean;
@@ -92,6 +77,7 @@ export class ConfigureProductTypesComponent implements OnInit {
                 private propertyService: PropertyService,
                 private snackBar: MatSnackBar,
                 @Inject(FormBuilder) private fb: FormBuilder) {
+        super();
         this.showSpinner = false;
         this.form = fb.group({
             coreFacility: ['', Validators.required],
@@ -115,6 +101,8 @@ export class ConfigureProductTypesComponent implements OnInit {
             return v.isActive && v.isActive === 'Y';
         });
         this.loadPriceCategories();
+
+        this.primaryDisable = (action) => this.form.invalid || !this.selectedProductType;
     }
 
     private loadProductTypes(productTypes: any[]): void {
@@ -127,14 +115,14 @@ export class ConfigureProductTypesComponent implements OnInit {
     private loadPriceCategories(): void {
         this.priceCategories = [];
         this.productsService.getPriceCategories(true, this.propertyService.getProperty(PropertyService.PROPERTY_PRODUCT_SHEET_NAME).propertyValue).subscribe((result: any) => {
-            if (result && Array.isArray(result)) {
-                this.priceCategories = result;
+            if (result && (Array.isArray(result) || result.PriceCategory)) {
+                this.priceCategories = UtilService.getJsonArray(result, result.PriceCategory);
             } else {
                 let message: string = "";
                 if (result && result.message) {
                     message = ": " + result.message;
                 }
-                this.dialogsService.confirm("An error occurred while retrieving price categories" + message, null);
+                this.dialogsService.error("An error occurred while retrieving price categories" + message);
             }
         },(err:IGnomexErrorResponse) => {
             this.showSpinner = false;
@@ -185,7 +173,7 @@ export class ConfigureProductTypesComponent implements OnInit {
 
     public removeProductType(): void {
         if (this.selectedProductType && this.selectedProductType.canDelete === 'Y') {
-            this.dialogsService.confirm("Are you sure you want to delete " + this.selectedProductType.display + "?", " ").subscribe((answer: boolean) => {
+            this.dialogsService.confirm("Are you sure you want to delete " + this.selectedProductType.display + "?").subscribe((answer: boolean) => {
                 if (answer) {
                     this.showSpinner = true;
                     this.productsService.deleteProductType(this.collectFields()).subscribe((response: any) => {
@@ -201,7 +189,7 @@ export class ConfigureProductTypesComponent implements OnInit {
                             if (response && response.message) {
                                 message = ": " + response.message;
                             }
-                            this.dialogsService.confirm("An error occurred while deleting the product type" + message, null);
+                            this.dialogsService.error("An error occurred while deleting the product type" + message);
                         }
                         this.showSpinner = false;
                     });
@@ -214,7 +202,7 @@ export class ConfigureProductTypesComponent implements OnInit {
         if (this.selectedProductType) {
             let descriptionTrimmed: string = (this.form.controls['description'].value as string).trim();
             if (!descriptionTrimmed) {
-                this.dialogsService.confirm("Please set description", null);
+                this.dialogsService.alert("Please set description", null, DialogType.VALIDATION);
                 return;
             }
             this.showSpinner = true;
@@ -231,7 +219,7 @@ export class ConfigureProductTypesComponent implements OnInit {
                     if (response && response.message) {
                         message = ": " + response.message;
                     }
-                    this.dialogsService.confirm("An error occurred while saving the product type" + message, null);
+                    this.dialogsService.error("An error occurred while saving the product type" + message);
                 }
                 this.showSpinner = false;
             });
@@ -242,7 +230,7 @@ export class ConfigureProductTypesComponent implements OnInit {
         if (this.showNewPriceCategoryInput && !this.form.controls['newPriceCategoryName'].invalid) {
             let name: string = (this.form.controls['newPriceCategoryName'].value as string).trim();
             if (!name) {
-                this.dialogsService.confirm("Please set name", null);
+                this.dialogsService.alert("Please set name", null, DialogType.VALIDATION);
                 return;
             }
             this.productsService.saveNewProductPriceCategory(name).subscribe((response: any) => {
@@ -256,7 +244,7 @@ export class ConfigureProductTypesComponent implements OnInit {
                     if (response && response.message) {
                         message = ": " + response.message;
                     }
-                    this.dialogsService.confirm("An error occurred while saving the price category" + message, null);
+                    this.dialogsService.error("An error occurred while saving the price category" + message);
                 }
             });
         }

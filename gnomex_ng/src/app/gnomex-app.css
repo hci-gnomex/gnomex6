@@ -97,10 +97,6 @@ div.dialogDiv {
     margin: 0.4rem 0rem;
 }
 
-jqxComboBox.dialogComboBox {
-    display: inline;
-}
-
 div.sidenav {
     transition: 0.5s;
     padding: 1% 0;
@@ -251,6 +247,10 @@ div.mainnav {
     font-style: italic;
 }
 
+.bold {
+    font-weight: bold;
+}
+
 .overflow-auto {
     overflow: auto;
 }
@@ -267,12 +267,24 @@ img.icon {
     margin-right: 2em;
 }
 
+.children-flex-grow > * {
+    flex: 1;
+}
+
 .no-padding .mat-dialog-container {
     padding: 0 !important;
 }
 
+.no-padding-dialog {
+    padding: 0;
+}
+
 .no-margin {
     margin: 0;
+}
+
+.no-padding {
+    padding: 0;
 }
 
 .small-font {
@@ -329,8 +341,16 @@ img.icon {
     padding: 0.6em;
 }
 
+.double-padded-left-right {
+    padding: 0.3em 0.6em 0.3em 0.6em;
+}
+
 .double-left-padded {
     padding-left: 0.6em;
+}
+
+.double-padded-right {
+    padding-right: 0.6em;
 }
 
 .warningLabelMinor {
@@ -372,8 +392,8 @@ button.mat-button.link-button {
 }
 
 .dialog-header-colors {
-    background-color: #84b278;
-    color: white;
+    background-color: white;
+    color: var(--bluewarmvivid-medlight);
 }
 .generic-dialog-header-colors{
     background-color: var(--bluewarmvivid-medlight);
@@ -387,6 +407,11 @@ button.mat-button.link-button {
 label.mat-radio-label {
     margin-top: 0.15em !important;
     margin-bottom: 0.15em !important;
+}
+
+mat-dialog-content {
+    max-height: 80vh;
+    max-width: 80vw;
 }
 
 /*!

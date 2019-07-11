@@ -1,9 +1,9 @@
 <div style="margin-bottom: 1em;">
     <img [src]="dtService.datatrackListTreeNode.icon"> Folder {{dtService.datatrackListTreeNode.name}}
 </div>
-<form (ngSubmit)="save()" [formGroup]="folderFormGroup" style="display:flex;flex-direction: column;">
-    <div style="width:100%;">
-        <div style="width:100%;display:flex;">
+<form (ngSubmit)="save()" [formGroup]="folderFormGroup" class="flex-container-col full-width">
+    <div class="full-width">
+        <div class="flex-container-row full-width">
             <mat-form-field style="margin-right: 2em; width:60%;">
                 <input matInput formControlName="folderName"  type="text" placeholder="Name"/>
                 <mat-error *ngIf="folderFormGroup.get('folderName').hasError('required')">
@@ -11,43 +11,28 @@
                 </mat-error>
             </mat-form-field>
             <div style="width:40%">
-                <label for="descriptEditor">Lab</label>
-                <jqxComboBox id="descriptEditor" width="100%"
-                             #comboBox
-                             [placeHolder]="'Select a lab...'"
-                             [displayMember]="this.prefService.labDisplayField"
-                             [valueMember]="'idLab'"
-                             [height]="20"
-                             [disabled]="secAdvisor.isGuest"
-                             [source]="labList"
-                             (onSelect)="onSelect($event)" (onUnselect)="onUnselect($event)">
-                </jqxComboBox>
+                <custom-combo-box [options]="this.labList"
+                                  placeholder="Lab"
+                                  valueField="idLab"
+                                  [displayField]="this.prefService.labDisplayField"
+                                  [formControl]="this.folderFormGroup.get('lab')">
+                </custom-combo-box>
             </div>
 
         </div>
-
-        <div style="width:100%;">
-
-            <label > Description </label>
-            <jqxEditor #editorReference
-                       [(ngModel)]="description"
-                       (onChange)="changed($event)"
-                       [ngModelOptions]="{standalone: true}"
-                       id="experimentDescriptionId"
-                       width="100%"
-                       [height]="400"
-                       [editable]="edit"
-                       [tools]="toolBarSettings"
-                       [toolbarPosition]="'bottom'">
-            </jqxEditor>
+        <div class="full-width">
+            <angular-editor #descEditorRef formControlName="description" [config]="this.editorConfig">
+            </angular-editor>
         </div>
         <div> Created By: {{this.dtService.datatrackListTreeNode.createdBy}}
             {{this.dtService.datatrackListTreeNode.createDate}}
         </div>
-
-
     </div>
-    <save-footer [disableSave]="this.secAdvisor.isGuest || !canWrite" [dirty]="folderFormGroup.dirty"
-                 [showSpinner]="this.showSpinner">
-    </save-footer>
+    <div>
+        <save-footer [disableSave]="this.secAdvisor.isGuest || !canWrite" [dirty]="folderFormGroup.dirty"
+                     [showSpinner]="this.showSpinner">
+        </save-footer>
+    </div>
+
+
 </form>

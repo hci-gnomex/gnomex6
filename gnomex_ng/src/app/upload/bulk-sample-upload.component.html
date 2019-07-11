@@ -1,10 +1,5 @@
 <div class="full-height full-width flex-container-col">
-    <div mat-dialog-title class="full-width padded no-margin title">
-        <div #topmostLeftmost (mousedown)="onMouseDownHeader($event)" class="full-width align-center flex-container-row {{ movingDialog ? 'grabbed' : 'grabbable' }}">
-            <div>Upload Multi-Experiment Sample Sheet</div>
-        </div>
-    </div>
-    <div mat-dialog-content class="full-width flex-grow padded no-margin no-max-height background">
+    <div class="full-width flex-grow padded no-margin no-max-height background">
         <div class="full-height full-width">
             <div #oneEmWidth class="no-height single-em"></div>
             <div *ngIf="!fileParsed" class="full-height full-width flex-container-row align-center">
@@ -199,28 +194,16 @@
             </div>
         </div>
     </div>
-    <div mat-dialog-actions *ngIf="!fileParsed" class="flex-container-row full-width padded-left-right-bottom no-margin background">
-        <div class="full-height flex-grow">
+    <div class="flex-container-row no-padding no-margin justify-flex-end generic-dialog-footer-colors">
+        <div *ngIf="!fileParsed">
+            <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="closeButton()" name="Close"></save-footer>
         </div>
-        <div>
-            <button mat-raised-button (click)="closeButton()">Close</button>
+        <div *ngIf="fileParsed && !fileUploaded">
+            <save-footer (saveClicked)="importSamplesButton()" name="Import Samples"></save-footer>
+            <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="closeButton()" name="Close"></save-footer>
         </div>
-    </div>
-    <div mat-dialog-actions *ngIf="fileParsed && !fileUploaded" class="flex-container-row full-width padded-left-right-bottom no-margin background">
-        <div class="full-height flex-grow">
-        </div>
-        <div class="padded-left-right">
-            <button mat-raised-button (click)="importSamplesButton()">Import Samples</button>
-        </div>
-        <div>
-            <button mat-raised-button (click)="closeButton()">Close</button>
-        </div>
-    </div>
-    <div mat-dialog-actions *ngIf="fileParsed && fileUploaded" class="flex-container-row full-width padded-left-right-bottom no-margin background">
-        <div>
-            <button mat-raised-button (click)="closeButton()">Close</button>
-        </div>
-        <div class="full-height flex-grow">
+        <div *ngIf="fileParsed && fileUploaded">
+            <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="closeButton()" name="Close"></save-footer>
         </div>
     </div>
 </div>

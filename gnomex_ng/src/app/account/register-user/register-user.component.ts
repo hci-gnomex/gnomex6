@@ -1,12 +1,9 @@
-
-import {Component, OnInit, OnDestroy} from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {ActivatedRoute} from "@angular/router";
 import {IRegisterUser, ISimpleLab} from "../../util/interfaces/register-user.model";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
-import {numberRange} from "../../util/validators/number-range-validator";
 import {MatSlideToggleChange} from "@angular/material";
-import {V} from "@angular/cdk/typings/esm5/keycodes";
 import {PasswordUtilService} from "../../services/password-util.service";
 import {UserService} from "../../services/user.service";
 import {HttpParams} from "@angular/common/http";
@@ -104,20 +101,16 @@ import {HttpParams} from "@angular/common/http";
                         </div>
                         <ng-template #selectLab >
 
-                            <mat-form-field class="input-field">
-                                <mat-select placeholder="Choose Lab" formControlName="labDropdown">
-                                    <mat-option>  </mat-option>
-                                    <mat-option *ngFor="let lab of this.labs" [value]="lab.idLab" > {{lab.name}}
-                                    </mat-option>
-                                </mat-select>
-                                <mat-error *ngIf="this.formGroup?.get('newLabGroup.contactEmail')?.hasError('pattern')">
-                                    This field is required
-                                </mat-error>
-                            </mat-form-field>
+                            <div class="input-field">
+                                <custom-combo-box placeholder="Choose Lab"
+                                                  displayField="name" [options]="labs" valueField="idLab"
+                                                  [formControlName]="'labDropdown'">
+                                </custom-combo-box>
+                            </div>
                         </ng-template>
                     </div>
                     <div>
-                        <mat-slide-toggle 
+                        <mat-slide-toggle
                                 *ngIf="isUniversityAuthd"
                                 (change)="toggledUniversityState($event)"
                                 formControlName="uofuAffiliate"
@@ -214,7 +207,7 @@ import {HttpParams} from "@angular/common/http";
             padding-top: 10px;
             text-align: center;
         }
-        mat-form-field.input-field {
+        .input-field {
             width: 20em;
         }
     `]
@@ -280,7 +273,7 @@ export class RegisterUserComponent  implements OnInit, OnDestroy{
                     }
 
                 }else if(regUserResp && regUserResp.message){
-                    this.dialogService.alert(regUserResp.message);
+                    this.dialogService.alert(regUserResp.message, "", DialogType.FAILED);
                 }
             }
         });

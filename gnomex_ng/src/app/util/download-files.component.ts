@@ -1,89 +1,98 @@
 import {ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
-import {MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {ConstantsService} from "../services/constants.service";
 import {ITreeOptions, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
 import {PropertyService} from "../services/property.service";
 import {FileService} from "../services/file.service";
 import {Observable} from "rxjs";
-import {DialogsService} from "./popup/dialogs.service";
+import {DialogsService, DialogType} from "./popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
 import {DownloadProgressComponent} from "./download-progress.component";
 import {UtilService} from "../services/util.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
+import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
+import {ActionType} from "./interfaces/generic-dialog-action.model";
 
 @Component({
     template: `
         <div class="full-height full-width flex-container-col">
-            <div mat-dialog-title class="no-margin-force no-padding">
-                <div class="dialog-header-colors padded">
-                    Select Files to Download
+            <div class="full-height full-width flex-container-col padded">
+                <div class="flex-container-row">
+                    <label>Drag files or folders that you want to download</label>
+                </div>
+                <div class="flex-container-row justify-space-between">
+                    <label>Available Files</label>
+                    <label>Files to Download</label>
+                </div>
+                <div class="trees-container">
+                    <as-split>
+                        <as-split-area size="50">
+                            <tree-root #availableFilesTreeComponent
+                                       [nodes]="this.availableFilesNodes"
+                                       [options]="this.filesOptions">
+                                <ng-template #treeNodeTemplate let-node>
+                                    <img src="{{node.data.icon}}" class="icon">
+                                    <span>{{node.data.displayName}}</span>
+                                </ng-template>
+                            </tree-root>
+                        </as-split-area>
+                        <as-split-area size="50">
+                            <tree-root #filesToDownloadTreeComponent
+                                       [nodes]="this.filesToDownloadNodes"
+                                       [options]="this.filesOptions">
+                                <ng-template #treeNodeTemplate let-node>
+                                    <img src="{{node.data.icon}}" class="icon">
+                                    <span>{{node.data.displayName}}</span>
+                                </ng-template>
+                            </tree-root>
+                        </as-split-area>
+                    </as-split>
+                </div>
+                <div class="flex-container-row justify-space-between">
+                    <label>{{this.availableFilesCount}} file(s)</label>
+                    <label>{{this.filesToDownloadCount}} file(s) ({{this.filesToDownloadSizeLabel}}
+                        )</label>
                 </div>
             </div>
-            <div mat-dialog-content class="full-height no-padding-force no-margin-force">
-                <div class="full-height full-width flex-container-col padded">
-                    <div class="flex-container-row justify-center">
-                        <label>Drag files or folders that you want to download</label>
-                    </div>
-                    <div class="flex-container-row justify-space-between">
-                        <label>Available Files</label>
-                        <label>Files to Download</label>
-                    </div>
-                    <div class="trees-container">
-                        <as-split>
-                            <as-split-area size="50">
-                                <tree-root #availableFilesTreeComponent
-                                           [nodes]="this.availableFilesNodes"
-                                           [options]="this.filesOptions">
-                                    <ng-template #treeNodeTemplate let-node>
-                                        <img src="{{node.data.icon}}" class="icon">
-                                        <span>{{node.data.displayName}}</span>
-                                    </ng-template>
-                                </tree-root>
-                            </as-split-area>
-                            <as-split-area size="50">
-                                <tree-root #filesToDownloadTreeComponent
-                                           [nodes]="this.filesToDownloadNodes"
-                                           [options]="this.filesOptions">
-                                    <ng-template #treeNodeTemplate let-node>
-                                        <img src="{{node.data.icon}}" class="icon">
-                                        <span>{{node.data.displayName}}</span>
-                                    </ng-template>
-                                </tree-root>
-                            </as-split-area>
-                        </as-split>
-                    </div>
-                    <div class="flex-container-row justify-space-between">
-                        <label>{{this.availableFilesCount}} file(s)</label>
-                        <label>{{this.filesToDownloadCount}} file(s) ({{this.filesToDownloadSizeLabel}})</label>
-                    </div>
+            <mat-dialog-actions class="justify-flex-end no-margin no-padding generic-dialog-footer-colors">
+                <div class="double-padded-right">
+                    <button mat-raised-button color="primary" class="primary-action" [disabled]="this.filesToDownloadCount < 1" (click)="this.download()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download</button>
+                    <button mat-raised-button color="primary" class="primary-action" [disabled]="this.filesToDownloadCount < 1 || !this.isFDTSupported" (click)="this.downloadFDTCommandLine()"><img [src]="this.constantsService.ICON_DOWNLOAD_LARGE" class="icon">FDT Command Line</button>
+                    <button mat-raised-button color="primary" class="primary-action" [disabled]="this.filesToDownloadCount < 1 || !this.isFDTSupported" (click)="this.downloadFDT()"><img [src]="this.constantsService.ICON_DOWNLOAD_LARGE" class="icon">FDT Download</button>
+                    <button mat-raised-button color="primary" class="primary-action" *ngIf="this.showCreateSoftLinks" [disabled]="this.filesToDownloadCount < 1" (click)="this.createSoftLinks()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Create Soft Links</button>
+                    <button mat-raised-button color="accent" class="secondary-action" mat-dialog-close>Cancel</button>
                 </div>
-            </div>
-            <mat-dialog-actions class="justify-flex-end no-margin-force">
-                <button mat-button [disabled]="this.filesToDownloadCount < 1" (click)="this.download()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download</button>
-                <button mat-button [disabled]="this.filesToDownloadCount < 1 || !this.isFDTSupported" (click)="this.downloadFDTCommandLine()"><img [src]="this.constantsService.ICON_DOWNLOAD_LARGE" class="icon">FDT Command Line</button>
-                <button mat-button [disabled]="this.filesToDownloadCount < 1 || !this.isFDTSupported" (click)="this.downloadFDT()"><img [src]="this.constantsService.ICON_DOWNLOAD_LARGE" class="icon">FDT Download</button>
-                <button mat-button *ngIf="this.showCreateSoftLinks" [disabled]="this.filesToDownloadCount < 1" (click)="this.createSoftLinks()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Create Soft Links</button>
-                <button mat-button mat-dialog-close>Cancel</button>
             </mat-dialog-actions>
         </div>
     `,
-    styles:[`
+    styles: [`
         div.trees-container {
             width: 60em;
             height: 25em;
             border: solid lightgrey 1px;
             padding: 0.3em;
         }
-        .no-padding-force {
-            padding: 0 !important;
+        .no-margin {
+            margin: 0;
         }
-        .no-margin-force {
-            margin: 0 !important;
+        .no-padding {
+            padding: 0;
+        }
+        .primary-action {
+            background-color: var(--bluewarmvivid-medlight);
+            font-weight: bolder;
+            color: white;
+        }
+        .secondary-action {
+            background-color: var(--sidebar-footer-background-color);
+            font-weight: bolder;
+            color: var(--bluewarmvivid-medlight);
+            border: var(--bluewarmvivid-medlight)  solid 1px;
         }
     `]
 })
-export class DownloadFilesComponent implements OnInit, OnDestroy {
+export class DownloadFilesComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
     @ViewChild("availableFilesTreeComponent") private availableFilesTreeComponent: TreeComponent;
     public availableFilesNodes: any[] = [];
@@ -114,8 +123,8 @@ export class DownloadFilesComponent implements OnInit, OnDestroy {
                 private utilService: UtilService,
                 private fileService: FileService,
                 private dialogsService: DialogsService,
-                private securityAdvisor: CreateSecurityAdvisorService,
-                private dialog: MatDialog) {
+                private securityAdvisor: CreateSecurityAdvisorService) {
+        super();
     }
 
     ngOnInit() {
@@ -161,20 +170,22 @@ export class DownloadFilesComponent implements OnInit, OnDestroy {
                 let terms: string = this.propertyService.getPropertyValue(PropertyService.PROPERTY_GUEST_DOWNLOAD_TERMS);
                 if (terms) {
                     let guestTermsConfig: MatDialogConfig = new MatDialogConfig();
-                    guestTermsConfig.panelClass = "no-padding-dialog";
+                    guestTermsConfig.autoFocus = false;
                     guestTermsConfig.width = "30em";
                     guestTermsConfig.height = "30em";
                     guestTermsConfig.data = {
                         terms: terms,
                     };
-                    guestTermsConfig.disableClose = true;
-                    let guestTermsDialog: MatDialogRef<GuestTermsDialogComponent> = this.dialog.open(GuestTermsDialogComponent, guestTermsConfig);
-                    guestTermsDialog.afterClosed().subscribe((result: any) => {
-                        if (result) {
-                            this.email = result;
-                        } else {
-                            this.dialogRef.close();
-                        }
+                    this.dialogsService.genericDialogContainer(GuestTermsDialogComponent, "Download Terms", null, guestTermsConfig,
+                        {actions: [
+                                {type: ActionType.PRIMARY, icon: this.constantsService.ICON_ACCEPT, name: "Accept", internalAction: "accept"},
+                                {type: ActionType.SECONDARY, icon: this.constantsService.ICON_DECLINE, name: "Decline", internalAction: "onClose"}
+                            ]}).subscribe((result: any) => {
+                                if(result) {
+                                    this.email = result;
+                                } else {
+                                    this.dialogRef.close();
+                                }
                     });
                 }
             });
@@ -306,8 +317,11 @@ export class DownloadFilesComponent implements OnInit, OnDestroy {
                     suggestedFilename: this.suggestedFilename,
                     fileType: ".zip",
                 };
-                progressWindowConfig.disableClose = true;
-                this.dialog.open(DownloadProgressComponent, progressWindowConfig);
+                progressWindowConfig.autoFocus = false;
+                this.dialogsService.genericDialogContainer(DownloadProgressComponent, null, null, progressWindowConfig,
+                    {actions: [
+                            {type: ActionType.SECONDARY, name: "Close", internalAction: "close"}
+                        ]});
             } else {
                 this.handleBackendError(result, "caching file download list");
             }
@@ -348,7 +362,7 @@ export class DownloadFilesComponent implements OnInit, OnDestroy {
         let files: any[] = this.gatherFilesToDownload(this.filesToDownloadNodes[0]);
         this.makeSoftLinksFn(files).subscribe((result: any) => {
             if (result && result.result === 'SUCCESS' && result.softLinkPath) {
-                this.dialogsService.alert(result.softLinkPath, "Soft Link Path:");
+                this.dialogsService.alert(result.softLinkPath, "Soft Link Path:", DialogType.SUCCESS);
             } else {
                 this.handleBackendError(result, "making soft links");
             }
@@ -360,7 +374,7 @@ export class DownloadFilesComponent implements OnInit, OnDestroy {
         if (response && response.message) {
             message = ": " + response.message;
         }
-        this.dialogsService.confirm("An error occurred while " + action + message, null);
+        this.dialogsService.error("An error occurred while " + action + message);
     }
 
 }

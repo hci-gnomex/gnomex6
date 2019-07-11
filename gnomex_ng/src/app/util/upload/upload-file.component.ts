@@ -1,14 +1,13 @@
 import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import { MatDialogRef } from '@angular/material';
-import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowSelectedEvent} from "ag-grid-community";
+import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {UploadFileService} from "../../services/upload-file.service";
 import {IFileParams} from "../interfaces/file-params.model";
 import {ConstantsService} from "../../services/constants.service";
-import {concat, of, Subscription} from "rxjs";
+import {Subscription} from "rxjs";
 import {FileService} from "../../services/file.service";
 import {DialogsService} from "../popup/dialogs.service";
-import {flatMap, last, take} from "rxjs/operators";
-import {TabChangeEvent} from "../tabs";
+import {take} from "rxjs/operators";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {saveAs} from 'file-saver';
 import {PropertyService} from "../../services/property.service";
@@ -22,11 +21,29 @@ import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
             float: right;
         }
 
+        .primary-action {
+            background-color: var(--bluewarmvivid-medlight);
+            font-weight: bolder;
+            color: white;
+        }
+        .secondary-action {
+            background-color: var(--sidebar-footer-background-color);
+            font-weight: bolder;
+            color: var(--bluewarmvivid-medlight);
+            border: var(--bluewarmvivid-medlight)  solid 1px;
+        }
+
         :host {
             height: 100%;
             display: flex;
             flex: 1;
             flex-direction: column;
+        }
+        .no-padding {
+            padding: 0;
+        }
+        .no-margin {
+            margin: 0;
         }
 
     `]
@@ -49,8 +66,6 @@ export class UploadFileComponent implements OnInit {
     private uploadSubscription: Subscription;
     private orgExperimentFileParams:any;
     private orgAnalysisFileParams:any;
-
-
 
 
 
@@ -80,7 +95,7 @@ export class UploadFileComponent implements OnInit {
     constructor(public dialogRef: MatDialogRef<UploadFileComponent>,
                 public uploadService: UploadFileService,
                 private dialogService: DialogsService,
-                public constService:ConstantsService,
+                public constService: ConstantsService,
                 public secAdvisor: CreateSecurityAdvisorService,
                 private propertyService: PropertyService,
                 private fileService: FileService) {}
@@ -210,7 +225,7 @@ export class UploadFileComponent implements OnInit {
             },error =>{
                 this.rowData = [];
                 this.gridApi.setRowData(this.rowData = []);
-                this.dialogService.alert(error);
+                this.dialogService.error(error);
                 this.primaryButtonText = "Upload";
             });
         }else{

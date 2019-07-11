@@ -1,7 +1,8 @@
 import {Component, OnInit} from "@angular/core";
-import {MatDialog, MatDialogRef} from "@angular/material";
 import {AboutComponent} from "./about.component";
 import {Router} from "@angular/router";
+import {DialogsService} from "../util/popup/dialogs.service";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'about-window-launcher',
@@ -9,22 +10,20 @@ import {Router} from "@angular/router";
 })
 
 export class AboutWindowLauncher implements OnInit {
-    aboutDialogRef: MatDialogRef<AboutComponent>;
 
-    constructor(private dialog: MatDialog, private router: Router) {
+    constructor(private dialogsService: DialogsService, private router: Router) {
     }
 
     ngOnInit() {
-        setTimeout(() => {
-            this.aboutDialogRef = this.dialog.open(AboutComponent);
-        });
 
-        setTimeout(() =>
-            this.aboutDialogRef.afterClosed()
-                .subscribe(() => {
-                    this.router.navigate([{ outlets: { modal: null }}]);
-                })
-        );
+        setTimeout(() => {
+            this.dialogsService.genericDialogContainer(AboutComponent, " About", null, null,
+                {actions: [
+                        {type: ActionType.SECONDARY, name: "Close", internalAction: "onClose"}
+                    ]}).subscribe(() => {
+                this.router.navigate([{ outlets: { modal: null }}]);
+            });
+        });
     }
 
 }

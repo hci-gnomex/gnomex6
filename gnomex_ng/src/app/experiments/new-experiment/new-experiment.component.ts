@@ -1,5 +1,11 @@
 import {
-    Component, ComponentRef, OnDestroy, OnInit, Output, EventEmitter, ViewChild
+    Component,
+    ComponentRef,
+    EventEmitter,
+    OnDestroy,
+    OnInit,
+    Output,
+    ViewChild,
 } from '@angular/core';
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {FormGroup} from "@angular/forms";
@@ -9,7 +15,7 @@ import {first} from "rxjs/internal/operators";
 
 import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
 import {ExperimentBioinformaticsTabComponent} from "../experiment-detail/experiment-bioinformatics-tab.component";
@@ -26,17 +32,16 @@ import {TabSeqSetupViewComponent} from "./tab-seq-setup-view.component";
 import {TabVisibilityComponent} from "./tab-visibility.component";
 
 import {Experiment} from "../../util/models/experiment.model";
-import {IAnnotation} from "../../util/interfaces/annotation.model";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'new-experiment',
     templateUrl: "./new-experiment.component.html",
-    styles: [`        
+    styles: [`
         
         .bordered { border: 1px solid silver; }
         
-        .highlight-agreement { 
+        .highlight-agreement {
             color: green;
             font-style: italic;
         }
@@ -462,6 +467,62 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             });
         } else if (category.type === NewExperimentService.TYPE_NANOSTRING) {
             this.newExperimentService.currentState = "NanoStringState";
+
+
+            this.tabs.push({
+                label: "Sample Details",
+                disabled: true,
+                component: TabSampleSetupViewComponent
+            });
+
+            if (this.annotationInputs
+                && this.annotationInputs.annotations
+                && Array.isArray(this.annotationInputs.annotations)
+                && this.annotationInputs.annotations.length) {
+
+                this.tabs.push({
+                    label: "Other Details",
+                    disabled: true,
+                    component: AnnotationTabComponent
+                });
+            }
+
+            this.tabs.push({
+                label: "Assay Type",
+                disabled: true,
+                component: TabSeqSetupViewComponent
+            });
+            // this.tabs.push({
+            //     label: "Sequencing Options",
+            //     disabled: true,
+            //     component: TabSeqProtoViewComponent
+            // });
+            this.tabs.push({
+                label: "Annotations",
+                disabled: true,
+                component: TabAnnotationViewComponent
+            });
+            this.tabs.push({
+                label: "Experiment Design",
+                disabled: true,
+                component: TabSamplesIlluminaComponent
+            });
+            this.tabs.push({
+                label: "Visibility",
+                disabled: true,
+                component: TabVisibilityComponent
+            });
+            this.tabs.push({
+                label: "Bioinformatics",
+                disabled: true,
+                component: ExperimentBioinformaticsTabComponent
+            });
+            this.tabs.push({
+                label: "Confirm",
+                disabled: true,
+                component: TabConfirmIlluminaComponent
+            });
+
         } else if (category.type === NewExperimentService.TYPE_CLINICAL_SEQUENOM) {
             this.newExperimentService.currentState = "ClinicalSequenomState";
         } else if (category.type === NewExperimentService.TYPE_MICROARRAY) {
@@ -542,7 +603,6 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         this.dialogService.startDefaultSpinnerDialog();
 
         this.experimentService.saveRequest(this.inputs.experiment).subscribe((response) => {
-            console.log("Save Experiment returned!");
             this.dialogService.stopAllSpinnerDialogs();
 
             if (!response) {
@@ -556,22 +616,13 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                     + '\n'
                     + 'Please inscribe database ID numbers on the lids of 1.5 ml microcentrifuge tubes.  Inscribe sample names on the sides of tubes. ';
 
-                let temp = this.dialogService.alert(submissionMessage, "Request Submitted").subscribe((value: boolean) => {
+                let temp = this.dialogService.alert(submissionMessage, "Request Submitted", DialogType.SUCCESS).subscribe((value: boolean) => {
                     if (response.requestNumber) {
-                        // this.router.navigateByUrl('ShowRequestForm.gx?idRequest=' + response.requestNumber);
-
                         window.open('ShowRequestForm.gx?idRequest=' + response.idRequest, '_blank');
-
-                        // setTimeout(() => {
-                        //     this.router.navigateByUrl('/experiments/' + response.requestNumber);
-                        // });
-
-                        // this.router.navigate(['/experiments', { outlets: { 'browsePanel': ['id', response.requestNumber] } } ]);
 
                         this.gnomexService.navByNumber(response.requestNumber);
                     } else {
                         // Should not be reachable...
-                        // this.router.navigateByUrl("/home");
                     }
 
                     temp.unsubscribe();

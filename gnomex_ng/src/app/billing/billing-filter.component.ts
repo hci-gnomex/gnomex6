@@ -12,6 +12,9 @@ import {UserPreferencesService} from "../services/user-preferences.service";
     selector: 'billing-filter',
     templateUrl: "./billing-filter.component.html",
     styles: [`
+        .children-margin-right > *:not(:last-child) {
+            margin-right: 1em;
+        }
         .small-margin-right {
             margin-right: 2em;
         }

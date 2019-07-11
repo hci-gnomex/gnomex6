@@ -1,9 +1,14 @@
-<h6>Annotation Progress Report</h6>
-<div>
+<h4>Annotation Progress Report</h4>
+<div class="flex-container-row align-center half-width">
     <label style="width: 6rem">Lab Group</label>
-    <jqxComboBox style="display: inline-block" [width]="250" [height]="30" [placeHolder]="'All Labs...'"
-                 [source]="labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
-                 (onSelect)="onLabSelect($event)" (onUnselect)="onLabUnselect()">
-    </jqxComboBox>
+    <div class="flex-grow">
+        <custom-combo-box [options]="this.labList"
+                          placeholder="All Labs..."
+                          [temporaryPlaceholder]="true"
+                          valueField="idLab"
+                          [displayField]="this.prefService.labDisplayField"
+                          (optionSelected)="onLabSelect($event)">
+        </custom-combo-box>
+    </div>
 </div>
-<button mat-button (click)="run()"><img src="../../assets/accept.png" style="margin: 0rem 0.2rem 0rem 0rem">Run</button>
+<button mat-button (click)="run()"><img src="../../assets/accept.png" class="icon">Run</button>

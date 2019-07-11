@@ -1,47 +1,34 @@
-import {Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {DialogPosition, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
+import {MatDialogConfig, MatDialogRef} from "@angular/material";
 import {Router} from "@angular/router";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {SampleUploadService} from "./sample-upload.service";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
 import {ShowErrorsShowSamplesRenderer} from "../util/grid-renderers/show-errors-show-samples.renderer";
 import {Subscription} from "rxjs";
 import {GnomexService} from "../services/gnomex.service";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'bulk-sample-upload-launcher',
     template: `
         <div></div>
     `,
-    styles: [`
-        
-        .no-padding-dialog .mat-dialog-container {
-            padding: 0;
-        }
-        .no-padding-dialog .mat-dialog-container .mat-dialog-actions {
-            background-color: #eeeeeb;
-        }
-        
-    `]
 }) export class BulkSampleUploadLauncherComponent {
 
-    constructor (private dialog: MatDialog,
+    constructor (private dialogsService: DialogsService,
                  private router: Router) {
 
         let config: MatDialogConfig = new MatDialogConfig();
         config.width = '60em';
-        config.height = '45em';
-        config.panelClass = 'no-padding-dialog';
-        config.disableClose = true;
-        config.hasBackdrop = false;
+        config.height = '43.5em';
+        config.autoFocus = false;
 
-        let dialogRef = this.dialog.open(BulkSampleUploadComponent, config);
-
-        dialogRef.afterClosed().subscribe((result) => {
-            // After closing the dialog, route away from this component so that the dialog could
-            // potentially be reopened.
-            this.router.navigate([{ outlets: {modal: null}}]);
-        });
+        this.dialogsService.genericDialogContainer(BulkSampleUploadComponent, "Upload Multi-Experiment Sample Sheet", null, config)
+            .subscribe((result: any) => {
+                this.router.navigate([{ outlets: {modal: null}}]);
+            });
     }
 }
 
@@ -50,7 +37,7 @@ import {GnomexService} from "../services/gnomex.service";
     templateUrl: 'bulk-sample-upload.component.html',
     styles: [`
 
-        .no-height { height: 0;  } 
+        .no-height { height: 0;  }
         .single-em { width: 1em; }
         
         .no-max-height { max-height: none; }
@@ -73,13 +60,13 @@ import {GnomexService} from "../services/gnomex.service";
         
         .inline-block { display: inline-block; }
 
-        .padded { padding: 0.3em; } 
+        .padded { padding: 0.3em; }
         
         .padded-top { padding-top: 0.3em; }
         
-        .padded-left-right { 
-            padding-left:  0.3em; 
-            padding-right: 0.3em; 
+        .padded-left-right {
+            padding-left:  0.3em;
+            padding-right: 0.3em;
         }
         
         .padded-left-right-bottom {
@@ -109,22 +96,12 @@ import {GnomexService} from "../services/gnomex.service";
         }
     
     `]
-}) export class BulkSampleUploadComponent implements OnDestroy {
-
-    @ViewChild('topmostLeftmost') topmostLeftmost: ElementRef;
+}) export class BulkSampleUploadComponent extends BaseGenericContainerDialog implements OnDestroy {
 
     @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
     @ViewChild('fileInput') fileInput: ElementRef;
-
-
-    originalXClick: number = 0;
-    originalYClick: number = 0;
-
-    protected positionX: number = 0;
-    protected positionY: number = 0;
-
-    movingDialog: boolean = false;
-
+    
+    public actionType: any = ActionType;
 
     public file: any;
     protected fileParsed: boolean = false;
@@ -147,7 +124,7 @@ import {GnomexService} from "../services/gnomex.service";
     private sampleGridHeaders: any[];
     private rows: any[];
 
-    private errorRows_original: any[];
+    public errorRows_original: any[];
     private rows_original: any[];
 
     private uploadSubscription: Subscription;
@@ -156,7 +133,7 @@ import {GnomexService} from "../services/gnomex.service";
     public context: any = this;
 
     private finalErrors:   any;
-    private finalRequests: any;
+    public finalRequests: any;
 
 
     private get importedGridColumnDefs(): any[] {
@@ -421,50 +398,9 @@ import {GnomexService} from "../services/gnomex.service";
     constructor(private dialogRef: MatDialogRef<BulkSampleUploadComponent>,
                 private dialogService: DialogsService,
                 private gnomexService: GnomexService,
-                private sampleUploadService: SampleUploadService) { }
-
-
-
-    onMouseDownHeader(event: any): void {
-        if (!event) {
-            return;
-        }
-
-        this.positionX = this.topmostLeftmost.nativeElement.offsetLeft;
-        this.positionY = this.topmostLeftmost.nativeElement.offsetTop;
-
-        this.originalXClick = event.screenX;
-        this.originalYClick = event.screenY;
-
-        this.movingDialog = true;
+                private sampleUploadService: SampleUploadService) {
+        super();
     }
-    @HostListener('window:mousemove', ['$event'])
-    onMouseMove(event: any): void {
-        if (!event) {
-            return;
-        }
-
-        if (this.movingDialog) {
-            this.positionX += event.screenX - this.originalXClick;
-            this.positionY += event.screenY - this.originalYClick;
-
-            this.originalXClick = event.screenX;
-            this.originalYClick = event.screenY;
-
-            let newDialogPosition: DialogPosition = {
-                left:   '' + this.positionX + 'px',
-                top:    '' + this.positionY + 'px',
-            };
-
-            this.dialogRef.updatePosition(newDialogPosition);
-        }
-    }
-    @HostListener('window:mouseup', ['$event'])
-    onMouseUp(): void {
-        this.movingDialog = false;
-    }
-
-
 
     public ngOnDestroy(): void {
         if (this.uploadSubscription) {
@@ -652,7 +588,7 @@ import {GnomexService} from "../services/gnomex.service";
                             });
                         }
 
-                        this.dialogService.alert("File uploaded successfully").subscribe(() => {
+                        this.dialogService.alert("File uploaded successfully", null, DialogType.SUCCESS).subscribe(() => {
                             if (this.importableGridApi) {
                                 this.assignImportableGridContents();
                                 this.importableGridApi.sizeColumnsToFit();
@@ -660,7 +596,7 @@ import {GnomexService} from "../services/gnomex.service";
                         });
                         this.fileParsed = true;
                     } else {
-                        this.dialogService.alert("File failed to upload.");
+                        this.dialogService.alert("File failed to upload.", null, DialogType.FAILED);
                     }
                 });
             } else {
@@ -693,7 +629,11 @@ import {GnomexService} from "../services/gnomex.service";
                 temp = "There is an error in the sheet. These errors may result in rows and/or columns being ignored in the spread sheet. Do you wish to continue?"
             }
 
-            this.dialogService.yesNoDialog(["Data Skipped Warning", temp], this, "importSamples");
+            this.dialogService.confirm(["Data Skipped Warning", temp]).subscribe((result: any) => {
+                if(result) {
+                    this.importSamples();
+                }
+            });
         } else {
             this.importSamples();
         }

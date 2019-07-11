@@ -178,6 +178,7 @@ export class Experiment {
     public project:                            any;
     public slideProduct:                       string = "";
     public isExternal:                         string = ''; // "N",
+    public amendState:                         string = ''; // "SolexaLaneAmendState";
     public requestStatus:                      string = "";
     public reagent:                            string = ''; // "asdf"
     public elutionBuffer:                      string = ''; // "fdsa",
@@ -206,7 +207,7 @@ export class Experiment {
     public get seqPrepByCore(): string {
         // The sample should always return "", but save what the choice was in case we
         // save more samples, because samples save this information individually (???)
-        return "";
+        return this.seqPrepByCore_forSamples;
     }
     public set seqPrepByCore(value: string) {
         this.seqPrepByCore_forSamples = value ? value : '';
@@ -312,6 +313,8 @@ export class Experiment {
         for (let sample of this.samples) {
             sample.codeBioanalyzerChipType = this._codeBioanalyzerChipType;
         }
+
+        this.refreshSampleAnnotationList();
     };
     public onChange_codeBioanalyzerChipType: BehaviorSubject<any> = new BehaviorSubject<any>('');
 
@@ -384,7 +387,16 @@ export class Experiment {
     public billingItems:            any[] = [];
     public SeqLibTreatmentEntries:  any[] = [];
     public protocols:               any[] = [];
-    public sequenceLanes:           any[] = [];
+
+    public get sequenceLanes(): any[] {
+        return this._sequenceLanes;
+    }
+    public set sequenceLanes(value: any[]) {
+        this._sequenceLanes = value ? value : [];
+        this.onChange_sequenceLanes.next(this._sequenceLanes);
+    }
+    public _sequenceLanes: any[] = [];
+    public onChange_sequenceLanes: BehaviorSubject<any[]> = new BehaviorSubject(this._sequenceLanes);
 
     // PropertyEntries should probably be named something more like "SampleAnnotationTemplates".
     public _PropertyEntries:         any[] = [];
@@ -538,7 +550,7 @@ export class Experiment {
             return null;
         }
 
-        let experiment = new Experiment(dictionaryService, gnomexService, propertyService, securityAdvisor);
+        let experiment: Experiment = new Experiment(dictionaryService, gnomexService, propertyService, securityAdvisor);
 
         experiment.cloneProperty("name", value);
         experiment.cloneProperty("number", value);
@@ -590,7 +602,15 @@ export class Experiment {
         experiment.cloneProperty("createDate", value);
         experiment.cloneProperty("completedDate", value);
         experiment.cloneProperty("notes", value);
-        experiment.cloneProperty("application", value);
+
+        if (value.application) {
+            if (value.application.Application) {
+                experiment.application_object = value.application.Application;
+            } else {
+                experiment.cloneProperty("application", value);
+            }
+        }
+
         experiment.cloneProperty("projectName", value);
         experiment.cloneProperty("idProject", value);
         experiment.cloneProperty("project", value);
@@ -752,6 +772,19 @@ export class Experiment {
         return keep;
     }
 
+
+    public replaceAllSequenceLanes(): void {
+        let result: any[] = [];
+
+        for (let sample of this.samples) {
+            for (let sequenceLane of sample.createAllSequenceLanes()) {
+                result.push(sequenceLane);
+            }
+        }
+
+        this.sequenceLanes = result;
+    }
+
     // private getSelectedPropertyEntries
     public getSelectedSampleAnnotations(): any[] {
         return this.PropertyEntries.filter((value: any) => {
@@ -805,7 +838,9 @@ export class Experiment {
 
             if (this._PropertyEntries_original && Array.isArray(this._PropertyEntries_original)) {
                 let originalPropertiesThatAreSelected: any[] = this._PropertyEntries_original.filter((value) => {
-                    return value.isSelected && value.isSelected === 'true';
+                    return value.isSelected
+                        && value.isSelected === 'true'
+                        && (!value.idCoreFacility || value.idCoreFacility === this.idCoreFacility);
                 });
 
                 for (let propertyEntry of response) {
@@ -827,6 +862,10 @@ export class Experiment {
 
     public getJSONObjectRepresentation(): any {
         let tempSamples: any[] = [];
+
+        for (let sample of this.samples) {
+            sample.experiment = this;
+        }
 
         for (let sample of this.samples) {
             tempSamples.push(sample.getJSONObjectRepresentation());
@@ -924,6 +963,7 @@ export class Experiment {
             hasSampleDescription:               this.hasSampleDescription,
             hasPlates:                          this.hasPlates,
             isOpeningNewBillingTemplate:        this.isOpeningNewBillingTemplate,
+            amendState:                         this.amendState,
 
             analysisExperimentItems:  this.analysisExperimentItems,
             billingItems:             this.billingItems,

@@ -1,10 +1,17 @@
-import {AfterViewChecked, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+    AfterViewChecked,
+    ChangeDetectorRef,
+    Component,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {URLSearchParams} from "@angular/http";
-import {MatDialog, MatDialogConfig, MatDialogRef, MatSnackBar, MatSnackBarConfig} from "@angular/material";
+import {MatDialogConfig, MatSnackBar, MatSnackBarConfig} from "@angular/material";
 
 import {GridOptions} from "ag-grid-community/main";
-import {GridApi, GridReadyEvent, ColDef, RowSelectedEvent} from "ag-grid-community";
+import {ColDef, GridApi, GridReadyEvent, RowSelectedEvent} from "ag-grid-community";
 
 import {Subscription} from "rxjs";
 
@@ -29,8 +36,9 @@ import {HttpParams} from "@angular/common/http";
 import {PropertyService} from "../services/property.service";
 import {UtilService} from "../services/util.service";
 import {ConstantsService} from "../services/constants.service";
-import {ConfigAnnotationDialogComponent} from "../util/config-annotation-dialog.component";
 import {EditInstitutionsComponent} from "../util/edit-institutions.component";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {TabSeqSetupViewComponent} from "../experiments/new-experiment/tab-seq-setup-view.component";
 
 /**
  * @title Basic tabs
@@ -44,17 +52,15 @@ import {EditInstitutionsComponent} from "../util/edit-institutions.component";
             flex-grow: 1 !important;
         }
         
-        div.formRow {
-            display: flex;
-            flex-direction: row;
-            margin: 0.5% 0;
-            width: 80%;
-        }
         mat-form-field.formField {
-            width: 30%;
+            flex: 1;
             min-width: 15em;
-            margin: 0 0.5%;
         }
+        
+        .min-width {
+            min-width: 15em;
+        }
+        
         ::ng-deep.mat-tab-label, ::ng-deep.mat-tab-label-active{
             min-width: 10em;
             padding: 3px;
@@ -79,12 +85,12 @@ import {EditInstitutionsComponent} from "../util/edit-institutions.component";
         
         .reserve-height {
             height:     fit-content;
-            min-height: fit-content; 
+            min-height: fit-content;
         }
         
         .small-width { width: 12em; }
 
-        .horizontal-spacer { 
+        .horizontal-spacer {
             height: 100%;
             width: 0.3em;
         }
@@ -143,6 +149,43 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     public readonly EXACADEMIC = "EXACADEMIC";
     public readonly EXCOMM = "EXCOMM";
     public readonly INTERNAL = "INTERNAL";
+
+
+    public get disable_isActive_lab(): boolean {
+        if (this.createSecurityAdvisorService.isSuperAdmin) {
+            return false;
+        } else if (this.selectedGroup
+            && this.selectedGroup.managers
+            && Array.isArray(this.selectedGroup.managers)) {
+
+            let temp: any[] = this.selectedGroup.managers.filter((a: any) => {
+                return "" + a.idAppUser === "" + this.createSecurityAdvisorService.idAppUser;
+            });
+
+            return temp.length === 0;
+        } else {
+            return true;
+        }
+    }
+
+    public get isActive_lab(): boolean {
+        return this.selectedGroup
+            && this.selectedGroup.isActive
+            && this.selectedGroup.isActive === 'Y';
+    }
+    public set isActive_lab(value: boolean ){
+        if (this.selectedGroup && this.selectedGroup.isActive) {
+            this.selectedGroup.isActive = (value ? 'Y' : 'N');
+        }
+    }
+    public onChange_isActive(event: any) {
+        if (event && event.checked && event.checked === true) {
+            this.selectedGroup.isActive = 'Y';
+        } else {
+            this.selectedGroup.isActive = 'N';
+        }
+    }
+
 
     public showInstitutions: boolean = false;
     public institutionGridColDefs: ColDef[];
@@ -209,11 +252,6 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     public showSpinner: boolean = false;
     private isActiveChanged: boolean = false;
     private beingIsActive: boolean = false;
-    private createUserDialogRef: MatDialogRef<NewUserDialogComponent>;
-    private deleteUserDialogRef: MatDialogRef<DeleteUserDialogComponent>;
-    private createGroupDialogRef: MatDialogRef<NewGroupDialogComponent>;
-    private deleteGroupDialogRef: MatDialogRef<DeleteGroupDialogComponent>;
-    private verifyUsersDialogRef: MatDialogRef<VerifyUsersDialogComponent>;
     panelOpenState: boolean = false;
     public externalGroup: boolean = false;
     public groupFormDirty: boolean = false;
@@ -225,18 +263,17 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 public passwordUtilService: PasswordUtilService,
                 public constantsService: ConstantsService,
                 private appUserListService: AppUserListService,
+                private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private formBuilder: FormBuilder,
                 private snackBar: MatSnackBar,
                 private dialogsService: DialogsService,
                 private getLabService: GetLabService,
                 private labListService: LabListService,
                 private dictionaryService: DictionaryService,
-                private changeRef:ChangeDetectorRef,
+                private changeRef: ChangeDetectorRef,
                 public prefService: UserPreferencesService,
                 private propertyService: PropertyService,
-                private utilService: UtilService,
-                private dialog: MatDialog
-                ) {
+                private utilService: UtilService) {
         this.columnDefs = [
             {
                 headerName: "",
@@ -362,9 +399,9 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     }
 
     public buildGroups(params: URLSearchParams) {
-        this.labListService.getLabListWithParams(params).subscribe((response: any[]) => {
-            this.groupsData = response;
-            this.groupLabel = response.length + " groups";
+        this.labListService.getLabListWithParams(params).subscribe((response: any) => {
+            this.groupsData = response ? UtilService.getJsonArray(response, response.Lab) : [];
+            this.groupLabel = this.groupsData.length + " groups";
             this.setPricing();
         });
 
@@ -511,7 +548,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 lastName: this.selectedGroup.lastName,
                 pricing: this.selectedGroup.pricing,
                 contactPhone: this.selectedGroup.contactPhone,
-                contactEmail: this.selectedGroup.contactEmail,
+                contactEmail: this.selectedGroup.contactEmail
             });
     }
 
@@ -591,6 +628,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
      *
      */
     onSelectionChanged(event?: any) {
+        this.dialogsService.startDefaultSpinnerDialog();
+
         let params: URLSearchParams = new URLSearchParams();
         let selectedRows = this.gridOptions.api.getSelectedRows();
         this.idAppUser = selectedRows[0].idAppUser;
@@ -639,6 +678,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             if (this.secAdvisor.isAdmin && !this.secAdvisor.isSuperAdmin && this.selectedUser.codeUserPermissionKind === 'SUPER') {
                 this.userForm.disable();
             }
+
+            this.dialogsService.stopAllSpinnerDialogs();
         });
 
     }
@@ -646,14 +687,15 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     onGroupsSelectionChanged(event?: any) {
         this.dialogsService.startDefaultSpinnerDialog();
 
-        let params: URLSearchParams = new URLSearchParams();
+        let params: HttpParams = new HttpParams();
         let selectedRows = this.groupsGridOptions.api.getSelectedRows();
         this.idLab = selectedRows[0].idLab;
         this.myCoreFacilities = [];
-        params.set("idLab", this.idLab);
+        params = params.set("idLab", this.idLab);
 
         this.getLabService.getLab(params).subscribe((response: any) => {
             this.selectedGroup = response.Lab;
+            this.isBillingAccountsTabDirty = false;
             if (this.showInstitutions) {
                 this.resetInstitutionControls();
                 this.labInstitutions = UtilService.getJsonArray(this.selectedGroup.institutions, this.selectedGroup.institutions.Institution);
@@ -661,6 +703,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                     this.institutionGridApi.setRowData(this.labInstitutions);
                 }
             }
+
             this.myCoreFacilities = this.buildGroupCoreControls();
             this.setLabPricing(this.selectedGroup);
             this.setGroupValues();
@@ -843,6 +886,13 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         }
 
         let myCores = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.CoreFacility");
+
+        myCores = myCores.filter((value) => {
+            return !value.isActive || value.isActive !== 'N';
+        });
+
+        myCores = myCores.sort(TabSeqSetupViewComponent.sortBySortOrderThenDisplay);
+
         for (let myCore of myCores) {
             let control: FormControl = new FormControl(myCore.display);
             this.groupForm.addControl(myCore.display, control);
@@ -873,15 +923,17 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     newUser() {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.height = '20em';
-        configuration.width  = '24em';
+        configuration.width  = '40em';
 
-        this.createUserDialogRef = this.dialog.open(NewUserDialogComponent, configuration);
-        this.createUserDialogRef.afterClosed()
-            .subscribe(result => {
-                if (this.createUserDialogRef.componentInstance.rebuildUsers) {
-                    this.buildUsers();
-                }
-            })
+        this.dialogsService.genericDialogContainer(NewUserDialogComponent, "Add User", this.constantsService.ICON_USER, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.buildUsers();
+                    }
+        });
 
     }
 
@@ -895,13 +947,15 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             userName: this.selectedUser[this.prefService.userDisplayField]
         };
 
-        this.deleteUserDialogRef = this.dialog.open(DeleteUserDialogComponent, configuration);
-        this.deleteUserDialogRef.afterClosed()
-            .subscribe(result => {
-                if (this.deleteUserDialogRef.componentInstance.rebuildUsers) {
-                    this.buildUsers();
-                }
-            })
+        this.dialogsService.genericDialogContainer(DeleteUserDialogComponent, "Delete User", this.constantsService.ICON_USER, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "delete"},
+                    {type: ActionType.SECONDARY, name: "No", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.buildUsers();
+                    }
+        });
 
     }
 
@@ -1037,19 +1091,19 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         let coresIManage = this.setCoreFacilities();
 
         if (this.codeUserPermissionKind === 'ADMIN' && coresIManage === 0) {
-            this.dialogsService.confirm("The user is marked as an admin; Please specify the core facilities the user can manage.", null);
+            this.dialogsService.alert("The user is marked as an admin; Please specify the core facilities the user can manage.", null);
         } else {
             if (this.isActiveChanged && this.isActiveFC.value == false) {
                 if ( this.isMemberOfLab()) {
                     let activeMessage = this.buildLabsMessage();
-                    this.dialogsService.confirm("Inactivating this user will remove them from the following lab(s):", activeMessage).subscribe(answer => {
+                    this.dialogsService.confirm("Inactivating this user will remove them from the following lab(s):<br>" + activeMessage).subscribe(answer => {
                         if (answer) {
                             this.beingIsActive = true;
                             this.save();
                         }
                     });
                 } else {
-                    this.dialogsService.confirm("This will inactivate the user", " ").subscribe(answer => {
+                    this.dialogsService.confirm("This will inactivate the user").subscribe(answer => {
                         if (answer) {
                             this.beingIsActive = true;
                             this.save();
@@ -1118,8 +1172,14 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             warningMessages.push(' ');
             warningMessages.push('Continue with save anyway?');
 
-            this.dialogsService.yesNoDialog(warningMessages, this, "saveGroup");
+            this.dialogsService.confirm(warningMessages).subscribe((result: any) => {
+                if(result) {
+                    this.dialogsService.startDefaultSpinnerDialog();
+                    this.saveGroup();
+                }
+            });
         } else {
+            this.dialogsService.startDefaultSpinnerDialog();
             this.saveGroup();
         }
     }
@@ -1298,7 +1358,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             let stringifiedSF = JSON.stringify(cores);
             params = params.set("coreFacilitiesJSONString", stringifiedSF);
             params = params.set("excludeUsage", this.selectedGroup.excludeUsage);
-            params = params.set("lab", this.selectedGroup.lab);
+            params = params.set("isActive", this.selectedGroup.isActive);
             params = params.set("idLab", this.selectedGroup.idLab);
             params = params.set("version", this.selectedGroup.version);
         }
@@ -1340,7 +1400,9 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
 
                 this.snackBar.open("Changes Saved", "Lab", config);
                 this.buildLabList();
+                this.onGroupsSelectionChanged();
             }
+            this.dialogsService.stopAllSpinnerDialogs();
             this.showSpinner = false;
         });
     }
@@ -1359,7 +1421,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
 
     searchCoreFacility(event) {
         let params: URLSearchParams = new URLSearchParams();
-        params.set("idCoreFacility", event.value);
+        params.set("idCoreFacility", event ? event : "");
         params.set("idInstitution", "");
         params.set("isExternal", "");
         params.set("listKind", "UnboundedLabList");
@@ -1420,11 +1482,16 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     }
 
     public onEditInstitutions(): void {
-        let dialogRef: MatDialogRef<EditInstitutionsComponent> = this.dialog.open(EditInstitutionsComponent);
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
-                this.buildInstitutions();
-            }
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.autoFocus = false;
+        this.dialogsService.genericDialogContainer(EditInstitutionsComponent, "Edit Institutions", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if (result) {
+                        this.buildInstitutions();
+                    }
         });
     }
 
@@ -1437,7 +1504,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     searchInstitution(event) {
         let params: URLSearchParams = new URLSearchParams();
         params.set("idCoreFacility", "");
-        params.set("idInstitution", event.value);
+        params.set("idInstitution", event ? event : "");
         params.set("isExternal", "");
         params.set("listKind", "UnboundedLabList");
 
@@ -1448,15 +1515,17 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     newGroup() {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.height = '35em';
-        configuration.width  = '20em';
+        configuration.width  = '40em';
 
-        this.createGroupDialogRef = this.dialog.open(NewGroupDialogComponent, configuration);
-        this.createGroupDialogRef.afterClosed()
-            .subscribe(result => {
-                if (this.createGroupDialogRef.componentInstance.rebuildGroups) {
-                    this.buildLabList();
-                }
-            })
+        this.dialogsService.genericDialogContainer(NewGroupDialogComponent, "Add Group", this.constantsService.ICON_USER, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.buildLabList();
+                    }
+        });
 
     }
 
@@ -1470,13 +1539,15 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             labName: this.selectedGroup[this.prefService.labDisplayField]
         };
 
-        this.deleteGroupDialogRef = this.dialog.open(DeleteGroupDialogComponent, configuration);
-        this.deleteGroupDialogRef.afterClosed()
-            .subscribe(result => {
-                if (this.deleteGroupDialogRef.componentInstance.rebuildGroups) {
-                    this.buildLabList();
-                }
-            })
+        this.dialogsService.genericDialogContainer(DeleteGroupDialogComponent, "Delete Group", this.constantsService.ICON_USER, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "delete"},
+                    {type: ActionType.SECONDARY, name: "No", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.buildLabList();
+                    }
+        });
 
     }
 
@@ -1492,10 +1563,11 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             labName: this.selectedGroup[this.prefService.labDisplayField]
         };
 
-        this.verifyUsersDialogRef = this.dialog.open(VerifyUsersDialogComponent, configuration);
-        this.verifyUsersDialogRef.afterClosed()
-            .subscribe(result => {
-            })
+        this.dialogsService.genericDialogContainer(VerifyUsersDialogComponent, "Send Email",
+            this.constantsService.EMAIL_GO_LINK, configuration, {actions: [
+                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "verify"},
+                    {type: ActionType.SECONDARY, name: "No", internalAction: "onClose"}
+                ]});
 
     }
 
@@ -1510,6 +1582,9 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             return true;
         }
         if (this.showInstitutions && this.institutionsChanged) {
+            return true;
+        }
+        if (this.isBillingAccountsTabDirty) {
             return true;
         }
         return false;
@@ -1529,4 +1604,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         this.utilService.removeChangeDetectorRef(this.changeRef);
     }
 
+    private isBillingAccountsTabDirty: boolean = false;
+    onManualDirty() {
+        this.isBillingAccountsTabDirty = true;
+    }
 }

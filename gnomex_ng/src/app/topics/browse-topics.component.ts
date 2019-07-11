@@ -1,49 +1,49 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {
-    AfterViewInit, ChangeDetectorRef, Component,ElementRef, Input, OnDestroy, OnInit, ViewChild,
-    ViewEncapsulation
+    AfterViewInit,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    Input,
+    OnDestroy,
+    OnInit,
+    ViewChild,
 } from "@angular/core";
 
-import { URLSearchParams } from "@angular/http";
-
-import { jqxWindowComponent } from "jqwidgets-framework";
-import { jqxButtonComponent } from "jqwidgets-framework";
-import { jqxComboBoxComponent } from "jqwidgets-framework";
-import { jqxNotificationComponent  } from "jqwidgets-framework";
-import { jqxCheckBoxComponent } from "jqwidgets-framework";
+import {URLSearchParams} from "@angular/http";
 import {
-    TreeComponent, ITreeOptions, TreeNode, TreeModel, IActionMapping,
-    TREE_ACTIONS
+    IActionMapping,
+    ITreeOptions,
+    TREE_ACTIONS,
+    TreeComponent,
+    TreeModel,
+    TreeNode,
 } from "angular-tree-component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
-import {NavigationEnd, Router} from "@angular/router";
-import {MatDialogRef, MatDialog, MatAutocomplete,MatOption} from '@angular/material';
+import {Router} from "@angular/router";
+import {MatDialogConfig} from "@angular/material";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {TopicService} from "../services/topic.service";
 import {GnomexService} from "../services/gnomex.service";
 import {MoveTopicComponent} from "./move-topic.component";
-import {DialogsService} from "../util/popup/dialogs.service";
-import {LabListService} from "../services/lab-list.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {ExperimentsService} from "../experiments/experiments.service";
 import {AnalysisService} from "../services/analysis.service";
 import {DataTrackService} from "../services/data-track.service";
 import {DictionaryService} from "../services/dictionary.service";
-import { transaction } from 'mobx';
+import {transaction} from "mobx";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {HttpParams} from "@angular/common/http";
 import {UtilService} from "../services/util.service";
 
-const actionMapping:IActionMapping = {
+const actionMapping: IActionMapping = {
     mouse: {
         click: (tree, node, $event) => {
             $event.ctrlKey
                 ? TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event)
-                : TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event)
+                : TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
         }
     }
 };
@@ -53,7 +53,7 @@ const actionMapping:IActionMapping = {
     templateUrl: "./browse-topics.component.html",
     styles: [`
 
-        mat-form-field.formField {
+        .formField {
             margin: 0 2.0%;
             width: 20%
         }
@@ -102,16 +102,10 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild("experimentsTree") experimentTreeComponent: TreeComponent;
     @ViewChild("analysisTree") analysisTreeComponent: TreeComponent;
     @ViewChild("datatrackTree") datatrackTreeComponent: TreeComponent;
-    @ViewChild("autoLab") dtLabAutocomplete: MatAutocomplete;
     @ViewChild("datatrackInput") datatrackInput: ElementRef;
-    @ViewChild("autoOrg") dtOrgAutocomplete: MatAutocomplete;
-    @ViewChild("autoAnalLab") analLabAutoComplete: MatAutocomplete;
     @ViewChild("analysisInput") analysisInput: ElementRef;
-    @ViewChild("autoExpLab") expLabAutoComplete: MatAutocomplete;
     @ViewChild("experimentInput") experimentInput: ElementRef;
-    @ViewChild("autoGen") dtGenAutocomplete: MatAutocomplete;
     @Input() childMessage: string;
-    public moveTopicDialogRef: MatDialogRef<MoveTopicComponent>;
 
     private treeModel: TreeModel;
     private experimentTreeModel: TreeModel;
@@ -147,8 +141,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     // private showSpinner: boolean = false;
     private idAnalysis: string = "";
     private idExperiment: string = "";
-    private emptyLab = {idLab: "0",
-        name: ""};
     private previousURLParams: HttpParams;
     private resetExperiment: boolean = false;
     private resetAnalysis: boolean = false;
@@ -158,10 +150,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     private experimentLabel: string;
     private analysisLabel: string;
     private datatrackLabel: string;
-    private previousExperimentMatOption: MatOption;
-    private previousAnalysisMatOption: MatOption;
-    private previousDatatrackMatOption: MatOption;
-    private previousOrganismMatOption: MatOption;
     private navInitSubsciption:Subscription;
 
 
@@ -276,7 +264,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     ngOnInit() {
         this.utilService.registerChangeDetectorRef(this.changeDetector);
         this.treeModel = this.treeComponent.treeModel;
-        // this.showSpinner = true;
         setTimeout(() => {
             this.dialogService.startDefaultSpinnerDialog();
         });
@@ -293,11 +280,14 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
                 if(this.gnomexService.orderInitObj) { // this is if component is being navigated to by url
                     let id: string = "t" + this.gnomexService.orderInitObj.idTopic;
+                    let capID = id.toUpperCase();
                     if (this.treeModel && id) {
                         let tNode = this.treeModel.getNodeById(id);
                         if(tNode){
                             tNode.setIsActive(true);
                             tNode.scrollIntoView();
+                        }else{
+                            this.dialogService.alert("You do not have permission to view Topic " + capID , "INVALID", DialogType.FAILED);
                         }
                         this.gnomexService.orderInitObj = null;
                     }
@@ -314,7 +304,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
 
 
-        this.pickerLabs.push(this.emptyLab);
         this.pickerLabs = this.pickerLabs.concat(this.gnomexService.labList);
         this.organisms = this.gnomexService.das2OrganismList;
         this.isExperimentsTab = true;
@@ -340,7 +329,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     constructor(private topicService: TopicService, private router: Router,
-                private dialog: MatDialog,
                 private dialogService: DialogsService,
                 private gnomexService: GnomexService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
@@ -374,8 +362,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     onMoveNode($event) {
-        this.dialogService.startDefaultSpinnerDialog()
-        // this.showSpinner = true;
         this.currentItem = $event.node;
         this.targetItem = $event.to.parent;
         this.doMove($event);
@@ -383,8 +369,9 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     doMove(event) {
         if (this.currentItem.idTopic === this.targetItem.idTopic) {
-            this.dialogService.confirm("Moving or Copying an item to the same topic is not allowed.'.", null);
+            this.dialogService.alert("Moving or Copying an item to the same topic is not allowed.'.", null, DialogType.WARNING);
         } else {
+            this.dialogService.startDefaultSpinnerDialog();
             var params: URLSearchParams = new URLSearchParams();
 
             if ((event.node.idRequest || event.node.idAnalysis || event.node.idDataTrack) && !this.currentItem.idTopic) {
@@ -407,21 +394,23 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.topicService.refreshTopicsList_fromBackend();
                 });
             } else {
-                this.moveTopicDialogRef = this.dialog.open(MoveTopicComponent, {
-                    height: '220px',
-                    width: '400px',
-                    data: {
-                        currentItem: this.currentItem,
-                        targetItem: this.targetItem
-                    }
-                });
-                this.moveTopicDialogRef.afterClosed()
-                    .subscribe(result => {
-                        if (this.moveTopicDialogRef.componentInstance.noButton) {
+                let config: MatDialogConfig = new MatDialogConfig();
+                config.width = "35em";
+                config.height = "15em";
+                config.data = {
+                    currentItem: this.currentItem,
+                    targetItem: this.targetItem
+                };
+                let title: string = this.targetItem.label.length > 30 ? this.targetItem.label.substr(0, 29) + "..." : this.targetItem.label;
+                title = "Move/Copy to " + title;
+                this.dialogService.genericDialogContainer(MoveTopicComponent, title, this.currentItem.icon, config,
+                    {actions: []}).subscribe((result: any) => {
+                        if (!result) {
                             this.resetTree();
                         }
-                    })
+                });
             }
+            this.dialogService.stopAllSpinnerDialogs();
         }
     }
 
@@ -594,14 +583,13 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         let topicListNode = _.cloneDeep(this.selectedItem.data);
 
 
-
         if(this.selectedItem.isRoot){
             this.router.navigate(['/topics', { outlets: { topicsPanel: null }}]);
         }else if(name === "Data Tracks" || name === "Experiments" || name === "Analysis" ){
             this.router.navigate(['/topics', { outlets: { topicsPanel: null }}]);
         }else {
             if ((this.selectedItem.data.label as string).endsWith('(Restricted Visibility)')) {
-                this.dialogService.alert("You do not have permission to view this");
+                this.dialogService.alert("You do not have permission to view this", null, DialogType.FAILED);
                 return;
             }
 
@@ -623,10 +611,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
 
             }
             if(pathPair){
-
                 this.router.navigate(['/topics',{outlets:{topicsPanel:pathPair}}])
-
-
             }
         }
 
@@ -660,31 +645,11 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         this.utilService.removeChangeDetectorRef(this.changeDetector);
         this.topicListSubscription.unsubscribe();
         this.navInitSubsciption.unsubscribe();
-    }
-
-    chooseFirstExpLabOption() {
-        this.expLabAutoComplete.options.first.select();
-    }
-
-    chooseFirstAnalLabOption() {
-        this.analLabAutoComplete.options.first.select();
-    }
-
-    chooseFirstLabOption(): void {
-        this.dtLabAutocomplete.options.first.select();
-    }
-
-    chooseFirstOrgOption(): void {
-        this.dtOrgAutocomplete.options.first.select();
-    }
-
-    chooseFirstGenomeOption(): void {
-        this.dtGenAutocomplete.options.first.select();
+        this.gnomexService.navInitBrowseTopicSubject.next(null);
     }
 
     selectExperimentLabOption(event) {
-        if (event.source.value) {
-            this.experimentLab = event.source.value;
+        if (event) {
             this.dialogService.startDefaultSpinnerDialog();
             // this.showSpinner = true;
             this.getExperiments(this.experimentLab.idLab, this.selectedExpTimeFrame);
@@ -692,8 +657,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     selectAnalysisLabOption(event) {
-        if (event.source.value && event.source.selected && event.source.value.idLab !== "0") {
-            this.analysisLab = event.source.value;
+        if (event && event.idLab !== "0") {
             this.dialogService.startDefaultSpinnerDialog();
             // this.showSpinner = true;
             this.getAnalysis(this.analysisLab.idLab, this.selectedAnalTimeFrame);
@@ -701,20 +665,16 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     selectDatatrackLabOption(event) {
-        if (event.source.value && event.source.selected && event.source.value.idLab !== "0") {
+        if (event && event.idLab !== "0") {
             this.oldOrganisms = [];
-            this.datatrackLab = event.source.value;
-            let orgs = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ORGANISM);
             this.dialogService.startDefaultSpinnerDialog();
             // this.showSpinner = true;
             this.getDatatracks(this.datatrackLab.idLab, "", "");
-            console.log("datatrack lab");
         }
     }
 
     selectDatatrackOrgOption(event) {
-        if (event != undefined && event.source.value && event.source.value.idLab !== "0") {
-            this.organism = event.source.value;
+        if (event) {
             let genomeBuilds = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.GENOME_BUILD);
             this.genomeBuildList = genomeBuilds.filter(gen => {
                 if (gen.isActive === "Y" && !(gen.value === "")) {
@@ -739,155 +699,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         this.getDatatracks(this.datatrackLab.idLab, "", "");
     }
 
-    selectDatatrackGenOption(event) {
-        this.genomeBuild = event.source.value;
+    selectDatatrackGenOption() {
         this.getDatatracks(this.datatrackLab.idLab, this.organism.idOrganism, this.genomeBuild.idGenomeBuild);
-    }
-
-    filterAnalysisLabs(selectedLab: any): any[] {
-        let fLabs: any[];
-        if (selectedLab) {
-            if (selectedLab.idLab) {
-                if (selectedLab.idLab === "0") {
-                    this.dialogService.startDefaultSpinnerDialog();
-                    // this.showSpinner = true;
-                    this.resetAnalysis = true;
-                    this.analysisLab = null;
-                    this.analysisInput.nativeElement.blur();
-                } else {
-                    fLabs = this.pickerLabs.filter(lab =>
-                        lab.name.toLowerCase().indexOf(selectedLab.name.toLowerCase()) >= 0);
-                    return fLabs;
-                }
-            } else {
-                fLabs = this.pickerLabs.filter(lab =>
-                    lab.name.toLowerCase().indexOf(selectedLab.toLowerCase()) >= 0);
-                return fLabs;
-            }
-        } else {
-            return this.pickerLabs;
-        }
-    }
-
-    filterDatatrackLabs(selectedLab: any): any[] {
-        let fLabs: any[];
-        if (selectedLab) {
-            if (selectedLab.idLab) {
-                if (selectedLab.idLab === "0") {
-                    this.dialogService.startDefaultSpinnerDialog();
-                    // this.showSpinner = true;
-                    this.resetDatatrack = true;
-                    this.datatrackLab = null;
-                    this.datatrackInput.nativeElement.blur();
-                } else {
-                    fLabs = this.pickerLabs.filter(lab =>
-                        lab.name.toLowerCase().indexOf(selectedLab.name.toLowerCase()) >= 0);
-                    return fLabs;
-                }
-            } else {
-                fLabs = this.pickerLabs.filter(lab =>
-                    lab.name.toLowerCase().indexOf(selectedLab.toLowerCase()) >= 0);
-                return fLabs;
-            }
-        } else {
-            return this.pickerLabs;
-        }
-
-    }
-
-    filterExperimentLabs(selectedLab: any): any[] {
-        let fLabs: any[];
-        if (selectedLab) {
-            if (selectedLab.idLab) {
-                if (selectedLab.idLab === "0") {
-                    this.dialogService.startDefaultSpinnerDialog();
-                    // this.showSpinner = true;
-                    this.resetExperiment = true;
-                    this.experimentLab = null;
-                    this.experimentInput.nativeElement.blur();
-                } else {
-                    fLabs = this.pickerLabs.filter(lab =>
-                        lab.name.toLowerCase().indexOf(selectedLab.name.toLowerCase()) >= 0);
-                    return fLabs;
-                }
-            } else {
-                fLabs = this.pickerLabs.filter(lab =>
-                    lab.name.toLowerCase().indexOf(selectedLab.toLowerCase()) >= 0);
-                return fLabs;
-            }
-        } else {
-            return this.pickerLabs;
-        }
-
-    }
-
-    filterOrganism(selectedOrganism: any): any[] {
-        let fOrgs: any[] = [];
-        if (selectedOrganism) {
-            if (selectedOrganism.idOrganism) {
-                fOrgs = this.organisms.filter(org =>
-                    org.binomialName.toLowerCase().indexOf(selectedOrganism.binomialName.toLowerCase()) >= 0);
-                return fOrgs;
-            } else {
-                fOrgs = this.organisms.filter(org =>
-                    org.binomialName.toLowerCase().indexOf(selectedOrganism.toLowerCase()) >= 0);
-                return fOrgs;
-            }
-        } else {
-            return this.organisms;
-        }
-    }
-
-    highlightExpLabFirstOption(event): void {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.expLabAutoComplete.options.first) {
-            if (this.previousExperimentMatOption) {
-                this.previousExperimentMatOption.setInactiveStyles();
-            }
-            this.expLabAutoComplete.options.first.setActiveStyles();
-            this.previousExperimentMatOption = this.expLabAutoComplete.options.first;
-        }
-    }
-
-    highlightAnalLabFirstOption(event): void {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.analLabAutoComplete.options.first) {
-            if (this.previousAnalysisMatOption) {
-                this.previousAnalysisMatOption.setInactiveStyles();
-            }
-            this.analLabAutoComplete.options.first.setActiveStyles();
-            this.previousAnalysisMatOption = this.analLabAutoComplete.options.first;
-        }
-    }
-
-    highlightDtLabFirstOption(event): void {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.dtLabAutocomplete.options.first) {
-            if (this.previousDatatrackMatOption) {
-                this.previousDatatrackMatOption.setInactiveStyles();
-            }
-            this.dtLabAutocomplete.options.first.setActiveStyles();
-            this.previousDatatrackMatOption = this.dtLabAutocomplete.options.first;
-        }
-    }
-
-    highlightDtOrgFirstOption(event): void {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.dtOrgAutocomplete.options.first) {
-            if (this.previousOrganismMatOption) {
-                this.previousOrganismMatOption.setInactiveStyles();
-            }
-            this.dtOrgAutocomplete.options.first.setActiveStyles();
-            this.previousOrganismMatOption = this.dtOrgAutocomplete.options.first;
-        }
     }
 
     searchExperiementsOnEnter(event): void {
@@ -907,33 +720,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             this.searchDatatrack();
         }
     }
-
-
-    displayOrg(org: any) {
-        return org ? org.binomialName : org;
-    }
-
-    displayGen(gen: any) {
-        return gen ? gen.genomeBuildName : gen;
-    }
-
-    filterGenomeBuild(genomeBuild: any): any[] {
-        let gBuilds: any[];
-        if (genomeBuild) {
-            if (genomeBuild.idGenomeBuild) {
-                gBuilds = this.genomeBuildList.filter(gen =>
-                    gen.genomeBuildName.toLowerCase().indexOf(genomeBuild.genomeBuildName.toLowerCase()) >= 0);
-                return gBuilds;
-            } else {
-                gBuilds = this.genomeBuildList.filter(gen =>
-                    gen.genomeBuildName.toLowerCase().indexOf(genomeBuild.toLowerCase()) >= 0);
-                return gBuilds;
-            }
-        } else {
-            return this.genomeBuildList;
-        }
-    }
-
 
     onTabChange(event) {
         if (event.tab.textLabel === "Experiments") {

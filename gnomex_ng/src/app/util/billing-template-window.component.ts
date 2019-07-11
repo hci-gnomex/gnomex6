@@ -2,17 +2,18 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {BillingService} from "../services/billing.service";
 import {HttpParams} from "@angular/common/http";
-import {DialogsService} from "./popup/dialogs.service";
+import {DialogsService, DialogType} from "./popup/dialogs.service";
 import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowSelectedEvent} from "ag-grid-community";
 import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
 import {DictionaryService} from "../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
+import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
 
 @Component({
     selector: 'billing-template-window',
     templateUrl: "./billing-template-window.component.html",
     styles: [`
-        .margin-right {
+        .children-margin-right > *:not(:last-child) {
             margin-right: 1em;
         }
         div.accounts-grid-div {
@@ -21,7 +22,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
     `]
 })
 
-export class BillingTemplateWindowComponent implements OnInit {
+export class BillingTemplateWindowComponent extends BaseGenericContainerDialog implements OnInit {
 
     public idCoreFacility: string = "";
     public codeRequestCategory: string = "";
@@ -46,6 +47,8 @@ export class BillingTemplateWindowComponent implements OnInit {
                 private dialogsService: DialogsService,
                 private dictionaryService: DictionaryService,
                 public createSecurityAdvisorService: CreateSecurityAdvisorService) {
+        super();
+
         if (data && data.params) {
             let params: BillingTemplateWindowParams = data.params as BillingTemplateWindowParams;
             if (params.idCoreFacility) {
@@ -112,7 +115,7 @@ export class BillingTemplateWindowComponent implements OnInit {
                 if (response && response.message) {
                     message = ": " + response.message;
                 }
-                this.dialogsService.confirm("An error occurred while retrieving lab list" + message, null);
+                this.dialogsService.error("An error occurred while retrieving lab list" + message);
             }
             this.labList.sort((a: any, b: any) => {
                 return (a.name as string).localeCompare((b.name as string));
@@ -195,7 +198,7 @@ export class BillingTemplateWindowComponent implements OnInit {
     public promptToSave(): void {
         this.gridApi.stopEditing();
         if (this.currentAccountsList.length < 1) {
-            this.dialogsService.confirm("Please add at least one billing account", null);
+            this.dialogsService.alert("Please add at least one billing account", null, DialogType.VALIDATION);
             return;
         }
         let acceptBalanceFound: boolean = false;
@@ -203,23 +206,23 @@ export class BillingTemplateWindowComponent implements OnInit {
         for (let account of this.currentAccountsList) {
             if (account.acceptBalance === 'Y') {
                 if (acceptBalanceFound) {
-                    this.dialogsService.confirm("Only one account can accept balance", null);
+                    this.dialogsService.alert("Only one account can accept balance", null, DialogType.VALIDATION);
                     return;
                 }
                 acceptBalanceFound = true;
             }
             if (account.percentSplit <= 0) {
-                this.dialogsService.confirm("All account(s) must have a positive percentage", null);
+                this.dialogsService.alert("All account(s) must have a positive percentage", null, DialogType.VALIDATION);
                 return;
             }
             total += account.percentSplit;
         }
         if (!acceptBalanceFound) {
-            this.dialogsService.confirm("No account is designated to accept remaining balance", null);
+            this.dialogsService.alert("No account is designated to accept remaining balance", null, DialogType.VALIDATION);
             return;
         }
         if (total > 100) {
-            this.dialogsService.confirm("Percentage total exceeds 100%", null);
+            this.dialogsService.alert("Percentage total exceeds 100%", null, DialogType.VALIDATION);
             return;
         }
         this.save();

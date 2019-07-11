@@ -12,7 +12,7 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
                     {{this.message}}
                 </div>
                 <div class="major-left-right-margin">
-                    <button mat-raised-button [disabled]="disableSave" 
+                    <button mat-raised-button [disabled]="disableSave"
                             [color]="actionType" (click)="notifySave()"
                             [ngClass]="{'primary-action': actionType === type.PRIMARY,
                                         'secondary-action': actionType === type.SECONDARY && !disableSave }">
@@ -29,7 +29,7 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
             color: white;
         }
         .secondary-action{
-            background-color: white;
+            background-color: var(--sidebar-footer-background-color);
             font-weight: bolder;
             color: var(--bluewarmvivid-medlight);
             border: var(--bluewarmvivid-medlight)  solid 1px;

@@ -5,9 +5,9 @@ import {IAnnotation, IPropertyEntryValue} from "../../util/interfaces/annotation
 import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
 import {ConstantsService} from "../../services/constants.service";
 import {GnomexService} from "../../services/gnomex.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
-import {MatDialog, MatDialogRef, MatTabChangeEvent} from "@angular/material";
+import {MatDialog, MatDialogConfig} from "@angular/material";
 import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
 import {DatatracksSummaryTabComponent} from "./datatracks-summary-tab.component";
 import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
@@ -19,6 +19,7 @@ import {first} from "rxjs/operators";
 import {DatatracksFilesTabComponent} from "./datatracks-files-tab.component";
 import {UtilService} from "../../services/util.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 @Component({
     templateUrl: "./datatrack-detail-overview.component.html",
@@ -56,13 +57,11 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     public showSaveSpinner: boolean = false;
     public canWrite = false;
     public folderList: any[];
-    public initSummaryView: boolean = true;
     public types = OrderType;
 
     private datatrack: any;
     private datatrackFiles: Array<any>;
     private datatrackDirectory: any;
-    private shareWebLinkDialogRef: MatDialogRef<ShareLinkDialogComponent>;
 
 
     constructor(public dataTrackService: DataTrackService, private route: ActivatedRoute,
@@ -126,7 +125,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     }
 
     initLinkVisibility() {
-        if (this.datatrack.Files) {
+        if (this.datatrack && this.datatrack.Files) {
             let ucscLinkFile: string = "";
 
             this.datatrackDirectory = this.datatrack.Files.Dir;
@@ -193,7 +192,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                 if (resp && resp.message) {
                     message = ": " + resp.message;
                 }
-                this.dialogService.confirm("An error occurred while making link. " + message, null);
+                this.dialogService.error("An error occurred while making link. " + message);
             }
         });
     }
@@ -203,7 +202,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
 
         let IGVLinkCallBack = (resp): void => {
             if (resp && resp.result && resp.result === "SUCCESS") {
-                this.dialogService.confirm(resp.igvURL, null);
+                this.dialogService.alert(resp.igvURL, null, DialogType.SUCCESS);
             }
             this.showSpinner = false;
         };
@@ -213,7 +212,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                 this.dialogService.confirm("Creating an IGV data repository containing all user-visible datatracks affiliated with IGV-supported genome builds. " +
                     "If there are unconverted USeq files, this can take a significant amount of time.  When finished, a URL link will be displayed. " +
                     "Paste the link into IGV's Data Registry URL field.  If new data tracks are added, a new repository must be created, but the " +
-                    "link will remain valid.", "Do you wish to continue?").pipe(first()).subscribe((answer: boolean) => {
+                    "link will remain valid.<br> Do you wish to continue?").pipe(first()).subscribe((answer: boolean) => {
                     if (answer) {
                         this.dataTrackService.makeIGVLink().pipe(first()).subscribe(IGVLinkCallBack, (err: IGnomexErrorResponse) => {
                             this.showSpinner = false;
@@ -249,7 +248,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
 
         this.dataTrackService.makeURLLink(params).pipe(first()).subscribe(resp => {
             if (resp && resp.result && resp.result === "SUCCESS") {
-                this.dialogService.confirm(resp.urlsToLink, null);
+                this.dialogService.alert(resp.urlsToLink, null, DialogType.SUCCESS);
             }
         }, (err:IGnomexErrorResponse) => {
             this.showSpinner = false;
@@ -261,7 +260,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         this.dataTrackService.destroyLinks().pipe(first())
             .subscribe(resp => {
                 if (resp && resp.result && resp.result === "SUCCESS") {
-                    this.dialogService.confirm("All Links Destroyed.", null);
+                    this.dialogService.alert("All Links Destroyed.", null, DialogType.SUCCESS);
                 }
             },(err:IGnomexErrorResponse) =>{
                 this.showSpinner = false;
@@ -269,21 +268,24 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     }
 
     shareableLink(): void {
-        this.shareWebLinkDialogRef = this.dialog.open(ShareLinkDialogComponent, {
-            width: "35em",
-            panelClass: "no-padding-dialog",
-            autoFocus: false,
-            data: {
-                name: "Data Track",
-                number: this.datatrack ? this.datatrack.number : "",
-                type: "dataTrackNumber"
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = "35em";
+        configuration.panelClass = "no-padding-dialog";
+        configuration.autoFocus = true;
+        configuration.disableClose = true;
+        configuration.data = {
+            number: this.datatrack ? this.datatrack.number : "",
+            type: "dataTrackNumber"
+        };
 
-            }
-        });
+        this.dialogsService.genericDialogContainer(ShareLinkDialogComponent,
+            "Web Link for Data Track " + (this.datatrack ? this.datatrack.number : ""), null, configuration,
+            {actions: [{type: ActionType.PRIMARY, name: "Copy To Clipboard", internalAction: "copyToClipboard"}
+                ]});
     }
 
     showFolders(showFolders: any) {
-        this.dialogService.createCustomDialog(showFolders, "Folders for " + this.datatrack.name);
+        this.dialogService.createCustomDialog(showFolders, "Folders for " + this.datatrack.name, this.constService.ICON_FOLDER);
     }
 
     ngOnDestroy() {
@@ -294,10 +296,10 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         this.orderValidateService.emitOrderValidateSubject();
         let name = this.dtOverviewForm.get("summaryForm.folderName").value;
         let summary = this.dtOverviewForm.get("summaryForm.summary").value;
-        let description: string = this.orderValidateService.propsNotOnForm["description"];
+        let description: string = this.dtOverviewForm.get("summaryForm.description").value;
         let idAppUser: string = "";
         let codeVisibility: string = this.dtOverviewForm.get("visibilityForm.codeVisibility").value;
-        let idLab: string = this.dtOverviewForm.get("visibilityForm.lab").value.idLab;
+        let idLab: string = this.dtOverviewForm.get("visibilityForm.lab").value;
 
         let c: Array<any> = this.dtOverviewForm.get("visibilityForm.collaborators").value;
         let collaborators: string = "";
@@ -335,21 +337,17 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                 this.dtOverviewForm.markAsPristine();
                 let treeNode = this.dataTrackService.datatrackListTreeNode;
                 if (treeNode) {
-                    this.gnomexService.orderInitObj = {};
-                    this.gnomexService.orderInitObj.idDataTrack = treeNode.idDataTrack;
-                    this.gnomexService.orderInitObj.idGenomeBuild = treeNode.idGenomeBuild;
-                    this.gnomexService.orderInitObj.idOrganism = treeNode.idOrganism;
-                    this.gnomexService.orderInitObj.idLab = idLab;
-                    this.gnomexService.navInitBrowseDatatrackSubject.next(this.gnomexService.orderInitObj);
+                    let params: HttpParams = new HttpParams()
+                        .set("idDataTrack", treeNode.idDataTrack)
+                        .set("idGenomeBuild",treeNode.idGenomeBuild )
+                        .set("idOrganism", treeNode.idOrganism )
+                        .set("idLab", treeNode.idLab);
+                    this.dataTrackService.getDatatracksList_fromBackend(params);
                 }
             }
         },(err:IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
-    }
-
-    tabChanged(event: MatTabChangeEvent) {
-        this.initSummaryView = event.tab.textLabel === "Summary";
     }
 
 }

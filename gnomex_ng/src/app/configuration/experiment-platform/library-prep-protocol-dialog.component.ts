@@ -1,27 +1,21 @@
 import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
-import {MatDialogRef, MAT_DIALOG_DATA, MatDialogConfig, MatDialog} from "@angular/material";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {ConstantsService} from "../../services/constants.service";
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {ProtocolService} from "../../services/protocol.service";
 import {HttpParams} from "@angular/common/http";
-import {Subscription} from "rxjs";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {first} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
-
+import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 
 
 @Component({
     template: `
         <form [formGroup]="formGroup">
-            <div mat-dialog-title class="padded-outer">
-                <div class="dialog-header-colors padded-inner">
-                    Edit Library Prep
-                </div>
-            </div>
-            <div mat-dialog-content style="margin: 0; padding: 0;">
+            <div class="flex-container-col full-width full-height">
                 <div style="margin: 0.5em;">
                     <div class="flex-container-row spaced-children-margin" style="align-items:center;">
                         <mat-form-field  class="medium-form-input">
@@ -38,7 +32,7 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
                         <mat-form-field  class="medium-form-input">
                             <input matInput placeholder="URL" formControlName="url">
                         </mat-form-field>
-                        <button mat-button color="accent" [disabled]="!formGroup.get('url').value" (click)="navToURL()" > 
+                        <button mat-button color="accent" [disabled]="!formGroup.get('url').value" (click)="navToURL()" >
                             <img [src]="this.constService.PAGE_GO">
                             View URL
                         </button>
@@ -54,54 +48,22 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
                             <input matInput placeholder="Read 2 Adapter Sequence" formControlName="adapterSequenceFivePrime">
                         </mat-form-field>
                     </div>
-                    
-                    
-                </div>
-            </div>
-            <div class="padded-outer" style="justify-content: flex-end;"  mat-dialog-actions>
-                <div class="padded-inner flex-container-row" style="align-items:center" >
-                    <div class="flex-grow">
-                        <save-footer [disableSave]="formGroup.invalid"
-                                     [showSpinner]="showSpinner"
-                                     (saveClicked)="saveChanges()"
-                                     [dirty]="formGroup.dirty" >
-                        </save-footer>
-                    </div>
-                    <button mat-button  mat-dialog-close> Cancel  </button>
                 </div>
             </div>
         </form>
     `,
     styles: [`
-
-        .padded-outer{
-            margin:0;
-            padding:0;
-        }
-        .padded-inner{
-            padding:0.3em;
-
-        }
         .medium-form-input{
             width: 30em
         }
-
-
-
-
     `]
 })
-export class LibraryPrepProtocolDialogComponent implements OnInit, OnDestroy{
+export class LibraryPrepProtocolDialogComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy{
 
     saveProtocolFn:any;
     protocolParams:any;
     protocol:any;
     formGroup:FormGroup;
-    private protocolSubscription: Subscription;
-    public showSpinner:boolean = false;
-
-
-
 
     constructor(private dialogRef: MatDialogRef<LibraryPrepProtocolDialogComponent>,
                 public constService:ConstantsService, private fb: FormBuilder,
@@ -110,6 +72,7 @@ export class LibraryPrepProtocolDialogComponent implements OnInit, OnDestroy{
                 private protocolService:ProtocolService,
                 private dialogService:DialogsService,
                 @Inject(MAT_DIALOG_DATA) private data) {
+        super();
         if (this.data) {
             this.saveProtocolFn =  this.data.saveProtocolFn;
             this.protocolParams = this.data.protocol;
@@ -147,6 +110,9 @@ export class LibraryPrepProtocolDialogComponent implements OnInit, OnDestroy{
                 });
         }
 
+        this.primaryDisable = (action) => {return this.formGroup.invalid; };
+        this.dirty = () => {return this.formGroup.dirty; };
+
     }
 
     /*backend sends an empty array when no string provided for description*/
@@ -181,27 +147,22 @@ export class LibraryPrepProtocolDialogComponent implements OnInit, OnDestroy{
                 if(resp && resp.result && resp.result === "SUCCESS"){
                     this.showSpinner = false;
                     if(resp.message){
-                        this.dialogService.alert(resp.message);
+                        this.dialogService.alert(resp.message, "", DialogType.SUCCESS);
                         return;
                     }
                     this.saveProtocolFn(resp);
                     this.dialogRef.close();
                 }else{
                     this.showSpinner = false;
-                    this.dialogService.alert("An error occurred please contact GNomEx Support")
+                    this.dialogService.error("An error occurred please contact GNomEx Support");
                 }
             }, error => {
                 this.showSpinner = false;
-                this.dialogService.alert(error)});
+                this.dialogService.error(error);
+        });
     }
 
     ngOnDestroy(){
-        //this.protocolSubscription.unsubscribe();
     }
-
-
-
-
-
 
 }

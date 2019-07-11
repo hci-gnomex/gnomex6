@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {Subscription} from "rxjs";
@@ -8,12 +8,11 @@ import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {ConstantsService} from "../../services/constants.service";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {DictionaryService} from "../../services/dictionary.service";
-import {MatDialog, MatDialogConfig} from "@angular/material";
-import {SampleTypeDetailDialogComponent} from "./sample-type-detail-dialog.component";
-import {IlluminaSeqDialogComponent} from "./illumina-seq-dialog.component";
+import {MatDialogConfig} from "@angular/material";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {LibraryPrepDialogComponent} from "./library-prep-dialog.component";
 import {GnomexService} from "../../services/gnomex.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 //assets/page_add.png
 
@@ -195,10 +194,12 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
 
 
 
-    constructor(private fb:FormBuilder,private expPlatfromService:ExperimentPlatformService,
-                public constService:ConstantsService,private dictionaryService:DictionaryService,
-                private dialog: MatDialog,private dialogService:DialogsService,
-                private gnomexService:GnomexService){
+    constructor(private fb: FormBuilder,
+                private expPlatfromService: ExperimentPlatformService,
+                public constService: ConstantsService,
+                private dictionaryService: DictionaryService,
+                private dialogService: DialogsService,
+                private gnomexService: GnomexService) {
     }
 
     ngOnInit(){
@@ -301,23 +302,26 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
             this.formGroup.markAsDirty();
         }
     };
+
     openLibPrepEditor(){
-        let config: MatDialogConfig = new MatDialogConfig();
         if(this.selectedApp.length > 0){
+            let config: MatDialogConfig = new MatDialogConfig();
             config.data = {
                 rowData: this.selectedApp[0],
                 applyFn: this.applyLibPrepFn,
                 appThemeList: this.appThemeCol,
                 expPlatformNode: this.expPlatfromNode
             };
-            config.panelClass = "no-padding-dialog";
-            this.dialog.open(LibraryPrepDialogComponent,config);
+
+            this.dialogService.genericDialogContainer(LibraryPrepDialogComponent, "Edit Library Prep", null, config,
+                {actions: [
+                        {type: ActionType.PRIMARY, name: "Apply", internalAction: "applyLibPrepChanges"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                    ]});
 
         }
-
-
-
     }
+
     addApplication(){
         let rcAppList:any[] = [];
         this.nextAppNumb++;
@@ -356,8 +360,8 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
     }
     removeApplication(){
         let app = this.selectedApp[0];
-        this.dialogService.confirm("Warn","Are you sure you want to remove experiment type "
-            + app.display + "?" ).subscribe(result =>{
+        this.dialogService.confirm("Are you sure you want to remove experiment type "
+            + app.display + "?", "Warning").subscribe(result =>{
             if(result){
                 let i:number = this.rowData.indexOf(app);
                 if(i > -1 ){

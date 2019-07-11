@@ -8,25 +8,26 @@ import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode, SelectionChangedEvent} from "ag-grid-community";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
     selector: 'price-category-view',
     templateUrl: "./price-category-view.component.html",
     styles: [`
         div.grid-div {
-            height: 300px;
-            width: 400px;
+            height: 10em;
+            width: 100%;
         }
     `]
 })
 
-export class PriceCategoryViewComponent implements OnInit {
+export class PriceCategoryViewComponent extends BaseGenericContainerDialog implements OnInit {
 
     private allSteps: any[];
     private allChargeKinds: any[];
     private allFilterTypes: any[];
 
-    public title: string = "Price Category";
+    public innerTitle: string = "Price Category";
     public form: FormGroup;
     private idPriceCategory: string = "0";
     private idPriceSheet: string;
@@ -42,6 +43,7 @@ export class PriceCategoryViewComponent implements OnInit {
                 private billingService: BillingService,
                 private dialogsService: DialogsService,
                 private dictionaryService: DictionaryService) {
+        super();
 
         this.allSteps = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.STEP).filter((s: any) => {
             return s.value && s.isActive && s.isActive !== 'N';
@@ -76,7 +78,7 @@ export class PriceCategoryViewComponent implements OnInit {
             this.billingService.getPriceCategory(this.data.idPriceCategory).subscribe((result: any) => {
                 if (result && result.PriceCategory) {
                     let priceCategory: any = result.PriceCategory;
-                    this.title += " " + priceCategory.name;
+                    this.innerTitle += " " + priceCategory.name;
                     this.idPriceCategory = priceCategory.idPriceCategory;
                     this.form.controls['name'].setValue(priceCategory.name);
                     this.form.controls['active'].setValue(priceCategory.isActive === 'Y');
@@ -91,7 +93,7 @@ export class PriceCategoryViewComponent implements OnInit {
                     if (result && result.message) {
                         message = ": " + result.message;
                     }
-                    this.dialogsService.confirm("An error occurred while retrieving the price category" + message, null);
+                    this.dialogsService.error("An error occurred while retrieving the price category" + message);
                 }
             });
         }
@@ -156,7 +158,7 @@ export class PriceCategoryViewComponent implements OnInit {
                 if (result && result.message) {
                     message = ": " + result.message;
                 }
-                this.dialogsService.confirm("An error occurred while saving the price category" + message, null);
+                this.dialogsService.error("An error occurred while saving the price category" + message);
             }
         });
     }

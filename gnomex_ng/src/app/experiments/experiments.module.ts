@@ -7,19 +7,7 @@ import {EXPERIMENTS_ROUTING} from "./experiments.routes";
 import { TreeModule } from "angular-tree-component";
 
 import { AngularMaterialModule } from "../../modules/angular-material.module";
-import { ButtonModule } from "../../modules/button.module";
-import { CheckBoxModule} from "../../modules/checkbox.module";
-import { ComboBoxModule }     from "../../modules/combobox.module";
 import { EmailRelatedUsersPopupModule } from "../util/emailRelatedUsersPopup/email-related-users-popup.module";
-import { ExpanderModule }     from "../../modules/expander.module";
-import { TreeGridModule } from "../../modules/tree-grid.module";
-import { InputModule } from "../../modules/input.module";
-import { LoaderModule }       from "../../modules/loader.module";
-import { PanelModule }        from "../../modules/panel.module";
-import { NotificationModule } from "../../modules/notification.module";
-import { TextAreaModule }     from "../../modules/textarea.module";
-import { ToggleButtonModule } from "../../modules/togglebutton.module";
-import { WindowModule }       from "../../modules/window.module";
 import {UtilModule} from "../util/util.module";
 import {ServicesModule} from "../services/services.module";
 import { AngularSplitModule } from 'angular-split';
@@ -29,11 +17,6 @@ import {ExperimentOrdersComponent} from "./orders/experiment-orders.component";
 import {BrowsePanelComponent} from "./browse-panel.component";
 import {AgGridModule} from 'ag-grid-angular/main';
 import { DynamicModule } from 'ng-dynamic-component';
-
-
-import {
-    DropDownModule
-} from '../../modules/index';
 
 import {
     ExperimentsBrowseTab,
@@ -51,7 +34,6 @@ import {CreateProjectLauncherComponent} from "./create-project-launcher-componen
 import {IconRendererComponent} from "../util/grid-renderers/icon-renderer.component";
 import {TabNotesViewComponent} from "./new-experiment/tab-notes-view.component";
 import {TabSampleSetupViewComponent} from "./new-experiment/tab-sample-setup-view.component";
-import {TabPropertiesViewComponent} from "./new-experiment/tab-properties-view.component";
 import {TabSeqSetupViewComponent} from "./new-experiment/tab-seq-setup-view.component";
 import {NewExperimentComponent} from "./new-experiment/new-experiment.component";
 import {AnnotationTabComponent} from "../util/annotation-tab.component";
@@ -82,7 +64,6 @@ import {ProtocolDialogComponent} from "./experiment-detail/protocol-dialog.compo
 import {ExperimentSequenceLanesTab} from "./experiment-detail/experiment-sequence-lanes-tab";
 import {ManageFilesDialogComponent} from "../util/upload/manage-files-dialog.component";
 import {RelatedDataModule} from "../util/related-data.module";
-import {RichEditorModule} from "../../modules/rich-editor.module";
 import {ManageFilesModule} from "../util/upload/manage-files.module";
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {ExperimentBillingTabComponent} from "./experiment-detail/experiment-billing-tab.component";
@@ -90,34 +71,22 @@ import {LinkButtonRenderer} from "../util/grid-renderers/link-button.renderer";
 import {NewExternalExperimentComponent} from "./new-experiment/new-external-experiment.component";
 import {TabExternalSetupComponent} from "./new-experiment/tab-external-setup.component";
 import {TabExternalDescriptionComponent} from "./new-experiment/tab-external-description.component";
+import {AmendExperimentOverviewComponent} from "./amend-experiment-overview.component";
+import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.component";
 
 @NgModule({
     imports: [
         EXPERIMENTS_ROUTING,
-        ButtonModule,
-        CheckBoxModule,
-        ComboBoxModule,
         CommonModule,
         EmailRelatedUsersPopupModule,
-        ExpanderModule,
         FormsModule,
-        InputModule,
-        LoaderModule,
-        NotificationModule,
-        PanelModule,
         ServicesModule,
-        TextAreaModule,
-        ToggleButtonModule,
         TreeModule.forRoot(),
         UtilModule,
-        WindowModule,
         RelatedDataModule,
-        RichEditorModule,
         ManageFilesModule,
         ReactiveFormsModule,
-        DropDownModule,
         AngularMaterialModule,
-        TreeGridModule,
         AgGridRendererModule,
         AngularSplitModule,
         DynamicModule,
@@ -163,7 +132,6 @@ import {TabExternalDescriptionComponent} from "./new-experiment/tab-external-des
         CreateProjectLauncherComponent,
         TabNotesViewComponent,
         TabSampleSetupViewComponent,
-        TabPropertiesViewComponent,
         TabSeqSetupViewComponent,
         TabSeqProtoViewComponent,
         NewExperimentComponent,
@@ -185,6 +153,8 @@ import {TabExternalDescriptionComponent} from "./new-experiment/tab-external-des
         NewExternalExperimentComponent,
         TabExternalSetupComponent,
         TabExternalDescriptionComponent,
+        AmendExperimentOverviewComponent,
+        TabAmendExperimentSetupComponent,
     ],
     entryComponents: [
         CreateProjectComponent,
@@ -195,7 +165,6 @@ import {TabExternalDescriptionComponent} from "./new-experiment/tab-external-des
         ExperimentBioinformaticsTabComponent,
         TabNotesViewComponent,
         TabSampleSetupViewComponent,
-        TabPropertiesViewComponent,
         TabSeqSetupViewComponent,
         NewExperimentComponent,
         NewExperimentSetupComponent,
@@ -209,6 +178,7 @@ import {TabExternalDescriptionComponent} from "./new-experiment/tab-external-des
         ProtocolDialogComponent,
         TabExternalSetupComponent,
         TabExternalDescriptionComponent,
+        TabAmendExperimentSetupComponent,
     ],
     exports:[
         CreateProjectComponent,
@@ -218,7 +188,6 @@ import {TabExternalDescriptionComponent} from "./new-experiment/tab-external-des
         CreateProjectLauncherComponent,
         TabNotesViewComponent,
         TabSampleSetupViewComponent,
-        TabPropertiesViewComponent,
         TabSeqSetupViewComponent,
         NewExperimentComponent,
         NewExperimentSetupComponent,
@@ -230,6 +199,8 @@ import {TabExternalDescriptionComponent} from "./new-experiment/tab-external-des
         NewExternalExperimentComponent,
         TabExternalSetupComponent,
         TabExternalDescriptionComponent,
+        AmendExperimentOverviewComponent,
+        TabAmendExperimentSetupComponent,
     ]
 })
 export class ExperimentsModule { }

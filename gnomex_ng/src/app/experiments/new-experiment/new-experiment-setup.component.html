@@ -35,24 +35,10 @@
                     <div class="heading">
                         Verify your lab group :
                     </div>
-                    <mat-form-field class="moderate-width">
-                        <input matInput
-                               placeholder="Select a Lab"
-                               aria-label="Lab"
-                               formControlName="selectLab"
-                               [matAutocomplete]="autoLab"
-                               (keyup.enter)="chooseFirstLabOption()">
-                        <mat-autocomplete [displayWith]="this.prefService.createLabDisplayWithFunction()" #autoLab="matAutocomplete">
-                            <mat-option *ngFor="let lab of filterLabList(form.get('selectLab').value)"
-                                        [value]="lab"
-                                        (onSelectionChange)="selectLabOption($event)">
-                                {{ lab[this.prefService.labDisplayField] }}
-                            </mat-option>
-                        </mat-autocomplete>
-                        <mat-error *ngIf="form?.get('selectLab')?.hasError('required')">
-                            Lab is required
-                        </mat-error>
-                    </mat-form-field>
+                    <custom-combo-box class="moderate-width" placeholder="Select a Lab" (optionSelected)="selectLabOption($event)"
+                                      [displayField]="this.prefService.labDisplayField" [options]="this.labList"
+                                      [formControlName]="'selectLab'">
+                    </custom-combo-box>
                 </div>
             </li>
             <li *ngIf="showName" class="full-width align-baseline">
@@ -60,17 +46,10 @@
                     <div class="heading">
                         Verify your name :
                     </div>
-                    <mat-form-field class="moderate-width">
-                        <mat-select placeholder="Your name" [(ngModel)]="submitter" formControlName="selectName">
-                            <mat-option *ngFor="let mem of possibleSubmitters" [value]="mem">
-                                {{ mem.firstLastDisplayName }}
-                            </mat-option>
-                            <mat-option [value]="null">
-                                --
-                            </mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="form?.get('selectOwner')?.hasError('required')">Name is required</mat-error>
-                    </mat-form-field>
+                    <custom-combo-box class="moderate-width" placeholder="Your name"
+                                      [displayField]="this.prefService.userDisplayField" [options]="possibleSubmitters"
+                                      [(ngModel)]="submitter" [formControlName]="'selectName'">
+                    </custom-combo-box>
                 </div>
             </li>
             <li *ngIf="showBilling" class="full-width align-baseline">
@@ -79,14 +58,10 @@
                         <div class="heading">
                             Select a payment method :
                         </div>
-                        <mat-form-field class="moderate-width">
-                            <mat-select placeholder="Account" formControlName="selectAccount" (selectionChange)="onBillingSelection($event)">
-                                <mat-option *ngFor="let account of authorizedBillingAccounts" [value]="account">
-                                    {{ account.accountNameDisplay }}
-                                </mat-option>
-                            </mat-select>
-                            <mat-error *ngIf="form?.get('selectAccount')?.hasError('required')"> Account is required</mat-error>
-                        </mat-form-field>
+                        <custom-combo-box class="moderate-width" placeholder="Account" (optionSelected)="onBillingSelection($event)"
+                                          displayField="accountNameDisplay" [options]="authorizedBillingAccounts"
+                                          [formControlName]="'selectAccount'">
+                        </custom-combo-box>
                     </div>
                     <div class="flex-column-container moderate-width major-padding-left">
                         <div class="double-padded-left instructions">
@@ -114,14 +89,10 @@
                     <div class="heading word-wrap">
                         {{ "Select a folder : \n (for organizing experiments)" }}
                     </div>
-                    <mat-form-field class="moderate-width">
-                        <mat-select placeholder="Project" formControlName="selectProject" (selectionChange)="onProjectSelection($event)">
-                            <mat-option *ngFor="let project of filteredProjectList" [value]="project">
-                                {{ project.name }}
-                            </mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="form?.get('selectProject')?.hasError('required')"> Project is required</mat-error>
-                    </mat-form-field>
+                    <custom-combo-box class="moderate-width" placeholder="Project" (optionSelected)="onProjectSelection($event)"
+                                      displayField="name" [options]="filteredProjectList"
+                                      [formControlName]="'selectProject'">
+                    </custom-combo-box>
                     <div class="flex-container-row major-padding-left">
                         <div class="padded-right">
                             <button mat-button class="link-button minimize" (click)="onClickEditProject()">Edit</button>

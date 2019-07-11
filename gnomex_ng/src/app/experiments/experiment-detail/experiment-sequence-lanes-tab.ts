@@ -1,14 +1,20 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild} from "@angular/core";
 import {ConstantsService} from "../../services/constants.service";
-import {GridApi, GridReadyEvent, GridSizeChangedEvent, SelectionChangedEvent} from "ag-grid-community";
+import {
+    GridApi,
+    GridReadyEvent,
+    GridSizeChangedEvent,
+    SelectionChangedEvent,
+} from "ag-grid-community";
 import {ActivatedRoute} from "@angular/router";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {ExperimentsService} from "../experiments.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {IconRendererComponent} from "../../util/grid-renderers";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {AgGridNg2} from "ag-grid-angular";
 
 @Component({
     selector: 'experiment-sequence-lanes-tab',
@@ -34,13 +40,15 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
                     <div class="flex-container-col full-height padded">
                         <label>Sequence Lanes (to assign sample to lane, select sample in left-hand grid and lane in right-hand grid and press "Assign to lane"</label>
                         <div class="flex-container-row">
-                            <button mat-button [disabled]="!this.canEdit || !this.selectedSample || this.selectedLanes.length !== 1" (click)="this.assignSampleToLane()">Assign to lane</button>
-                            <button mat-button [disabled]="!this.canEdit" (click)="this.addSequenceLane()"><img [src]="this.constantsService.ICON_ADD" class="icon">Add sequence lane</button>
-                            <button mat-button [disabled]="!this.canEdit || this.selectedLanes.length < 1" (click)="this.copySequenceLane()"><img [src]="this.constantsService.ICON_TABLE_MULTIPLE" class="icon">Copy sequence lane</button>
-                            <button mat-button [disabled]="!this.canEdit || this.selectedLanes.length < 1" (click)="this.promptToDeleteSequenceLane()"><img [src]="this.constantsService.ICON_DELETE" class="icon">Delete sequence lane(s)</button>
+                            <button mat-button [disabled]="!editMode || !this.canEdit || !this.selectedSample || this.selectedLanes.length !== 1" (click)="this.assignSampleToLane()">Assign to lane</button>
+                            <button mat-button [disabled]="!editMode || !this.canEdit" (click)="this.addSequenceLane()"><img [src]="this.constantsService.ICON_ADD" class="icon">Add sequence lane</button>
+                            <button mat-button [disabled]="!editMode || !this.canEdit || this.selectedLanes.length < 1" (click)="this.copySequenceLane()"><img [src]="this.constantsService.ICON_TABLE_MULTIPLE" class="icon">Copy sequence lane</button>
+                            <button mat-button [disabled]="!editMode || !this.canEdit || this.selectedLanes.length < 1" (click)="this.promptToDeleteSequenceLane()"><img [src]="this.constantsService.ICON_DELETE" class="icon">Delete sequence lane(s)</button>
                         </div>
                         <div class="flex-grow">
-                            <ag-grid-angular class="ag-theme-balham full-height full-width"
+                            <ag-grid-angular #lanesGrid
+                                             class="ag-theme-balham full-height full-width"
+                                             stopEditingWhenGridLosesFocus="true"
                                              (gridReady)="this.onLanesGridReady($event)"
                                              (gridSizeChanged)="this.onGridSizeChanged($event)"
                                              (selectionChanged)="this.onLanesGridSelectionChanged($event)"
@@ -57,9 +65,12 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
         </div>
     `,
     styles: [`
-    `]
+    `],
 })
-export class ExperimentSequenceLanesTab implements OnInit {
+export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
+    @ViewChild("lanesGrid") lanesGrid: AgGridNg2;
+    
+    @Input() editMode: boolean;
 
     public sampleGridSplitSize: number = 0;
     public canEdit: boolean = false;
@@ -73,10 +84,25 @@ export class ExperimentSequenceLanesTab implements OnInit {
     private lanesGridApi: GridApi;
     public lanesGridColDefs: any[] = [];
     public lanesGridData: any[] = [];
-    private selectedLanes: any[] = [];
+    public selectedLanes: any[] = [];
 
     private lanesToRemove: any[] = [];
 
+    private valueChanging = (params): boolean => {
+        let rowData = params.data;
+        let field = params.colDef.field;
+        
+        if (params.newValue !== params.oldValue) {
+            rowData.isDirty = "Y";
+            rowData[field] = params.newValue;
+            this.experimentsService.experimentOverviewForm.markAsDirty();
+            return true;
+        } else {
+            rowData[field] = params.oldValue;
+            return false;
+        }
+    }
+    
     constructor(public constantsService: ConstantsService,
                 private route: ActivatedRoute,
                 private dialogsService: DialogsService,
@@ -118,20 +144,20 @@ export class ExperimentSequenceLanesTab implements OnInit {
                     {headerName: "Sample Name", headerTooltip: "Sample Name", field: "sampleName"},
                     {headerName: "Sample ID", headerTooltip: "Sample ID", field: "sampleNumber"},
                     {headerName: "Sequencing Protocol", headerTooltip: "Sequencing Protocol",
-                        field: "idNumberSequencingCyclesAllowed", editable: this.canEdit, cellRendererFramework: SelectRenderer,
+                        field: "idNumberSequencingCyclesAllowed", editable: this.canEdit && this.editMode, cellRendererFramework: SelectRenderer,
                         cellEditorFramework: SelectEditor, selectOptions: sequencingProtocolList,
                         selectOptionsDisplayField: "display", selectOptionsValueField: "value",
-                        showFillButton: true, fillAll: true},
+                        showFillButton: true, fillAll: true, valueSetter: this.valueChanging},
                     {headerName: "Status in Workflow", headerTooltip: "Status in Workflow", field: "workflowStatus"},
                     {headerName: "Flow Cell #", headerTooltip: "Flow Cell #", field: "flowCellNumber"},
                     {headerName: "Channel", headerTooltip: "Channel", field: "flowCellChannelNumber"},
                     {headerName: "# Cycles (actual)", headerTooltip: "# Cycles (actual)", field: "numberSequencingCyclesActual"},
                     {headerName: "Last Cycle Status", headerTooltip: "Last Cycle Status", field: "lastCycleStatus", cellRendererFramework: SelectRenderer,
                         cellEditorFramework: SelectEditor, selectOptions: workflowStatusList, selectOptionsDisplayField: "display",
-                        selectOptionsValueField: "value", editable: this.canEdit},
+                        selectOptionsValueField: "value", editable: this.canEdit && this.editMode, valueSetter: this.valueChanging},
                     {headerName: "Pipeline Status", headerTooltip: "Pipeline Status", field: "pipelineStatus", cellRendererFramework: SelectRenderer,
                         cellEditorFramework: SelectEditor, selectOptions: workflowStatusList, selectOptionsDisplayField: "display",
-                        selectOptionsValueField: "value", editable: this.canEdit},
+                        selectOptionsValueField: "value", editable: this.canEdit && this.editMode, valueSetter: this.valueChanging},
                 ];
 
                 let samples: any[] = [];
@@ -175,6 +201,25 @@ export class ExperimentSequenceLanesTab implements OnInit {
     public onLanesGridReady(event: GridReadyEvent): void {
         event.api.sizeColumnsToFit();
         this.lanesGridApi = event.api;
+        this.setEditMode();
+    }
+    
+    setEditMode() {
+        if (this.lanesGrid.columnApi.getColumn("idNumberSequencingCyclesAllowed")) {
+            this.lanesGrid.columnApi.getColumn("idNumberSequencingCyclesAllowed").getColDef().editable = this.canEdit && this.editMode;
+        }
+        if (this.lanesGrid.columnApi.getColumn("lastCycleStatus")) {
+            this.lanesGrid.columnApi.getColumn("lastCycleStatus").getColDef().editable = this.canEdit && this.editMode;
+        }
+        if (this.lanesGrid.columnApi.getColumn("pipelineStatus")) {
+            this.lanesGrid.columnApi.getColumn("pipelineStatus").getColDef().editable = this.canEdit && this.editMode;
+        }
+    }
+    
+    ngOnChanges(changes: SimpleChanges): void {
+        if(!changes["editMode"].isFirstChange()) {
+            this.setEditMode();
+        }
     }
 
     public onLanesGridSelectionChanged(event: SelectionChangedEvent): void {
@@ -282,7 +327,7 @@ export class ExperimentSequenceLanesTab implements OnInit {
         if (this.selectedSample && this.selectedLanes.length === 1) {
             let selectedLane: any = this.selectedLanes[0];
             if (selectedLane.idSample !== "0") {
-                this.dialogsService.alert("Cannot overwrite existing sample " + selectedLane.sampleName);
+                this.dialogsService.alert("Cannot overwrite existing sample " + selectedLane.sampleName, null, DialogType.WARNING);
                 return;
             }
 
@@ -334,7 +379,7 @@ export class ExperimentSequenceLanesTab implements OnInit {
                 let title: string = "Warning";
                 let message: string = "Lane " + lane.number + " is already loaded on flow cell " + lane.flowCellNumber
                     + "-" + lane.flowCellChannelNumber + ". Remove lane anyway?";
-                this.dialogsService.confirm(title, message).subscribe((answer: boolean) => {
+                this.dialogsService.confirm(message, title).subscribe((answer: boolean) => {
                     if (answer) {
                         this.deleteSequenceLane(lane);
                     }

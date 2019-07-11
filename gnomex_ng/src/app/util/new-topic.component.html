@@ -1,27 +1,17 @@
-<h6 mat-dialog-title><img src="../../assets/topic_tag.png">{{title}}</h6>
-<mat-dialog-content>
-    <div>
-        <mat-form-field class="dialogFormField">
-            <input matInput [(ngModel)]="name" placeholder="Name">
-        </mat-form-field>
-    </div>
-    <div class="dialogDiv">
-        <label>Group</label>
-        <jqxComboBox class="dialogComboBox" [width]="'100%'" [height]="30" [placeHolder]="'...'"
-                     [source]="labList" [displayMember]="this.prefService.labDisplayField" [valueMember]="'idLab'"
-                     (onSelect)="onLabSelect($event)" (onUnselect)="onLabUnselect()">
-        </jqxComboBox>
-    </div>
-    <div class="dialogDiv">
-        <label>Owner</label>
-        <jqxComboBox class="dialogComboBox" [width]="'100%'" [height]="30" [placeHolder]="'...'"
-                     [source]="ownerList" [displayMember]="this.prefService.userDisplayField" [valueMember]="'idAppUser'"
-                     (onSelect)="onOwnerSelect($event)" (onUnselect)="onOwnerUnselect()">
-        </jqxComboBox>
-    </div>
-</mat-dialog-content>
-<mat-dialog-actions>
-    <button mat-button *ngIf="!showSpinner && !(name === '') && !(idLab === '') && !(idOwner === '')" (click)="save()">Save</button>
-    <button mat-button *ngIf="!showSpinner" mat-dialog-close>Cancel</button>
-    <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-</mat-dialog-actions>
+<div class="full-width full-height flex-container-col double-padded-left-right">
+    <mat-form-field class="full-width">
+        <input matInput placeholder="Name" [formControl]="this.form.get('name')">
+        <mat-error *ngIf="this.form.get('name').hasError('required')">Project name is <strong>required</strong></mat-error>
+        <mat-error *ngIf="this.form.get('name').hasError('maxlength')">
+            Project name can be at most 2000 characters
+        </mat-error>
+    </mat-form-field>
+    <custom-combo-box class="full-width" placeholder="Group" [options]="this.labList"
+                      valueField="idLab" [displayField]="this.prefService.labDisplayField" (optionSelected)="onLabSelect()"
+                      [formControl]="this.form.get('idLab')">
+    </custom-combo-box>
+    <custom-combo-box class="full-width" placeholder="Owner" [options]="this.ownerList"
+                      valueField="idAppUser" [displayField]="this.prefService.userDisplayField"
+                      [formControl]="this.form.get('idAppUser')">
+    </custom-combo-box>
+</div>

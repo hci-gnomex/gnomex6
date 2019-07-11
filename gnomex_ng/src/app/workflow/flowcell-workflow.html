@@ -1,29 +1,30 @@
-<div class="flex-column-container-workflow">
-    <div class="flex-row-container">
-        <img src="../../assets/rectangle.png" height="16" width="16" style="margin-top: .65em">
-        <mat-label style="margin-left: .4em;margin-top: .4em;">{{label}}</mat-label>
+<div class="flex-container-col full-height full-width">
+    <div class="flex-container-row padded align-center">
+        <img class="icon" src="../../assets/rectangle.png" height="16" width="16">
+        <mat-label>{{label}}</mat-label>
     </div>
-    <div class="flex-row-container">
+    <div class="flex-container-row spaced-children-margin align-center">
 
-        <mat-form-field class="formField">
+        <mat-form-field class="formField ">
             <input matInput [(ngModel)]="searchText" (input)="search($event)" placeholder="Experiment or FlowCell #">
         </mat-form-field>
-        <date-range-filter class="filter-by-date" (onChange)="this.dateRangeChange($event)"></date-range-filter>
-        <div class="flow-cell-counter">{{this.workingWorkItemList.length}} Flow Cells</div>
+        <date-range-filter (onChange)="this.dateRangeChange($event)"></date-range-filter>
+        <button mat-button (click)="onFind($event)">
+            <img class="icon" [src]="this.constService.ICON_MAGNIFIER">Find
+        </button>
+        <div class="justify-flex-end"> {{this.workingWorkItemList.length}} Flow Cells</div>
     </div>
-    <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-    <div *ngIf="selectedFlowCell&&selectedFlowCell.number" class="flex-row-container">
+    <div *ngIf="selectedFlowCell&&selectedFlowCell.number" class="flex-container-row">
         <span style="font-weight: bold;margin-left: .3em">Flow Cell {{selectedFlowCell.number}}
         </span>
         <button mat-button (click)="onClickPrepReport()"><mat-icon>launch</mat-icon>Preparation Report</button>
         <button mat-button (click)="onClickRunReport()"><mat-icon>launch</mat-icon>Run Report</button>
         <button mat-button (click)="onClickEditFlowCell()"><mat-icon>edit</mat-icon>Edit Flow Cell</button>
     </div>
-    <div class="row-one" style="width: 100%;height: 90%">
-        <ag-grid-angular id="userTable" class="ag-theme-balham full-width"
+    <div class="flex-grow">
+        <ag-grid-angular class="ag-theme-balham full-height full-width"
                          [gridOptions]="gridOptions"
                          [rowData]="workingWorkItemList"
-                         [columnDefs]="columnDefs"
                          (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
                          (rowSelected)="selectedRow($event)"
                          [rowSelection]="'single'"

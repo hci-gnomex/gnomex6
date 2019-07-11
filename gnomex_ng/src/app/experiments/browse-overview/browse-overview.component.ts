@@ -19,14 +19,11 @@ import {HttpParams} from "@angular/common/http";
                 <div >
                     {{ nodeTitle}} &nbsp;&nbsp;&nbsp;&nbsp; {{ "(" + this.experimentsService.experimentList.length + " Experiments)"}}
                 </div>
-                <div>
+                <div class="flex-container-row align-center right-padding">
                     <label>Experiment #</label>
-                    <jqxComboBox  class="inlineComboBox"
-                                  [width]="170"
-                                  [height]="20"
-                                  [source]="orderedExperimentIds"
-                                  (onSelect)="onIDSelect($event)" (onUnselect)="onUnselectID($event)">
-                    </jqxComboBox>
+                    <custom-combo-box [options]="this.orderedExperimentIds"
+                                      (optionSelected)="onIDSelect($event)">
+                    </custom-combo-box>
                 </div>
             </div>
             <div class="full-width full-height flex-grow-greater overflow">
@@ -158,10 +155,14 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
 
             if(data){//when user selects from the tree
                 let idProject = data['idProject'];
-                params = params.set('idProject',idProject);
+                if(idProject){
+                    params = params.set('idProject',idProject);
+                }
             }else{// Use when user changes to tab to progress
                 let idProject = this.route.snapshot.paramMap.get('idProject');
-                params = params.set('idProject',idProject);
+                if(idProject){
+                    params = params.set('idProject',idProject);
+                }
             }
 
             if(!this.initialized) {
@@ -289,11 +290,11 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
 
     onIDSelect($event: any): void {
         let filteredIdList: Array<any> = [];
-        if($event.args && $event.args.item.value) {
+        if($event) {
             let eList: Array<any> = this.experimentsService.experimentList;
             if(eList) {
                 eList.forEach(reqObject => {
-                    if($event.args.item.value === reqObject.requestNumber) {
+                    if($event === reqObject.requestNumber) {
                         filteredIdList.push(reqObject);
                     }
                 });
@@ -301,14 +302,11 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
         }
         if(filteredIdList.length > 0 ) {
             this.experimentsService.emitFilteredOverviewList(filteredIdList);
-        }
-    }
-
-
-    onUnselectID($event: any): void {
-        let eList: Array<any> = this.experimentsService.experimentList;
-        if(eList) {
-            this.experimentsService.emitFilteredOverviewList(eList);
+        } else {
+            let eList: Array<any> = this.experimentsService.experimentList;
+            if(eList) {
+                this.experimentsService.emitFilteredOverviewList(eList);
+            }
         }
     }
 

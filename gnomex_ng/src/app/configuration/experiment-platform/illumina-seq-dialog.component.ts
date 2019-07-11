@@ -1,34 +1,21 @@
-import {AfterViewInit, Component, Inject, OnInit, ViewChild} from "@angular/core";
-import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material";
+import {Component, Inject, OnInit} from "@angular/core";
+import {MatDialogRef, MAT_DIALOG_DATA } from "@angular/material";
 import {ConstantsService} from "../../services/constants.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {numberRange} from "../../util/validators/number-range-validator";
-
+import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 
 
 @Component({
     templateUrl: "illumina-seq-dialog.component.html",
     styles: [`
-
-        .padded-outer{
-            margin:0;
-            padding:0;
-        }
-        .padded-inner{
-            padding:0.3em;
-
-        }
-        mat-form-field.medium-form-input{
+        .medium-form-input{
             width: 20em;
             margin-right: 1em;
         }
-
-
-
-
     `]
 })
-export class IlluminaSeqDialogComponent implements OnInit{
+export class IlluminaSeqDialogComponent extends BaseGenericContainerDialog implements OnInit{
 
     rowData:any;
     applyFn:any;
@@ -40,8 +27,10 @@ export class IlluminaSeqDialogComponent implements OnInit{
     readonly currencyRegex = /^[0-9]+\.\d{2}$/;
 
     constructor(private dialogRef: MatDialogRef<IlluminaSeqDialogComponent>,
-                public constService:ConstantsService,private fb:FormBuilder,
+                public constService: ConstantsService,
+                private fb: FormBuilder,
                 @Inject(MAT_DIALOG_DATA) private data) {
+        super();
         if (this.data && this.data.rowData) {
             this.rowData = this.data.rowData;
             this.applyFn = this.data.applyFn;
@@ -68,7 +57,7 @@ export class IlluminaSeqDialogComponent implements OnInit{
             this.showRunOptions = true;
             this.formGroup.addControl("isCustom",new FormControl(this.rowData.isCustom,Validators.required));
         }
-
+        this.primaryDisable = (action) => {return this.formGroup.invalid; };
 
     }
 
@@ -76,10 +65,5 @@ export class IlluminaSeqDialogComponent implements OnInit{
         this.applyFn(this.formGroup);
         this.dialogRef.close();
     }
-
-
-
-
-
 
 }

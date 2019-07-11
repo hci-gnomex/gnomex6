@@ -1,97 +1,57 @@
-import {AfterViewInit, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
-import {MatDialogRef, MAT_DIALOG_DATA, MatDialogConfig, MatDialog} from "@angular/material";
+import {AfterViewInit, Component, Inject, OnInit, ViewChild} from "@angular/core";
+import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {ConstantsService} from "../../services/constants.service";
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {FormBuilder, FormGroup} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {ProtocolService} from "../../services/protocol.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
-import {jqxEditorComponent} from "../../../assets/jqwidgets-ts/angular_jqxeditor";
+import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
+import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
 
 
 
 @Component({
     template: `
         <form [formGroup]="formGroup">
-            <div mat-dialog-title class="padded-outer">
-                <div class="dialog-header-colors padded-inner">
-                    Lib Prep Steps
-                </div>
-            </div>
-            <div mat-dialog-content style="margin: 0; padding: 0;">
+            <div class="flex-container-col full-width full-height">
                 <div class="flex-container-row" style="margin: 0.5em;">
                     <div class="flex-grow flex-container-col" style="margin-right: 0.5em;">
-                        <label class="gx-label" style="margin-bottom:0.5em;" for="coreStepsLabel" > Core Steps </label>
-                        <jqxEditor
-                                #coreEditorRef
-                                (onChange)="changedVal($event)"
-                                id="coreStepsLabel"
-                                [height]="300"
-                                [editable]="true"
-                                [tools]="tbarSettings"
-                                [toolbarPosition]="'bottom'">
-
-                        </jqxEditor>
+                        <label class="gx-label" style="margin-bottom:0.5em;" for="coreStepsId" > Core Steps </label>
+                        <angular-editor #csEditorRef id="coreStepsId" formControlName="coreSteps" [config]="this.editorConfig">
+                        </angular-editor>
                     </div>
                     <div class="flex-grow flex-container-col">
-                        <label class="gx-label" for="labStepsLabel" > Core Steps(No Lib Prep) </label>
-                        <jqxEditor
-                                #labEditorRef
-                                (onChange)="changedVal($event)"
-                                id="labStepsLabel"
-                                [height]="300"
-                                [editable]="true"
-                                [tools]="tbarSettings"
-                                [toolbarPosition]="'bottom'">
 
-                        </jqxEditor>
+                        <label class="gx-label" style="margin-bottom:0.5em;" for="labStepsLabel" > Core Steps(No Lib Prep) </label>
+
+                        <angular-editor   #csNoLibPrepEditorRef id="coreStepsNoLibPrepId" formControlName="coreStepsNoLibPrep" [config]="this.editorConfigNoPrep">
+                        </angular-editor>
+
                     </div>
 
-                </div>
-            </div>
-            <div class="padded-outer" style="justify-content: flex-end;"  mat-dialog-actions>
-                <div class="padded-inner flex-container-row" style="align-items:center" >
-                    <div class="flex-grow">
-                        <save-footer [name]="applyText"
-                                     (saveClicked)="applyChanges()"
-                                     [dirty]="formGroup.dirty" >
-                        </save-footer>
-                    </div>
-                    <button mat-button  mat-dialog-close> Cancel  </button>
                 </div>
             </div>
         </form>
     `,
     styles: [`
-
-        .padded-outer{
-            margin:0;
-            padding:0;
+        :host /deep/ angular-editor #editor {
+            resize: none;
         }
-        .padded-inner{
-            padding:0.3em;
-
+        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
+            display: none;
         }
-        .medium-form-input{
-            width: 30em
-        }
-
-
-
-
     `]
 })
-export class LibraryPrepStepsDialogComponent implements OnInit, AfterViewInit{
+export class LibraryPrepStepsDialogComponent extends BaseGenericContainerDialog implements OnInit{
 
     applyStepsFn:any;
-    applyText:string = "Apply";
-    readonly tbarSettings :string  ="bold italic underline | left center right |  format font size | color | ul ol | outdent indent";
     formGroup:FormGroup;
     rowData:any;
-
-    @ViewChild('coreEditorRef') coreEditorRef:jqxEditorComponent;
-    @ViewChild('labEditorRef') labEditorRef:jqxEditorComponent;
-
+    @ViewChild("csEditorRef") csEditor: AngularEditorComponent;
+    @ViewChild("csNoLibPrepEditorRef") csNoPrepEditor: AngularEditorComponent;
+    public editorConfig: AngularEditorConfig;
+    public editorConfigNoPrep: AngularEditorConfig;
 
 
 
@@ -102,6 +62,7 @@ export class LibraryPrepStepsDialogComponent implements OnInit, AfterViewInit{
                 private protocolService:ProtocolService,
                 private dialogService:DialogsService,
                 @Inject(MAT_DIALOG_DATA) private data) {
+        super();
         if (this.data) {
             this.rowData = this.data.rowData;
             this.applyStepsFn = this.data.applyStepsFn;
@@ -109,28 +70,38 @@ export class LibraryPrepStepsDialogComponent implements OnInit, AfterViewInit{
     }
 
     ngOnInit(){
+
+        this.editorConfig = {
+            spellcheck: true,
+            height: "15em",
+            minHeight: "10em",
+            enableToolbar: true,
+            placeholder: "Core Steps",
+            editable: true
+        };
+        this.editorConfigNoPrep = {
+            spellcheck: true,
+            height: "15em",
+            minHeight: "10em",
+            enableToolbar: true,
+            placeholder: "Core Steps(No Lib Prep)",
+            editable: true
+        };
+
         this.formGroup = this.fb.group({
+                coreSteps:'',
+                coreStepsNoLibPrep: ''
             }
         );
+        this.formGroup.get("coreSteps").setValue( this.rowData.coreSteps ? this.rowData.coreSteps : '');
+        this.formGroup.get("coreStepsNoLibPrep").setValue( this.rowData.coreStepsNoLibPrep ? this.rowData.coreStepsNoLibPrep : '');
 
+
+        this.dirty = () => {return this.formGroup.dirty; };
     }
     applyChanges(){
-        this.applyStepsFn(this.coreEditorRef.val(), this.labEditorRef.val());
+        this.applyStepsFn(this.formGroup.get("coreSteps").value, this.formGroup.get("coreStepsNoLibPrep").value);
         this.dialogRef.close();
     }
-
-    changedVal(event:any){
-        this.formGroup.markAsDirty();
-    }
-
-    ngAfterViewInit(){
-        this.coreEditorRef.val( this.rowData.coreSteps ? this.rowData.coreSteps : '');
-        this.labEditorRef.val( this.rowData.coreStepsNoLibPrep ? this.rowData.coreStepsNoLibPrep : '');
-    }
-
-
-
-
-
 
 }

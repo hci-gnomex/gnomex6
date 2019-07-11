@@ -24,6 +24,7 @@ export class ConstantsService {
         "     4. After all of the files have been uploaded (% Completed column indicates 100 for all files), click the<br>        \"Organize files\" link on Experiment Detail to move the uploaded files to the appropriate folders.<br>         button.";
 
     public readonly ICON_CHECKED = "assets/tick.png";
+    public readonly ICON_MONEY = "assets/money.png";
     public readonly SEGMENT_NEW = "assets/segment_new.png";
     public readonly SEGMENT_REMOVE = "assets/segment_remove.png";
     public readonly SEGMENT_NEW_DISABLE = "assets/segment_new_disable.png";
@@ -85,6 +86,7 @@ export class ConstantsService {
         " color | ul ol | outdent indent";
     public readonly ICON_SAVE: string = "assets/save.png";
     public readonly GLOBE_LINK: string = "assets/globe_link.png";
+    public readonly ICON_MAGNIFIER:string ="assets/magnifier.png";
     public readonly ICON_TABLE_LINK: string = "assets/table_link.png";
     public readonly EMAIL_GO_LINK: string = "assets/email_go.png";
     public readonly ICON_UCSC: string = "assets/ucscFavicon.png";
@@ -95,6 +97,12 @@ export class ConstantsService {
     public readonly ICON_DOWNLOAD: string = "assets/download.png";
     public readonly ICON_DOWNLOAD_LARGE: string = "assets/download_large.png";
     public readonly ICON_BLUE_EXIT: string = "assets/blue-exit-button.png";
+    public readonly ICON_BAR_CHART: string = "assets/chart_bar.png";
+    public readonly ICON_PRINTER: string = "assets/printer.png";
+    public readonly ICON_EXCLAMATION: string = "assets/exclamation.png";
+    public readonly ICON_WORK_AUTH_FORM: string = "assets/work_auth_form.png";
+    public readonly ICON_FLAG_YELLOW: string = "assets/flag_yellow.png";
+    public readonly ICON_USER: string = "assets/user.png";
 
     public readonly ICON_ANALYSIS: string = "assets/map.png";
     public readonly ICON_ANALYSIS_ADD: string = "assets/map_add.png";
@@ -115,8 +123,10 @@ export class ConstantsService {
     public readonly ICON_ACCEPT: string = "assets/accept.png";
     public readonly ICON_DECLINE: string = "assets/decline.png";
     public readonly ICON_CANCEL: string =  "assets/icon-cancel.png";
+    public readonly ICON_GROUP: string = "assets/group.png";
     public readonly ICON_CLOSE_BLACK: string = "assets/close_black.png";
     public readonly ICON_GREEN_BULLET: string = "assets/bullet_green.png";
+    public readonly ICON_RED_BULLET: string = "assets/bullet_red.png";
     public readonly ICON_BLUE_FOLDER: string = "assets/blue_folder.png";
     public readonly ICON_FOLDER: string = "assets/folder.png";
     public readonly ICON_FOLDER_NEW: string = "assets/folder_new.png";
@@ -125,8 +135,10 @@ export class ConstantsService {
     public readonly ICON_FLASK: string = "assets/flask.png";
     public readonly ICON_ORGANISM: string = "assets/organism.jpg";
     public readonly ICON_ORGANISM_NEW: string = "assets/organism_new.png";
+    public readonly ICON_GENOME_BUILD: string = "assets/genome_build.png";
     public readonly ICON_GENOME_BUILD_NEW: string = "assets/genome_build_new.png";
     public readonly ICON_ADD: string = "assets/add.png";
+    public readonly ICON_ADD_DISABLE: string = "assets/add_disable.png";
     public readonly ICON_DELETE: string = "assets/delete.png";
     public readonly ICON_CROSS: string = "assets/cross.png";
     public readonly ICON_CROSSOUT: string = "assets/crossout.png";
@@ -152,6 +164,10 @@ export class ConstantsService {
     public readonly ICON_DATABASE_LIGHTNING: string = "assets/database_lightning.png";
     public readonly ICON_TABLE_MULTIPLE: string = "assets/table_multiple.png";
     public readonly ICON_TAG_BLUE_EDIT: string = "assets/tag_blue_edit.png";
+
+    public readonly ICON_MATERIAL_ARROW_EXPAND: string = "assets/icons8-expand-arrow-24.png";
+    public readonly ICON_MATERIAL_ARROW_COLLAPSE: string = "assets/icons8-collapse-arrow-24.png";
+    public readonly ICON_MATERIAL_FILTER_EDIT: string = "assets/icons8-filter-edit-24.png";
 
     public readonly STATUS_IN_PROGRESS: string = "In Progress";
     public readonly STATUS_COMPLETED: string = "Completed";

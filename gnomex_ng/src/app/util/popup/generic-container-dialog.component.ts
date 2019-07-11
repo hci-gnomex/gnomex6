@@ -10,7 +10,7 @@ import {
 import {MatDialogRef, MatDialog, MAT_DIALOG_DATA, DialogPosition} from "@angular/material";
 
 import {Router} from "@angular/router";
-import {GDAction, GDActionConfig,ActionType} from "../interfaces/generic-dialog-action.model";
+import {GDAction, ActionType} from "../interfaces/generic-dialog-action.model";
 import {BaseGenericContainerDialog} from "./base-generic-container-dialog";
 import {UtilService} from "../../services/util.service";
 import {ConstantsService} from "../../services/constants.service";
@@ -47,7 +47,10 @@ import {ConstantsService} from "../../services/constants.service";
         .force-flex-container-row{
             display:flex !important;
         }
-        
+        .i-class {
+            margin-left:  0.3em;
+            margin-right: 0.3em;
+        }
         
     `]
 })
@@ -64,14 +67,10 @@ export class GenericContainerDialogComponent implements OnInit, OnDestroy {
     originalYClick: number = 0;
     dialogContent:BaseGenericContainerDialog;
 
-
     protected positionX: number = 0;
     protected positionY: number = 0;
     movingDialog: boolean = false;
     useSaveFooter: boolean;
-
-
-
 
 
     constructor(private dialog: MatDialog,
@@ -80,14 +79,13 @@ export class GenericContainerDialogComponent implements OnInit, OnDestroy {
                 private utilService: UtilService,
                 private changeDetector: ChangeDetectorRef,
                 private dialogRef: MatDialogRef<GenericContainerDialogComponent>,
-                @Inject(MAT_DIALOG_DATA) private data) {
+                @Inject(MAT_DIALOG_DATA) public data) {
         if (data) {
             this.dialogContentBluePrint = data.dialogContent;
             this.icon = data.icon;
             this.title = data.title;
             this.useSaveFooter = data.actionConfig ? data.actionConfig.useSaveFooter : false;
             this.actions = data.actionConfig ? <GDAction[]>data.actionConfig.actions : [];
-
         }
     }
 
@@ -98,15 +96,17 @@ export class GenericContainerDialogComponent implements OnInit, OnDestroy {
         this.dialogContent = <BaseGenericContainerDialog>event.instance;
     }
 
-
     executeAction(action:GDAction):void{
         if(action.externalAction){
             action.externalAction();
         }
         if(action.internalAction){
-            this.dialogContent[action.internalAction]();
+            if(action.internalAction === "cancel" || action.internalAction === "onClose") {
+                this.onClose();
+            } else {
+                this.dialogContent[action.internalAction]();
+            }
         }
-        console.log(action);
     }
 
     onMouseDownHeader(event: any): void {
@@ -150,7 +150,7 @@ export class GenericContainerDialogComponent implements OnInit, OnDestroy {
         this.changeDetector.reattach();
     }
 
-    onClose($event){
+    onClose(){
         this.dialogRef.close();
     }
 

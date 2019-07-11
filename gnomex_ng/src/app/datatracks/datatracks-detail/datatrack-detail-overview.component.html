@@ -62,9 +62,9 @@
 
     <div style="display:flex; flex: 1;">
 
-        <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border" (selectedTabChange)="tabChanged($event)">
+        <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border" >
             <mat-tab style="height:100%" label="Summary">
-                <dt-summary-tab [showEditor]="initSummaryView" ></dt-summary-tab>
+                <dt-summary-tab ></dt-summary-tab>
             </mat-tab>
             <mat-tab style="height:100%" label="Annotations">
                 <annotation-tab [annotations]="annotations" [orderType]="types.DATATRACK"> </annotation-tab>

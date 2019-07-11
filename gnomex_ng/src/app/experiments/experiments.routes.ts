@@ -13,6 +13,7 @@ import {ProjectListResolverService} from "../services/resolvers/project-list-res
 import {ExperimentDetailOverviewComponent} from "./experiment-detail/experiment-detail-overview.component";
 import {NewExperimentComponent} from "./new-experiment/new-experiment.component";
 import {NewExternalExperimentComponent} from "./new-experiment/new-external-experiment.component";
+import {AmendExperimentOverviewComponent} from "./amend-experiment-overview.component";
 
 /**
  * A file defining and exporting the router configuration for the experiments module.
@@ -42,7 +43,8 @@ const ROUTES: Routes = [
     { path: "newProject", component: CreateProjectLauncherComponent, outlet: 'modal' },
     { path: "newExperiment", component: NewExperimentComponent, runGuardsAndResolvers: 'paramsOrQueryParamsChange' },
     { path: "newExperiment/:idCoreFacility", component: NewExperimentComponent, runGuardsAndResolvers: 'paramsOrQueryParamsChange' },
-    { path: "new-external-experiment", component: NewExternalExperimentComponent }
+    { path: "new-external-experiment", component: NewExternalExperimentComponent },
+    { path: "amend-experiment", component: AmendExperimentOverviewComponent },
 
 ];
 

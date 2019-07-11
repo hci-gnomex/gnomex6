@@ -1,18 +1,15 @@
 <div class="full-height">
-    <form [formGroup]="this.filterForm" class="ten-percent-height flex-container-row padded">
+    <form [formGroup]="this.filterForm" class="ten-percent-height flex-container-row padded align-center">
         <label class="margin-right"><img src="../../assets/basket.png" class="icon">Product Ledgers</label>
-        <mat-form-field [hidden]="this.labList.length < 2" class="margin-right">
-            <mat-select placeholder="Lab" [formControlName]="'lab'">
-                <mat-option>None</mat-option>
-                <mat-option *ngFor="let lab of this.labList" [value]="lab.idLab">{{lab.name}}</mat-option>
-            </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-            <mat-select placeholder="Product" [formControlName]="'product'">
-                <mat-option>None</mat-option>
-                <mat-option *ngFor="let p of this.productList" [value]="p.idProduct">{{p.display}}</mat-option>
-            </mat-select>
-        </mat-form-field>
+        <custom-combo-box [hidden]="this.labList.length < 2" class="margin-right" placeholder="Lab"
+                          [options]="this.labList"
+                          valueField="idLab" [displayField]="this.prefService.labDisplayField"
+                          [formControlName]="'lab'">
+        </custom-combo-box>
+        <custom-combo-box placeholder="Product" [options]="this.productList"
+                          valueField="idProduct" displayField="display"
+                          [formControlName]="'product'">
+        </custom-combo-box>
     </form>
     <div class="ninety-percent-height flex-container-row padded">
         <div class="full-height border-right flex-one">

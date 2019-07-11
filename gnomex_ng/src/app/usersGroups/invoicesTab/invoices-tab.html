@@ -1,38 +1,49 @@
-<div class="flex-row-container" >
-    <div class="users-groups-row-one">
-        <div class="flex-column-container" style="width: 100%">
-            <div style="display: flex;">
-                <custom-combo-box class="formField" placeholder="Core facility" [formControl]="this.coreFacilityFC" valueField="idCoreFacility"
-                                  (optionSelected)="selectOption()" [options]="filterCores(this.core)" displayField="display">
-                </custom-combo-box>
-                <context-help name="coreFacilityHelp" label="Help me choose" popupTitle="Core Facility Information"
-                              [isEditMode]="this.secAdvisor.isSuperAdmin" tooltipPosition="right"></context-help>
-            </div>
-            <div>
-                <app-month-picker label="Billing period"
-                                  [formControl]="monthInputCtrl"
-                                  [max]="max"
-                                  [min]="min">
-                </app-month-picker>
-            </div>
-            <div style="width: 40%">
-                <div  *ngIf="billingAccounts.length>0">
-                    <mat-label>Billing Accounts</mat-label>
-                </div>
-                <mat-selection-list #billingAcc [(ngModel)]="selectedAccounts" (ngModelChange)="onNgModelChange($event)">
-                    <mat-list-option *ngFor="let account of billingAccounts" [value]="account.idBillingAccount">
-                        {{account.accountNameDisplay}}
-                    </mat-list-option>
-                </mat-selection-list>
-                <div *ngIf="billingAccounts.length<=0">
-                    <mat-label>No invoice available for this core and period</mat-label>
-                </div>
-            </div>
-            <div>
-                <button mat-button [disabled]="this.selectedAccounts.length<=0" (click)="run()">
-                    <mat-icon aria-label="New...">picture_as_pdf</mat-icon>
-                    Show Printable Invoice</button>
-            </div>
+<div class="full-width full-height flex-container-col padded">
+    <div class="flex-container-row align-baseline">
+        <div class="flex-grow padded">
+            <custom-combo-box class="full-width"
+                              placeholder="Core facility"
+                              displayField="display"
+                              valueField="idCoreFacility"
+                              [formControl]="this.coreFacilityFC"
+                              [options]="filterCores(this.core)"
+                              (optionSelected)="selectOption()">
+            </custom-combo-box>
         </div>
+        <div class="padded">
+            <context-help name="coreFacilityHelp"
+                          label="Help me choose"
+                          popupTitle="Core Facility Information"
+                          tooltipPosition="right"
+                          [isEditMode]="this.secAdvisor.isSuperAdmin">
+            </context-help>
+        </div>
+        <div class="flex-grow">
+        </div>
+    </div>
+    <div class="padded">
+        <app-month-picker label="Billing period"
+                          [formControl]="monthInputCtrl"
+                          [max]="max"
+                          [min]="min">
+        </app-month-picker>
+    </div>
+    <div class="padded">
+        <div  *ngIf="billingAccounts.length>0">
+            <mat-label>Billing Accounts</mat-label>
+        </div>
+        <mat-selection-list [(ngModel)]="selectedAccounts" (ngModelChange)="onNgModelChange($event)">
+            <mat-list-option *ngFor="let account of billingAccounts" [value]="account.idBillingAccount">
+                {{account.accountNameDisplay}}
+            </mat-list-option>
+        </mat-selection-list>
+        <div *ngIf="billingAccounts.length<=0">
+            <mat-label>No invoice available for this core and period</mat-label>
+        </div>
+    </div>
+    <div class="padded">
+        <button mat-button [disabled]="this.selectedAccounts.length<=0" (click)="run()">
+            <mat-icon aria-label="New...">picture_as_pdf</mat-icon>
+            Show Printable Invoice</button>
     </div>
 </div>

@@ -1,19 +1,16 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {Component, Input, OnDestroy, OnInit} from "@angular/core";
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {IAnnotation} from "./interfaces/annotation.model";
 import {selectRequired} from "./validators/select-required.validator";
-import {
-    MatDialog, MatDialogConfig,
-    MatDialogRef, MatSelectChange
-} from "@angular/material";
-import {ConfigAnnotationDialogComponent} from "./config-annotation-dialog.component";
+import {MatDialogConfig} from "@angular/material";
 import {BrowseOrderValidateService} from "../services/browse-order-validate.service";
 import {IAnnotationOption} from "./interfaces/annotation-option.model";
 import {AnnotationService} from "../services/annotation.service";
 import {BehaviorSubject, Subscription} from "rxjs";
+import {ActionType} from "./interfaces/generic-dialog-action.model";
+import {ConfigureAnnotationsComponent} from "./configure-annotations.component";
+import {DialogsService} from "./popup/dialogs.service";
+import {ConstantsService} from "../services/constants.service";
 
 export enum OrderType {
     ANALYSIS = 'a',
@@ -72,7 +69,7 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
         this._disabled = value;
         if (this.form) {
             if (this._disabled) {
-                this.form.disable()
+                this.form.disable();
             } else {
                 this.form.enable();
             }
@@ -192,7 +189,8 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
     };
 
 
-    constructor(private dialog: MatDialog,
+    constructor(private dialogsService: DialogsService,
+                private constService: ConstantsService,
                 private orderValidateService: BrowseOrderValidateService) {
     }
 
@@ -206,33 +204,42 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
         this.orderValidateSubscription = this.orderValidateService.getOrderValidateObservable().subscribe(this.prepAnnotationForSave);
     }
 
-   
-
 
     loadConfigAnnotations() {
         let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.maxHeight = '80%';
-        configuration.data = {orderType: this.orderType};
+        configuration.width = "80em";
+        configuration.height = "56em";
+        configuration.autoFocus = false;
+        configuration.data = {
+            isDialog: true,
+            orderType: this.orderType
+        };
 
-        let dialogRef: MatDialogRef<ConfigAnnotationDialogComponent> = this.dialog.open(ConfigAnnotationDialogComponent, configuration);
+        this.dialogsService.genericDialogContainer(ConfigureAnnotationsComponent, "Configure Annotations", null, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Close", internalAction: "onClose"}
+                ]});
+
     }
 
 
-    selectOpt(opt: any) { // on mat option
-        let selected: boolean = opt.selected;
-        opt.value.selected = selected ? 'Y' : 'N';
+    selectOpts(opts: any[], annot: IAnnotation) {
+        for (let opt of annot.PropertyOption) {
+            opt.selected = 'N';
+        }
+        for (let opt of opts) {
+            opt.selected = 'Y';
+        }
     }
 
-    selectChanged(opt: MatSelectChange, annot:IAnnotation) { // on mat select
+    selectChanged(opt: any, annot:IAnnotation) { // on mat select
         for(let opt of annot.PropertyOption){
             opt.selected = 'N';
         }
-        opt.value.selected = 'Y';
-    }
-
-
-    compareByID(itemOne, itemTwo) {
-        return itemOne && itemTwo && itemOne.name == itemTwo.name;
+        if (opt) {
+            opt.selected = 'Y';
+        }
     }
     
     ngOnDestroy(): void {

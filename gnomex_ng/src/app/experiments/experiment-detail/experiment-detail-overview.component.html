@@ -36,7 +36,7 @@
     <div class="flex-grow-greater overflow-auto">
         <mat-tab-group class="full-width full-height bordered" (selectedTabChange)="tabChanged($event)">
             <mat-tab label="Overview">
-                <experiment-overview-tab [experiment]="experiment"></experiment-overview-tab>
+                <experiment-overview-tab [experiment]="experiment" [editMode]="isEditMode"></experiment-overview-tab>
             </mat-tab>
             <mat-tab label="Description">
                 <description-tab [editMode]="isEditMode" ></description-tab>
@@ -54,13 +54,13 @@
                  <tab-samples-illumina #tabSamplesIlluminaComponent [experiment]="_experiment" [stateChangeSubject]="modeSubject"></tab-samples-illumina>
             </mat-tab>
             <mat-tab label="Visibility" >
-                 <visibility-detail-tab></visibility-detail-tab>
+                 <visibility-detail-tab [disabled]="!isEditMode"></visibility-detail-tab>
             </mat-tab>
             <mat-tab *ngIf="showSequenceLanesTab" label="Sequence Lanes">
-                <experiment-sequence-lanes-tab></experiment-sequence-lanes-tab>
+                <experiment-sequence-lanes-tab [editMode]="isEditMode"></experiment-sequence-lanes-tab>
             </mat-tab>
             <mat-tab *ngIf="showBioinformaticsTab" label="Bioinformatics">
-                <experiment-bioinformatics-tab [experiment]="experiment"></experiment-bioinformatics-tab>
+                <experiment-bioinformatics-tab [experiment]="experiment" [editMode]="isEditMode"></experiment-bioinformatics-tab>
             </mat-tab>
             <mat-tab label="Files">
                 <experiment-files-tab></experiment-files-tab>
@@ -72,8 +72,8 @@
     </div>
     <div class="full-width">
         <save-footer (saveClicked)="save()"
-                     [disableSave]="!isEditMode"
-                     [dirty]="false">
+                     [disableSave]="this.experimentService.experimentOverviewForm.invalid || !isEditMode"
+                     [dirty]="this.experimentService.experimentOverviewForm.dirty">
         </save-footer>
     </div>
 </div>

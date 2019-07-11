@@ -1,59 +1,81 @@
-
-import {Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output} from "@angular/core";
-import {FormBuilder } from "@angular/forms"
+import {Component, OnInit} from "@angular/core";
+import {FormBuilder} from "@angular/forms";
 import {Subscription} from "rxjs";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
-import {GridOptions, RowDataChangedEvent} from "ag-grid-community/main";
-import {URLSearchParams} from "@angular/http"
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
+import {GridOptions} from "ag-grid-community/main";
+import {URLSearchParams} from "@angular/http";
 import {LaunchPropertiesService} from "../../services/launch-properites.service";
 import {MatDialogRef} from "@angular/material";
+import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
+import {ConstantsService} from "../../services/constants.service";
 
 @Component({
-    templateUrl: "./manage-links.component.html",
+    template: `
+        <div class="flex-container-col full-height full-width padded">
+            <div class="flex-container-row justify-flex-end padded-top-bottom">
+                <button mat-button (click)="new()"><img class="icon" [src]="this.constService.ICON_GREEN_BULLET">New</button>
+                <button mat-button [disabled]="selectedRow.length === 0" (click)="delete()"><img class="icon" [src]="this.constService.ICON_RED_BULLET">Delete</button>
+            </div>
+            <div class="full-width full-height">
+                <ag-grid-angular style="width: 100%; height: 40em;" class="ag-theme-fresh"
+                                 [gridOptions]="gridOptions"
+                                 [rowData]="rowData"
+                                 [columnDefs]="columnDefs"
+                                 [rowSelection]="rowSelection"
+                                 (rowSelected)="onRowSelected($event)"
+                                 (gridReady)="onGridReady($event)"
+                                 (rowDataChanged)="dataChanged()"
+                                 [enableSorting]="true"
+                                 [enableColResize]="true">
+                </ag-grid-angular>
+            </div>
+        </div>
+    `,
 })
-export class ManageLinksComponent implements OnInit{
+export class ManageLinksComponent extends BaseGenericContainerDialog implements OnInit{
+    public gridOptions: GridOptions = {};
+    public rowSelection;
+    public selectedRow: any[] = [];
+    public columnDefs;
+    rowData: Array<any> = [];
     private getFAQSubscription: Subscription;
     private saveFAQSubscription: Subscription;
-    private coreList:Array<any>;
-    public dirty: boolean = false;
-    private gridOptions:GridOptions = {};
-    private rowSelection;
-    private columnDefs;
-    private  displayModelFormatter = (params)=>  {
-        if(params.value){
-            let display =  (<string>params.value).split(',');
+    private coreList: Array<any>;
+    private  displayModelFormatter = (params) =>  {
+        if(params.value) {
+            let display =  (<string>params.value).split(",");
             return display[0];
         }
-        return '';
-    };
+        return "";
+    }
 
-    private valueChanging = (params):boolean => {
+    private valueChanging = (params): boolean => {
         let rowData = params.   data;
         let field = params.colDef.field;
 
 
         if(params.newValue !== params.oldValue){
-            rowData.isDirty='Y';
-            this.dirty = true;
-            if (field === 'coreString') {
-                rowData['idCoreFacility'] = params.newValue.substring(params.newValue.indexOf(',')+1, params.newValue.length);
+            rowData.isDirty = "Y";
+            this.dirty = () => true;
+            if (field === "coreString") {
+                rowData["idCoreFacility"] = params.newValue.substring(params.newValue.indexOf(",") + 1, params.newValue.length);
             }
             rowData[field] = params.newValue;
 
             return true;
         }
         return false;
-    };
+    }
 
-
-    rowData:Array<any> =[];
 
     constructor(public dialogRef: MatDialogRef<ManageLinksComponent>,
                 protected fb: FormBuilder,
                 private secAdvisor: CreateSecurityAdvisorService,
                 private dialogService: DialogsService,
-                private launchPropertiesService: LaunchPropertiesService) {
+                private launchPropertiesService: LaunchPropertiesService,
+                public constService: ConstantsService) {
+        super();
         this.columnDefs = [
             {
                 headerName: "Title",
@@ -88,8 +110,9 @@ export class ManageLinksComponent implements OnInit{
     }
 
     ngOnInit(){
-        let params: URLSearchParams = new URLSearchParams();
-        this.coreList = this.secAdvisor.myCoreFacilities;
+        if(!this.coreList) {
+            this.coreList = this.secAdvisor.myCoreFacilities;
+        }
 
         this.getFAQSubscription = this.launchPropertiesService.getFAQ().subscribe((response: any[]) => {
             console.log("subscribe createSecurityAdvisor");
@@ -104,7 +127,7 @@ export class ManageLinksComponent implements OnInit{
 
     setCoreFacility(reqObj: any): void{
         let coreObj = this.coreList.find(core => core.value === reqObj.idCoreFacility);
-        reqObj["coreString"] = coreObj.display;
+        reqObj["coreString"] = coreObj ? coreObj.display : "";
     }
 
     dataChanged(): void {
@@ -114,12 +137,15 @@ export class ManageLinksComponent implements OnInit{
         this.gridOptions.api.sizeColumnsToFit();
 
     }
+    onRowSelected(event: any) {
+        this.selectedRow = this.gridOptions.api.getSelectedRows();
+    }
 
     save():void{
         let faqCollection: 'FAQ';
         for (let faq of this.rowData) {
             if (faq.title === '' || faq.url === '') {
-                this.dialogService.confirm("Please enter both title and URL for each item before proceeding.", null);
+                this.dialogService.alert("Please enter both title and URL for each item before proceeding.", null, DialogType.VALIDATION);
                 return;
             }
         }
@@ -129,7 +155,7 @@ export class ManageLinksComponent implements OnInit{
 
         params.set("faqXMLString", stringifiedFaqCollection);
         this.saveFAQSubscription = this.launchPropertiesService.saveFAQ(params).subscribe((response: Response) => {
-            setTimeout(() =>this.dialogRef.close());
+            setTimeout(() => this.dialogRef.close(this.dirty));
         });
     }
 
@@ -138,7 +164,7 @@ export class ManageLinksComponent implements OnInit{
         this.rowData.push(newRecord);
 
         this.gridOptions.api.setRowData(this.rowData);
-        this.dirty = true;
+        this.dirty = () => true;
 
     }
 
@@ -146,7 +172,7 @@ export class ManageLinksComponent implements OnInit{
         let selected = this.gridOptions.api.getFocusedCell();
         this.rowData.splice(selected.rowIndex, 1);
         this.gridOptions.api.setRowData(this.rowData);
-        this.dirty = true;
+        this.dirty = () => true;
     }
 
     buildCoreList():Array<string>{

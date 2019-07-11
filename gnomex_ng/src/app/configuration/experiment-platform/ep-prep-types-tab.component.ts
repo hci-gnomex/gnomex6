@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {Subscription} from "rxjs";
@@ -8,9 +8,10 @@ import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {ConstantsService} from "../../services/constants.service";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {DictionaryService} from "../../services/dictionary.service";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {PrepTypePricingDialogComponent} from "./prep-type-pricing-dialog.component";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 //assets/page_add.png
 
@@ -57,12 +58,7 @@ import {PrepTypePricingDialogComponent} from "./prep-type-pricing-dialog.compone
 
             </div>
         </div>
-    `,
-    styles:[`
-        .padded-checkbox{
-            padding-top: 1.25rem;
-        }
-    `]
+    `
 })
 
 export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
@@ -108,9 +104,11 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
 
 
 
-    constructor(private fb:FormBuilder,private expPlatfromService:ExperimentPlatformService,
-                public constService:ConstantsService,private dictionaryService:DictionaryService,
-                private dialog: MatDialog,private dialogService:DialogsService){
+    constructor(private fb: FormBuilder,
+                private expPlatfromService: ExperimentPlatformService,
+                public constService: ConstantsService,
+                private dictionaryService: DictionaryService,
+                private dialogService: DialogsService) {
     }
 
     ngOnInit(){
@@ -163,15 +161,19 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
         }
 
     };
-    openPricingEditor(){
-        let config: MatDialogConfig = new MatDialogConfig();
-        if(this.selectedPrepTypeRow.length > 0){
+    openPricingEditor() {
+        if(this.selectedPrepTypeRow.length > 0) {
+            let config: MatDialogConfig = new MatDialogConfig();
+            config.width = "25em";
             config.data = {
                 rowData: this.selectedPrepTypeRow[0],
                 applyFn: this.applyPrepTypeFn,
             };
-            config.panelClass = "no-padding-dialog";
-            this.dialog.open(PrepTypePricingDialogComponent,config);
+            this.dialogService.genericDialogContainer(PrepTypePricingDialogComponent, "Prep Type Pricing", null, config,
+                {actions: [
+                        {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Apply", internalAction: "applyChanges"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                    ]});
         }
     }
     addPrepType(){
@@ -194,9 +196,8 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
     }
     removePrepType(){
         let prepType = this.selectedPrepTypeRow[0];
-        this.dialogService.confirm("Remove Prep Type",
-            "Are you sure you want to remove prep type named \'" + prepType.isolationPrepType +'\'?')
-            .subscribe(result =>{
+        this.dialogService.confirm("Are you sure you want to remove prep type named \'" + prepType.isolationPrepType +'\'?', "Remove Prep Type")
+            .subscribe((result: any) =>{
             if(result){
                 let removeIndex:number = this.rowData.indexOf(prepType);
                 if(removeIndex > -1){

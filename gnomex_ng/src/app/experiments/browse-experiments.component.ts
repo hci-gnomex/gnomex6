@@ -10,14 +10,6 @@ import {
 import {URLSearchParams} from "@angular/http";
 
 import {ExperimentsService} from "./experiments.service";
-import {
-    jqxButtonComponent,
-    jqxCheckBoxComponent,
-    jqxComboBoxComponent,
-    jqxLoaderComponent,
-    jqxNotificationComponent,
-    jqxWindowComponent,
-} from "jqwidgets-framework";
 import {ITreeOptions, ITreeState, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
 import {BrowseFilterComponent} from "../util/browse-filter.component";
 import * as _ from "lodash";
@@ -25,20 +17,21 @@ import {Subscription} from "rxjs";
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {CreateProjectComponent} from "./create-project.component";
-import {MatCheckboxChange, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {MatCheckboxChange, MatDialogConfig} from "@angular/material";
 import {LabListService} from "../services/lab-list.service";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {DeleteProjectComponent} from "./delete-project.component";
 import {ReassignExperimentComponent} from "./reassign-experiment.component";
 import {DeleteExperimentComponent} from "./delete-experiment.component";
-import {DragDropHintComponent} from "../analysis/drag-drop-hint.component";
 import {DictionaryService} from "../services/dictionary.service";
 import {PropertyService} from "../services/property.service";
 import {GnomexService} from "../services/gnomex.service";
-import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {HttpParams} from "@angular/common/http";
 import {UtilService} from "../services/util.service";
 import {filter} from "rxjs/operators";
+import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../services/constants.service";
 
 const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
 
@@ -46,10 +39,6 @@ const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
     selector: "experiments",
     templateUrl: "./browse-experiments.component.html",
     styles: [`
-        .jqx-notification {
-            margin-top: 30em;
-            margin-left: 20em;
-        }
 
 
         .t  { display: table;      }
@@ -87,15 +76,20 @@ const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
 
         .no-overflow  { overflow:    hidden; }
         .no-word-wrap { white-space: nowrap; }
+
+        .allow-line-breaks {
+            white-space: pre-line;
+        }
+        .background-lightyellow {
+            background-color: lightyellow;
+        }
     `]
 })
 
 export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @ViewChild("tree") treeComponent: TreeComponent;
-    @ViewChild("responseMsgWindow") responseMsgWindow: jqxWindowComponent;
-    @ViewChild("msgNoAuthUsersForLab") msgNoAuthUsersForLab: jqxNotificationComponent;
-    @ViewChild("toggleButton") toggleButton: jqxButtonComponent;
+    toggleButton: string = "Expand Projects";
 
     @ViewChild(BrowseFilterComponent)
 
@@ -114,6 +108,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     public disableDeleteExperiment: boolean = true;
     public disableAll: boolean = false;
 
+    public readonly DRAG_DROP_HINT: string = "Drag-and-drop to move object to another group";
+    public showDragDropHint: boolean = false;
+
     private treeModel: TreeModel;
     private currentItem: any;
     private targetItem: any;
@@ -126,11 +123,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private labList: any[] = [];
     private selectedExperiment: any;
     private projectRequestListSubscription: Subscription;
-    private deleteProjectDialogRef: MatDialogRef<DeleteProjectComponent>;
-    private createProjectDialogRef: MatDialogRef<CreateProjectComponent>;
-    private reassignExperimentDialogRef: MatDialogRef<ReassignExperimentComponent>;
-    private deleteExperimentDialogRef: MatDialogRef<DeleteExperimentComponent>;
-    private navProjectReqList: any;
     private navInitSubscription: Subscription;
     private labListSubscription: Subscription;
     private navEndSubscription: Subscription;
@@ -179,7 +171,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
 
         this.navEndSubscription = this.router.events.pipe(filter(event => event instanceof NavigationEnd))
-            .subscribe((event:NavigationEnd) =>{
+            .subscribe((event: NavigationEnd) => {
                 if(this.route.snapshot.firstChild) {
                     let data = this.route.snapshot.firstChild.data;
                     if (data.experiment && data.experiment.Request) {
@@ -202,14 +194,14 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 private changeDetectorRef: ChangeDetectorRef,
                 private utilService: UtilService,
                 public createSecurityAdvisorService: CreateSecurityAdvisorService,
-                private dialog: MatDialog,
                 private dialogsService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private gnomexService: GnomexService,
                 private labListService: LabListService,
                 private propertyService: PropertyService,
                 private route: ActivatedRoute,
-                private router: Router) {
+                private router: Router,
+                public constantsService: ConstantsService) {
 
         this.items = [];
         this.dragEndItems = [];
@@ -225,44 +217,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             } else {
                 this.experimentCount = "0";
                 this.experimentCountMessage = "";
-            }
-            if (this.createProjectDialogRef && this.createProjectDialogRef.componentInstance) {
-                if(this.createProjectDialogRef.componentInstance.showSpinner === true) {
-                    this.createProjectDialogRef.componentInstance.showSpinner = false;
-                }
-                if(this.createProjectDialogRef.componentInstance.newProjectId) {
-                    this.setActiveNodeId = "p" + this.createProjectDialogRef.componentInstance.newProjectId;
-                }
-                this.createProjectDialogRef.close();
-                this.createProjectDialogRef = null;
-            }
-
-            if (this.deleteProjectDialogRef && this.deleteProjectDialogRef.componentInstance) {
-                if(this.deleteProjectDialogRef.componentInstance.showSpinner === true) {
-                    this.deleteProjectDialogRef.componentInstance.showSpinner = false;
-                }
-                if(this.parentProject) {
-                    this.setActiveNodeId = this.parentProject.data.id;
-                }
-                this.deleteProjectDialogRef.close();
-                this.deleteProjectDialogRef = null;
-            }
-
-            if (this.deleteExperimentDialogRef && this.deleteExperimentDialogRef.componentInstance) {
-                if(this.deleteExperimentDialogRef.componentInstance.showSpinner === true) {
-                    this.deleteExperimentDialogRef.componentInstance.showSpinner = false;
-                }
-                if(this.parentProject) {
-                    this.setActiveNodeId = this.parentProject.data.id;
-                }
-                this.deleteExperimentDialogRef.close();
-                this.deleteExperimentDialogRef = null;
-            }
-
-            if (this.reassignExperimentDialogRef) {
-                this.dialogsService.stopAllSpinnerDialogs();
-                this.reassignExperimentDialogRef.close();
-                this.reassignExperimentDialogRef = null;
             }
 
             if (this.experimentsService.browsePanelParams && this.experimentsService.browsePanelParams["refreshParams"]) {
@@ -284,15 +238,24 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
 
             setTimeout(() => {
-                this.toggleButton.val("Collapse Projects");
+                this.toggleButton = "Collapse Projects";
                 this.treeModel.expandAll();
 
                 if(this.gnomexService.orderInitObj) {
                     let id: string = "r" + this.gnomexService.orderInitObj.idRequest;
                     if(this.treeModel && id) {
-                        this.treeModel.getNodeById(id).setIsActive(true);
-                        this.treeModel.getNodeById(id).scrollIntoView();
+                        let node: ITreeNode = this.treeModel.getNodeById(id);
+                        if(node) {
+                            this.treeModel.getNodeById(id).setIsActive(true);
+                            this.treeModel.getNodeById(id).scrollIntoView();
+                            this.gnomexService.orderInitObj = null;
+                        } else {
+                            let navArray = ["/experiments",  {outlets: {"browsePanel": [this.gnomexService.orderInitObj.idRequest]}}];
+                            this.disableNewProject = true;
+                            this.router.navigate(navArray);
+                        }
                         this.gnomexService.orderInitObj = null;
+
                     }
                 } else if(this.setActiveNodeId) {
                     let node: TreeNode;
@@ -314,7 +277,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 let idProject = this.gnomexService.orderInitObj.idProject;
 
                 let ids: HttpParams = new HttpParams()
-                    .set("idProject", idProject)
+                    .set("idProject", idProject ? idProject : '')
                     .set("showEmptyProjectFolders", "Y")
                     .set("showCategory", "N")
                     .set("showSamples", "N");
@@ -443,9 +406,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
     showReassignWindow() {
         let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = "40em";
+        configuration.autoFocus = false;
         configuration.data = {
-            currentItemId:      this.currentItem.id,
-            idProject:          this.targetItem.id,
             labMembers:         this.labMembers,
             billingAccounts:    this.billingAccounts,
             currentItem:        this.currentItem,
@@ -453,13 +416,17 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             showBillingCombo:   this.showBillingCombo
         };
 
-        this.reassignExperimentDialogRef = this.dialog.open(ReassignExperimentComponent, configuration);
-
-        this.reassignExperimentDialogRef.afterClosed().subscribe(result => {
-            if (this.reassignExperimentDialogRef && this.reassignExperimentDialogRef.componentInstance.noButton) {
+        this.dialogsService.genericDialogContainer(ReassignExperimentComponent,
+            "Reassignment", this.constantsService.ICON_FOLDER_ADD, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "reassignYesButtonClicked"},
+                    {type: ActionType.SECONDARY, name: "No", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+            if(!result) {
                 this.resetTree();
             }
         });
+
     }
 
 
@@ -506,7 +473,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             }
         }
 
-        for (let billingAccount of response.authorizedBillingAccounts) {
+        for (let billingAccount of response.billingAccounts) {
             if (billingAccount.isApproved === "Y" && billingAccount.isActive === "Y" && billingAccount.idCoreFacility === requestCategoryCoreFacility) {
                 billingAccount.label = billingAccount.accountName;
                 this.billingAccounts.push(billingAccount);
@@ -535,8 +502,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         }
         if (this.labMembers.length < 1) {
             this.dialogsService
-                .confirm("Sorry, in order to reassign this experiment you must change its owner to a member of the new lab group. However," +
-                    "you do not have permission to access the member list for this lab. Please contact an administrator.", null)
+                .alert("Sorry, in order to reassign this experiment you must change its owner to a member of the new lab group. However," +
+                    "you do not have permission to access the member list for this lab. Please contact an administrator.", null, DialogType.FAILED)
                 .subscribe(
                     res => {
                         this.resetTree();
@@ -576,14 +543,25 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             }
 
             let configuration: MatDialogConfig = new MatDialogConfig();
-
+            configuration.width = "45em";
+            configuration.panelClass = "no-padding-dialog";
+            configuration.autoFocus = false;
+            configuration.disableClose = true;
             configuration.data = {
                 labList:            useThisLabList,
                 items:              this.items,
                 selectedLabItem:    selectedLab
             };
 
-            this.createProjectDialogRef = this.dialog.open(CreateProjectComponent, configuration);
+            this.dialogsService.genericDialogContainer(CreateProjectComponent, "New Project", this.constantsService.ICON_FOLDER_ADD, configuration,
+                {actions: [
+                        {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                    ]}).subscribe((result: any) => {
+                if(result) {
+                    this.setActiveNodeId = "p" + result;
+                }
+            });
         }
     }
 
@@ -593,20 +571,43 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      */
     deleteProjectClicked(event: any) {
         if(!this.selectedItem.data.isEmptyFolder) {
-            this.dialogsService.alert("Project cannot be deleted because it has experiments. Please reassign experiments to another project before deleting.", "Warning");
+            this.dialogsService.alert("Project cannot be deleted because it has experiments. <br>Please reassign experiments to another project before deleting.", "", DialogType.WARNING);
             return;
         }
         let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = "30em";
+        configuration.height = "15em";
+        configuration.disableClose = true;
         configuration.data = { selectedItem: this.selectedItem };
 
-        this.deleteProjectDialogRef = this.dialog.open(DeleteProjectComponent, configuration);
+        this.dialogsService.genericDialogContainer(DeleteProjectComponent, "Warning: Delete Project",
+            this.constantsService.ICON_EXCLAMATION, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "deleteProject"},
+                    {type: ActionType.SECONDARY, name: "No", internalAction: "cancel"}
+                ]}).subscribe((result: any) => {
+            if(result && this.parentProject) {
+                this.setActiveNodeId = this.parentProject.data.id;
+            }
+        });
     }
 
     deleteExperimentClicked() {
         let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = "30em";
+        configuration.height = "15em";
+        configuration.disableClose = true;
         configuration.data = { selectedExperiment: this.selectedExperiment };
 
-        this.deleteExperimentDialogRef = this.dialog.open(DeleteExperimentComponent, configuration);
+        this.dialogsService.genericDialogContainer(DeleteExperimentComponent, "Warning: Delete Experiment", this.constantsService.ICON_EXCLAMATION, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "deleteExperiment"},
+                    {type: ActionType.SECONDARY, name: "No", internalAction: "cancel"}
+                ]}).subscribe((result: any) => {
+            if(result && this.parentProject) {
+                this.setActiveNodeId = this.parentProject.data.id;
+            }
+        });
     }
     /**
      * A node is selected in the tree.
@@ -658,33 +659,18 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      * The expand collapse toggle is selected.
      */
     expandCollapseClicked(): void {
-        setTimeout(_ => {
+        if (this.toggleButton === "Collapse Projects") {
+            this.toggleButton = "Expand Projects"
+            this.treeModel.collapseAll();
+        } else {
+            this.toggleButton = "Collapse Projects";
+            this.treeModel.expandAll();
+        }
 
-            var toggled = this.toggleButton.toggled();
-
-            if (toggled) {
-                this.toggleButton.val("Expand Projects");
-                this.treeModel.collapseAll();
-            } else {
-
-                this.toggleButton.val("Collapse Projects");
-                this.treeModel.expandAll();
-            }
-        });
     }
 
-    dragDropHintClicked(event: any) {
-        let configuration: MatDialogConfig = new MatDialogConfig();
-
-        let dialogRef: MatDialogRef<DragDropHintComponent> = this.dialog.open(DragDropHintComponent, configuration);
-    }
-
-    /**
-     * Show the response from the back end.
-     */
-    responseMsgNoButtonClicked() {
-        this.responseMsg = "";
-        this.responseMsgWindow.close();
+    onClickShowDragDropHint(): void {
+        this.showDragDropHint = !this.showDragDropHint;
     }
 
     ngOnDestroy(): void {
@@ -694,7 +680,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.gnomexService.navInitBrowseExperimentSubject.next(null);
         this.projectRequestListSubscription.unsubscribe();
         this.labListSubscription.unsubscribe();
-        this.navProjectReqList = null;
         this.experimentsService.filteredLabs = undefined;
         this.experimentsService.labList = [];
         UtilService.safelyUnsubscribe(this.canDeleteProjectSubscription);

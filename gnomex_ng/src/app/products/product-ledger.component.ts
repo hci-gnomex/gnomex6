@@ -8,30 +8,19 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {ITreeOptions, TreeComponent, TreeModel} from "angular-tree-component";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {ColumnApi, GridApi, GridReadyEvent} from "ag-grid-community";
-import {MatDialog, MatDialogRef, MatSnackBar} from "@angular/material";
+import {MatDialogConfig, MatSnackBar} from "@angular/material";
 import {AddLedgerEntryComponent} from "./add-ledger-entry.component";
 import {HttpParams} from "@angular/common/http";
 import {AddProductWindowComponent} from "./add-product-window.component";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {UserPreferencesService} from "../services/user-preferences.service";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../services/constants.service";
 
 @Component({
     selector: 'product-ledger',
     templateUrl: "./product-ledger.component.html",
     styles: [`
-        div.flex-container-row {
-            display: flex;
-            flex-direction: row;
-        }
-        div.flex-container-col {
-            display: flex;
-            flex-direction: column;
-        }
-        .full-height {
-            height: 100%;
-        }
-        .full-width {
-            width: 100%;
-        }
         .ninety-five-percent-height {
             height: 95%;
         }
@@ -44,23 +33,14 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
         .five-percent-height {
             height: 5%;
         }
-        .half-width {
-            width: 50%;
-        }
         .margin-right {
             margin-right: 2rem;
         }
         .margin-bottom {
             margin-bottom: 2rem;
         }
-        .align-center {
-            align-items: center;
-        }
         .justify-end {
             justify-content: flex-end;
-        }
-        .justify-space-between {
-            justify-content: space-between;
         }
         .flex-one {
             flex: 1;
@@ -81,9 +61,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             background: yellow;
             padding: 0.5rem;
             margin-left: 1rem;
-        }
-        img.icon {
-            margin-right: 0.5rem;
         }
         .border-right {
             border-right: 2px solid lightgray;
@@ -112,13 +89,14 @@ export class ProductLedgerComponent implements OnInit {
     public gridRowData: any[];
 
     constructor(@Inject(FormBuilder) private fb: FormBuilder,
+                public prefService: UserPreferencesService,
                 private labListService: LabListService,
                 private productsService: ProductsService,
                 private dialogsService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private snackBar: MatSnackBar,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
-                private dialog: MatDialog,) {
+                private constService: ConstantsService) {
         this.filterForm = fb.group({
             lab: '',
             product: '',
@@ -154,10 +132,11 @@ export class ProductLedgerComponent implements OnInit {
             }
         });
         this.productsService.getProductList().subscribe((response: any) => {
-            if (response && Array.isArray(response)) {
+            if (response) {
                 let filteredProductTypes = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.PRODUCT_TYPE).filter((type: any) => {
                     return type.value && type.idCoreFacility && (this.createSecurityAdvisorService.isCoreFacilityIManage(type.idCoreFacility) || this.createSecurityAdvisorService.isMyCoreFacility(type.idCoreFacility));
                 });
+                response = Array.isArray(response) ? response : [response.Product];
                 this.productList = (response as any[]).filter((product: any) => {
                     for (let pt of filteredProductTypes) {
                         if (pt.idProductType === product.idProductType) {
@@ -258,44 +237,49 @@ export class ProductLedgerComponent implements OnInit {
             activeNode.toggleActivated(null);
             this.selectProduct(null);
         }
-        let addProductDialogRef: MatDialogRef<AddProductWindowComponent> = this.dialog.open(AddProductWindowComponent, {
-            data: {
-                productList: this.productList,
-                idLab: idLab
-            },
-            width: '500px'
-        });
-        addProductDialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
-                let labFound: boolean = false;
-                for (let labNode of this.treeModel.roots) {
-                    if (labNode.data.idLab === result.idLab) {
-                        labFound = true;
-                        let productFound = false;
-                        for (let childNode of labNode.children) {
-                            if (childNode.data.idProduct === result.product.idProduct) {
-                                productFound = true;
+
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "35em";
+        config.autoFocus = false;
+        config.data = {
+            productList: this.productList,
+            idLab: idLab
+        };
+        this.dialogsService.genericDialogContainer(AddProductWindowComponent, "Add Product", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if (result) {
+                        let labFound: boolean = false;
+                        for (let labNode of this.treeModel.roots) {
+                            if (labNode.data.idLab === result.idLab) {
+                                labFound = true;
+                                let productFound = false;
+                                for (let childNode of labNode.children) {
+                                    if (childNode.data.idProduct === result.product.idProduct) {
+                                        productFound = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!productFound) {
+                                    labNode.data.children.push(result.product);
+                                    this.treeModel.update();
+                                }
+
                                 break;
                             }
                         }
 
-                        if (!productFound) {
-                            labNode.data.children.push(result.product);
+                        if (!labFound) {
+                            this.treeNodes.push(this.makeLabNode(result));
                             this.treeModel.update();
                         }
 
-                        break;
+                        this.selectNode(result.idLab, result.product.idProduct);
+                        this.showDirtyNote = true;
                     }
-                }
-
-                if (!labFound) {
-                    this.treeNodes.push(this.makeLabNode(result));
-                    this.treeModel.update();
-                }
-
-                this.selectNode(result.idLab, result.product.idProduct);
-                this.showDirtyNote = true;
-            }
         });
     }
 
@@ -320,16 +304,22 @@ export class ProductLedgerComponent implements OnInit {
 
     public addRow(): void {
         if (this.selectedProduct) {
-            let addLedgerEntryDialogRef: MatDialogRef<AddLedgerEntryComponent> = this.dialog.open(AddLedgerEntryComponent, {
-                data: {product: this.selectedProduct},
-                width: '500px'
-            });
-            addLedgerEntryDialogRef.afterClosed().subscribe((result: any) => {
-                if (result) {
-                    this.showDirtyNote = false;
-                    this.loadLedger(this.selectedProduct);
-                    this.loadProductLedgerEntries();
-                }
+
+            let config: MatDialogConfig = new MatDialogConfig();
+            config.width = "45em";
+            config.data = {
+                product: this.selectedProduct
+            };
+            this.dialogsService.genericDialogContainer(AddLedgerEntryComponent, "Add Ledger Entry", null, config,
+                {actions: [
+                        {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "save"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                    ]}).subscribe((result: any) => {
+                        if (result) {
+                            this.showDirtyNote = false;
+                            this.loadLedger(this.selectedProduct);
+                            this.loadProductLedgerEntries();
+                        }
             });
         }
     }
@@ -353,7 +343,7 @@ export class ProductLedgerComponent implements OnInit {
                     if (response && response.message) {
                         message = ": " + response.message;
                     }
-                    this.dialogsService.confirm("An error occurred while saving" + message, null);
+                    this.dialogsService.error("An error occurred while saving" + message);
                 }
                 this.showSpinner = false;
             });

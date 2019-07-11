@@ -8,7 +8,6 @@ import {UtilModule} from "../../util/util.module";
 
 import {AccountFieldsConfigurationService} from "../../services/account-fields-configuration.service";
 import {EditBillingAccountErrorDialogComponent} from "./dialogs/edit-billing-account-error-dialog.component";
-import {EditBillingAccountSuccessDialogComponent} from "./dialogs/edit-billing-account-success-dialog.component";
 import {EditBillingAccountLauncher, EditBillingAccountComponent} from "./edit-billing-account.component";
 
 @NgModule({
@@ -24,12 +23,10 @@ import {EditBillingAccountLauncher, EditBillingAccountComponent} from "./edit-bi
 		EditBillingAccountComponent,
 		EditBillingAccountErrorDialogComponent,
 		EditBillingAccountLauncher,
-		EditBillingAccountSuccessDialogComponent
 	],
 	entryComponents: [
 		EditBillingAccountComponent,
 		EditBillingAccountErrorDialogComponent,
-		EditBillingAccountSuccessDialogComponent
 	],
 	providers: [
 		AccountFieldsConfigurationService
@@ -38,7 +35,6 @@ import {EditBillingAccountLauncher, EditBillingAccountComponent} from "./edit-bi
 		EditBillingAccountComponent,
 		EditBillingAccountErrorDialogComponent,
 		EditBillingAccountLauncher,
-		EditBillingAccountSuccessDialogComponent
 	]
 })
 export class EditBillingAccountModule {

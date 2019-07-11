@@ -1,7 +1,7 @@
 import {Component, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {PasswordUtilService} from "../services/password-util.service";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {ActivatedRoute, ParamMap, Router} from "@angular/router";
 import {GnomexService} from "../services/gnomex.service";
 
@@ -81,7 +81,7 @@ export class ChangePasswordComponent implements OnInit {
     private guid: string;
     public formGroup: FormGroup;
 
-    constructor(private passwordUtilService: PasswordUtilService,
+    constructor(public passwordUtilService: PasswordUtilService,
                 private dialogsService: DialogsService,
                 private router: Router,
                 private route: ActivatedRoute,
@@ -109,14 +109,14 @@ export class ChangePasswordComponent implements OnInit {
         let passwordConfirm: string = this.formGroup.controls['passwordConfirm'].value;
         this.passwordUtilService.changePassword(username, password, passwordConfirm, this.guid).subscribe((result: any) => {
             if (result && result.result && result.result === 'SUCCESS') {
-                this.dialogsService.confirm("Your password has been changed", null);
+                this.dialogsService.alert("Your password has been changed", "", DialogType.SUCCESS);
                 this.router.navigateByUrl("/authenticate");
             } else {
                 let message: string = "";
                 if (result && result.message) {
                     message = ": " + result.message;
                 }
-                this.dialogsService.confirm("An error occurred while changing your password" + message, null);
+                this.dialogsService.error("An error occurred while changing your password" + message);
             }
         });
     }

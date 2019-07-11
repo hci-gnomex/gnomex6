@@ -8,7 +8,6 @@ import {AngularMaterialModule} from "../../../modules/angular-material.module";
 import {ServicesModule} from "../../services/services.module";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {UtilModule} from "../../util/util.module";
-import {RichEditorModule} from "../../../modules";
 import {ExperimentPlatformOverviewComponent} from "./experiment-platform-overview.component";
 import {ExperimentPlatformTabComponent} from "./experiment-platform-tab.component";
 import {EpSampleTypeTabComponent} from "./ep-sample-type-tab.component";
@@ -35,6 +34,7 @@ import {LibraryPrepStepsDialogComponent} from "./library-prep-steps-dialog.compo
 import {EpExperimentTypeQcTabComponent} from "./ep-experiment-type-qc-tab.component";
 import {QcAssayDialogComponent} from "./qc-assay-dialog.component";
 import {QcAssayChipTypeDialogComponent} from "./qc-assay-chip-type-dialog.component";
+import {AngularEditorModule} from "@kolkov/angular-editor";
 
 
 
@@ -57,7 +57,7 @@ import {QcAssayChipTypeDialogComponent} from "./qc-assay-chip-type-dialog.compon
             IconTextRendererComponent
         ]),
         UtilModule,
-        RichEditorModule,
+        AngularEditorModule,
         ReactiveFormsModule,
         AngularSplitModule,
         DynamicModule.withComponents([ExperimentPlatformTabComponent,

@@ -1,10 +1,5 @@
 <form [formGroup]="formGroup">
-    <div mat-dialog-title class="padded-outer">
-        <div class="dialog-header-colors padded-inner">
-            Edit Library Prep
-        </div>
-    </div>
-    <div mat-dialog-content style="margin: 0; padding: 0;">
+    <div class="flex-container-col full-height full-width">
         <div style="margin: 0.5em;">
             <div class="flex-container-row spaced-children-margin">
                 <mat-form-field  class="medium-form-input">
@@ -20,14 +15,11 @@
                     </mat-error>
                 </mat-form-field>
             </div>
-            <mat-form-field class="medium-form-input">
-                <mat-select  placeholder="Sequencing Experiment Type Theme" formControlName="idApplicationTheme">
-                    <mat-option
-                            *ngFor="let theme of appThemeList"
-                            [value]="theme.value" >{{theme.display}}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
+            <custom-combo-box class="medium-form-input" placeholder="Sequencing Experiment Type Theme"
+                              [options]="this.appThemeList"
+                              valueField="value" displayField="display"
+                              [formControlName]="'idApplicationTheme'">
+            </custom-combo-box>
             <div class="flex-container-col">
                 <label class="gx-label"> Experiment Platform Compatibility </label>
                 <ng-container *ngFor="let app of reqCategoryAppList">
@@ -38,20 +30,16 @@
             </div>
 
             <div class="flex-container-row spaced-children-margin">
-                <mat-form-field class="medium-form-input">
-                    <mat-select placeholder="Index Family A" formControlName="idBarcodeSchemeA">
-                        <mat-option *ngFor="let indexA of indexFamily" [value]="indexA.value" >
-                            {{indexA.display}}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <mat-form-field class="medium-form-input">
-                    <mat-select placeholder="Index Family B" formControlName="idBarcodeSchemeB">
-                        <mat-option *ngFor="let indexB of indexFamily" [value]="indexB.value" >
-                            {{indexB.display}}
-                        </mat-option>
-                    </mat-select>
-                </mat-form-field>
+                <custom-combo-box class="medium-form-input" placeholder="Index Family A"
+                                  [options]="this.indexFamily"
+                                  valueField="value" displayField="display"
+                                  [formControlName]="'idBarcodeSchemeA'">
+                </custom-combo-box>
+                <custom-combo-box class="medium-form-input" placeholder="Index Family B"
+                                  [options]="this.indexFamily"
+                                  valueField="value" displayField="display"
+                                  [formControlName]="'idBarcodeSchemeB'">
+                </custom-combo-box>
             </div>
             <div class="flex-container-row spaced-children-margin" style="font-size: small">
                 <div class="flex-container-col" style="flex:2">
@@ -97,23 +85,6 @@
                 </div>
 
             </div>
-
-
-
-
-        </div>
-    </div>
-    <div class="padded-outer" style="justify-content: flex-end;"  mat-dialog-actions>
-        <div class="padded-inner flex-container-row" style="align-items:center" >
-            <div class="flex-grow">
-                <save-footer
-                        [actionType]="applyText"
-                        [disableSave]="formGroup.invalid"
-                        (saveClicked)="applyLibPrepChanges()"
-                        [dirty]="formGroup.dirty" >
-                </save-footer>
-            </div>
-            <button mat-button  mat-dialog-close> Cancel  </button>
         </div>
     </div>
 </form>

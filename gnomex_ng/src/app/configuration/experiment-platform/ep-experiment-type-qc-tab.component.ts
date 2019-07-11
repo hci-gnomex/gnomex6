@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {Subscription} from "rxjs";
@@ -6,10 +6,10 @@ import {CellValueChangedEvent, GridApi} from "ag-grid-community";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {ConstantsService} from "../../services/constants.service";
 import {DictionaryService} from "../../services/dictionary.service";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {DialogsService} from "../../util/popup/dialogs.service";
-import {GnomexService} from "../../services/gnomex.service";
 import {QcAssayDialogComponent} from "./qc-assay-dialog.component";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 @Component({
     template: `
@@ -151,10 +151,11 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
 
 
 
-    constructor(private fb:FormBuilder,private expPlatfromService:ExperimentPlatformService,
-                public constService:ConstantsService,private dictionaryService:DictionaryService,
-                private dialog: MatDialog,private dialogService:DialogsService,
-                private gnomexService:GnomexService){
+    constructor(private fb: FormBuilder,
+                private expPlatfromService: ExperimentPlatformService,
+                public constService: ConstantsService,
+                private dictionaryService: DictionaryService,
+                private dialogService: DialogsService) {
     }
 
     ngOnInit(){
@@ -250,20 +251,25 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
 
     };
 
-    openQCEditor(){
-        let config: MatDialogConfig = new MatDialogConfig();
-        if(this.selectedApp.length > 0){
+    openQCEditor() {
+        if(this.selectedApp.length > 0) {
+            let config: MatDialogConfig = new MatDialogConfig();
             config.data = {
                 rowData: this.selectedApp[0],
                 applyFn: this.applyQCAssayFn,
                 expPlatform: this.expPlatfromNode
             };
-            config.height="30em";
-            config.width="50em";
-            config.panelClass = "no-padding-dialog";
-            this.dialog.open(QcAssayDialogComponent,config);
+            config.height = "30em";
+            config.width = "52em";
+
+            this.dialogService.genericDialogContainer(QcAssayDialogComponent, "Edit QC Assay", null, config,
+                {actions: [
+                        {type: ActionType.PRIMARY, name: "Apply", internalAction: "applyChanges"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                    ]});
         }
     }
+
     addApplication(){
         this.nextAppNumb++;
         let newApp = {
@@ -287,10 +293,11 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
         this.openQCEditor();
 
     }
+
     removeApplication(){
         let app = this.selectedApp[0];
-        this.dialogService.confirm("Warn","Are you sure you want to remove experiment type \'"
-            + app.display + "\'?" ).subscribe(result =>{
+        this.dialogService.confirm("Are you sure you want to remove experiment type \'"
+            + app.display + "\'?", "Warning").subscribe(result =>{
             if(result){
                 let i:number = this.rowData.indexOf(app);
                 if(i > -1 ){
@@ -305,13 +312,8 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
 
     }
 
-
-
-
-
     ngOnDestroy(){
         this.expPlatformSubscription.unsubscribe();
     }
-
 
 }

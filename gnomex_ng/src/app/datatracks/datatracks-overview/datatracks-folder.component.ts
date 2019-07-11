@@ -1,91 +1,91 @@
-import {AfterViewInit, Component, OnInit, ViewChild} from "@angular/core";
+import {Component, Input, OnInit, ViewChild} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {PrimaryTab} from "../../util/tabs/primary-tab.component";
 import {DataTrackService} from "../../services/data-track.service";
 import {ActivatedRoute} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {URLSearchParams} from "@angular/http";
-import {jqxEditorComponent} from "../../../assets/jqwidgets-ts/angular_jqxeditor";
-import {jqxComboBoxComponent} from "../../../assets/jqwidgets-ts/angular_jqxcombobox";
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
+import {GnomexService} from "../../services/gnomex.service";
 
 
 @Component({
-    templateUrl: "./datatracks-folder.component.html"
+    templateUrl: "./datatracks-folder.component.html",
+    styles:[`
+        :host /deep/ angular-editor #editor {
+            resize: none;
+        }
+        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
+            display: none;
+        }
+    `]
 })
-export class DatatracksFolderComponent extends PrimaryTab implements OnInit, AfterViewInit {
+export class DatatracksFolderComponent implements OnInit {
     //Override
-    @ViewChild("editorReference") myEditor: jqxEditorComponent;
-    @ViewChild("comboBox")  myCombo: jqxComboBoxComponent;
 
     public canWrite: boolean = false;
     public showSpinner: boolean = false;
-    public readonly tbarSettings : string  = "bold italic underline | left center right |  format font size | color | ul ol | outdent indent";
-    private toolBarSettings: string;
+    public editorConfig: AngularEditorConfig;
     private folderFormGroup: FormGroup;
     private labList: Array<string> = [];
-    private idLabString: string;
-    private description: string;
+    @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
+    // todo need a toggle for editable for datatracks overview detail
+    @Input() editable;
 
-
-    constructor(protected fb: FormBuilder, public dtService: DataTrackService,
-                private route: ActivatedRoute, public secAdvisor: CreateSecurityAdvisorService,
-                private dialogService: DialogsService,
+    constructor(protected fb: FormBuilder,
+                public dtService: DataTrackService,
+                private route: ActivatedRoute,
+                private gnomexService : GnomexService,
+                public secAdvisor: CreateSecurityAdvisorService,
                 public prefService: UserPreferencesService) {
-        super(fb);
     }
 
 
     ngOnInit(): void { // Note this hook runs once if route changes to another folder you don't recreate component
-        this.labList = this.dtService.labList;
-        this.description = "TESTME PLEASE";
+        this.labList = this.gnomexService.labList.sort(this.prefService.createLabDisplaySortFunction());
+        this.editorConfig = {
+            spellcheck: true,
+            height: "25em",
+            enableToolbar: true,
+            placeholder: "Enter a description"
+        };
 
-        if(this.secAdvisor.isGuest) {
-            this.toolBarSettings = "";
-        } else {
-            this.toolBarSettings = this.tbarSettings;
-        }
+
+        this.editorConfig.editable = !this.secAdvisor.isGuest;
+        this.descEditor.editorToolbar.showToolbar = !this.secAdvisor.isGuest;
+
 
         this.folderFormGroup =  this.fb.group({
             folderName: [{value: ""  , disabled: this.secAdvisor.isGuest}, [ Validators.required, Validators.maxLength(100)]],
+            lab: [{value: "", disabled: this.secAdvisor.isGuest}, []],
+            description:[{value:"", disabled: this.secAdvisor.isGuest}]
         });
 
         this.route.paramMap.forEach(params => {
             let folderName = this.dtService.datatrackListTreeNode.name;
             this.canWrite = this.dtService.datatrackListTreeNode.canWrite === "Y";
             this.folderFormGroup.get("folderName").setValue(folderName);
+            this.folderFormGroup.get("description").setValue(this.dtService.datatrackListTreeNode.description);
+            this.folderFormGroup.get("lab").setValue(this.dtService.datatrackListTreeNode.idLab);
+            this.folderFormGroup.markAsPristine();
         });
 
     }
 
-    ngAfterViewInit(): void {
-
-
-        this.route.paramMap.forEach(params => {
-            let description = this.dtService.datatrackListTreeNode.description;
-            this.myEditor.val(description);
-            setTimeout(() => {
-                this.myCombo.selectItem(this.dtService.datatrackListTreeNode.idLab);
-                this.folderFormGroup.markAsPristine();
-            });
-
-        });
-    }
 
     save(): void {
         this.showSpinner = true;
 
         let idDataTrackFolder = this.dtService.datatrackListTreeNode.idDataTrackFolder;
         let name = this.folderFormGroup.get("folderName").value;
+        let description = this.folderFormGroup.get("description").value;
 
         let params:HttpParams = new HttpParams()
             .set('idDataTrackFolder', idDataTrackFolder)
-            .set('description', this.description)
+            .set('description', description)
             .set('name', name)
-            .set('idLab',this.idLabString);
+            .set('idLab', this.folderFormGroup.get("lab").value ? this.folderFormGroup.get("lab").value : "");
 
         this.dtService.saveFolder(params).subscribe(resp =>{
             this.folderFormGroup.markAsPristine();
@@ -94,26 +94,6 @@ export class DatatracksFolderComponent extends PrimaryTab implements OnInit, Aft
         },(err:IGnomexErrorResponse) =>{
             this.showSpinner = false;
         });
-    }
-
-    onSelect(event: any): void {
-        if (event.args) {
-            if (event.args.item && event.args.item.value) {
-                this.idLabString = event.args.item.value;
-                this.folderFormGroup.markAsDirty();
-            }
-        } else {
-            this.idLabString = "";
-        }
-    }
-
-    onUnselect(event: any): void {
-        this.idLabString = "";
-    }
-
-    changed(event: any) {
-        console.log(event.args);
-        this.folderFormGroup.markAsDirty();
     }
 
 }

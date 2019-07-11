@@ -3,10 +3,10 @@ import {AfterViewInit, Component, ElementRef, Inject, ViewChild} from '@angular/
 import {ConstantsService} from "../../services/constants.service";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
-import {RemoveLinkButtonRenderer} from "../../util/grid-renderers/remove-link-button.renderer";
 import {IconLinkButtonRenderer} from "../../util/grid-renderers/icon-link-button.renderer";
 import {GnomexService} from "../../services/gnomex.service";
 import {UserPreferencesService} from "../../services/user-preferences.service";
+import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 
 @Component({
     selector: 'collaborators-dialog',
@@ -23,7 +23,7 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
         
     `]
 })
-export class CollaboratorsDialogComponent implements AfterViewInit {
+export class CollaboratorsDialogComponent extends BaseGenericContainerDialog implements AfterViewInit {
 
     @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
 
@@ -94,6 +94,7 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
                 private gnomexService: GnomexService,
                 public prefService: UserPreferencesService,
                 @Inject(MAT_DIALOG_DATA) private data) {
+        super();
         if (!this.data || !this.data.possibleCollaborators || !this.data.idFieldValue || !this.data.idField || !Array.isArray(this.data.possibleCollaborators)) {
             this.dialogRef.close();
         }
@@ -137,11 +138,7 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
 
 
     public collaboratorDropdownChange(event: any): void {
-        if (event && event.value && event.value.idAppUser) {
-            this.collaboratorToAdd = event.value;
-        } else {
-            this.collaboratorToAdd = null;
-        }
+        this.collaboratorToAdd = event ? event : null;
 
         if (this.collaboratorToAdd) {
             let existingCollaborator = this.currentCollaborators.filter((a) => {
@@ -204,7 +201,7 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
         });
     }
 
-    public onClickOkay(): void {
+    public onClickUpdate(): void {
         let returnedCollaborators: any[] = [];
 
         for (let collaborator of this.currentCollaborators) {
@@ -258,5 +255,9 @@ export class CollaboratorsDialogComponent implements AfterViewInit {
         if (event && event.api) {
             event.api.sizeColumnsToFit();
         }
+    }
+
+    public cancel(): void {
+        this.dialogRef.close();
     }
 }

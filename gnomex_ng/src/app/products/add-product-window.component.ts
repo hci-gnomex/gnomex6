@@ -4,24 +4,30 @@ import {ProductsService} from "../services/products.service";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {UserPreferencesService} from "../services/user-preferences.service";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 
 @Component({
     selector: 'add-product-window',
-    templateUrl: "./add-product-window.component.html",
+    template: `
+        <div class="flex-container-col full-height full-width double-padded">
+            <form [formGroup]="this.form">
+                <custom-combo-box class="full-width" placeholder="Lab"
+                                  [options]="this.labList"
+                                  displayField="displayName"
+                                  [formControlName]="'lab'">
+                </custom-combo-box>
+                <custom-combo-box class="full-width" placeholder="Product"
+                                  [options]="this.productList"
+                                  displayField="display"
+                                  [formControlName]="'product'">
+                </custom-combo-box>
+            </form>
+        </div>
+    `,
     styles: [`
-        form.flex-container-col {
-            display: flex;
-            flex-direction: column;
-        }
-        mat-form-field.full-width {
-            width: 100%;
-        }
-        img.icon {
-            margin-right: 0.5rem;
-        }
     `]
 })
-export class AddProductWindowComponent implements OnInit {
+export class AddProductWindowComponent extends BaseGenericContainerDialog implements OnInit {
     public form: FormGroup;
     public labList: any[];
     public productList: any[];
@@ -32,6 +38,7 @@ export class AddProductWindowComponent implements OnInit {
                 private dialogRef: MatDialogRef<AddProductWindowComponent>,
                 private dialogsService: DialogsService,
                 public prefService: UserPreferencesService) {
+        super();
         this.form = fb.group({
             lab: ['', Validators.required],
             product: ['', Validators.required]
@@ -55,7 +62,7 @@ export class AddProductWindowComponent implements OnInit {
                 if (response && response.message) {
                     message = ": " + response.message;
                 }
-                this.dialogsService.confirm("An error occurred while retrieving the lab list" + message, null);
+                this.dialogsService.error("An error occurred while retrieving the lab list" + message);
             }
         });
     }
@@ -64,6 +71,8 @@ export class AddProductWindowComponent implements OnInit {
         Object.keys(this.form.controls).forEach((key: string) => {
             this.form.controls[key].markAsTouched();
         });
+
+        this.primaryDisable = (action) => this.form.invalid;
     }
 
     public save(): void {

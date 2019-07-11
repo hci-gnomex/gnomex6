@@ -1,17 +1,11 @@
-import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {ActivatedRoute} from "@angular/router";
 import {IAnnotation} from "../../util/interfaces/annotation.model";
 import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
-import {OrderType} from "../../util/annotation-tab.component";
+import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
 import {IRelatedObject} from "../../util/interfaces/related-objects.model";
 import {ExperimentsService} from "../experiments.service";
-import {
-    MatDialog,
-    MatDialogConfig,
-    MatDialogRef,
-    MatSnackBar,
-    MatTabChangeEvent,
-} from "@angular/material";
+import {MatDialogConfig, MatSnackBar, MatTabChangeEvent} from "@angular/material";
 import {DictionaryService} from "../../services/dictionary.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {BehaviorSubject, Subscription} from "rxjs";
@@ -31,6 +25,14 @@ import {HttpParams} from "@angular/common/http";
 import {first} from "rxjs/operators";
 import {BasicEmailDialogComponent} from "../../util/basic-email-dialog.component";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {VisibilityDetailTabComponent} from "../../util/visibility-detail-tab.component";
+import {FormGroup} from "@angular/forms";
+import {BillingService} from "../../services/billing.service";
+import {BillingTemplate} from "../../util/billing-template-window.component";
+import {ExperimentBioinformaticsTabComponent} from "./experiment-bioinformatics-tab.component";
+import {ExperimentBillingTabComponent} from "./experiment-billing-tab.component";
+import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 export const TOOLTIPS = Object.freeze({
     PRINT_EXPERIMENT_ORDER: "Create PDF form for this experiment order",
@@ -79,7 +81,7 @@ export const TOOLTIPS = Object.freeze({
         }
     `]
 })
-export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
+export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, AfterViewInit {
     public toolTips: any = TOOLTIPS;
 
     public annotations: any = [];
@@ -104,16 +106,19 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
 
     private overviewListSubscription: Subscription;
     private requestCategory: any;
-    private createAnalysisDialogRef: MatDialogRef<CreateAnalysisComponent>;
-    private contactCoreEmailDialogRef: MatDialogRef<BasicEmailDialogComponent>;
 
     @ViewChild(ExperimentSequenceLanesTab) private sequenceLanesTab: ExperimentSequenceLanesTab;
 
     @ViewChild("tabSamplesIlluminaComponent") private tabSamplesIlluminaComponent: TabSamplesIlluminaComponent;
-
+    
+    @ViewChild(AnnotationTabComponent) private annotationTab: AnnotationTabComponent;
+    @ViewChild(VisibilityDetailTabComponent) private visibilityDetailTab: VisibilityDetailTabComponent;
+    @ViewChild(ExperimentBioinformaticsTabComponent) private bioinformaticsTab : ExperimentBioinformaticsTabComponent;
+    @ViewChild(ExperimentBillingTabComponent) private billingTab: ExperimentBillingTabComponent;
+    
     constructor(private securityAdvisor: CreateSecurityAdvisorService,
                 private dictionaryService: DictionaryService,
-                private experimentService: ExperimentsService,
+                public experimentService: ExperimentsService,
                 private gnomexService: GnomexService,
                 private propertyService: PropertyService,
                 public constService: ConstantsService,
@@ -121,11 +126,13 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                 private dialogsService: DialogsService,
                 private route: ActivatedRoute,
                 private fileService: FileService,
-                private dialog: MatDialog,
-                private snackBar: MatSnackBar) {
+                private snackBar: MatSnackBar,
+                private billingService: BillingService,
+                private orderValidateService: BrowseOrderValidateService) {
     }
 
     ngOnInit(): void {
+        this.experimentService.clearExperimentOverviewForm();
 
         this.overviewListSubscription = this.experimentService.getExperimentOverviewListSubject().subscribe(data => {
             this.experimentOverviewNode = data;
@@ -137,6 +144,8 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
             this.showSequenceLanesTab = false;
             this.showBillingTab = false;
             this.showCreateAnalysisButton = false;
+
+            this.experimentService.experimentOverviewForm.reset();
 
             if (data && data.experiment && data.experiment.Request) {
                 this.experiment  = data.experiment.Request;
@@ -200,9 +209,18 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
 
     }
 
+    ngAfterViewInit(): void {
+        if(this.annotations && this.annotations.length > 0) {
+            this.experimentService.addExperimentOverviewFormMember(this.annotationTab.form, "AnnotationTabComponent");
+        }
+
+        this.experimentService.addExperimentOverviewFormMember(this.visibilityDetailTab.form, "VisibilityDetailTabComponent");
+    }
+
     ngOnDestroy() {
         this.overviewListSubscription.unsubscribe();
         this.experimentService.setEditMode(false);
+        this.experimentService.clearExperimentOverviewForm();
     }
 
     initRelatedData(experiment: any): boolean {
@@ -248,15 +266,107 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     }
 
     save() {
-        // TODO: This is a temporary handle and it needs to be implemented when we work on Save() function
-        let mes: string = "Save() method hasn't been implemented. Continue anyway?";
-        this.dialogsService.yesNoDialog(mes, this, "changeEditMode", null, "Save Confirmation");
+        this.dialogsService.startDefaultSpinnerDialog();
+
+        if(this.showBioinformaticsTab && this.bioinformaticsTab) {
+            this._experiment.bioinformaticsAssist = this.bioinformaticsTab.experiment.bioinformaticsAssist;
+            this._experiment.analysisInstructions = this.bioinformaticsTab.experiment.analysisInstructions;
+        }
+
+        let experimentOverviewForm: FormGroup = this.experimentService.experimentOverviewForm;
+
+        Object.keys(experimentOverviewForm.controls).forEach(key => {
+            if(key === "AnnotationTabComponent") {
+                this.orderValidateService.emitOrderValidateSubject();
+                this._experiment.RequestProperties = this.orderValidateService.annotationsToSave;
+            } else if(key === "BillingTemplateWindowComponent") {
+                // Saved already. Skip BillingTemplateWindowComponent;
+            } else {
+                let experimentTabForm: FormGroup = <FormGroup>experimentOverviewForm.get(key);
+                Object.keys(experimentTabForm.controls).forEach(k => {
+                    let val = experimentTabForm.get(k).value;
+                    if(val) {
+                        if(k.includes("JSONString")) {
+                            this._experiment[k] = JSON.stringify(experimentTabForm.get(k).value);
+                        } else {
+                            this._experiment[k] = experimentTabForm.get(k).value;
+                        }
+                    }
+                });
+            }
+        });
+
+        this.replaceArrayItems();
+
+        if(this.showBillingTab) {
+            let BillingTemplateForm: FormGroup = <FormGroup>this.experimentService.experimentOverviewForm.get("BillingTemplateWindowComponent");
+            if (BillingTemplateForm && BillingTemplateForm.dirty) {
+                this.saveBillingAccount(BillingTemplateForm);
+                return;
+            }
+        }
+
+        this.saveRequest();
+
+    }
+
+    saveRequest(): void {
+        this._experiment.idBillingAccount = "";
+        this._experiment.billingItems = [];
+        this.experimentService.saveRequest(this._experiment).subscribe((response) => {
+            if (response && response.requestNumber) {
+                this.gnomexService.navByNumber(response.requestNumber);
+                this.dialogsService.stopAllSpinnerDialogs();
+            } else {
+                this.dialogsService.stopAllSpinnerDialogs();
+            }
+        }, (err: IGnomexErrorResponse) => {
+            this.dialogsService.stopAllSpinnerDialogs();
+        });
+    }
+
+
+    saveBillingAccount(BillingTemplateForm: FormGroup): void {
+        let billingTemplate: BillingTemplate = BillingTemplateForm.value as BillingTemplate;
+        this.billingService.saveBillingTemplate(billingTemplate).subscribe((result: any) => {
+            if (result && result.result === "SUCCESS") {
+                this.saveRequest();
+            }
+        }, (err: IGnomexErrorResponse) => {
+            this.dialogsService.stopAllSpinnerDialogs();
+        });
+    }
+
+    replaceArrayItems() {
+        if (this._experiment.project.Project && this._experiment.project.Project.requests && !Array.isArray(this._experiment.project.Project.requests)) {
+            this._experiment.project.Project.requests = [this._experiment.project.Project.requests];
+        }
+
+        if(this._experiment.collaborators && !Array.isArray(this._experiment.collaborators)) {
+            this._experiment.collaborators = [this._experiment.collaborators["ExperimentCollaborator"]];
+        }
+
+        if(this._experiment.labeledSamples && !Array.isArray(this._experiment.labeledSamples)) {
+            this._experiment.labeledSamples = [this._experiment.labeledSamples];
+        }
+
+        if(this._experiment.workItems && !Array.isArray(this._experiment.workItems)) {
+            this._experiment.workItems = [this._experiment.workItems];
+        }
+
+        if(this._experiment.sequenceLanes && !Array.isArray(this._experiment.sequenceLanes)) {
+            this._experiment.sequenceLanes = [this._experiment.sequenceLanes["SequenceLane"]];
+        }
     }
 
     startEdit(element: Element) {
-        if(this.isEditMode) {
+        if(this.isEditMode && this.experimentService.experimentOverviewForm.dirty) {
             let warningMessage: string = "Your changes haven't been saved. Continue anyway?";
-            this.dialogsService.yesNoDialog(warningMessage, this, "changeEditMode", null, "Changing EditMode");
+            this.dialogsService.confirm(warningMessage).subscribe((result: any) => {
+                if(result) {
+                    this.changeEditMode();
+                }
+            });
         } else {
             this.changeEditMode();
         }
@@ -265,9 +375,6 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
     public modeSubject: BehaviorSubject<string> = new BehaviorSubject<string>('VIEW');
 
     changeEditMode() {
-        // TODO: Here needs to save the changes first when save() function is implemented, or
-        // TODO: we can change the logic to not be saved first when change editMode but only when click the save button.
-
         if (!this.isEditMode) {
             this.modeSubject.next('EDIT');
         } else {
@@ -277,6 +384,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
         this.experimentService.setEditMode(!this.isEditMode);
         this.experimentService.modeChangedExperiment = this.experiment;
         this.isEditMode = this.experimentService.getEditMode();
+        this.experimentService.experimentOverviewForm.markAsPristine();
         this.setNodeTitle();
     }
 
@@ -309,9 +417,8 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                     suggestedFilename: "gnomex-data",
                 };
                 config.disableClose = true;
-                this.dialog.open(DownloadFilesComponent, config);
-
-            },(err:IGnomexErrorResponse) => {
+                this.dialogsService.genericDialogContainer(DownloadFilesComponent, "Download Files", null, config);
+            }, (err: IGnomexErrorResponse) => {
             });
         }
     }
@@ -326,7 +433,11 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
             number: this.experiment ? this.experiment.number : "",
             type: "requestNumber"
         };
-        this.dialog.open(ShareLinkDialogComponent, configuration);
+        this.dialogsService.genericDialogContainer(ShareLinkDialogComponent,
+            "Web Link for Experiment " + (this.experiment ? this.experiment.number : ""), null, configuration,
+            {actions: [
+                {type: ActionType.PRIMARY, name: "Copy To Clipboard", internalAction: "copyToClipboard"}
+                ]});
     }
 
     showPrintableRequestForm() {
@@ -347,8 +458,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
             }
 
             let config: MatDialogConfig = new MatDialogConfig();
-            config.width = "35em";
-            // config.height = "30em";
+            config.width = "40em";
             config.panelClass = "no-padding-dialog";
             config.autoFocus = false;
             config.disableClose = true;
@@ -361,7 +471,11 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
 
             };
 
-            this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, config);
+            this.dialogsService.genericDialogContainer(CreateAnalysisComponent, "Create Analysis", null, config, {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save" , internalAction: "createAnalysisYesButtonClicked", externalAction: () => { console.log("hello"); }},
+                    {type: ActionType.SECONDARY,  name: "Cancel", internalAction: "cancel"}
+                ]});
+
         }
     }
 
@@ -369,7 +483,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
         if (this.experiment) {
             let subjectText = "Inquiry about Experiment " + this.experiment.number;
 
-            let saveFn = (data: any) => {
+            let saveFn = (data: any): boolean  => {
 
                 data.format =  "text";
                 data.idAppUser = this.secAdvisor.idAppUser.toString();
@@ -388,19 +502,12 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
                     .set("subject", data.subject);
 
                 this.experimentService.emailServlet(params).pipe(first()).subscribe(resp => {
-                    let email = <BasicEmailDialogComponent>this.contactCoreEmailDialogRef.componentInstance;
-                    email.showSpinner = false;
-
-                    this.contactCoreEmailDialogRef.close();
-
-                    this.snackBar.open("Email successfully sent", "Contact Core", {
-                        duration: 2000
-                    });
-
-
-
-                }, (err:IGnomexErrorResponse) => {
+                    this.dialogsService.stopAllSpinnerDialogs();
+                    return true;
+                }, (err: IGnomexErrorResponse) => {
+                    this.dialogsService.stopAllSpinnerDialogs();
                 });
+                return false;
             };
 
             let configuration: MatDialogConfig = new MatDialogConfig();
@@ -411,12 +518,17 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy {
             configuration.disableClose = true;
             configuration.data = {
                 saveFn: saveFn,
-                title: "Email Core Regarding this Experiment",
+                action: "Contact Core",
                 parentComponent: "Experiment",
                 subjectText: subjectText,
             };
 
-            this.contactCoreEmailDialogRef = this.dialog.open(BasicEmailDialogComponent, configuration);
+            this.dialogsService.genericDialogContainer(BasicEmailDialogComponent,
+                "Email Core Regarding this Experiment", this.constService.EMAIL_GO_LINK, configuration,
+                {actions: [
+                        {type: ActionType.PRIMARY, icon: this.constService.EMAIL_GO_LINK, name: "Send Email", internalAction: "send"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                    ]});
 
         }
     }

@@ -1,30 +1,55 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {MatDialogRef, MAT_DIALOG_DATA} from '@angular/material';
-import {Component, Inject, OnInit, ViewChild} from "@angular/core";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {Component, Inject, OnInit} from "@angular/core";
+import {FormBuilder} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {HttpParams} from "@angular/common/http";
 import {GridApi} from "ag-grid-community";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {first} from "rxjs/operators";
+import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../../services/constants.service";
 
 @Component({
-    templateUrl:'./sort-order-dialog.component.html',
-    styles:[`
+    template: `
+        <div class="flex-container-col full-width full-height">
+        <div class="full-height padded" style="background-color: #eeeeeb;border:thin;">
+            <div style="height:25em; width:50em;">
+                <ag-grid-angular style="width: 100%; height: 100%;" class="ag-theme-fresh"
+                                 [rowData]="rowData"
+                                 [columnDefs]="columnDefs"
+                                 (cellValueChanged)="cellValueChanged($event)"
+                                 (gridSizeChanged)="onGridSizeChanged($event)"
+                                 [stopEditingWhenGridLosesFocus]="true"
+                                 [rowSelection]="'single'"
+                                 [enableSorting]="true"
+                                 [enableColResize]="true"
+                                 [rowDeselection]="true"
+                                 (gridReady)="onGridReady($event)">
+                </ag-grid-angular>
 
-    `]
-
+            </div>
+        </div>
+        <div class="flex-container-row justify-space-between generic-dialog-footer-colors">
+            <div class="flex-container-row">
+                <save-footer [icon]="this.constService.ICON_REFRESH" [actionType]="actionType.SECONDARY" (saveClicked)="refresh()" name="Refresh"></save-footer>
+            </div>
+            <div class="flex-container-row justify-flex-end">
+                <save-footer [icon]="this.constService.ICON_SAVE" (saveClicked)="save()" name="Save"></save-footer>
+                <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="cancel()" name="Cancel"></save-footer>
+            </div>
+        </div>
+        </div>
+    `,
 })
 
-export class SortOrderDialogComponent implements OnInit{
+export class SortOrderDialogComponent extends BaseGenericContainerDialog implements OnInit{
     private idCoreFacility: string;
     private gridApi:GridApi;
     private sortOrderList:any[] = [];
     public showSpinner:boolean = false;
     public isDirty:boolean = false;
-
+    public actionType: any = ActionType;
 
 
     sortFn= (obj1:any , obj2:any) =>{
@@ -93,11 +118,13 @@ export class SortOrderDialogComponent implements OnInit{
 
 
     constructor(private dialogRef: MatDialogRef<SortOrderDialogComponent>,
-                @Inject(MAT_DIALOG_DATA) private data: any, private fb: FormBuilder,
+                @Inject(MAT_DIALOG_DATA) private data: any,
+                private fb: FormBuilder,
                 private expPlatformService: ExperimentPlatformService,
-                private dialogService:DialogsService) {
+                private dialogService: DialogsService,
+                public constService: ConstantsService) {
+        super();
         this.idCoreFacility = data.idCoreFacility;
-
 
     }
 
@@ -110,11 +137,11 @@ export class SortOrderDialogComponent implements OnInit{
                     this.rowData.sort(this.sortFn);
 
                 }else if(resp && resp.message) {
-                    this.dialogService.alert(resp.message);
+                    this.dialogService.error(resp.message);
                 }
-            })
+            });
 
-
+        this.dirty = () => {return this.isDirty; };
 
     }
     onGridReady(params){
@@ -135,9 +162,8 @@ export class SortOrderDialogComponent implements OnInit{
     }
 
     refresh(){
-        this.dialogService.confirm("Discard changes",
-            "Refreshing will discard your changes.  Do want to discard your changes?" )
-            .subscribe((answer:boolean) =>{
+        this.dialogService.confirm("Refreshing will discard your changes.  Do want to discard your changes?", "Discard Changes Confirm")
+            .subscribe((answer:any) =>{
                 if(answer){
                     this.expPlatformService.getExperimentPlatformSortOrderList(new HttpParams().set('idCoreFacility',this.idCoreFacility)).
                         pipe(first()).subscribe(resp => {
@@ -149,7 +175,7 @@ export class SortOrderDialogComponent implements OnInit{
                                 this.isDirty = false;
 
                             }else if(resp && resp.message) {
-                                this.dialogService.alert(resp.message);
+                                this.dialogService.error(resp.message);
                             }
                         });
                 }
@@ -172,9 +198,13 @@ export class SortOrderDialogComponent implements OnInit{
                     this.isDirty = false;
                     this.expPlatformService.getExperimentPlatformList_fromBackend();
                 }else if(resp && resp.message){
-                    this.dialogService.alert(resp.message);
+                    this.dialogService.error(resp.message);
                 }
-            })
+            });
+    }
+
+    cancel(): void {
+        this.dialogRef.close();
     }
 
 }

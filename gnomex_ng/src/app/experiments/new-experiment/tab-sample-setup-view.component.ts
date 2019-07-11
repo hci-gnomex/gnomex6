@@ -1,8 +1,6 @@
 import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 
-import {MatOption, MatAutocomplete} from "@angular/material";
-
 import {GnomexService} from "../../services/gnomex.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
@@ -197,7 +195,6 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
         this._organism = value;
     };
 
-    @ViewChild("autoOrg") orgAutocomplete: MatAutocomplete;
     @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
 
     public form: FormGroup;
@@ -208,7 +205,6 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     private sampleType: any;
     public filteredSampleTypeListDna: any[] = [];
     public filteredSampleTypeListRna: any[] = [];
-    private previousOrganismMatOption: MatOption;
     private showSampleNotes: boolean = false;
     public showSamplePrepContainer: boolean = true;
     public showKeepSample: boolean = true;
@@ -793,6 +789,13 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 this.showSamplePurification = false;
             }
 
+            if (this.requestCategory.type === NewExperimentService.TYPE_NANOSTRING) {
+                this.showSamplePrepContainer = true;
+                this.requireSamplePrepContainer = true;
+                this.showSamplePurification = false;
+                this.showKeepSample = false;
+            }
+
             if (this._experiment) {
                 let qcInstText: any = this.propertyService.getProperty(PropertyService.PROPERTY_QC_INSTRUCTIONS, this._experiment.idCoreFacility, this._experiment.codeRequestCategory);
 
@@ -829,60 +832,17 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 if (this.requestCategory && this.requestCategory.idOrganism) {
                     let organism = this.dictionaryService.getEntry('hci.gnomex.model.OrganismLite',this.requestCategory.idOrganism);
                     if ( this.securityAdvisor.isArray(organism)) {
-                        this.form.get("organism").setValue(organism[0]);
+                        this.form.get("organism").setValue(organism[0].idOrganism);
                         return;
 
                     } else {
-                        this.form.get("organism").setValue(organism);
+                        this.form.get("organism").setValue(organism.idOrganism);
                         return;
                     }
                 }
             }
         }
     }
-
-    public display_generic(value: any): void {
-        return value ? (typeof(value) === 'string' ? value : value.display) : '';
-    }
-
-    public chooseFirstOrgOption(): void {
-        this.orgAutocomplete.options.first.select();
-    }
-
-    public displayOrg(org: any): void {
-        return org ? org.combinedName : org;
-    }
-
-    public highlightDtOrgFirstOption(event): void {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.orgAutocomplete.options.first) {
-            if (this.previousOrganismMatOption) {
-                this.previousOrganismMatOption.setInactiveStyles();
-            }
-            this.orgAutocomplete.options.first.setActiveStyles();
-            this.previousOrganismMatOption = this.orgAutocomplete.options.first;
-        }
-    }
-
-    public filterOrganism(selectedOrganism: any): any[] {
-        let fOrgs: any[] = [];
-        if (selectedOrganism) {
-            if (selectedOrganism.idOrganism) {
-                fOrgs = this.organisms.filter(org =>
-                    org.combinedName.toLowerCase().indexOf(selectedOrganism.combinedName.toLowerCase()) >= 0);
-                return fOrgs;
-            } else {
-                fOrgs = this.organisms.filter(org =>
-                    org.combinedName.toLowerCase().indexOf(selectedOrganism.toLowerCase()) >= 0);
-                return fOrgs;
-            }
-        } else {
-            return this.organisms;
-        }
-    }
-
 
     public onGridReady(event: any): void {
         if (!event) {
@@ -905,11 +865,8 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
 
 
     public selectOrganism(event): void {
-        if (event !== undefined && event.source && event.source.value && event.source.value.idLab !== "0") {
-            // needed for an input with autocomplete instead of a matselect.
-            this.form.get("organism").setValue(event.source.value);
-
-            this._experiment.organism = this.form.get("organism").value;
+        if (event && (!event.idLab || event.idLab !== "0")) {
+            this._experiment.organism = this.dictionaryService.getEntry('hci.gnomex.model.OrganismLite', this.form.get("organism").value.idOrganism);
         }
     }
 
@@ -959,13 +916,8 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     }
 
     public onSelectSampleSource(event: any): void {
-        if (event
-            && event.isUserInput
-            && event.isUserInput === true
-            && event.source
-            && event.source.value) {
-
-            this._experiment.idSampleSource = event.source.value.value;
+        if (event) {
+            this._experiment.idSampleSource = event.value;
         }
     }
 

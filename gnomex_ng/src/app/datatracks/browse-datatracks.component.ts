@@ -1,35 +1,30 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {
     AfterViewInit, ChangeDetectorRef, Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild
 } from "@angular/core";
 
-import { jqxWindowComponent } from "jqwidgets-framework";
-import { jqxButtonComponent } from "jqwidgets-framework";
-import { jqxComboBoxComponent } from "jqwidgets-framework";
-import { jqxNotificationComponent  } from "jqwidgets-framework";
-import { jqxCheckBoxComponent } from "jqwidgets-framework";
 import {
-    TreeComponent, ITreeOptions, TreeNode, TreeModel, IActionMapping,
-    TREE_ACTIONS
+    IActionMapping,
+    ITreeOptions,
+    TREE_ACTIONS,
+    TreeComponent,
+    TreeModel,
+    TreeNode,
 } from "angular-tree-component";
 import {Subscription} from "rxjs";
-import {ActivatedRoute, NavigationExtras, Router} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {LabListService} from "../services/lab-list.service";
 import {DataTrackService} from "../services/data-track.service";
 import {MoveDataTrackComponent} from "./move-datatrack.component";
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import * as _ from "lodash";
 import {GnomexService} from "../services/gnomex.service";
-import {URLSearchParams} from "@angular/http";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {UtilService} from "../services/util.service";
 import {HttpParams} from "@angular/common/http";
 
-const actionMapping:IActionMapping = {
+const actionMapping: IActionMapping = {
     mouse: {
         click: (tree, node, $event) => {
             $event.ctrlKey
@@ -43,11 +38,11 @@ const actionMapping:IActionMapping = {
     selector: "datatracks",
     templateUrl: "./browse-datatracks.component.html",
     styles: [`
-        
+
         .short-width { width: 10em; }
-        
+
         .padded { padding: 0.3em; }
-        
+
         .left-right-padded {
             padding-left:  0.3em;
             padding-right: 0.3em;
@@ -58,33 +53,31 @@ const actionMapping:IActionMapping = {
         }
 
         .vertical-spacer { height: 0.3em; }
-        
+
         .foreground { background-color: white;   }
         .background { background-color: #EEEEEE; }
-        
+
         .border { border: #C8C8C8 solid thin; }
-        
+
         .major-border {
             border-radius: 0.3em;
             border: 1px solid darkgrey;
         }
-        
+
         .small-font      { font-size: small; }
-        
+
         .no-overflow { overflow: hidden; }
-        
+
         .no-word-wrap { white-space: nowrap; }
-        
+
     `]
 })
 
 export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @ViewChild("datatracksTree") treeComponent: TreeComponent;
-    @ViewChild("labComboBox") labComboBox: jqxComboBoxComponent;
     @Output() selItem: EventEmitter<ITreeNode> = new EventEmitter();
     private treeModel: TreeModel;
-    public moveDatatrackDialogRef: MatDialogRef<MoveDataTrackComponent>;
     private navInitSubscription: Subscription;
 
     /*
@@ -116,8 +109,8 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
     public labMembers: any;
     private billingAccounts: any;
-    private selectedItem: ITreeNode;
-    private allActiveNodes: ITreeNode[] = [];
+    public selectedItem: ITreeNode;
+    public allActiveNodes: ITreeNode[] = [];
     public datatracksCount: number = 0;
     private dataTracksListSubscription: Subscription;
     private labList: any[] = [];
@@ -148,8 +141,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 private router: Router,
                 private route: ActivatedRoute,
                 private labListService: LabListService,
-                private dialog: MatDialog,
-                private gnomexService:GnomexService,
+                private gnomexService: GnomexService,
                 private changeDetectorRef: ChangeDetectorRef,
                 private utilService: UtilService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService) {
@@ -162,7 +154,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
         this.dataTracksListSubscription = this.datatracksService.getDatatracksListObservable().subscribe(response => {
             this.buildTree(response);
-            let id = null;
 
             if(this.datatracksService.previousURLParams && this.datatracksService.previousURLParams["refreshParams"] ){ // this code occurs when searching
                 let navArray:any[] = ['/datatracks', { outlets: { datatracksPanel: null }}];
@@ -173,17 +164,20 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
             }
 
 
-
             setTimeout(_ => {
                 //this.treeModel.expandAll();
                 if(this.gnomexService.orderInitObj) { // this is if component is being navigated to by url
-                    let id: string = "d" + this.gnomexService.orderInitObj.idDataTrack;
-                    if (this.treeModel && id) {
-                        let dtNode: ITreeNode = this.treeModel.getNodeById(id);
-                        if(dtNode){
+                    let idDataTrack: string = this.gnomexService.orderInitObj.idDataTrack;
+                    if (this.treeModel && idDataTrack) {
+                        let dtNode: ITreeNode = this.treeModel.getNodeById("d" + idDataTrack);
+                        if(dtNode) {
                             dtNode.ensureVisible();
                             dtNode.setIsActive(true);
                             dtNode.scrollIntoView();
+                        } else {
+                            this.disableDelete = false;
+                            let navArray = ["/datatracks",  {outlets: {"datatracksPanel": [idDataTrack]}}];
+                            this.router.navigate(navArray);
                         }
                         this.gnomexService.orderInitObj = null;
                     }
@@ -203,29 +197,25 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
         });
 
-
         this.navInitSubscription = this.gnomexService.navInitBrowseDatatrackSubject.subscribe( orderInitObj => {
-            if(orderInitObj){
+            if(orderInitObj) {
                 let ids: HttpParams = new HttpParams()
-                    .set("number", this.gnomexService.orderInitObj.dataTrackNumber)
-                    .set("idOrganism", this.gnomexService.orderInitObj.idOrganism)
-                    .set("idLab", this.gnomexService.orderInitObj.idLab)
-                    .set("idGenomeBuild",this.gnomexService.orderInitObj.idGenomeBuild);
+                    .set("number", this.gnomexService.orderInitObj.dataTrackNumber ? this.gnomexService.orderInitObj.dataTrackNumber : '')
+                    .set("idOrganism", this.gnomexService.orderInitObj.idOrganism ? this.gnomexService.orderInitObj.idOrganism : '')
+                    .set("idLab", this.gnomexService.orderInitObj.idLab ? this.gnomexService.orderInitObj.idLab : '')
+                    .set("idGenomeBuild", this.gnomexService.orderInitObj.idGenomeBuild ? this.gnomexService.orderInitObj.idGenomeBuild : '');
                 this.datatracksService.previousURLParams = ids;
                 this.datatracksService.getDatatracksList_fromBackend(ids);
-            }else{
+            } else {
                 this.datatracksService.getDatatracksList_fromBackend(new HttpParams());
             }
         });
 
-
-
-
-        this.datatracksService.startSearchSubject.subscribe((value) =>{
+        this.datatracksService.startSearchSubject.subscribe((value) => {
             if (value) {
                 this.dialogsService.startDefaultSpinnerDialog();
             }
-        })
+        });
     }
 
     go(event: any) {
@@ -256,17 +246,21 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
     doMove(event) {
         let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = "35em";
+        configuration.height = "15em";
         configuration.data = {
             currentItem: this.currentItem,
             targetItem: this.targetItem
         };
 
-        this.moveDatatrackDialogRef= this.dialog.open(MoveDataTrackComponent, configuration);
+        let title: string = this.targetItem.label.length > 30 ? this.targetItem.label.substr(0, 29) + "..." : this.targetItem.label;
+        title = "Move/Copy to " + title;
 
-        this.moveDatatrackDialogRef.afterClosed().subscribe(result => {
-            if (this.moveDatatrackDialogRef.componentInstance.noButton) {
-                this.resetTree();
-            }
+        this.dialogsService.genericDialogContainer(MoveDataTrackComponent, title,
+            this.currentItem.icon, configuration).subscribe((result: any) => {
+                if(!result) {
+                    this.resetTree();
+                }
         });
     }
 
@@ -539,7 +533,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         this.dataTracksListSubscription.unsubscribe();
         this.navInitSubscription.unsubscribe();
         this.labListSubscription.unsubscribe();
-        //this.gnomexService.navInitBrowseDatatrackSubject.next(null);
+        this.gnomexService.navInitBrowseDatatrackSubject.next(null);
         this.navDatatrackList = null;
     }
 }

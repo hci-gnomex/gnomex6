@@ -1,11 +1,8 @@
 import {AfterViewInit, Component, Inject, OnInit} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
-import {
-    MatDialog,
-    MatDialogRef,
-} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
-import {GridOptions} from "ag-grid-community";
+import {GridApi, GridOptions} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -18,12 +15,15 @@ import {HttpParams} from "@angular/common/http";
 import {DOCUMENT} from "@angular/common";
 import {EditFlowcellDialogComponent} from "./edit-flowcell-dialog.component";
 import {UtilService} from "../services/util.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {ConstantsService} from "../services/constants.service";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 
 
 @Component({
     selector: 'flowcell-workflow',
     templateUrl: 'flowcell-workflow.html',
-    styles: [`        
+    styles: [`
         
         mat-form-field.formField {
             width: 20%;
@@ -34,42 +34,39 @@ import {UtilService} from "../services/util.service";
             flex-grow: 1;
             margin-left: 85em;
         }
-        .flow-cell-counter {
-            margin-top: 1.1em;
-        }
         .filter-by-date {
-            margin-top: .75em;
             width: 20%
         }
     `]
 })
 
 export class FlowcellWorkflowComponent implements OnInit, AfterViewInit {
-    private showSpinner: boolean = false;
 
     private workItemList: any[] = [];
     private workingWorkItemList: any[] = [];
     private sequenceProtocolsList: any[] = [];
-    private editFlowCellDialogRef: MatDialogRef<EditFlowcellDialogComponent>;
     private gridOptions:GridOptions = {};
     private changedRowMap: Map<string, any> = new Map<string, any>();
-    private columnDefs;
+    public label:string = "Flow Cells";
     private searchText: string;
     private dirty: boolean = false;
-    private gridApi;
+    private gridApi:GridApi;
     private gridColumnApi;
     private libraryPrepQCProtocols: any[] =[];
     public filterForm: FormGroup;
     private selectedFlowCell: any;
+    public columnDefs:any[];
+
+
 
     constructor(@Inject(FormBuilder) private fb: FormBuilder,
                 @Inject(DOCUMENT) private document: Document,
                 public workflowService: WorkflowService,
                 private gnomexService: GnomexService,
                 private dialogsService: DialogsService,
-                private dialog: MatDialog,
                 private securityAdvisor: CreateSecurityAdvisorService,
-                private dictionaryService: DictionaryService) {
+                private dictionaryService: DictionaryService,
+                public constService:ConstantsService ) {
 
         this.filterForm = fb.group({
             date: ['', [
@@ -81,12 +78,58 @@ export class FlowcellWorkflowComponent implements OnInit, AfterViewInit {
 
     ngOnInit() {
         this.sequenceProtocolsList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.NumberSequencingCyclesAllowed").filter(proto =>
-            (proto.codeRequestCategory ===  "HISEQ" || proto.codeRequestCategory === "MISEQ" || proto.codeRequestCategory === "NOSEQ") && proto.isActive === 'Y'
+            (proto.codeRequestCategory ===  "HISEQ" || proto.codeRequestCategory === "MISEQ" ||
+                proto.codeRequestCategory === "NOSEQ" || proto.codeRequestCategory === "ILLSEQ") && proto.isActive === 'Y'
         );
+        this.columnDefs = [
+            {
+                headerName: "Flow Cell",
+                editable: false,
+                width: 120,
+                field: "number",
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+            },
+            {
+                headerName: "Barcode",
+                editable: false,
+                width: 120,
+                field: "barcode",
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+            },
+            {
+                headerName: "Cluster Gen Date",
+                editable: false,
+                width: 150,
+                field: "createDate",
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+            },
+            {
+                headerName: "Sequencing Protocol",
+                editable: false,
+                width: 450,
+                field: "idNumberSequencingCyclesAllowed",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.sequenceProtocolsList,
+                selectOptionsDisplayField: "name",
+                selectOptionsValueField: "idNumberSequencingCyclesAllowed",
+                showFillButton: true,
+                fillGroupAttribute: 'idRequest',
+            },
+            {
+                headerName: "Content",
+                editable: false,
+                width: 555,
+                field: "notes",
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+            },
+
+        ];
+
     }
 
     initialize() {
-        this.showSpinner = true;
+        this.dialogsService.startDefaultSpinnerDialog();
         let params: HttpParams = new HttpParams();
         if (this.filterForm.controls['date'].value) {
             let dateRange: DateRange = this.filterForm.controls['date'].value;
@@ -99,55 +142,15 @@ export class FlowcellWorkflowComponent implements OnInit, AfterViewInit {
         this.workflowService.getFlowCellList(params).subscribe((response: any) => {
             if (response && response.result !== "INVALID") {
                 this.workItemList = response ? UtilService.getJsonArray(response, response.WorkItem) : [];
-
                 this.workingWorkItemList = this.workItemList;
-
-                this.columnDefs = [
-                    {
-                        headerName: "Flow Cell",
-                        editable: false,
-                        width: 120,
-                        field: "number",
-                        cellRendererFramework: TextAlignLeftMiddleRenderer,
-                    },
-                    {
-                        headerName: "Barcode",
-                        editable: false,
-                        width: 120,
-                        field: "barcode",
-                        cellRendererFramework: TextAlignLeftMiddleRenderer,
-                    },
-                    {
-                        headerName: "Cluster Gen Date",
-                        editable: false,
-                        width: 150,
-                        field: "createDate",
-                        cellRendererFramework: TextAlignLeftMiddleRenderer,
-                    },
-                    {
-                        headerName: "Sequencing Protocol",
-                        editable: false,
-                        width: 450,
-                        field: "idNumberSequencingCyclesAllowed",
-                        cellRendererFramework: SelectRenderer,
-                        cellEditorFramework: SelectEditor,
-                        selectOptions: this.sequenceProtocolsList,
-                        selectOptionsDisplayField: "name",
-                        selectOptionsValueField: "idNumberSequencingCyclesAllowed",
-                        showFillButton: true,
-                        fillGroupAttribute: 'idRequest',
-                    },
-                    {
-                        headerName: "Content",
-                        editable: false,
-                        width: 555,
-                        field: "notes",
-                        cellRendererFramework: TextAlignLeftMiddleRenderer,
-                    },
-
-                ];
+                this.gridApi.setRowData(this.workingWorkItemList);
+                if(this.searchText){
+                    this.gridOptions.api.setQuickFilter(this.searchText);
+                }
             }
-            this.showSpinner = false;
+            this.dialogsService.stopAllSpinnerDialogs();
+        },(err:IGnomexErrorResponse) =>{
+            this.dialogsService.stopAllSpinnerDialogs();
         });
     }
 
@@ -176,18 +179,20 @@ export class FlowcellWorkflowComponent implements OnInit, AfterViewInit {
         this.changedRowMap.set(event.data.key, event.data);
         this.dirty = true;
     }
+    onFind(event){
+        this.initialize();
+    }
 
     onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
+        this.gridApi.setColumnDefs(this.columnDefs);
         params.api.sizeColumnsToFit();
-        this.initialize();
     }
 
     search() {
         this.gridOptions.api.setQuickFilter(this.searchText);
     }
-
 
     refreshWorklist(event) {
         this.initialize();
@@ -213,21 +218,23 @@ export class FlowcellWorkflowComponent implements OnInit, AfterViewInit {
         params = params.set("id", this.selectedFlowCell.idFlowCell);
         this.workflowService.getFlowCell(params).subscribe((response: any) => {
             editFlowCell = response;
-            this.editFlowCellDialogRef = this.dialog.open(EditFlowcellDialogComponent, {
-                height: '50em',
-                width: '60em',
-                data: {
-                    flowCell: editFlowCell.FlowCell
-                }
-
+            let config: MatDialogConfig = new MatDialogConfig();
+            config.width = "60em";
+            config.height = "50em";
+            config.data = {
+                flowCell: editFlowCell.FlowCell
+            };
+            this.dialogsService.genericDialogContainer(EditFlowcellDialogComponent, null, null, config,
+                {actions: [
+                        {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "saveFlowCell"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                    ]}).subscribe((result: any) => {
+                        if(result) {
+                            this.searchText = "";
+                            this.initialize();
+                        }
             });
-            this.editFlowCellDialogRef.afterClosed()
-                .subscribe(result => {
-                    if (this.editFlowCellDialogRef.componentInstance.rebuildFlowCells) {
-                        this.initialize();
-                    }
-                })
-        })
+        });
     }
 
     launchEditFlowCell(event) {

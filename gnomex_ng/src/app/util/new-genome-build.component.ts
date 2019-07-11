@@ -2,75 +2,90 @@ import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {OrganismService} from "../services/organism.service";
 import {DataTrackService} from "../services/data-track.service";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "./popup/dialogs.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {IGnomexErrorResponse} from "./interfaces/gnomex-error.response.model";
+import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {GDAction} from "./interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../services/constants.service";
 
 @Component({
     selector: 'new-genome-build',
     template: `
-        <h6 mat-dialog-title>New Genome Build</h6>
-        <div mat-dialog-content class="content">
-            <div class="flex-container-col">
-                <div class="dialogDiv">
-                    <label>Organism</label>
-                    <jqxComboBox class="dialogComboBox" [width]="'100%'" [height]="30" [placeHolder]="'...'"
-                                 [source]="das2OrganismList" [displayMember]="'binomialName'" [valueMember]="'idOrganism'"
-                                 (onSelect)="onOrganismSelect($event)" (onUnselect)="onOrganismUnselect()">
-                    </jqxComboBox>
-                </div>
-                <mat-form-field class="dialogFormField">
-                    <input matInput [(ngModel)]="name" placeholder="Name">
+        <form [formGroup]="genomeBuildForm" class="full-height full-width flex-container-col double-padded-left-right">
+            <div class="flex-container-row align-center padded full-width">
+                <custom-combo-box class="full-width padded" [options]="this.das2OrganismList"
+                                  placeholder="Organism"
+                                  valueField="idOrganism"
+                                  [displayField]="'binomialName'"
+                                  [formControlName]="'idOrganism'"
+                                  (optionSelected)="onOrganismSelect($event)">
+                </custom-combo-box>
+            </div>
+            <div class="flex-container-row full-width align-center padded">
+                <mat-form-field class="full-width padded">
+                    <input matInput placeholder="Name" formControlName="name">
                     <mat-hint align="end">Example: H_sapiens_Mar_2006</mat-hint>
                 </mat-form-field>
-                <mat-form-field class="dialogFormField">
-                    <input matInput [matDatepicker]="buildDatepicker" placeholder="Build Date" (dateChange)="buildDateChange($event)">
+            </div>
+            <div class="flex-container-row full-width align-center padded">
+                <mat-form-field class="full-width padded">
+                    <input matInput [matDatepicker]="buildDatepicker" placeholder="Build Date" (dateChange)="buildDateChange($event)" formControlName="buildDate">
                     <mat-datepicker-toggle matSuffix [for]="buildDatepicker"></mat-datepicker-toggle>
                     <mat-datepicker #buildDatepicker></mat-datepicker>
                 </mat-form-field>
-                <mat-checkbox [(ngModel)]="activeFlag">Active</mat-checkbox>
             </div>
-        </div>
-        <div mat-dialog-actions>
-            <button mat-button *ngIf="!showSpinner" [disabled]="!idOrganism && !name && !buildDate" (click)="save()">Save</button>
-            <button mat-button *ngIf="!showSpinner" mat-dialog-close>Cancel</button>
-            <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-        </div>
+            <div class="flex-container-row full-width align-center padded">
+                <mat-checkbox formControlName="activeFlag">Active</mat-checkbox>
+            </div>
+        </form>
     `,
     styles: [`
-        .content {
-            height: 16em;
+        .label-width {
+            width: 7em;
         }
     `]
 })
 
-export class NewGenomeBuildComponent {
-    private selectedItem: ITreeNode;
+export class NewGenomeBuildComponent extends BaseGenericContainerDialog {
+    public genomeBuildForm: FormGroup;
 
     public idOrganism: string = "";
-    public name: string = "";
     public buildDate: string = "";
-    public activeFlag: boolean = true;
 
     public das2OrganismList: any[] = [];
 
-    public showSpinner: boolean = false;
+    public primaryDisable: (action?: GDAction) => boolean;
 
     constructor(public dialogRef: MatDialogRef<NewGenomeBuildComponent>,
                 private organismService: OrganismService,
                 private dataTrackService: DataTrackService,
                 @Inject(MAT_DIALOG_DATA) private data: any,
                 private dialogsService: DialogsService,
-                private dictionaryService: DictionaryService) {
-        if (this.data) {
-            this.selectedItem = data.selectedItem;
-        }
+                private dictionaryService: DictionaryService,
+                private fb: FormBuilder,
+                private constantsService: ConstantsService) {
+
+        super();
         this.organismService.getDas2OrganismList().subscribe((response: any[]) => {
             this.das2OrganismList = response;
-        },(err:IGnomexErrorResponse) =>{
+        }, (err: IGnomexErrorResponse) => {
         });
+
+        this.genomeBuildForm = this.fb.group({
+            idOrganism: ["", Validators.required],
+            name: ["", [Validators.required, Validators.maxLength(this.constantsService.MAX_LENGTH_500)]],
+            buildDate: ["", Validators.required],
+            activeFlag: [true]
+        });
+
+        this.genomeBuildForm.markAsPristine();
+
+        this.primaryDisable = (action) => {
+            return this.genomeBuildForm.invalid;
+        };
     }
 
     public buildDateChange(event: any): void {
@@ -82,42 +97,33 @@ export class NewGenomeBuildComponent {
     }
 
     public onOrganismSelect(event: any): void {
-        if (event.args != undefined && event.args.item != null && event.args.item.value != null) {
-            this.idOrganism = event.args.item.value;
+        if (event) {
+            this.idOrganism = event;
         } else {
-            this.resetOrganismSelection();
+            this.idOrganism = "";
         }
     }
 
-    public onOrganismUnselect(): void {
-        this.resetOrganismSelection();
-    }
-
-    private resetOrganismSelection(): void {
-        this.idOrganism = "";
-    }
-
     public save(): void {
-        this.showSpinner = true;
+        this.dialogsService.startDefaultSpinnerDialog();
         let params: HttpParams = new HttpParams()
-            .set("das2Name", this.name)
-            .set("genomeBuildName", this.name)
+            .set("das2Name", this.genomeBuildForm.get("name").value)
+            .set("genomeBuildName", this.genomeBuildForm.get("name").value)
             .set("buildDate", this.buildDate)
             .set("idOrganism", this.idOrganism)
-            .set("isActive", this.activeFlag ? "Y" : "N");
+            .set("isActive", this.genomeBuildForm.get("activeFlag").value ? "Y" : "N");
         this.dataTrackService.saveGenomeBuild(params).subscribe((response: any) => {
-            this.showSpinner = false;
             if (response && response.idGenomeBuild) {
-                if (this.data && this.selectedItem) {
-                    this.dictionaryService.reloadAndRefresh(() => {
-                        this.dataTrackService.refreshDatatracksList_fromBackend();
-                    }, null, DictionaryService.GENOME_BUILD);
-                }
-                this.dialogRef.close(true);
+                this.dictionaryService.reloadAndRefresh(() => {
+                    this.dataTrackService.refreshDatatracksList_fromBackend();
+                }, null, DictionaryService.GENOME_BUILD);
+                this.dialogRef.close(response.idGenomeBuild);
             }
-        },(err:IGnomexErrorResponse) => {
-            this.showSpinner = false;
+            this.dialogsService.stopAllSpinnerDialogs();
+        }, (err: IGnomexErrorResponse) => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
     }
 
 }
+

@@ -1,4 +1,16 @@
-import {AfterViewInit, Component, EventEmitter, Injector, Input, OnChanges, OnDestroy, Output, SimpleChanges} from "@angular/core";
+import {
+    AfterViewInit,
+    Component,
+    ElementRef,
+    EventEmitter,
+    Injector,
+    Input,
+    OnChanges,
+    OnDestroy,
+    Output, SimpleChange,
+    SimpleChanges,
+    ViewChild
+} from "@angular/core";
 import {AbstractControl, ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, NgControl} from "@angular/forms";
 import {Subscription} from "rxjs";
 import {UtilService} from "../services/util.service";
@@ -7,14 +19,20 @@ import {debounceTime} from "rxjs/operators";
 @Component({
     selector: "custom-combo-box",
     template: `
-        <mat-form-field class="full-width full-height">
-            <input matInput class="full-width full-height" [placeholder]="this.placeholder"
+        <mat-form-field class="full-width full-height" [matTooltip]="this.tooltip">
+            <input #input matInput class="full-width full-height"
+                   name="customComboBoxFilter"
+                   autocomplete="off"
+                   [placeholder]="this.temporaryPlaceholder ? (this.innerControl.value ? '' : this.placeholder) : this.placeholder"
                    [matAutocomplete]="auto" [formControl]="this.innerControl">
-            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionSelected)="this.selectOption($event.option.value)"
+            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete"
+                              (optionSelected)="this.selectOption($event.option.value)"
                               (opened)="this.onOpened()" (closed)="this.onClosed()" [displayWith]="this.displayFn">
                 <mat-option *ngIf="this.allowNone && (this.forceShowNone || !this.innerControl.value)">None</mat-option>
-                <mat-option *ngFor="let opt of this.loadedOptions" [value]="opt">{{this.displayField ? opt[this.displayField] : opt}}</mat-option>
-                <mat-option *ngIf="this.isLoading">Loading...</mat-option>
+                <mat-option *ngFor="let opt of this.loadedOptions" [value]="opt">
+                    {{this.displayField ? opt[this.displayField] : opt}}
+                </mat-option>
+                <mat-option *ngIf="this.includeLoadingOption">Loading...</mat-option>
             </mat-autocomplete>
             <mat-error *ngIf="this.innerControl.hasError('required')">{{this.placeholder}} is required</mat-error>
         </mat-form-field>
@@ -27,19 +45,25 @@ import {debounceTime} from "rxjs/operators";
 })
 
 export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDestroy, ControlValueAccessor {
+    @ViewChild("input") inputElement: ElementRef;
+
     @Input() public placeholder: string = "";
+    @Input() public temporaryPlaceholder: boolean = false;
+    @Input() public tooltip: string = "";
     @Input() public allowNone: boolean = true;
     public forceShowNone: boolean = false;
 
     @Input() private options: any[] = [];
-    public isLoading: boolean = false;
+    public includeLoadingOption: boolean = true;
     public loadedOptions: any[] = [];
 
     @Input() private valueField: string;
+    @Input() private forceEmitObject: boolean = false;
     @Input() public displayField: string;
 
     private outerControl: AbstractControl = new FormControl();
     public innerControl: FormControl = new FormControl(null);
+    private ignoreInnerControlChanges: boolean = false;
     private innerControlSubscription: Subscription;
     private noNgControl: boolean = false;
 
@@ -68,11 +92,22 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
         }
 
         this.innerControlSubscription = this.innerControl.valueChanges.pipe(debounceTime(300)).subscribe(() => {
-            this.filterOptions();
+            if (!this.ignoreInnerControlChanges) {
+                this.filterOptions();
+            } else {
+                this.ignoreInnerControlChanges = false;
+            }
         });
     }
 
     ngOnChanges(changes: SimpleChanges): void {
+        if (changes.options) {
+            let optionsChange: SimpleChange = changes.options;
+            if (!optionsChange.currentValue) {
+                this.options = [];
+            }
+        }
+
         this.loadOnlyCurrentValue();
     }
 
@@ -100,13 +135,24 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
         this.loadedOptions = [];
         let newValue: any = null;
         if (this.outerControl.value) {
-            let currentlySelected: any = this.options.find((opt: any) => (this.valueField ? opt[this.valueField] === this.outerControl.value : opt === this.outerControl.value));
+            let currentlySelected: any = this.options.find((opt: any) => {
+                let optValue: any = this.valueField ? opt[this.valueField] : opt;
+                if (this.forceEmitObject) {
+                    let outerValue: any = this.outerControl.value ? (this.valueField ? this.outerControl.value[this.valueField] : this.outerControl.value) : null;
+                    if (optValue === outerValue) {
+                        return true;
+                    }
+                } else {
+                    return optValue === this.outerControl.value;
+                }
+            });
             if (currentlySelected) {
                 newValue = currentlySelected;
                 this.loadedOptions.push(currentlySelected);
             }
         }
         if (this.innerControl.value !== newValue) {
+            this.ignoreInnerControlChanges = true;
             this.innerControl.setValue(newValue);
         }
     }
@@ -132,10 +178,11 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
 
     public onOpened(): void {
         this.onTouchedFn();
-        this.isLoading = true;
+        this.inputElement.nativeElement.select(); // Highlights text
+
         setTimeout(() => {
             this.filterOptions(true);
-            this.isLoading = false;
+            this.includeLoadingOption = false;
         });
     }
 
@@ -146,14 +193,18 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
 
         setTimeout(() => {
             this.loadOnlyCurrentValue();
+            this.includeLoadingOption = true;
         });
     }
 
     public selectOption(opt: any): void {
-        let newVal: any = opt ? (this.valueField ? opt[this.valueField] : opt) : null;
+        let newVal: any = opt ? ((this.valueField && !this.forceEmitObject) ? opt[this.valueField] : opt) : null;
         if (this.noNgControl) {
             this.outerControl.setValue(newVal);
         }
+
+        this.inputElement.nativeElement.blur();
+
         this.onChangeFn(newVal);
         this.optionSelected.emit(newVal);
     }

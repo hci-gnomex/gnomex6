@@ -10,9 +10,9 @@ import {PropertyService} from "../services/property.service";
 import {ActivatedRoute} from "@angular/router";
 import {GridApi} from "ag-grid-community";
 import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
-import {MatSelectChange} from "@angular/material";
 import {first} from "rxjs/operators";
 import {UserPreferencesService} from "../services/user-preferences.service";
+import {HttpParams} from "@angular/common/http";
 
 @Component({
     selector: 'visibility-detail-tab',
@@ -28,7 +28,7 @@ import {UserPreferencesService} from "../services/user-preferences.service";
                     </mat-radio-button>
                 </mat-radio-group>
             </div>
-            <mat-form-field class="short-input" *ngIf="isPrivacyExpSupported" 
+            <mat-form-field class="short-input" *ngIf="isPrivacyExpSupported"
                             matTooltip="Public visibility date&#13;(visibility automatically changes to public on this date)">
                 <input matInput [matDatepicker]="privacyPicker" placeholder="Privacy Expiration" formControlName="privacyExp" [min]="this.today">
                 <mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>
@@ -37,25 +37,16 @@ import {UserPreferencesService} from "../services/user-preferences.service";
             <div style="margin-top: 1em; display: flex; flex-direction: column;" *ngIf="showCollaboratorBlock" >
                 <label class="gx-label"> Individual collaborators allowed access to this data track  </label>
                 <div >
-                    <mat-form-field style="width:30%" >
-                        <mat-select (selectionChange)="collaborDropdownChange($event)"
-                                    [compareWith]="compareByID"
-                                    placeholder="Collaborators"
-                                    formControlName="collaborator" >
-                            <mat-option ></mat-option>
-                            <mat-option *ngFor="let collab of this.collabDropdown"
-                                        [value]="collab" >
-                                {{collab[this.prefService.userDisplayField]}}
-                            </mat-option>
-                        </mat-select>
-                        <mat-error *ngIf="this.visibilityForm?.get('collaborator')?.hasError('selectRequired')">
-                            This field is required
-                        </mat-error>
-                    </mat-form-field>
-                    <button mat-button [disabled]="!enableAdd" type="button" (click)="addCollaborator()">
+                    <div style="width:30%">
+                        <custom-combo-box placeholder="Collaborators" (optionSelected)="collaborDropdownChange($event)"
+                                          [options]="collabDropdown" [displayField]="this.prefService.userDisplayField"
+                                          [formControlName]="'collaborator'">
+                        </custom-combo-box>
+                    </div>
+                    <button mat-button [disabled]="!enableAdd || _disabled" type="button" (click)="addCollaborator()">
                         <img [src]="this.constService.ICON_ADD"> add
                     </button>
-                    <button mat-button [disabled]="selectedCollabRow.length < 1" type="button" (click)="removeCollaborator()">
+                    <button mat-button [disabled]="selectedCollabRow.length < 1 || _disabled" type="button" (click)="removeCollaborator()">
                         <img [src]="this.constService.ICON_DELETE"> remove
                     </button>
                 </div>
@@ -159,6 +150,20 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
 
     ];
 
+    public _disabled: boolean = false;
+
+    @Input()
+    set disabled(value: boolean) {
+        this._disabled = value;
+        if (this.visibilityForm) {
+            if (this._disabled) {
+                this.visibilityForm.disable();
+            } else {
+                this.visibilityForm.enable();
+            }
+        }
+    }
+
     sortFn = (obj1,obj2 ) =>{
         if (obj1[this.prefService.userDisplayField] < obj2[this.prefService.userDisplayField])
             return -1;
@@ -222,13 +227,15 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
 
             this.visibilityForm.get("codeVisibility").setValue(this.currentOrder.codeVisibility);
 
-            let labParams: URLSearchParams = new URLSearchParams();
+
 
             let idLab = this.currentOrder.idLab;
             if(idLab !== null  && idLab !== undefined) { //empty string is valid
-                labParams.set('idLab', idLab);
-                labParams.set('includeBillingAccounts', 'N');
-                labParams.set('includeProductCounts','N');
+                let labParams: HttpParams = new HttpParams()
+                    .set('idLab', idLab)
+                    .set('includeBillingAccounts', 'N')
+                    .set('includeProductCounts','N');
+
                 this.getLabService.getLab(labParams).pipe(first()).subscribe( data =>{
                     this.currentLab = data.Lab ? data.Lab : data;
                     this.memCollaborators = this.formatCollabList(this.currentLab.membersCollaborators);
@@ -260,6 +267,11 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
             }
 
             this.visibilityForm.markAsPristine();
+            if (this._disabled) {
+                this.visibilityForm.disable();
+            } else {
+                this.visibilityForm.enable();
+            }
         });
     }
 
@@ -345,8 +357,8 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
 
     }
 
-    collaborDropdownChange(event:MatSelectChange) {
-        if (event.value ) {
+    collaborDropdownChange(event:any) {
+        if (event) {
             this.enableAdd = true;
         } else {
             this.enableAdd = false;

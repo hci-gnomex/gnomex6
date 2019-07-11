@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {Subscription} from "rxjs";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
@@ -6,19 +6,19 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {ConstantsService} from "../../services/constants.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {GnomexService} from "../../services/gnomex.service";
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
-import {ImportSegmentsDialog} from "../../datatracks/datatracks-overview/genome-build/import-segments-dialog";
+import {MatDialogConfig} from "@angular/material";
 import {SortOrderDialogComponent} from "./sort-order-dialog.component";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {numberRange} from "../../util/validators/number-range-validator";
 import {PropertyService} from "../../services/property.service";
+
 //assets/page_add.png
 
 @Component({
     selector: 'experiment-platform-tab',
     templateUrl: './experiment-platform-tab.component.html',
     styles:[`
-        mat-form-field.medium-form-input{
+        .medium-form-input{
             width: 30em;
         }
         .padded-checkbox{
@@ -51,7 +51,6 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
     public showVendor:boolean = false;
     public showChannels:boolean = false;
     public showProductDetails:boolean = false;
-    private createSortOrderDialog: MatDialogRef<SortOrderDialogComponent>;
     public channelLabel:string;
     public channelMax:number = 1;
     public productTypeList: any[] = [];
@@ -65,7 +64,7 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
     constructor(private fb:FormBuilder, private expPlatformService:ExperimentPlatformService,
                 private dictionaryService:DictionaryService, private constService:ConstantsService,
                 private secAdvisor:CreateSecurityAdvisorService, private gnomexService:GnomexService,
-                private dialog: MatDialog, private dialogService: DialogsService){
+                private dialogService: DialogsService){
 
     }
 
@@ -189,20 +188,15 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
             this.dialogService.alert("Please save changes before editing sort order across platforms.")
         }else{
             let configuration: MatDialogConfig = new MatDialogConfig();
+            configuration.autoFocus = false;
             configuration.data = {
                 idCoreFacility: this.expPlatformNode.idCoreFacility
             };
 
-            this.createSortOrderDialog = this.dialog.open(SortOrderDialogComponent, configuration);
+            this.dialogService.genericDialogContainer(SortOrderDialogComponent, "Edit Experiment Platform Sort Order", null, configuration);
 
         }
 
-    }
-
-
-
-    compareByID(reqCatOne, reqCatTwo) { // reqCatTwo is the str don't have object
-        return reqCatOne && reqCatTwo &&  reqCatOne.value === reqCatTwo;
     }
 
     private  setSecurityLabel():void {
@@ -261,7 +255,7 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
     }
 
 
-    onTypeChanged(event:any):void{
+    onTypeChanged():void{
         let selectedType:any = this.formGroup.get('type').value;
         if(selectedType){
             this.formGroup.get('icon').setValue(selectedType.defaultIcon);
@@ -319,7 +313,7 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
 
 
 
-    onCoreChanged(event:any):void{
+    onCoreChanged():void{
         this.showExpPlatformFields();
         this.filterProjectTypeList();
         this.updateProductType();

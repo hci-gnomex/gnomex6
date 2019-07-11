@@ -1,27 +1,23 @@
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {AfterViewInit, Component, OnDestroy, OnInit} from "@angular/core";
 import {TopicService} from "../services/topic.service";
 import {ActivatedRoute} from "@angular/router";
 import {Subscription} from "rxjs";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ConstantsService} from "../services/constants.service";
 import {GnomexService} from "../services/gnomex.service";
-import {
-    MatAutocomplete,
-    MatDialog,
-    MatDialogConfig,
-    MatDialogRef,
-    MatSnackBar,
-} from "@angular/material";
+import {MatDialog, MatDialogConfig, MatSnackBar} from "@angular/material";
 import {GetLabService} from "../services/get-lab.service";
 import {URLSearchParams} from "@angular/http";
 import {PropertyService} from "../services/property.service";
 import {HttpParams} from "@angular/common/http";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {BasicEmailDialogComponent} from "../util/basic-email-dialog.component";
 import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
 import {first} from "rxjs/operators";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {AngularEditorConfig} from "@kolkov/angular-editor";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     templateUrl: "./topics-detail.component.html",
@@ -55,8 +51,6 @@ import {AngularEditorConfig} from "@kolkov/angular-editor";
 
 export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
-    @ViewChild("autoLab") matAutoLab: MatAutocomplete;
-
     public showSpinner: boolean = false;
     public topicNode: any;
     private inInitialization: boolean = false;
@@ -65,7 +59,6 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private topicListNodeSubscription: Subscription;
     private topicLab: any;
     public labList: any[] = [];
-    private emailImportDialogRef: MatDialogRef<BasicEmailDialogComponent>;
 
     public editorConfig: AngularEditorConfig;
     private labChangesSubscription: Subscription;
@@ -189,14 +182,14 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                 if (visMessage) {
                     let message = "A topic may not be given broader visibility than its parent. Since the parent is currently only visible to " +
                         visMessage + ", visibility for this topic has been set to the same level.";
-                    this.dialogService.confirm(message, null);
+                    this.dialogService.alert(message, null, DialogType.SUCCESS);
                 }
             } else {
                 let message: string = "";
                 if (result && result.message) {
                     message = ": " + result.message;
                 }
-                this.dialogService.alert("An error occurred while saving the topic" + message);
+                this.dialogService.error("An error occurred while saving the topic" + message);
             }
         });
     }
@@ -207,23 +200,30 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         configuration.panelClass = "no-padding-dialog";
         configuration.autoFocus = false;
         configuration.data = {
-            name:   this.topicNode.name,
             number: this.topicNode.idTopic,
             type:   "topicNumber"
         };
-        this.dialog.open(ShareLinkDialogComponent, configuration);
+
+        let topicName: string = "Topic T" + this.topicNode.idTopic + " - " + this.topicNode.name;
+        topicName = topicName.length > 35 ? topicName.substr(0, 35) + "..." : topicName;
+
+        this.dialogService.genericDialogContainer(ShareLinkDialogComponent,
+            "Web Link for " + topicName, null, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Copy To Clipboard", internalAction: "copyToClipboard"}
+                ]});
     }
 
     onEmailClick(): void {
         let idAppUser = this.topicForm.get("idAppUser").value;
         if(!idAppUser) {
-            this.dialogService.confirm("There is no owner selected for this topic. " +
+            this.dialogService.alert("There is no owner selected for this topic. " +
                 " Please select an owner in the dropdown and save before" +
-                " trying to communicate through email.", null);
+                " trying to communicate through email.", null, DialogType.VALIDATION);
             return;
         }
 
-        let saveFn = (data: any) => {
+        let saveFn = (data: any): boolean => {
             data.format =  "text";
             data.idAppUser = idAppUser;
 
@@ -235,21 +235,12 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                 .set("subject", data.subject);
 
             this.topicService.emailTopicOwner(params).pipe(first()).subscribe(resp => {
-                let email = <BasicEmailDialogComponent>this.emailImportDialogRef.componentInstance;
-                email.showSpinner = false;
-
-                if(resp && resp.result === "SUCCESS") {
-                    this.emailImportDialogRef.close();
-
-                    this.snackBar.open("Email was sent", "Email Topic Owner", {
-                        duration: 2000
-                    });
-                } else if(resp && resp.message) {
-                    this.dialogService.alert("Error sending email" + ": " + resp.message);
-                }
-            }, error => {
-                this.dialogService.alert(error);
+                this.dialogService.stopAllSpinnerDialogs();
+                return true;
+            }, (err: IGnomexErrorResponse) => {
+                this.dialogService.stopAllSpinnerDialogs();
             });
+            return false;
         };
 
         let configuration: MatDialogConfig = new MatDialogConfig();
@@ -260,12 +251,17 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         configuration.disableClose = true;
         configuration.data = {
             saveFn: saveFn,
-            title: "Email Topic Owner",
+            action: "Email Topic Owner",
             parentComponent: "Topics",
             subjectText: "",
         };
 
-        this.emailImportDialogRef = this.dialog.open(BasicEmailDialogComponent, configuration);
+        this.dialogService.genericDialogContainer(BasicEmailDialogComponent,
+            "Email Topic Owner", this.constService.EMAIL_GO_LINK, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.EMAIL_GO_LINK, name: "Send", internalAction: "send"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]});
     }
 
     ngOnDestroy() {

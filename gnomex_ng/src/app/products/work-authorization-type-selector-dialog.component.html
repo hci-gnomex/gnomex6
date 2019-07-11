@@ -1,11 +1,9 @@
 <div class="full-height full-width flex-container-col">
-    <div mat-dialog-title class="dialog-header-colors no-padding no-margin">
-        <div class="full-width full-height padded title-size">
-            New Billing Account (Choose Type)
-        </div>
-    </div>
     <div mat-dialog-content class="flex-grow no-padding no-margin">
         <div class="full-width full-height flex-container-col padded background">
+            <div class="padded">
+                <b>*Note:</b> New accounts will require approval from billing administrator before use.
+            </div>
             <div class="full-width full-height foreground bordered padded">
                 <div *ngIf="showInternalButton && gnomexButtonLabel" class="full-width padded">
                     <button mat-raised-button class="link-button" (click)="onClickInternalButton()">
@@ -17,15 +15,6 @@
                         {{ option.label }}
                     </button>
                 </div>
-            </div>
-        </div>
-    </div>
-    <div mat-dialog-actions class="no-padding no-margin">
-        <div class="full-width right-align flex-container-row padded-left-right-bottom background">
-            <div class="full-height flex-grow">
-            </div>
-            <div>
-                <button mat-button mat-dialog-close>Cancel</button>
             </div>
         </div>
     </div>

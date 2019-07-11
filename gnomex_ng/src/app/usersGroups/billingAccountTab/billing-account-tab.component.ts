@@ -1,23 +1,31 @@
-import {AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from "@angular/core";
-import {ErrorStateMatcher, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {
+    AfterViewInit,
+    Component,
+    ElementRef, EventEmitter,
+    Input,
+    OnDestroy,
+    OnInit, Output,
+    ViewChild,
+} from "@angular/core";
+import {ErrorStateMatcher, MatDialogConfig} from "@angular/material";
 
 import {DictionaryService} from "../../services/dictionary.service";
 import {PropertyService} from "../../services/property.service";
 
 import {EditBillingAccountComponent} from "../../billing/edit_billing_account/edit-billing-account.component";
 
-import { ApproveButtonRenderer } from "../../util/grid-renderers/approve-button.renderer";
-import { CheckboxRenderer } from "../../util/grid-renderers/checkbox.renderer";
-import { DateEditor } from "../../util/grid-editors/date.editor";
-import { DateRenderer } from "../../util/grid-renderers/date.renderer";
-import { IconLinkButtonRenderer } from "../../util/grid-renderers/icon-link-button.renderer";
-import { SplitStringToMultipleLinesRenderer } from "../../util/grid-renderers/split-string-to-multiple-lines.renderer";
-import { RemoveLinkButtonRenderer } from "../../util/grid-renderers/remove-link-button.renderer";
-import { SelectEditor } from "../../util/grid-editors/select.editor";
-import { SelectRenderer } from "../../util/grid-renderers/select.renderer";
-import { TextAlignLeftMiddleRenderer } from "../../util/grid-renderers/text-align-left-middle.renderer";
-import { TextAlignRightMiddleRenderer } from "../../util/grid-renderers/text-align-right-middle.renderer";
-import { UploadViewRemoveRenderer } from "../../util/grid-renderers/upload-view-remove.renderer";
+import {ApproveButtonRenderer} from "../../util/grid-renderers/approve-button.renderer";
+import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
+import {DateEditor} from "../../util/grid-editors/date.editor";
+import {DateRenderer} from "../../util/grid-renderers/date.renderer";
+import {IconLinkButtonRenderer} from "../../util/grid-renderers/icon-link-button.renderer";
+import {SplitStringToMultipleLinesRenderer} from "../../util/grid-renderers/split-string-to-multiple-lines.renderer";
+import {RemoveLinkButtonRenderer} from "../../util/grid-renderers/remove-link-button.renderer";
+import {SelectEditor} from "../../util/grid-editors/select.editor";
+import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
+import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align-right-middle.renderer";
+import {UploadViewRemoveRenderer} from "../../util/grid-renderers/upload-view-remove.renderer";
 
 
 import * as _ from "lodash";
@@ -26,10 +34,12 @@ import {AccountFieldsConfigurationService} from "../../services/account-fields-c
 import {Subscription} from "rxjs";
 import {FormControl, FormGroup, FormGroupDirective, NgForm, Validators} from "@angular/forms";
 
-import { BillingUsersSelectorComponent } from "./billingUsersSelector/billing-users-selector.component";
+import {BillingUsersSelectorComponent} from "./billingUsersSelector/billing-users-selector.component";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {CopyAccountsDialogComponent} from "./dialogs/copy-accounts-dialog.component";
 import {UniqueIdGeneratorService} from "../../services/unique-id-generator.service";
+import {ConstantsService} from "../../services/constants.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
     isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -42,31 +52,31 @@ export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
 	templateUrl: "./billing-account-tab.component.html",
 	styles: [`
         
-        .border {  
-            width: 50%;  
-            margin-bottom: 0.8em;  
-            padding: 0.5em;  
-            border: 1px solid lightgrey;  
-            border-radius: 3px;  
+        .border {
+            width: 50%;
+            margin-bottom: 0.8em;
+            padding: 0.5em;
+            border: 1px solid lightgrey;
+            border-radius: 3px;
         }
         
-        .t  { display: table;      }  
-        .tr { display: table-row;  }  
+        .t  { display: table;      }
+        .tr { display: table-row;  }
         .td { display: table-cell; }
         
-        .block        { display: block;        }  
+        .block        { display: block;        }
         .inline-block { display: inline-block; }
         
         
         .padded { padding: 0.3em; }
         
-        .padded-not-bottom { 
+        .padded-not-bottom {
             padding-top:   0.3em;
             padding-left:  0.3em;
-            padding-right: 0.3em; 
+            padding-right: 0.3em;
         }
 
-        .medium-width    { width:  20em;  }
+        .medium-width    { width:  30em;  }
         .vertical-spacer { height: 0.3em; }
         
         .small-font { font-size: x-small; }
@@ -94,6 +104,21 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 		this._labInfo = value;
 		this.onLabChanged();
 	}
+
+    @Output() onDirty: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+	public get isDirty(): boolean {
+	    return this._isDirty;
+    }
+    public set isDirty(value: boolean) {
+	    if (this._isDirty === false && value === true) {
+            this.onDirty.emit(value);
+        }
+
+        this._isDirty = value;
+    }
+
+	private _isDirty: boolean = false;
 
 	coreFacilities: any[];
 	selectedCoreFacility: any;
@@ -161,7 +186,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 private dialogsService: DialogsService,
                 private propertyService: PropertyService,
                 private accountFieldsConfigurationService: AccountFieldsConfigurationService,
-                private dialog: MatDialog,
+                private constService: ConstantsService,
                 private idGenerator: UniqueIdGeneratorService) {
 		this.context = { componentParent: this };
 	}
@@ -259,6 +284,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
         this.tabFormGroup.removeControl("chartfieldGridFormControl");
         this.tabFormGroup.removeControl("poGridFormControl");
         this.tabFormGroup.removeControl("creditCardGridFormControl");
+
+        this.markAsPristine();
 	}
 
 
@@ -1061,10 +1088,10 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 	}
 
 
-	onCoreFacilitySelected(event: any): void {
-		this.assignChartfieldGridContents(event.value);
-		this.assignPoGridContents(event.value);
-		this.assignCreditCardGridContents(event.value);
+	onCoreFacilitySelected(): void {
+		this.assignChartfieldGridContents(this.selectedCoreFacility);
+		this.assignPoGridContents(this.selectedCoreFacility);
+		this.assignCreditCardGridContents(this.selectedCoreFacility);
 	}
 
 
@@ -1240,79 +1267,72 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
     openChartfieldEditor(rowNode: any) {
         this.chartfieldRowNode_LastSelected = rowNode.id;
 
-        let data = { labActiveSubmitters: this.labActiveSubmitters };
-
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = '60em';
-        configuration.panelClass = 'no-padding-dialog';
-        configuration.data = data;
+        configuration.autoFocus = false;
+        configuration.data = {
+            labActiveSubmitters: this.labActiveSubmitters,
+            rowData: rowNode.data
+        };
 
-        let dialogRef = this.dialog.open(EditBillingAccountComponent, configuration);
-        dialogRef.componentInstance.rowData = rowNode.data;
-
-        dialogRef.afterClosed().subscribe((result) => {
-            // We only expect a result back if the popup's "OK" button was clicked.
-            if (!result) {
-                return;
-            }
-
-            this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
-
-            this.dialogsService.alert('Screen has been updated. Click the save button to update the accounts in the database.');
-
-            this.translateChangesOntoAccountRecords(rowNode);
+        this.dialogsService.genericDialogContainer(EditBillingAccountComponent, "Edit Billing Account", this.constService.ICON_WORK_AUTH_FORM, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Update", internalAction: "onUpdateButtonClicked"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
+                        this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.", "Screen Updated");
+                        this.translateChangesOntoAccountRecords(rowNode);
+                    }
         });
     }
 
     openPoEditor(rowNode: any) {
         this.poRowNode_LastSelected = rowNode.id;
 
-        let data = { labActiveSubmitters: this.labActiveSubmitters };
-
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = '60em';
-        configuration.panelClass = 'no-padding-dialog';
-        configuration.data = data;
+        configuration.autoFocus = false;
+        configuration.data = {
+            labActiveSubmitters: this.labActiveSubmitters,
+            rowData: rowNode.data
+        };
 
-        let dialogRef = this.dialog.open(EditBillingAccountComponent, configuration);
-        dialogRef.componentInstance.rowData = rowNode.data;
-
-        dialogRef.afterClosed().subscribe((result) => {
-            // We only expect a result back if the popup's "OK" button was clicked.
-            if (!result) {
-                return;
+        this.dialogsService.genericDialogContainer(EditBillingAccountComponent, "Edit Billing Account", this.constService.ICON_WORK_AUTH_FORM, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Update", internalAction: "onUpdateButtonClicked"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+            if(result) {
+                this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
+                this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.", "Screen Updated");
+                this.translateChangesOntoAccountRecords(rowNode);
             }
-            this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
-
-            this.dialogsService.alert('Screen has been updated. Click the save button to update the accounts in the database.');
-
-            this.translateChangesOntoAccountRecords(rowNode);
         });
     }
 
     openCreditCardEditor(rowNode: any) {
         this.creditCardRowNode_LastSelected = rowNode.id;
 
-        let data = { labActiveSubmitters: this.labActiveSubmitters };
-
 	    let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = '60em';
-        configuration.panelClass = 'no-padding-dialog';
-        configuration.data = data;
+        configuration.autoFocus = false;
+        configuration.data = {
+            labActiveSubmitters: this.labActiveSubmitters,
+            rowData: rowNode.data
+        };
 
-        let dialogRef = this.dialog.open(EditBillingAccountComponent, configuration);
-        dialogRef.componentInstance.rowData = rowNode.data;
-
-        dialogRef.afterClosed().subscribe((result) => {
-            // We only expect a result back if the popup's "OK" button was clicked.
-            if (!result) {
-                return;
+        this.dialogsService.genericDialogContainer(EditBillingAccountComponent, "Edit Billing Account", this.constService.ICON_WORK_AUTH_FORM, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Update", internalAction: "onUpdateButtonClicked"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+            if(result) {
+                this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
+                this.dialogsService.alert("Screen has been updated. Click the save button to update the accounts in the database.", "Screen Updated");
+                this.translateChangesOntoAccountRecords(rowNode);
             }
-            this.updateAccount(this.chartfieldGridApi, this.chartfieldRowNode_LastSelected, result);
-
-            this.dialogsService.alert('Screen has been updated. Click the save button to update the accounts in the database.');
-
-            this.translateChangesOntoAccountRecords(rowNode);
         });
     }
 
@@ -1368,7 +1388,10 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 
 
 	onChartfieldUsersClicked(rowIndex: string): void {
-		if (this.chartfieldGridApi && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex) && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+		if (this.chartfieldGridApi
+            && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex)
+            && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data) {
+
 			let data = {
 				options: this.labActiveSubmitters,
 				optionName: "Users",
@@ -1379,21 +1402,21 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 
             let configuration: MatDialogConfig = new MatDialogConfig();
             configuration.width = '60em';
-            configuration.height = '45em';
-            configuration.panelClass = 'no-padding-dialog';
+            configuration.height = '40em';
+            configuration.autoFocus = false;
             configuration.data = data;
 
-			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, configuration);
+			this.dialogsService.genericDialogContainer(BillingUsersSelectorComponent, "", null, configuration)
+                .subscribe((result: any) => {
+                    if (result !== null
+                        && result !== undefined
+                        && this.chartfieldGridApi
+                        && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex)
+                        && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data) {
 
-			dialogRef.afterClosed().subscribe((result) => {
-				if (dialogRef
-                    && dialogRef.componentInstance
-                    && this.chartfieldGridApi
-                    && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex)
-                    && this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data) {
-					this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = dialogRef.componentInstance.value;
-					this.chartfieldGridApi.refreshCells();
-				}
+                        this.chartfieldGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = result;
+                        this.chartfieldGridApi.refreshCells();
+                    }
 			});
 		}
 	}
@@ -1410,21 +1433,21 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 
             let configuration: MatDialogConfig = new MatDialogConfig();
             configuration.width = '60em';
-            configuration.height = '45em';
-            configuration.panelClass = 'no-padding-dialog';
+            configuration.height = '40em';
+            configuration.autoFocus = false;
             configuration.data = data;
 
-			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, configuration);
+            this.dialogsService.genericDialogContainer(BillingUsersSelectorComponent, null, null, configuration)
+                .subscribe((result: any) => {
+                    if (result !== null
+                        && result !== undefined
+                        && this.poGridApi
+                        && this.poGridApi.getDisplayedRowAtIndex(rowIndex)
+                        && this.poGridApi.getDisplayedRowAtIndex(rowIndex).data) {
 
-			dialogRef.afterClosed().subscribe((result) => {
-				if (dialogRef
-                    && dialogRef.componentInstance
-                    && this.poGridApi
-                    && this.poGridApi.getDisplayedRowAtIndex(rowIndex)
-                    && this.poGridApi.getDisplayedRowAtIndex(rowIndex).data) {
-					this.poGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = dialogRef.componentInstance.value;
-					this.poGridApi.refreshCells();
-				}
+                        this.poGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = result;
+                        this.poGridApi.refreshCells();
+                    }
 			});
 		}
 	}
@@ -1441,21 +1464,21 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 
             let configuration: MatDialogConfig = new MatDialogConfig();
             configuration.width = '60em';
-            configuration.height = '45em';
-            configuration.panelClass = 'no-padding-dialog';
+            configuration.height = '40em';
+            configuration.autoFocus = false;
             configuration.data = data;
 
-			let dialogRef = this.dialog.open(BillingUsersSelectorComponent, configuration);
+            this.dialogsService.genericDialogContainer(BillingUsersSelectorComponent, null, null, configuration)
+                .subscribe((result: any) => {
+                    if (result !== null
+                        && result !== undefined
+                        && this.creditCardGridApi
+                        && this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex)
+                        && this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex).data) {
 
-			dialogRef.afterClosed().subscribe((result) => {
-				if (dialogRef
-                    && dialogRef.componentInstance
-                    && this.creditCardGridApi
-                    && this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex)
-                    && this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex).data) {
-					this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = dialogRef.componentInstance.value;
-					this.creditCardGridApi.refreshCells();
-				}
+                        this.creditCardGridApi.getDisplayedRowAtIndex(rowIndex).data.acctUsers = result;
+                        this.creditCardGridApi.refreshCells();
+                    }
 			});
 		}
 	}
@@ -1567,7 +1590,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
     onCopyAccountsClicked(): void {
         let config: MatDialogConfig = new MatDialogConfig();
         config.width  = '60em';
-        config.panelClass = 'no-padding-dialog';
+        config.autoFocus = false;
         config.data = {
             labInfo: this._labInfo,
             creditCardCompanies: this.creditCardCompanies,
@@ -1575,28 +1598,29 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             coreFacilities: this.coreFacilities
         };
 
-        let dialogRef = this.dialog.open(CopyAccountsDialogComponent, config);
-        dialogRef.afterClosed().subscribe((data) => {
-            if (!data || !data.saveButtonClicked) {
-                return;
-            }
+        this.dialogsService.genericDialogContainer(CopyAccountsDialogComponent, "", this.constService.ICON_WORK_AUTH_FORM, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Add to working document", internalAction: "onClickSaveButton"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((data) => {
+                    if(data) {
+                        for (let account of data.chartfieldAccountRowsToCopy) {
+                            this._labInfo.internalBillingAccounts.push(account);
+                            this._labInfo.billingAccounts.push(account);
+                        }
+                        for (let account of data.poAccountRowsToCopy) {
+                            this._labInfo.pOBillingAccounts.push(account);
+                            this._labInfo.billingAccounts.push(account);
+                        }
+                        for (let account of data.creditCardAccountRowsToCopy) {
+                            this._labInfo.creditCardBillingAccounts.push(account);
+                            this._labInfo.billingAccounts.push(account);
+                        }
 
-            for (let account of data.chartfieldAccountRowsToCopy) {
-                this._labInfo.internalBillingAccounts.push(account);
-                this._labInfo.billingAccounts.push(account);
-            }
-            for (let account of data.poAccountRowsToCopy) {
-                this._labInfo.pOBillingAccounts.push(account);
-                this._labInfo.billingAccounts.push(account);
-            }
-            for (let account of data.creditCardAccountRowsToCopy) {
-                this._labInfo.creditCardBillingAccounts.push(account);
-                this._labInfo.billingAccounts.push(account);
-            }
-
-            this.assignChartfieldGridContents(this.selectedCoreFacility);
-            this.assignPoGridContents(this.selectedCoreFacility);
-            this.assignCreditCardGridContents(this.selectedCoreFacility);
+                        this.assignChartfieldGridContents(this.selectedCoreFacility);
+                        this.assignPoGridContents(this.selectedCoreFacility);
+                        this.assignCreditCardGridContents(this.selectedCoreFacility);
+                    }
         });
     }
 
@@ -1628,6 +1652,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
         if (!eventOrDataHaver || !eventOrDataHaver.data || !this._labInfo) {
             return;
         }
+
+        this.markAsDirty();
 
         // There should never be more than one row with the same _uniqueId, (depending on how
         // the copy account function is implemented) but this should be able to handle the changes either way.
@@ -1673,6 +1699,13 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 }
             }
         }
+    }
+
+    private markAsPristine(): void {
+        this.isDirty = false;
+    }
+    private markAsDirty(): void {
+        this.isDirty = true;
     }
 
     testFunction(): void {

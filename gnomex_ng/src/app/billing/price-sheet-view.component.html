@@ -1,6 +1,4 @@
-<h6 mat-dialog-title>{{this.title}}</h6>
-<mat-dialog-content>
-    <form [formGroup]="this.form">
+    <form [formGroup]="this.form" class="flex-container-col full-width full-height double-padded">
         <div>
             <mat-form-field class="full-width">
                 <input matInput placeholder="Name" [formControlName]="'name'">
@@ -34,8 +32,3 @@
             </ag-grid-angular>
         </div>
     </form>
-</mat-dialog-content>
-<mat-dialog-actions>
-    <button mat-button color="primary" (click)="this.save()">Save</button>
-    <button mat-button mat-dialog-close>Cancel</button>
-</mat-dialog-actions>

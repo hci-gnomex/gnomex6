@@ -1,4 +1,4 @@
-<div class="flex-column-container-workflow">
+<div class="flex-container-col full-width full-height">
     <div class="flex-row-container">
         <img src="../../assets/data-accept.png" height="16" width="16" style="margin-top: .5em">
         <mat-label style="margin-left: .4em;margin-top: .4em;">{{label}}</mat-label>
@@ -7,18 +7,18 @@
     </div>
     <div class="flex-row-container">
 
-        <mat-form-field class="formField">
-            <input #requestInput matInput placeholder="Request #" aria-label="Request #" [matAutocomplete]="autoRequest"
-                   [(ngModel)]="workItem" (keyup.enter)="chooseFirstRequestOption()" (keyup)="highlightFirstRequestOption($event)">
-            <mat-autocomplete #autoRequest="matAutocomplete">
-                <mat-option (onSelectionChange)="selectRequestOption($event)" *ngFor="let request of filterRequests(this.workItem)" [value]="request.requestNumber">{{request.requestNumber}}</mat-option>
-            </mat-autocomplete>
-        </mat-form-field>
-        <mat-form-field class="formField">
-            <mat-select [(ngModel)]="core" placeholder="Core facility" [compareWith]="compareByID">
-                <mat-option (onSelectionChange)="selectCoreOption($event)" *ngFor="let cor of filterCores()" [value]="cor">{{cor.display}}</mat-option>
-            </mat-select>
-        </mat-form-field>
+        <div class="formField">
+            <custom-combo-box placeholder="Request #" (optionSelected)="selectRequestOption()"
+                              [options]="this.requestIds" displayField="requestNumber" valueField="requestNumber"
+                              [(ngModel)]="workItem" [allowNone]="false">
+            </custom-combo-box>
+        </div>
+        <div class="formField">
+            <custom-combo-box placeholder="Core facility" (optionSelected)="selectCoreOption()"
+                              [options]="filterCores()"displayField="display"
+                              [(ngModel)]="core">
+            </custom-combo-box>
+        </div>
     </div>
     <div class="flex-grow">
         <ag-grid-angular class="ag-theme-balham full-height full-width"

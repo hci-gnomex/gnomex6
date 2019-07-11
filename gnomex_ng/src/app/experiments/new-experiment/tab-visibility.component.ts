@@ -14,6 +14,7 @@ import {Subscription} from "rxjs/index";
 
 import {Experiment} from "../../util/models/experiment.model";
 import {UserPreferencesService} from "../../services/user-preferences.service";
+import {HttpParams} from "@angular/common/http";
 
 @Component({
     selector: 'tab-visibility',
@@ -69,17 +70,15 @@ export class TabVisibilityComponent implements OnInit, OnDestroy{
             this.visibilityForm.get("codeVisibility").setValue('MEM');
         }
 
-
-        let labParams: URLSearchParams = new URLSearchParams();
-
         if (!this.idLabSubscription) {
             this.idLabSubscription = this._experiment.onChange_idLab.subscribe((value: string) => {
                 let idLab = this.currentOrder.idLab;
 
-                if(idLab !== null  && idLab !== undefined) { //empty string is valid
-                    labParams.set('idLab', idLab);
-                    labParams.set('includeBillingAccounts', 'N');
-                    labParams.set('includeProductCounts','N');
+                if(idLab) {
+                    let labParams: HttpParams = new HttpParams()
+                        .set('idLab', idLab)
+                        .set('includeBillingAccounts', 'N')
+                        .set('includeProductCounts','N');
                     this.getLabService.getLab(labParams).pipe(first()).subscribe( data =>{
                         this.currentLab = data.Lab ? data.Lab : data;
 
@@ -92,12 +91,12 @@ export class TabVisibilityComponent implements OnInit, OnDestroy{
                         this.possibleCollaborators = this.removeInvalidDropdownCollabs(this.possibleCollaborators,currentCollaborators);
 
                         //remove from grid inactive collabs and the owner if in grid
-                        for(let dropdownCollab of this.allCollabs){
+                        for (let dropdownCollab of this.allCollabs){
                             let i:number = currentCollaborators.findIndex(c => c.idAppUser === dropdownCollab.idAppUser);
-                            if(i > -1 && dropdownCollab.isActive === 'N'){
+                            if (i > -1 && dropdownCollab.isActive === 'N'){
                                 currentCollaborators.splice(i,1);
                             }
-                            else if(i > -1 && this.currentOrder.idAppUser === dropdownCollab.idAppUser ){
+                            else if (i > -1 && this.currentOrder.idAppUser === dropdownCollab.idAppUser ){
                                 currentCollaborators.splice(i,1);
                             }
                         }

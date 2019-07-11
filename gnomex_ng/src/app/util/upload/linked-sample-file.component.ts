@@ -1,43 +1,66 @@
-
-import {Component, OnInit, ViewChild, AfterViewInit, EventEmitter, Output, Input} from "@angular/core";
+import {
+    AfterViewInit,
+    Component,
+    EventEmitter,
+    Input,
+    OnInit,
+    Output,
+    ViewChild,
+} from "@angular/core";
 import {Subscription} from "rxjs";
-import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {DialogsService} from "../popup/dialogs.service";
+import {DialogsService, DialogType} from "../popup/dialogs.service";
 import {GnomexService} from "../../services/gnomex.service";
-import {AnalysisService} from "../../services/analysis.service";
-import {IActionMapping, ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
-import {HttpParams} from "@angular/common/http";
+import {
+    ITreeOptions,
+    TREE_ACTIONS,
+    TreeComponent,
+    TreeModel,
+    TreeNode,
+} from "angular-tree-component";
 import {ConstantsService} from "../../services/constants.service";
 import {first} from "rxjs/operators";
-import { ITreeNode} from "angular-tree-component/dist/defs/api";
-import {FormBuilder, FormControl, FormGroup} from "@angular/forms";
+import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {FormBuilder, FormGroup} from "@angular/forms";
 import {TabChangeEvent} from "../tabs/index";
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {NameFileDialogComponent} from "./name-file-dialog.component";
 import {FileService} from "../../services/file.service";
 import {IFileParams} from "../interfaces/file-params.model";
 import {ExperimentsService} from "../../experiments/experiments.service";
-import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode, ValueParserParams, RowClickedEvent, RowDragEvent} from "ag-grid-community";
-import * as _ from "lodash";
-
-
+import {
+    GridApi,
+    GridReadyEvent,
+    GridSizeChangedEvent,
+    RowClickedEvent,
+    RowDragEvent,
+    RowNode,
+} from "ag-grid-community";
+import {ActionType} from "../interfaces/generic-dialog-action.model";
 
 
 @Component({
     selector: "linked-sample-file",
-    templateUrl:"./linked-sample-file.component.html",
+    templateUrl: "./linked-sample-file.component.html",
     styles: [`
 
         .no-padding-dialog {
             padding: 0;
         }
+
         .truncate{
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
         .no-overflow  { overflow: hidden; }
 
+        .secondary-action {
+            background-color: var(--sidebar-footer-background-color);
+            font-weight: bolder;
+            color: var(--bluewarmvivid-medlight);
+            border: var(--bluewarmvivid-medlight)  solid 1px;
+        }
 
     `]
 })
@@ -65,7 +88,7 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
     public readonly SAMPLE:string = "Sample";
     public readonly SEQ_FOLDER:string = "SeqRunNumber";
     public readonly FILE = "FileDescriptor";
-
+    public actionType: any = ActionType.SECONDARY ;
 
 
     private readonly sampleHierarchyRules = {
@@ -95,7 +118,6 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
         private experimentService: ExperimentsService,
         private fileService: FileService,
         private fb:FormBuilder,
-        private dialog:MatDialog,
         public constService: ConstantsService,
         private dialogService: DialogsService) {
     }
@@ -202,12 +224,12 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
                 this.dialogService.stopAllSpinnerDialogs();
 
             } else {
-                this.dialogService.alert(resp.message);
+                this.dialogService.error(resp.message);
                 this.dialogService.stopAllSpinnerDialogs();
             }
 
         }, err => {
-            this.dialogService.alert(err.message);
+            this.dialogService.error(err.message);
             this.dialogService.stopAllSpinnerDialogs();
 
         });
@@ -441,7 +463,7 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
         }
 
         if(!added && !autoLink){
-            this.dialogService.alert(errorMessage );
+            this.dialogService.error(errorMessage );
         }
 
         return added
@@ -462,33 +484,31 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
         let config: MatDialogConfig = new MatDialogConfig();
         config.panelClass = 'no-padding-dialog';
         config.data = {
-            imgIcon: this.constService.ICON_FOLDER_ADD,
-            title: "Add New Folder",
             placeHolder: "Folder Name"
         };
         config.minWidth='35em';
 
-        let dialogRef: MatDialogRef<NameFileDialogComponent>  = this.dialog.open(NameFileDialogComponent,config);
-        dialogRef.afterClosed().pipe(first()).subscribe(data =>{
-            if(data){
-                let sampleGroupObj:any = {
-                    displayName:data,
-                    xmlNodeName: this.SAMPLE_GROUP,
-                    icon: this.constService.ICON_FOLDER_DISABLE
-                };
+        this.dialogService.genericDialogContainer(NameFileDialogComponent, "Add New Folder", this.constService.ICON_FOLDER_ADD, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "OK", internalAction: "applyChanges"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).pipe(first()).subscribe(data => {
+                    if(data) {
+                        let sampleGroupObj: any = {
+                            displayName: data,
+                            xmlNodeName: this.SAMPLE_GROUP,
+                            icon: this.constService.ICON_FOLDER_DISABLE,
+                        };
 
-
-                if(this.sampleFileSelectedNode){
-                    this.add([{data:sampleGroupObj}]);
-                }else{
-                    sampleGroupObj.idTreeGrid = ++this.idCounter;
-                    this.linkedSampleRowData.push(sampleGroupObj);
-                    this.gridApi.setRowData(this.linkedSampleRowData);
-                }
-            }
-
+                        if (this.sampleFileSelectedNode) {
+                            this.add([{data: sampleGroupObj}]);
+                        } else {
+                            sampleGroupObj.idTreeGrid = ++this.idCounter;
+                            this.linkedSampleRowData.push(sampleGroupObj);
+                            this.gridApi.setRowData(this.linkedSampleRowData);
+                        }
+                    }
         });
-
 
     }
 
@@ -574,7 +594,7 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
             if(sampleInitiated){
                 this.removeFromSibling(nodeName, sampNode)
             }else{
-                this.dialogService.alert("Sample(s) cannot be deleted. ");
+                this.dialogService.alert("Sample(s) cannot be deleted. ", null, DialogType.WARNING);
             }
 
         } else if (nodeName === this.SAMPLE_GROUP) {

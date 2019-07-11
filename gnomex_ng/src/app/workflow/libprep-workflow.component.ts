@@ -1,13 +1,11 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
-import { URLSearchParams } from "@angular/http";
-import {MatAutocomplete, MatAutocompleteTrigger, MatOption} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
-import {GridOptions, GridApi} from "ag-grid-community";
+import {GridApi} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {BarcodeSelectEditor} from "../util/grid-editors/barcode-select.editor";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {UtilService} from "../services/util.service";
@@ -18,18 +16,11 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
     selector: 'libprep-workflow',
     templateUrl: 'libprep-workflow.html',
     styles: [`
-        .flex-column-container-workflow {
-            display: flex;
-            flex-direction: column;
-            background-color: white;
-            height: 94%;
-            width: 100%;
-        }
         .flex-row-container {
             display: flex;
             flex-direction: row;
         }
-        mat-form-field.formField {
+        .formField {
             width: 20%;
             margin: 0 0.5%;
         }
@@ -59,11 +50,8 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 })
 
 export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
-    @ViewChild("autoRequest") autoRequestComplete: MatAutocomplete;
     @ViewChild("requestInput") requestInput: ElementRef;
     @ViewChild("coreFacility") coreFacilityInput: ElementRef;
-    @ViewChild("autoCore") autoCoreComplete: MatAutocomplete;
-    @ViewChild("autoRequest") trigger: MatAutocompleteTrigger;
 
     private workItemList: any[] = [];
     private workingWorkItemList: any[] = [];
@@ -77,7 +65,6 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
     private dirty: boolean = false;
     private showSpinner: boolean = false;
     private workItem: any;
-    private previousRequestMatOption: MatOption;
     private gridApi:GridApi;
     private gridColumnApi;
     private barCodes: any[] = [];
@@ -255,48 +242,11 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
         return items;
     }
 
-
-    chooseFirstRequestOption() {
-        if (this.autoRequestComplete.options.first) {
-            this.autoRequestComplete.options.first.select();
-        }
+    selectRequestOption() {
+        this.workingWorkItemList = this.filterWorkItems();
     }
 
-
-    filterRequests(name: any): any[] {
-        let fRequests: any[];
-        if (name) {
-            fRequests = this.requestIds.filter(request =>
-                request.requestNumber.indexOf(name) >= 0);
-            return fRequests;
-        } else {
-            return this.requestIds;
-        }
-    }
-
-
-    highlightFirstRequestOption(event) {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.autoRequestComplete.options.first) {
-            if (this.previousRequestMatOption) {
-                this.previousRequestMatOption.setInactiveStyles();
-            }
-            this.autoRequestComplete.options.first.setActiveStyles();
-            this.previousRequestMatOption = this.autoRequestComplete.options.first;
-        }
-    }
-
-
-    selectRequestOption(event) {
-        if (event.source.selected) {
-            this.workItem = event.source.value;
-            this.workingWorkItemList = this.filterWorkItems();
-        }
-    }
-
-    selectCodeOption(event) {
+    selectCodeOption() {
         this.initialize();
     }
 
@@ -415,8 +365,7 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
         if (areUnique == false) {
             this.dialogsService.confirm("Request " + requestNumber +
                 " has samples in the same multiplex group whose barcodes do not differ by at least 3 base pairs."
-
-                , "continue?").subscribe(answer => {
+                + "<br> continue?").subscribe(answer => {
                 if (answer) {
                     this.save();
                 }
@@ -478,7 +427,7 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
             for(let value of Array.from( this.changedRowMap.values()) ) {
                 if(value.idLibPrepPerformedBy === '' && value.seqPrepStatus != '' && value.seqPrepStatus != "Terminated") {
 
-                    this.dialogsService.confirm("Make sure all samples have a name selected in the 'Performed By' column before changing the status.\"", null);
+                    this.dialogsService.alert("Make sure all samples have a name selected in the 'Performed By' column before changing the status.\"", null, DialogType.VALIDATION);
                     return;
                 }
                 workItems.push(value);

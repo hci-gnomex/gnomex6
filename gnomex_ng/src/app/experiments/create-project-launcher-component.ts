@@ -1,8 +1,11 @@
 import {AfterViewInit, Component, OnInit} from "@angular/core";
-import {MatDialog, MatDialogRef} from "@angular/material";
+import {MatDialog, MatDialogConfig} from "@angular/material";
 import {Router} from "@angular/router";
 import {CreateProjectComponent} from "./create-project.component";
 import {GnomexService} from "../services/gnomex.service";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {DialogsService} from "../util/popup/dialogs.service";
+import {ConstantsService} from "../services/constants.service";
 
 @Component({
     selector: 'create-project-launcher',
@@ -11,12 +14,11 @@ import {GnomexService} from "../services/gnomex.service";
 
 
 export class CreateProjectLauncherComponent implements OnInit, AfterViewInit {
-    createProjectDialogRef: MatDialogRef<CreateProjectComponent>;
 
     constructor(private dialog: MatDialog, private router: Router,
                 private gnomexService: GnomexService,
-    ) {
-
+                private dialogsService: DialogsService,
+                private constantsService: ConstantsService) {
     }
 
     /**
@@ -24,23 +26,28 @@ export class CreateProjectLauncherComponent implements OnInit, AfterViewInit {
      */
     ngOnInit() {
 
-        setTimeout(() => this.createProjectDialogRef= this.dialog.open(CreateProjectComponent, {
-            data: {
+        setTimeout(() => {
+            let configuration: MatDialogConfig = new MatDialogConfig();
+            configuration.width = "45em";
+            configuration.panelClass = "no-padding-dialog";
+            configuration.autoFocus = false;
+            configuration.disableClose = true;
+            configuration.data = {
                 labList: this.gnomexService.submitRequestLabList,
                 items: [],
-                selectedLabItem: ''
-            }
+                selectedLabItem: ""
+            };
 
-            })
-
-        );
-        setTimeout(() =>
-            this.createProjectDialogRef.afterClosed()
-            .subscribe(result => {
-                console.log("after close");
-                this.router.navigate([{ outlets: { modal: null }}]);
-            })
-        );
+            this.dialogsService.genericDialogContainer(CreateProjectComponent, "New Project", this.constantsService.ICON_FOLDER_ADD, configuration,
+                {actions: [
+                        {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                    ]}).subscribe((result: any) => {
+                if(result) {
+                    this.router.navigate([{ outlets: { modal: null }}]);
+                }
+            });
+        });
     }
 
     ngAfterViewInit() {

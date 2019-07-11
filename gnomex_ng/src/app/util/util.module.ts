@@ -2,10 +2,7 @@ import {NgModule} from "@angular/core";
 import {BrowserModule} from "@angular/platform-browser";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {CommonModule} from "@angular/common";
-import {DateRangePickerComponent} from "./date-range-picker.component";
 import {BrowseFilterComponent} from "./browse-filter.component";
-import {ComboBoxModule} from '../../modules/combobox.module';
-import {CalendarModule} from "../../modules/calendar.module";
 import {TabsModule} from "./tabs/tabs.module";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -35,7 +32,6 @@ import {BillingPeriodSelectorPopupComponent} from "./billing-period-selector-pop
 import {VisibilityDetailTabComponent} from "./visibility-detail-tab.component";
 import {ContextHelpComponent} from "./context-help.component";
 import {ContextHelpPopupComponent} from "./context-help-popup.component";
-import {RichEditorModule} from "../../modules/rich-editor.module";
 import {DownloadPickerComponent} from "./download-picker.component";
 import {DownloadProgressComponent} from "./download-progress.component";
 import {DownloadFilesComponent} from "./download-files.component";
@@ -44,21 +40,20 @@ import {TreeModule} from "angular-tree-component";
 import {EditInstitutionsComponent} from "./edit-institutions.component";
 import {CustomComboBoxComponent} from "./custom-combo-box.component";
 import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
-
+import {CustomMultiComboBoxComponent} from "./custom-multi-combo-box.component";
+import {AngularEditorModule} from "@kolkov/angular-editor";
 @NgModule({
     imports: [
         BrowserModule,
         BrowserAnimationsModule,
         CommonModule,
-        CalendarModule,
-        ComboBoxModule,
         FormsModule,
         ReactiveFormsModule,
         AngularMaterialModule,
         AgGridModule.withComponents([
             CheckboxRenderer,
         ]),
-        RichEditorModule,
+        AngularEditorModule,
         AngularSplitModule,
         TreeModule,
     ],
@@ -67,7 +62,6 @@ import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
         BrowseFilterComponent,
         DateParserComponent,
         DatePickerComponent,
-        DateRangePickerComponent,
         DateRangeFilterComponent,
         DateRangeFilterPopupComponent,
         DeleteDataTrackComponent,
@@ -94,6 +88,7 @@ import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
         DownloadFilesComponent,
         EditInstitutionsComponent,
         CustomComboBoxComponent,
+        CustomMultiComboBoxComponent,
         GuestTermsDialogComponent,
     ],
     entryComponents: [
@@ -119,7 +114,6 @@ import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
         BillingUsageReportComponent,
         DateParserComponent,
         DatePickerComponent,
-        DateRangePickerComponent,
         DateRangeFilterComponent,
         DeleteDataTrackComponent,
         MenuHeaderBillingComponent,
@@ -145,6 +139,7 @@ import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
         DownloadFilesComponent,
         EditInstitutionsComponent,
         CustomComboBoxComponent,
+        CustomMultiComboBoxComponent,
         GuestTermsDialogComponent,
     ]
 })

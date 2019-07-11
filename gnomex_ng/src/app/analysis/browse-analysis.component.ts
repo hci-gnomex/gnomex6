@@ -1,10 +1,23 @@
-import {AfterViewInit, ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild,} from "@angular/core";
-import {ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode,} from "angular-tree-component";
+import {
+    AfterViewInit,
+    ChangeDetectorRef,
+    Component,
+    OnDestroy,
+    OnInit,
+    ViewChild,
+} from "@angular/core";
+import {
+    ITreeOptions,
+    TREE_ACTIONS,
+    TreeComponent,
+    TreeModel,
+    TreeNode,
+} from "angular-tree-component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {AnalysisService} from "../services/analysis.service";
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {MatDialog, MatDialogConfig} from "@angular/material";
 import {DeleteAnalysisComponent} from "./delete-analysis.component";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {LabListService} from "../services/lab-list.service";
@@ -12,7 +25,7 @@ import {CreateAnalysisComponent} from "./create-analysis.component";
 import {CreateAnalysisGroupComponent} from "./create-analysis-group.component";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {GnomexService} from "../services/gnomex.service";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {UtilService} from "../services/util.service";
@@ -53,13 +66,21 @@ import {filter} from "rxjs/operators";
         .small-font {
             font-size: 12px;
         }
+        .allow-line-breaks {
+            white-space: pre-line;
+        }
+        .background-lightyellow {
+            background-color: lightyellow;
+        }
     `]
 })
 
 export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
 
-
     @ViewChild("analysisTree") treeComponent: TreeComponent;
+
+    public readonly DRAG_AND_DROP_HINT: string = "Drag-and-drop to move analyses to another lab and/or group. Hold Ctrl while dragging-and-dropping to assign to multiple groups";
+    public showDragDropHint: boolean = false;
     public options: ITreeOptions;
 
     public items: any;
@@ -71,14 +92,11 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
     public analysisCount: string = "0";
     public analysisCountMessage: string = "";
-    public deleteAnalysisDialogRef: MatDialogRef<DeleteAnalysisComponent>;
     public disabled: boolean = true;
     public disableNewAnalysis: boolean = true;
     public disableDelete: boolean = true;
     public disableNewAnalysisGroup: boolean = true;
     public disableAll: boolean = false;
-    public createAnalysisDialogRef: MatDialogRef<CreateAnalysisComponent>;
-    public createAnalysisGroupDialogRef: MatDialogRef<CreateAnalysisGroupComponent>;
     private treeModel: TreeModel;
     private billingAccounts: any;
     private selectedItem: ITreeNode;
@@ -138,7 +156,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.items = [].concat([]);
 
             if (!response) {
-                this.dialogsService.alert("No results");
+                this.dialogsService.alert("No results", "Data Not Found");
                 return;
             }
 
@@ -151,30 +169,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             }
 
             this.buildTree(response.Lab);
-            if (this.createAnalysisDialogRef && this.createAnalysisDialogRef.componentInstance) {
-                this.createAnalysisDialogRef.close();
-                this.createAnalysisDialogRef = null;
-            }
-            if (this.deleteAnalysisDialogRef && this.deleteAnalysisDialogRef.componentInstance) {
-                if (this.deleteAnalysisDialogRef.componentInstance.showSpinner) {
-                    this.deleteAnalysisDialogRef.componentInstance.showSpinner = false;
-                }
-                if(this.parentProject) {
-                    this.analysisService.setActiveNodeId = this.parentProject.data.id;
-                }
-                this.deleteAnalysisDialogRef.close();
-                this.deleteAnalysisDialogRef = null;
-            }
-            if (this.createAnalysisGroupDialogRef && this.createAnalysisGroupDialogRef.componentInstance) {
-                if (this.createAnalysisGroupDialogRef.componentInstance.showSpinner) {
-                    this.createAnalysisGroupDialogRef.componentInstance.showSpinner = false;
-                }
-                if(this.createAnalysisGroupDialogRef.componentInstance.newAnalysisGroupId) {
-                    this.analysisService.setActiveNodeId = "p" + this.createAnalysisGroupDialogRef.componentInstance.newAnalysisGroupId;
-                }
-                this.createAnalysisGroupDialogRef.close();
-                this.createAnalysisGroupDialogRef = null;
-            }
 
             if(this.analysisService.createdAnalysis) {
                 this.analysisService.setActiveNodeId = "a" + this.analysisService.createdAnalysis;
@@ -212,12 +206,15 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 if(this.gnomexService.orderInitObj) { // this is if component is being navigated to by url
                     let id: string = "" + this.gnomexService.orderInitObj.idAnalysis;
                     if(this.treeModel && id) {
-                        let node = this.findNodeById("a" + id);
+                        let node: ITreeNode = this.findNodeById("a" + id);
                         if(node) {
                             node.setIsActive(true);
                             node.scrollIntoView();
-                            this.gnomexService.orderInitObj = null;
+                        } else {
+                            let navArray = ["/analysis", {outlets: {"analysisPanel": [this.gnomexService.orderInitObj.idAnalysis]}}];
+                            this.router.navigate(navArray);
                         }
+                        this.gnomexService.orderInitObj = null;
                     }
                 } else if(this.analysisService.setActiveNodeId) {
                     let node: TreeNode;
@@ -240,10 +237,10 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 let idLab = this.gnomexService.orderInitObj.idLab;
                 let idAnalysisGroup = this.gnomexService.orderInitObj.idAnalysisGroup;
                 let ids: HttpParams = new HttpParams()
-                    .set("idLab", idLab)
+                    .set("idLab", idLab ? idLab : '')
                     .set("searchPublicProjects", "Y")
                     .set("showCategory", "N")
-                    .set("idAnalysisGroup", idAnalysisGroup)
+                    .set("idAnalysisGroup", idAnalysisGroup ? idAnalysisGroup : '')
                     .set("showSamples", "N");
 
                 this.analysisService.analysisPanelParams = ids;
@@ -252,8 +249,8 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         });
 
         this.navEndSubscription = this.router.events.pipe(filter(event => event instanceof NavigationEnd))
-            .subscribe((event:NavigationEnd) =>{
-                if(this.route.snapshot.firstChild){
+            .subscribe((event: NavigationEnd) => {
+                if(this.route.snapshot.firstChild) {
                     let data = this.route.snapshot.firstChild.data;
                     if(data.analysis && data.analysis.Analysis){
                         let selectedAnalysis = data.analysis.Analysis;
@@ -274,7 +271,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 private dialog: MatDialog,
                 private dialogsService: DialogsService,
                 private route: ActivatedRoute,
-                private constService:ConstantsService,
+                private constService: ConstantsService,
                 private utilService: UtilService,
                 private gnomexService: GnomexService,
                 private labListService: LabListService,
@@ -303,7 +300,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
      */
     buildTree(response: any[]) {
         this.labs = [];
-        this.items = [].concat(null);
+        this.items = [];
 
         if(response) {
             if (!this.isArray(response)) {
@@ -394,8 +391,10 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     deleteAnalysisClicked(event: any) {
         if (this.selectedItem && this.selectedItem.level !== 1 && this.items.length > 0) {
             let configuration: MatDialogConfig = new MatDialogConfig();
-            configuration.height = "375px";
-            configuration.width  = "300px";
+            configuration.width = "35em";
+            configuration.panelClass = "no-padding-dialog";
+            configuration.autoFocus = false;
+            configuration.disableClose = true;
 
             configuration.data = {
                 idAnalysisGroup:    this.selectedItem.data.idAnalysisGroup,
@@ -404,9 +403,17 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 nodes:              this.treeModel.activeNodes
             };
 
-            this.deleteAnalysisDialogRef = this.dialog.open(DeleteAnalysisComponent, configuration);
+            this.dialogsService.genericDialogContainer(DeleteAnalysisComponent, "Warning: Delete Analysis", this.constService.ICON_EXCLAMATION, configuration, {actions: [
+                    {type: ActionType.PRIMARY, icon: null, name: "Yes" , internalAction: "deleteAnalysis", externalAction: () => { console.log("hello"); }},
+                    {type: ActionType.SECONDARY,  name: "No", internalAction: "cancel"}
+                ]}).subscribe((data: any) => {
+                    if(data) {
+                        if(this.parentProject) {
+                            this.analysisService.setActiveNodeId = this.parentProject.data.id;
+                        }
+                    }
+            });
         }
-        this.selectedItem = null;
     }
 
     /**
@@ -428,7 +435,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             }
 
             let configuration: MatDialogConfig = new MatDialogConfig();
-            configuration.width = "35em";
+            configuration.width = "40em";
             configuration.panelClass = "no-padding-dialog";
             configuration.autoFocus = false;
             configuration.disableClose = true;
@@ -440,13 +447,10 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 parentComponent: "Analysis",
             };
 
-
-            this.dialogsService.genericDialogContainer(CreateAnalysisComponent,"Create Analysis",null,configuration, {actions: [
-                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name:"Save" , internalAction:"saveAnalysis",externalAction:()=>{ console.log("hello")}},
-                    {type: ActionType.SECONDARY,  name:"Cancel", internalAction:"cancel"}
+            this.dialogsService.genericDialogContainer(CreateAnalysisComponent, "Create Analysis", null, configuration, {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save" , internalAction: "createAnalysisYesButtonClicked", externalAction: () => { console.log("hello"); }},
+                    {type: ActionType.SECONDARY,  name: "Cancel", internalAction: "cancel"}
                 ]});
-
-            //this.createAnalysisDialogRef = this.dialog.open(CreateAnalysisComponent, configuration);
         }
     }
 
@@ -473,12 +477,19 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 selectedLab: this.selectedIdLab,
             };
 
-            this.createAnalysisGroupDialogRef = this.dialog.open(CreateAnalysisGroupComponent, configuration,);
+            this.dialogsService.genericDialogContainer(CreateAnalysisGroupComponent, "Create Analysis Group", null, configuration, {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save" , internalAction: "createAnalysisGroup", externalAction: () => { console.log("hello"); }},
+                    {type: ActionType.SECONDARY,  name: "Cancel", internalAction: "cancel"}
+                ]}).subscribe(data => {
+                    if(data) {
+                        this.analysisService.setActiveNodeId = "p" + data;
+                    }
+                });
         }
     }
 
-    dragDropHintClicked(event: any) {
-        this.dialogsService.alert("Drag-and-drop to move analyses to another lab and/or group. Hold Ctrl while dragging-and-dropping to assign to multiple groups");
+    dragDropHintClicked(): void {
+        this.showDragDropHint = !this.showDragDropHint;
     }
 
     treeOnSelect(event: any) {
@@ -528,9 +539,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.disableNewAnalysis = false;
             this.disableDelete = false;
             this.disableNewAnalysisGroup = false;
-            let params: HttpParams = new HttpParams()
-                .set("idAnalysis", idAnalysis);
-
         }
 
         this.router.navigate(navArray);
@@ -590,7 +598,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             if (result && result.result === "SUCCESS") {
                 this.analysisService.refreshAnalysisGroupList_fromBackend();
                 if (result.invalidPermission) {
-                    this.dialogsService.alert(result.invalidPermission, "Warning");
+                    this.dialogsService.alert(result.invalidPermission, null, DialogType.WARNING);
                 }
             }
         }, (err: IGnomexErrorResponse) => {

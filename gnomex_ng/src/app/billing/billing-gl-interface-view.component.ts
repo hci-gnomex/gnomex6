@@ -1,47 +1,42 @@
 import {Component, Inject, OnInit} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {FormControl, Validators} from "@angular/forms";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {GDAction} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'billing-gl-interface-view',
     template: `
-        <h6 mat-dialog-title>{{this.billingPeriodString}} GL Interface {{this.totalPriceDisplay}}</h6>
-        <mat-dialog-content>
-            <mat-form-field>
-                <input matInput placeholder="Journal Entry Revision" [formControl]="this.revisionFC">
-            </mat-form-field>
-        </mat-dialog-content>
-        <mat-dialog-actions>
-            <button mat-button color="primary" [disabled]="this.revisionFC.invalid" (click)="this.send()">OK</button>
-            <button mat-button mat-dialog-close>Cancel</button>
-        </mat-dialog-actions>
+        <mat-form-field class="full-width double-padded">
+            <input matInput placeholder="Journal Entry Revision" [formControl]="this.revisionFC">
+        </mat-form-field>
     `,
-    styles: [`        
-    `]
+    styles: [``]
 })
 
-export class BillingGlInterfaceViewComponent implements OnInit {
+export class BillingGlInterfaceViewComponent extends BaseGenericContainerDialog implements OnInit {
 
-    public totalPriceDisplay: string = "";
+    public primaryDisable: (action?: GDAction) => boolean;
     public totalPrice: number;
     private idBillingPeriod: string;
     private idCoreFacility: string;
-    public billingPeriodString: string = "";
 
     public revisionFC: FormControl;
 
     constructor(@Inject(MAT_DIALOG_DATA) private data: any,
                 private dialogRef: MatDialogRef<BillingGlInterfaceViewComponent>) {
+        super();
     }
 
     ngOnInit() {
         this.totalPrice = this.data.totalPrice;
-        this.totalPriceDisplay = this.totalPrice.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
         this.idBillingPeriod = this.data.idBillingPeriod;
         this.idCoreFacility = this.data.idCoreFacility;
-        this.billingPeriodString = this.data.billingPeriodString;
 
         this.revisionFC = new FormControl("1", Validators.required);
+        this.primaryDisable = (action) => {
+            return this.revisionFC.invalid;
+        };
     }
 
     public send(): void {

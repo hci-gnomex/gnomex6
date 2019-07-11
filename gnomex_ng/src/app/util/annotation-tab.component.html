@@ -3,49 +3,35 @@
         <div [ngSwitch]="annot.codePropertyType" *ngFor="let annot of annotations" class="full-width full-height small-font padded">
             <div class="display-white-space">{{ annot && annot.description ? annot.description : '' }}</div>
             <div *ngSwitchCase="'CHECK'" class="annot-control">
-                <label>{{ annot && annot.name ? annot.name : "" }}</label>
+                <!--<label>{{ annot && annot.name ? annot.name : "" }}</label>-->
                 <mat-checkbox  [formControl]="this.form.controls[annot.name]" >
+                    {{ annot && annot.name ? annot.name : "" }}
                 </mat-checkbox>
                 <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('required')">
                     This field is required
                 </mat-error>
             </div>
             <mat-form-field *ngSwitchCase="'TEXT'" class="annot-control" >
-                <label>{{ annot && annot.name ? annot.name : "" }}</label>
                 <input matInput placeholder="{{annot.name}}" [formControl]="this.form.controls[annot.name]">
                 <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('required')">
                     This field is required
                 </mat-error>
             </mat-form-field>
-            <mat-form-field *ngSwitchCase="'MOPTION'" class="annot-control" >
-                <label>{{ annot && annot.name ? annot.name : "" }}</label>
-                <mat-select [compareWith]="compareByID" [placeholder]="annot.name" multiple [formControl]="this.form.controls[annot.name]">
-                    <mat-option *ngFor="let opt of annot.PropertyOption"
-                                #mOptRef
-                                (onSelectionChange)="selectOpt(mOptRef)"
-                                [value]="opt"> {{opt.name}}
-                    </mat-option>
-                </mat-select>
-                <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('selectRequired')">
-                    This field is required
-                </mat-error>
-            </mat-form-field>
-            <mat-form-field  *ngSwitchCase="'OPTION'" class="annot-control">
-                <label>{{ annot && annot.name ? annot.name : "" }}</label>
-                <mat-select (selectionChange)="selectChanged($event,annot)"
-                            [compareWith]="compareByID"
-                            [placeholder]="annot && annot.name ? annot.name : ''"
-                            [formControl]="this.form.controls[annot.name]">
-                    <mat-option [value]="" >
-                    </mat-option>
-                    <mat-option *ngFor="let opt of annot.PropertyOption"#optRef [value]="opt" >
-                        {{opt.name}}
-                    </mat-option>
-                </mat-select>
-                <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('selectRequired')">
-                    This field is required
-                </mat-error>
-            </mat-form-field>
+            <div *ngSwitchCase="'MOPTION'" class="annot-control">
+                <custom-multi-combo-box [placeholder]="annot.name"
+                                        [formControl]="this.form.controls[annot.name]"
+                                        [options]="annot.PropertyOption"
+                                        (selectionChanged)="selectOpts($event, annot)"
+                                        displayField="name">
+                </custom-multi-combo-box>
+            </div>
+            <div *ngSwitchCase="'OPTION'" class="annot-control">
+                <custom-combo-box [placeholder]="annot && annot.name ? annot.name : ''"
+                                  (optionSelected)="selectChanged($event,annot)"
+                                  [options]="annot.PropertyOption" displayField="name"
+                                  [formControl]="this.form.controls[annot.name]">
+                </custom-combo-box>
+            </div>
             <div *ngSwitchCase="'URL'" class="annot-control">
                 <url-annotation [formControl]="this.form.controls[annot.name]">  </url-annotation>
             </div>

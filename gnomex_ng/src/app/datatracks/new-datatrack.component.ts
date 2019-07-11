@@ -10,41 +10,35 @@ import {UserPreferencesService} from "../services/user-preferences.service";
 import {ConstantsService} from "../services/constants.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {GDAction} from "../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: 'new-datatrack-folder',
     template: `
-        <h6 mat-dialog-title><img [src]="this.constantsService.ICON_DATATRACK" class="icon">Add new data track to {{folder}}</h6>
-        <mat-dialog-content>
-            <form [formGroup]="this.form">
-                <div class="dialogDiv">
-                    <mat-form-field class="full-width">
-                        <input matInput formControlName="name" placeholder="Name">
-                    </mat-form-field>
-                </div>
-                <div class="dialogDiv">
-                    <custom-combo-box class="full-width" placeholder="Lab" [options]="this.labList"
-                                        valueField="idLab" [displayField]="this.prefService.labDisplayField"
-                                        [formControl]="this.form.get('idLab')">
-                    </custom-combo-box>
-                </div>
-                <div class="dialogDiv">
-                    <custom-combo-box class="full-width" placeholder="Visibility" [options]="this.visibilityList"
-                                        valueField="value" displayField="display"
-                                        [formControl]="this.form.get('codeVisibility')">
-                    </custom-combo-box>
-                </div>
-            </form>
-        </mat-dialog-content>
-        <mat-dialog-actions class="justify-flex-end">
-            <button mat-button *ngIf="!showSpinner" [disabled]="this.form.invalid" (click)="save()">Save</button>
-            <button mat-button *ngIf="!showSpinner" mat-dialog-close>Cancel</button>
-            <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-        </mat-dialog-actions>
+        <form [formGroup]="this.form" class="full-width full-height flex-container-col double-padded-left-right">
+            <div class="dialogDiv">
+                <mat-form-field class="full-width">
+                    <input matInput formControlName="name" placeholder="Name">
+                </mat-form-field>
+            </div>
+            <div class="dialogDiv">
+                <custom-combo-box class="full-width" placeholder="Lab" [options]="this.labList"
+                                  valueField="idLab" [displayField]="this.prefService.labDisplayField"
+                                  [formControl]="this.form.get('idLab')">
+                </custom-combo-box>
+            </div>
+            <div class="dialogDiv">
+                <custom-combo-box class="full-width" placeholder="Visibility" [options]="this.visibilityList"
+                                  valueField="value" displayField="display"
+                                  [formControl]="this.form.get('codeVisibility')">
+                </custom-combo-box>
+            </div>
+        </form>
     `,
 })
 
-export class NewDataTrackComponent implements OnInit {
+export class NewDataTrackComponent extends BaseGenericContainerDialog implements OnInit {
     private selectedItem: ITreeNode;
 
     public folder: string = "";
@@ -52,6 +46,7 @@ export class NewDataTrackComponent implements OnInit {
     public visibilityList: any[] = [];
     public labList: any[] = [];
     public showSpinner: boolean = false;
+    public primaryDisable: (action?: GDAction) => boolean;
 
     constructor(public dialogRef: MatDialogRef<NewDataTrackComponent>,
                 public constantsService: ConstantsService,
@@ -62,6 +57,7 @@ export class NewDataTrackComponent implements OnInit {
                 public prefService: UserPreferencesService,
                 private formBuilder: FormBuilder,
                 @Inject(MAT_DIALOG_DATA) private data: any) {
+        super();
     }
 
     ngOnInit() {
@@ -79,6 +75,10 @@ export class NewDataTrackComponent implements OnInit {
         this.visibilityList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.VISIBILITY).filter((vis: any) => {
             return vis.value !== "INST";
         });
+
+        this.primaryDisable = (action) => {
+            return this.form.invalid;
+        };
     }
 
     public save(): void {

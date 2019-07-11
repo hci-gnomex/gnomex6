@@ -16,6 +16,8 @@ import {PropertyService} from "../../services/property.service";
 import {CollaboratorsDialogComponent} from "../../experiments/experiment-detail/collaborators-dialog.component";
 import {AnalysisService} from "../../services/analysis.service";
 import {UserPreferencesService} from "../../services/user-preferences.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../../services/constants.service";
 
 @Component({
     selector: "analysis-info-tab",
@@ -91,12 +93,9 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
             <div class="form-row-children">
                 <div class="flex-container-col">
                     <div class="flex-container-row form-entry-children">
-                        <mat-form-field>
-                            <mat-select placeholder="Genome Builds" [formControlName]="'genomeBuildToAdd'">
-                                <mat-option>None</mat-option>
-                                <mat-option *ngFor="let build of this.genomeBuildList" [value]="build">{{build.display}}</mat-option>
-                            </mat-select>
-                        </mat-form-field>
+                        <custom-combo-box placeholder="Genome Builds" [formControlName]="'genomeBuildToAdd'"
+                                          displayField="display" [options]="genomeBuildList">
+                        </custom-combo-box>
                         <button mat-button (click)="this.addGenomeBuild()" [disabled]="!isEditMode || !canUpdate || !this.form.controls['genomeBuildToAdd'].value">
                             <img src="../../../assets/add.png" class="icon">Add
                         </button>
@@ -117,12 +116,9 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
                 </div>
                 <span></span>
                 <div class="flex-container-col">
-                    <mat-form-field>
-                        <mat-select placeholder="Institution" [formControlName]="'idInstitution'">
-                            <mat-option>None</mat-option>
-                            <mat-option *ngFor="let inst of this.institutionList" [value]="inst.idInstitution">{{inst.display}}</mat-option>
-                        </mat-select>
-                    </mat-form-field>
+                    <custom-combo-box placeholder="Institution" [formControlName]="'idInstitution'"
+                                      displayField="display" valueField="idInstitution" [options]="institutionList">
+                    </custom-combo-box>
                     <div>
                         <ul>Analysis Group(s)
                             <li *ngFor="let analysisGroup of this.form.controls['analysisGroupsJSONString'].value">{{analysisGroup.name}}</li>
@@ -204,7 +200,8 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
                 private router: Router,
                 private analysisService: AnalysisService,
                 public prefService: UserPreferencesService,
-                public propertyService: PropertyService) {
+                public propertyService: PropertyService,
+                private constantsService: ConstantsService) {
         this.form = this.formBuilder.group({
             labName: [{value: "", disabled: true}],
             name: [{value: "", disabled: true}, Validators.required],
@@ -278,7 +275,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
         });
 
         this.route.data.forEach((data: any) => {
-            if (!data.analysis.Analysis) {
+            if (!data.analysis || !data.analysis.Analysis) {
                 return;
             }
 
@@ -343,7 +340,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
                         if (result && result.message) {
                             message = ": " + result.message;
                         }
-                        this.dialogsService.confirm("An error occurred while retrieving lab" + message, null);
+                        this.dialogsService.error("An error occurred while retrieving lab" + message);
                     }
                 });
             }
@@ -414,20 +411,32 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
 
     public openEditAnalysisType(): void {
         let config: MatDialogConfig = new MatDialogConfig();
-        config.width = "1000px";
-        config.height = "800px";
-        let dialogRef: MatDialogRef<BrowseDictionaryComponent> = this.dialog.open(BrowseDictionaryComponent, config);
-        dialogRef.afterClosed().subscribe(() => {
-            this.dictionaryService.reloadAndRefresh(() => {
-                this.analysisTypes = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ANALYSIS_TYPE);
-            }, null, DictionaryService.ANALYSIS_TYPE);
+        config.width = "75em";
+        config.height = "50em";
+        config.panelClass = "no-padding-dialog";
+        config.autoFocus = false;
+        config.disableClose = true;
+        config.data = {
+            isDialog: true,
+            preSelectedDictionary: "hci.gnomex.model.AnalysisType",
+            preSelectedEntry: this.form.controls["idAnalysisType"].value
+        };
+
+        this.dialogsService.genericDialogContainer(BrowseDictionaryComponent, "Dictionary Editor", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: null, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]}).subscribe(() => {
+                    this.dictionaryService.reloadAndRefresh(() => {
+                        this.analysisTypes = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ANALYSIS_TYPE);
+                        }, null, DictionaryService.ANALYSIS_TYPE);
         });
     }
 
     public openEditAnalysisProtocol(): void {
         let manageProtocolsRoute: string = "/manage-protocols";
         if (this.form.dirty) {
-            this.dialogsService.confirm("Unsaved changes will be lost. Proceed?", " ").subscribe((result: boolean) => {
+            this.dialogsService.confirm("Unsaved changes will be lost. Proceed?").subscribe((result: any) => {
                 if (result) {
                     this.router.navigateByUrl(manageProtocolsRoute);
                 }
@@ -440,13 +449,26 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
     public openEditOrganism(): void {
         let config: MatDialogConfig = new MatDialogConfig();
         config.width = "1000px";
-        config.height = "800px";
-        let dialogRef: MatDialogRef<ConfigureOrganismsComponent> = this.dialog.open(ConfigureOrganismsComponent, config);
-        dialogRef.afterClosed().subscribe(() => {
-            this.dictionaryService.reloadAndRefresh(() => {
-                this.organismList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ORGANISM);
-                this.refreshGenomeBuilds();
-            });
+        config.height = "790px";
+        config.panelClass = "no-padding-dialog";
+        config.autoFocus = false;
+        config.disableClose = true;
+        config.data = {
+            isDialog: true,
+            preSelectedOrganism: this.form.controls["idOrganism"].value,
+        };
+
+        this.dialogsService.genericDialogContainer(ConfigureOrganismsComponent, "Configure Organisms", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: null, name: "Save", internalAction: "prepareToSaveOrganism"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.dictionaryService.reloadAndRefresh(() => {
+                            this.organismList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ORGANISM);
+                            this.refreshGenomeBuilds();
+                        });
+                    }
         });
     }
 
@@ -468,7 +490,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
                     if (result && result.message) {
                         message = ": " + result.message;
                     }
-                    this.dialogsService.confirm("An error occurred while retrieving lab" + message, null);
+                    this.dialogsService.error("An error occurred while retrieving lab" + message);
                 }
             });
             return;
@@ -485,6 +507,8 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
         config.height = "33em";
         config.width  = "44em";
         config.panelClass = "no-padding-dialog";
+        config.disableClose = true;
+        config.autoFocus = false;
 
         config.data = {
             currentCollaborators:  this.form.controls["collaboratorsJSONString"].value,
@@ -493,12 +517,15 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
             idFieldValue: this.analysis.idAnalysis
         };
 
-        let dialogRef: MatDialogRef<CollaboratorsDialogComponent> = this.dialog.open(CollaboratorsDialogComponent, config);
-        dialogRef.afterClosed().subscribe((result: any[]) => {
-            if (result) {
-                this.form.controls["collaboratorsJSONString"].setValue(result);
-                this.form.markAsDirty();
-            }
+        this.dialogsService.genericDialogContainer(CollaboratorsDialogComponent, "Collaborators for Analysis A" + this.analysis.idAnalysis, this.constantsService.ICON_GROUP, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Update", internalAction: "onClickUpdate"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.form.controls["collaboratorsJSONString"].setValue(result);
+                        this.form.markAsDirty();
+                    }
         });
     }
 

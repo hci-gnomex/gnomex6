@@ -1,13 +1,12 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
-import { URLSearchParams } from "@angular/http";
-import {MatAutocomplete, MatDialog, MatDialogRef, MatOption} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
-import {GridOptions, GridApi} from "ag-grid-community";
+import {GridApi, GridOptions} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {BarcodeSelectEditor} from "../util/grid-editors/barcode-select.editor";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
@@ -18,6 +17,8 @@ import {UserPreferencesService} from "../services/user-preferences.service";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {Subscription} from "rxjs";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../services/constants.service";
 
 @Component({
     selector: 'flowcellassm-workflow',
@@ -52,8 +53,6 @@ import {Subscription} from "rxjs";
 })
 
 export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
-    @ViewChild("autoProtocol") autoProtocolComplete: MatAutocomplete;
-    @ViewChild("autoLab") autoLabComplete: MatAutocomplete;
     @ViewChild("labInput") labInput: ElementRef;
 
     private static readonly COLOR = '#f1eed6';
@@ -68,7 +67,6 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
     public assmColumnDefs;
     private showSpinner: boolean = false;
     public selectedLab:FormControl;
-    private previousLabMatOption: MatOption;
     private gridApi:GridApi;
     private gridColumnApi;
     private assmGridApi:GridApi;
@@ -79,7 +77,6 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
     private gridOptions:GridOptions = {};
     private lanes: any[] = [];
     private selectedSeqlanes: any[] = [];
-    private deleteSeqlaneDialogRef: MatDialogRef<DeleteSeqlaneDialogComponent>;
     private emptyLab = {idLab: "0",
         name: ""};
     private labList: any[] = [];
@@ -98,7 +95,7 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                 private gnomexService: GnomexService,
                 private dialogsService: DialogsService,
                 private securityAdvisor: CreateSecurityAdvisorService,
-                private dialog: MatDialog,
+                private constService: ConstantsService,
                 private dictionaryService: DictionaryService,
                 public prefService: UserPreferencesService) {
         this.barcodeFC = new FormControl("");
@@ -344,25 +341,12 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
         this.assmGridApi.sizeColumnsToFit();
     }
 
-    chooseFirstProtocolOption() {
-        if (this.autoProtocolComplete.options.first) {
-            this.autoProtocolComplete.options.first.select();
-        }
-    }
-
-    chooseFirstLabOption() {
-        if (this.autoLabComplete.options.first) {
-            this.autoLabComplete.options.first.select();
-        }
-    }
-
-
     onSeqListSelection(event: any): void {
-        if(!event.value){
+        if(!event){
             this.workingWorkItemList = this.workItemList.slice();
         }else{
             this.workingWorkItemList = this.workItemList.filter(workItem =>
-                 workItem.idNumberSequencingCyclesAllowed === event.value.idNumberSequencingCyclesAllowed
+                 workItem.idNumberSequencingCyclesAllowed === event.idNumberSequencingCyclesAllowed
             );
         }
 
@@ -397,20 +381,6 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
         )
     }
 
-    highlightFirstLabOption(event) {
-        if (event.key == "ArrowDown" || event.key == "ArrowUp") {
-            return;
-        }
-        if (this.autoLabComplete.options.first) {
-            if (this.previousLabMatOption) {
-                this.previousLabMatOption.setInactiveStyles();
-            }
-            this.autoLabComplete.options.first.setActiveStyles();
-            this.previousLabMatOption = this.autoLabComplete.options.first;
-        }
-    }
-
-
     onNotifyGridRowDataChanged(event) {
         if (this.gridApi) {
             this.gridApi.hideOverlay();
@@ -433,7 +403,7 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
         if (this.assmItemList.filter(lane=>
             lane.laneNumber === event.data.laneNumber).length === 0) {
             if (!this.firstSelectedFlowcellRequestType && event.data.codeRequestCategory != this.selectedFlowcellRequestType) {
-                this.dialogsService.confirm("Only one type of experiment can be assembled on a flow cell", null);
+                this.dialogsService.alert("Only one type of experiment can be assembled on a flow cell", null, DialogType.WARNING);
             } else {
                 for (let proto of this.filteredProtocolsList) {
                     if (proto.idNumberSequencingCyclesAllowed === event.data.idNumberSequencingCyclesAllowed) {
@@ -528,11 +498,11 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
             let validIndexTags = this.validateIndexTags();
 
             if (this.protocolFC.value === "") {
-                this.dialogsService.confirm("Please choose a sequencing protocol for the flow cell.", null);
+                this.dialogsService.alert("Please choose a sequencing protocol for the flow cell.", null, DialogType.FAILED);
                 return;
             }
             if (validProtoAndLanes.errorMessage) {
-                this.dialogsService.confirm(validProtoAndLanes.errorMessage, null);
+                this.dialogsService.alert(validProtoAndLanes.errorMessage, null, DialogType.VALIDATION);
                 return;
             }
             if (validProtoAndLanes.warningMessage) {
@@ -545,7 +515,7 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                 warningMessage += validIndexTags.warningMessage;
             }
             if (warningMessage) {
-                this.dialogsService.confirm(warningMessage, " Continue saving?").subscribe((answer: boolean) => {
+                this.dialogsService.confirm(warningMessage + "<br> Continue saving?").subscribe((answer: boolean) => {
                     if (answer) {
                         this.saveWorkItems();
                     }
@@ -576,7 +546,7 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                 if (!responseJSON.flowCellNumber) {
                     responseJSON.flowCellNumber = "";
                 }
-                this.dialogsService.confirm("Flowcell " + responseJSON.flowCellNumber + " created", null);
+                this.dialogsService.alert("Flowcell " + responseJSON.flowCellNumber + " created", null, DialogType.SUCCESS);
                 this.assmItemList = [];
                 this.initialize();
             }
@@ -610,22 +580,24 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
         } else {
             laneString = "lanes";
         }
-        this.deleteSeqlaneDialogRef = this.dialog.open(DeleteSeqlaneDialogComponent, {
-            height: '12em',
-            width: '22em',
-            data: {
-                seqLanes: seqLanes,
-                laneLength: this.selectedSeqlanes.length,
-                laneString: laneString
-            }
-
-        });
-        this.deleteSeqlaneDialogRef.afterClosed()
-            .subscribe(result => {
-                if (this.deleteSeqlaneDialogRef.componentInstance.rebuildSeqlanes) {
-                    this.initialize();
-                }
-            })
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "25em";
+        config.height = "12em";
+        config.autoFocus = false;
+        config.data = {
+            seqLanes: seqLanes,
+            laneLength: this.selectedSeqlanes.length,
+            laneString: laneString
+        };
+        this.dialogsService.genericDialogContainer(DeleteSeqlaneDialogComponent, "Delete Sequence Lane", this.constService.ICON_DELETE, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "delete"},
+                    {type: ActionType.SECONDARY, name: "No", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+                    if (result) {
+                        this.initialize();
+                    }
+            });
 
     }
 

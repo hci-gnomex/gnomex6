@@ -1,5 +1,4 @@
 import {AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild} from "@angular/core";
-import {URLSearchParams} from "@angular/http";
 
 import {Subscription} from "rxjs";
 
@@ -9,19 +8,19 @@ import {MultipleLineTextRenderer} from "../../util/grid-renderers/multiple-line-
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
 import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align-right-middle.renderer";
-import {TwoButtonRenderer} from "../../util/grid-renderers/two-button.renderer";
 
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {ExperimentsService} from "../experiments.service";
 import {PropertyService} from "../../services/property.service";
-import {MatDialog, MatDialogConfig} from "@angular/material";
-import {Validators} from "@angular/forms";
+import {MatDialogConfig} from "@angular/material";
 import {LinkButtonRenderer} from "../../util/grid-renderers/link-button.renderer";
 import {GnomexService} from "../../services/gnomex.service";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {ConstantsService} from "../../services/constants.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 /**
  *	This component represents the screen you get pulled to by selecting "Experiment -> Orders" from
@@ -35,13 +34,13 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 @Component({
 	selector: "ExperimentOrders",
 	templateUrl: "./experiment-orders.component.html",
-	styles: [`		
+	styles: [`
 		
 		.most-width { width: 80%; }
 		
-		.t  { display: table;      }  
-		.tr { display: table-row;  }  
-		.td { display: table-cell; }  
+		.t  { display: table;      }
+		.tr { display: table-row;  }
+		.td { display: table-cell; }
 		
 		.vertical-center { vertical-align: middle; }
 
@@ -49,29 +48,29 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 		
         .small-font { font-size: small; }
 		
-		.background {  
-			background-color: #EEEEEE;  
-			padding: 0.3em;  
-			border-radius: 0.3em;  
-			border: 1px solid darkgrey;  
-			position: relative;  
+		.background {
+			background-color: #EEEEEE;
+			padding: 0.3em;
+			border-radius: 0.3em;
+			border: 1px solid darkgrey;
+			position: relative;
 		}
 		
-		.flex-column-container {  
-			display: flex;  
-			flex-direction: column;  
-		}  
-		.flex-row-container {  
-			display: flex;  
-			flex-direction: row;  
-		}  
-		.flex-stretch {  
-			flex: 1;  
+		.flex-column-container {
+			display: flex;
+			flex-direction: column;
+		}
+		.flex-row-container {
+			display: flex;
+			flex-direction: row;
+		}
+		.flex-stretch {
+			flex: 1;
 		}
 		
-		.vertical-spacer {  
-			height:0.3em;  
-			width:0;  
+		.vertical-spacer {
+			height:0.3em;
+			width:0;
 		}
 	  
       .title {
@@ -144,7 +143,6 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
     private emToPxConversionRate: number = 1;
 
 	private dropdownChoices: any[] = [
-		{value: "", label: ""},
 		{value: "COMPLETE", label: "COMPLETE"},
 		{value: "FAILED", label: "FAILED"},
 		{value: "NEW", label: "NEW"},
@@ -302,12 +300,12 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
 	debug: string;
 
 	constructor (private createSecurityAdvisorService: CreateSecurityAdvisorService,
-                 private dialog: MatDialog,
                  private dialogService: DialogsService,
                  private dictionaryService: DictionaryService,
 				 private experimentsService: ExperimentsService,
 				 private gnomexService: GnomexService,
-				 private propertyService: PropertyService) {
+				 private propertyService: PropertyService,
+                 private constantsService: ConstantsService) {
 	}
 
 	ngOnInit(): void {
@@ -401,7 +399,7 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
 	goButtonClicked(): void {
 		// The "go" button should be disabled in this case, but if we get a click without a valid status,
 		// stop.
-		if (!this.enableChanges || this.changeStatus === "") {
+		if (!this.enableChanges || !this.changeStatus) {
 			return;
 		}
 
@@ -447,7 +445,7 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
                 let errorMessage = "One or more of the selected orders has already been added to an " +
                     "instrument run. The order(s) cannot be deleted.";
 
-                this.dialogService.alert(errorMessage);
+                this.dialogService.error(errorMessage);
             } else {
                 let warningMessage = 'Are you sure you want to delete these orders?';
                 let usedProducts: boolean = false;
@@ -470,14 +468,18 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
                 }
 
                 if (usedProducts) {
-                    warningMessage += "\n\n" +
+                    warningMessage += "<br>" +
                         "WARNING: One or more of the selected orders may have used products. " +
                         "If the products were not actually consumed, please revert the status " +
                         "of the order to an earlier status or manually return the products to " +
-                        "the lab before deleting.\n\n";
+                        "the lab before deleting.<br>";
                 }
 
-                this.dialogService.yesNoDialog(warningMessage, this, 'onConfirmDelete');
+                this.dialogService.confirm(warningMessage).subscribe((result: any) => {
+                    if(result) {
+                        this.onConfirmDelete();
+                    }
+                });
             }
         }
 	}
@@ -545,9 +547,14 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
             let configuration: MatDialogConfig = new MatDialogConfig();
             configuration.panelClass = 'no-padding-dialog';
             configuration.width  = '40%';
+            configuration.disableClose = true;
             configuration.data   = { idRequests: idRequests };
 
-            this.dialog.open(EmailRelatedUsersPopupComponent, configuration);
+            this.dialogService.genericDialogContainer(EmailRelatedUsersPopupComponent, "Send email to users associated with selected orders", this.constantsService.EMAIL_GO_LINK, configuration,
+                {actions: [
+                        {type: ActionType.PRIMARY, icon: this.constantsService.EMAIL_GO_LINK, name: "Send email", internalAction: "sendEmailButtonClicked"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                    ]});
         }
 	}
 

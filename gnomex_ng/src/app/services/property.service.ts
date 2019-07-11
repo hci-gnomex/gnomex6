@@ -55,6 +55,10 @@ export class PropertyService {
     public static readonly PROPERTY_DISABLE_USER_SIGNUP: string = "disable_user_signup";
     public static readonly PROPERTY_NO_GUEST_ACCESS: string = "no_guest_access";
     public static readonly PROPERTY_GUEST_DOWNLOAD_TERMS: string = "guest_download_terms";
+    public static readonly PROPERTY_ALLOW_PRICE_QUOTE: string = "allow_price_quote";
+    public static readonly PROPERTY_HIDE_MULTIPLEX_LANE_OOLUMN: string = "hide_multiplex_lane_column";
+    public static readonly PROPERTY_DEFAULT_VALUE_MULTIPLEX_LANE_COLUMN: string = "default_value_multiplex_lane_column";
+    public static readonly PROPERTY_ESTIMATED_PRICE_WARNING: string = "estimated_price_warning";
 
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_GROUP: string  = "analysis_assistance_group";
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_HEADER: string = "analysis_assistance_header";
@@ -63,6 +67,8 @@ export class PropertyService {
     public static readonly PROPERTY_EXPERIMENT_FILE_SAMPLE_LINKING_ENABLED:string = "experiment_file_sample_linking_enabled";
 
     public static readonly PROPERTY_QC_INSTRUCTIONS: string = "qc_instructions";
+    public static readonly PROPERTY_BST_LINKAGE_SUPPORTED: string = "bst_linkage_supported";
+    public static readonly PROPERTY_CAN_ACCESS_BSTX: string = "can_access_bstx";
 
     constructor(private dictionaryService: DictionaryService,
                 private http: Http,

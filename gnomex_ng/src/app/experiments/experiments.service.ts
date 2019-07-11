@@ -3,13 +3,22 @@ import {Http, Response, URLSearchParams} from "@angular/http";
 import {Subject, throwError} from "rxjs";
 import {Observable} from "rxjs";
 import {BehaviorSubject} from "rxjs";
-import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+import {
+    HttpClient,
+    HttpEvent,
+    HttpEventType,
+    HttpHeaders,
+    HttpParams,
+    HttpRequest
+} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {first,catchError, map} from "rxjs/operators";
 import {Experiment} from "../util/models/experiment.model";
 import {CookieUtilService} from "../services/cookie-util.service";
 import {element} from "@angular/core/src/render3";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {AbstractControl, FormGroup} from "@angular/forms";
+import {saveAs} from "file-saver";
 
 
 export let BROWSE_EXPERIMENTS_ENDPOINT = new InjectionToken("browse_experiments_url");
@@ -53,13 +62,16 @@ export class ExperimentsService {
     public filteredLabs: any;
     public labList: any[] = [];
     private editMode: boolean = false;
+    private _experimentOverviewForm: FormGroup;
 
 
     constructor(private cookieUtilService: CookieUtilService,
                 private _http: Http,
                 private httpClient: HttpClient,
                 private dialogService: DialogsService,
-                @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {}
+                @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {
+        this._experimentOverviewForm = new FormGroup({});
+    }
 
     getExperimentsObservable(): Observable<any> {
         return this.experimentOrdersSubject.asObservable();
@@ -185,7 +197,8 @@ export class ExperimentsService {
     public getMultiplexLaneList(experiment: Experiment): Observable<any> {
 
         let params: HttpParams = new HttpParams()
-            .set('requestJSONString', JSON.stringify(experiment.getJSONObjectRepresentation()));
+            .set('requestJSONString', JSON.stringify(experiment.getJSONObjectRepresentation()))
+            .set("noJSONToXMLConversionNeeded", "Y");
 
         this.cookieUtilService.formatXSRFCookie();
 
@@ -216,10 +229,11 @@ export class ExperimentsService {
             return;
         }
 
-        let propertiesXML: string = JSON.stringify(experiment.RequestProperties);
-
-        if (!propertiesXML) {
-            propertiesXML = '';
+        let propertiesXML: string;
+        if(Array.isArray(experiment.RequestProperties) && experiment.RequestProperties.length === 0) {
+            propertiesXML = "";
+        } else {
+            propertiesXML = JSON.stringify(experiment.RequestProperties);
         }
 
         let params: HttpParams = new HttpParams()
@@ -308,10 +322,14 @@ export class ExperimentsService {
     }
 
     getProjectRequestList(params: HttpParams) {
-        return this._http.get("/gnomex/GetProjectRequestList.gx", {params:params})
+        return this.httpClient.get("/gnomex/GetProjectRequestList.gx", {params:params})
             .pipe(catchError((err:IGnomexErrorResponse) =>{
                 return throwError(err);
             }));
+    }
+
+    public getProjectRequestListNew(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetProjectRequestList.gx", {params: params});
     }
 
     getRequestProgressListObservable():Observable<any>{
@@ -397,5 +415,45 @@ export class ExperimentsService {
     emailServlet(params: HttpParams): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
         return this.httpClient.post("/gnomex/EmailServlet.gx", null, {params: params});
+    }
+
+    get experimentOverviewForm(): FormGroup {
+        return this._experimentOverviewForm;
+    }
+
+    public addExperimentOverviewFormMember(control: AbstractControl, name: string, afterControlAddedFn?: any): void {
+        setTimeout(() => {
+            this._experimentOverviewForm.addControl(name, control);
+            if(afterControlAddedFn) {
+                afterControlAddedFn();
+            }
+        });
+    }
+    public clearExperimentOverviewForm(): void {
+        this._experimentOverviewForm = new FormGroup({});
+    }
+
+    public showPriceQuote(experiment: Experiment): void {
+        if (!experiment) {
+            return;
+        }
+
+        let params: HttpParams = new HttpParams()
+            .set("requestJSONString", JSON.stringify(experiment.getJSONObjectRepresentation()))
+            .set("noJSONToXMLConversionNeeded", 'Y');
+
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+
+        const request: HttpRequest<any> = new HttpRequest<any>("POST", "/gnomex/ShowRequestForm.gx", params.toString(), {
+            headers: headers,
+            responseType: "blob"
+        });
+
+        this.httpClient.request(request).subscribe((event: HttpEvent<any>) => {
+            if (event.type === HttpEventType.Response) {
+                saveAs(event.body, "testing_ShowRequestForm.pdf");
+            }
+        });
     }
 }

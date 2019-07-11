@@ -29,13 +29,13 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {LinkButtonRenderer} from "../../util/grid-renderers/link-button.renderer";
 import {GridApi} from "ag-grid-community";
 import {SampleUploadService} from "../../upload/sample-upload.service";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {ExperimentsService} from "../experiments.service";
 
 @Component({
     selector: "tab-samples-illumina",
     templateUrl: "./tab-samples-illumina.component.html",
     styles: [`
-
-
         .no-height { height: 0;  }
         .single-em { width: 1em; }
         
@@ -62,8 +62,6 @@ import {SampleUploadService} from "../../upload/sample-upload.service";
             overflow: visible !important;
             white-space: normal !important;
         }
-        
-
     `]
 })
 
@@ -74,23 +72,18 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     private emToPxConversionRate: number = 13;
 
+    private _isAmendState: boolean = false;
+    @Input('isAmendState') public set isAmendState(value: boolean) {
+        this._isAmendState = value;
+    }
+    public get isAmendState(): boolean {
+        return this._isAmendState;
+    }
+
     @Input('experiment') public set experiment(value: Experiment) {
 
         let newExperiment: boolean = (this._experiment !== value);
-
-        this.dictionaryService.reloadAndRefresh(() => {
-            this.columnProperties = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.COLUMN_PROPERTIES);
-
-            if (this.columnProperties) {
-                this.columnProperties = this.columnProperties.filter((a) => {
-                    return a.codeRequestCategory === this._experiment.codeRequestCategory;
-                });
-            } else {
-                this.columnProperties = [];
-            }
-        }, () => {
-            this.dialogService.alert("Error refreshing data from server.", "ERROR:")
-        }, DictionaryService.COLUMN_PROPERTIES);
+        this.getColumnProperties();
 
         this._experiment = value;
 
@@ -118,6 +111,17 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
         if (newExperiment && this.onChange_idSampleSourceSubscription) {
             this.onChange_idSampleSourceSubscription.unsubscribe();
+        }
+        if (newExperiment && this.onChange_codeRequestCategorySubscription) {
+            this.onChange_codeRequestCategorySubscription.unsubscribe();
+        }
+
+        if (!this.onChange_codeRequestCategorySubscription) {
+            this.onChange_codeRequestCategorySubscription = this._experiment.onChange_codeRequestCategory.subscribe((value) => {
+                this.getColumnProperties();
+                let hide_property = this.propertyService.getProperty(PropertyService.PROPERTY_HIDE_MULTIPLEX_LANE_OOLUMN, this._experiment.idCoreFacility, this._experiment.codeRequestCategory);
+                this._hideMultiplexGroupColumn = hide_property && hide_property.propertyValue && hide_property.propertyValue === 'Y';
+            });
         }
 
         if (!this.onChange_numberOfSamplesSubscription) {
@@ -153,7 +157,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
         if (!this.onChange_organismSubscription) {
             this.onChange_organismSubscription = this._experiment.onChange_organism.subscribe((value) => {
                 if (value && this.samplesGridApi) {
-                    this.changeOrganism();
+                    this.changeOrganism(value);
                     this.requireReconfirmation();
                 }
             });
@@ -229,14 +233,16 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 this.createColumnsBasedOnState(state);
                 this.assignRowDataBasedOnState(state);
 
-                if (this.showCcCheckbox
-                    && (this._state === TabSamplesIlluminaComponent.STATE_EDIT
-                        || this._state === TabSamplesIlluminaComponent.STATE_VIEW)) {
-
+                if (this.showCcCheckbox) {
                     setTimeout(() => {
                         if (this.ccCheckbox) {
-                            this.ccCheckbox.checked = true;
-                            this.toggleCC({ checked: true });
+                            if(this._experiment.hasCCNumber === "Y") {
+                                this.ccCheckbox.checked = true;
+                                this.toggleCC({ checked: true });
+                            } else {
+                                this.ccCheckbox.checked = false;
+                                this.toggleCC({ checked: false });
+                            }
                         }
                     });
                 }
@@ -273,11 +279,14 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     public get usingMultiplexGroupGroups(): boolean {
         return this._experiment
-            && this._experiment.requestCategory
+            && this._experiment.isExternal !== 'Y'
             && this._experiment.requestCategory.isIlluminaType
-            && this._experiment.requestCategory.isIlluminaType === 'Y'
-            && this._experiment.isExternal !== 'Y';
+            && this._experiment.requestCategory.isIlluminaType === 'Y';
     };
+
+    public get hideMultiplexGroupColumn(): boolean {
+        return this._hideMultiplexGroupColumn;
+    }
 
     public get showConcentrationUnitColumn(): boolean {
         return !this.usingMultiplexGroupGroups;
@@ -288,15 +297,18 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public get showCcCheckbox(): boolean {
-        let search1: any = this.propertyService.getProperty("bst_linkage_supported");
-        let search2: any = this.propertyService.getProperty("can_access_bstx");
+        if (this._state === this.STATE_VIEW) {
+            return false;
+        }
 
-        return this._experiment
-            && this._experiment.requestCategory
-            && this._experiment.requestCategory.isIlluminaType
-            && this._experiment.requestCategory.isIlluminaType === 'N'
-            && search1 && search1.propertyValue
-            && search2 && search2.propertyValue;
+        if (this.experiment && this.experiment.isExternal === "Y") {
+            return false;
+        }
+
+        let isBSTLinkageSupported: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_BST_LINKAGE_SUPPORTED);
+        let canAccessBSTX: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_ACCESS_BSTX);
+
+        return isBSTLinkageSupported && canAccessBSTX;
     }
 
     public get showNucleicAcidExtractionMethod(): boolean {
@@ -377,10 +389,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public get showLinkToCCNumber(): boolean {
-        return this._experiment
-            && this._experiment.requestCategory
-            && this._experiment.requestCategory.isIlluminaType
-            && this._experiment.requestCategory.isIlluminaType === 'N';
+        return this._experiment && this._experiment.hasCCNumber === 'Y';
     }
 
     public get showDescription(): boolean {
@@ -390,11 +399,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
             && this._experiment.requestCategory.isIlluminaType === 'N';
     }
 
+
     public context: any = this;
 
     private _experiment: Experiment;
 
     private _barCodes: any[] = [];
+
+    private _hideMultiplexGroupColumn: boolean = false;
+    private _defaultMultiplexGroupValue: string;
 
     public _state: string = TabSamplesIlluminaComponent.STATE_NEW;
 
@@ -407,6 +420,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
     private onChange_selectedProtocolSubscription: Subscription;
     private onChange_codeBioanalyzerChipTypeSubscription: Subscription;
     private onChange_idSampleSourceSubscription: Subscription;
+    private onChange_codeRequestCategorySubscription: Subscription;
 
     public static readonly ANNOTATION_ATTRIBUTE_NAME_PREFIX :string = "ANNOT";
 
@@ -500,7 +514,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             sortOrder: 5
         });
 
-        if (this.usingMultiplexGroupGroups) {
+        if (this.usingMultiplexGroupGroups && !this.hideMultiplexGroupColumn) {
             temp.push({
                 headerName: "Multiplex Group",
                 editable: true,
@@ -644,11 +658,11 @@ export class TabSamplesIlluminaComponent implements OnInit {
         if (this.usingMultiplexGroupGroups) {
             temp.push({
                 headerName: "# Seq Lanes",
-                field: "numberSequencingLanes",
+                field: this.isAmendState ? "sequenceLaneCount" : "numberSequencingLanes",
                 width: 6.5 * this.emToPxConversionRate,
                 minWidth: 5 * this.emToPxConversionRate,
                 maxWidth: 8 * this.emToPxConversionRate,
-                editable: true,
+                editable: !this.isAmendState,
                 cellRendererFramework: TextAlignRightMiddleRenderer,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
                 showFillButton: true,
@@ -657,6 +671,27 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 cellStyle: {color: 'black', 'background-color': 'LightGreen'},
                 sortOrder: 200
             });
+
+            if (this.isAmendState) {
+                temp.push({
+                    headerName: "Addtl # Seq Lanes",
+                    field: "numberSequencingLanes",
+                    width: 6.5 * this.emToPxConversionRate,
+                    minWidth: 5 * this.emToPxConversionRate,
+                    maxWidth: 8 * this.emToPxConversionRate,
+                    editable: true,
+                    cellRendererFramework: TextAlignRightMiddleRenderer,
+                    cellEditorFramework: TextAlignLeftMiddleEditor,
+                    showFillButton: true,
+                    fillGroupAttribute: 'frontEndGridGroup',
+                    headerTooltip: "This is the number of times (0 or greater) that you want to sequence this sample again.",
+                    validators: [Validators.required],
+                    errorNameErrorMessageMap: [
+                        {errorName: 'required', errorMessage: 'Addtl # Seq Lanes required'},
+                    ],
+                    sortOrder: 200
+                });
+            }
         }
 
         if (this._experiment
@@ -682,71 +717,74 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 ],
                 sortOrder: 300
             });
-            temp.push({
-                headerName: "Index Tag Sequence A",
-                field: "barcodeSequence",
-                width:    7.5 * this.emToPxConversionRate,
-                minWidth: 6.5 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: false,
-                sortOrder: 305
-            });
 
-            let permittedBarcodes: any[] = [];
-
-            if (this._experiment && this._experiment.samples && this._experiment.samples.length > 0) {
-                permittedBarcodes = BarcodeSelectEditor.getPermittedBarcodes('B', this._experiment.samples[0].idSeqLibProtocol, this.dictionaryService);
-            }
-
-            if (permittedBarcodes && Array.isArray(permittedBarcodes) && permittedBarcodes.length > 0) {
+            if (!this.isAmendState) {
                 temp.push({
-                    headerName: "Index Tag B",
-                    editable: true,
-                    width:    12 * this.emToPxConversionRate,
-                    minWidth: 12 * this.emToPxConversionRate,
-                    maxWidth: 20 * this.emToPxConversionRate,
-                    field: "idOligoBarcodeB",
-                    cellRendererFramework: SelectRenderer,
-                    cellEditorFramework: BarcodeSelectEditor,
-                    selectOptions: this._barCodes,
-                    selectOptionsDisplayField: "display",
-                    selectOptionsValueField: "idOligoBarcodeB",
-                    indexTagLetter: 'B',
-                    validators: [Validators.required],
-                    errorNameErrorMessageMap: [
-                        {errorName: 'required', errorMessage: 'Index Tag B required'}
-                    ],
-                    sortOrder: 310
+                    headerName: "Index Tag Sequence A",
+                    field: "barcodeSequence",
+                    width:    7.5 * this.emToPxConversionRate,
+                    minWidth: 6.5 * this.emToPxConversionRate,
+                    maxWidth: 9 * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: false,
+                    sortOrder: 305
                 });
-            } else {
+
+                let permittedBarcodes: any[] = [];
+
+                if (this._experiment && this._experiment.samples && this._experiment.samples.length > 0) {
+                    permittedBarcodes = BarcodeSelectEditor.getPermittedBarcodes('B', this._experiment.samples[0].idSeqLibProtocol, this.dictionaryService);
+                }
+
+                if (permittedBarcodes && Array.isArray(permittedBarcodes) && permittedBarcodes.length > 0) {
+                    temp.push({
+                        headerName: "Index Tag B",
+                        editable: true,
+                        width:    12 * this.emToPxConversionRate,
+                        minWidth: 12 * this.emToPxConversionRate,
+                        maxWidth: 20 * this.emToPxConversionRate,
+                        field: "idOligoBarcodeB",
+                        cellRendererFramework: SelectRenderer,
+                        cellEditorFramework: BarcodeSelectEditor,
+                        selectOptions: this._barCodes,
+                        selectOptionsDisplayField: "display",
+                        selectOptionsValueField: "idOligoBarcodeB",
+                        indexTagLetter: 'B',
+                        validators: [Validators.required],
+                        errorNameErrorMessageMap: [
+                            {errorName: 'required', errorMessage: 'Index Tag B required'}
+                        ],
+                        sortOrder: 310
+                    });
+                } else {
+                    temp.push({
+                        headerName: "Index Tag B",
+                        editable: true,
+                        width:    12 * this.emToPxConversionRate,
+                        minWidth: 12 * this.emToPxConversionRate,
+                        maxWidth: 20 * this.emToPxConversionRate,
+                        field: "idOligoBarcodeB",
+                        cellRendererFramework: SelectRenderer,
+                        cellEditorFramework: BarcodeSelectEditor,
+                        selectOptions: this._barCodes,
+                        selectOptionsDisplayField: "display",
+                        selectOptionsValueField: "idOligoBarcodeB",
+                        indexTagLetter: 'B',
+                        sortOrder: 310
+                    });
+                }
+
                 temp.push({
-                    headerName: "Index Tag B",
-                    editable: true,
-                    width:    12 * this.emToPxConversionRate,
-                    minWidth: 12 * this.emToPxConversionRate,
-                    maxWidth: 20 * this.emToPxConversionRate,
-                    field: "idOligoBarcodeB",
-                    cellRendererFramework: SelectRenderer,
-                    cellEditorFramework: BarcodeSelectEditor,
-                    selectOptions: this._barCodes,
-                    selectOptionsDisplayField: "display",
-                    selectOptionsValueField: "idOligoBarcodeB",
-                    indexTagLetter: 'B',
-                    sortOrder: 310
+                    headerName: "Index Tag Sequence B",
+                    field: "barcodeSequenceB",
+                    width:    7 * this.emToPxConversionRate,
+                    minWidth: 6.5 * this.emToPxConversionRate,
+                    maxWidth: 9 * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: false,
+                    sortOrder: 315
                 });
             }
-
-            temp.push({
-                headerName: "Index Tag Sequence B",
-                field: "barcodeSequenceB",
-                width:    7 * this.emToPxConversionRate,
-                minWidth: 6.5 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: false,
-                sortOrder: 315
-            });
         }
 
         return temp;
@@ -768,7 +806,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             pinned: "left"
         });
 
-        if (this.usingMultiplexGroupGroups) {
+        if (this.usingMultiplexGroupGroups && !this.hideMultiplexGroupColumn) {
             temp.push({
                 headerName: "Multiplex Group",
                 editable: true,
@@ -1236,22 +1274,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
             }
         }
 
-        temp.push({
-            headerName: "CC Number",
-            field: "ccNumber",
-            width:    9 * this.emToPxConversionRate,
-            minWidth: 8 * this.emToPxConversionRate,
-            maxWidth: 10 * this.emToPxConversionRate,
-            suppressSizeToFit: true,
-            editable: false,
-            cellRendererFramework: TextAlignLeftMiddleRenderer,
-            cellEditorFramework: TextAlignLeftMiddleEditor,
-            showFillButton: true,
-            fillGroupAttribute: 'frontEndGridGroup',
-            hide: this.hideCCNum,
-            ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
-            sortOrder: 140
-        });
 
         // This is used as the sortOrder basis for the sample annotations.
         this._tabIndexToInsertAnnotations = 150;
@@ -1435,20 +1457,22 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
         this.form = this.fb.group({});
 
-        this.form.addControl(
-            'invalidateWithoutSamples',
-            new FormControl('', (control: AbstractControl) => {
-                if (control
-                    && control.parent
-                    && control.parent.controls
-                    && control.parent.controls['gridFormGroup']
-                    && control.parent.controls['gridFormGroup'].controls) {
-                    return null;
-                } else {
-                    return { message: 'Grid is not populated yet' };
-                }
-            })
-        );
+        if (!this.isAmendState) {
+            this.form.addControl(
+                'invalidateWithoutSamples',
+                new FormControl('', (control: AbstractControl) => {
+                    if (control
+                        && control.parent
+                        && control.parent.controls
+                        && control.parent.controls['gridFormGroup']
+                        && control.parent.controls['gridFormGroup'].controls) {
+                        return null;
+                    } else {
+                        return { message: 'Grid is not populated yet' };
+                    }
+                })
+            );
+        }
 
         this.samplesGridColumnDefs = this.defaultSampleColumnDefinitions;
         this.nodeChildDetails = this.getItemNodeChildDetails;
@@ -1617,17 +1641,18 @@ export class TabSamplesIlluminaComponent implements OnInit {
         this.confirm();
     }
 
-    private rebuildColumnDefinitions(): void {
-        this.columnProperties = [];
-        this.columnProperties = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.COLUMN_PROPERTIES);
-
-        if (this.columnProperties) {
-            this.columnProperties = this.columnProperties.filter((a) => {
-                return this._experiment && a.codeRequestCategory === this._experiment.codeRequestCategory;
+    private getColumnProperties(): void {
+        if (this._experiment && this._experiment.codeRequestCategory) {
+            this.columnProperties = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.COLUMN_PROPERTIES).filter((cp) => {
+                return this._experiment && cp.codeRequestCategory === this._experiment.codeRequestCategory;
             });
         } else {
             this.columnProperties = [];
         }
+    }
+
+    private rebuildColumnDefinitions(): void {
+        this.getColumnProperties();
 
         let temp: any[]  = this.defaultSampleColumnDefinitions;
 
@@ -1703,11 +1728,12 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
     }
 
-    private changeOrganism() {
+    private changeOrganism(value: any) {
+        for (let sample of this._experiment.samples) {
+            sample.idOrganism = value && value.idOrganism ? value.idOrganism : '';
+        }
+
         if (this.samplesGridApi) {
-            // this.samplesGridApi.forEachNode((node: any) => {
-            //     node.data.idOrganism = this._experiment.organism.idOrganism;
-            // });
             this.samplesGridApi.redrawRows();
         }
     }
@@ -1735,6 +1761,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         let idSeqRunType: string = '';
         let protocol: any = '';
         let numberSequencingLanes: string = this._experiment.isRapidMode === 'Y' ? '2' : '1';
+        if (this.isAmendState) {
+            numberSequencingLanes = "";
+        }
 
         if (this.gnomexService.submitInternalExperiment() && this._experiment.sampleType) {
             idSampleType = this._experiment.sampleType.idSampleType;
@@ -1783,7 +1812,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
         if (this._experiment && this._experiment.numberOfSamples) {
 
-            Sample.createNewSamplesForExperiment(this._experiment, this.dictionaryService, this.gnomexService);
+            Sample.createNewSamplesForExperiment(this._experiment, this.dictionaryService, this.propertyService, this.gnomexService);
 
             this.createColumnsBasedOnState(this._state);
             this.assignRowDataBasedOnState(this._state); // REMEMBER
@@ -1856,7 +1885,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             this.samplesGridApi.redrawRows();
         }
         if (this.ccCheckbox) {
-            this.ccCheckbox.checked = false;
+            this.toggleCC(this.ccCheckbox);
         }
 
         return temp;
@@ -1928,6 +1957,12 @@ export class TabSamplesIlluminaComponent implements OnInit {
             if (temp.length > 0) {
                 this.gridColumnApi.setColumnVisible(temp[0].colId, event.checked);
                 this.ccNumberIsCurrentlyHidden = !event.checked;
+                if(!event.checked) {
+                    this._experiment.hasCCNumber = "N";
+                    for (let sample of this._experiment.samples) {
+                        sample.ccNumber = "";
+                    }
+                }
             }
 
             if (this.form && this.form.get('invalidateWithoutSamples')) {
@@ -1937,7 +1972,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public onClickCCNumberLink(event: any): void {
-        console.log("Hello World");
+        //console.log("Hello World");
 
         let search: any = this.propertyService.getProperty("gnomex_linkage_bst_url");
         let ccNum: string = '';
@@ -2020,9 +2055,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
         config.panelClass = 'no-padding-dialog';
         config.data = data;
 
-        let dialogRef = this.dialog.open(UploadSampleSheetComponent, config);
-
-        dialogRef.afterClosed().subscribe((result) => {
+        this.dialogService.genericDialogContainer(UploadSampleSheetComponent, "Upload Sample Sheet", null, config,
+            {actions: [{type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}]}).subscribe((result: any) => {
             if (result && Array.isArray(result)) {
                 this._experiment.numberOfSamples = '' + result.length;
             }
@@ -2038,8 +2072,24 @@ export class TabSamplesIlluminaComponent implements OnInit {
             state = "new";
         }
 
-        if (this._lab) {
-            this.sampleUploadService.downloadSampleSheet(this._lab.name, state, this.samplesGridColumnDefs, this._experiment);
+        if (this._experiment) {
+            if (this._lab) {
+                this.sampleUploadService.downloadSampleSheet(this._lab.name, state, this.samplesGridColumnDefs, this._experiment);
+            } else if (this._experiment.lab) {
+                this.sampleUploadService.downloadSampleSheet(this._experiment.lab.name, state, this.samplesGridColumnDefs, this._experiment);
+            } else if (this._experiment.idLab && this.gnomexService.labList && Array.isArray(this.gnomexService.labList)) {
+                let selectionSet = this.gnomexService.labList.filter((lab) => {
+                    return lab.idLab && lab.idLab === this._experiment.idLab;
+                });
+
+                if (selectionSet && Array.isArray(selectionSet) && selectionSet.length > 0) {
+                    this.sampleUploadService.downloadSampleSheet(selectionSet[0].name, state, this.samplesGridColumnDefs, this._experiment);
+                } else {
+                    this.sampleUploadService.downloadSampleSheet("Unknown Lab", state, this.samplesGridColumnDefs, this._experiment);
+                }
+            } else {
+                this.sampleUploadService.downloadSampleSheet("Unknown Lab", state, this.samplesGridColumnDefs, this._experiment);
+            }
         }
     }
 

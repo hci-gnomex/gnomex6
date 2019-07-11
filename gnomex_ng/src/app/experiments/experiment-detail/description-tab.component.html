@@ -5,8 +5,8 @@
         </div>
         <div class="flex-grow">
             <mat-form-field class="field-width">
-                <input matInput type="text" formControlName="expName">
-                <mat-error *ngIf="descriptionForm.get('expName').hasError('maxlength')">
+                <input matInput type="text" formControlName="name">
+                <mat-error *ngIf="descriptionForm.get('name').hasError('maxlength')">
                     Experiment Name can be at most {{this.constantsService.MAX_LENGTH_200}}
                     characters
                 </mat-error>
@@ -30,26 +30,26 @@
     <div class="full-width flex-container-col padded" *ngIf="showProjectDesc">
         <label class="gx-label" for="projectDescEditor">Project Description</label>
         <angular-editor #projectDescEditorRef id="projectDescEditor"
-                        formControlName="projectDesc"
+                        formControlName="projectDescription"
                         [config]="projectDescEditorConfig">
         </angular-editor>
-        <mat-error *ngIf="descriptionForm.get('projectDesc').hasError('maxlength')">
+        <mat-error *ngIf="descriptionForm.get('projectDescription').hasError('maxlength')">
             Project Description can be at most {{this.constantsService.MAX_LENGTH_4000}} characters
             including HTML code formatting and styles. Character count: {{descriptionForm.get(
-            'projectDesc').value.toString().length}}
+            'projectDescription').value.toString().length}}
         </mat-error>
     </div>
 
-    <div class="full-width flex-container-col padded" *ngIf="showNotesForCoreFacility">
+    <div class="full-width flex-container-col padded" *ngIf="showCorePrepInstructions">
         <label class="gx-label" for="notesEditor">Notes for Core Facility</label>
         <angular-editor #notesEditorRef id="notesEditor"
-                        formControlName="notesForCoreFacility"
+                        formControlName="corePrepInstructions"
                         [config]="notesEditorConfig">
         </angular-editor>
-        <mat-error *ngIf="descriptionForm.get('notesForCoreFacility').hasError('maxlength')">
+        <mat-error *ngIf="descriptionForm.get('corePrepInstructions').hasError('maxlength')">
             Summary can be at most {{this.constantsService.MAX_LENGTH_5000}} characters including
             HTML code formatting and styles. Character count: {{descriptionForm.get(
-            'notesForCoreFacility').value.toString().length}}
+            'corePrepInstructions').value.toString().length}}
         </mat-error>
     </div>
 

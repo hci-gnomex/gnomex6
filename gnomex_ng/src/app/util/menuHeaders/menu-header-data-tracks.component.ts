@@ -2,12 +2,11 @@ import {Component, EventEmitter, Inject, Input, OnInit, Output, SimpleChanges} f
 
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {NewGenomeBuildComponent} from "../new-genome-build.component";
-import {MatDialogRef, MatDialog, MatDialogConfig} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {NewOrganismComponent} from "../new-organism.component";
 import {NewDataTrackFolderComponent} from "../../datatracks/new-datatrackfolder.component";
-import {DialogsService} from "../popup/dialogs.service";
+import {DialogsService, DialogType} from "../popup/dialogs.service";
 import {DataTrackService} from "../../services/data-track.service";
-import {Response, URLSearchParams} from "@angular/http";
 import {NewDataTrackComponent} from "../../datatracks/new-datatrack.component";
 import {DeleteDataTrackComponent} from "../../datatracks/delete-datatrack.component";
 import {ConstantsService} from "../../services/constants.service";
@@ -19,6 +18,7 @@ import {HttpParams} from "@angular/common/http";
 import {Router} from "@angular/router";
 import {DictionaryService} from "../../services/dictionary.service";
 import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
+import {ActionType} from "../interfaces/generic-dialog-action.model";
 
 const DATATRACK = "DATATRACK";
 const GENOMEBUILD = "GENOMEBUILD";
@@ -35,6 +35,8 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     @Input() allActiveNodes: ITreeNode[];
     @Output() onDataTrackFolderCreated: EventEmitter<string> = new EventEmitter<string>();
     @Output() onDataTrackCreated: EventEmitter<string> = new EventEmitter<string>();
+    @Output() onGenomeBuildCreated: EventEmitter<string> = new EventEmitter<string>();
+    @Output() onOrganismCreated: EventEmitter<string> = new EventEmitter<string>();
 
     public newDTisDisabled: boolean = true;
     public newGenomeBuildisDisabled: boolean = true;
@@ -58,7 +60,6 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     constructor(private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dialogsService: DialogsService,
                 private dataTrackService: DataTrackService,
-                private dialog: MatDialog,
                 public constantsService: ConstantsService,
                 @Inject(DOCUMENT) private document: Document,
                 private router: Router,
@@ -114,14 +115,18 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     }
 
     public makeNewDataTrack(): void {
-        let dialogRef: MatDialogRef<NewDataTrackComponent> = this.dialog.open(NewDataTrackComponent, {
-            height: "23em",
-            width: "40em",
-            data: {
-                selectedItem: this.selectedNode
-            }
-        });
-        dialogRef.afterClosed().subscribe((result: any) => {
+        let title: string = "Add new data track to " + this.selectedNode.data.label;
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "40em";
+        config.height = "23em";
+        config.data = {
+            selectedItem: this.selectedNode
+        };
+        this.dialogsService.genericDialogContainer(NewDataTrackComponent, title, this.constantsService.ICON_DATATRACK, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
             if (result) {
                 this.onDataTrackCreated.emit(result);
             }
@@ -129,15 +134,20 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     }
 
     public makeNewFolder(): void {
-        let dialogRef: MatDialogRef<NewDataTrackFolderComponent> = this.dialog.open(NewDataTrackFolderComponent, {
-            height: "18em",
-            width: "40em",
-            data: {
-                selectedItem: this.selectedNode
-            }
-        });
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
+        let title = "Add new data track folder to " + this.selectedNode.data.label;
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "40em";
+        config.height = "18em";
+        config.data = {
+            selectedItem: this.selectedNode
+        };
+
+        this.dialogsService.genericDialogContainer(NewDataTrackFolderComponent, title, this.constantsService.ICON_FOLDER_GROUP, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+            if(result) {
                 this.onDataTrackFolderCreated.emit(result);
             }
         });
@@ -155,37 +165,42 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     }
 
     public deleteDataTrack(type: string, params:HttpParams): void {
-        if (type === DATATRACK) {
 
+        if (type === DATATRACK) {
+            this.dialogsService.startDefaultSpinnerDialog();
             this.dataTrackService.deleteDataTrack(params).subscribe((response: any) => {
                 this.router.navigateByUrl("/datatracks");
                 this.dataTrackService.refreshDatatracksList_fromBackend();
             }, (err:IGnomexErrorResponse) =>{
+                this.dialogsService.stopAllSpinnerDialogs();
             });
         } else if (type === DATATRACKFOLDER) {
-
+            this.dialogsService.startDefaultSpinnerDialog();
             this.dataTrackService.deleteDataTrackFolder(params).subscribe((response: any) => {
                 this.router.navigateByUrl("/datatracks");
                 this.dataTrackService.refreshDatatracksList_fromBackend();
             },(err:IGnomexErrorResponse) => {
+                this.dialogsService.stopAllSpinnerDialogs();
             });
         } else if (type === GENOMEBUILD) {
-
+            this.dialogsService.startDefaultSpinnerDialog();
             this.dataTrackService.deleteGenomeBuild(params).subscribe((response: any) => {
                 this.router.navigateByUrl("/datatracks");
                 this.dictionaryService.reloadAndRefresh(() => {
                     this.dataTrackService.refreshDatatracksList_fromBackend();
                 }, null, DictionaryService.GENOME_BUILD);
             },(err:IGnomexErrorResponse) =>{
+                this.dialogsService.stopAllSpinnerDialogs();
             });
         } else if (type === ORGANISM) {
-
+            this.dialogsService.startDefaultSpinnerDialog();
             this.dataTrackService.deleteOrganism(params).subscribe((response: any) => {
                 this.router.navigateByUrl("/datatracks");
                 this.dictionaryService.reloadAndRefresh(() => {
                     this.dataTrackService.refreshDatatracksList_fromBackend();
                 }, null, DictionaryService.ORGANISM);
             }, (err:IGnomexErrorResponse) =>{
+                this.dialogsService.stopAllSpinnerDialogs();
             });
         }
     }
@@ -197,13 +212,17 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         let params: HttpParams = new HttpParams();
 
         if (this.selectedNode.data.idDataTrack) {
-            let dialogRef: MatDialogRef<DeleteDataTrackComponent> = this.dialog.open(DeleteDataTrackComponent, {
-                height: "210px",
-                width: "300px",
-                data: {
-                    selectedItem: this.selectedNode
-                }
-            });
+            let config: MatDialogConfig = new MatDialogConfig();
+            config.height = "15em";
+            config.width = "35em";
+            config.data = {
+                selectedItem: this.selectedNode
+            };
+            this.dialogsService.genericDialogContainer(DeleteDataTrackComponent, "Confirm: Delete Data Track", this.selectedNode.data.icon, config,
+                {actions: [
+                        {type: ActionType.PRIMARY, name: "Yes", internalAction: "delete"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                    ]});
         } else {
             if (this.selectedNode.data.binomialName) {
                 if (this.selectedNode.data.GenomeBuild) {
@@ -237,6 +256,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                     level = "Confirm";
                     confirmString = "Remove genome build " + this.selectedNode.data.label + "?";
                     type = GENOMEBUILD;
+                    params = params.set("idGenomeBuild", this.selectedNode.data.idGenomeBuild);
                     params = params.set("idGenomeBuild", this.selectedNode.data.idGenomeBuild);
                 }
             }
@@ -283,43 +303,46 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         }
 
         if (itemsToDownload.length < 1) {
-            this.dialogsService.alert("Please select the data tracks or folders to download");
+            this.dialogsService.alert("Please select the data tracks or folders to download", null, DialogType.FAILED);
             return;
         }
 
         this.dataTrackService.getDownloadEstimatedSize(downloadKeys).subscribe((result: any) => {
             if (result && result.size) {
                 if (result.size === "0") {
-                    this.dialogsService.alert("No data files exist for the selected item(s)");
+                    this.dialogsService.alert("No data files exist for the selected item(s)", "Data Not Found");
                 } else {
                     let config: MatDialogConfig = new MatDialogConfig();
                     config.data = {
                         estimatedDownloadSize: result.size,
                         uncompressedDownloadSize: result.uncompressedSize
                     };
-                    let dialogRef: MatDialogRef<DownloadPickerComponent> = this.dialog.open(DownloadPickerComponent, config);
-                    dialogRef.afterClosed().subscribe((choice: any) => {
-                        if (choice) {
-                            if (choice === DownloadPickerComponent.DOWNLOAD_NORMAL) {
-                                let downloadParams: HttpParams = new HttpParams()
-                                    .set("mode", "zip");
-                                let progressWindowConfig: MatDialogConfig = new MatDialogConfig();
-                                progressWindowConfig.data = {
-                                    url: "DownloadDataTrackFileServlet.gx",
-                                    estimatedDownloadSize: parseInt(result.size),
-                                    params: downloadParams,
-                                    suggestedFilename: "gnomex-datatracks",
-                                    fileType: ".zip"
-                                };
-                                progressWindowConfig.disableClose = true;
-                                this.dialog.open(DownloadProgressComponent, progressWindowConfig);
-                            } else if (choice === DownloadPickerComponent.DOWNLOAD_FDT) {
-                                let url: string = this.document.location.href;
-                                url = url.substring(0, url.indexOf("/gnomex") + 7);
-                                url += "/FastDataTransferDownloadDataTrackServlet.gx";
-                                window.open(url, "_blank");
+                    this.dialogsService.genericDialogContainer(DownloadPickerComponent, "Confirm Download", null, config)
+                        .subscribe((choice: any) => {
+                            if (choice) {
+                                if (choice === DownloadPickerComponent.DOWNLOAD_NORMAL) {
+                                    let downloadParams: HttpParams = new HttpParams()
+                                        .set("mode", "zip");
+                                    let progressWindowConfig: MatDialogConfig = new MatDialogConfig();
+                                    progressWindowConfig.data = {
+                                        url: "DownloadDataTrackFileServlet.gx",
+                                        estimatedDownloadSize: parseInt(result.size),
+                                        params: downloadParams,
+                                        suggestedFilename: "gnomex-datatracks",
+                                        fileType: ".zip"
+                                    };
+                                    progressWindowConfig.disableClose = true;
+                                    this.dialogsService.genericDialogContainer(DownloadProgressComponent, null, null, progressWindowConfig,
+                                        {actions: [
+                                                {type: ActionType.SECONDARY, name: "Cancel", internalAction: "close"}
+                                            ]});
+                                } else if (choice === DownloadPickerComponent.DOWNLOAD_FDT) {
+                                    let url: string = this.document.location.href;
+                                    url = url.substring(0, url.indexOf("/gnomex") + 7);
+                                    url += "/FastDataTransferDownloadDataTrackServlet.gx";
+                                    window.open(url, "_blank");
+                                }
                             }
-                        }
                     });
                 }
             }
@@ -333,39 +356,55 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         if (result && result.message) {
             message = ": " + result.message;
         }
-        this.dialogsService.alert("An error occurred while " + action + message, null);
+        this.dialogsService.error("An error occurred while " + action + message);
     }
 
     private getChildDataTracks(item: any, children: any[]): void {
-        for (let child of item.items) {
-            if (child.idDataTrack) {
-                children.push(child);
-            } else {
-                this.getChildDataTracks(child, children);
+        if(item.items) {
+            for (let child of item.items) {
+                if (child.idDataTrack) {
+                    children.push(child);
+                } else {
+                    this.getChildDataTracks(child, children);
+                }
             }
         }
     }
 
     private makeNewGenomeBuild(): void {
-        let dialogRef: MatDialogRef<NewGenomeBuildComponent> = this.dialog.open(NewGenomeBuildComponent, {
-            height: "24em",
-            width: "30em",
-            data: {
-                selectedItem: this.selectedNode
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = "35em";
+        configuration.autoFocus = false;
+        configuration.data = {
+            selectedItem: this.selectedNode
+        };
+
+        this.dialogsService.genericDialogContainer(NewGenomeBuildComponent, "New Genome Build", this.constantsService.ICON_GENOME_BUILD, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+            if(result) {
+                this.onGenomeBuildCreated.emit(result);
             }
         });
     }
 
     private makeNewOrganism(): void {
-        let dialogRef: MatDialogRef<NewOrganismComponent> = this.dialog.open(NewOrganismComponent, {
-            height: "24em",
-            width: "30em",
-        });
-        dialogRef.afterClosed().subscribe((result: any) => {
-            if (result) {
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = "35em";
+
+        this.dialogsService.genericDialogContainer(NewOrganismComponent, "New Species", this.constantsService.ICON_ORGANISM, configuration,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+            if(result) {
                 this.dictionaryService.reloadAndRefresh(() => {
                     this.dataTrackService.refreshDatatracksList_fromBackend();
                 }, null, DictionaryService.ORGANISM);
+                this.onGenomeBuildCreated.emit(result);
+                this.dialogsService.stopAllSpinnerDialogs();
             }
         });
     }

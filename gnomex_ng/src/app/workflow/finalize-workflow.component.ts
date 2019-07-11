@@ -1,13 +1,12 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
+import {AfterViewInit, Component, OnInit} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
-import { URLSearchParams } from "@angular/http";
-import {MatAutocomplete, MatDialog, MatOption} from "@angular/material";
+import {MatDialog} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
-import {GridOptions, GridApi} from "ag-grid-community";
+import {GridApi, GridOptions} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
-import {DialogsService} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
 import {SeqlaneSelectEditor} from "../util/grid-editors/seqlane-select.editor";
@@ -20,7 +19,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 @Component({
     selector: 'finalizeFlowCell-workflow',
     templateUrl: 'finalizeFlowCell-workflow.html',
-    styles: [`        
+    styles: [`
         .flex-row-container-itailic {
             display: flex;
             flex-direction: row;
@@ -529,11 +528,11 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             let validIndexTags = this.validateIndexTags();
 
             if (this.protocolFC.value === "") {
-                this.dialogsService.confirm("Please choose a sequencing protocol for the flow cell.", null);
+                this.dialogsService.alert("Please choose a sequencing protocol for the flow cell.", null, DialogType.FAILED);
                 return;
             }
             if (validProtoAndLanes.errorMessage) {
-                this.dialogsService.confirm(validProtoAndLanes.errorMessage, null);
+                this.dialogsService.alert(validProtoAndLanes.errorMessage, null, DialogType.VALIDATION);
                 return;
             }
             if (validProtoAndLanes.warningMessage) {
@@ -546,7 +545,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
                 warningMessage += validIndexTags.warningMessage;
             }
             if (warningMessage) {
-                this.dialogsService.confirm(warningMessage + " Continue saving?", " ").subscribe((answer: boolean) => {
+                this.dialogsService.confirm(warningMessage + " Continue saving?").subscribe((answer: boolean) => {
                     if (answer) {
                         this.saveWorkItems();
                     }
@@ -600,7 +599,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             if (!response.flowCellNumber) {
                 response.flowCellNumber = "";
             }
-            this.dialogsService.confirm("Flowcell " + response.flowCellNumber + " created", null);
+            this.dialogsService.alert("Flowcell " + response.flowCellNumber + " created", null, DialogType.SUCCESS);
             this.assmItemList = [];
             this.initialize();
 
@@ -623,7 +622,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     deleteFlowCell(event) {
-        this.dialogsService.confirm( "Delete Flow Cell "+this.selectedFlowCell[0].number, "Continue?").subscribe((answer: boolean) => {
+        this.dialogsService.confirm( "Delete Flow Cell "+this.selectedFlowCell[0].number + ". <br> Continue?").subscribe((answer: boolean) => {
             if (answer) {
                 this.delete();
             }
@@ -641,7 +640,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
                 if (!response.flowCellNumber) {
                     response.flowCellNumber = "";
                 }
-                this.dialogsService.confirm("Flowcell " + response.flowCellNumber + " deleted", null);
+                this.dialogsService.alert("Flowcell " + response.flowCellNumber + " deleted", null, DialogType.SUCCESS);
                 this.assmItemList = [];
                 this.initialize();
             } else {
@@ -649,7 +648,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
                 if (response && response.message) {
                     message = ": " + response.message;
                 }
-                this.dialogsService.confirm("An error occurred while deleting" + message, null);
+                this.dialogsService.error("An error occurred while deleting" + message);
             }
             this.showSpinner = false;
         });
@@ -724,7 +723,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
 
         }
         if (this.originalProtocol && this.protocolFC.value.idNumberSequencingCyclesAllowed !== this.originalProtocol.value) {
-            this.dialogsService.confirm("Changing the protocol for the flow cell will change the protocol for all the samples it contains.", null);
+            this.dialogsService.alert("Changing the protocol for the flow cell will change the protocol for all the samples it contains.", null, DialogType.WARNING);
         }
         this.flowCellRunFolder = runFolder;
     }

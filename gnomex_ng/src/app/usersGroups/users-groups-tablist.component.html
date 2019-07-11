@@ -58,22 +58,15 @@
                                                 {{panelOpenState ? 'less' : 'more'}}
                                             </mat-panel-title>
                                         </mat-expansion-panel-header>
-                                        <mat-form-field>
-                                            <mat-select placeholder="Core facility" (selectionChange)="searchCoreFacility($event)">
-                                                <mat-option *ngFor="let core of this.myCoreFacilitiesIManage" [value]="core.value">
-                                                    {{core.facilityName}}
-                                                </mat-option>
-                                            </mat-select>
-                                        </mat-form-field>
+                                        <custom-combo-box placeholder="Core facility" (optionSelected)="searchCoreFacility($event)"
+                                                          displayField="facilityName" [options]="myCoreFacilitiesIManage"
+                                                          valueField="value">
+                                        </custom-combo-box>
                                         <mat-checkbox [(ngModel)]="externalGroup" (change)="onExternalGroupChange($event)">External</mat-checkbox>
-                                        <mat-form-field>
-                                            <mat-select placeholder="Institution" (selectionChange)="searchInstitution($event)">
-                                                <mat-option>None</mat-option>
-                                                <mat-option *ngFor="let institute of this.institutions" [value]="institute.value">
-                                                    {{institute.institution}}
-                                                </mat-option>
-                                            </mat-select>
-                                        </mat-form-field>
+                                        <custom-combo-box placeholder="Institution" (optionSelected)="searchInstitution($event)"
+                                                          displayField="institution" [options]="institutions"
+                                                          valueField="value">
+                                        </custom-combo-box>
                                     </mat-expansion-panel>
                                 </mat-accordion>
                             </div>
@@ -126,128 +119,146 @@
                         <as-split direction="vertical">
                             <as-split-area size="75" class="foreground">
                                 <!--user detail-->
-                                <div class="full-height full-width foreground flex-container-col">
-                                    <form class="full-height full-width flex-container-col" [formGroup]="userForm">
-                                        <div class="reserve-height flex-container-row align-center padded">
-                                            <mat-form-field class="formField">
+                                <form class="full-height full-width foreground flex-container-col" [formGroup]="userForm">
+                                    <div class="reserve-height flex-container-row align-center padded">
+                                        <div class="flex-grow min-width padded">
+                                            <mat-form-field class="full-width">
                                                 <input matInput formControlName="firstName" placeholder="First name">
                                                 <mat-error *ngIf="userForm.controls['firstName'].hasError('required')">
                                                     First name is <strong>required</strong>
                                                 </mat-error>
                                             </mat-form-field>
-                                            <mat-form-field class="formField">
+                                        </div>
+                                        <div class="flex-grow min-width padded">
+                                            <mat-form-field class="full-width">
                                                 <input matInput formControlName="lastName" placeholder="Last Name">
                                                 <mat-error *ngIf="userForm.controls['lastName'].hasError('required')">
                                                     Last name is <strong>required</strong>
                                                 </mat-error>
                                             </mat-form-field>
-                                            <mat-checkbox formControlName="isActive" (change)="onIsActiveChange($event)">User is Active</mat-checkbox>
                                         </div>
-                                        <div class="reserve-height flex-container-row align-center padded">
-                                            <mat-form-field class="formField">
+                                        <div class="flex-grow min-width padded">
+                                            <mat-checkbox formControlName="isActive" (change)="onIsActiveChange($event)">
+                                                User is Active
+                                            </mat-checkbox>
+                                        </div>
+                                    </div>
+                                    <div class="reserve-height flex-container-row align-center padded">
+                                        <div class="flex-grow min-width padded">
+                                            <mat-form-field class="full-width">
                                                 <input matInput formControlName="phone" placeholder="Phone">
                                             </mat-form-field>
-                                            <mat-form-field class="formField">
+                                        </div>
+                                        <div class="flex-grow min-width padded">
+                                            <mat-form-field class="full-width">
                                                 <input matInput formControlName="email" placeholder="Email">
                                                 <mat-error *ngIf="this.emailFC.hasError('required')">Required</mat-error>
                                                 <mat-error *ngIf="this.emailFC.hasError('email') && !this.emailFC.hasError('required')">Valid Email Required</mat-error>
                                             </mat-form-field>
-                                            <mat-form-field class="formField">
+                                        </div>
+                                        <div class="flex-grow min-width padded">
+                                            <mat-form-field class="full-width">
                                                 <input matInput formControlName="ucscUrl" placeholder="UCSC Url">
                                             </mat-form-field>
                                         </div>
-                                        <div class="reserve-height flex-container-row align-center padded">
-                                            <mat-form-field class="formField">
+                                    </div>
+                                    <div class="reserve-height flex-container-row align-center padded">
+                                        <div class="flex-grow min-width padded">
+                                            <mat-form-field class="full-width">
                                                 <input matInput formControlName="institute" placeholder="Institution (Optional)">
                                             </mat-form-field>
-                                            <mat-form-field class="formField">
+                                        </div>
+                                        <div class="flex-grow min-width padded">
+                                            <mat-form-field class="full-width">
                                                 <input matInput formControlName="department" placeholder="Department (Optional)">
                                             </mat-form-field>
                                         </div>
-                                        <div class="full-width flex-grow">
-                                            <div class="full-height full-width flex-container-row padded-left-right-bottom">
-                                                <div class="foreground border-padding">
-                                                    <!--need flex row container-->
-                                                    <div class="full-width flex-container-row">
-                                                        <div class="full-height flex-grow">
-                                                            <div class="full-height foreground flex-container-col">
-                                                                <div class="large-margin-right">
-                                                                    <mat-radio-group class="flex-container-row" formControlName="userType" (change)="onUserTypeChange($event)">
-                                                                        <mat-radio-button [value]="USER_TYPE_UNIVERSITY">University User</mat-radio-button>
-                                                                        <mat-radio-button class="large-margin-left" [value]="USER_TYPE_EXTERNAL">External User</mat-radio-button>
-                                                                    </mat-radio-group>
-                                                                </div>
-                                                                <div *ngIf="usertypeFC.value===USER_TYPE_UNIVERSITY" class="full-width">
+                                        <div class="flex-grow min-width padded">
+                                        </div>
+                                    </div>
+                                    <div class="full-width flex-grow">
+                                        <div class="full-height full-width flex-container-row padded-left-right-bottom">
+                                            <div class="foreground border-padding">
+                                                <!--need flex row container-->
+                                                <div class="full-width flex-container-row">
+                                                    <div class="full-height flex-grow">
+                                                        <div class="full-height foreground flex-container-col">
+                                                            <div class="large-margin-right">
+                                                                <mat-radio-group class="flex-container-row" formControlName="userType" (change)="onUserTypeChange($event)">
+                                                                    <mat-radio-button [value]="USER_TYPE_UNIVERSITY">University User</mat-radio-button>
+                                                                    <mat-radio-button class="large-margin-left" [value]="USER_TYPE_EXTERNAL">External User</mat-radio-button>
+                                                                </mat-radio-group>
+                                                            </div>
+                                                            <div *ngIf="usertypeFC.value===USER_TYPE_UNIVERSITY" class="full-width">
+                                                                <mat-form-field class="formField">
+                                                                    <input matInput formControlName="uNid" placeholder="uNID">
+                                                                    <mat-error *ngIf="userForm.controls['uNid'].hasError('required') || userForm.controls['uNid'].hasError('pattern')">Invalid uNID</mat-error>
+                                                                </mat-form-field>
+                                                            </div>
+                                                            <div *ngIf="usertypeFC.value===USER_TYPE_EXTERNAL" class="full-width">
+                                                                <div class="full-width">
                                                                     <mat-form-field class="formField">
-                                                                        <input matInput formControlName="uNid" placeholder="uNID">
-                                                                        <mat-error *ngIf="userForm.controls['uNid'].hasError('required') || userForm.controls['uNid'].hasError('pattern')">Invalid uNID</mat-error>
+                                                                        <input matInput formControlName="userName" placeholder="User name">
+                                                                        <mat-error *ngIf="this.usernameFC.hasError('required')">Required</mat-error>
                                                                     </mat-form-field>
                                                                 </div>
-                                                                <div *ngIf="usertypeFC.value===USER_TYPE_EXTERNAL" class="full-width">
-                                                                    <div class="full-width">
-                                                                        <mat-form-field class="formField">
-                                                                            <input matInput formControlName="userName" placeholder="User name">
-                                                                            <mat-error *ngIf="this.usernameFC.hasError('required')">Required</mat-error>
-                                                                        </mat-form-field>
-                                                                    </div>
-                                                                    <div class="full-width">
-                                                                        <mat-form-field class="formField">
-                                                                            <input matInput matTooltip="Passwords must be 8-25 characters long, contain no spaces or slashes, and contain three or more of the following: lowercase letter, uppercase letter, digit, or symbol." type="password" formControlName="password" placeholder="Password">
-                                                                            <mat-error *ngIf="this.passwordFC.hasError('validatePassword')">{{this.passwordUtilService.PASSWORD_COMPLEXITY_ERROR}}</mat-error>
-                                                                        </mat-form-field>
-                                                                    </div>
-                                                                    <div class="full-width">
-                                                                        <mat-form-field class="formField">
-                                                                            <input matInput matTooltip="Passwords must be 8-25 characters long, contain no spaces or slashes, and contain three or more of the following: lowercase letter, uppercase letter, digit, or symbol." type="password" formControlName="passwordConfirm" placeholder="Confirm Password">
-                                                                            <mat-error *ngIf="this.passwordConfirmFC.hasError('validatePasswordConfirm')">{{this.passwordUtilService.PASSWORD_MATCH_ERROR}}</mat-error>
-                                                                        </mat-form-field>
-                                                                    </div>
+                                                                <div class="full-width">
+                                                                    <mat-form-field class="formField">
+                                                                        <input matInput matTooltip="Passwords must be 8-25 characters long, contain no spaces or slashes, and contain three or more of the following: lowercase letter, uppercase letter, digit, or symbol." type="password" formControlName="password" placeholder="Password">
+                                                                        <mat-error *ngIf="this.passwordFC.hasError('validatePassword')">{{this.passwordUtilService.PASSWORD_COMPLEXITY_ERROR}}</mat-error>
+                                                                    </mat-form-field>
                                                                 </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="small-width large-margin-left">
-                                                            <div class="full-height foreground flex-container-col">
-                                                                <label>Permission Level</label>
-                                                                <div class="full-width flex-grow">
-                                                                    <mat-radio-group class="flex-container-col full-width" formControlName="permissionLevel" (change)="onPermissionLevelChange($event)">
-                                                                        <mat-radio-button value="LAB">Group</mat-radio-button>
-                                                                        <mat-radio-button value="ADMIN">Admin</mat-radio-button>
-                                                                        <mat-radio-button value="BILLING">Billing Admin</mat-radio-button>
-                                                                        <mat-radio-button value="SUPER" [disabled] = !secAdvisor.isSuperAdmin>Super Admin</mat-radio-button>
-                                                                    </mat-radio-group>
+                                                                <div class="full-width">
+                                                                    <mat-form-field class="formField">
+                                                                        <input matInput matTooltip="Passwords must be 8-25 characters long, contain no spaces or slashes, and contain three or more of the following: lowercase letter, uppercase letter, digit, or symbol." type="password" formControlName="passwordConfirm" placeholder="Confirm Password">
+                                                                        <mat-error *ngIf="this.passwordConfirmFC.hasError('validatePasswordConfirm')">{{this.passwordUtilService.PASSWORD_MATCH_ERROR}}</mat-error>
+                                                                    </mat-form-field>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                                <div *ngIf="codeUserPermissionKind==='BILLING'||codeUserPermissionKind==='ADMIN'" class="foreground border-padding margin-left">
-                                                    <div class="full-width full-height large-padding-right">
-                                                        <label class="full-width">Core facilities this user manages</label>
-                                                        <div class="flex-container-col">
-                                                            <mat-checkbox *ngFor="let cfm of coreFacilitiesIManage" [checked]=cfm.isSelected [formControlName]=cfm.mDisplay>
-                                                                {{cfm.display}}
-                                                            </mat-checkbox>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div *ngIf="codeUserPermissionKind!=='SUPER' && codeUserPermissionKind!=='ADMIN' && (this.secAdvisor.isSuperAdmin||this.secAdvisor.isBillingAdmin)" class="foreground border-padding margin-left">
-                                                    <div class="full-width full-height large-padding-right">
-                                                        <div class="flex-container-row align-center">
-                                                            <label class="full-width">Submit experiments in all labs in core</label>
-                                                            <context-help name="SubmitterPermissionHelp" tooltipPosition="right"
-                                                                          [isEditMode]="this.secAdvisor.isSuperAdmin" popupTitle="Submitter Help"></context-help>
-                                                        </div>
-                                                        <div class="flex-container-col">
-                                                            <mat-checkbox *ngFor="let cf of coreFacilitiesICanSubmitTo" [checked]=cf.isSelected [formControlName]=cf.display>
-                                                                {{cf.display}}
-                                                            </mat-checkbox>
+                                                    <div class="small-width large-margin-left">
+                                                        <div class="full-height foreground flex-container-col">
+                                                            <label>Permission Level</label>
+                                                            <div class="full-width flex-grow">
+                                                                <mat-radio-group class="flex-container-col full-width" formControlName="permissionLevel" (change)="onPermissionLevelChange($event)">
+                                                                    <mat-radio-button value="LAB">Group</mat-radio-button>
+                                                                    <mat-radio-button value="ADMIN">Admin</mat-radio-button>
+                                                                    <mat-radio-button value="BILLING">Billing Admin</mat-radio-button>
+                                                                    <mat-radio-button value="SUPER" [disabled] = !secAdvisor.isSuperAdmin>Super Admin</mat-radio-button>
+                                                                </mat-radio-group>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div *ngIf="codeUserPermissionKind==='BILLING'||codeUserPermissionKind==='ADMIN'" class="foreground border-padding margin-left">
+                                                <div class="full-width full-height large-padding-right">
+                                                    <label class="full-width">Core facilities this user manages</label>
+                                                    <div class="flex-container-col">
+                                                        <mat-checkbox *ngFor="let cfm of coreFacilitiesIManage" [checked]=cfm.isSelected [formControlName]=cfm.mDisplay>
+                                                            {{cfm.display}}
+                                                        </mat-checkbox>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div *ngIf="codeUserPermissionKind!=='SUPER' && codeUserPermissionKind!=='ADMIN' && (this.secAdvisor.isSuperAdmin||this.secAdvisor.isBillingAdmin)" class="foreground border-padding margin-left">
+                                                <div class="full-width full-height large-padding-right">
+                                                    <div class="flex-container-row align-center">
+                                                        <label class="full-width">Submit experiments in all labs in core</label>
+                                                        <context-help name="SubmitterPermissionHelp" tooltipPosition="right"
+                                                                      [isEditMode]="this.secAdvisor.isSuperAdmin" popupTitle="Submitter Help"></context-help>
+                                                    </div>
+                                                    <div class="flex-container-col">
+                                                        <mat-checkbox *ngFor="let cf of coreFacilitiesICanSubmitTo" [checked]=cf.isSelected [formControlName]=cf.display>
+                                                            {{cf.display}}
+                                                        </mat-checkbox>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </form>
-                                </div>
+                                    </div>
+                                </form>
                             </as-split-area>
                             <as-split-area size="25">
                                 <div class="full-height full-width flex-container-row foreground padded">
@@ -320,41 +331,56 @@
                             <div *ngIf="isGroupSubTab && selectedGroup" #groupsDetail class="full-height full-width background border-padding">
                                 <div class="full-height full-width foreground flex-container-col">
                                     <form class="full-width padded" [formGroup]="groupForm">
-                                        <div class="formRow">
-                                            <mat-form-field class="formField">
-                                                <input matInput formControlName="firstName" placeholder="First name">
-                                                <mat-error *ngIf="groupForm.controls['firstName'].hasError('incorrect')">
-                                                    First name or Last name <strong>required</strong>
-                                                </mat-error>
-                                            </mat-form-field>
-                                            <mat-form-field class="formField">
-                                                <input matInput formControlName="lastName" placeholder="Last Name (or lab name)">
-                                                <mat-error *ngIf="groupForm.controls['lastName'].hasError('incorrect')">
-                                                    Last name or First name <strong>required</strong>
-                                                </mat-error>
-                                                <mat-hint>PI gets billing emails + notifications.</mat-hint>
-                                            </mat-form-field>
+                                        <div class="flex-container-row align-baseline">
+                                            <div class="flex-grow min-width padded">
+                                                <mat-form-field class="full-width">
+                                                    <input matInput formControlName="firstName" placeholder="First name">
+                                                    <mat-error *ngIf="groupForm.controls['firstName'].hasError('incorrect')">
+                                                        First name or Last name <strong>required</strong>
+                                                    </mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="flex-grow min-width padded">
+                                                <mat-form-field class="full-width">
+                                                    <input matInput formControlName="lastName" placeholder="Last Name (or lab name)">
+                                                    <mat-error *ngIf="groupForm.controls['lastName'].hasError('incorrect')">
+                                                        Last name or First name <strong>required</strong>
+                                                    </mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="flex-grow min-width padded">
+                                                <mat-checkbox [checked]="isActive_lab" [disabled]="disable_isActive_lab" (change)="onChange_isActive($event)">
+                                                    Lab is Active
+                                                </mat-checkbox>
+                                            </div>
                                         </div>
-                                        <div class="formRow">
-                                            <mat-form-field class="formField">
-                                                <input matInput formControlName="contactPhone" placeholder="Phone">
-                                            </mat-form-field>
-                                            <mat-form-field class="formField">
-                                                <input matInput formControlName="contactEmail" placeholder="Email">
-                                                <mat-error *ngIf="this.groupEmailFC.hasError('required')">Required</mat-error>
-                                                <mat-error *ngIf="this.groupEmailFC.hasError('email') && !this.groupEmailFC.hasError('required')">Valid Email Required</mat-error>
-                                            </mat-form-field>
+                                        <div class="flex-container-row">
+                                            <div class="flex-grow min-width padded">
+                                                <mat-form-field class="full-width">
+                                                    <input matInput formControlName="contactPhone" placeholder="Phone">
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="flex-grow min-width padded">
+                                                <mat-form-field class="full-width">
+                                                    <input matInput formControlName="contactEmail" placeholder="Email">
+                                                    <mat-hint>PI gets billing emails + notifications.</mat-hint>
+                                                    <mat-error *ngIf="this.groupEmailFC.hasError('required')">Required</mat-error>
+                                                    <mat-error *ngIf="this.groupEmailFC.hasError('email') && !this.groupEmailFC.hasError('required')">Valid Email Required</mat-error>
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="flex-grow min-width padded">
+                                            </div>
                                         </div>
-                                        <div class="full-width flex-container-row">
+                                        <div class="full-width flex-container-row padded-top">
                                             <div class="height-auto flex-grow foreground border-padding">
                                                 <!--need flex row container-->
                                                 <div class="full-width full-height foreground flex-container-col">
                                                     <label>Pricing</label>
                                                     <div class="full-width flex-grow">
                                                         <mat-radio-group class="flex-container-col full-width" formControlName="pricing">
-                                                            <mat-radio-button value="INTERNAL"><img src="../../assets/group.png"> Internal</mat-radio-button>
-                                                            <mat-radio-button value="EXACADEMIC"><img src="../../assets/graduation_cap.png"> External Academic</mat-radio-button>
-                                                            <mat-radio-button value="EXCOMM"><img src="../../assets/building.png"> External Commercial</mat-radio-button>
+                                                            <mat-radio-button class="padded-left-right" value="INTERNAL"><img src="../../assets/group.png"> Internal</mat-radio-button>
+                                                            <mat-radio-button class="padded-left-right" value="EXACADEMIC"><img src="../../assets/graduation_cap.png"> External Academic</mat-radio-button>
+                                                            <mat-radio-button class="padded-left-right" value="EXCOMM"><img src="../../assets/building.png"> External Commercial</mat-radio-button>
                                                         </mat-radio-group>
                                                     </div>
                                                 </div>
@@ -364,11 +390,15 @@
                                             <div class="height-auto flex-grow foreground border-padding">
                                                 <div class="flex-container-col full-width">
                                                     <label class="full-width">Core facilities</label>
-                                                    <mat-checkbox *ngFor="let core of myCoreFacilities" [formControlName]="core.display">
-                                                        {{core.display}}
-                                                    </mat-checkbox>
+                                                    <div *ngFor="let core of myCoreFacilities" class="padded-left-right-top">
+                                                        <mat-checkbox [formControlName]="core.display">
+                                                            {{core.display}}
+                                                        </mat-checkbox>
+                                                    </div>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div class="horizontal-spacer">
                                         </div>
                                         <div class="full-width flex-container-row institution-div" *ngIf="showInstitutions">
                                             <div class="height-auto flex-grow foreground border-padding">
@@ -409,20 +439,20 @@
                             </div>
                         </mat-tab>
                         <mat-tab label="Billing Admin" class="full-height">
-                            <div *ngIf="selectedGroup">
+                            <div *ngIf="selectedGroup" class="full-height full-width">
                                 <billing-admin-tab [group]="selectedGroup" #billingAdminTab ></billing-admin-tab>
                             </div>
                         </mat-tab>
                         <mat-tab label="Membership" class="full-height">
-                            <div *ngIf="selectedGroup">
+                            <div *ngIf="selectedGroup" class="full-height full-width">
                                 <membership-tab [memberGroup]="selectedGroup" [users]="rowData" #membershipTab ></membership-tab>
                             </div>
                         </mat-tab>
                         <mat-tab #groupTab label="Billing Accounts" class="full-height full-width">
-                            <billing-account-tab #billingAccountTab *ngIf="groupSubTabName && groupSubTabName === 'Billing Accounts'" [labInfo]="selectedGroup"></billing-account-tab>
+                            <billing-account-tab #billingAccountTab *ngIf="groupSubTabName && groupSubTabName === 'Billing Accounts'" [labInfo]="selectedGroup" (onDirty)="onManualDirty()"></billing-account-tab>
                         </mat-tab>
                         <mat-tab label="Invoices" class="full-height">
-                            <div *ngIf="selectedGroup">
+                            <div *ngIf="selectedGroup" class="full-height full-width">
                                 <invoices-tab [memberGroup]="selectedGroup" #invoicesTab></invoices-tab>
                             </div>
                         </mat-tab>

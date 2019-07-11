@@ -74,7 +74,7 @@
         </ag-grid-angular>
     </div>
     <div class="formRow" *ngIf="this.showRequestLabMembership">
-        <button mat-button color="accent" (click)="this.showRequestLabMembershipDialog()">Request Membership to Additional Labs</button>
+        <button mat-button class="link-button underline minimize" (click)="this.showRequestLabMembershipDialog()">Request Membership to Additional Labs</button>
     </div>
     <div class="formRow">
         <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.allFG.valid" (click)="this.save()"><img class="icon" src="../../assets/action_save.gif">Save</button>

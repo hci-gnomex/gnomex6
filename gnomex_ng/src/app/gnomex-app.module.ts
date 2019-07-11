@@ -50,6 +50,9 @@ import {AngularSplitModule} from "angular-split";
 import {RegisterUserModule} from "./account/register-user/register-user.module";
 import {HTTP_INTERCEPTORS} from "@angular/common/http";
 import {ErrorHandlerInterceptor} from "./services/interceptors/error-handler.interceptor";
+import {LogoutComponent} from "./header/logout.component";
+import {LogoutLoaderComponent} from "./header/logout-loader-component";
+import {WINDOW_PROVIDERS} from "./services/window.service";
 
 
 
@@ -108,6 +111,8 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy},
         {provide:HTTP_INTERCEPTORS, useClass: ErrorHandlerInterceptor, multi: true },
         {provide: Window, useValue: window},
+        ...WINDOW_PROVIDERS,
+
         UserService,
         AuthenticationService,
         ExperimentsService,
