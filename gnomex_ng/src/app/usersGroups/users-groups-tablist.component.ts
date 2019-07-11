@@ -11,7 +11,7 @@ import {URLSearchParams} from "@angular/http";
 import {MatDialogConfig, MatSnackBar, MatSnackBarConfig} from "@angular/material";
 
 import {GridOptions} from "ag-grid-community/main";
-import {ColDef, GridApi, GridReadyEvent, RowSelectedEvent} from "ag-grid-community";
+import {ColDef, GridApi, GridReadyEvent, RowSelectedEvent, RowNode} from "ag-grid-community";
 
 import {Subscription} from "rxjs";
 
@@ -223,9 +223,6 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     public myCoreFacilities: any[] = [];
     public isUserTab: boolean = true;
     public isGroupsTab: boolean = false;
-    public isGroupSubTab: boolean = true;
-    public groupSubTabName: string = "";
-    public isBillingAdminSubTab: boolean = false;
     private userForm: FormGroup;
     private groupForm: FormGroup;
     private selectedUser: any = "";
@@ -385,7 +382,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         }
     }
 
-    public buildUsers() {
+    public buildUsers(idAppUserToSelect?: string) {
+        this.selectedUser = null;
         this.rowData = [];
         if (this.secAdvisor.isAdmin || this.secAdvisor.isSuperAdmin || this.secAdvisor.isBillingAdmin) {
             this.getAppUserListSubscription = this.appUserListService.getFullAppUserList().subscribe((response: any[]) => {
@@ -394,6 +392,17 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 this.userForm.markAsPristine();
                 this.touchUserFields();
                 this.rowData = response;
+
+                if (idAppUserToSelect) {
+                    setTimeout(() => {
+                        this.gridOptions.api.forEachNode((node: RowNode) => {
+                            if (node.data.idAppUser === idAppUserToSelect) {
+                                node.setSelected(true);
+                                this.gridOptions.api.ensureIndexVisible(node.rowIndex);
+                            }
+                        });
+                    });
+                }
             });
         }
     }
@@ -429,8 +438,10 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         }
     }
 
-    public buildLabList() {
-        var params: URLSearchParams = new URLSearchParams();
+    public buildLabList(idLabToSelect?: string) {
+        this.selectedGroup = null;
+
+        let params: URLSearchParams = new URLSearchParams();
         params.set("idCoreFacility", this.idCoreFacility);
         params.set("idInstitution", "");
         params.set("isExternal", "");
@@ -449,6 +460,17 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             this.groupLabel = this.groupsData.length + " lab groups";
             this.createGroupForm();
             this.setPricing();
+
+            if (idLabToSelect) {
+                setTimeout(() => {
+                    this.groupsGridOptions.api.forEachNode((node: RowNode) => {
+                        if (node.data.idLab === idLabToSelect) {
+                            node.setSelected(true);
+                            this.groupsGridOptions.api.ensureIndexVisible(node.rowIndex);
+                        }
+                    });
+                });
+            }
         });
 
     }
@@ -805,22 +827,6 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         }
     }
 
-    onGroupsTabChange(event) {
-        this.groupSubTabName = event.tab.textLabel;
-        switch(event.tab.textLabel) {
-            case "Group": {
-                this.isGroupSubTab = true;
-                this.isBillingAdminSubTab = false;
-                break;
-            }
-            case "Billing Admin": {
-                this.isBillingAdminSubTab = true;
-                this.isGroupSubTab = false;
-                break;
-            }
-        }
-    }
-
     selectSubmissionCheckbox(getAppUser: any) {
         // Have to build checkboxes on the fly
         this.coreFacilitiesICanSubmitTo = [];
@@ -930,9 +936,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                     {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
                 ]}).subscribe((result: any) => {
-                    if(result) {
-                        this.buildUsers();
-                    }
+                    this.buildUsers(result);
         });
 
     }
@@ -1080,7 +1084,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                     config.duration = 3000;
 
                     this.snackBar.open("Changes Saved", "User", config);
-                    this.buildUsers();
+                    this.buildUsers(responseJSON.idAppUser);
                 }
             }
             this.showSpinner = false;
@@ -1399,7 +1403,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 config.duration = 2000;
 
                 this.snackBar.open("Changes Saved", "Lab", config);
-                this.buildLabList();
+                this.buildLabList(responseJSON.idLab);
                 this.onGroupsSelectionChanged();
             }
             this.dialogsService.stopAllSpinnerDialogs();
@@ -1523,7 +1527,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
                 ]}).subscribe((result: any) => {
                     if(result) {
-                        this.buildLabList();
+                        this.buildLabList(result);
                     }
         });
 

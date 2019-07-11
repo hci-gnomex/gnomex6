@@ -46,10 +46,14 @@ export class NewUserDialogComponent extends BaseGenericContainerDialog implement
         this.userService.saveAppUser(params).subscribe((response: any) => {
             this.showSpinner = false;
             if (response.status === 200) {
-                this.dialogRef.close(true);
+                let responseJSON: any = response.json();
+                if (responseJSON.idAppUser) {
+                    this.dialogRef.close(responseJSON.idAppUser);
+                }
                 this.dialogsService.alert("The user has been saved but is inactive. You must fill in login information and activate the user before the user can login.");
+            } else {
+                this.dialogRef.close();
             }
-            this.dialogRef.close();
         });
     }
 
