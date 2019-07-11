@@ -200,10 +200,10 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         this.navInitSubscription = this.gnomexService.navInitBrowseDatatrackSubject.subscribe( orderInitObj => {
             if(orderInitObj) {
                 let ids: HttpParams = new HttpParams()
-                    .set("number", this.gnomexService.orderInitObj.dataTrackNumber)
-                    .set("idOrganism", this.gnomexService.orderInitObj.idOrganism)
-                    .set("idLab", this.gnomexService.orderInitObj.idLab)
-                    .set("idGenomeBuild", this.gnomexService.orderInitObj.idGenomeBuild);
+                    .set("number", this.gnomexService.orderInitObj.dataTrackNumber ? this.gnomexService.orderInitObj.dataTrackNumber : '')
+                    .set("idOrganism", this.gnomexService.orderInitObj.idOrganism ? this.gnomexService.orderInitObj.idOrganism : '')
+                    .set("idLab", this.gnomexService.orderInitObj.idLab ? this.gnomexService.orderInitObj.idLab : '')
+                    .set("idGenomeBuild", this.gnomexService.orderInitObj.idGenomeBuild ? this.gnomexService.orderInitObj.idGenomeBuild : '');
                 this.datatracksService.previousURLParams = ids;
                 this.datatracksService.getDatatracksList_fromBackend(ids);
             } else {
