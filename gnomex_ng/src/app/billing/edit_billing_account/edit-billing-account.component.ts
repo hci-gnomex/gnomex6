@@ -651,8 +651,8 @@ export class EditBillingAccountComponent extends BaseGenericContainerDialog impl
             this._rowData.startDateOther           = startDateOther;
             this._rowData.expirationDate           = this.effectiveUntilDate;
             this._rowData.expirationDateOther      = expirationDateOther;
-            this._rowData.totalDollarAmount        = this.totalDollarAmount;
-            this._rowData.totalDollarAmountDisplay = '$' + this.totalDollarAmount;
+            this._rowData.totalDollarAmount        = this.totalDollarAmount ? this.totalDollarAmount : "";
+            this._rowData.totalDollarAmountDisplay = this.totalDollarAmount ? '$' + this.totalDollarAmount : "";
             this._rowData.activeAccount            = activeAccount;
             this._rowData.isPO                     = isPO;
 
@@ -837,8 +837,8 @@ export class EditBillingAccountComponent extends BaseGenericContainerDialog impl
             this._rowData.startDateOther           = startDateOther;
             this._rowData.expirationDate           = expirationDate;
             this._rowData.expirationDateOther      = expirationDateOther;
-            this._rowData.totalDollarAmount        = this.totalDollarAmount;
-            this._rowData.totalDollarAmountDisplay = '$' + this.totalDollarAmount;
+            this._rowData.totalDollarAmount        = this.totalDollarAmount ? this.totalDollarAmount : "";
+            this._rowData.totalDollarAmountDisplay = this.totalDollarAmount ? '$' + this.totalDollarAmount : "";
             this._rowData.activeAccount            = activeAccount;
             this._rowData.isPO                     = isPO;
             this._rowData.isCreditCard             = isCreditCard;
@@ -985,8 +985,8 @@ export class EditBillingAccountComponent extends BaseGenericContainerDialog impl
             this._rowData.startDateOther           = startDateOther;
             this._rowData.expirationDate           = expirationDate;
             this._rowData.expirationDateOther      = expirationDateOther;
-            this._rowData.totalDollarAmount        = this.totalDollarAmount;
-            this._rowData.totalDollarAmountDisplay = '$' + this.totalDollarAmount;
+            this._rowData.totalDollarAmount        = this.totalDollarAmount ? this.totalDollarAmount : "";
+            this._rowData.totalDollarAmountDisplay = this.totalDollarAmount ? '$' + this.totalDollarAmount : "";
             this._rowData.activeAccount            = activeAccount;
             this._rowData.isPO                     = isPO;
             this._rowData.isCreditCard             = isCreditCard;
