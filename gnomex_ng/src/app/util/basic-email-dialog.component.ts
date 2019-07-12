@@ -98,16 +98,21 @@ export class BasicEmailDialogComponent extends BaseGenericContainerDialog implem
     public send() {
         if(this.emailGroup) {
             this.dialogsService.startDefaultSpinnerDialog();
-            let emailData: any = null;
+            let emailData: any = {value: {}};
             emailData.value.subject = this.emailGroup.get("subject").value;
             emailData.value.fromAddress = this.emailGroup.get("fromAddress").value;
             emailData.value.body = this.emailGroup.get("body").value;
-            if(this.data.saveFn(emailData.value)) {
-                this.dialogRef.close();
-                this.snackBar.open("Email successfully sent", this.action, {
-                    duration: 2000
-                });
-            }
+            this.data.saveFn(emailData.value).subscribe((success: boolean) => {
+                this.dialogsService.stopAllSpinnerDialogs();
+                if (success) {
+                    this.dialogRef.close();
+                    this.snackBar.open("Email successfully sent", this.action, {
+                        duration: 2000
+                    });
+                }
+            }, () => {
+                this.dialogsService.stopAllSpinnerDialogs();
+            });
         }
 
     }
