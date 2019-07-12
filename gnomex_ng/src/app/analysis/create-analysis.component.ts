@@ -16,6 +16,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {ActionType, GDAction} from "../util/interfaces/generic-dialog-action.model";
 import {ConfigureOrganismsComponent} from "../configuration/configure-organisms.component";
+import {UtilService} from "../services/util.service";
 
 @Component({
     selector: "create-analysis-dialog",
@@ -122,7 +123,7 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
             visibility: ["", [
                 Validators.required
             ]],
-            genomeBuilds: []
+            genomeBuilds: [[]]
         });
         if (this.createSecurityAdvisorService.isAdmin) {
             this.createAnalysisForm.addControl("analysisOwner", new FormControl("", Validators.required));
@@ -182,13 +183,16 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     onLabSelect(event: any) {
         if (event) {
             this.analysisGroupList = [];
+            this.ownerList = [];
 
             this.dialogsService.startDefaultSpinnerDialog();
 
             this.idLabString = event;
             if (this.showOwnerComboBox) {
                 this.getLabService.getLabByIdOnlyForHistoricalOwnersAndSubmitters(this.idLabString).subscribe((response: any) => {
-                    this.ownerList = response.Lab.historicalOwnersAndSubmitters;
+                    if(response && response.Lab && response.Lab.historicalOwnersAndSubmitters) {
+                        this.ownerList = UtilService.getJsonArray(response.Lab.historicalOwnersAndSubmitters, response.Lab.historicalOwnersAndSubmitters.AppUser);
+                    }
                 });
             }
 
@@ -354,6 +358,8 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
      * The yes button was selected in the delete project dialog.
      */
     createAnalysisYesButtonClicked() {
+        console.log(this.createAnalysisForm.get("genomeBuilds").value);
+        console.log(this.createAnalysisForm.get("genomeBuilds").value.length);
         if (this.createAnalysisForm.get("genomeBuilds").value.length === 0) {
             this.dialogsService
                 .confirm("A genome build has not been specified. Create new analysis anyway?", "Warning")
