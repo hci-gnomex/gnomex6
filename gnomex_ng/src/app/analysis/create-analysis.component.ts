@@ -358,8 +358,6 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
      * The yes button was selected in the delete project dialog.
      */
     createAnalysisYesButtonClicked() {
-        console.log(this.createAnalysisForm.get("genomeBuilds").value);
-        console.log(this.createAnalysisForm.get("genomeBuilds").value.length);
         if (this.createAnalysisForm.get("genomeBuilds").value.length === 0) {
             this.dialogsService
                 .confirm("A genome build has not been specified. Create new analysis anyway?", "Warning")
