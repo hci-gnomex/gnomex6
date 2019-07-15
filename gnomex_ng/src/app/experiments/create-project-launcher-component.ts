@@ -43,9 +43,7 @@ export class CreateProjectLauncherComponent implements OnInit, AfterViewInit {
                         {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
                         {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
                     ]}).subscribe((result: any) => {
-                if(result) {
-                    this.router.navigate([{ outlets: { modal: null }}]);
-                }
+                this.router.navigate([{ outlets: { modal: null }}]);
             });
         });
     }
