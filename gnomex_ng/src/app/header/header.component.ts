@@ -1897,15 +1897,18 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     private addNewExperimentMenus(navMenu: any[]): void {
-        if (this.gnomexService.myCoreFacilities != null && this.gnomexService.myCoreFacilities.length > 1) {
-            for (let i: number = 0; i < navMenu.length; i++) {
-                let children = [];
-                if (navMenu[i].context === "newExperimentOrder") {
-                    navMenu[i].children = this.addCoreNewExperiments(navMenu[i], children);
+        for (let menuItem of navMenu) {
+            if (menuItem.context === "newExperimentOrder") {
+                if (this.gnomexService.myCoreFacilities) {
+                    if (this.gnomexService.myCoreFacilities.length === 1) {
+                        menuItem.route = "/newExperiment/" + this.gnomexService.myCoreFacilities[0].idCoreFacility;
+                    } else if (this.gnomexService.myCoreFacilities.length > 1) {
+                        menuItem.children = this.addCoreNewExperiments(menuItem, []);
+                    }
                 }
-                if (navMenu[i].children) {
-                    this.addNewExperimentMenus(navMenu[i].children);
-                }
+            }
+            if (menuItem.children) {
+                this.addNewExperimentMenus(menuItem.children);
             }
         }
     }
@@ -1932,15 +1935,18 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
     }
 
     private addProductOrderMenus(navMenu: any[]): void {
-        if (this.gnomexService.myCoreFacilities != null && this.gnomexService.myCoreFacilities.length > 1) {
-            for (let i: number = 0; i < navMenu.length; i++) {
-                let children: any[] = [];
-                if (navMenu[i].context === "newProductOrder") {
-                    navMenu[i].children = this.addCoreNewProducts(navMenu[i], children);
+        for (let menuItem of navMenu) {
+            if (menuItem.context === "newProductOrder") {
+                if (this.gnomexService.myCoreFacilities) {
+                    if (this.gnomexService.myCoreFacilities.length === 1) {
+                        menuItem.route = "/order-products/" + this.gnomexService.myCoreFacilities[0].idCoreFacility;
+                    } else if (this.gnomexService.myCoreFacilities.length > 1) {
+                        menuItem.children = this.addCoreNewProducts(menuItem, []);
+                    }
                 }
-                if (navMenu[i].children) {
-                    this.addProductOrderMenus(navMenu[i].children);
-                }
+            }
+            if (menuItem.children) {
+                this.addProductOrderMenus(menuItem.children);
             }
         }
     }
