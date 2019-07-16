@@ -9,6 +9,7 @@ import {ExperimentsService} from "../experiments/experiments.service";
 import {AnalysisService} from "./analysis.service";
 import {DOCUMENT} from "@angular/common";
 import {Form, FormGroup} from "@angular/forms";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Injectable()
 export class FileService {
@@ -314,6 +315,32 @@ export class FileService {
 
         return of({result: "SUCCESS"});
     };
+
+    public startFDTupload(idOrder:string, orderType: string): Observable<any>{
+        let params: HttpParams = new HttpParams();
+        let headers: HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
+        if(orderType === 'e'){
+            params = params.set('idRequest', idOrder );
+        }else{
+            params = params.set('idAnalysis', idOrder);
+        }
+
+        return this.httpClient.post("/gnomex/FastDataTransferUploadStart.gx", params.toString(), {headers: headers})
+            .pipe(flatMap( (resp:any) =>{
+                let uuid:string = resp.uuid;
+                let url: string = this.document.location.href;
+                url = url.substring(0, url.indexOf("/gnomex") + 7);
+                url += "/FastDataTransferUploadGetJnlpServlet.gx";
+                url += "?uuid=" + uuid;
+                url += "&showCommandLineInstructions=" + "Y";
+                window.open(url, "_blank");
+
+                return of({result: "SUCCESS"});
+
+
+            }));
+
+    }
 
     public makeSoftLinks: (files: any[]) => Observable<any> = (files: any[]) => {
         let headers: HttpHeaders = new HttpHeaders()

@@ -264,7 +264,12 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     }
 
     public handleFDTUploadCommandLine(): void {
-        // TODO FDT Upload Command Line
+        if(this.analysis &&  this.analysis.idAnalysis){
+            this.fileService.startFDTupload(this.analysis.idAnalysis, 'a')
+                .subscribe(resp => {
+                    // nothing to show window.open() displays html text
+                },(err:IGnomexErrorResponse) =>{});
+        }
     }
 
     public handleFDTUploadFiles(): void {
