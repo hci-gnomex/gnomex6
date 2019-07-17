@@ -79,6 +79,7 @@ public void init(ServletConfig config) throws ServletException {
       xmlHintMap = jsonTOxml.initHints(hintFile);
     } catch (Exception e) {
       System.err.println("[GNomExFrontController] ERROR ERROR unable to initHints: " + e);
+      System.err.println("[GNomExFrontController] ERROR ERROR unable to initHints: " + e);
     }
     System.out.println("[GNomExFrontController] xmlHintMap size: " + xmlHintMap.size() + "\nxmlHintMap: " + xmlHintMap);
   } // end of init
