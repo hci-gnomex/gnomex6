@@ -42,12 +42,10 @@ export class EditBillingAccountLauncher {
 					{type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Update", internalAction: "onUpdateButtonClicked"},
 					{type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
 				]}).subscribe((result: any) => {
-					if(result) {
-						// TODO: Verify if the data is updated and success pop-up may needed here
-                        // After closing the dialog, route away from this component so that the dialog could
-                        // potentially be reopened.
-                        this.router.navigate([{ outlets: {modal: null}}]);
-					}
+            // TODO: Verify if the data is updated and success pop-up may needed here
+            // After closing the dialog, route away from this component so that the dialog could
+            // potentially be reopened.
+            this.router.navigate([{ outlets: {modal: null}}]);
 		});
 	}
 }

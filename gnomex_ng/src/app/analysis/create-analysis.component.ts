@@ -78,6 +78,8 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     private codeVisibility: string;
     private readonly parentComponent: string = "";
 
+    public labDisplayField: string = this.prefService.labDisplayField;
+
     constructor(private dialogRef: MatDialogRef<CreateAnalysisComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
                 private dictionaryService: DictionaryService,
                 private dialog: MatDialog,
@@ -94,6 +96,11 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     ) {
         super();
         this.labList = data.labList;
+        if (this.labList && this.labList.length) {
+            if (!this.labList[0][this.labDisplayField]) {
+                this.labDisplayField = "labName";
+            }
+        }
         this.items = data.items;
         this.selectedLab = data.selectedLab;
         this.selectedAnalysisGroup = data.selectedAnalysisGroup;
