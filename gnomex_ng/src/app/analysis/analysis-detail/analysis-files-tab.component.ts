@@ -20,6 +20,8 @@ import {FileService} from "../../services/file.service";
 import {Subscription} from "rxjs";
 import {DownloadFilesComponent} from "../../util/download-files.component";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {PropertyService} from "../../services/property.service";
+import {DictionaryService} from "../../services/dictionary.service";
 
 @Component({
     selector: 'analysis-files-tab',
@@ -27,8 +29,8 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
         <div class="padded flex-container-col full-height">
             <div class="flex-container-row">
                 <button mat-button (click)="this.handleUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD" class="icon">Upload Files</button>
-                <button mat-button (click)="this.handleFDTUploadCommandLine()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Command Line</button>
-                <button mat-button (click)="this.handleFDTUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Files</button>
+                <button mat-button *ngIf="isFDTSupported" (click)="this.handleFDTUploadCommandLine()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Command Line</button>
+                <button mat-button *ngIf="isFDTSupported" (click)="this.handleFDTUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Files</button>
                 <button mat-button (click)="this.handleManageFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon">Manage Files</button>
                 <button mat-button (click)="this.handleDownloadFiles()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download Files</button>
             </div>
@@ -62,6 +64,8 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     public canUpdate: boolean = false;
     private formGroup: FormGroup;
     private updateFileSubscription: Subscription;
+    public isFDTSupported:boolean = false;
+    public isClinicalResearch:boolean = false;
 
 
     constructor(public constantsService: ConstantsService,
@@ -70,10 +74,13 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
                 private route: ActivatedRoute,
                 private dialogsService: DialogsService,
                 private dataTrackService: DataTrackService,
+                private propertyService: PropertyService,
                 private dialog:MatDialog) {
     }
 
     ngOnInit() {
+        this.isFDTSupported = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_FDT_SUPPORTED);
+
         this.gridColDefs = [
             {headerName: "Folder or File", field: "displayName", tooltipField: "displayName", cellRenderer: "agGroupCellRenderer",
                 cellRendererParams: {innerRenderer: getDownloadGroupRenderer(), suppressCount: true}},
@@ -264,7 +271,12 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     }
 
     public handleFDTUploadCommandLine(): void {
-        // TODO FDT Upload Command Line
+        if(this.analysis &&  this.analysis.idAnalysis){
+            this.fileService.startFDTupload(this.analysis.idAnalysis, 'a')
+                .subscribe(resp => {
+                    // nothing to show window.open() displays html text
+                },(err:IGnomexErrorResponse) =>{});
+        }
     }
 
     public handleFDTUploadFiles(): void {
