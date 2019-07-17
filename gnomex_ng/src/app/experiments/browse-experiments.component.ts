@@ -151,7 +151,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 }
             },
 
-            allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && node.isLeaf,
+            allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && node.isLeaf && node.data.idRequest,
         };
 
         this.labListService.getLabList_FromBackEnd();

@@ -31,7 +31,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 import {UtilService} from "../services/util.service";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../services/constants.service";
-import {filter} from "rxjs/operators";
+import {filter, first} from "rxjs/operators";
 
 
 @Component({
@@ -125,7 +125,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             allowDrop: (element: any, to: {parent: TreeNode, index: number}) => {
                 return !!to.parent.data.idAnalysisGroup;
             },
-            allowDrag: (node: any) => !this.createSecurityAdvisorService.isGuest && node.isLeaf,
+            allowDrag: (node: any) => !this.createSecurityAdvisorService.isGuest && node.isLeaf && node.data.idAnalysis,
             actionMapping: {
                 mouse: {
                     click: (tree, node, $event) => {
@@ -407,11 +407,11 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                     {type: ActionType.PRIMARY, icon: null, name: "Yes" , internalAction: "deleteAnalysis", externalAction: () => { console.log("hello"); }},
                     {type: ActionType.SECONDARY,  name: "No", internalAction: "cancel"}
                 ]}).subscribe((data: any) => {
-                    if(data) {
-                        if(this.parentProject) {
-                            this.analysisService.setActiveNodeId = this.parentProject.data.id;
-                        }
+                if(data) {
+                    if(this.parentProject) {
+                        this.analysisService.setActiveNodeId = this.parentProject.data.id;
                     }
+                }
             });
         }
     }
@@ -481,10 +481,10 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                     {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save" , internalAction: "createAnalysisGroup", externalAction: () => { console.log("hello"); }},
                     {type: ActionType.SECONDARY,  name: "Cancel", internalAction: "cancel"}
                 ]}).subscribe(data => {
-                    if(data) {
-                        this.analysisService.setActiveNodeId = "p" + data;
-                    }
-                });
+                if(data) {
+                    this.analysisService.setActiveNodeId = "p" + data;
+                }
+            });
         }
     }
 
@@ -586,22 +586,27 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     }
 
     private moveNode: (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => void = (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => {
-        let idLab: string = node.data.idLab;
-        let idAnalysisGroup: string = node.data.idAnalysisGroup;
-        let analyses: any[] = [];
-        for (let n of tree.getActiveNodes()) {
-            analyses.push(n.data);
-        }
-        let isCopyMode: boolean = $event.ctrlKey;
+        this.dialogsService.confirm("Are you sure you want to move this analysis to " + node.data.name + " Folder?").pipe(first())
+            .subscribe(action =>{
+                if(action){
+                    let idLab: string = node.data.idLab;
+                    let idAnalysisGroup: string = node.data.idAnalysisGroup;
+                    let analyses: any[] = [];
+                    for (let n of tree.getActiveNodes()) {
+                        analyses.push(n.data);
+                    }
+                    let isCopyMode: boolean = $event.ctrlKey;
 
-        this.analysisService.moveAnalysis(idLab, idAnalysisGroup, analyses, isCopyMode).subscribe((result: any) => {
-            if (result && result.result === "SUCCESS") {
-                this.analysisService.refreshAnalysisGroupList_fromBackend();
-                if (result.invalidPermission) {
-                    this.dialogsService.alert(result.invalidPermission, null, DialogType.WARNING);
+                    this.analysisService.moveAnalysis(idLab, idAnalysisGroup, analyses, isCopyMode).subscribe((result: any) => {
+                        if (result && result.result === "SUCCESS") {
+                            this.analysisService.refreshAnalysisGroupList_fromBackend();
+                            if (result.invalidPermission) {
+                                this.dialogsService.alert(result.invalidPermission, null, DialogType.WARNING);
+                            }
+                        }
+                    }, (err: IGnomexErrorResponse) => {
+                    });
                 }
-            }
-        }, (err: IGnomexErrorResponse) => {
-        });
+            });
     }
 }
