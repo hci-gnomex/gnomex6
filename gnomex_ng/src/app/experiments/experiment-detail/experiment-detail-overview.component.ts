@@ -8,7 +8,7 @@ import {ExperimentsService} from "../experiments.service";
 import {MatDialogConfig, MatSnackBar, MatTabChangeEvent} from "@angular/material";
 import {DictionaryService} from "../../services/dictionary.service";
 import {GnomexService} from "../../services/gnomex.service";
-import {BehaviorSubject, Subscription} from "rxjs";
+import {BehaviorSubject, Observable, Subscription} from "rxjs";
 import {ExperimentSequenceLanesTab} from "./experiment-sequence-lanes-tab";
 
 import {Experiment} from "../../util/models/experiment.model";
@@ -22,7 +22,7 @@ import {FileService} from "../../services/file.service";
 import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
 import {CreateAnalysisComponent} from "../../analysis/create-analysis.component";
 import {HttpParams} from "@angular/common/http";
-import {first} from "rxjs/operators";
+import {first, map} from "rxjs/operators";
 import {BasicEmailDialogComponent} from "../../util/basic-email-dialog.component";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {VisibilityDetailTabComponent} from "../../util/visibility-detail-tab.component";
@@ -483,7 +483,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
         if (this.experiment) {
             let subjectText = "Inquiry about Experiment " + this.experiment.number;
 
-            let saveFn = (data: any): boolean  => {
+            let saveFn = (data: any): Observable<boolean>  => {
 
                 data.format =  "text";
                 data.idAppUser = this.secAdvisor.idAppUser.toString();
@@ -501,13 +501,9 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                     .set("idAppUser", data.idAppUser)
                     .set("subject", data.subject);
 
-                this.experimentService.emailServlet(params).pipe(first()).subscribe(resp => {
-                    this.dialogsService.stopAllSpinnerDialogs();
-                    return true;
-                }, (err: IGnomexErrorResponse) => {
-                    this.dialogsService.stopAllSpinnerDialogs();
-                });
-                return false;
+                return this.experimentService.emailServlet(params).pipe(map((result) => {
+                    return result && result.result === "SUCCESS";
+                }));
             };
 
             let configuration: MatDialogConfig = new MatDialogConfig();

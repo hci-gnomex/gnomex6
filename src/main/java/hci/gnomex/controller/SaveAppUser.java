@@ -322,7 +322,7 @@ public class SaveAppUser extends GNomExCommand implements Serializable {
           sess.flush();
           JsonObject value = Json.createObjectBuilder()
                   .add("result", "SUCCESS")
-                  .add("idAppUser", appUser.getIdAppUser())
+                  .add("idAppUser", "" + appUser.getIdAppUser())
                   .build();
           this.jsonResult = value.toString();
 

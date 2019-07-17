@@ -656,7 +656,7 @@ public class SaveLab extends GNomExCommand implements Serializable {
 					this.xmlResult = "<SUCCESS idLab=\"" + lab.getIdLab() + "\"/>";
 					JsonObject value = Json.createObjectBuilder()
 																 .add("result", "SUCCESS")
-																 .add("idLab", lab.getIdLab())
+																 .add("idLab", "" + lab.getIdLab())
 																 .build();
 					this.jsonResult = value.toString();
 

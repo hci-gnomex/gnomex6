@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, OnDestroy, OnInit} from "@angular/core";
 import {TopicService} from "../services/topic.service";
 import {ActivatedRoute} from "@angular/router";
-import {Subscription} from "rxjs";
+import {Observable, Subscription} from "rxjs";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ConstantsService} from "../services/constants.service";
 import {GnomexService} from "../services/gnomex.service";
@@ -13,7 +13,7 @@ import {HttpParams} from "@angular/common/http";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {BasicEmailDialogComponent} from "../util/basic-email-dialog.component";
 import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
-import {first} from "rxjs/operators";
+import {first, map} from "rxjs/operators";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {AngularEditorConfig} from "@kolkov/angular-editor";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
@@ -223,7 +223,7 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
             return;
         }
 
-        let saveFn = (data: any): boolean => {
+        let saveFn = (data: any): Observable<boolean> => {
             data.format =  "text";
             data.idAppUser = idAppUser;
 
@@ -234,13 +234,9 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                 .set("idAppUser", data.idAppUser)
                 .set("subject", data.subject);
 
-            this.topicService.emailTopicOwner(params).pipe(first()).subscribe(resp => {
-                this.dialogService.stopAllSpinnerDialogs();
-                return true;
-            }, (err: IGnomexErrorResponse) => {
-                this.dialogService.stopAllSpinnerDialogs();
-            });
-            return false;
+            return this.topicService.emailTopicOwner(params).pipe(map((result) => {
+                return result && result.result === "SUCCESS";
+            }));
         };
 
         let configuration: MatDialogConfig = new MatDialogConfig();

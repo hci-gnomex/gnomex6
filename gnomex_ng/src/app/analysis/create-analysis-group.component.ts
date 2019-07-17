@@ -79,6 +79,8 @@ export class CreateAnalysisGroupComponent extends BaseGenericContainerDialog imp
     private readonly selectedLab: any;
     private idLabString: string;
 
+    public labDisplayField: string = this.prefService.labDisplayField;
+
 
 
     constructor(private dialogRef: MatDialogRef<CreateAnalysisGroupComponent>,
@@ -92,6 +94,11 @@ export class CreateAnalysisGroupComponent extends BaseGenericContainerDialog imp
 
         super();
         this.labList = data.labList;
+        if (this.labList && this.labList.length) {
+            if (!this.labList[0][this.labDisplayField]) {
+                this.labDisplayField = "labName";
+            }
+        }
         this.selectedLab = data.selectedLab;
     }
 
