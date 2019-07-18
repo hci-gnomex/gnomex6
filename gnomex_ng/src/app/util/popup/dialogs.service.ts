@@ -68,6 +68,7 @@ export class DialogsService {
 
         configuration.panelClass = "no-padding";
         configuration.disableClose = true;
+        configuration.hasBackdrop = false;
 
         let dialogRef = this.dialog.open(CustomDialogComponent, configuration);
         return dialogRef.afterClosed();
@@ -132,6 +133,7 @@ export class DialogsService {
         }
         configuration.panelClass = "no-padding";
         configuration.disableClose = true;
+        configuration.hasBackdrop = false;
         let dialogRef = this.dialog.open(GenericContainerDialogComponent, configuration );
 
         return dialogRef.afterClosed();
@@ -158,6 +160,7 @@ export class DialogsService {
         configuration.panelClass = "no-padding";
         configuration.disableClose = true;
         configuration.autoFocus = false;
+        configuration.hasBackdrop = false;
 
         let dialogRef: MatDialogRef<AlertDialogComponent>;
 

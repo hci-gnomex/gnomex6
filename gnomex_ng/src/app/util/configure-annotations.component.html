@@ -124,7 +124,7 @@
                 <div class="tabContent">
                     <div class="appliesToGroup" *ngIf="!experimentPlatformMode || this.listFilteredApplication.length > 0">
                         <label>Only show for these platforms/experiment types</label>
-                        <div style="display: flex; flex-direction: row;">
+                        <div class="justify-space-between" style="display: flex; flex-direction: row;">
                             <custom-combo-box class="appliesToField" *ngIf="!experimentPlatformMode"
                                               placeholder="Platform" displayField="display"
                                               [options]="this.listFilteredExperimentPlatform"
@@ -135,8 +135,10 @@
                                               [options]="this.listFilteredApplication"
                                               [(ngModel)]="this.appliesToApp">
                             </custom-combo-box>
-                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || !this.appliesToPlatform.value" (click)="this.addPlatform()"><img class="icon" src="../../assets/add.png"></button>
-                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedPlatformIndex == null" (click)="this.deletePlatform()"><img class="icon" src="../../assets/delete.png"></button>
+                            <div class="flex-container-row">
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || !this.appliesToPlatform.value" (click)="this.addPlatform()"><img class="icon" src="../../assets/add.png"></button>
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedPlatformIndex == null" (click)="this.deletePlatform()"><img class="icon" src="../../assets/delete.png"></button>
+                            </div>
                         </div>
                         <ag-grid-angular style="width: 100%; height: 100%;"
                                          class="ag-theme-fresh"
@@ -151,14 +153,16 @@
                     </div>
                     <div class="appliesToGroup">
                         <label>Only show for these organisms</label>
-                        <div style="display: flex; flex-direction: row;">
+                        <div class="justify-space-between" style="display: flex; flex-direction: row;">
                             <custom-combo-box class="appliesToField"
                                               placeholder="Organism" displayField="display"
                                               [options]="this.listOrganism"
                                               [(ngModel)]="this.appliesToOrganism">
                             </custom-combo-box>
-                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToOrganism == null" (click)="this.addOrganism()"><img class="icon" src="../../assets/add.png"></button>
-                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedOrganismIndex == null" (click)="this.deleteOrganism()"><img class="icon" src="../../assets/delete.png"></button>
+                            <div class="flex-container-row">
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToOrganism == null" (click)="this.addOrganism()"><img class="icon" src="../../assets/add.png"></button>
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedOrganismIndex == null" (click)="this.deleteOrganism()"><img class="icon" src="../../assets/delete.png"></button>
+                            </div>
                         </div>
                         <ag-grid-angular style="width: 100%; height: 100%;"
                                          class="ag-theme-fresh"
@@ -173,14 +177,16 @@
                     </div>
                     <div class="appliesToGroup" *ngIf="!experimentPlatformMode">
                         <label>Only show for these analysis types</label>
-                        <div style="display: flex; flex-direction: row;">
+                        <div class="justify-space-between" style="display: flex; flex-direction: row;">
                             <custom-combo-box class="appliesToField"
                                               placeholder="Analysis Type" displayField="display"
                                               [options]="this.listAnalysisType"
                                               [(ngModel)]="this.appliesToAnalysisType">
                             </custom-combo-box>
-                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToAnalysisType == null" (click)="this.addAnalysisType()"><img class="icon" src="../../assets/add.png"></button>
-                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedAnalysisTypeIndex == null" (click)="this.deleteAnalysisType()"><img class="icon" src="../../assets/delete.png"></button>
+                            <div class="flex-container-row">
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToAnalysisType == null" (click)="this.addAnalysisType()"><img class="icon" src="../../assets/add.png"></button>
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedAnalysisTypeIndex == null" (click)="this.deleteAnalysisType()"><img class="icon" src="../../assets/delete.png"></button>
+                            </div>
                         </div>
                         <ag-grid-angular style="width: 100%; height: 100%;"
                                          class="ag-theme-fresh"
@@ -195,15 +201,15 @@
                     </div>
                     <div class="appliesToGroup" *ngIf="!experimentPlatformMode">
                         <label>Only show for these users (only applies to non-required sample annotations)</label>
-                        <div style="display: flex; flex-direction: row;">
-                            <div style="width: 30%; margin-right: 2%;">
-                                <custom-combo-box placeholder="User" [options]="this.appUserList"
-                                                    displayField="display"
-                                                    [formControl]="this.appliesToUser" class="full-height full-width">
-                                </custom-combo-box>
+                        <div class="justify-space-between" style="display: flex; flex-direction: row;">
+                            <custom-combo-box class="appliesToField" placeholder="User" [options]="this.appUserList"
+                                              displayField="display"
+                                              [formControl]="this.appliesToUser" class="full-height full-width">
+                            </custom-combo-box>
+                            <div class="flex-container-row">
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToUser.value == null" (click)="this.addUser()"><img class="icon" src="../../assets/add.png"></button>
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedUserIndex == null" (click)="this.deleteUser()"><img class="icon" src="../../assets/delete.png"></button>
                             </div>
-                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToUser.value == null" (click)="this.addUser()"><img class="icon" src="../../assets/add.png"></button>
-                            <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedUserIndex == null" (click)="this.deleteUser()"><img class="icon" src="../../assets/delete.png"></button>
                         </div>
                         <ag-grid-angular style="width: 100%; height: 100%;"
                                          class="ag-theme-fresh"
@@ -294,8 +300,8 @@
     mat-form-field.propFormField {
         width: 65%;
     }
-    mat-form-field.appliesToField {
-        width: 30%;
+    custom-combo-box.appliesToField {
+        width: 40%;
         margin-right: 2%;
     }
     label.leadingLabel {

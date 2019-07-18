@@ -29,9 +29,7 @@ export class CreateProjectLauncherComponent implements OnInit, AfterViewInit {
         setTimeout(() => {
             let configuration: MatDialogConfig = new MatDialogConfig();
             configuration.width = "45em";
-            configuration.panelClass = "no-padding-dialog";
             configuration.autoFocus = false;
-            configuration.disableClose = true;
             configuration.data = {
                 labList: this.gnomexService.submitRequestLabList,
                 items: [],
@@ -43,7 +41,7 @@ export class CreateProjectLauncherComponent implements OnInit, AfterViewInit {
                         {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
                         {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
                     ]}).subscribe((result: any) => {
-                this.router.navigate([{ outlets: { modal: null }}]);
+                        this.router.navigate([{ outlets: { modal: null }}]);
             });
         });
     }

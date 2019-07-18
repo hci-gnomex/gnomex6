@@ -26,6 +26,7 @@
                     <img class="icon" [src]="constService.ICON_UPLOAD">
                     Upload Sample Sheet
                 </button>
+                <input type="file" #fileInput accept=".txt" class="hidden" (change)="onFileSelected($event)" multiple>
                 <button mat-button
                         class="padded-right"
                         color="link"

@@ -21,13 +21,10 @@ import {ConstantsService} from "../../services/constants.service";
     styles: [`
         .no-padding{
             padding:0;
-            
         }
         .no-margin{
             margin: 0;
         }
-        
-        
         .grabbable {
             cursor: move;
             cursor: grab;
@@ -51,7 +48,10 @@ import {ConstantsService} from "../../services/constants.service";
             margin-left:  0.3em;
             margin-right: 0.3em;
         }
-        
+        .mat-dialog-content {
+            max-height: 80vh;
+            max-width: 80vw;
+        }
     `]
 })
 export class GenericContainerDialogComponent implements OnInit, OnDestroy {
