@@ -262,7 +262,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
             }
 
             this.dialogsService
-                .confirm(level, confirmString)
+                .confirm(confirmString, level)
                 .subscribe(
                     res => {
                         if (res) {

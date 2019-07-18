@@ -56,6 +56,7 @@ export class ContextHelpComponent implements OnInit {
 
     public showPopup(): void {
         let config: MatDialogConfig = new MatDialogConfig();
+        config.minWidth = "30em";
         config.data = {
             popupTitle: this.popupTitle,
             dictionary: this.dictionary,
@@ -63,9 +64,9 @@ export class ContextHelpComponent implements OnInit {
         };
         let icon: string = "";
         if(this.isEditMode) {
-            icon = "<i class='fas fa-wrench fa-1x' style='color: var(--bluewarmvivid-medlight);'></i>";
+            icon = "<i class='fa fa-wrench fa-1x' style='color: var(--bluewarmvivid-medlight);'></i>";
         } else {
-            icon = "<i class='fas fa-info-circle fa-1x' style='color: var(--bluewarmvivid-medlight);'></i>";
+            icon = "<i class='fa fa-info-circle fa-1x' style='color: var(--bluewarmvivid-medlight);'></i>";
         }
         this.dialogsService.genericDialogContainer(ContextHelpPopupComponent, "", icon, config)
             .subscribe((result: any) => {

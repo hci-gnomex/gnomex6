@@ -123,6 +123,7 @@ export class SequenceFilesDialog extends BaseGenericContainerDialog implements O
     }
 
     ngOnInit(){
+        this.dtName = this.dtName.length > 25 ? this.dtName.substr(0, 25) + "..." : this.dtName;
         this.innerTitle = "Upload sequence files for: " + this.dtName;
 
     }

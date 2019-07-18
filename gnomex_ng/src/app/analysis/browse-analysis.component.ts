@@ -472,6 +472,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
             let configuration: MatDialogConfig = new MatDialogConfig();
             configuration.width = "40em";
+            configuration.autoFocus = false;
             configuration.data = {
                 labList: useThisLabList,
                 selectedLab: this.selectedIdLab,
