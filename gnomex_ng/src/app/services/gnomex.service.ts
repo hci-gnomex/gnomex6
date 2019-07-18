@@ -714,7 +714,7 @@ export class GnomexService {
                         forkJoin(this.appUserListService.getFullAppUserList(),this.labListService.getLabList())
                             .pipe(first()).subscribe((response: any[]) => {
                             this.progressService.displayLoader(45);
-                            this.appUserList = UtilService.getJsonArray(response[0], response[0] ? response[0].AppUser : []);
+                            this.appUserList = UtilService.getJsonArray(response[0], response[0] ? response[0].AppUser : null);
                             this.labList = response[1];
                             this.progressService.displayLoader(60);
                             this.myCoreFacilities = this.dictionaryService.coreFacilities();

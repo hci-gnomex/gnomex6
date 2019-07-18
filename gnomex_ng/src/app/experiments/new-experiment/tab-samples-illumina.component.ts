@@ -695,6 +695,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
 
         if (this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y'
             && this._experiment.seqPrepByCore_forSamples
             && this._experiment.seqPrepByCore_forSamples === 'N') {
 
@@ -1030,8 +1033,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         // }
 
         if (this._experiment
-            && this._experiment.seqPrepByCore_forSamples
-            && this._experiment.seqPrepByCore_forSamples === 'N') {
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y') {
 
             temp.push({
                 headerName: "Index Tag A",
@@ -1062,7 +1066,14 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 editable: false,
                 sortOrder: 301
             });
-            if (this._barCodes && Array.isArray(this._barCodes) && this._barCodes.length > 0) {
+
+            let permittedBarcodes: any[] = [];
+
+            if (this._experiment && this._experiment.samples && this._experiment.samples.length > 0) {
+                permittedBarcodes = BarcodeSelectEditor.getPermittedBarcodes('B', this._experiment.samples[0].idSeqLibProtocol, this.dictionaryService);
+            }
+
+            if (permittedBarcodes && Array.isArray(permittedBarcodes) && permittedBarcodes.length > 0) {
                 temp.push({
                     headerName: "Index Tag B",
                     editable: true,
@@ -1279,8 +1290,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         this._tabIndexToInsertAnnotations = 150;
 
         if (this._experiment
-            && this._experiment.seqPrepByCore_forSamples
-            && this._experiment.seqPrepByCore_forSamples === 'N') {
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y') {
 
             temp.push({
                 headerName: "Index Tag A",
@@ -1311,7 +1323,14 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 editable: false,
                 sortOrder: 301
             });
-            if (this._barCodes && Array.isArray(this._barCodes) && this._barCodes.length > 0) {
+
+            let permittedBarcodes: any[] = [];
+
+            if (this._experiment && this._experiment.samples && this._experiment.samples.length > 0) {
+                permittedBarcodes = BarcodeSelectEditor.getPermittedBarcodes('B', this._experiment.samples[0].idSeqLibProtocol, this.dictionaryService);
+            }
+
+            if (permittedBarcodes && Array.isArray(permittedBarcodes) && permittedBarcodes.length > 0) {
                 temp.push({
                     headerName: "Index Tag B",
                     editable: false,
@@ -1331,34 +1350,37 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     ],
                     sortOrder: 302
                 });
-            } else {
+
                 temp.push({
-                    headerName: "Index Tag B",
+                    headerName: "Index Tag Sequence B",
+                    field: "barcodeSequenceB",
+                    width:    8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    maxWidth: 10 * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
                     editable: false,
-                    width:    12 * this.emToPxConversionRate,
-                    minWidth: 12 * this.emToPxConversionRate,
-                    maxWidth: 20 * this.emToPxConversionRate,
-                    field: "idOligoBarcodeB",
-                    cellRendererFramework: SelectRenderer,
-                    cellEditorFramework: BarcodeSelectEditor,
-                    selectOptions: this._barCodes,
-                    selectOptionsDisplayField: "display",
-                    selectOptionsValueField: "idOligoBarcodeB",
-                    indexTagLetter: 'B',
-                    sortOrder: 302
+                    sortOrder: 303
                 });
+            } else {
+                // In view mode, if there are no usable Index Tag B's, we just don't display this column.
+
+                // temp.push({
+                //     headerName: "Index Tag B",
+                //     editable: false,
+                //     width:    12 * this.emToPxConversionRate,
+                //     minWidth: 12 * this.emToPxConversionRate,
+                //     maxWidth: 20 * this.emToPxConversionRate,
+                //     field: "idOligoBarcodeB",
+                //     cellRendererFramework: SelectRenderer,
+                //     cellEditorFramework: BarcodeSelectEditor,
+                //     selectOptions: this._barCodes,
+                //     selectOptionsDisplayField: "display",
+                //     selectOptionsValueField: "idOligoBarcodeB",
+                //     indexTagLetter: 'B',
+                //     sortOrder: 302
+                // });
             }
 
-            temp.push({
-                headerName: "Index Tag Sequence B",
-                field: "barcodeSequenceB",
-                width:    8.5 * this.emToPxConversionRate,
-                minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: false,
-                sortOrder: 303
-            });
             temp.push({
                 headerName: "QC Status",
                 field: "qualStatus",
