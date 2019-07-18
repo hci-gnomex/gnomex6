@@ -515,7 +515,7 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
                 warningMessage += validIndexTags.warningMessage;
             }
             if (warningMessage) {
-                this.dialogsService.confirm(warningMessage + "<br> Continue saving?").subscribe((answer: boolean) => {
+                this.dialogsService.confirm(warningMessage + "<br>Continue saving?").subscribe((answer: boolean) => {
                     if (answer) {
                         this.saveWorkItems();
                     }

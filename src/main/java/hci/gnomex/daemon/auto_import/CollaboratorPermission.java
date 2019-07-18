@@ -1,13 +1,7 @@
 package hci.gnomex.daemon.auto_import;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.sql.SQLException;
+import java.util.*;
 import java.util.Map.Entry;
 
 public class CollaboratorPermission {
@@ -17,13 +11,16 @@ public class CollaboratorPermission {
     private Query query;
     private static Set<String> levelOptions;
     private String level;
+    private boolean authCollaborators;
     private static Set<String> dataVendorOptions;
     private List<String> dataVendors = new ArrayList();
+    private List<String> excludedVendors = new ArrayList<>();
     private String attributeType;
     private List<String> attributeIDs = new ArrayList();
     public List<String> IRBs = new ArrayList();
     private static int AVATAR_FOLDER_ID = 11;
     private static int FOUNDATION_FOLDER_ID = 14;
+    private static int TEMPUS_FOLDER_ID = 22;
 
     static {
         diseaseAliasMap.put("Abdomen", Arrays.asList("Abdominal wall"));
@@ -76,12 +73,14 @@ public class CollaboratorPermission {
         diseaseAliasMap.put("Uterus", Arrays.asList());
         diseaseAliasMap.put("Vagina", Arrays.asList());
         diseaseAliasMap.put("Whipple Resection", Arrays.asList());
+
         levelOptions = new HashSet();
         levelOptions.add("experiment");
         levelOptions.add("experimentproperty");
         levelOptions.add("sampleproperty");
         levelOptions.add("sample");
         levelOptions.add("analysis");
+
         dataVendorOptions = new HashSet();
         dataVendorOptions.add("avatar");
         dataVendorOptions.add("foundation");
@@ -91,6 +90,7 @@ public class CollaboratorPermission {
 
 
     CollaboratorPermission(String[] args) throws Exception {
+        authCollaborators = false;
         for(int i = 0; i < args.length; ++i) {
             args[i] = args[i].toLowerCase();
             if (args[i].equals("-irb")) {
@@ -115,7 +115,7 @@ public class CollaboratorPermission {
                 }
 
                 this.level = args[i].toLowerCase();
-            } else if (args[i].equals("-datavendor")) {
+            } else if (args[i].equals("-vendor")) {
                 ++i;
                 this.parseArgs(i, this.dataVendors, args);
                 Iterator var3 = this.dataVendors.iterator();
@@ -127,9 +127,24 @@ public class CollaboratorPermission {
                         throw new Exception("dataVendor is not found, please provide a valid option: Avatar,Foundation,Tempus, or all");
                     }
                 }
-            } else if (args[i].equals("-dbcredentials")) {
+            }else if(args[i].equals("-excludevendor")){
+                ++i;
+                this.parseArgs(i, this.excludedVendors, args);
+                Iterator var3 = this.excludedVendors.iterator();
+
+                while(var3.hasNext()) {
+                    String v = (String)var3.next();
+                    boolean isVendor = dataVendorOptions.contains(v.toLowerCase());
+                    if (!isVendor) {
+                        throw new Exception("excluded vendor is not found, please provide a valid option: Avatar,Foundation,Tempus");
+                    }
+                }
+            }
+            else if (args[i].equals("-dbcredentials")) {
                 ++i;
                 this.query = new Query(args[i]);
+            }else if(args[i].equals("-auth")){
+                this.authCollaborators = true;
             }
         }
 
@@ -141,10 +156,11 @@ public class CollaboratorPermission {
         try {
             cp = new CollaboratorPermission(args);
             List<Integer> analysisList = cp.getAnalysesWithCriteria();
-            System.out.println("Analyses to be used ");
-            System.out.println(analysisList);
-            Map<Integer, List<Integer>> analysisForCollabs = cp.query.getCollaboratorsForIRB(cp.IRBs, analysisList);
-            cp.assignAnalysisToCollabs(analysisForCollabs);
+            if(cp.isCollaboratorsAuthed()){
+                Map<Integer, List<Integer>> analysisForCollabs = cp.query.getCollaboratorsForIRB(cp.IRBs, analysisList);
+                cp.assignAnalysisToCollabs(analysisForCollabs);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
             cp.query.closeConnection();
@@ -158,69 +174,184 @@ public class CollaboratorPermission {
 
     }
 
-    private List<Integer> getAnalysesWithCriteria() {
-        List<Integer> analysisIDList = new ArrayList();
+    public boolean isCollaboratorsAuthed() {
+        return  this.authCollaborators;
+    }
+    private List<Integer> getAnalysesWithCriteria() throws Exception {
+        List<Integer> analysisIDList = new ArrayList<>();
         if (this.level.equals("sampleproperty")) {
-            StringBuilder strBuilder = new StringBuilder();
-            strBuilder.append("SELECT summary.idAnalysis\n ");
-            strBuilder.append("FROM ( SELECT s.name, s.idSample, a.idAnalysis\n ");
-            strBuilder.append("FROM Sample s JOIN Request r ON s.idRequest = r.idRequest\n ");
-            strBuilder.append("JOIN Analysis a ON a.name = r.name ");
-            strBuilder.append(this.makeAnalysisGroupINstatement(this.dataVendors));
-            strBuilder.append("\n ");
-            strBuilder.append(this.makeQueryStatement(this.dataVendors));
-            strBuilder.append("\n ");
-            strBuilder.append(") as summary\n ");
-            strBuilder.append("JOIN PropertyEntry pe ON pe.idSample = summary.idSample\n ");
-            strBuilder.append("JOIN Property p ON p.idProperty = pe.idProperty\n ");
-            strBuilder.append("WHERE p.name = '");
-            strBuilder.append(this.attributeType);
-            strBuilder.append("' AND ");
-            strBuilder.append("pe.valueString LIKE ?");
-            this.query.executeAnalysisWithCriteriaQuery(strBuilder.toString(), this.attributeIDs);
-            System.out.println(this.attributeIDs.toString());
-            System.out.println("The query: \n" + strBuilder.toString());
-        } else if (!this.level.equals("sample") && !this.level.equals("experimentproperty") && !this.level.equals("experiment") && this.level.equals("analysis") && this.attributeType.equals("idanalysis")) {
+            analysisIDList = getAnalysisIDsFromProperty();
+
+        }else if(this.level.equals("analysis") && this.attributeType.equals("name")){
+            analysisIDList = getAnalysisFromPersonID();
+        }
+        else if (this.level.equals("analysis") && this.attributeType.equals("idanalysis")) {
             List<Integer> tempIntegerList = new ArrayList();
             for(String id: this.attributeIDs) {
                 tempIntegerList.add(new Integer(id));
             }
 
             analysisIDList = tempIntegerList;
+            outSummary(new HashSet<>(), analysisIDList);
         }
 
         return analysisIDList;
     }
 
-    private String makeQueryStatement(List<String> dataVendors) {
+    List<Integer> getAnalysisIDsFromProperty() throws Exception {
+        Set<String> personIDList = new TreeSet<>();
+        List<Integer> analysisIDList = new ArrayList();
+
+        for(int i = 0; i < this.dataVendors.size(); i++){
+            StringBuilder strBuilder = new StringBuilder();
+
+            strBuilder.append("SELECT summary.personID \n ");
+            strBuilder.append("FROM ( SELECT  s.name, s.idSample, a.name as personID, a.idAnalysis\n ");
+            strBuilder.append("FROM Sample s JOIN Request r ON s.idRequest = r.idRequest\n ");
+            strBuilder.append("JOIN Analysis a ON a.name = r.name ");
+            strBuilder.append(this.makeAnalysisGroupINstatement(this.dataVendors.get(i)));
+            strBuilder.append("\n ");
+            strBuilder.append(this.makeQueryStatement(this.dataVendors.get(i)));
+            strBuilder.append("\n ");
+            strBuilder.append(") as summary\n ");
+            strBuilder.append("JOIN PropertyEntry pe ON pe.idSample = summary.idSample\n ");
+            strBuilder.append("JOIN Property p ON p.idProperty = pe.idProperty\n ");
+            strBuilder.append("WHERE p.name = '");
+            strBuilder.append(this.attributeType);
+            strBuilder.append("' ");
+            strBuilder.append(" AND ");
+            strBuilder.append("pe.valueString LIKE");
+            strBuilder.append(" '%");
+            strBuilder.append(attributeIDs.get(0));// only supporting one for now needs to changed for an array
+            strBuilder.append("%'");
+
+            if(i > 0  && personIDList.size() > 0){
+                strBuilder.append(" AND ");
+                strBuilder.append(makePersonIdINstatement(personIDList, "summary.personID"));
+                personIDList.clear();
+            }
+
+            this.query.executeAnalysisWithCriteriaQuery(strBuilder.toString(), personIDList);
+        }
+
+        for(String ev : excludedVendors){
+            StringBuilder strBuilder = new StringBuilder();
+            strBuilder.append("SELECT a.name as personID \n ");
+            strBuilder.append("FROM Analysis a JOIN Request r ON r.name = a.name \n");
+            strBuilder.append(this.makeAnalysisGroupINstatement(ev));
+            this.query.filterPersonIDList(strBuilder.toString(), personIDList);
+
+        }
+
+
+        analysisIDList = this.query.getAnalysisIdFromPersonID(personIDList, makePersonIdINstatement(personIDList, "a.name"));
+        outSummary(personIDList, analysisIDList);
+        return analysisIDList;
+
+    }
+
+    List<Integer> getAnalysisFromPersonID() throws Exception{
+        Set<String> personIDList = new TreeSet<>();
+        List<Integer> analysisIDList = new ArrayList();
+        if(attributeIDs.size() > 0 ){
+            for(String attrID : attributeIDs){
+                personIDList.add(attrID);
+            }
+        }else{
+            String allPatientQuery = "SELECT a.name as PersonID FROM Analysis a";
+            this.query.executeAnalysisWithCriteriaQuery(allPatientQuery,personIDList);
+        }
+
+
+
+
+        for(int i = 0; i < this.dataVendors.size(); i++){
+            StringBuilder strBuilder = new StringBuilder();
+            strBuilder.append("SELECT a.name as personID \n ");
+            strBuilder.append("FROM Analysis a JOIN Request r ON r.name = a.name \n");
+            strBuilder.append(this.makeAnalysisGroupINstatement(this.dataVendors.get(i)));
+            strBuilder.append("\n ");
+
+            strBuilder.append("WHERE ");
+            strBuilder.append(makePersonIdINstatement(personIDList, "a.name"));
+            personIDList.clear();
+
+            this.query.executeAnalysisWithCriteriaQuery(strBuilder.toString(), personIDList);
+
+        }
+
+        for(String ev : excludedVendors){
+            StringBuilder strBuilder = new StringBuilder();
+            strBuilder.append("SELECT a.name as personID \n ");
+            strBuilder.append("FROM Analysis a JOIN Request r ON r.name = a.name \n");
+            strBuilder.append(this.makeAnalysisGroupINstatement(ev));
+            this.query.filterPersonIDList(strBuilder.toString(), personIDList);
+
+        }
+        analysisIDList = this.query.getAnalysisIdFromPersonID(personIDList, makePersonIdINstatement(personIDList, "a.name"));
+        outSummary(personIDList, analysisIDList);
+        return analysisIDList;
+    }
+
+
+
+    private String makeQueryStatement(String dataVendor) {
         StringBuilder strBuild = new StringBuilder("WHERE ");
 
-        for(int i = 0; i < dataVendors.size(); ++i) {
-            if ((dataVendors.get(i)).equals("avatar")) {
-                strBuild.append(" s.name LIKE '%SL%' ");
-            } else if ((dataVendors.get(i)).equals("foundation")) {
-                strBuild.append(" s.name  LIKE '%RF%' ");
-            } else if (!(dataVendors.get(i)).equals("tempus") && (dataVendors.get(i)).equals("all")) {
-                return "";
-            }
 
-            if (i < dataVendors.size() - 1) {
-                strBuild.append(" OR ");
-            }
+        if (dataVendor.equals("avatar")) {
+            strBuild.append(" s.name LIKE 'SL%' ");
+        } else if (dataVendor.equals("foundation")) {
+            strBuild.append(" s.name  REGEXP '^T?C?Q?RF[0-9]+' ");
+        } else if (dataVendor.equals("tempus")){
+            strBuild.append(" s.name LIKE 'TL%' ");
+        }else if(dataVendor.equals("all")) {
+            return " ";
         }
 
         return strBuild.toString();
     }
 
-    private String makeAnalysisGroupINstatement(List<String> dataVendors) {
+
+    private String makePersonIdINstatement(Set<String> personIDList, String idType ) {
+        StringBuilder strBuild = new StringBuilder();
+        strBuild.append(idType);
+        strBuild.append(" IN ( '");
+
+        strBuild.append(String.join("', '",personIDList));
+        strBuild.append("' );");
+        return strBuild.toString();
+    }
+
+    private String makeAnalysisGroupINstatement(String dataVendor) {
+        StringBuilder strBuild = new StringBuilder("JOIN AnalysisGroupItem agi ON agi.idAnalysis = a.idAnalysis AND agi.idAnalysisGroup IN ( ");
+
+
+        if (dataVendor.equals("avatar")) {
+            strBuild.append(AVATAR_FOLDER_ID);
+        } else if (dataVendor.equals("foundation")) {
+            strBuild.append(FOUNDATION_FOLDER_ID);
+        } else if (dataVendor.equals("tempus") ) {
+            strBuild.append(TEMPUS_FOLDER_ID);
+        }else if(dataVendor.equals("all")){
+            return "";
+        }
+
+        strBuild.append(" )");
+        return strBuild.toString();
+    }
+
+    private String makeAnalysisGroupINstatement(List<String> vList) {
         StringBuilder strBuild = new StringBuilder("JOIN AnalysisGroupItem agi ON agi.idAnalysis = a.idAnalysis AND agi.idAnalysisGroup IN (");
 
-        for(int i = 0; i < dataVendors.size(); ++i) {
-            if (((String)dataVendors.get(i)).equals("avatar")) {
+        for(int i = 0; i < vList.size(); ++i) {
+            if ((vList.get(i)).equals("avatar")) {
                 strBuild.append(AVATAR_FOLDER_ID);
-            } else if (((String)dataVendors.get(i)).equals("foundation")) {
+            } else if ((vList.get(i)).equals("foundation")) {
                 strBuild.append(FOUNDATION_FOLDER_ID);
-            } else if (!((String)dataVendors.get(i)).equals("tempus") && ((String)dataVendors.get(i)).equals("all")) {
+            } else if (vList.get(i).equals("tempus")) {
+                strBuild.append(TEMPUS_FOLDER_ID);
+            }else if(vList.get(i).equals("all")){
                 return "";
             }
 
@@ -232,6 +363,10 @@ public class CollaboratorPermission {
         strBuild.append(")");
         return strBuild.toString();
     }
+
+
+
+
 
     public List<String> getIRAAssociation() throws Exception {
         ArrayList<String> associations = new ArrayList<>();
@@ -307,8 +442,20 @@ public class CollaboratorPermission {
 
     }
 
-    public void assignAnalysisPermissionToCollabs(List<String> irbAssocationList) {
+    void outSummary(Set<String> personIDs, List<Integer> analysisIDs){
+        System.out.println("There are " + personIDs.size() +  " patients that meet your criteria specified ");
+        System.out.println("There are also " + analysisIDs.size() + " analyses for those patients" );
+        System.out.println("Patient IDs below");
+        for(String p : personIDs){
+            System.out.println(p);
+        }
+        System.out.println("Analysis IDs Below");
+        for(Integer a : analysisIDs){
+            System.out.println("" + a);
+        }
+
     }
+
 
     void parseArgs(int startIndex, List<String> itemList, String[] args) {
         for(int i = startIndex; i < args.length; ++i) {

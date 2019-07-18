@@ -24,7 +24,8 @@ public class Differ {
 	private List<String> uniqueByName;
 	private List<String> uniqueByChecksum;
 	private String onlyMatchOn; // for regex to match on either local or remote or both
-
+	private Integer startCaptureGroup;
+	private Integer endCaptureGroup;
 
 
 	public Differ(String[] args) {
@@ -33,7 +34,6 @@ public class Differ {
 		this.uniqueByName = new ArrayList<String>();
 		this.uniqueByChecksum = new ArrayList<String>();
 		this.onlyMatchOn = "all";
-
 
 		for (int i = 0; i < args.length; i++) {
 			args[i] = args[i].toLowerCase();
@@ -50,7 +50,22 @@ public class Differ {
 					onlyMatchOn = args[++i];
 				}
 				this.matchByName = args[++i];
-			}else if (args[i].equals("-help")) {
+			}else if(args[i].equals("-cp")){
+				try {
+					startCaptureGroup =  Integer.parseInt(args[i + 1]);
+					i++;
+					endCaptureGroup = Integer.parseInt(args[i + 1]);
+					i++;
+				}catch(Exception e){
+					if(startCaptureGroup == null){
+						System.out.println("Please provide at least a starting a range for the capture group");
+						System.exit(1);
+					}if(startCaptureGroup != null && endCaptureGroup == null){
+						endCaptureGroup = startCaptureGroup;
+					}
+				}
+
+			} else if (args[i].equals("-help")) {
 				//printUsage();
 				System.exit(0);
 			}
@@ -121,8 +136,6 @@ public class Differ {
 		}
 
 
-
-
 	}
 
 
@@ -133,6 +146,7 @@ public class Differ {
 		if(matchByName != null){
 			p = Pattern.compile(matchByName);
 		}
+		StringBuilder renameBuildStr = new StringBuilder();
 
 
 
@@ -152,8 +166,7 @@ public class Differ {
 				if(matchByName != null && !onlyMatchOn.equals("-r")){
 					Matcher m = p.matcher(line);
 					if(m.matches()){
-						String fileName = m.group(1);
-						fileMap.put(fileName, line );
+						fileMap.put(constructMatchedFileName(m,renameBuildStr), line );
 					}else{ // doesn't have to match name so get file plus extension
 						this.addToLocalMap(line);
 					}
@@ -190,21 +203,19 @@ public class Differ {
 					}
 				}
 
-
-
 			}else {
 				if(matchByName != null && !onlyMatchOn.equals("-l")){
 					Matcher m = p.matcher(line1);
 					if(m.matches()){
-						fileName = m.group(1);
+						fileName = constructMatchedFileName(m,renameBuildStr);
 						if(fileMap.get(fileName) == null ){
 							uniqueByName.add(line1);
 						}
 					}else{
-						addUniqueName(fileName, line1);
+						addUniqueName(line1);
 					}
 				}else{
-					addUniqueName(fileName, line1);
+					addUniqueName(line1);
 				}
 
 			}
@@ -217,9 +228,9 @@ public class Differ {
 		fileMap.put(fileName, line);
 	}
 
-	private void addUniqueName(String fileName, String line){
+	private void addUniqueName(String line){
 		String[] pathWithFile = line.split("/");
-		fileName = pathWithFile[pathWithFile.length -1];
+		String fileName = pathWithFile[pathWithFile.length -1];
 
 		if(fileMap.get(fileName) == null) { // diff
 			uniqueByName.add(line);
@@ -247,6 +258,31 @@ public class Differ {
 		return inclusionList;
 
 
+	}
+
+	private String  constructMatchedFileName( Matcher m, StringBuilder renameBuildStr ){
+		int endRange =  0;
+		if(startCaptureGroup == null ){ // if cp wasn't specified in args default to capture all groups
+			startCaptureGroup = 0;
+			endCaptureGroup = m.groupCount();
+		}
+
+		if ( m.groupCount() < endCaptureGroup){
+			System.out.println("End Capture Group  cannot greater than actual capture groups length: " +  m.groupCount());
+			System.exit(1);
+		}
+
+
+		for(int i = startCaptureGroup ; i <= endCaptureGroup; i++ ){
+			renameBuildStr.append(m.group(i));
+			if(i < m.groupCount()){
+				renameBuildStr.append("-");
+			}
+		}
+		String rename = renameBuildStr.toString();
+		renameBuildStr.setLength(0);
+
+		return rename;
 	}
 
 	public void writeDiffToFile(List<String> uniqueFiles){ // use if you want to do std.out

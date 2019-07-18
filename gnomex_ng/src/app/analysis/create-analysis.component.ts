@@ -16,6 +16,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {ActionType, GDAction} from "../util/interfaces/generic-dialog-action.model";
 import {ConfigureOrganismsComponent} from "../configuration/configure-organisms.component";
+import {UtilService} from "../services/util.service";
 
 @Component({
     selector: "create-analysis-dialog",
@@ -77,6 +78,8 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     private codeVisibility: string;
     private readonly parentComponent: string = "";
 
+    public labDisplayField: string = this.prefService.labDisplayField;
+
     constructor(private dialogRef: MatDialogRef<CreateAnalysisComponent>, @Inject(MAT_DIALOG_DATA) private data: any,
                 private dictionaryService: DictionaryService,
                 private dialog: MatDialog,
@@ -93,6 +96,11 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     ) {
         super();
         this.labList = data.labList;
+        if (this.labList && this.labList.length) {
+            if (!this.labList[0][this.labDisplayField]) {
+                this.labDisplayField = "labName";
+            }
+        }
         this.items = data.items;
         this.selectedLab = data.selectedLab;
         this.selectedAnalysisGroup = data.selectedAnalysisGroup;
@@ -122,7 +130,7 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
             visibility: ["", [
                 Validators.required
             ]],
-            genomeBuilds: []
+            genomeBuilds: [[]]
         });
         if (this.createSecurityAdvisorService.isAdmin) {
             this.createAnalysisForm.addControl("analysisOwner", new FormControl("", Validators.required));
@@ -182,13 +190,16 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     onLabSelect(event: any) {
         if (event) {
             this.analysisGroupList = [];
+            this.ownerList = [];
 
             this.dialogsService.startDefaultSpinnerDialog();
 
             this.idLabString = event;
             if (this.showOwnerComboBox) {
                 this.getLabService.getLabByIdOnlyForHistoricalOwnersAndSubmitters(this.idLabString).subscribe((response: any) => {
-                    this.ownerList = response.Lab.historicalOwnersAndSubmitters;
+                    if(response && response.Lab && response.Lab.historicalOwnersAndSubmitters) {
+                        this.ownerList = UtilService.getJsonArray(response.Lab.historicalOwnersAndSubmitters, response.Lab.historicalOwnersAndSubmitters.AppUser);
+                    }
                 });
             }
 

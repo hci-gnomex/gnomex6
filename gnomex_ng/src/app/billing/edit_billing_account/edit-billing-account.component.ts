@@ -42,12 +42,10 @@ export class EditBillingAccountLauncher {
 					{type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Update", internalAction: "onUpdateButtonClicked"},
 					{type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
 				]}).subscribe((result: any) => {
-					if(result) {
-						// TODO: Verify if the data is updated and success pop-up may needed here
-                        // After closing the dialog, route away from this component so that the dialog could
-                        // potentially be reopened.
-                        this.router.navigate([{ outlets: {modal: null}}]);
-					}
+            // TODO: Verify if the data is updated and success pop-up may needed here
+            // After closing the dialog, route away from this component so that the dialog could
+            // potentially be reopened.
+            this.router.navigate([{ outlets: {modal: null}}]);
 		});
 	}
 }
@@ -651,8 +649,8 @@ export class EditBillingAccountComponent extends BaseGenericContainerDialog impl
             this._rowData.startDateOther           = startDateOther;
             this._rowData.expirationDate           = this.effectiveUntilDate;
             this._rowData.expirationDateOther      = expirationDateOther;
-            this._rowData.totalDollarAmount        = this.totalDollarAmount;
-            this._rowData.totalDollarAmountDisplay = '$' + this.totalDollarAmount;
+            this._rowData.totalDollarAmount        = this.totalDollarAmount ? this.totalDollarAmount : "";
+            this._rowData.totalDollarAmountDisplay = this.totalDollarAmount ? '$' + this.totalDollarAmount : "";
             this._rowData.activeAccount            = activeAccount;
             this._rowData.isPO                     = isPO;
 
@@ -837,8 +835,8 @@ export class EditBillingAccountComponent extends BaseGenericContainerDialog impl
             this._rowData.startDateOther           = startDateOther;
             this._rowData.expirationDate           = expirationDate;
             this._rowData.expirationDateOther      = expirationDateOther;
-            this._rowData.totalDollarAmount        = this.totalDollarAmount;
-            this._rowData.totalDollarAmountDisplay = '$' + this.totalDollarAmount;
+            this._rowData.totalDollarAmount        = this.totalDollarAmount ? this.totalDollarAmount : "";
+            this._rowData.totalDollarAmountDisplay = this.totalDollarAmount ? '$' + this.totalDollarAmount : "";
             this._rowData.activeAccount            = activeAccount;
             this._rowData.isPO                     = isPO;
             this._rowData.isCreditCard             = isCreditCard;
@@ -985,8 +983,8 @@ export class EditBillingAccountComponent extends BaseGenericContainerDialog impl
             this._rowData.startDateOther           = startDateOther;
             this._rowData.expirationDate           = expirationDate;
             this._rowData.expirationDateOther      = expirationDateOther;
-            this._rowData.totalDollarAmount        = this.totalDollarAmount;
-            this._rowData.totalDollarAmountDisplay = '$' + this.totalDollarAmount;
+            this._rowData.totalDollarAmount        = this.totalDollarAmount ? this.totalDollarAmount : "";
+            this._rowData.totalDollarAmountDisplay = this.totalDollarAmount ? '$' + this.totalDollarAmount : "";
             this._rowData.activeAccount            = activeAccount;
             this._rowData.isPO                     = isPO;
             this._rowData.isCreditCard             = isCreditCard;

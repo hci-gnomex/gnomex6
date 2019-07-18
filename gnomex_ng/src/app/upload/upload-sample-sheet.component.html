@@ -1,12 +1,11 @@
 <div class="full-width full-height bordered foreground small-font">
-    <div *ngIf="!fileParsed" class="full-height full-width flex-container-row align-center">
-        <div class="full-height flex-grow">
+    <input type="file" accept=".txt" class="hidden" (change)="onFileSelected($event)" #fileInput>
+    <div *ngIf="!fileParsed" class="full-height full-width flex-container-col align-center">
+        <div class="full-height full-width flex-container-row align-center">
         </div>
-        <div>
-            <input type="file" accept=".txt" class="hidden" (change)="onFileSelected($event)" #fileInput>
-            <button mat-raised-button (click)="openFileChooser()">Upload</button>
-        </div>
-        <div class="full-height flex-grow">
+        <div class="full-width flex-container-row justify-flex-end generic-dialog-footer-colors">
+            <save-footer (saveClicked)="openFileChooser()" name="Upload"></save-footer>
+            <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="onClose()" name="Close"></save-footer>
         </div>
     </div>
     <div *ngIf="fileParsed && !reportResults" class="full-width full-height flex-container-col">
@@ -44,10 +43,12 @@
                     (Field formats)
                 </button>
             </div>
-            <div>
-                <button mat-raised-button (click)="onPopulateFields()">
-                    Populate Fields
-                </button>
+        </div>
+        <div class="full-width flex-container-row justify-space-between generic-dialog-footer-colors">
+            <save-footer (saveClicked)="openFileChooser()" name="Re-Upload"></save-footer>
+            <div class="flex-container-row justify-flex-end">
+                <save-footer (saveClicked)="onPopulateFields()" name="Populate Fields"></save-footer>
+                <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="onClose()" name="Close"></save-footer>
             </div>
         </div>
     </div>
@@ -61,16 +62,8 @@
                 <pre>{{reportText}}</pre>
             </div>
         </div>
-        <div class="full-width flex-container-row align-center padded-left-right-bottom">
-            <div class="full-height flex-grow">
-            </div>
-            <div class="full-height">
-                <button mat-raised-button mat-dialog-close>
-                    Done
-                </button>
-            </div>
-            <div class="full-height flex-grow">
-            </div>
+        <div class="full-width flex-container-row justify-flex-end generic-dialog-footer-colors">
+            <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="onClose()" name="Close"></save-footer>
         </div>
     </div>
 </div>

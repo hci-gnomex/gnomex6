@@ -8,13 +8,10 @@
                 <img [src]="rad.icon">{{rad.display}}
             </mat-radio-button>
         </mat-radio-group>
-
     </div>
-
     <div style="margin-top: 1em; display: flex; flex-direction: column;">
         <label class="gx-label"> Individual collaborators allowed access to this data track  </label>
-
-        <div>
+        <div class="flex-container-row">
             <div style="width:30%">
                 <custom-multi-combo-box class="full-width"
                                         placeholder="Collaborators"
@@ -26,35 +23,18 @@
                                         (selectionChanged)="collaborChange($event)">
                 </custom-multi-combo-box>
             </div>
-
             <button mat-button color="primary" [disabled]="!isSelectable" (click)="toggeSelect()"> {{ selectMode }} </button>
-
         </div>
-
-
-
     </div>
-
-
-
     <div style="width:30%;">
         <custom-combo-box placeholder="Lab" (optionSelected)="selectOption($event)"
                           [displayField]="this.prefService.labDisplayField" valueField="idLab"
                           [options]="this.labList" [formControlName]="'lab'">
         </custom-combo-box>
     </div>
-
-
     <div style="width:30%;">
         <custom-combo-box placeholder="Owner" valueField="idAppUser" [displayField]="this.prefService.userDisplayField"
                           [options]="getLabService.labMembersSubject | async" [formControlName]="'idAppUser'">
         </custom-combo-box>
     </div>
-
-
-
-
-
-
-
 </form>

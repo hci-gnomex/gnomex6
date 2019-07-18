@@ -62,6 +62,9 @@ import {ExperimentsService} from "../experiments.service";
             overflow: visible !important;
             white-space: normal !important;
         }
+        .hidden {
+            display: none;
+        }
     `]
 })
 
@@ -69,6 +72,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
     @ViewChild('ccCheckbox') ccCheckbox: MatCheckbox;
+    @ViewChild('fileInput') fileInput: ElementRef;
 
     private emToPxConversionRate: number = 13;
 
@@ -2065,26 +2069,34 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public upload(): void {
-        let data = {
-            sampleColumns: this.samplesGridColumnDefs,
-            ccNumberColumnIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
-            experiment: this._experiment
-        };
+        this.fileInput.nativeElement.click();
+    }
 
-        let config: MatDialogConfig = new MatDialogConfig();
-        config.width = '60em';
-        config.height = '45em';
-        config.panelClass = 'no-padding-dialog';
-        config.data = data;
+    public onFileSelected(event: any): void {
+        if (event.target.files && event.target.files.length > 0) {
+            // this.file = event.target.files[0];
+            let data = {
+                sampleColumns: this.samplesGridColumnDefs,
+                ccNumberColumnIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
+                experiment: this._experiment,
+                file: event.target.files[0]
+            };
 
-        this.dialogService.genericDialogContainer(UploadSampleSheetComponent, "Upload Sample Sheet", null, config,
-            {actions: [{type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}]}).subscribe((result: any) => {
-            if (result && Array.isArray(result)) {
-                this._experiment.numberOfSamples = '' + result.length;
-            }
+            let config: MatDialogConfig = new MatDialogConfig();
+            config.width = '60em';
+            config.height = '45em';
+            config.panelClass = 'no-padding-dialog';
+            config.data = data;
 
-            this.samplesGridApi.refreshCells();
-        });
+            this.dialogService.genericDialogContainer(UploadSampleSheetComponent, "Upload Sample Sheet", null, config)
+                .subscribe((result: any) => {
+                    if (result && Array.isArray(result)) {
+                        this._experiment.numberOfSamples = '' + result.length;
+                    }
+
+                    this.samplesGridApi.refreshCells();
+                });
+        }
     }
 
     public download(): void {

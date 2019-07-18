@@ -43,9 +43,9 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
             </div>
             <div class="flex-container-row full-width align-center">
                 <div [hidden]="!this.showLinkToTopic" class="half-width">
-                    <custom-multi-combo-box placeholder="Topic(s)" 
-                                            [formControl]="this.form.get('topic')" 
-                                            [options]="this.topicList" 
+                    <custom-multi-combo-box placeholder="Topic(s)"
+                                            [formControl]="this.form.get('topic')"
+                                            [options]="this.topicList"
                                             displayField="name">
                     </custom-multi-combo-box>
                 </div>
@@ -239,9 +239,7 @@ export class TabExternalSetupComponent implements OnInit, OnChanges, OnDestroy {
     public editProject(): void {
         let config: MatDialogConfig = new MatDialogConfig();
         config.width = "45em";
-        config.panelClass = "no-padding-dialog";
         config.autoFocus = false;
-        config.disableClose = true;
         config.data = {
             idProject: this.form.get("project").value.idProject,
         };
@@ -260,9 +258,7 @@ export class TabExternalSetupComponent implements OnInit, OnChanges, OnDestroy {
     public newProject(): void {
         let config: MatDialogConfig = new MatDialogConfig();
         config.width = "45em";
-        config.panelClass = "no-padding-dialog";
         config.autoFocus = false;
-        config.disableClose = true;
         config.data = {};
 
         this.dialogsService.genericDialogContainer(CreateProjectComponent, "New Project", this.constantsService.ICON_FOLDER_ADD, config,

@@ -10,11 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Query {
     private String username;
@@ -42,7 +38,7 @@ public class Query {
             bf = new BufferedReader(fr);
             String line = "";
 
-            while((line = bf.readLine()) != null) {
+            while ((line = bf.readLine()) != null) {
                 String[] credArray = line.split(" ");
                 if (credArray[0].equals("username")) {
                     this.username = credArray[1];
@@ -84,16 +80,20 @@ public class Query {
     public void initalizeConnection() {
         try {
             Class.forName(className);
-            conn = DriverManager.getConnection(connectionStr, username,password);
+            conn = DriverManager.getConnection(connectionStr, username, password);
         } catch (SQLException e) {
             if (conn != null) {
-				try { conn.close(); } catch (Exception ex) { /* ignored */ }
+                try {
+                    conn.close();
+                } catch (Exception ex) { /* ignored */ }
             }
             e.printStackTrace();
             System.exit(1);
         } catch (ClassNotFoundException e) {
             if (conn != null) {
-				try { conn.close(); } catch (Exception ex) { /* ignored */ }
+                try {
+                    conn.close();
+                } catch (Exception ex) { /* ignored */ }
             }
 
             e.printStackTrace();
@@ -111,7 +111,7 @@ public class Query {
             stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery(query);
 
-            while(rs.next()) {
+            while (rs.next()) {
                 String personId = rs.getString("name");
                 if (personId.equals(pe)) {
                     idAnalysis = rs.getInt("idAnalysis");
@@ -121,7 +121,10 @@ public class Query {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            try { stmt.close(); } catch (Exception e) { }
+            try {
+                stmt.close();
+            } catch (Exception e) {
+            }
         }
 
         return idAnalysis != null ? "" + idAnalysis : null;
@@ -129,23 +132,23 @@ public class Query {
 
     public List getXMLFileStatus(String fileName) {
         List xmlStatusRow = new ArrayList();
-		List<List> xmlStatus = new ArrayList<List>();
-		StringBuilder strBuild = new StringBuilder();
+        List<List> xmlStatus = new ArrayList<List>();
+        StringBuilder strBuild = new StringBuilder();
 
 
-		String sqlStmt = "SELECT srcFileName, srcFileModDtTm, processedYN "
-				+ "FROM MolecularProfiling.dbo.XmlFileData xData " +
-				"WHERE xData.srcFileName =? "
-				+ "ORDER BY xData.srcFileName";
+        String sqlStmt = "SELECT srcFileName, srcFileModDtTm, processedYN "
+                + "FROM MolecularProfiling.dbo.XmlFileData xData " +
+                "WHERE xData.srcFileName =? "
+                + "ORDER BY xData.srcFileName";
 
 
         PreparedStatement prepStmt = null;
         try {
-			prepStmt = conn.prepareStatement(sqlStmt);
+            prepStmt = conn.prepareStatement(sqlStmt);
             prepStmt.setString(1, fileName);
             ResultSet rs = prepStmt.executeQuery();
 
-            while(rs.next()) {
+            while (rs.next()) {
                 xmlStatusRow.add(rs.getString("srcFileName"));
                 xmlStatusRow.add(rs.getTimestamp("srcFileModDtTm"));
                 xmlStatusRow.add(rs.getString("processedYN"));
@@ -153,11 +156,13 @@ public class Query {
             }
 
 
-		}catch(SQLException e){
+        } catch (SQLException e) {
             return xmlStatus;
-        }
-        finally {
-            try { prepStmt.close();} catch (Exception e) { }
+        } finally {
+            try {
+                prepStmt.close();
+            } catch (Exception e) {
+            }
 
         }
 
@@ -165,31 +170,34 @@ public class Query {
     }
 
     public boolean isExistingExperiment(String mrn) {
-		String sqlStmt = "SELECT rq.idRequest, rq.number " +
-				" FROM Request rq" +
-				" WHERE rq.idRequest IN (SELECT pe.idRequest  FROM PropertyEntry as pe" +
-				" JOIN Property as p  ON p.idProperty = pe.idProperty" +
-				" WHERE pe.valueString = ?)";
+        String sqlStmt = "SELECT rq.idRequest, rq.number " +
+                " FROM Request rq" +
+                " WHERE rq.idRequest IN (SELECT pe.idRequest  FROM PropertyEntry as pe" +
+                " JOIN Property as p  ON p.idProperty = pe.idProperty" +
+                " WHERE pe.valueString = ?)";
 
         PreparedStatement prepStmt = null;
         int count = 0;
 
         try {
-			prepStmt = conn.prepareStatement(sqlStmt);
+            prepStmt = conn.prepareStatement(sqlStmt);
             prepStmt.setString(1, mrn);
 
 
-			ResultSet rs = prepStmt.executeQuery();
+            ResultSet rs = prepStmt.executeQuery();
 
-			while(rs.next()) {
+            while (rs.next()) {
                 rs.getString("idRequest");
                 rs.getString("number");
-				count++;
+                count++;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-            try { prepStmt.close();} catch (Exception e) { }
+            try {
+                prepStmt.close();
+            } catch (Exception e) {
+            }
 
         }
 
@@ -204,15 +212,15 @@ public class Query {
                 " WHERE a.name = ? AND ag.name = ?";
         PreparedStatement pStmnt = null;
         Integer analysisID = -1;
-		List<Integer> analysisDupicates = new ArrayList<Integer>();
+        List<Integer> analysisDupicates = new ArrayList<Integer>();
 
         try {
-			pStmnt = conn.prepareStatement(query);
+            pStmnt = conn.prepareStatement(query);
             pStmnt.setString(1, name);
             pStmnt.setString(2, folderName);
             ResultSet rs = pStmnt.executeQuery();
 
-            while(rs.next()) {
+            while (rs.next()) {
                 System.out.println("Analysis:  " + rs.getInt("idAnalysis") + " is already created");
                 analysisID = rs.getInt("idAnalysis");
                 analysisDupicates.add(analysisID);
@@ -220,9 +228,9 @@ public class Query {
 
             if (analysisDupicates.size() > 1) {
                 String strDups = "";
-				for(Integer dup : analysisDupicates ){ // if dups never expect to be that many so string cat is fine
-					strDups += dup + ", ";
-				}
+                for (Integer dup : analysisDupicates) { // if dups never expect to be that many so string cat is fine
+                    strDups += dup + ", ";
+                }
 
 
                 throw new Exception("There are duplicate analyses: " + strDups + " in Analysis Group " + folderName);
@@ -233,7 +241,10 @@ public class Query {
             System.out.println(e.getMessage());
             e.getStackTrace();
         } finally {
-            try { pStmnt.close(); } catch (Exception var20) { }
+            try {
+                pStmnt.close();
+            } catch (Exception var20) {
+            }
 
         }
 
@@ -244,11 +255,13 @@ public class Query {
         return this.conn;
     }
 
-	public void closeConnection(){ // call after every set of sql queries
-		if(conn != null){
-			try { conn.close(); } catch (Exception e) { /* ignored */ }
-            }
+    public void closeConnection() { // call after every set of sql queries
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (Exception e) { /* ignored */ }
         }
+    }
 
     public List<String> getImportedIDReport(List<String> sampleIDList, Integer idAnalysisGroup) {
         List<String> importedReport = new ArrayList();
@@ -256,10 +269,10 @@ public class Query {
         if (sampleIDList.size() > 0) {
             String sampleName = "";
 
-			if (idAnalysisGroup == 11) { //avatar project
+            if (idAnalysisGroup == 11) { //avatar project
                 sampleName = "SL";
-			}else if (idAnalysisGroup == 14) {// foundation project{
-				sampleName = "RF"; //TRF, CRF, QRF
+            } else if (idAnalysisGroup == 14) {// foundation project{
+                sampleName = "RF"; //TRF, CRF, QRF
             }
 
             String query = "SELECT r.idRequest, a.idAnalysis, s.name, a.name FROM Sample s \n" +
@@ -272,9 +285,9 @@ public class Query {
 
             try {
                 StringBuilder strBuild = new StringBuilder();
-				stat = conn.createStatement();
-				ResultSet rs = stat.executeQuery(query);
-				while(rs.next()){
+                stat = conn.createStatement();
+                ResultSet rs = stat.executeQuery(query);
+                while (rs.next()) {
                     strBuild.append(rs.getInt(1));
                     strBuild.append("\t");
                     strBuild.append(rs.getInt(2));
@@ -284,13 +297,14 @@ public class Query {
                     strBuild.append(rs.getString(4));
                     strBuild.append("\n");
                     importedReport.add(strBuild.toString());
-					strBuild = new StringBuilder();
+                    strBuild = new StringBuilder();
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
             } finally {
                 if (stat != null) {
-                    try { stat.close();
+                    try {
+                        stat.close();
                     } catch (SQLException e) {
                         e.printStackTrace();
                         System.exit(1);
@@ -313,7 +327,7 @@ public class Query {
         int count = 0;
 
         try {
-			pStmnt = conn.prepareStatement(strBuild.toString());
+            pStmnt = conn.prepareStatement(strBuild.toString());
             pStmnt.setInt(1, requestID);
             pStmnt.setInt(2, analysisID);
             ResultSet rs = pStmnt.executeQuery();
@@ -332,7 +346,10 @@ public class Query {
             System.out.println(e.getMessage());
             e.getStackTrace();
         } finally {
-            try { pStmnt.close(); } catch (Exception e) { }
+            try {
+                pStmnt.close();
+            } catch (Exception e) {
+            }
         }
         return hasLink;
     }
@@ -348,14 +365,14 @@ public class Query {
 
             String collabToAnalysisQuery = "SELECT * from Lab l JOIN LabUser lu ON lu.idLab = l.idLab WHERE l.lastName LIKE ?";
 
-            for(String irb: irbs) {
+            for (String irb : irbs) {
 
                 pStatement = conn.prepareStatement(collabToAnalysisQuery);
                 pStatement.setString(1, "%" + irb + "%");
                 ResultSet rs = pStatement.executeQuery();
 
                 int labID = -1;
-                while(rs.next()) {
+                while (rs.next()) {
 
                     collabIDsInLab.add(rs.getInt("idAppUser"));
                     Integer currentLabID = rs.getInt("idLab");
@@ -369,14 +386,13 @@ public class Query {
             }
 
 
-
-            for(Integer aID : analysisIDs ) {
+            for (Integer aID : analysisIDs) {
                 collabToAnalysisQuery = "SELECT * from AnalysisCollaborator ac WHERE ac.idAnalysis = ? AND ac.idAppUser = ?";
                 collabsToAddForAnalysis.put(aID, new ArrayList());
                 System.out.println("-------------------------------------------------------------------");
 
 
-                for(Integer collabID : collabIDsInLab) {
+                for (Integer collabID : collabIDsInLab) {
 
                     boolean existingRelation = false;
                     pStatement = conn.prepareStatement(collabToAnalysisQuery);
@@ -389,7 +405,7 @@ public class Query {
                     }
 
                     if (!existingRelation) {
-                        ((List)collabsToAddForAnalysis.get(aID)).add(collabID);
+                        ((List) collabsToAddForAnalysis.get(aID)).add(collabID);
                         System.out.println("   actual collabs added " + collabID);
                     }
                 }
@@ -402,13 +418,17 @@ public class Query {
             e.printStackTrace();
             System.err.println(e.getMessage());
 
-            try { pStatement.close(); } catch (SQLException se) {
+            try {
+                pStatement.close();
+            } catch (SQLException se) {
                 System.out.println("can't close prepared statement");
             }
 
             System.exit(1);
         } finally {
-            try { pStatement.close(); } catch (SQLException se) {
+            try {
+                pStatement.close();
+            } catch (SQLException se) {
                 System.out.println("can't close prepared statement");
             }
 
@@ -421,14 +441,14 @@ public class Query {
         StringBuilder strIDList = new StringBuilder();
         strIDList.append("(");
 
-        for(int i = 0; i < ids.size(); ++i) {
+        for (int i = 0; i < ids.size(); ++i) {
             if (i < ids.size() - 1) {
                 strIDList.append("'");
-                strIDList.append((String)ids.get(i));
+                strIDList.append((String) ids.get(i));
                 strIDList.append("', ");
             } else {
                 strIDList.append("'");
-                strIDList.append((String)ids.get(i));
+                strIDList.append((String) ids.get(i));
                 strIDList.append("'");
             }
         }
@@ -448,8 +468,8 @@ public class Query {
                 this.conn.setAutoCommit(false);
                 Iterator var6 = collabsToAddToAnalysis.iterator();
 
-                while(var6.hasNext()) {
-                    Integer collabID = (Integer)var6.next();
+                while (var6.hasNext()) {
+                    Integer collabID = (Integer) var6.next();
                     ps.setInt(1, analysisID);
                     ps.setInt(2, collabID);
                     ps.setString(3, "Y");
@@ -486,28 +506,65 @@ public class Query {
 
     }
 
-    public List<Integer> executeAnalysisWithCriteriaQuery(String query, List<String> attributeIDs) {
-        List<Integer> idAnalysisList = new ArrayList();
-        PreparedStatement pstmnt = null;
+    public Set<String> executeAnalysisWithCriteriaQuery(String query,
+                                                        Set<String> personIDList) throws Exception {
+        Statement stmnt = null;
 
         try {
-            pstmnt = this.conn.prepareStatement(query);
-            Iterator var5 = attributeIDs.iterator();
+            stmnt = this.conn.createStatement();
 
-            while(var5.hasNext()) {
-                String id = (String)var5.next();
-                pstmnt.setString(1, "%" + id + "%");
-                ResultSet rs = pstmnt.executeQuery(query);
+            ResultSet rs = stmnt.executeQuery(query);
 
-                while(rs.next()) {
-                    idAnalysisList.add(rs.getInt("idAnalysis"));
-                }
-
-                pstmnt.clearParameters();
+            while (rs.next()) {
+                personIDList.add(rs.getString("personID"));
             }
-        } catch (SQLException var8) {
+
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+            throw new Exception(sqlException.getMessage() + " : Could not execute query to find Analysis With Criteria");
         }
 
-        return idAnalysisList;
+        return personIDList;
+    }
+
+    public List<Integer> getAnalysisIdFromPersonID(Set<String> personIDList, String inStatement) throws Exception {
+        Statement stmnt = null;
+        List<Integer> analysisIDs = new ArrayList<>();
+
+        try {
+            stmnt = this.conn.createStatement();
+            String query = "SELECT a.idAnalysis FROM Analysis a WHERE " + inStatement;
+
+
+            ResultSet rs = stmnt.executeQuery(query);
+
+            while (rs.next()) {
+                analysisIDs.add(rs.getInt("idAnalysis"));
+            }
+
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+            throw new Exception(sqlException.getMessage() + " : Could not execute query to find Analysis With Criteria");
+        }
+        return analysisIDs;
+    }
+
+    public void filterPersonIDList(String filterQuery,Set<String> personIDList) throws Exception {
+        Statement stmnt = null;
+
+        try {
+            stmnt = this.conn.createStatement();
+
+            ResultSet rs = stmnt.executeQuery(filterQuery);
+
+            while (rs.next()) {
+                personIDList.remove(rs.getString("personID"));
+            }
+
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+            throw new Exception(sqlException.getMessage() + " : Could not execute query fo ");
+        }
+
     }
 }

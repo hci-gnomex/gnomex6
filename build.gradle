@@ -33,7 +33,8 @@ dependencies {
     runtime group: 'hci', name: 'hci-servlet-filter-cors', version: '1.+'
     runtime group: 'hci', name: 'hci-servlet-filter-pushstate', version: '1.+'
 
-    compile group: 'hci', name: 'auth-services', version: '1.+'
+    compile group: 'hci', name: 'auth-services', version: '4.+'
+    compile group: 'hci', name: 'auth-persistence', version: '3.1+'
     compile group: 'hci', name: 'hci-bean-validation', version: '+'
 
     compile group: 'servlets.com', name: 'cos', version: '05Nov2002'
@@ -49,6 +50,8 @@ dependencies {
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     compile group: 'jdom', name: 'jdom', version: '1.0b8'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
+
+    providedRuntime group: 'com.sun.mail', name: 'javax.mail', version: '1.5.0'
 
     //xml to json stuff for gnomexlite
     compile group: 'jline', name: 'jline', version: '0.9.94'
@@ -71,7 +74,6 @@ dependencies {
     //Realm stuff
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
     providedCompile group: 'log4j', name: 'log4j', version: '1.2.12'
-    //providedCompile group: 'javax.mail', name: 'mail', version: '1.4.7'
     providedCompile 'org.apache.tomcat:tomcat-jdbc:9.0.0.M10'
     providedCompile 'org.apache.tomcat:tomcat-catalina:7.0.68'
 
@@ -234,6 +236,12 @@ war {
 
     // Need to depend on the child project build tasks in order to build their products into the war
     dependsOn 'gnomex_ng:webpack'
+    // FOR FAST BUILD - uncomment below and comment out dependsOn above
+    //from("gnomex_ng/src") {
+    //    include "assets/**"
+    //    include "favicon.ico"
+    //    include "index.html"
+    //}
 
     manifest {
         attributes (

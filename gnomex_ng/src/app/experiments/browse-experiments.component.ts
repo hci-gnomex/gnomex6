@@ -151,7 +151,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 }
             },
 
-            allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && node.isLeaf,
+            allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && node.isLeaf && node.data.idRequest,
         };
 
         this.labListService.getLabList_FromBackEnd();
@@ -277,7 +277,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 let idProject = this.gnomexService.orderInitObj.idProject;
 
                 let ids: HttpParams = new HttpParams()
-                    .set("idProject", idProject)
+                    .set("idProject", idProject ? idProject : '')
                     .set("showEmptyProjectFolders", "Y")
                     .set("showCategory", "N")
                     .set("showSamples", "N");
@@ -544,9 +544,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
             let configuration: MatDialogConfig = new MatDialogConfig();
             configuration.width = "45em";
-            configuration.panelClass = "no-padding-dialog";
             configuration.autoFocus = false;
-            configuration.disableClose = true;
             configuration.data = {
                 labList:            useThisLabList,
                 items:              this.items,

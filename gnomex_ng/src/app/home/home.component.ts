@@ -10,27 +10,51 @@ import {first} from "rxjs/operators";
 import {AuthenticationService} from "../auth/authentication.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {PropertyService} from "../services/property.service";
+import {UtilService} from "../services/util.service";
 
 @Component({
     selector: "gnomex-home",
     template: `
         <div class="full-width full-height horizontal-center">
-            <div *ngIf="hideLoader | async; else loading"
-                 class="full-width full-height flex-container-col">
-                <div class="flex-grow">
+            <div *ngIf="hideLoader | async; else loading" class="full-width full-height flex-container-col">
+                <div *ngIf="this.bulletin" class="flex-grow multiline flex-container-col justify-center">
+                    <h3>{{ this.bulletin }}</h3>
                 </div>
-                <div class="horizontal-center">
+                <h3 *ngIf="this.splashScreenCoreFacilities.length">GNomEx Core Facilities</h3>
+                <div *ngIf="this.splashScreenCoreFacilities.length" class="flex-grow-large flex-container-row justify-center children-margin-right-small">
+                    <div *ngFor="let coreInfo of this.splashScreenCoreFacilities" class="flex-container-col info-pane children-margin-bottom-small">
+                        <h4>{{coreInfo.facilityName}}</h4>
+                        <div class="flex-container-row justify-center children-margin-right">
+                            <div class="flex-container-col">
+                                <span class="bold">Director: {{coreInfo.contactName}}</span>
+                                <span>{{coreInfo.contactRoom}}</span>
+                                <span>{{coreInfo.contactPhone}}</span>
+                            </div>
+                            <span class="divider-span"></span>
+                            <div class="flex-container-col">
+                                <span class="bold">Lab Info:</span>
+                                <span>{{coreInfo.labRoom}}</span>
+                                <span>{{coreInfo.labPhone}}</span>
+                            </div>
+                        </div>
+                        <a [href]="'mailto:' + coreInfo.contactEmail">{{coreInfo.contactEmail}}</a>
+                        <span class="divider-top-small">
+                            Submit an
+                            <a [routerLink]="['/newExperiment', coreInfo.idCoreFacility]"> experiment order </a>
+                            or
+                            <a [routerLink]="['', {outlets: {modal: ['NewBillingAccountModal']}}]"> billing account </a>
+                            to {{coreInfo.facilityName}}
+                        </span>
+                        <div class="flex-grow white-background padding-small" [innerHtml]="coreInfo.description"></div>
+                    </div>
+                </div>
+                <div *ngIf="!this.splashScreenCoreFacilities.length" class="horizontal-center flex-grow-large">
                     <img [src]="site_splash" alt="">
                 </div>
-                <div class="flex-grow-large flex-container-col">
-                    <div class="flex-grow multiline flex-container-col justify-center">
-                        <h2>{{ this.bulletin }}</h2>
-                    </div>
-                    <div class="flex-container-row full-width">
-                        <div class="flex-grow"></div>
-                        <div class="small-font padded major-padded-right">{{ firstLastName }}</div>
-                        <div class="small-font padded multiline">{{ permissionsText }}</div>
-                    </div>
+                <div class="flex-container-row full-width">
+                    <div class="flex-grow"></div>
+                    <div class="small-font padded major-padded-right">{{ firstLastName }}</div>
+                    <div class="small-font padded multiline">{{ permissionsText }}</div>
                 </div>
             </div>
             <ng-template #loading>
@@ -82,20 +106,50 @@ import {PropertyService} from "../services/property.service";
             position: relative;
             background-repeat: no-repeat;
         }
+        
+        .info-pane {
+            background: #EEEEEE;
+            border: 0.1em solid #B7BABC;
+            padding: 0.3em;
+            font-size: 0.8em;
+            width: 40em;
+        }
+        .white-background {
+            background: white;
+        }
+        .padding-small {
+            padding: 0.2em;
+        }
+        .children-margin-right-small > *:not(:last-child) {
+            margin-right: 0.3em;
+        }
+        .children-margin-right > *:not(:last-child) {
+            margin-right: 1em;
+        }
+        .divider-top-small {
+            border-top: 0.02em solid #D7D5D1;
+        }
+        .divider-span {
+            width: 1px;
+            height: 100%;
+            border-right: 0.02em solid #D7D5D1;
+        }
+        .children-margin-bottom-small > *:not(:last-child) {
+            margin-bottom: 0.5em;
+        }
     `],
-    encapsulation: ViewEncapsulation.None
 })
 export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     loadingProgress: number = 0;
 
     private showProgressSubscription: Subscription;
     public hideLoader: BehaviorSubject<boolean>;
-    public colorRanges = [{ stop: 100, color: '#3fca15' }];
     private launchProperties: any;
     public site_splash: string;
 
     public site_logo:string;
     public bulletin: string = "";
+    public splashScreenCoreFacilities: any[] = [];
 
     public firstLastName: string = '';
     public permissionsText: string = '';
@@ -139,6 +193,15 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         this.launchPropertiesService.getLaunchProperties(params).pipe(first()).subscribe((response: any) => {
             this.launchProperties = response;
             this.getProps(response);
+            if (response.CoreFacilities) {
+                this.splashScreenCoreFacilities = UtilService.getJsonArray(response.CoreFacilities, response.CoreFacilities.CoreFacility)
+                    .filter((core) => {
+                        return core.description;
+                    })
+                    .sort((core) => {
+                        return core.sortOrder;
+                    });
+            }
             this.gnomexService.coreFacilityList = response.CoreFacilities;
             this.progressService.displayLoader(10);
 

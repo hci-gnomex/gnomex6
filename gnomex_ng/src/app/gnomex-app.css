@@ -409,10 +409,6 @@ label.mat-radio-label {
     margin-bottom: 0.15em !important;
 }
 
-mat-dialog-content {
-    max-height: 80vh;
-    max-width: 80vw;
-}
 
 /*!
  * Bootstrap Reboot v4.1.3 (https://getbootstrap.com/)

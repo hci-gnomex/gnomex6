@@ -10,6 +10,8 @@ import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.
 import {Subscription} from "rxjs";
 import {DownloadFilesComponent} from "../../util/download-files.component";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {PropertyService} from "../../services/property.service";
+import {DictionaryService} from "../../services/dictionary.service";
 
 @Component({
     selector: 'experiment-files-tab',
@@ -18,8 +20,8 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
             <div class="flex-container-row">
                 <button mat-button (click)="this.handleUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD" class="icon">Upload Files</button>
                 <button mat-button (click)="this.handleSFTPUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">SFTP Upload Files</button>
-                <button mat-button (click)="this.handleFDTUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Files</button>
-                <button mat-button (click)="this.handleFDTUploadCommandLine()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Command Line</button>
+                <button mat-button *ngIf="!isClinicalResearch && isFDTSupported" (click)="this.handleFDTUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Files</button>
+                <button mat-button *ngIf="!isClinicalResearch && isFDTSupported" (click)="this.handleFDTUploadCommandLine()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Command Line</button>
                 <button mat-button (click)="this.handleManageFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon">Manage Files</button>
                 <button mat-button (click)="this.handleDownloadFiles()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download Files</button>
             </div>
@@ -56,16 +58,23 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
     private request:any;
     public canUpdate: boolean = false;
     private updateFileSubscription:Subscription;
+    public isFDTSupported:boolean = false;
+    public isClinicalResearch:boolean = false;
 
 
     constructor(public constantsService: ConstantsService,
                 private route: ActivatedRoute,
                 private fileService: FileService,
                 private dialogsService: DialogsService,
+                private propertyService: PropertyService,
+                private dictionaryService: DictionaryService,
                 private experimentsService: ExperimentsService) {
     }
 
     ngOnInit() {
+        this.isFDTSupported = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_FDT_SUPPORTED);
+
+
         this.gridColDefs = [
             {headerName: "Folder or File", field: "displayName", tooltipField: "displayName", cellRenderer: "agGroupCellRenderer",
                 cellRendererParams: {innerRenderer: getDownloadGroupRenderer(), suppressCount: true}},
@@ -104,6 +113,13 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
             this.getRequestDownloadListResult = null;
             if (data && data.experiment && data.experiment.Request) {
                 this.request = data.experiment.Request;
+                let reqCategory = this.dictionaryService.getEntry(DictionaryService.REQUEST_CATEGORY, this.request.codeRequestCategory);
+                if(reqCategory){
+                    this.isClinicalResearch = reqCategory.isClinicalResearch ? reqCategory.isClinicalResearch === 'Y' :  false
+                }else{
+                    this.isClinicalResearch = true ; // err on the side of security first because we don't know;
+                }
+
                 this.canUpdate = this.request.canUpdate && this.request.canUpdate === 'Y';
                 this.experimentsService.getRequestDownloadList(data.experiment.Request.idRequest).subscribe((result: any) => {
                     this.getRequestDownloadListResult = result;
@@ -170,7 +186,12 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
     }
 
     public handleFDTUploadCommandLine(): void {
-        // TODO FDT Upload Command Line
+        if(this.request &&  this.request.idRequest){
+            this.fileService.startFDTupload(this.request.idRequest, 'e')
+                .subscribe(resp => {
+                    // nothing to show window.open() displays html text
+                },(err:IGnomexErrorResponse) =>{});
+        }
     }
 
     public handleFDTUploadFiles(): void {
