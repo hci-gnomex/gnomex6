@@ -41,8 +41,10 @@ export class MoveDataTrackComponent extends BaseGenericContainerDialog {
             this.targetItem = data.targetItem;
             this.targetFolder = this.targetItem.label;
             if (this.targetItem.idGenomeBuild !== this.currentItem.idGenomeBuild) {
-                this.dialogsService.alert("Cannot move data track to a different genome build", "", DialogType.WARNING);
-                this.doCancel();
+                setTimeout(() => {
+                    this.dialogsService.alert("Cannot move data track to a different genome build", "", DialogType.WARNING);
+                    this.doCancel();
+                });
             }
         }
     }
@@ -67,7 +69,6 @@ export class MoveDataTrackComponent extends BaseGenericContainerDialog {
             this.dataTrackService.moveDataTrackFolder(params).subscribe((response: any) => {
                 this.showSpinner = false;
                 this.dialogRef.close(true);
-                this.dataTrackService.refreshDatatracksList_fromBackend();
             }, (err: IGnomexErrorResponse) => {
                 this.showSpinner = false;
             });
@@ -78,7 +79,6 @@ export class MoveDataTrackComponent extends BaseGenericContainerDialog {
             this.dataTrackService.moveDataTrack(params).subscribe((response: any) => {
                 this.showSpinner = false;
                 this.dialogRef.close(true);
-                this.dataTrackService.refreshDatatracksList_fromBackend();
             }, (err: IGnomexErrorResponse) => {
                 this.showSpinner = false;
             });
