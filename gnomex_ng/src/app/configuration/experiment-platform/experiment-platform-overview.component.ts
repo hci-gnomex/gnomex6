@@ -61,7 +61,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     public tabIndex = 0;
     public showInactive:boolean = false;
     private allExpPlatorms:any[] = [];
-    private selectedExpPlatformexPlatform : any;
+    private selectedExpPlatform : any;
 
 
 
@@ -147,6 +147,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
             this.experimentPlatformTabs = [];
             this.expPlatformService.clearOutExpPlatformForm();
             this.propagateTabChange(exPlatform);
+            this.tabComponentRefList = [];
         }
 
     }
@@ -156,7 +157,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
         if( this.selectRowIndex != event.rowIndex && event.node.selected){
             if(this.selectedPlatformList.length > 0){
-                this.selectedExpPlatformexPlatform =  _.cloneDeep(this.selectedPlatformList[0]);
+                this.selectedExpPlatform =  _.cloneDeep(this.selectedPlatformList[0]);
             }
             //console.log("Previous tab: " + this.selectRowIndex + " current Tab: " + event.rowIndex  );
             if(this.expPlatformService.expPlatformOverviewForm.dirty){
@@ -168,12 +169,12 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                         return;
                     }else{
                         this.selectRowIndex = event.rowIndex;
-                        this.changeExperimentPlaform(this.selectedExpPlatformexPlatform);
+                        this.changeExperimentPlaform(this.selectedExpPlatform);
                     }
                 })
             }else{
                 this.selectRowIndex = event.rowIndex;
-                this.changeExperimentPlaform(this.selectedExpPlatformexPlatform);
+                this.changeExperimentPlaform(this.selectedExpPlatform);
             }
 
         }
@@ -233,12 +234,17 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
             propertyTab.experimentPlatformMode = true;
         }
         setTimeout(()=>{
+
             let name = event.instance.constructor.name;
+            console.log(name + " is being called ");
             if(!(event.instance instanceof ConfigureAnnotationsComponent) ){
                 this.expPlatformService.addExpPlatformFormMember(event.instance.formGroup,name);
             }else {
+                console.log( "what is in our form ", this.expPlatformService.expPlatformOverviewForm.controls);
+                console.log("The idCoreFacility",  this.expPlatformService.findExpPlatformFormMember("ExperimentPlatformTabComponent.idCoreFacility").value);
+
                 let propertyTab:ConfigureAnnotationsComponent = event.instance;
-                propertyTab.setupExpPlatformMode(this.selectedExpPlatformexPlatform);
+                propertyTab.setupExpPlatformMode(this.selectedExpPlatform);
             }
         });
 
