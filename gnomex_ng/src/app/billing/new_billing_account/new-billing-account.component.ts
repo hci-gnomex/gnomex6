@@ -45,10 +45,7 @@ export class NewBillingAccountLauncher {
 					{type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "onSaveButtonClicked"},
 					{type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
 				]}).subscribe((result: any) => {
-					//FixMe: Does this need to be navigated to the created billing account page? If not, then close the dialog and the follow code is not necessary
-            // After closing the dialog, route away from this component so that the dialog could
-            // potentially be reopened.
-            this.router.navigate([{ outlets: {modal: null}}]);
+            		this.router.navigate([{ outlets: {modal: null}}]);
 		});
 	}
 }

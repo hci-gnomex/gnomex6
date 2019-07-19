@@ -62,6 +62,9 @@ import {ExperimentsService} from "../experiments.service";
             overflow: visible !important;
             white-space: normal !important;
         }
+        .hidden {
+            display: none;
+        }
     `]
 })
 
@@ -69,6 +72,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
     @ViewChild('ccCheckbox') ccCheckbox: MatCheckbox;
+    @ViewChild('fileInput') fileInput: ElementRef;
 
     private emToPxConversionRate: number = 13;
 
@@ -695,6 +699,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
 
         if (this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y'
             && this._experiment.seqPrepByCore_forSamples
             && this._experiment.seqPrepByCore_forSamples === 'N') {
 
@@ -1030,8 +1037,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         // }
 
         if (this._experiment
-            && this._experiment.seqPrepByCore_forSamples
-            && this._experiment.seqPrepByCore_forSamples === 'N') {
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y') {
 
             temp.push({
                 headerName: "Index Tag A",
@@ -1062,7 +1070,14 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 editable: false,
                 sortOrder: 301
             });
-            if (this._barCodes && Array.isArray(this._barCodes) && this._barCodes.length > 0) {
+
+            let permittedBarcodes: any[] = [];
+
+            if (this._experiment && this._experiment.samples && this._experiment.samples.length > 0) {
+                permittedBarcodes = BarcodeSelectEditor.getPermittedBarcodes('B', this._experiment.samples[0].idSeqLibProtocol, this.dictionaryService);
+            }
+
+            if (permittedBarcodes && Array.isArray(permittedBarcodes) && permittedBarcodes.length > 0) {
                 temp.push({
                     headerName: "Index Tag B",
                     editable: true,
@@ -1279,8 +1294,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         this._tabIndexToInsertAnnotations = 150;
 
         if (this._experiment
-            && this._experiment.seqPrepByCore_forSamples
-            && this._experiment.seqPrepByCore_forSamples === 'N') {
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y') {
 
             temp.push({
                 headerName: "Index Tag A",
@@ -1311,7 +1327,14 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 editable: false,
                 sortOrder: 301
             });
-            if (this._barCodes && Array.isArray(this._barCodes) && this._barCodes.length > 0) {
+
+            let permittedBarcodes: any[] = [];
+
+            if (this._experiment && this._experiment.samples && this._experiment.samples.length > 0) {
+                permittedBarcodes = BarcodeSelectEditor.getPermittedBarcodes('B', this._experiment.samples[0].idSeqLibProtocol, this.dictionaryService);
+            }
+
+            if (permittedBarcodes && Array.isArray(permittedBarcodes) && permittedBarcodes.length > 0) {
                 temp.push({
                     headerName: "Index Tag B",
                     editable: false,
@@ -1331,34 +1354,37 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     ],
                     sortOrder: 302
                 });
-            } else {
+
                 temp.push({
-                    headerName: "Index Tag B",
+                    headerName: "Index Tag Sequence B",
+                    field: "barcodeSequenceB",
+                    width:    8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    maxWidth: 10 * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
                     editable: false,
-                    width:    12 * this.emToPxConversionRate,
-                    minWidth: 12 * this.emToPxConversionRate,
-                    maxWidth: 20 * this.emToPxConversionRate,
-                    field: "idOligoBarcodeB",
-                    cellRendererFramework: SelectRenderer,
-                    cellEditorFramework: BarcodeSelectEditor,
-                    selectOptions: this._barCodes,
-                    selectOptionsDisplayField: "display",
-                    selectOptionsValueField: "idOligoBarcodeB",
-                    indexTagLetter: 'B',
-                    sortOrder: 302
+                    sortOrder: 303
                 });
+            } else {
+                // In view mode, if there are no usable Index Tag B's, we just don't display this column.
+
+                // temp.push({
+                //     headerName: "Index Tag B",
+                //     editable: false,
+                //     width:    12 * this.emToPxConversionRate,
+                //     minWidth: 12 * this.emToPxConversionRate,
+                //     maxWidth: 20 * this.emToPxConversionRate,
+                //     field: "idOligoBarcodeB",
+                //     cellRendererFramework: SelectRenderer,
+                //     cellEditorFramework: BarcodeSelectEditor,
+                //     selectOptions: this._barCodes,
+                //     selectOptionsDisplayField: "display",
+                //     selectOptionsValueField: "idOligoBarcodeB",
+                //     indexTagLetter: 'B',
+                //     sortOrder: 302
+                // });
             }
 
-            temp.push({
-                headerName: "Index Tag Sequence B",
-                field: "barcodeSequenceB",
-                width:    8.5 * this.emToPxConversionRate,
-                minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: false,
-                sortOrder: 303
-            });
             temp.push({
                 headerName: "QC Status",
                 field: "qualStatus",
@@ -2043,26 +2069,34 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public upload(): void {
-        let data = {
-            sampleColumns: this.samplesGridColumnDefs,
-            ccNumberColumnIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
-            experiment: this._experiment
-        };
+        this.fileInput.nativeElement.click();
+    }
 
-        let config: MatDialogConfig = new MatDialogConfig();
-        config.width = '60em';
-        config.height = '45em';
-        config.panelClass = 'no-padding-dialog';
-        config.data = data;
+    public onFileSelected(event: any): void {
+        if (event.target.files && event.target.files.length > 0) {
+            // this.file = event.target.files[0];
+            let data = {
+                sampleColumns: this.samplesGridColumnDefs,
+                ccNumberColumnIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
+                experiment: this._experiment,
+                file: event.target.files[0]
+            };
 
-        this.dialogService.genericDialogContainer(UploadSampleSheetComponent, "Upload Sample Sheet", null, config,
-            {actions: [{type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}]}).subscribe((result: any) => {
-            if (result && Array.isArray(result)) {
-                this._experiment.numberOfSamples = '' + result.length;
-            }
+            let config: MatDialogConfig = new MatDialogConfig();
+            config.width = '60em';
+            config.height = '45em';
+            config.panelClass = 'no-padding-dialog';
+            config.data = data;
 
-            this.samplesGridApi.refreshCells();
-        });
+            this.dialogService.genericDialogContainer(UploadSampleSheetComponent, "Upload Sample Sheet", null, config)
+                .subscribe((result: any) => {
+                    if (result && Array.isArray(result)) {
+                        this._experiment.numberOfSamples = '' + result.length;
+                    }
+
+                    this.samplesGridApi.refreshCells();
+                });
+        }
     }
 
     public download(): void {

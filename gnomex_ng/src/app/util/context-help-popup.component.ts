@@ -27,7 +27,7 @@ import {DictionaryService} from "../services/dictionary.service";
         </div>
         <div class="flex-container-row justify-flex-end generic-dialog-footer-colors">
             <save-footer *ngIf="this.isEditMode" [icon]="this.constService.ICON_SAVE" (saveClicked)="this.save()" name="Save"></save-footer>
-            <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="this.onClose()" name="Cancel"></save-footer>
+            <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="this.onClose()" name="Close"></save-footer>
         </div>
     `,
     styles: [`

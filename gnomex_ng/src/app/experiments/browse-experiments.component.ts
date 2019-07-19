@@ -544,9 +544,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
             let configuration: MatDialogConfig = new MatDialogConfig();
             configuration.width = "45em";
-            configuration.panelClass = "no-padding-dialog";
             configuration.autoFocus = false;
-            configuration.disableClose = true;
             configuration.data = {
                 labList:            useThisLabList,
                 items:              this.items,

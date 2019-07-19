@@ -20,12 +20,12 @@ import {DialogType} from "./dialogs.service";
                     <div class="flex-container-row align-center padded">
                         <img *ngIf="icon" class="icon" [src]="this.icon">
                         <div *ngIf="!icon">
-                            <i *ngIf="dialogType === type.ALERT" class="fas fa-exclamation fa-2x i-margin i-color-blue"></i>
-                            <i *ngIf="dialogType === type.SUCCESS" class="fas fa-check-circle fa-2x i-margin i-color-blue"></i>
-                            <i *ngIf="dialogType === type.FAILED || dialogType === type.ERROR" class="fas fa-exclamation-triangle fa-2x i-margin i-color-red"></i>
-                            <i *ngIf="dialogType === type.WARNING || dialogType === type.VALIDATION" class="fas fa-exclamation-triangle fa-2x i-margin i-color-blue"></i>
-                            <i *ngIf="dialogType === type.INFO" class="fas fa-info-circle fa-2x i-margin i-color-blue"></i>
-                            <i *ngIf="dialogType === type.CONFIRM" class="fas fa-check fa-2x i-margin i-color-blue"></i>
+                            <i *ngIf="dialogType === type.ALERT" class="fa fa-exclamation fa-2x i-margin i-color-blue"></i>
+                            <i *ngIf="dialogType === type.SUCCESS" class="fa fa-check-circle fa-2x i-margin i-color-blue"></i>
+                            <i *ngIf="dialogType === type.FAILED || dialogType === type.ERROR" class="fa fa-exclamation-triangle fa-2x i-margin i-color-red"></i>
+                            <i *ngIf="dialogType === type.WARNING || dialogType === type.VALIDATION" class="fa fa-exclamation-triangle fa-2x i-margin i-color-blue"></i>
+                            <i *ngIf="dialogType === type.INFO" class="fa fa-info-circle fa-2x i-margin i-color-blue"></i>
+                            <i *ngIf="dialogType === type.CONFIRM" class="fa fa-check fa-2x i-margin i-color-blue"></i>
                         </div>
                         <h1 *ngIf="dialogType !== type.ERROR"
                             style="margin:0;">{{this.title ? this.title : defaultTitle}}</h1>

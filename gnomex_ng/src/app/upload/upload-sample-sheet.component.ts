@@ -1,4 +1,4 @@
-import {Component, ElementRef, Inject, OnDestroy, ViewChild} from "@angular/core";
+import {Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {Subscription} from "rxjs";
 
@@ -72,11 +72,13 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
         label.mat-checkbox-layout { margin: 0; margin-bottom: 0; }
         
     `]
-}) export class UploadSampleSheetComponent extends BaseGenericContainerDialog implements OnDestroy {
+}) export class UploadSampleSheetComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
     private readonly SUCCESS_STATUS: string = 'SUCCESS';
 
     @ViewChild('fileInput') fileInput: ElementRef;
+
+    public actionType: any = ActionType ;
 
     private _firstRowIsColumnHeadings: boolean = true;
 
@@ -172,6 +174,15 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
                 private sampleUploadService: SampleUploadService,
                 @Inject(MAT_DIALOG_DATA) private data) {
         super();
+    }
+
+    ngOnInit(): void {
+        if(this.data) {
+            this.file = this.data.file;
+            setTimeout(() => {
+                this.onFileSelected();
+            });
+        }
     }
 
     ngOnDestroy(): void {
@@ -524,9 +535,15 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
     }
 
 
-    public onFileSelected(event: any): void {
-        if (event.target.files && event.target.files.length > 0) {
-            this.file = event.target.files[0];
+    public onFileSelected(event?: any): void {
+        if(event) {
+            this.file = null;
+            if (event.target.files && event.target.files.length > 0) {
+                this.file = event.target.files[0];
+            }
+        }
+
+        if(this.file) {
 
             let formData: FormData = new FormData();
             formData.append("filename", this.file.name);
@@ -555,15 +572,18 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
                             && Array.isArray(result.SampleSheetData)
                             && result.SampleSheetData.length > 0
                             && result.SampleSheetData[0].Column) {
-
-                            for (let item of result.SampleSheetData[0].Column) {
-                                let temp: any = {
-                                    label: item.Value,
-                                    data:  item.Name
-                                };
-
-                                this.headersDictionary.push(temp);
-                            }
+                                if(Array.isArray(result.SampleSheetData[0].Column)) {
+                                    for (let item of result.SampleSheetData[0].Column) {
+                                        let temp: any = {
+                                            label: item.Value,
+                                            data:  item.Name
+                                        };
+                                        this.headersDictionary.push(temp);
+                                    }
+                                } else {
+                                    this.dialogService.alert("File failed to upload.", null, DialogType.FAILED);
+                                    return;
+                                }
                         }
 
 
@@ -575,7 +595,7 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
                         }
 
                         this.fileData = result.SampleSheetData;
-
+                        this.assignGridContents();
                         this.fileParsed = true;
                     } else {
                         this.dialogService.alert("File failed to upload.", null, DialogType.FAILED);
@@ -601,7 +621,7 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
     public onFieldFormats(): void {
         let config: MatDialogConfig = new MatDialogConfig();
         config.width = '75em';
-        config.height = '30em';
+        config.height = '35em';
         config.autoFocus = false;
 
         this.dialogService.genericDialogContainer(SampleSheetColumnFormatsComponent, "Sample Sheet Column Formats", null, config,
@@ -622,5 +642,9 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
         if (event && event.api) {
             event.api.sizeColumnsToFit();
         }
+    }
+
+    public onClose(): void {
+        this.dialogRef.close();
     }
 }

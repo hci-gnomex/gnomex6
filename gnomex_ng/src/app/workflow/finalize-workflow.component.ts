@@ -545,7 +545,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
                 warningMessage += validIndexTags.warningMessage;
             }
             if (warningMessage) {
-                this.dialogsService.confirm(warningMessage + " Continue saving?").subscribe((answer: boolean) => {
+                this.dialogsService.confirm(warningMessage + "<br>Continue saving?").subscribe((answer: boolean) => {
                     if (answer) {
                         this.saveWorkItems();
                     }

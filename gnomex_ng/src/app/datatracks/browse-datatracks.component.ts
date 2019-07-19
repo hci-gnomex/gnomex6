@@ -24,15 +24,6 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {UtilService} from "../services/util.service";
 import {HttpParams} from "@angular/common/http";
 
-const actionMapping: IActionMapping = {
-    mouse: {
-        click: (tree, node, $event) => {
-            $event.ctrlKey
-                ? TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event)
-                : TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event)
-        }
-    }
-};
 
 @Component({
     selector: "datatracks",
@@ -80,32 +71,9 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     private treeModel: TreeModel;
     private navInitSubscription: Subscription;
 
-    /*
-    angular2-tree options
-     */
-    public options: ITreeOptions = {
-        displayField: "label",
-        childrenField: "items",
-        nodeClass: (node: TreeNode) => {
-            return "icon-" + node.data.icon;
-        },
-        allowDrop: (element, {parent, index}) => {
-            this.dragEndItems = _.cloneDeep(this.items);
-            if (parent.data.parentid === -1 || parent.data.isGenomeBuild ||
-                element.data.idDataTrackFolder === parent.data.idDataTrackFolder) {
-                return false;
-            } else {
-                return true;
-            }
-        },
-
-        allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && (node.data.isDataTrackFolder || node.data.idDataTrack),
-        actionMapping
-    };
+    public options: ITreeOptions;
     public items: any;
     public organisms: any;
-    public currentItem: any;
-    public targetItem: any;
 
     public labMembers: any;
     private billingAccounts: any;
@@ -117,7 +85,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     public disabled: boolean = true;
     public disableDelete: boolean = true;
     public searchText: string;
-    private dragEndItems: any[] = [];
     private navDatatrackList: any;
     private labListSubscription: Subscription;
 
@@ -125,6 +92,32 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     private idDataTrackToSelect: string = null;
 
     ngOnInit() {
+        this.options = {
+            displayField: "label",
+            childrenField: "items",
+            nodeClass: (node: TreeNode) => {
+                return "icon-" + node.data.icon;
+            },
+            allowDrop: (element: ITreeNode, to: {parent: ITreeNode, index: number}) => {
+                return to.parent.data.isDataTrackFolder && element.data.idDataTrackFolder !== to.parent.data.idDataTrackFolder;
+            },
+            allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && (node.data.isDataTrackFolder || node.data.idDataTrack),
+            actionMapping: {
+                mouse: {
+                    click: (tree, node, $event) => {
+                        $event.ctrlKey
+                            ? TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event)
+                            : TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
+                    },
+                    dragStart: (tree: TreeModel, node: TreeNode, $event) => {
+                        if (!node.isActive) {
+                            TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
+                        }
+                    },
+                    drop: this.moveNode,
+                }
+            },
+        };
         this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
         this.treeModel = this.treeComponent.treeModel;
         this.labListService.getLabList_FromBackEnd();
@@ -169,7 +162,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 if(this.gnomexService.orderInitObj) { // this is if component is being navigated to by url
                     let idDataTrack: string = this.gnomexService.orderInitObj.idDataTrack;
                     if (this.treeModel && idDataTrack) {
-                        let dtNode: ITreeNode = this.treeModel.getNodeById("d" + idDataTrack);
+                        let dtNode: ITreeNode = UtilService.findTreeNode(this.treeModel, "idDataTrack", idDataTrack);
                         if(dtNode) {
                             dtNode.ensureVisible();
                             dtNode.setIsActive(true);
@@ -218,50 +211,37 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         });
     }
 
-    go(event: any) {
-    }
+    private moveNode: (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => void = (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => {
+        let currentItem: any = from.data;
+        let targetItem: any = node.data;
 
-    treeChangeFilter(event) {
-    }
-
-    /**
-     * Reset the tree to the initial state.
-     */
-    resetTree() {
-        this.items = this.dragEndItems;
-    }
-
-    onMoveNode($event) {
-        console.log(
-            "Moved",
-            $event.node.name,
-            "to",
-            $event.to.parent.name,
-            "at index",
-            $event.to.index);
-        this.currentItem = $event.node;
-        this.targetItem = $event.to.parent;
-        this.doMove($event);
-    }
-
-    doMove(event) {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = "35em";
         configuration.height = "15em";
         configuration.data = {
-            currentItem: this.currentItem,
-            targetItem: this.targetItem
+            currentItem: currentItem,
+            targetItem: targetItem,
         };
 
-        let title: string = this.targetItem.label.length > 30 ? this.targetItem.label.substr(0, 29) + "..." : this.targetItem.label;
+        let title: string = targetItem.label.length > 30 ? targetItem.label.substr(0, 29) + "..." : targetItem.label;
         title = "Move/Copy to " + title;
 
-        this.dialogsService.genericDialogContainer(MoveDataTrackComponent, title,
-            this.currentItem.icon, configuration).subscribe((result: any) => {
-                if(!result) {
-                    this.resetTree();
+        this.dialogsService.genericDialogContainer(MoveDataTrackComponent, title, currentItem.icon, configuration).subscribe((result) => {
+            if (result) {
+                if (currentItem.isDataTrack && currentItem.idDataTrack) {
+                    this.idDataTrackToSelect = currentItem.idDataTrack;
+                } else if (currentItem.isDataTrackFolder && currentItem.idDataTrackFolder) {
+                    this.idDataTrackFolderToSelect = currentItem.idDataTrackFolder;
                 }
+                this.datatracksService.refreshDatatracksList_fromBackend();
+            }
         });
+    };
+
+    go(event: any) {
+    }
+
+    treeChangeFilter(event) {
     }
 
     treeUpdateData(event) {
@@ -308,9 +288,8 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 this.items = response;
             }
             this.organisms = this.organisms.concat(this.items);
-            for (var org of this.items) {
-                org.id = "o"+org.idOrganism;
-                org.parentid = -1;
+            for (let org of this.items) {
+                org.isOrganism = true;
 
                 org.icon = "assets/organism.png";
                 if (org.GenomeBuild) {
@@ -320,23 +299,20 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                         org.items = org.GenomeBuild;
                     }
 
-                    for (var gNomeBuild of org.items) {
+                    for (let gNomeBuild of org.items) {
                         if (gNomeBuild) {
                             this.assignIconToGenomeBuild(gNomeBuild);
                             gNomeBuild.labId = org.labId;
-                            gNomeBuild.id = "g"+gNomeBuild.idGenomeBuild;
-                            gNomeBuild.parentid = org.id;
                             if (gNomeBuild.DataTrack) {
                                 if (!this.isArray(gNomeBuild.DataTrack)) {
                                     gNomeBuild.items = [gNomeBuild.DataTrack];
                                 } else {
                                     gNomeBuild.items = gNomeBuild.DataTrack;
                                 }
-                                for (var dataTrack of gNomeBuild.items) {
+                                for (let dataTrack of gNomeBuild.items) {
                                     if (dataTrack) {
                                         if (dataTrack.label) {
                                             this.assignIconToDT(dataTrack);
-                                            dataTrack.parentid = gNomeBuild.id;
                                         } else {
                                             console.log("label not defined");
                                         }
@@ -360,7 +336,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     };
 
     addDataTracksFromFolder(root, items: any[]): any[] {
-        var dtItems: any[] = [];
+        let dtItems: any[] = [];
         if (!this.isArray(root.DataTrackFolder)) {
             root.DataTrackFolder = [root.DataTrackFolder];
         }
@@ -371,14 +347,14 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         if (!this.isArray(items)) {
             items = [items];
         }
-        for (var dtf of root.DataTrackFolder) {
+        for (let dtf of root.DataTrackFolder) {
             this.assignIconToDTFolder(dtf);
         }
         dtItems = dtItems.concat(root.DataTrackFolder);
         dtItems = dtItems.concat(items);
         root.items = dtItems;
 
-        for (var dtf of root.items) {
+        for (let dtf of root.items) {
 
             if (dtf.DataTrackFolder) {
                 this.assignIconToDTFolder(dtf);
@@ -388,7 +364,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 if (!this.isArray(dtf.DataTrack)) {
                     dtf.DataTrack = [dtf.DataTrack];
                 }
-                for (var dt of dtf.DataTrack) {
+                for (let dt of dtf.DataTrack) {
                     this.assignIconToDT(dt);
                 }
                 if (dtf.items) {
@@ -413,7 +389,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     }
 
     assignIconToDTFolder(dtf: any): void {
-        dtf.id = "df"+dtf.idDataTrackFolder;
         if (dtf.idLab) {
             dtf.icon = "assets/folder_group.png";
         } else {
@@ -439,7 +414,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         }
         this.datatracksCount++;
 
-        datatrack.id = "d"+datatrack.idDataTrack;
+        datatrack.isDataTrack = true;
     }
     /*
         Determine if the object is an array

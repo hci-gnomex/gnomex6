@@ -374,6 +374,8 @@ export class Experiment {
                 temp.push(Sample.createSampleObjectFromAny(this.dictionaryService, sample));
             }
         }
+
+        this._samples = temp;
     }
     public _samples:                 Sample[] = [];
 
