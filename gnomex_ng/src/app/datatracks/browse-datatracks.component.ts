@@ -203,12 +203,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 this.datatracksService.getDatatracksList_fromBackend(new HttpParams());
             }
         });
-
-        this.datatracksService.startSearchSubject.subscribe((value) => {
-            if (value) {
-                this.dialogsService.startDefaultSpinnerDialog();
-            }
-        });
     }
 
     private moveNode: (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => void = (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => {
@@ -245,11 +239,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     }
 
     treeUpdateData(event) {
-        if (this.datatracksService.startSearchSubject.getValue() === true) {
-            this.dialogsService.stopAllSpinnerDialogs();
-            this.datatracksService.startSearchSubject.next(false);
-            this.changeDetectorRef.detectChanges();
-        }
     }
 
     search() {
@@ -278,6 +267,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     @param
      */
     buildTree(response: any[]) {
+        this.dialogsService.addSpinnerWorkItem();
         this.datatracksCount = 0;
         if (response) {
             this.organisms = [];
@@ -329,7 +319,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 }
             }
         }
-        this.dialogsService.stopAllSpinnerDialogs();
+        this.dialogsService.removeSpinnerWorkItem();
         if(this.treeModel){
             this.treeModel.clearFilter();
         }
