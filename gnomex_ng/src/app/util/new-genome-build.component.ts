@@ -105,7 +105,7 @@ export class NewGenomeBuildComponent extends BaseGenericContainerDialog {
     }
 
     public save(): void {
-        this.dialogsService.startDefaultSpinnerDialog();
+        this.dialogsService.addSpinnerWorkItem();
         let params: HttpParams = new HttpParams()
             .set("das2Name", this.genomeBuildForm.get("name").value)
             .set("genomeBuildName", this.genomeBuildForm.get("name").value)
@@ -115,11 +115,15 @@ export class NewGenomeBuildComponent extends BaseGenericContainerDialog {
         this.dataTrackService.saveGenomeBuild(params).subscribe((response: any) => {
             if (response && response.idGenomeBuild) {
                 this.dictionaryService.reloadAndRefresh(() => {
+                    this.dialogsService.removeSpinnerWorkItem();
+                    this.dialogRef.close(response.idGenomeBuild);
                     this.dataTrackService.refreshDatatracksList_fromBackend();
-                }, null, DictionaryService.GENOME_BUILD);
-                this.dialogRef.close(response.idGenomeBuild);
+                }, () => {
+                    this.dialogsService.stopAllSpinnerDialogs();
+                }, DictionaryService.GENOME_BUILD);
+            } else {
+                this.dialogsService.stopAllSpinnerDialogs();
             }
-            this.dialogsService.stopAllSpinnerDialogs();
         }, (err: IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
         });
