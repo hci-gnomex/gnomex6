@@ -234,15 +234,11 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
             propertyTab.experimentPlatformMode = true;
         }
         setTimeout(()=>{
-
             let name = event.instance.constructor.name;
             console.log(name + " is being called ");
             if(!(event.instance instanceof ConfigureAnnotationsComponent) ){
                 this.expPlatformService.addExpPlatformFormMember(event.instance.formGroup,name);
             }else {
-                console.log( "what is in our form ", this.expPlatformService.expPlatformOverviewForm.controls);
-                console.log("The idCoreFacility",  this.expPlatformService.findExpPlatformFormMember("ExperimentPlatformTabComponent.idCoreFacility").value);
-
                 let propertyTab:ConfigureAnnotationsComponent = event.instance;
                 propertyTab.setupExpPlatformMode(this.selectedExpPlatform);
             }
