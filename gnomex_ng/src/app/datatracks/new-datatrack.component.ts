@@ -45,7 +45,6 @@ export class NewDataTrackComponent extends BaseGenericContainerDialog implements
     public form: FormGroup;
     public visibilityList: any[] = [];
     public labList: any[] = [];
-    public showSpinner: boolean = false;
     public primaryDisable: (action?: GDAction) => boolean;
 
     constructor(public dialogRef: MatDialogRef<NewDataTrackComponent>,
@@ -82,7 +81,7 @@ export class NewDataTrackComponent extends BaseGenericContainerDialog implements
     }
 
     public save(): void {
-        this.showSpinner = true;
+        this.dialogsService.addSpinnerWorkItem();
         let params: HttpParams = new HttpParams()
             .set("idLab", this.form.get("idLab").value)
             .set("idGenomeBuild", this.selectedItem.data.idGenomeBuild)
@@ -93,12 +92,14 @@ export class NewDataTrackComponent extends BaseGenericContainerDialog implements
         }
 
         this.dataTrackService.saveDataTrack(params).subscribe((response: any) => {
-            this.showSpinner = false;
             if (response && response.result && response.result === 'SUCCESS') {
+                this.dialogsService.removeSpinnerWorkItem();
                 this.dialogRef.close(response.idDataTrack);
+            } else {
+                this.dialogsService.stopAllSpinnerDialogs();
             }
         },(err:IGnomexErrorResponse) => {
-            this.showSpinner = false;
+            this.dialogsService.stopAllSpinnerDialogs();
         });
     }
 
