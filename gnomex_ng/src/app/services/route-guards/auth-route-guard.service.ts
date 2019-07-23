@@ -44,7 +44,7 @@ export class AuthRouteGuardService implements CanActivate {
      * @returns {Observable<boolean>} describing the result of this calculation
      */
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-        if (this._authenticationService.isGuestMode()) {
+        if (this._authenticationService.isGuestMode() || this.gnomexService.isGuestState ) {
             return of(true);
         }
 

@@ -18,6 +18,7 @@ import {HttpParams} from "@angular/common/http";
 import {UtilService} from "../services/util.service";
 import {PropertyService} from "../services/property.service";
 import {ConstantsService} from "../services/constants.service";
+import {GnomexService} from "../services/gnomex.service";
 
 @Component({
     selector: 'browse-filter',
@@ -218,6 +219,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 private dictionaryService: DictionaryService, private billingService: BillingService,
                 private dialogService: DialogsService, public constantsService: ConstantsService,
                 private propertyService: PropertyService,
+                private gnomexService: GnomexService,
                 public prefService: UserPreferencesService) {
         this.showMore = false;
         this.resetFields();
@@ -381,7 +383,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
             }
         }
 
-        if (isGuestState) {
+        if (isGuestState && !this.gnomexService.orderInitObj) {
             setTimeout(() => {
                 this.search();
             });

@@ -77,7 +77,7 @@ export class UtilService {
     }
 
     private static recursivelyCheckTreeNode(node: ITreeNode, attribute: string, value: string): ITreeNode {
-        if (node.data[attribute] === value) {
+        if (node.data[attribute] == value) {
             return node;
         } else if (node.hasChildren) {
             for (let child of node.children) {

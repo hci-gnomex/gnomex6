@@ -141,7 +141,7 @@ export class FlowcellWorkflowComponent implements OnInit, AfterViewInit {
 
         this.workflowService.getFlowCellList(params).subscribe((response: any) => {
             if (response && response.result !== "INVALID") {
-                this.workItemList = response ? UtilService.getJsonArray(response, response.WorkItem) : [];
+                this.workItemList = response ? UtilService.getJsonArray(response, response.FlowCell) : [];
                 this.workingWorkItemList = this.workItemList;
                 this.gridApi.setRowData(this.workingWorkItemList);
                 if(this.searchText){
