@@ -6,6 +6,9 @@ import hci.gnomex.utility.*;
 
 import java.io.IOException;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,74 +18,61 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
 public class UploadDataTrackURLServlet extends HttpServlet {
-private static final Logger LOG = Logger.getLogger(UploadDataTrackURLServlet.class);
+    private static final Logger LOG = Logger.getLogger(UploadDataTrackURLServlet.class);
 
-protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
-	// Restrict commands to local host if request is not secure
-	if (!ServletUtil.checkSecureRequest(req)) {
-		ServletUtil.reportServletError(res, "Secure connection is required. Prefix your request with 'https'");
-		return;
-	}
+        // Restrict commands to local host if request is not secure
+        if (!ServletUtil.checkSecureRequest(req)) {
+            ServletUtil.reportServletError(res, "Secure connection is required. Prefix your request with 'https'");
+            return;
+        }
 
-	Session sess = null;
+        Session sess = null;
 
-	try {
+        try {
+            boolean isLocalHost = req.getServerName().equalsIgnoreCase("localhost") || req.getServerName().equals("127.0.0.1");
 
-		boolean isLocalHost = req.getServerName().equalsIgnoreCase("localhost")
-				|| req.getServerName().equals("127.0.0.1");
+            sess = HibernateSession.currentReadOnlySession((req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
+            String portNumber = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.HTTP_PORT);
+            if (portNumber == null) {
+                portNumber = "";
+            } else {
+                portNumber = ":" + portNumber;
+            }
 
-		//
-		// COMMENTED OUT CODE:
-		// String baseURL = "http"+ (isLocalHost ? "://" : "s://") + req.getServerName() + req.getContextPath();
-		//
-		// To fix upload problem (missing session in upload servlet for FireFox, Safari), encode session in URL
-		// for upload servlet. Also, use non-secure (http: rather than https:) when making http request;
-		// otherwise, existing session is not accessible to upload servlet.
-		//
-		//
+            String baseURL = "http" + (isLocalHost ? "://" : "s://") + req.getServerName() + portNumber + req.getContextPath();
+            String URL = baseURL + "/UploadDataTrackFileServlet.gx";
 
-		sess = HibernateSession.currentReadOnlySession((req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
-		String portNumber = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.HTTP_PORT);
-		if (portNumber == null) {
-			portNumber = "";
-		} else {
-			portNumber = ":" + portNumber;
-		}
+            // Get the valid file extensions
+            StringBuilder fileExtensions = new StringBuilder();
+            for (int x = 0; x < Constants.DATATRACK_FILE_EXTENSIONS.length; x++) {
+                if (fileExtensions.length() > 0) {
+                    fileExtensions.append(";");
+                }
+                fileExtensions.append("*");
+                fileExtensions.append(Constants.DATATRACK_FILE_EXTENSIONS[x]);
+            }
 
-		String baseURL = "http" + "://" + req.getServerName() + portNumber + req.getContextPath();
-		String URL = baseURL + "/UploadDataTrackFileServlet.gx";
-		// Encode session id in URL so that session maintains for upload servlet when called from
-		// Flex upload component inside FireFox, Safari
-		URL += ";jsessionid=" + req.getRequestedSessionId();
-
-		// Get the valid file extensions
-		StringBuffer fileExtensions = new StringBuffer();
-		for (int x = 0; x < Constants.DATATRACK_FILE_EXTENSIONS.length; x++) {
-			if (fileExtensions.length() > 0) {
-				fileExtensions.append(";");
-			}
-			fileExtensions.append("*" + Constants.DATATRACK_FILE_EXTENSIONS[x]);
-		}
-
-		res.setContentType("application/xml");
-		String xmlResult = "<UploadURL url='" + URL + "'" + " fileExtensions='" + fileExtensions.toString() + "'" + "/>";
-		String jsonResult = Util.xmlToJson(xmlResult);
-		if (!jsonResult.equals(xmlResult)) {
-			res.setContentType("application/json");
-		}
-		res.getOutputStream().println(jsonResult);
-
-	} catch (Exception e) {
-		LOG.error("Error in UploadDataTrackFileServlet", e);
-	} finally {
-		if (sess != null) {
-			try {
-				HibernateSession.closeSession();
-			} catch (Exception e) {
-				LOG.error("Error in UploadDataTrackFileServlet", e);
-			}
-		}
-	}
-}
+            JsonObject value = Json.createObjectBuilder()
+                    .add("name", "UploadDataTrackURLServlet")
+                    .add("url", URL)
+                    .add("fileExtensions", fileExtensions.toString())
+                    .build();
+            res.setContentType("application/json");
+            try (JsonWriter jsonWriter = Json.createWriter(res.getOutputStream())) {
+                jsonWriter.writeObject(value);
+            }
+        } catch (Exception e) {
+            LOG.error("Error in UploadDataTrackFileServlet", e);
+        } finally {
+            if (sess != null) {
+                try {
+                    HibernateSession.closeSession();
+                } catch (Exception e) {
+                    LOG.error("Error in UploadDataTrackFileServlet", e);
+                }
+            }
+        }
+    }
 }
