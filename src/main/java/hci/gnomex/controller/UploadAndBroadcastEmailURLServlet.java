@@ -20,67 +20,51 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
 public class UploadAndBroadcastEmailURLServlet extends HttpServlet {
-	private static final Logger LOG = Logger.getLogger(UploadAndBroadcastEmailURLServlet.class);
+    private static final Logger LOG = Logger.getLogger(UploadAndBroadcastEmailURLServlet.class);
 
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		// Restrict commands to local host if request is not secure
-		if (!ServletUtil.checkSecureRequest(req)) {
-			ServletUtil.reportServletError(resp, "Secure connection is required. Prefix your request with 'https'");
-			return;
-		}
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Restrict commands to local host if request is not secure
+        if (!ServletUtil.checkSecureRequest(req)) {
+            ServletUtil.reportServletError(resp, "Secure connection is required. Prefix your request with 'https'");
+            return;
+        }
 
-		Session sess = null;
+        Session sess = null;
 
-		try {
+        try {
+            boolean isLocalHost = req.getServerName().equalsIgnoreCase("localhost") || req.getServerName().equals("127.0.0.1");
 
-			//boolean isLocalHost = req.getServerName().equalsIgnoreCase("localhost") || req.getServerName().equals("127.0.0.1");
+            sess = HibernateSession.currentReadOnlySession((req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
+            String portNumber = PropertyDictionaryHelper.getInstance(sess).getQualifiedProperty(PropertyDictionary.HTTP_PORT, req.getServerName());
+            if (portNumber == null) {
+                portNumber = "";
+            } else {
+                portNumber = ":" + portNumber;
+            }
 
-			//
-			// COMMENTED OUT CODE:
-			// String baseURL = "http"+ (isLocalHost ? "://" : "s://") + req.getServerName() + req.getContextPath();
-			//
-			// To fix upload problem (missing session in upload servlet for FireFox, Safari), encode session in URL
-			// for upload servlet. Also, use non-secure (http: rather than https:) when making http request;
-			// otherwise, existing session is not accessible to upload servlet.
-			//
-			//
+            String baseURL = "http" + (isLocalHost ? "://" : "s://") + req.getServerName() + portNumber + req.getContextPath();
+            String URL = baseURL + Constants.FILE_SEPARATOR + "UploadAndBroadcastEmailServlet.gx";
 
-			sess = HibernateSession.currentReadOnlySession((req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
-			String portNumber = PropertyDictionaryHelper.getInstance(sess).getQualifiedProperty(
-					PropertyDictionary.HTTP_PORT, req.getServerName());
-			if (portNumber == null) {
-				portNumber = "";
-			} else {
-				portNumber = ":" + portNumber;
-			}
-
-			String baseURL = "http" + "://" + req.getServerName() + portNumber + req.getContextPath();
-			String URL = baseURL + Constants.FILE_SEPARATOR + "UploadAndBroadcastEmailServlet.gx";
-			// Encode session id in URL so that session maintains for upload servlet when called from
-			// Flex upload component inside FireFox, Safari
-			URL += ";jsessionid=" + req.getRequestedSessionId();
-
-			JsonObject value = Json.createObjectBuilder()
-					.add("name", "UploadAndBroadcastEmailURLServlet")
-					.add("url", URL)
-					.build();
-			JsonWriter jsonWriter = Json.createWriter(resp.getOutputStream());
-
-			resp.setContentType("application/json");
-			jsonWriter.writeObject(value);
-			jsonWriter.close();
-		} catch (Exception e) {
-			LOG.error("An exception has occurred in UploadAndBroadcastEmailURLServlet ", e);
-			System.out.println("An error has occurred in UploadAndBroadcastEmailServlet - " + e.toString());
-		} finally {
-			if (sess != null) {
-				try {
-					HibernateSession.closeSession();
-				} catch (Exception e) {
-					LOG.error("An exception has occurred in UploadAndBroadcastEmailURLServlet ", e);
-				}
-			}
-		}
-	}
+            JsonObject value = Json.createObjectBuilder()
+                    .add("name", "UploadAndBroadcastEmailURLServlet")
+                    .add("url", URL)
+                    .build();
+            resp.setContentType("application/json");
+            try (JsonWriter jsonWriter = Json.createWriter(resp.getOutputStream())) {
+                jsonWriter.writeObject(value);
+            }
+        } catch (Exception e) {
+            LOG.error("An exception has occurred in UploadAndBroadcastEmailURLServlet ", e);
+            System.out.println("An error has occurred in UploadAndBroadcastEmailServlet - " + e.toString());
+        } finally {
+            if (sess != null) {
+                try {
+                    HibernateSession.closeSession();
+                } catch (Exception e) {
+                    LOG.error("An exception has occurred in UploadAndBroadcastEmailURLServlet ", e);
+                }
+            }
+        }
+    }
 }

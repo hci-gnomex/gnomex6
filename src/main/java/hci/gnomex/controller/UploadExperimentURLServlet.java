@@ -6,6 +6,9 @@ import hci.gnomex.utility.*;
 
 import java.io.IOException;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,67 +18,50 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
 public class UploadExperimentURLServlet extends HttpServlet {
-private static Logger LOG = Logger.getLogger(UploadExperimentURLServlet.class);
+    private static Logger LOG = Logger.getLogger(UploadExperimentURLServlet.class);
 
-protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 
-	// Restrict commands to local host if request is not secure
-	if (!ServletUtil.checkSecureRequest(req)) {
-		ServletUtil.reportServletError(res, "Secure connection is required. Prefix your request with 'https'");
-		return;
-	}
+        // Restrict commands to local host if request is not secure
+        if (!ServletUtil.checkSecureRequest(req)) {
+            ServletUtil.reportServletError(res, "Secure connection is required. Prefix your request with 'https'");
+            return;
+        }
 
-	Session sess = null;
+        Session sess = null;
 
-	try {
+        try {
+            boolean isLocalHost = req.getServerName().equalsIgnoreCase("localhost") || req.getServerName().equals("127.0.0.1");
 
-		boolean useSecureDownload = !req.getServerName().equalsIgnoreCase("localhost")
-				&& !req.getServerName().equals("127.0.0.1") && !req.getServerName().equals("h005973");
-		useSecureDownload = false; // https doesn't work
-		//
-		// COMMENTED OUT CODE:
-		// String baseURL = "http"+ (isLocalHost ? "://" : "s://") + req.getServerName() + req.getContextPath();
-		//
-		// To fix upload problem (missing session in upload servlet for FireFox, Safari), encode session in URL
-		// for upload servlet. Also, use non-secure (http: rather than https:) when making http request;
-		// otherwise, existing session is not accessible to upload servlet.
-		//
-		//
+            sess = HibernateSession.currentReadOnlySession((req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
+            String portNumber = PropertyDictionaryHelper.getInstance(sess).getQualifiedProperty(PropertyDictionary.HTTP_PORT, req.getServerName());
+            if (portNumber == null) {
+                portNumber = "";
+            } else {
+                portNumber = ":" + portNumber;
+            }
 
-		sess = HibernateSession.currentReadOnlySession((req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
-		String portNumber = PropertyDictionaryHelper.getInstance(sess).getQualifiedProperty(
-				PropertyDictionary.HTTP_PORT, req.getServerName());
-		if (portNumber == null) {
-			portNumber = "";
-		} else {
-			portNumber = ":" + portNumber;
-		}
+            String baseURL = "http" + (isLocalHost ? "://" : "s://") + req.getServerName() + portNumber + req.getContextPath();
+            String URL = baseURL + Constants.FILE_SEPARATOR + "UploadExperimentFileServlet.gx";
 
-		String baseURL = "http" + (useSecureDownload ? "s" : "") + "://" + req.getServerName() + portNumber
-				+ req.getContextPath();
-		String URL = baseURL + Constants.FILE_SEPARATOR + "UploadExperimentFileServlet.gx";
-		// Encode session id in URL so that session maintains for upload servlet when called from
-		// Flex upload component inside FireFox, Safari
-		URL += ";jsessionid=" + req.getRequestedSessionId();
-
-		res.setContentType("application/xml");
-		String xmlResult = "<UploadExperimentURL url='" + URL + "'/>";
-		String jsonResult = Util.xmlToJson(xmlResult);
-		if (!jsonResult.equals(xmlResult)) {
-			res.setContentType("application/json");
-		}
-		res.getOutputStream().println(jsonResult);
-
-	} catch (Exception e) {
-		LOG.error("An exception has occurred in UploadExperimentURLServlet ", e);
-	} finally {
-		if (sess != null) {
-			try {
-				HibernateSession.closeSession();
-			} catch (Exception e) {
-				LOG.error("An exception has occurred in UploadExperimentURLServlet ", e);
-			}
-		}
-	}
-}
+            JsonObject value = Json.createObjectBuilder()
+                    .add("name", "UploadExperimentURLServlet")
+                    .add("url", URL)
+                    .build();
+            res.setContentType("application/json");
+            try (JsonWriter jsonWriter = Json.createWriter(res.getOutputStream())) {
+                jsonWriter.writeObject(value);
+            }
+        } catch (Exception e) {
+            LOG.error("An exception has occurred in UploadExperimentURLServlet ", e);
+        } finally {
+            if (sess != null) {
+                try {
+                    HibernateSession.closeSession();
+                } catch (Exception e) {
+                    LOG.error("An exception has occurred in UploadExperimentURLServlet ", e);
+                }
+            }
+        }
+    }
 }

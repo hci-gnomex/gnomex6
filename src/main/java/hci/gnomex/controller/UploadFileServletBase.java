@@ -6,12 +6,12 @@ import com.oreilly.servlet.multipart.ParamPart;
 import com.oreilly.servlet.multipart.Part;
 import hci.framework.model.DetailObject;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.Topic;
 import hci.gnomex.model.TransferLog;
 import hci.gnomex.security.InvalidSecurityAdvisorException;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.GnomexFile;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.ServletUtil;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
@@ -20,8 +20,6 @@ import org.hibernate.Session;
 
 import javax.json.Json;
 import javax.json.JsonObject;
-import javax.json.JsonValue;
-import javax.json.JsonWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -53,27 +51,7 @@ public abstract class UploadFileServletBase extends HttpServlet {
 	protected abstract void createNewFile(UploadFileServletData data);
 	protected abstract void updateParentObject(UploadFileServletData data);
 
-	/*
-	 * SPECIAL NOTE - This servlet must be run on non-secure socket layer (http) in order to keep track of previously
-	 * created session. (see note below concerning flex upload bug on Safari and FireFox). Otherwise, session is not
-	 * maintained. Although the code tries to work around this problem by creating a new security advisor if one is not
-	 * found, the Safari browser cannot handle authenticating the user (this second time). So for now, this servlet must
-	 * be run non-secure.
-	 */
 	protected SecurityAdvisor getSecurityAdvisor(UploadFileServletData data) throws ServletException, InvalidSecurityAdvisorException {
-		//
-		// To work around flex upload problem with FireFox and Safari, create security advisor since we lose session and
-		// thus don't have security advisor in session attribute.
-		//
-		// Note from Flex developer forum (http://www.kahunaburger.com/2007/10/31/flex-uploads-via-httphttps/):
-		//
-		// Firefox uses two different processes to upload the file. The first one is the one that hosts your Flex (Flash)
-		// application and communicates with the server on one channel. The second one is the actual file-upload process
-		// that pipes multipart-mime data to the server. And, unfortunately, those two processes do not share cookies. So
-		// any sessionid-cookie that was established in the first channel is not being transported to the server in the
-		// second channel. This/ means that the server upload code cannot associate the posted data with an active session
-		// and rejects the data, thus failing the upload.
-		//
 		SecurityAdvisor secAdvisor = (SecurityAdvisor) data.req.getSession().getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY);
 		if (secAdvisor == null) {
 			System.out.println(this.getClass().getSimpleName() + ":  Warning - unable to find existing session. Creating security advisor.");
@@ -87,6 +65,12 @@ public abstract class UploadFileServletBase extends HttpServlet {
 	}
 
 	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		// Restrict commands to local host if request is not secure
+		if (!ServletUtil.checkSecureRequest(req)) {
+			ServletUtil.reportServletError(res, "Secure connection is required. Prefix your request with 'https'");
+			return;
+		}
+
 		UploadFileServletData data = new UploadFileServletData();
 		try {
 			data.req = req;
@@ -131,7 +115,7 @@ public abstract class UploadFileServletBase extends HttpServlet {
 			PrintWriter out = data.res.getWriter();
 			data.res.setHeader("Cache-Control", "max-age=0, must-revalidate");
 
-			org.dom4j.io.OutputFormat format = null;
+			org.dom4j.io.OutputFormat format;
 			org.dom4j.io.HTMLWriter writer = null;
 			Document doc = null;
 			String baseURL = "";
@@ -300,9 +284,9 @@ public abstract class UploadFileServletBase extends HttpServlet {
 	protected static class FileStringUtil {
 
 		public static String fixFormat(String path) {
-			path.replace("/", Constants.FILE_SEPARATOR);
-			path.replace("\\", Constants.FILE_SEPARATOR);
-			return path;
+			return path
+					.replace("/", Constants.FILE_SEPARATOR)
+					.replace("\\", Constants.FILE_SEPARATOR);
 		}
 
 		public static String fixFileFormat(String path) {
