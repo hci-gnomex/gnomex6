@@ -1,14 +1,10 @@
 package hci.gnomex.controller;
 
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.*;
 
 import java.io.IOException;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -31,38 +27,8 @@ public class UploadSequenceURLServlet extends HttpServlet {
         Session sess = null;
 
         try {
-            boolean isLocalHost = req.getServerName().equalsIgnoreCase("localhost") || req.getServerName().equals("127.0.0.1");
-
             sess = HibernateSession.currentReadOnlySession((req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
-            String portNumber = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.HTTP_PORT);
-            if (portNumber == null) {
-                portNumber = "";
-            } else {
-                portNumber = ":" + portNumber;
-            }
-
-            String baseURL = "http" + (isLocalHost ? "://" : "s://") + req.getServerName() + portNumber + req.getContextPath();
-            String URL = baseURL + "/UploadSequenceFileServlet.gx";
-
-            // Get the valid file extensions
-            StringBuilder fileExtensions = new StringBuilder();
-            for (int x = 0; x < Constants.SEQUENCE_FILE_EXTENSIONS.length; x++) {
-                if (fileExtensions.length() > 0) {
-                    fileExtensions.append(";");
-                }
-                fileExtensions.append("*");
-                fileExtensions.append(Constants.SEQUENCE_FILE_EXTENSIONS[x]);
-            }
-
-            JsonObject value = Json.createObjectBuilder()
-                    .add("name", "UploadSequenceURLServlet")
-                    .add("url", URL)
-                    .add("fileExtensions", fileExtensions.toString())
-                    .build();
-            res.setContentType("application/json");
-            try (JsonWriter jsonWriter = Json.createWriter(res.getOutputStream())) {
-                jsonWriter.writeObject(value);
-            }
+            Util.buildAndSendUploadFileServletURL(req, res, sess, "UploadSequenceURLServlet", "UploadSequenceFileServlet.gx", Constants.SEQUENCE_FILE_EXTENSIONS);
         } catch (Exception e) {
             LOG.error("Error in UploadSequenceURLServlet", e);
         } finally {
