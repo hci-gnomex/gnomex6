@@ -177,7 +177,11 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                 private changeDetector: ChangeDetectorRef,
                 private dictionaryService: DictionaryService,
                 private dialog: MatDialog) {
-        this.billingPeriods = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_PERIOD);
+        this.billingPeriods = this.dictionaryService
+            .getEntriesExcludeBlank(DictionaryService.BILLING_PERIOD)
+            .sort((a: any, b: any) => {
+                return a.startDateSort.localeCompare(b.startDateSort);
+            });
         this.statuses = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_STATUS).filter((stat: any) => {
             return stat.value === this.STATUS_PENDING || stat.value === this.STATUS_COMPLETED || stat.value === this.STATUS_APPROVED;
         });
@@ -186,25 +190,25 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         });
 
         this.billingItemGridColumnDefs = [
-            {headerName: "#", headerTooltip:"#", field: "requestNumber", tooltipField: "requestNumber", width: 100, cellRenderer: "agGroupCellRenderer"},
-            {headerName: "", width: 40, maxWidth: 40, minWidth: 40, cellRendererFramework: IconTextRendererComponent},
-            {headerName: "Group", headerTooltip:"Group", field: "labName", tooltipField: "labName", width: 100},
-            {headerName: "Client", headerTooltip:"Client", field: "submitter", tooltipField: "submitter", width: 100},
-            {headerName: "Acct", headerTooltip:"Acct", field: "billingAccountName", tooltipField: "billingAccountName", width: 100},
+            {headerName: "#", headerTooltip:"#", field: "requestNumber", tooltipField: "requestNumber", width: 150, cellRenderer: "agGroupCellRenderer",
+                cellRendererParams: {innerRenderer: getGroupRenderer(), suppressCount: true}},
+            {headerName: "Group", headerTooltip:"Group", field: "labName", tooltipField: "labName", width: 150},
+            {headerName: "Client", headerTooltip:"Client", field: "submitter", tooltipField: "submitter", width: 150},
+            {headerName: "Acct", headerTooltip:"Acct", field: "billingAccountName", tooltipField: "billingAccountName", width: 200},
             {headerName: "Period", headerTooltip:"Period", editable: true, field: "idBillingPeriod", width: 100, cellRendererFramework: SelectRenderer,
                 cellEditorFramework: SelectEditor, selectOptions: this.billingPeriods, selectOptionsDisplayField: "display",
                 selectOptionsValueField: "idBillingPeriod"},
             {headerName: "%", headerTooltip:"%", field: "percentageDisplay", tooltipField: "percentageDisplay", width: 100},
             {headerName: "Type", headerTooltip:"Type", field: "codeBillingChargeKind", tooltipField: "codeBillingChargeKind", width: 100},
-            {headerName: "Price Category", headerTooltip:"Price Category", field: "category", tooltipField: "category", width: 100},
-            {headerName: "Description", headerTooltip:"Description", editable: true, field: "description", tooltipField: "description", width: 100},
-            {headerName: "Complete Date", headerTooltip:"Complete Date", editable: true, field: "completeDate", width: 100, cellRendererFramework: DateRenderer,
+            {headerName: "Price Category", headerTooltip:"Price Category", field: "category", tooltipField: "category", width: 150},
+            {headerName: "Description", headerTooltip:"Description", editable: true, field: "description", tooltipField: "description", width: 150},
+            {headerName: "Complete Date", headerTooltip:"Complete Date", editable: true, field: "completeDate", width: 150, cellRendererFramework: DateRenderer,
                 cellEditorFramework: DateEditor, dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY")},
-            {headerName: "Notes", headerTooltip:"Notes", editable: true, field: "notes", tooltipField: "notes", width: 100},
-            {headerName: "Unit price", headerTooltip:"Unit Price", editable: true, field: "unitPrice", tooltipField: "unitPrice", width: 100},
+            {headerName: "Notes", headerTooltip:"Notes", editable: true, field: "notes", tooltipField: "notes", width: 150},
+            {headerName: "Unit price", headerTooltip:"Unit Price", editable: true, field: "unitPrice", tooltipField: "unitPrice", width: 120},
             {headerName: "Qty", headerTooltip:"Qty", editable: true, field: "qty", tooltipField: "qty", width: 100},
-            {headerName: "Total price", headerTooltip:"Total price", field: "invoicePrice", tooltipField: "invoicePrice", width: 100},
-            {headerName: "Status", headerTooltip:"Status", editable: true, field: "codeBillingStatus", width: 100, cellRendererFramework: SelectRenderer,
+            {headerName: "Total price", headerTooltip:"Total price", field: "invoicePrice", tooltipField: "invoicePrice", width: 120},
+            {headerName: "Status", headerTooltip:"Status", editable: true, field: "codeBillingStatus", width: 150, cellRendererFramework: SelectRenderer,
                 cellEditorFramework: SelectEditor, selectOptions: this.statuses, selectOptionsDisplayField: "display",
                 selectOptionsValueField: "codeBillingStatus"},
         ];
@@ -288,7 +292,6 @@ export class NavBillingComponent implements OnInit, OnDestroy {
 
     public onBillingItemGridReady(event: GridReadyEvent): void {
         event.api.setColumnDefs(this.billingItemGridColumnDefs);
-        event.api.sizeColumnsToFit();
         this.billingItemGridApi = event.api;
     }
 
@@ -331,7 +334,9 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         }
     }
 
-    public onFilterChange(event: BillingFilterEvent): void {
+    public onFilterChange(event: BillingFilterEvent, nodeToReselect?: ITreeNode): void {
+        this.dialogsService.addSpinnerWorkItem();
+
         this.lastFilterEvent = event;
 
         // BillingRequestList
@@ -363,12 +368,16 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                 .set("deepSortResults", "Y");
         }
 
+        this.dialogsService.addSpinnerWorkItem();
         this.billingService.getBillingRequestList(billingRequestListParams).subscribe((result: any) => {
+            this.dialogsService.removeSpinnerWorkItem();
             this.billingItemsTreeLastResult = result;
             this.buildBillingItemsTree(this.billingItemsTreeLastResult);
+        }, () => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
 
-        this.refreshBillingItemList(event);
+        this.refreshBillingItemList(event, !!nodeToReselect, nodeToReselect);
 
         // BillingInvoiceList
         let billingInvoiceListParams: HttpParams = new HttpParams()
@@ -378,7 +387,9 @@ export class NavBillingComponent implements OnInit, OnDestroy {
             .set("idLab", event.requestNumber || event.invoiceNumber ? '' : event.idLab ? event.idLab : '')
             .set("idCoreFacility", event.requestNumber || event.invoiceNumber ? '' : event.idCoreFacility ? event.idCoreFacility : '')
             .set("excludeNewRequests", excludeNewRequests ? 'Y' : 'N');
+        this.dialogsService.addSpinnerWorkItem();
         this.billingService.getBillingInvoiceList(billingInvoiceListParams).subscribe((result: any) => {
+            this.dialogsService.removeSpinnerWorkItem();
             let invoices: any[] = [];
             if (result && Array.isArray(result)) {
                 invoices = result;
@@ -394,13 +405,17 @@ export class NavBillingComponent implements OnInit, OnDestroy {
             for (let invoice of invoices) {
                 this.invoiceMap[invoice.idInvoice] = invoice;
             }
+        }, () => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
 
         // Price tree grid
         this.refreshPricingGrid();
+
+        this.dialogsService.removeSpinnerWorkItem();
     }
 
-    public refreshBillingItemList(event: BillingFilterEvent, reselectIfPossible?: boolean): void {
+    public refreshBillingItemList(event: BillingFilterEvent, reselectIfPossible?: boolean, nodeToReselect?: ITreeNode): void {
         this.showDirtyNote = false;
         this.selectedBillingItems = [];
         this.selectedBillingRequest = null;
@@ -445,6 +460,9 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                     let billingItems: any[] = Array.isArray(r.BillingItem) ? r.BillingItem : [r.BillingItem];
                     for (let b of billingItems) {
                         b.icon = "assets/money.png";
+                        // This is necessary so the icon in the grid is properly rendered (there must be a non-null value
+                        // for that field in order for the group cell renderer to be activated)
+                        b.requestNumber = "";
                     }
                     r.BillingItem = billingItems;
                 } else {
@@ -453,7 +471,11 @@ export class NavBillingComponent implements OnInit, OnDestroy {
             }
 
             if (reselectIfPossible) {
-                this.selectTreeNode(this.billingItemsTreeSelectedNode);
+                if (nodeToReselect) {
+                    this.selectTreeNode(nodeToReselect);
+                } else {
+                    this.selectTreeNode(this.billingItemsTreeSelectedNode);
+                }
             }
         });
     }
@@ -630,7 +652,10 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                 this.totalPrice += Number(price);
             }
         }
-        this.billingItemGridLabel = node.data.label + " " + this.totalPrice.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
+
+        // TODO this is a temporary fix until the total price of split billing items is correctly displayed
+        //this.billingItemGridLabel = node.data.label + " " + this.totalPrice.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
+        this.billingItemGridLabel = node.data.label;
 
         if (node.data.idInvoice && this.invoiceMap[node.data.idInvoice]) {
             let invoice: any = this.invoiceMap[node.data.idInvoice];
@@ -717,7 +742,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         for (let statusNode of this.billingItemsTreeComponent.treeModel.roots) {
             let foundNode: ITreeNode = this.recursivelyFindTreeNode(statusNode, node.data.display);
             if (foundNode) {
-                node.toggleActivated(null);
+                foundNode.toggleActivated(null);
                 break;
             }
         }
@@ -812,6 +837,8 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     }
 
     private saveBillingItems(): void {
+        let selectedTreeNode: ITreeNode = this.billingItemsTreeSelectedNode;
+
         let saveListArray: any[] = [];
         for (let r of this.billingItemList) {
             if (r.isDirty === 'Y') {
@@ -837,7 +864,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         this.billingService.saveBillingItemList(params).subscribe((result: any) => {
             if (result && result.result === "SUCCESS") {
                 if (this.lastFilterEvent) {
-                    this.onFilterChange(this.lastFilterEvent);
+                    this.onFilterChange(this.lastFilterEvent, selectedTreeNode);
                 }
             } else {
                 let message: string = "";
@@ -907,6 +934,8 @@ export class NavBillingComponent implements OnInit, OnDestroy {
 
     public openSplitWindow(): void {
         if (this.selectedBillingRequest) {
+            let selectedTreeNode: ITreeNode = this.billingItemsTreeSelectedNode;
+
             let id: string = "";
             let className: string = "";
 
@@ -953,7 +982,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                                     this.billingService.saveBillingTemplate(result).subscribe((result: any) => {
                                         if (result && result.result === "SUCCESS") {
                                             if (this.lastFilterEvent) {
-                                                this.onFilterChange(this.lastFilterEvent);
+                                                this.onFilterChange(this.lastFilterEvent, selectedTreeNode);
                                             }
                                         } else {
                                             let message: string = "";
@@ -1334,4 +1363,25 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         }
     }
 
+}
+
+function getGroupRenderer() {
+    function GroupRenderer() {
+    }
+
+    GroupRenderer.prototype.init = function(params) {
+        let tempDiv = document.createElement("div");
+        if (params.data.icon) {
+            tempDiv.innerHTML = '<span><img src="' + params.data.icon + '" class="icon"/>' + params.value + '</span>';
+        } else {
+            tempDiv.innerHTML = '<span>' + params.value + '</span>';
+        }
+        this.eGui = tempDiv.firstChild;
+    };
+
+    GroupRenderer.prototype.getGui = function() {
+        return this.eGui;
+    };
+
+    return GroupRenderer;
 }

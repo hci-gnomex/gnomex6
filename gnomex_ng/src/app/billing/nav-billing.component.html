@@ -85,11 +85,12 @@
             <div class="flex-ten">
                 <ag-grid-angular class="ag-theme-balham full-height full-width font-small"
                                  (gridReady)="this.onBillingItemGridReady($event)"
-                                 (gridSizeChanged)="this.onGridSizeChanged($event)"
                                  (cellValueChanged)="this.onBillingItemGridChange($event)"
                                  (selectionChanged)="this.onBillingItemGridSelection()"
                                  (rowClicked)="this.onBillingItemGridRowSelection($event)"
                                  [getNodeChildDetails]="this.getBillingItemNodeChildDetails"
+                                 [enableColResize]="true"
+                                 [stopEditingWhenGridLosesFocus]="true"
                                  [rowSelection]="'multiple'"
                                  [singleClickEdit]="true"
                                  [rowClassRules]="this.billingItemGridRowClassRules"
