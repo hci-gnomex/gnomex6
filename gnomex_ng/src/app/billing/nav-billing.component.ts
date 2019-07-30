@@ -7,7 +7,7 @@ import {BillingService} from "../services/billing.service";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {ConstantsService} from "../services/constants.service";
 import {PropertyService} from "../services/property.service";
-import {MatCheckboxChange, MatDialog, MatDialogConfig} from "@angular/material";
+import {MatCheckboxChange, MatDialogConfig} from "@angular/material";
 import {
     CellValueChangedEvent,
     GridApi,
@@ -175,8 +175,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                 private propertyService: PropertyService,
                 private utilService: UtilService,
                 private changeDetector: ChangeDetectorRef,
-                private dictionaryService: DictionaryService,
-                private dialog: MatDialog) {
+                private dictionaryService: DictionaryService) {
         this.billingPeriods = this.dictionaryService
             .getEntriesExcludeBlank(DictionaryService.BILLING_PERIOD)
             .sort((a: any, b: any) => {
@@ -286,8 +285,8 @@ export class NavBillingComponent implements OnInit, OnDestroy {
 
     ngOnDestroy() {
         this.utilService.removeChangeDetectorRef(this.changeDetector);
-        this.onCoreCommentsWindowRequestSelected.unsubscribe();
-        this.refreshSubscription.unsubscribe();
+        UtilService.safelyUnsubscribe(this.onCoreCommentsWindowRequestSelected);
+        UtilService.safelyUnsubscribe(this.refreshSubscription);
     }
 
     public onBillingItemGridReady(event: GridReadyEvent): void {
@@ -373,11 +372,15 @@ export class NavBillingComponent implements OnInit, OnDestroy {
             this.dialogsService.removeSpinnerWorkItem();
             this.billingItemsTreeLastResult = result;
             this.buildBillingItemsTree(this.billingItemsTreeLastResult);
+
+            this.refreshBillingItemList(event, !!nodeToReselect, nodeToReselect);
         }, () => {
             this.dialogsService.stopAllSpinnerDialogs();
-        });
+            this.billingItemsTreeLastResult = [];
+            this.buildBillingItemsTree(this.billingItemsTreeLastResult);
 
-        this.refreshBillingItemList(event, !!nodeToReselect, nodeToReselect);
+            this.refreshBillingItemList(null);
+        });
 
         // BillingInvoiceList
         let billingInvoiceListParams: HttpParams = new HttpParams()
@@ -395,12 +398,6 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                 invoices = result;
             } else if (result && result.Invoice) {
                 invoices.push(result.Invoice);
-            } else if (result) {
-                let message: string = "";
-                if (result.message) {
-                    message = ": " + result.message;
-                }
-                this.dialogsService.error("An error occurred while retrieving invoice list" + message);
             }
             for (let invoice of invoices) {
                 this.invoiceMap[invoice.idInvoice] = invoice;
@@ -416,6 +413,8 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     }
 
     public refreshBillingItemList(event: BillingFilterEvent, reselectIfPossible?: boolean, nodeToReselect?: ITreeNode): void {
+        this.dialogsService.addSpinnerWorkItem();
+
         this.showDirtyNote = false;
         this.selectedBillingItems = [];
         this.selectedBillingRequest = null;
@@ -427,6 +426,11 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         this.billingItemGridLabel = '';
         this.billingItemList = [];
         this.billingItemGridData = [];
+
+        if (!event) {
+            this.dialogsService.removeSpinnerWorkItem();
+            return;
+        }
 
         let excludeNewRequests: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_EXCLUDE_NEW_REQUESTS, event.idCoreFacility);
 
@@ -442,17 +446,12 @@ export class NavBillingComponent implements OnInit, OnDestroy {
             .set("excludeInactiveBillingTemplates", 'Y')
             .set("sortResults", 'N');
 
+        this.dialogsService.addSpinnerWorkItem();
         this.billingService.getBillingItemList(params).subscribe((result: any) => {
             if (result && Array.isArray(result)) {
                 this.billingItemList = result;
             } else if (result && result.Request) {
                 this.billingItemList = [result.Request];
-            } else if (result) {
-                let message: string = "";
-                if (result.message) {
-                    message = ": " + result.message;
-                }
-                this.dialogsService.error("An error occurred while retrieving billing item list" + message);
             }
 
             for (let r of this.billingItemList) {
@@ -470,6 +469,8 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                 }
             }
 
+            this.dialogsService.removeSpinnerWorkItem();
+
             if (reselectIfPossible) {
                 if (nodeToReselect) {
                     this.selectTreeNode(nodeToReselect);
@@ -477,7 +478,11 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                     this.selectTreeNode(this.billingItemsTreeSelectedNode);
                 }
             }
+        }, () => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
+
+        this.dialogsService.removeSpinnerWorkItem();
     }
 
     private buildBillingItemsTree(result: any, reselectIfPossible?: boolean): void {
@@ -862,17 +867,10 @@ export class NavBillingComponent implements OnInit, OnDestroy {
             .set("billingItemJSONString", JSON.stringify(paramObject))
             .set("noJSONToXMLConversionNeeded", "Y");
         this.billingService.saveBillingItemList(params).subscribe((result: any) => {
-            if (result && result.result === "SUCCESS") {
-                if (this.lastFilterEvent) {
-                    this.onFilterChange(this.lastFilterEvent, selectedTreeNode);
-                }
-            } else {
-                let message: string = "";
-                if (result && result.message) {
-                    message = ": " + result.message;
-                }
-                this.dialogsService.error("An error occurred while saving billing items" + message);
+            if (this.lastFilterEvent) {
+                this.onFilterChange(this.lastFilterEvent, selectedTreeNode);
             }
+        }, () => {
         });
     }
 
@@ -997,6 +995,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                 } else {
                     this.dialogsService.error("There was an error retrieving the billing template");
                 }
+            }, () => {
             });
         }
     }
@@ -1058,6 +1057,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                     this.priceTreeGridData = priceSheets;
                 }
             }
+        }, () => {
         });
     }
 
@@ -1175,19 +1175,12 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                 .set("dropPosition", dropPosition);
             this.billingService.movePriceCategory(params).subscribe((result: any) => {
                 if (result) {
-                    if (result.result && result.result === "SUCCESS") {
-                        this.refreshPricingGrid();
-                        if (result.message) {
-                            this.dialogsService.alert(result.message, null, DialogType.SUCCESS);
-                        }
-                    } else {
-                        let message: string = "";
-                        if (result.message) {
-                            message = ": " + result.message;
-                        }
-                        this.dialogsService.error("An error occurred while moving price category" + message);
+                    this.refreshPricingGrid();
+                    if (result.message) {
+                        this.dialogsService.alert(result.message, null, DialogType.SUCCESS);
                     }
                 }
+            }, () => {
             });
         } else {
             this.dialogsService.alert("Drag-and-drop only allowed for price categories");
@@ -1295,15 +1288,8 @@ export class NavBillingComponent implements OnInit, OnDestroy {
 
                     if (controllerCall) {
                         controllerCall.subscribe((result: any) => {
-                            if (result && result.result && result.result === "SUCCESS") {
-                                this.refreshPricingGrid();
-                            } else {
-                                let message: string = "";
-                                if (result && result.message) {
-                                    message = ": " + result.message;
-                                }
-                                this.dialogsService.error("An error occurred while removing" + message);
-                            }
+                            this.refreshPricingGrid();
+                        }, () => {
                         });
                     }
                 }
@@ -1344,6 +1330,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                 idPriceCategory: this.selectedPriceTreeGridItem.parent.data.idPriceCategory,
                 idPrice: this.selectedPriceTreeGridItem.data.idPrice,
                 idRequest: this.selectedBillingRequest.idRequest,
+                requestNumber: '',
                 idBillingAccount: this.selectedBillingRequest.idBillingAccount,
                 idLab: this.selectedBillingRequest.idLab,
                 percentagePrice: '1',
