@@ -13,6 +13,10 @@
                           [options]="this.runOptions" valueField="value" displayField="display"
                           [formControlName]="'isCustom'">
         </custom-combo-box>
+        <context-help *ngIf="!this.canEnterPrice || this.secAdvisor.isSuperAdmin"
+                      name="ExperimentPlatformPricingHelp" [isEditMode]="this.secAdvisor.isSuperAdmin"
+                      label="Why can't I edit prices?" popupTitle="Pricing Help"
+                      tooltipPosition="right"></context-help>
         <div style="align-items: center" class="flex-container-row">
             <mat-form-field class="medium-form-input">
                 <input matInput placeholder="Internal Pricing" formControlName="unitPriceInternal">

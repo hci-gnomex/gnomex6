@@ -100,12 +100,9 @@
             </li>
         </ol>
         <div class="full-width flex-container-col padded">
-            <context-help *ngIf="bioinformaticsAssist" name="bioNote" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
+            <context-help name="bioNote" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
                           [isEditMode]="this.createSecurityAdvisorService.isAdmin" popupTitle="Analysis Note Help"
                           label="Enter a note regarding analysis. (optional)"></context-help>
-            <!--<div *ngIf="!bioinformaticsAssist" class="disabled-color">-->
-                <!--Disabled.-->
-            <!--</div>-->
             <div class="full-width padded {{bioinformaticsAssist ? 'enable-bordered' : 'disable-bordered'}}">
                 <textarea matInput
                           matTextareaAutosize

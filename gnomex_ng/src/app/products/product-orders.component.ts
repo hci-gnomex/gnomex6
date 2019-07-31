@@ -302,7 +302,7 @@ export class ProductOrdersComponent implements OnInit {
                 }
 
                 if (allComplete) {
-                    this.dialogsService.alert("The selected line item(s) is marked as complete and cannot be deleted", null, DialogType.SUCCESS);
+                    this.dialogsService.alert("The selected line item(s) is marked as complete and cannot be deleted", null, DialogType.WARNING);
                 } else if (hasComplete) {
                     this.dialogsService.confirm("At least one of the selected line item(s) is marked as complete and will be skipped. Continue?", "Warning").subscribe((response: boolean) => {
                         if (response) {
@@ -323,7 +323,7 @@ export class ProductOrdersComponent implements OnInit {
         this.productsService.deleteProductLineItems(params).subscribe((response: any) => {
             if (response && response.result && response.result === 'SUCCESS') {
                 if (response.message) {
-                    this.dialogsService.alert(response.message, null, DialogType.SUCCESS);
+                    this.dialogsService.alert(response.message, null, DialogType.ALERT);
                 }
                 this.snackBar.open("Item(s) Deleted", "Product Orders", {
                     duration: 2000,

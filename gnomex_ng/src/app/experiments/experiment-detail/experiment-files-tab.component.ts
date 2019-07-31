@@ -40,11 +40,7 @@ import {DictionaryService} from "../../services/dictionary.service";
             </div>
         </div>
     `,
-    styles: [`
-        .no-padding-dialog {
-            padding: 0;
-        }
-    `]
+    styles: [``]
 })
 export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
 
@@ -173,7 +169,6 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
 
     public handleUploadFiles(): void {
         let config: MatDialogConfig = new MatDialogConfig();
-        config.panelClass = 'no-padding-dialog';
         config.data = {
             order: this.request,
             startTabIndex: 0,
@@ -181,7 +176,7 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
         };
         config.height = "40.3em";
         config.width = "70em";
-        config.disableClose = true;
+        config.autoFocus = false;
         this.dialogsService.genericDialogContainer(ManageFilesDialogComponent, "Upload Files", null, config);
     }
 
@@ -196,7 +191,6 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
 
     public handleFDTUploadFiles(): void {
         let config: MatDialogConfig = new MatDialogConfig();
-        config.panelClass = 'no-padding-dialog';
         config.data = {
             order: this.request,
             startTabIndex: 0,
@@ -204,7 +198,7 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
         };
         config.height = "40.3em";
         config.width = "70em";
-        config.disableClose = true;
+        config.autoFocus = false;
         this.dialogsService.genericDialogContainer(ManageFilesDialogComponent, "Upload Files", null, config);
     }
 
@@ -214,7 +208,6 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
 
     public handleManageFiles(): void {
         let config: MatDialogConfig = new MatDialogConfig();
-        config.panelClass = 'no-padding-dialog';
         config.data = {
             order: this.request,
             startTabIndex: 1,
@@ -222,13 +215,12 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
         };
         config.height = "40.3em";
         config.width = "70em";
-        config.disableClose = true;
+        config.autoFocus = false;
         this.dialogsService.genericDialogContainer(ManageFilesDialogComponent, "Upload Files", null, config);
     }
 
     public handleDownloadFiles(): void {
         let config: MatDialogConfig = new MatDialogConfig();
-        config.panelClass = 'no-padding-dialog';
         config.data = {
             showCreateSoftLinks: true,
             downloadListSource: this.gridData[0],
@@ -238,7 +230,7 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
             downloadURL: "DownloadFileServlet.gx",
             suggestedFilename: "gnomex-data",
         };
-        config.disableClose = true;
+        config.autoFocus = false;
         this.dialogsService.genericDialogContainer(DownloadFilesComponent, "Download Files", null, config);
     }
 

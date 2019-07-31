@@ -43,7 +43,7 @@
             </div>
             <div class="flex-container-row spaced-children-margin" style="font-size: small">
                 <div class="flex-container-col" style="flex:2">
-                    <label class="gx-label"> Experiment Platform Compatibility </label>
+                    <label class="gx-label"> Availability </label>
                     <mat-radio-group class="flex-container-col"  formControlName="onlyForLabPrepped">
                         <mat-radio-button  value="N">
                             Always Available
@@ -54,31 +54,37 @@
                     </mat-radio-group>
                 </div>
                 <div class="flex-container-col" style="flex:2">
-                    <mat-form-field >
-                        <span matPrefix>$ &nbsp;</span>
-                        <input matInput placeholder="Internal Pricing" formControlName="unitPriceInternal">
-                        <mat-error *ngIf="formGroup.get('unitPriceInternal')?.hasError('pattern')">
-                            Invalid dollar amount
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field >
-                        <span matPrefix>$ &nbsp;</span>
-                        <input matInput placeholder="External Academic Pricing" formControlName="unitPriceExternalAcademic">
-                        <mat-error *ngIf="formGroup.get('unitPriceExternalAcademic')?.hasError('pattern')">
-                            Invalid dollar amount
-                        </mat-error>
-                    </mat-form-field>
-                    <mat-form-field >
-                        <span matPrefix>$ &nbsp;</span>
-                        <input matInput placeholder="External Commercial Pricing" formControlName="unitPriceExternalCommercial">
-                        <mat-error *ngIf="formGroup.get('unitPriceExternalCommercial')?.hasError('pattern')">
-                            Invalid dollar amount
-                        </mat-error>
-                    </mat-form-field>
+                    <div *ngIf="this.canEnterPrices" class="flex-container-col">
+                        <mat-form-field >
+                            <span matPrefix>$ &nbsp;</span>
+                            <input matInput placeholder="Internal Pricing" formControlName="unitPriceInternal">
+                            <mat-error *ngIf="formGroup.get('unitPriceInternal')?.hasError('pattern')">
+                                Invalid dollar amount
+                            </mat-error>
+                        </mat-form-field>
+                        <mat-form-field >
+                            <span matPrefix>$ &nbsp;</span>
+                            <input matInput placeholder="External Academic Pricing" formControlName="unitPriceExternalAcademic">
+                            <mat-error *ngIf="formGroup.get('unitPriceExternalAcademic')?.hasError('pattern')">
+                                Invalid dollar amount
+                            </mat-error>
+                        </mat-form-field>
+                        <mat-form-field >
+                            <span matPrefix>$ &nbsp;</span>
+                            <input matInput placeholder="External Commercial Pricing" formControlName="unitPriceExternalCommercial">
+                            <mat-error *ngIf="formGroup.get('unitPriceExternalCommercial')?.hasError('pattern')">
+                                Invalid dollar amount
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <context-help *ngIf="!this.canEnterPrices || this.secAdvisor.isSuperAdmin"
+                                  name="ExperimentPlatformPricingHelp" [isEditMode]="this.secAdvisor.isSuperAdmin"
+                                  label="Why can't I edit prices?" popupTitle="Pricing Help"
+                                  tooltipPosition="right"></context-help>
                 </div>
                 <div class="flex-container-col" style="align-items:start; flex:1">
-                    <button mat-button color="accent" (click)="openProtocolEditor()"> Edit Protocol </button>
-                    <button mat-button color="accent" (click)="openStepsEditor()" > Lib Prep Steps </button>
+                    <button mat-button class="link-button minimize" (click)="openProtocolEditor()"> Edit Protocol </button>
+                    <button mat-button class="link-button minimize" (click)="openStepsEditor()" > Configure Lib Prep Steps </button>
                     <mat-checkbox formControlName="hasCaptureLibDesign">
                         Custom Design Id
                     </mat-checkbox>

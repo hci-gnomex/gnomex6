@@ -29,8 +29,8 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {LinkButtonRenderer} from "../../util/grid-renderers/link-button.renderer";
 import {GridApi} from "ag-grid-community";
 import {SampleUploadService} from "../../upload/sample-upload.service";
-import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
-import {ExperimentsService} from "../experiments.service";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {NewExperimentService} from "../../services/new-experiment.service";
 
 @Component({
     selector: "tab-samples-illumina",
@@ -50,9 +50,6 @@ import {ExperimentsService} from "../experiments.service";
         }
         .sample-instructions {
             background-color: lightyellow;
-            
-            width: 40rem;
-            
             min-width:  45%;
             max-width: 100%;
         }
@@ -286,7 +283,23 @@ export class TabSamplesIlluminaComponent implements OnInit {
             && this._experiment.isExternal !== 'Y'
             && this._experiment.requestCategory.isIlluminaType
             && this._experiment.requestCategory.isIlluminaType === 'Y';
-    };
+    }
+
+    public get showIlluminaInstructions(): boolean {
+        return this.usingMultiplexGroupGroups
+            && !this.hideMultiplexGroupColumn
+            && (this._state === this.STATE_NEW || this._state === this.STATE_EDIT);
+    }
+
+    public get requestCategoryType(): string {
+        if(this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.type) {
+            return this._experiment.requestCategory.type === NewExperimentService.TYPE_MISEQ ?
+                NewExperimentService.TYPE_HISEQ : this._experiment.requestCategory.type;
+        }
+        return null;
+    }
 
     public get hideMultiplexGroupColumn(): boolean {
         return this._hideMultiplexGroupColumn;
@@ -488,7 +501,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
     private ccNumberIsCurrentlyHidden: boolean = true;
 
     private gridColumnApi;
-    public showInstructions: boolean = false;
 
     private samplesGridApi: GridApi;
 
@@ -1475,7 +1487,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 private fb: FormBuilder,
                 private dialog: MatDialog,
                 private propertyService: PropertyService,
-                private sampleUploadService: SampleUploadService) { }
+                private sampleUploadService: SampleUploadService,
+                public createSecurityAdvisor: CreateSecurityAdvisorService) { }
 
     ngOnInit() {
         this.organisms = this.dictionaryService.getEntries(DictionaryService.ORGANISM);
@@ -2125,10 +2138,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 this.sampleUploadService.downloadSampleSheet("Unknown Lab", state, this.samplesGridColumnDefs, this._experiment);
             }
         }
-    }
-
-    public onClickShowInstructions(): void {
-        this.showInstructions = !this.showInstructions;
     }
 
     public onAddSample(): void {

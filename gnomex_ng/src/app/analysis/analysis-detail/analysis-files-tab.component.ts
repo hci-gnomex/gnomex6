@@ -258,7 +258,6 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
 
     public handleUploadFiles(): void {
         let config: MatDialogConfig = new MatDialogConfig();
-        config.panelClass = 'no-padding-dialog';
         config.data = {
             order: this.analysis,
             startTabIndex: 0,
@@ -266,7 +265,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         };
         config.height = "40.3em";
         config.width = "70em";
-        config.disableClose = true;
+        config.autoFocus = false;
         this.dialogsService.genericDialogContainer(ManageFilesDialogComponent, "Upload Files", null, config);
     }
 
@@ -281,7 +280,6 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
 
     public handleFDTUploadFiles(): void {
         let config: MatDialogConfig = new MatDialogConfig();
-        config.panelClass = 'no-padding-dialog';
         config.data = {
             order: this.analysis,
             startTabIndex: 0,
@@ -289,13 +287,12 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         };
         config.height = "40.3em";
         config.width = "70em";
-        config.disableClose = true;
+        config.autoFocus = false;
         this.dialogsService.genericDialogContainer(ManageFilesDialogComponent, "Upload Files", null, config);
     }
 
     public handleManageFiles(): void {
         let config: MatDialogConfig = new MatDialogConfig();
-        config.panelClass = 'no-padding-dialog';
         config.data = {
             order: this.analysis,
             startTabIndex: 1,
@@ -303,7 +300,6 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         };
         config.height = "40.3em";
         config.width = "70em";
-        config.disableClose = true;
         config.autoFocus = false;
         this.dialogsService.genericDialogContainer(ManageFilesDialogComponent, "Upload Files", null, config);
 
@@ -311,7 +307,6 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
 
     public handleDownloadFiles(): void {
         let config: MatDialogConfig = new MatDialogConfig();
-        config.panelClass = 'no-padding-dialog';
         config.data = {
             showCreateSoftLinks: false,
             downloadListSource: this.gridData[0],
@@ -320,7 +315,6 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
             downloadURL: "DownloadAnalysisFileServlet.gx",
             suggestedFilename: "gnomex-analysis",
         };
-        config.disableClose = true;
         config.autoFocus = false;
         this.dialogsService.genericDialogContainer(DownloadFilesComponent, "Download Files", null, config);
     }
