@@ -290,7 +290,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
 
 
     constructor(private billingService: BillingService,
-                private createSecurityAdvisor: CreateSecurityAdvisorService,
+                public createSecurityAdvisor: CreateSecurityAdvisorService,
                 private dialog: MatDialog,
                 private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,

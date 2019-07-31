@@ -17,6 +17,7 @@ import {Experiment} from "../../util/models/experiment.model";
 import {ConfigureAnnotationsComponent} from "../../util/configure-annotations.component";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../../services/constants.service";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 
 
 @Component({
@@ -31,6 +32,13 @@ import {ConstantsService} from "../../services/constants.service";
         .moderate-width {
             width: 40em;
             min-width: 20em;
+        }
+        .moderate-height {
+            height: 95%;
+            min-height: 20em;
+        }
+        .double-padded-top-bottom {
+            padding: 0.6em 0 0.6em 0;
         }
         
     `]
@@ -83,7 +91,7 @@ export class TabAnnotationViewComponent implements OnDestroy {
         });
     }
 
-    private _experiment: Experiment;
+    public _experiment: Experiment;
 
     private experimentSubscription: Subscription;
     private onChange_codeRequestCategorySubscription: Subscription;
@@ -123,7 +131,8 @@ export class TabAnnotationViewComponent implements OnDestroy {
                 private propertyService: PropertyService,
                 private dialogsService: DialogsService,
                 private gnomexService: GnomexService,
-                private constService: ConstantsService) {
+                private constService: ConstantsService,
+                public secAdvisor: CreateSecurityAdvisorService) {
 
         this.form = this.fb.group({
             customAnnot: [''],

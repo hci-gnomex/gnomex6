@@ -316,7 +316,8 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
                 applyFn: this.applySeqOptionsFn,
                 runOptions: this.expPlatfromService.isHiSeq ? this._runOptions :  [],
                 cycleList: this.seqCycleList,
-                seqTypeRunList: this.seqTypeRunList
+                seqTypeRunList: this.seqTypeRunList,
+                canEnterPrices: this.expPlatfromNode.canEnterPrices
             };
 
             this.dialogService.genericDialogContainer(IlluminaSeqDialogComponent, "Edit Sequencing Option", null, config,
@@ -342,7 +343,7 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
         this.seqOptionsList.splice(0,0,newSeqOpt);
         this.selectedSeqOpt = [newSeqOpt];
         this.gridApi.setRowData(this.seqOptionsList);
-        this.openSeqEditor()
+        this.openSeqEditor();
 
     }
     removeSeqOption(){

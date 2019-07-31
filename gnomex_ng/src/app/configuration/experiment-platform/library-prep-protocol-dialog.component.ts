@@ -32,7 +32,7 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
                         <mat-form-field  class="medium-form-input">
                             <input matInput placeholder="URL" formControlName="url">
                         </mat-form-field>
-                        <button mat-button color="accent" [disabled]="!formGroup.get('url').value" (click)="navToURL()" >
+                        <button mat-button class="link-button minimize" [disabled]="!formGroup.get('url').value" (click)="navToURL()" >
                             <img [src]="this.constService.PAGE_GO">
                             View URL
                         </button>

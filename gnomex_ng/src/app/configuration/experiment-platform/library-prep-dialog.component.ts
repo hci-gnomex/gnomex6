@@ -11,6 +11,7 @@ import {LibraryPrepStepsDialogComponent} from "./library-prep-steps-dialog.compo
 import * as _ from "lodash";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 
 
 @Component({
@@ -23,6 +24,7 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
 })
 export class LibraryPrepDialogComponent extends BaseGenericContainerDialog implements OnInit{
 
+    canEnterPrices: boolean = false;
     rowData:any;
     uncomittedRowData:any;
     applyFn:any;
@@ -51,7 +53,8 @@ export class LibraryPrepDialogComponent extends BaseGenericContainerDialog imple
                 private expPlatformService: ExperimentPlatformService,
                 private dictionaryService: DictionaryService,
                 private dialogService:DialogsService,
-                @Inject(MAT_DIALOG_DATA) private data) {
+                @Inject(MAT_DIALOG_DATA) private data,
+                public secAdvisor: CreateSecurityAdvisorService) {
         super();
         if (this.data && this.data.rowData) {
             this.rowData = this.data.rowData;
@@ -91,6 +94,9 @@ export class LibraryPrepDialogComponent extends BaseGenericContainerDialog imple
 
         this.primaryDisable = (action) => {return this.formGroup.invalid; };
         this.dirty = () => {return this.formGroup.dirty; };
+        if(this.expPlatformNode) {
+            this.canEnterPrices = this.expPlatformNode.canEnterPrices === "Y";
+        }
     }
     compareByID(obj1,item2){
         return obj1 && item2 && obj1.value === item2;
@@ -136,7 +142,7 @@ export class LibraryPrepDialogComponent extends BaseGenericContainerDialog imple
             };
         }
 
-        this.dialogService.genericDialogContainer(LibraryPrepProtocolDialogComponent, "Edit Library Prep", null, config,
+        this.dialogService.genericDialogContainer(LibraryPrepProtocolDialogComponent, "Edit Sequence Lib Protocol", null, config,
             {actions: [
                     {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "saveChanges"},
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}

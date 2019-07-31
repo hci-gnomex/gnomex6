@@ -14,6 +14,7 @@ import {numberRange} from "../../util/validators/number-range-validator";
 import {first} from "rxjs/operators";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 
 
 @Component({
@@ -39,42 +40,54 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
                             <mat-checkbox  formControlName="hasChipTypes" > Has Assays </mat-checkbox>
                         </div>
                     </div>
-                    <div class="flex-container-row spaced-children-margin"  *ngIf="!this.formGroup.get('hasChipTypes').value">
-                        <mat-form-field class="flex-grow">
-                            <span matPrefix>$ &nbsp;</span>
-                            <input matInput placeholder="Internal Pricing" formControlName="unitPriceInternal">
-                            <mat-error  *ngIf="this.formGroup?.controls['unitPriceInternal']?.hasError('pattern')">
-                                Invalid dollar amount
-                            </mat-error>
-                        </mat-form-field>
+                    <div class="flex-container-col" *ngIf="!this.formGroup.get('hasChipTypes').value">
+                        <div *ngIf="!this.canEnterPrice || this.secAdvisor.isSuperAdmin">
+                            <context-help name="ExperimentPlatformQCPricingHelp" [isEditMode]="this.secAdvisor.isSuperAdmin"
+                                          label="Why can't I edit prices?" popupTitle="Pricing Help"
+                                          tooltipPosition="right"></context-help>
+                        </div>
+                        <div class="flex-container-row spaced-children-margin">
+                            <mat-form-field class="flex-grow">
+                                <span matPrefix>$ &nbsp;</span>
+                                <input matInput placeholder="Internal Pricing" formControlName="unitPriceInternal">
+                                <mat-error  *ngIf="this.formGroup?.controls['unitPriceInternal']?.hasError('pattern')">
+                                    Invalid dollar amount
+                                </mat-error>
+                            </mat-form-field>
 
-                        <mat-form-field  class="flex-grow">
-                            <span matPrefix>$ &nbsp;</span>
-                            <input matInput placeholder="External Academic Pricing" formControlName="unitPriceExternalAcademic">
-                            <mat-error  *ngIf="this.formGroup?.controls['unitPriceExternalAcademic']?.hasError('pattern')">
-                                Invalid dollar amount
-                            </mat-error>
-                        </mat-form-field>
-                        <mat-form-field  class="flex-grow">
-                            <span matPrefix>$ &nbsp;</span>
-                            <input matInput placeholder="External Commercial Pricing" formControlName="unitPriceExternalCommercial">
-                            <mat-error  *ngIf="this.formGroup?.controls['unitPriceExternalCommercial']?.hasError('pattern')">
-                                Invalid dollar amount
-                            </mat-error>
-                        </mat-form-field>
+                            <mat-form-field  class="flex-grow">
+                                <span matPrefix>$ &nbsp;</span>
+                                <input matInput placeholder="External Academic Pricing" formControlName="unitPriceExternalAcademic">
+                                <mat-error  *ngIf="this.formGroup?.controls['unitPriceExternalAcademic']?.hasError('pattern')">
+                                    Invalid dollar amount
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field  class="flex-grow">
+                                <span matPrefix>$ &nbsp;</span>
+                                <input matInput placeholder="External Commercial Pricing" formControlName="unitPriceExternalCommercial">
+                                <mat-error  *ngIf="this.formGroup?.controls['unitPriceExternalCommercial']?.hasError('pattern')">
+                                    Invalid dollar amount
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
                     </div>
 
                     <div *ngIf="this.formGroup.get('hasChipTypes').value" class="flex-container-col flex-grow">
-                        <div class="flex-container-row align-center">
-                            <button  mat-button color="primary" type="button" (click)="addChip()">
-                                <img [src]="this.constService.ICON_ADD"> Add
-                            </button>
-                            <button [disabled]="selectedAssay.length === 0" (click)="removeChip()" mat-button color="primary">
-                                <img [src]="this.constService.ICON_DELETE"> Remove
-                            </button>
-                            <button mat-button [disabled]="selectedAssay.length === 0" color="primary" (click)="openAssayEditor()">
-                                Edit QC Assay
-                            </button>
+                        <div class="flex-container-row align-center justify-space-between">
+                            <div class="flex-container-row">
+                                <button  mat-button color="primary" type="button" (click)="addChip()">
+                                    <img [src]="this.constService.ICON_ADD"> Add
+                                </button>
+                                <button [disabled]="selectedAssay.length === 0" (click)="removeChip()" mat-button color="primary">
+                                    <img [src]="this.constService.ICON_DELETE"> Remove
+                                </button>
+                                <button mat-button [disabled]="selectedAssay.length === 0" color="primary" (click)="openAssayEditor()">
+                                    Edit QC Assay
+                                </button>
+                            </div>
+                            <context-help name="QCAssayConfigurationHelp" label="Assays Help" popupTitle="QC Assay Help"
+                                          [isEditMode]="this.secAdvisor.isSuperAdmin" tooltipPosition="right">
+                            </context-help>
                         </div>
 
                         <ag-grid-angular class="flex-grow full-width ag-theme-balham"
@@ -113,6 +126,7 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
 })
 export class QcAssayDialogComponent extends BaseGenericContainerDialog implements OnInit{
 
+    public canEnterPrice: boolean = false;
     applyFn:any;
     formGroup:FormGroup;
     rowData:any;
@@ -135,7 +149,7 @@ export class QcAssayDialogComponent extends BaseGenericContainerDialog implement
     }
 
 
-    private columnDefs:any[] = [
+    public columnDefs:any[] = [
         {
             headerName: "Name",
             field: "bioanalyzerChipType",
@@ -214,7 +228,8 @@ export class QcAssayDialogComponent extends BaseGenericContainerDialog implement
                 private gnomexService: GnomexService,
                 private dictionaryService: DictionaryService,
                 private dialogService: DialogsService,
-                @Inject(MAT_DIALOG_DATA) private data) {
+                @Inject(MAT_DIALOG_DATA) private data,
+                public secAdvisor: CreateSecurityAdvisorService) {
         super();
         if (this.data) {
             this.rowData = this.data.rowData;
@@ -225,7 +240,7 @@ export class QcAssayDialogComponent extends BaseGenericContainerDialog implement
 
     ngOnInit(){
         this.rowData.application = this.rowData.display;
-        let canEntryPrice:boolean = this.expPlatform.canEnterPrices == 'Y';
+        this.canEnterPrice = this.expPlatform.canEnterPrices === 'Y';
 
         let tempChipTypes:any[] | any = null;
         if(this.rowData.ChipTypes) {
@@ -240,15 +255,15 @@ export class QcAssayDialogComponent extends BaseGenericContainerDialog implement
             sortOrder: [this.rowData.sortOrder? this.rowData.sortOrder : '', numberRange(0,99) ],
             hasChipTypes: this.rowData.hasChipTypes ? this.rowData.hasChipTypes === 'Y' : false,
             unitPriceInternal: [
-                {value:this.rowData.unitPriceInternal ? this.rowData.unitPriceInternal : '0.00', disabled:!canEntryPrice},
+                {value:this.rowData.unitPriceInternal ? this.rowData.unitPriceInternal : '0.00', disabled: !this.canEnterPrice},
                 Validators.pattern(this.currencyRegex)
             ],
             unitPriceExternalAcademic:[
-                {value:this.rowData.unitPriceExternalAcademic ? this.rowData.unitPriceExternalAcademic : '0.00',disabled:!canEntryPrice},
+                {value:this.rowData.unitPriceExternalAcademic ? this.rowData.unitPriceExternalAcademic : '0.00', disabled: !this.canEnterPrice},
                 Validators.pattern(this.currencyRegex)
             ],
             unitPriceExternalCommercial: [
-                {value:this.rowData.unitPriceExternalCommercial ? this.rowData.unitPriceExternalCommercial : '0.00',disabled:!canEntryPrice},
+                {value:this.rowData.unitPriceExternalCommercial ? this.rowData.unitPriceExternalCommercial : '0.00', disabled: !this.canEnterPrice},
                 Validators.pattern(this.currencyRegex)
             ],
 

@@ -406,7 +406,6 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
         if (this.experiment && this.experiment.idRequest) {
             this.experimentService.getRequestDownloadList(this.experiment.idRequest).subscribe((result: any) => {
                 let config: MatDialogConfig = new MatDialogConfig();
-                config.panelClass = "no-padding-dialog";
                 config.data = {
                     showCreateSoftLinks: true,
                     downloadListSource: result.Request,
@@ -416,7 +415,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                     downloadURL: "DownloadFileServlet.gx",
                     suggestedFilename: "gnomex-data",
                 };
-                config.disableClose = true;
+                config.autoFocus = false;
                 this.dialogsService.genericDialogContainer(DownloadFilesComponent, "Download Files", null, config);
             }, (err: IGnomexErrorResponse) => {
             });
@@ -426,7 +425,6 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
     shareLink(): void {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = "35em";
-        configuration.panelClass = "no-padding-dialog";
         configuration.autoFocus = false;
         configuration.data = {
             name: "Experiment",
@@ -459,9 +457,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
 
             let config: MatDialogConfig = new MatDialogConfig();
             config.width = "40em";
-            config.panelClass = "no-padding-dialog";
             config.autoFocus = false;
-            config.disableClose = true;
             config.data = {
                 labList: useThisLabList,
                 items: items,
@@ -509,9 +505,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
             let configuration: MatDialogConfig = new MatDialogConfig();
             configuration.width = "45em";
             configuration.height = "35em";
-            configuration.panelClass = "no-padding-dialog";
             configuration.autoFocus = false;
-            configuration.disableClose = true;
             configuration.data = {
                 saveFn: saveFn,
                 action: "Contact Core",

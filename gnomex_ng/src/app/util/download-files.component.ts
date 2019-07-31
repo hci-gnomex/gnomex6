@@ -18,16 +18,15 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
     template: `
         <div class="full-height full-width flex-container-col">
             <div class="full-height full-width flex-container-col padded">
-                <div class="flex-container-row">
-                    <label>Drag files or folders that you want to download</label>
-                </div>
                 <div class="flex-container-row justify-space-between">
-                    <label>Available Files</label>
-                    <label>Files to Download</label>
+                    <label>Drag files or folders that you want to download. Hold CTRL or SHIFT key to select multiple.</label>
+                    <context-help name="downloadhelp" label="Download Help"
+                                  popupTitle="Download Help" [isEditMode]="this.securityAdvisor.isAdmin"></context-help>
                 </div>
                 <div class="trees-container">
                     <as-split>
                         <as-split-area size="50">
+                            <label>Available Files</label>
                             <tree-root #availableFilesTreeComponent
                                        [nodes]="this.availableFilesNodes"
                                        [options]="this.filesOptions">
@@ -38,6 +37,7 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
                             </tree-root>
                         </as-split-area>
                         <as-split-area size="50">
+                            <label>Files to Download</label>
                             <tree-root #filesToDownloadTreeComponent
                                        [nodes]="this.filesToDownloadNodes"
                                        [options]="this.filesOptions">
@@ -90,6 +90,12 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
             color: var(--bluewarmvivid-medlight);
             border: var(--bluewarmvivid-medlight)  solid 1px;
         }
+        /*tree-root.tree-viewport {*/
+            /*height: 93%;*/
+        /*}*/
+        tree-viewport {
+            height: 93%;
+        }
     `]
 })
 export class DownloadFilesComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
@@ -123,7 +129,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
                 private utilService: UtilService,
                 private fileService: FileService,
                 private dialogsService: DialogsService,
-                private securityAdvisor: CreateSecurityAdvisorService) {
+                public securityAdvisor: CreateSecurityAdvisorService) {
         super();
     }
 
