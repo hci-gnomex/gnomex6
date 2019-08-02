@@ -19,7 +19,7 @@ import {GnomexService} from "../services/gnomex.service";
                     </div>
                     <div class="container foreground">
                         <div class="horizontal-centered login-heading">
-                            <img src="../../assets/gnomex_logo_hdr.png" alt="GNomEx">
+                            <img [src]="'./assets/gnomex_logo_hdr.png'" alt="GNomEx">
                         </div>
                         <div class="full-width major-vertical-spacer flex-container-row align-center">
                             <div *ngIf="_errorMsg" class="horizontal-centered small-font {{ errorClasses }}">

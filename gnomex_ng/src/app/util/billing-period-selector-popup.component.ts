@@ -9,9 +9,9 @@ import {BillingPeriod} from "./billing-period-selector.component";
         <mat-dialog-content>
             <div class="flex-container-col align-center">
                 <div>
-                    <button mat-button [hidden]="this.currentYear - 1 < this.minYear" (click)="this.changeYear(-1)"><img src="../../assets/arrow_left.png"></button>
+                    <button mat-button [hidden]="this.currentYear - 1 < this.minYear" (click)="this.changeYear(-1)"><img [src]="'./assets/arrow_left.png'"></button>
                     <label>{{this.currentYear}}</label>
-                    <button mat-button [hidden]="this.currentYear + 1 > this.maxYear" (click)="this.changeYear(1)"><img src="../../assets/arrow_right.png"></button>
+                    <button mat-button [hidden]="this.currentYear + 1 > this.maxYear" (click)="this.changeYear(1)"><img [src]="'./assets/arrow_right.png'"></button>
                 </div>
             </div>
             <div class="flex-container-row flex-wrap">

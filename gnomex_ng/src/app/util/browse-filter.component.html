@@ -122,8 +122,8 @@
                 <label for="invoiceNumberInput" class="leading-label">Invoice #</label>
                 <input class="filterTextInput" [(ngModel)]="invoiceNumberString" id="invoiceNumberInput">
             </div>
-            <button *ngIf="showMoreSwitch && !showMore" class="showHideButton" (click)="toggleShowMore()"><img src="../../assets/arrow_down.gif" alt="" class="icon">More...</button>
-            <button class="searchButton" (click)="search()"><img src="../../assets/magnifier.png" alt="" class="icon">Search</button>
+            <button *ngIf="showMoreSwitch && !showMore" class="showHideButton" (click)="toggleShowMore()"><img [src]="'./assets/arrow_down.gif'" alt="" class="icon">More...</button>
+            <button class="searchButton" (click)="search()"><img [src]="'./assets/magnifier.png'" alt="" class="icon">Search</button>
         </div>
         <div class="padding-right flex-container-row justify-flex-end flex-grow align-center">
             <img [hidden]="!this.isCollapsed" [src]="this.constantsService.ICON_MATERIAL_FILTER_EDIT" class="collapse-expand-icon">
@@ -192,6 +192,6 @@
             <label for="ccNumberInput" class="leading-label">CC Number</label>
             <input class="filterTextInput" [(ngModel)]="ccNumberString" id="ccNumberInput">
         </div>
-        <button class="showHideButton" (click)="toggleShowMore()"><img src="../../assets/arrow_up.gif" alt="" class="icon">Less...</button>
+        <button class="showHideButton" (click)="toggleShowMore()"><img [src]="'./assets/arrow_up.gif'" alt="" class="icon">Less...</button>
     </div>
 </div>

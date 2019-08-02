@@ -17,7 +17,7 @@ import {CellRendererValidation} from "./cell-renderer-validation";
 						{{ displayString }}
 					</div>
 					<!--<div class="td vertical-center">-->
-						<!--<button class="full-height"><img src="../../../assets/calendar_date.png" alt=""/></button>-->
+						<!--<button class="full-height"><img [src]="'./assets/calendar_date.png'" alt=""/></button>-->
 					<!--</div>-->
 				</div>
 			</div>

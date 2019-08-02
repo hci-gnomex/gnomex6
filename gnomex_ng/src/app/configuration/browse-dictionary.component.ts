@@ -25,12 +25,12 @@ import {GDAction} from "../util/interfaces/generic-dialog-action.model";
                 <div class="flex-container-row justify-space-between align-center tree-row">
                     <label>Dictionaries</label>
                     <div>
-                        <button mat-button (click)="refreshAll()"><img src="../../assets/refresh.png" class="button-image"></button>
+                        <button mat-button (click)="refreshAll()"><img [src]="'./assets/refresh.png'" class="button-image"></button>
                         <button mat-button [disabled]="!this.selectedDictionary && !this.selectedEntry" (click)="addEntry()">
-                            <img [src]="!this.selectedDictionary && !this.selectedEntry ? '../../assets/add_disable.png' : '../../assets/add.png'" class="button-image">
+                            <img [src]="!this.selectedDictionary && !this.selectedEntry ? './assets/add_disable.png' : './assets/add.png'" class="button-image">
                         </button>
                         <button mat-button [disabled]="!this.selectedEntry" (click)="deleteEntry()">
-                            <img [src]="!this.selectedEntry ? '../../assets/delete_disable.png' : '../../assets/delete.png'" class="button-image">
+                            <img [src]="!this.selectedEntry ? './assets/delete_disable.png' : './assets/delete.png'" class="button-image">
                         </button>
                     </div>
                 </div>
@@ -39,8 +39,8 @@ import {GDAction} from "../util/interfaces/generic-dialog-action.model";
                         <input matInput placeholder="Search" [(ngModel)]="this.searchText" (keydown.enter)="searchDictionary()">
                     </mat-form-field>
                     <div>
-                        <button mat-button (click)="searchDictionary()"><img src="../../assets/magnifier.png" class="button-image"></button>
-                        <button mat-button (click)="clearSearch()"><img src="../../assets/cross.png" class="button-image"></button>
+                        <button mat-button (click)="searchDictionary()"><img [src]="'./assets/magnifier.png'" class="button-image"></button>
+                        <button mat-button (click)="clearSearch()"><img [src]="'./assets/cross.png'" class="button-image"></button>
                     </div>
                 </div>
                 <div class="tree-container">
@@ -212,10 +212,10 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         let dictionariesTemp: Dictionary[] = this.dictionaryService.getEditableDictionaries();
         for (let dictionary of dictionariesTemp) {
             dictionary.display = dictionary.displayName;
-            dictionary.icon = "assets/folder.png";
+            dictionary.icon = "./assets/folder.png";
             dictionary.DictionaryEntry = this.dictionaryService.getEntriesExcludeBlank(dictionary.className);
             for (let entry of (dictionary.DictionaryEntry as DictionaryEntry[])) {
-                entry.icon = "assets/page_white.png";
+                entry.icon = "./assets/page_white.png";
             }
         }
         dictionariesTemp.sort((a: Dictionary, b:Dictionary) => {

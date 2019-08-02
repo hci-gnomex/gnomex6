@@ -1,6 +1,6 @@
 <div class="full-height">
     <form [formGroup]="this.filterForm" class="ten-percent-height flex-container-row padded align-center">
-        <label class="margin-right"><img src="../../assets/basket.png" class="icon">Product Ledgers</label>
+        <label class="margin-right"><img [src]="'./assets/basket.png'" class="icon">Product Ledgers</label>
         <custom-combo-box [hidden]="this.labList.length < 2" class="margin-right" placeholder="Lab"
                           [options]="this.labList"
                           valueField="idLab" [displayField]="this.prefService.labDisplayField"
@@ -14,7 +14,7 @@
     <div class="ninety-percent-height flex-container-row padded">
         <div class="full-height border-right flex-one">
             <div *ngIf="this.isAdminState" class="five-percent-height flex-container-row justify-end">
-                <button mat-button color="accent" (click)="this.addProduct()"><img src="../../assets/add.png" class="icon">Add Product</button>
+                <button mat-button color="accent" (click)="this.addProduct()"><img [src]="'./assets/add.png'" class="icon">Add Product</button>
             </div>
             <div class="ninety-five-percent-height">
                 <tree-root #tree [nodes]="this.treeNodes" [options]="this.treeOptions" (activate)="this.onActivate($event)"></tree-root>
@@ -22,8 +22,8 @@
         </div>
         <div class="full-height flex-container-col flex-three padded">
             <div class="flex-container-row justify-space-between five-percent-height">
-                <label><img class="icon" src="../../assets/review.png">Product Total: {{this.selectedProduct && this.selectedProduct.qty ? this.selectedProduct.qty : ''}}</label>
-                <button [disabled]="!this.selectedProduct" *ngIf="this.isAdminState" mat-button color="accent" (click)="this.addRow()"><img src="../../assets/add.png" class="icon">Add Row</button>
+                <label><img class="icon" [src]="'./assets/review.png'">Product Total: {{this.selectedProduct && this.selectedProduct.qty ? this.selectedProduct.qty : ''}}</label>
+                <button [disabled]="!this.selectedProduct" *ngIf="this.isAdminState" mat-button color="accent" (click)="this.addRow()"><img [src]="'./assets/add.png'" class="icon">Add Row</button>
             </div>
             <div class="ninety-percent-height">
                 <ag-grid-angular class="ag-theme-fresh full-height full-width"
@@ -37,7 +37,7 @@
             <div class="flex-container-row justify-end five-percent-height">
                 <span [hidden]="this.showSpinner || !this.showDirtyNote" class="dirty-note margin-right">Changes Have Not Been Saved</span>
                 <button mat-button color="primary" [hidden]="this.showSpinner" [disabled]="!this.selectedProduct"
-                        (click)="this.save()"><img class="icon" src="../../assets/action_save.gif">Save</button>
+                        (click)="this.save()"><img class="icon" [src]="'./assets/action_save.gif'">Save</button>
                 <mat-spinner [hidden]="!this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
             </div>
         </div>

@@ -46,15 +46,15 @@
                             <div class="full-width full-height flex-container-col">
                                 <!-- Only one header should be shown-->
                                 <div *ngIf="isExperimentsTab" class="flex-container-row align-center">
-                                    <img src="../../assets/flask.png" alt="">
+                                    <img [src]="'./assets/flask.png'" alt="">
                                     <mat-label class="padded">Add Experiment (Find and drag to topic)</mat-label>
                                 </div>
                                 <div *ngIf="isAnalysisTab" class="flex-container-row align-center">
-                                    <img src="../../assets/map.png" alt="">
+                                    <img [src]="'./assets/map.png'" alt="">
                                     <mat-label class="padded">Add Analysis (Find and drag to topic)</mat-label>
                                 </div>
                                 <div *ngIf="isDatatracksTab" class="flex-container-row align-center">
-                                    <img src="../../assets/datatrack.png" alt="">
+                                    <img [src]="'./assets/datatrack.png'" alt="">
                                     <mat-label class="padded">Add Data Track (Find and drag to topic)</mat-label>
                                 </div>
                                 <!-- End headers-->
@@ -73,7 +73,7 @@
                                             <input matInput [(ngModel)]="experimentSearchText" placeholder="Search" (keyup)="searchExperiementsOnEnter($event)">
                                         </mat-form-field>
                                         <button mat-button class="minimize" (click)="searchExperiment()">
-                                            <img src="../../assets/magnifier.png">
+                                            <img [src]="'./assets/magnifier.png'">
                                         </button>
                                         <div class="flex-grow">
                                         </div>
@@ -98,7 +98,7 @@
                                         <mat-form-field class="formField">
                                             <input matInput [(ngModel)]="analysisSearchText" placeholder="Search" (keyup)="searchAnalysisOnEnter($event)">
                                         </mat-form-field>
-                                        <button mat-button (click)="searchAnalysis()"><img src="../../assets/magnifier.png"></button>
+                                        <button mat-button (click)="searchAnalysis()"><img [src]="'./assets/magnifier.png'"></button>
                                         <mat-radio-group class="radio-group-container" (change)="onAnalRadioChange($event)" [(ngModel)]="selectedAnalTimeFrame">
                                             <mat-radio-button class="topics-radio-button" (click)="selectFrame(frame, 'analysis')" *ngFor="let frame of timeFrames" [value]="frame">
                                                 {{frame}}
@@ -134,7 +134,7 @@
                                         <mat-form-field class="formField">
                                             <input matInput [(ngModel)]="datatrackSearchText" placeholder="Search" (keyup)="searchDatatrackOnEnter($event)">
                                         </mat-form-field>
-                                        <button mat-button (click)="searchDatatrack()"><img src="../../assets/magnifier.png"></button>
+                                        <button mat-button (click)="searchDatatrack()"><img [src]="'./assets/magnifier.png'"></button>
                                     </div>
                                     <!-- End search criteria filters -->
                                     <!-- Only one counter should be shown -->

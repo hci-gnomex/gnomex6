@@ -23,7 +23,7 @@
                             <div>
                                 <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()"
                                         [disabled]="this.createSecurityAdvisorService.isGuest" [matTooltip]="this.DRAG_AND_DROP_HINT">
-                                    <img src="../../assets/information.png">
+                                    <img [src]="'./assets/information.png'">
                                     Drag-and-drop hint
                                 </button>
                             </div>
@@ -50,13 +50,13 @@
                                 <div class="tr">
                                     <div class="td">
                                         <button mat-button [disabled]="disableNewAnalysis || this.disableAll" (click)="createAnalysisClicked($event)">
-                                            <img src="../../assets/map.png" alt="">
+                                            <img [src]="'./assets/map.png'" alt="">
                                             New Analysis
                                         </button>
                                     </div>
                                     <div class="td">
                                         <button mat-button [disabled]="disableDelete || this.disableAll" (click)="deleteAnalysisClicked($event)">
-                                            <img class="exit" src="../../assets/delete.png" alt="">
+                                            <img class="exit" [src]="'./assets/delete.png'" alt="">
                                             Delete
                                         </button>
                                     </div>
@@ -64,7 +64,7 @@
                                 <div class="tr">
                                     <div class="td">
                                         <button mat-button [disabled]="disableNewAnalysisGroup || this.disableAll" (click)="createAnalysisGroupClicked($event)">
-                                            <img src="../../assets/folder_add.png">
+                                            <img [src]="'./assets/folder_add.png'">
                                             New analysis group
                                         </button>
                                     </div>

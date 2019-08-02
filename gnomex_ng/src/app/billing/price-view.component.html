@@ -28,8 +28,8 @@
             <label>Price applies to</label>
         </div>
         <div>
-            <button mat-button (click)="this.addCriteria()"><img src="../../assets/attach_add.png" class="icon">New criteria</button>
-            <button mat-button [disabled]="!this.selectedCriteria" (click)="this.removeCriteria()"><img src="../../assets/delete.png" class="icon">Remove</button>
+            <button mat-button (click)="this.addCriteria()"><img [src]="'./assets/attach_add.png'" class="icon">New criteria</button>
+            <button mat-button [disabled]="!this.selectedCriteria" (click)="this.removeCriteria()"><img [src]="'./assets/delete.png'" class="icon">Remove</button>
         </div>
         <div class="grid-div">
             <ag-grid-angular class="ag-theme-balham full-height full-width"

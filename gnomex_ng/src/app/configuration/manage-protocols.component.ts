@@ -190,7 +190,7 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
 
         if (this.protocolList) {
             for (let protocolFolder of this.protocolList) {
-                protocolFolder.icon = '../../assets/folder.png';
+                protocolFolder.icon = './assets/folder.png';
                 protocolFolder.isProtocol = 'N';
                 protocolFolder.idComposite = '' + protocolFolder.protocolClassName;
                 protocolFolder.protocolType = '' + protocolFolder.label;
@@ -208,7 +208,7 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
                     }
 
                     for (let protocol of protocolFolder.Protocol) {
-                        protocol.icon = '../../assets/brick.png';
+                        protocol.icon = './assets/brick.png';
                         protocol.isProtocol = 'Y';
                         protocol.idComposite = '' + protocol.id + protocolFolder.protocolClassName;
 

@@ -69,7 +69,7 @@
                         mat-raised-button
                         [disabled]="!isCheckboxChecked || !onSubmitTab"
                         (click)="SaveNewExperiment()">
-                    <img src="../../../assets/accept.png">
+                    <img [src]="'./assets/accept.png'">
                     {{ submitOrSaveButtonLabel }}
                 </button>
             </div>
