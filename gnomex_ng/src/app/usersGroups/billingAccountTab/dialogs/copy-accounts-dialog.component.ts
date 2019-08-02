@@ -92,7 +92,7 @@ export class CopyAccountsDialogComponent extends BaseGenericContainerDialog impl
             editable: false,
             width: 350,
             cellRendererFramework: IconLinkButtonRenderer,
-            icon: "../../../assets/pricesheet.png",
+            icon: "./assets/pricesheet.png",
             field: "accountName"
         });
         columnDefinitions.push({
@@ -243,7 +243,7 @@ export class CopyAccountsDialogComponent extends BaseGenericContainerDialog impl
             editable: false,
             width: 350,
             cellRendererFramework: IconLinkButtonRenderer,
-            icon: "../../../assets/email_open.png",
+            icon: "./assets/email_open.png",
             field: "accountName"
         });
         columnDefinitions.push({
@@ -303,7 +303,7 @@ export class CopyAccountsDialogComponent extends BaseGenericContainerDialog impl
             editable: false,
             width: 350,
             cellRendererFramework: IconLinkButtonRenderer,
-            icon: "../../../assets/creditcards.png",
+            icon: "./assets/creditcards.png",
             field: "accountName"
         });
         columnDefinitions.push({

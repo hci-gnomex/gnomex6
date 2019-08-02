@@ -3,7 +3,7 @@
         <as-split-area size="50">
             <div class="flex-container-col full-height full-width padded">
                 <div class="flex-container-row">
-                    <img src="../../assets/DNA_diag.png" height="16" width="16" style="margin-top: .65em">
+                    <img [src]="'./assets/DNA_diag.png'" height="16" width="16" style="margin-top: .65em">
                     <mat-label style="margin-left: .4em;margin-top: .4em;">{{label}}</mat-label>
                 </div>
                 <div class="flex-container-row">
@@ -52,7 +52,7 @@
         <as-split-area size="50">
             <form [formGroup]="this.allFG" class="flex-container-col full-height full-width padded">
                 <div class="flex-container-row justify-flex-end">
-                    <button mat-button matTooltip="Refresh worklist"(click)="refreshWorklist($event)"><img class="icon" src="../../assets/action_refresh.gif">Refresh</button>
+                    <button mat-button matTooltip="Refresh worklist"(click)="refreshWorklist($event)"><img class="icon" [src]="'./assets/action_refresh.gif'">Refresh</button>
                 </div>
                 <div class="flex-row-container-margin">
                     <mat-label>Flow Cell to Assemble</mat-label>
@@ -100,7 +100,7 @@
     </as-split>
     <div class="flex-container-row justify-center">
         <button mat-button [disabled]="this.selectedSeqlanes.length===0" matTooltip="Delete selected sequence lanes" (click)="deleteWorkItem($event)">
-            <img class="icon" src="../../assets/delete.png">Delete
+            <img class="icon" [src]="'./assets/delete.png'">Delete
         </button>
         <div class="flex-grow">
             <save-footer (saveClicked)="save()"

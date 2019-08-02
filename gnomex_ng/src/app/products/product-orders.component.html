@@ -1,7 +1,7 @@
 <div class="flex-container-col full-height padded">
     <div class="flex-container-row justify-space-between padded align-center border flex-two">
         <form class="flex-container-row align-center" [formGroup]="this.filterForm">
-            <label class="margin-right reduced-font"><img src="../../assets/basket.png" class="icon">Product Orders</label>
+            <label class="margin-right reduced-font"><img [src]="'./assets/basket.png'" class="icon">Product Orders</label>
             <div class="filter-col margin-right">
                 <custom-combo-box class="reduced-font" placeholder="Lab" [options]="this.filterLabList"
                                   valueField="idLab" [displayField]="this.prefService.labDisplayField"
@@ -56,7 +56,7 @@
             <div class="full-height" [hidden]="this.detailDisplayMode !== this.DETAIL_ORDER_MODE">
                 <mat-tab-group class="full-height">
                     <mat-tab label="Product Order Info">
-                        <label *ngIf="this.currentProductOrder"><img src="../../assets/review.png" class="icon">Product Order {{this.currentProductOrder.productOrderNumber}}</label>
+                        <label *ngIf="this.currentProductOrder"><img [src]="'./assets/review.png'" class="icon">Product Order {{this.currentProductOrder.productOrderNumber}}</label>
                         <table *ngIf="this.currentProductOrder" class="half-width">
                             <tr>
                                 <td class="italics">Submitter</td>
@@ -123,9 +123,9 @@
             </custom-combo-box>
             <button mat-button class="margin-right" color="primary"
                     [disabled]="!this.changeStatus || !this.changeProductOrders || this.changeProductOrders.length < 1"
-                    (click)="this.promptToSave()"><img class="icon" src="../../assets/bullet_go.png">Go</button>
+                    (click)="this.promptToSave()"><img class="icon" [src]="'./assets/bullet_go.png'">Go</button>
             <button mat-button color="warn" [disabled]="!this.changeProductOrders || this.changeProductOrders.length < 1"
-                    (click)="this.promptToDelete()"><img class="icon" src="../../assets/delete.png">Delete</button>
+                    (click)="this.promptToDelete()"><img class="icon" [src]="'./assets/delete.png'">Delete</button>
         </div>
         <label [hidden]="this.displayMode !== this.DISPLAY_OVERVIEW">({{this.productOrderLineItemList.length}} line items)</label>
     </div>

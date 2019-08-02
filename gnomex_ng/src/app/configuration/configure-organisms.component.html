@@ -1,8 +1,8 @@
 <div class="full-height full-width padding-sides flex-container-col">
     <h5 *ngIf="!this.isDialog" class="flex-one">Configure Organisms</h5>
     <div class="full-width flex-container-row flex-one">
-        <button mat-button (click)="this.addOrganism()"><img class="icon" src="../../assets/page_add.png">Add</button>
-        <button mat-button [disabled]="!this.selectedOrganism || !this.canDeleteSelectedOrganism" (click)="this.removeOrganism()"><img class="icon" src="../../assets/page_remove.png">Remove</button>
+        <button mat-button (click)="this.addOrganism()"><img class="icon" [src]="'./assets/page_add.png'">Add</button>
+        <button mat-button [disabled]="!this.selectedOrganism || !this.canDeleteSelectedOrganism" (click)="this.removeOrganism()"><img class="icon" [src]="'./assets/page_remove.png'">Remove</button>
     </div>
     <div class="full-width flex-container-row flex-twenty">
         <ag-grid-angular class="ag-theme-balham full-height quarter-width margin-right"
@@ -59,8 +59,8 @@
             <div class="full-width flex-container-col flex-three align-center">
                 <div class="full-width flex-container-row flex-one align-center">
                     <label class="margin-right">Genome Builds</label>
-                    <button mat-button [disabled]="!this.canUpdateSelectedOrganism" (click)="this.addGenomeBuild()"><img class="icon" src="../../assets/add.png">Add</button>
-                    <button mat-button [disabled]="!this.canUpdateSelectedOrganism || this.genomeBuildSelectedIndex == null" (click)="this.removeGenomeBuild()"><img class="icon" src="../../assets/delete.png">Remove</button>
+                    <button mat-button [disabled]="!this.canUpdateSelectedOrganism" (click)="this.addGenomeBuild()"><img class="icon" [src]="'./assets/add.png'">Add</button>
+                    <button mat-button [disabled]="!this.canUpdateSelectedOrganism || this.genomeBuildSelectedIndex == null" (click)="this.removeGenomeBuild()"><img class="icon" [src]="'./assets/delete.png'">Remove</button>
                 </div>
                 <ag-grid-angular class="ag-theme-balham flex-two full-width"
                                  (gridReady)="this.onGenomeBuildGridReady($event)"
@@ -82,7 +82,7 @@
             <div *ngIf="!this.isDialog" class="full-width flex-container-row flex-one align-center justify-end">
                 <span *ngIf="this.formGroup.dirty && !this.showSpinner" class="dirty-note">Changes Have Not Been Saved</span>
                 <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.canUpdateSelectedOrganism || !this.formGroup.valid"
-                        (click)="this.prepareToSaveOrganism()"><img class="icon" src="../../assets/action_save.gif">Save</button>
+                        (click)="this.prepareToSaveOrganism()"><img class="icon" [src]="'./assets/action_save.gif'">Save</button>
                 <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
             </div>
         </div>

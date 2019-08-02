@@ -51,7 +51,7 @@
         <tr *ngFor="let p of this.productList">
             <td>
                 <mat-checkbox [(ngModel)]="p.isSelected" [disabled]="true">{{p.name}} (Order Qty: {{p.orderQty}})</mat-checkbox>
-                <img class="description-icon" *ngIf="p.description" src="../../assets/white_information.png" matTooltip="{{p.description}}">
+                <img class="description-icon" *ngIf="p.description" [src]="'./assets/white_information.png'" matTooltip="{{p.description}}">
             </td>
             <td>
                 <input matInput class="half-width user-input" type="number" [(ngModel)]="p.quantity" (change)="this.checkQuantity(p)">
@@ -75,6 +75,6 @@
         <mat-checkbox [(ngModel)]="this.userConsent">
             As the Principal Investigator or authorized personnel of the account(s) listed above I authorize the Core Facility to charge the account for the products selected.
         </mat-checkbox>
-        <button mat-button [disabled]="!this.userConsent || !this.enableSubmit" color="primary" (click)="this.submitOrder()"><img src="../../assets/save.png" class="icon">Submit</button>
+        <button mat-button [disabled]="!this.userConsent || !this.enableSubmit" color="primary" (click)="this.submitOrder()"><img [src]="'./assets/save.png'" class="icon">Submit</button>
     </div>
 </div>

@@ -36,7 +36,7 @@
     </div>
     <div class="flex-row-container justify-center justify-space-between">
         <button mat-button  matTooltip="Refresh worklist" (click)="refreshWorklist($event)">
-            <img src="../../assets/action_refresh.gif">Refresh
+            <img [src]="'./assets/action_refresh.gif'">Refresh
         </button>
         <div class="flex-grow">
             <save-footer style="width: 100%" (saveClicked)="save()"

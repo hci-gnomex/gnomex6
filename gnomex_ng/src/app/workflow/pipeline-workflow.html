@@ -1,6 +1,6 @@
 <div class="flex-container-col full-height full-width">
     <div class="flex-container-row">
-        <img src="../../assets/server_go.png" height="16" width="16" style="margin-top: .65em">
+        <img [src]="'./assets/server_go.png'" height="16" width="16" style="margin-top: .65em">
         <mat-label style="margin-left: .4em;margin-top: .4em;">{{label}}</mat-label>
     </div>
     <div class="flex-grow" >
@@ -19,7 +19,7 @@
     </div>
     <div class="flex-container-row justify-center">
         <button mat-button  matTooltip="Refresh worklist"(click)="refreshWorklist($event)">
-            <img class="icon" src="../../assets/action_refresh.gif">Refresh
+            <img class="icon" [src]="'./assets/action_refresh.gif'">Refresh
         </button>
         <div class="flex-grow">
             <save-footer (saveClicked)="save()"

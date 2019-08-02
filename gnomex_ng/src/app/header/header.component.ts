@@ -244,12 +244,12 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'My Account',
                         context: 'browseExperiments',
-                        iconName: '../../assets/white_information.png',
+                        iconName: './assets/white_information.png',
                         route: './MyAccount'
                     },
                     {
                         displayName: 'Sign out',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: [{outlets: {'modal': 'logout'}}]
                     }
                 ]
@@ -260,31 +260,31 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             {
                 displayName: 'Experiments',
                 class: 'top-menu-item',
-                iconName: '../../assets/flask.png',
+                iconName: './assets/flask.png',
                 route: '/experiments',
             },
             {
                 displayName: 'Analysis',
                 class: 'top-menu-item',
-                iconName: '../../assets/map.png',
+                iconName: './assets/map.png',
                 route: '/analysis'
             },
 
             {
                 displayName: 'Data Tracks',
                 class: 'top-menu-item',
-                iconName: '../../assets/datatrack.png',
+                iconName: './assets/datatrack.png',
                 route: '/datatracks'
             },
             {
                 displayName: 'Topics',
                 class: 'top-menu-item',
-                iconName: '../../assets/topic_tag.png',
+                iconName: './assets/topic_tag.png',
                 route: '/topics'
             },
             {
                 displayName: 'Protocols',
-                iconName: '../../assets/brick.png',
+                iconName: './assets/brick.png',
                 class: 'top-menu-item',
                 route: '/manage-protocols'
             },
@@ -293,7 +293,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.userNavItems = [
             {
                 displayName: 'New Experiment Order',
-                iconName: '../../assets/flask_add.png',
+                iconName: './assets/flask_add.png',
                 class: 'top-menu-item',
                 context: 'newExperimentOrder',
                 route: ''
@@ -301,39 +301,39 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             {
                 displayName: 'Experiments',
                 class: 'top-menu-item',
-                iconName: '../../assets/flask.png',
+                iconName: './assets/flask.png',
                 children: [
                     {
                         displayName: 'Browse Experiments',
                         context: 'browseExperiments',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/experiments',
                     },
                     {
                         displayName: 'New Experiment Order',
-                        iconName: '../../assets/flask_add.png',
+                        iconName: './assets/flask_add.png',
                         context: 'newExperimentOrder',
                         route: ''
                     },
                     {
                         displayName: 'Add Additional Illumina Sequencing Lanes',
-                        iconName: '../../assets/flask_edit.png',
+                        iconName: './assets/flask_edit.png',
                         route: 'amend-experiment'
                     },
                     {
                         displayName: 'New Project',
-                        iconName: '../../assets/folder_add.png',
+                        iconName: './assets/folder_add.png',
                         route: [{outlets: {modal: ['newProject']}}]
                     },
                     {
                         displayName: 'Upload Experiment data generated at third party facility',
                         context: 'newExternalExperiment',
-                        iconName: '../../assets/experiment_register.png',
+                        iconName: './assets/experiment_register.png',
                         route: '/new-external-experiment'
                     },
                     {
                         displayName: 'New Billing Account',
-                        iconName: '../../assets/money.png',
+                        iconName: './assets/money.png',
                         route: [{outlets: {'modal': 'NewBillingAccountModal'}}]
                     }
                 ]
@@ -342,43 +342,43 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                 displayName: 'Analysis',
                 context: 'bioinformatics',
                 class: 'top-menu-item',
-                iconName: '../../assets/map.png',
+                iconName: './assets/map.png',
                 route: '/analysis'
             },
             {
                 displayName: 'Data Tracks',
                 context: 'bioinformatics',
                 class: 'top-menu-item',
-                iconName: '../../assets/datatrack.png',
+                iconName: './assets/datatrack.png',
                 route: '/datatracks'
             },
             {
                 displayName: 'Topics',
                 context: 'bioinformatics',
                 class: 'top-menu-item',
-                iconName: '../../assets/topic_tag.png',
+                iconName: './assets/topic_tag.png',
                 route: '/topics'
             },
             {
                 displayName: 'Products',
                 context: 'product',
                 class: 'top-menu-item',
-                iconName: '../../assets/basket.png',
+                iconName: './assets/basket.png',
                 children: [
                     {
                         displayName: 'Order Products',
                         context: 'newProductOrder',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/order-products'
                     },
                     {
                         displayName: 'Product Orders',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/product-ledger'
                     }
                 ]
@@ -386,21 +386,21 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             {
                 displayName: 'Configure',
                 class: 'top-menu-item',
-                iconName: '../../assets/page_white_wrench.png',
+                iconName: './assets/page_white_wrench.png',
                 children: [
                     {
                         displayName: 'Configure Annotations',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: '/configure-organisms'
                     },
                     {
                         displayName: 'Protocols',
-                        iconName: '../../assets/brick.png',
+                        iconName: './assets/brick.png',
                         route: '/manage-protocols'
                     }
                 ]
@@ -408,27 +408,27 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             {
                 displayName: 'Reports',
                 class: 'top-menu-item',
-                iconName: '../../assets/page.png',
+                iconName: './assets/page.png',
                 children: [
                     {
                         displayName: 'Track Usage',
                         context: 'usage',
-                        iconName: '../../assets/chart_bar.png',
+                        iconName: './assets/chart_bar.png',
                         route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Progress Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationProgressReport'
                     },
                     {
                         displayName: 'Project/Experiment Report',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/ProjectExperimentReport'
                     }
                 ]
@@ -438,40 +438,40 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.managerNavItems = [
             {
                 displayName: 'Experiments',
-                iconName: '../../assets/flask.png',
+                iconName: './assets/flask.png',
                 class: 'top-menu-item',
                 children: [
                     {
                         displayName: 'Browse Experiments',
                         context: 'browseExperiments',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/experiments',
                     },
                     {
                         displayName: 'New Experiment Order',
-                        iconName: '../../assets/flask_add.png',
+                        iconName: './assets/flask_add.png',
                         context: 'newExperimentOrder',
                         route: ''
                     },
                     {
                         displayName: 'Add Additional Illumina Sequencing Lanes',
-                        iconName: '../../assets/flask_edit.png',
+                        iconName: './assets/flask_edit.png',
                         route: 'amend-experiment'
                     },
                     {
                         displayName: 'New Project',
-                        iconName: '../../assets/folder_add.png',
+                        iconName: './assets/folder_add.png',
                         route: [{outlets: {modal: ['newProject']}}]
                     },
                     {
                         displayName: 'Upload Experiment data generated at third party facility',
                         context: 'newExternalExperiment',
-                        iconName: '../../assets/experiment_register.png',
+                        iconName: './assets/experiment_register.png',
                         route: '/new-external-experiment'
                     },
                     {
                         displayName: 'New Billing Account',
-                        iconName: '../../assets/money.png',
+                        iconName: './assets/money.png',
                         route: [{outlets: {'modal': 'NewBillingAccountModal'}}]
                     }
                 ]
@@ -480,43 +480,43 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                 displayName: 'Analysis',
                 context: 'bioinformatics',
                 class: 'top-menu-item',
-                iconName: '../../assets/map.png',
+                iconName: './assets/map.png',
                 route: '/analysis'
             },
             {
                 displayName: 'Data Tracks',
                 context: 'bioinformatics',
                 class: 'top-menu-item',
-                iconName: '../../assets/datatrack.png',
+                iconName: './assets/datatrack.png',
                 route: '/datatracks'
             },
             {
                 displayName: 'Topics',
                 context: 'bioinformatics',
                 class: 'top-menu-item',
-                iconName: '../../assets/topic_tag.png',
+                iconName: './assets/topic_tag.png',
                 route: '/topics'
             },
             {
                 displayName: 'Products',
                 context: 'product',
                 class: 'top-menu-item',
-                iconName: '../../assets/basket.png',
+                iconName: './assets/basket.png',
                 children: [
                     {
                         displayName: 'Order Products',
                         context: 'newProductOrder',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/order-products'
                     },
                     {
                         displayName: 'Product Orders',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/product-ledger'
                     }
                 ]
@@ -524,27 +524,27 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             {
                 displayName: 'Users & Groups',
                 class: 'top-menu-item',
-                iconName: '../../assets/group.png',
+                iconName: './assets/group.png',
                 route: '/UsersGroups'
             },
             {
                 displayName: 'Configure',
                 class: 'top-menu-item',
-                iconName: '../../assets/page_white_wrench.png',
+                iconName: './assets/page_white_wrench.png',
                 children: [
                     {
                         displayName: 'Configure Annotations',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: '/configure-organisms'
                     },
                     {
                         displayName: 'Protocols',
-                        iconName: '../../assets/brick.png',
+                        iconName: './assets/brick.png',
                         route: '/manage-protocols'
                     }
                 ]
@@ -552,26 +552,26 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             {
                 displayName: 'Reports',
                 class: 'top-menu-item',
-                iconName: '../../assets/page.png',
+                iconName: './assets/page.png',
                 children: [
                     {
                         displayName: 'Track Usage',
-                        iconName: '../../assets/chart_bar.png',
+                        iconName: './assets/chart_bar.png',
                         route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Progress Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationProgressReport'
                     },
                     {
                         displayName: 'Project/Experiment Report',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/ProjectExperimentReport'
                     }
                 ]
@@ -581,23 +581,23 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.managerESNavItems = [
             {
                 displayName: 'Experiments',
-                iconName: '../../assets/flask.png',
+                iconName: './assets/flask.png',
                 class: 'top-menu-item',
                 children: [
                     {
                         displayName: 'Browse Experiments',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/experiments',
                     },
                     {
                         displayName: 'Create New Experiments and Upload Files',
                         context: 'newExperimentOrder',
-                        iconName: '../../assets/flask_add.png',
+                        iconName: './assets/flask_add.png',
                         route: ''
                     },
                     {
                         displayName: 'New Project',
-                        iconName: '../../assets/folder_add.png',
+                        iconName: './assets/folder_add.png',
                         route: [{outlets: {modal: ['newProject']}}]
                     }
                 ]
@@ -606,52 +606,52 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                 displayName: 'Analysis',
                 context: 'bioinformatics',
                 class: 'top-menu-item',
-                iconName: '../../assets/map.png',
+                iconName: './assets/map.png',
                 route: '/analysis'
             },
             {
                 displayName: 'Data Tracks',
                 context: 'bioinformatics',
                 class: 'top-menu-item',
-                iconName: '../../assets/datatrack.png',
+                iconName: './assets/datatrack.png',
                 route: '/datatracks'
             },
             {
                 displayName: 'Topics',
                 context: 'bioinformatics',
                 class: 'top-menu-item',
-                iconName: '../../assets/topic_tag.png',
+                iconName: './assets/topic_tag.png',
                 route: '/topics'
             },
             {
                 displayName: 'Users & Groups',
                 class: 'top-menu-item',
-                iconName: '../../assets/group.png',
+                iconName: './assets/group.png',
                 route: '/UsersGroups'
             },
             {
                 displayName: 'Configure',
                 class: 'top-menu-item',
-                iconName: '../../assets/page_white_wrench.png',
+                iconName: './assets/page_white_wrench.png',
                 children: [
                     {
                         displayName: 'Configure Annotations',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: '/configure-organisms'
                     },
                     {
                         displayName: 'Manage Microarray Catalog',
-                        iconName: '../../assets/image.png',
+                        iconName: './assets/image.png',
                         route: ''
                     },
                     {
                         displayName: 'Protocols',
-                        iconName: '../../assets/brick.png',
+                        iconName: './assets/brick.png',
                         route: '/manage-protocols'
                     }
                 ]
@@ -659,26 +659,26 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             {
                 displayName: 'Reports',
                 class: 'top-menu-item',
-                iconName: '../../assets/page.png',
+                iconName: './assets/page.png',
                 children: [
                     {
                         displayName: 'Track Usage',
-                        iconName: '../../assets/chart_bar.png',
+                        iconName: './assets/chart_bar.png',
                         route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Progress Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationProgressReport'
                     },
                     {
                         displayName: 'Project/Experiment Report',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/ProjectExperimentReport'
                     }
                 ]
@@ -688,55 +688,55 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.adminNavItems = [
             {
                 displayName: 'Orders',
-                iconName: '../../assets/review.png',
+                iconName: './assets/review.png',
                 route: '/experiments-orders',
             },
             {
                 displayName: 'Experiments',
-                iconName: '../../assets/flask.png',
+                iconName: './assets/flask.png',
                 class: 'top-menu-item',
                 children: [
                     {
                         displayName: 'Browse Experiments',
                         context: 'browseExperiments',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/experiments',
                     },
                     {
                         displayName: 'New Experiment Order',
                         context: 'newExperimentOrder',
-                        iconName: '../../assets/flask_add.png',
+                        iconName: './assets/flask_add.png',
 
                     },
                     {
                         displayName: 'Add Additional Illumina Sequencing Lanes',
-                        iconName: '../../assets/flask_edit.png',
+                        iconName: './assets/flask_edit.png',
                         route: 'amend-experiment'
                     },
                     {
                         displayName: 'New Project',
-                        iconName: '../../assets/folder_add.png',
+                        iconName: './assets/folder_add.png',
                         route: [{outlets: {modal: ['newProject']}}]
                     },
                     {
                         displayName: 'Upload Experiment data generated at third party facility',
                         context: 'newExternalExperiment',
-                        iconName: '../../assets/experiment_register.png',
+                        iconName: './assets/experiment_register.png',
                         route: '/new-external-experiment'
                     },
                     {
                         displayName: 'New Billing Account',
-                        iconName: '../../assets/money.png',
+                        iconName: './assets/money.png',
                         route: [{outlets: {'modal': 'NewBillingAccountModal'}}]
                     },
                     {
                         displayName: 'Orders',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/experiments-orders',
                     },
                     {
                         displayName: 'Bulk Sample Sheet Import',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: [{outlets: {'modal': 'BulkSampleUpload'}}]
                     }
                 ]
@@ -745,32 +745,32 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                 displayName: 'Analysis',
                 context: 'bioinformatics',
                 class: 'top-menu-item',
-                iconName: '../../assets/map.png',
+                iconName: './assets/map.png',
                 route: '/analysis'
             },
             {
                 displayName: 'Data Tracks',
                 context: 'bioinformatics',
                 class: 'top-menu-item',
-                iconName: '../../assets/datatrack.png',
+                iconName: './assets/datatrack.png',
                 route: '/datatracks'
             },
             {
                 displayName: 'Topics',
                 context: 'bioinformatics',
                 class: 'top-menu-item',
-                iconName: '../../assets/topic_tag.png',
+                iconName: './assets/topic_tag.png',
                 route: '/topics'
             },
             {
                 displayName: 'Workflow...',
                 class: 'top-menu-item',
-                iconName: '../../assets/review.png',
+                iconName: './assets/review.png',
                 children: [
                     {
                         displayName: 'QC',
                         context: 'QC',
-                        iconName: '../../assets/data-accept.png',
+                        iconName: './assets/data-accept.png',
                         route: '/qcWorkFlow'
                     },
                     {
@@ -779,37 +779,37 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Illumina - Lib Prep',
                         context: 'HISEQ',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/libprepWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Lib Prep QC',
                         context: 'HISEQ',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/libprepQcWorkFlow'
                     },
                     {
                         displayName: 'Illumina - FlowCell Assembly',
                         context: 'HISEQ',
-                        iconName: '../../assets/DNA_diag_lightening.png',
+                        iconName: './assets/DNA_diag_lightening.png',
                         route: '/flowcellassmWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Finalize Flow Cell',
                         context: 'HISEQ',
-                        iconName: '../../assets/DNA_diag_lightening.png',
+                        iconName: './assets/DNA_diag_lightening.png',
                         route: '/finalizeWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Data Pipeline',
                         context: 'HISEQ',
-                        iconName: '../../assets/page_go.png',
+                        iconName: './assets/page_go.png',
                         route: '/pipelineWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Flow Cells',
                         context: 'HISEQ',
-                        iconName: '../../assets/rectangle.png',
+                        iconName: './assets/rectangle.png',
                         route: '/flowcellWorkFlow'
                     },
                     {
@@ -818,21 +818,21 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Microarray',
                         context: 'microarray',
-                        iconName: '../../assets/microarray_small.png',
+                        iconName: './assets/microarray_small.png',
                         children: [
                             {
                                 displayName: 'Labeling',
-                                iconName: '../../assets/asterisk_yellow.png',
+                                iconName: './assets/asterisk_yellow.png',
                                 route: ''
                             },
                             {
                                 displayName: 'Hyb',
-                                iconName: '../../assets/basket_put.png',
+                                iconName: './assets/basket_put.png',
                                 route: ''
                             },
                             {
                                 displayName: 'Extraction',
-                                iconName: '../../assets/microarray_small.png',
+                                iconName: './assets/microarray_small.png',
                                 route: ''
                             },
                         ]
@@ -842,7 +842,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     },
                     {
                         displayName: 'Workflow (all)',
-                        iconName: '../../assets/building_go.png',
+                        iconName: './assets/building_go.png',
                         route: ''
                     },
                     {
@@ -850,22 +850,22 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     },
                     {
                         displayName: 'Fill Plate',
-                        iconName: '../../assets/run_review.png',
+                        iconName: './assets/run_review.png',
                         route: ''
                     },
                     {
                         displayName: 'Build Run',
-                        iconName: '../../assets/run_add.png',
+                        iconName: './assets/run_add.png',
                         route: ''
                     },
                     {
                         displayName: 'Plates & Runs',
-                        iconName: '../../assets/run_review.png',
+                        iconName: './assets/run_review.png',
                         route: ''
                     },
                     {
                         displayName: 'Results',
-                        iconName: '../../assets/tv_chart_review.png',
+                        iconName: './assets/tv_chart_review.png',
                         route: ''
                     },
                 ]
@@ -873,12 +873,12 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             {
                 displayName: 'Workflow',
                 class: 'top-menu-item',
-                iconName: '../../assets/review.png',
+                iconName: './assets/review.png',
                 children: [
                     {
                         displayName: 'QC',
                         context: 'QC',
-                        iconName: '../../assets/data-accept.png',
+                        iconName: './assets/data-accept.png',
                         route: '/qcWorkFlow'
                     },
                     {
@@ -887,37 +887,37 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Illumina - Lib Prep',
                         context: 'HISEQ',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/libprepWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Lib Prep QC',
                         context: 'HISEQ',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/libprepQcWorkFlow'
                     },
                     {
                         displayName: 'Illumina - FlowCell Assembly',
                         context: 'HISEQ',
-                        iconName: '../../assets/DNA_diag_lightening.png',
+                        iconName: './assets/DNA_diag_lightening.png',
                         route: '/flowcellassmWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Finalize Flow Cell',
                         context: 'HISEQ',
-                        iconName: '../../assets/DNA_diag_lightening.png',
+                        iconName: './assets/DNA_diag_lightening.png',
                         route: '/finalizeWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Data Pipeline',
                         context: 'HISEQ',
-                        iconName: '../../assets/page_go.png',
+                        iconName: './assets/page_go.png',
                         route: '/pipelineWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Flow Cells',
                         context: 'HISEQ',
-                        iconName: '../../assets/rectangle.png',
+                        iconName: './assets/rectangle.png',
                         route: '/flowcellWorkFlow'
                     },
                     {
@@ -926,21 +926,21 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Microarray',
                         context: 'microarray',
-                        iconName: '../../assets/microarray_small.png',
+                        iconName: './assets/microarray_small.png',
                         children: [
                             {
                                 displayName: 'Labeling',
-                                iconName: '../../assets/asterisk_yellow.png',
+                                iconName: './assets/asterisk_yellow.png',
                                 route: ''
                             },
                             {
                                 displayName: 'Hyb',
-                                iconName: '../../assets/basket_put.png',
+                                iconName: './assets/basket_put.png',
                                 route: ''
                             },
                             {
                                 displayName: 'Extraction',
-                                iconName: '../../assets/microarray_small.png',
+                                iconName: './assets/microarray_small.png',
                                 route: ''
                             },
                         ]
@@ -950,7 +950,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     },
                     {
                         displayName: 'Workflow (all)',
-                        iconName: '../../assets/building_go.png',
+                        iconName: './assets/building_go.png',
                         route: ''
                     }
                 ]
@@ -959,27 +959,27 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                 displayName: 'Products...',
                 context: 'product',
                 class: 'top-menu-item',
-                iconName: '../../assets/basket.png',
+                iconName: './assets/basket.png',
                 children: [
                     {
                         displayName: 'Order Products',
                         context: 'newProductOrder',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/order-products'
                     },
                     {
                         displayName: 'Product Orders',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/product-ledger'
                     },
                     {
                         displayName: 'Configure Products',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: '/configure-products'
                     },
                 ]
@@ -987,58 +987,58 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             {
                 displayName: 'Billing',
                 class: 'top-menu-item',
-                iconName: '../../assets/money.png',
+                iconName: './assets/money.png',
                 route: '/browse-billing'
             },
             {
                 displayName: 'Users & Groups',
                 class: 'top-menu-item',
-                iconName: '../../assets/group.png',
+                iconName: './assets/group.png',
                 route: '/UsersGroups'
             },
             {
                 displayName: 'Configure',
                 class: 'top-menu-item',
-                iconName: '../../assets/page_white_wrench.png',
+                iconName: './assets/page_white_wrench.png',
                 children: [
                     {
                         displayName: 'Add/Edit Dictionaries',
-                        iconName: '../../assets/book.png',
+                        iconName: './assets/book.png',
                         route: '/browse-dictionary'
                     },
                     {
                         displayName: 'Configure Core Facilities',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: './configure-core-facility'
                     },
                     {
                         displayName: 'Configure Annotations',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Experiment Platform',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: 'configure-experiment-platform'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: '/configure-organisms'
                     },
                     {
                         displayName: 'Manage Microarray Catalog',
-                        iconName: '../../assets/image.png',
+                        iconName: './assets/image.png',
                         route: ''
                     },
                     {
                         displayName: 'Manage Protocols',
-                        iconName: '../../assets/brick.png',
+                        iconName: './assets/brick.png',
                         route: '/manage-protocols'
                     },
                     {
                         displayName: 'Configure Billing Account Fields',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: ''
                     },
 
@@ -1048,31 +1048,31 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                 displayName: 'Reports',
                 context: 'browseExperiments',
                 class: 'top-menu-item',
-                iconName: '../../assets/page.png',
+                iconName: './assets/page.png',
                 children: [
                     {
                         displayName: 'Track Usage',
-                        iconName: '../../assets/chart_bar.png',
+                        iconName: './assets/chart_bar.png',
                         route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Progress Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationProgressReport'
                     },
                     {
                         displayName: 'Project/Experiment Report',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/ProjectExperimentReport'
                     },
                     {
                         displayName: 'Send email to all GNomEx users',
-                        iconName: '../../assets/email_go.png',
+                        iconName: './assets/email_go.png',
                         route: [{outlets: {modal: ['EmailAll']}}]
                     }
                 ]
@@ -1083,65 +1083,65 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.adminPlateBasedNavItems = [
             {
                 displayName: 'Orders',
-                iconName: '../../assets/review.png',
+                iconName: './assets/review.png',
                 class: 'top-menu-item',
                 route: '/experiments-orders',
             },
             {
                 displayName: 'Fill Plate',
-                iconName: '../../assets/run_review.png',
+                iconName: './assets/run_review.png',
                 class: 'top-menu-item',
                 route: '/experiments-orders',
             },
             {
                 displayName: 'Build Run',
-                iconName: '../../assets/run_review.png',
+                iconName: './assets/run_review.png',
                 class: 'top-menu-item',
                 route: '/experiments-orders',
             },
             {
                 displayName: 'Plates & Runs',
-                iconName: '../../assets/run_review.png',
+                iconName: './assets/run_review.png',
                 class: 'top-menu-item',
                 route: '/experiments-orders',
             },
             {
                 displayName: 'Results',
-                iconName: '../../assets/tv_chart_review.png',
+                iconName: './assets/tv_chart_review.png',
                 class: 'top-menu-item',
                 route: ''
             },
             {
                 displayName: 'Experiments',
-                iconName: '../../assets/flask.png',
+                iconName: './assets/flask.png',
                 class: 'top-menu-item',
                 children: [
                     {
                         displayName: 'Browse Experiments',
                         context: 'browseExperiments',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/experiments',
                     },
                     {
                         displayName: 'New Experiment Order',
                         context: 'newExperimentOrder',
-                        iconName: '../../assets/flask_add.png',
+                        iconName: './assets/flask_add.png',
                         route: ''
                     },
                     {
                         displayName: 'New Project',
-                        iconName: '../../assets/folder_add.png',
+                        iconName: './assets/folder_add.png',
                         route: [{outlets: {modal: ['newProject']}}]
                     },
                     {
                         displayName: 'Upload Experiment data generated at third party facility',
                         context: 'newExternalExperiment',
-                        iconName: '../../assets/experiment_register.png',
+                        iconName: './assets/experiment_register.png',
                         route: '/new-external-experiment'
                     },
                     {
                         displayName: 'New Billing Account',
-                        iconName: '../../assets/money.png',
+                        iconName: './assets/money.png',
                         //route: "['/NewBillingAccount', {outlets: {'modal   {outlets: {modal: '/NewBillingAccount'}}]"
                         //route: '[{outlets: {"modal": ["NewBillingAccountModal"]}}]'
                         route: [{outlets: {'modal': 'NewBillingAccountModal'}}]
@@ -1150,13 +1150,13 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             },
             {
                 displayName: 'Workflow...',
-                iconName: '../../assets/review.png',
+                iconName: './assets/review.png',
                 class: 'top-menu-item',
                 children: [
                     {
                         displayName: 'QC',
                         context: 'QC',
-                        iconName: '../../assets/data-accept.png',
+                        iconName: './assets/data-accept.png',
                         route: '/qcWorkFlow'
                     },
                     {
@@ -1165,37 +1165,37 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Illumina - Lib Prep',
                         context: 'HISEQ',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/libprepWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Lib Prep QC',
                         context: 'HISEQ',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/libprepQcWorkFlow'
                     },
                     {
                         displayName: 'Illumina - FlowCell Assembly',
                         context: 'HISEQ',
-                        iconName: '../../assets/DNA_diag_lightening.png',
+                        iconName: './assets/DNA_diag_lightening.png',
                         route: '/flowcellassmWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Finalize Flow Cell',
                         context: 'HISEQ',
-                        iconName: '../../assets/DNA_diag_lightening.png',
+                        iconName: './assets/DNA_diag_lightening.png',
                         route: '/finalizeWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Data Pipeline',
                         context: 'HISEQ',
-                        iconName: '../../assets/page_go.png',
+                        iconName: './assets/page_go.png',
                         route: '/pipelineWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Flow Cells',
                         context: 'HISEQ',
-                        iconName: '../../assets/rectangle.png',
+                        iconName: './assets/rectangle.png',
                         route: '/flowcellWorkFlow'
                     },
                     {
@@ -1204,21 +1204,21 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Microarray',
                         context: 'microarray',
-                        iconName: '../../assets/microarray_small.png',
+                        iconName: './assets/microarray_small.png',
                         children: [
                             {
                                 displayName: 'Labeling',
-                                iconName: '../../assets/asterisk_yellow.png',
+                                iconName: './assets/asterisk_yellow.png',
                                 route: ''
                             },
                             {
                                 displayName: 'Hyb',
-                                iconName: '../../assets/basket_put.png',
+                                iconName: './assets/basket_put.png',
                                 route: ''
                             },
                             {
                                 displayName: 'Extraction',
-                                iconName: '../../assets/microarray_small.png',
+                                iconName: './assets/microarray_small.png',
                                 route: ''
                             },
                         ]
@@ -1228,7 +1228,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     },
                     {
                         displayName: 'Workflow (all)',
-                        iconName: '../../assets/building_go.png',
+                        iconName: './assets/building_go.png',
                         route: ''
                     },
                     {
@@ -1236,22 +1236,22 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     },
                     {
                         displayName: 'Fill Plate',
-                        iconName: '../../assets/run_review.png',
+                        iconName: './assets/run_review.png',
                         route: ''
                     },
                     {
                         displayName: 'Build Run',
-                        iconName: '../../assets/run_add.png',
+                        iconName: './assets/run_add.png',
                         route: ''
                     },
                     {
                         displayName: 'Plates & Runs',
-                        iconName: '../../assets/run_review.png',
+                        iconName: './assets/run_review.png',
                         route: ''
                     },
                     {
                         displayName: 'Results',
-                        iconName: '../../assets/tv_chart_review.png',
+                        iconName: './assets/tv_chart_review.png',
                         route: ''
                     },
                 ]
@@ -1259,82 +1259,82 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             {
                 displayName: 'Products',
                 context: 'product',
-                iconName: '../../assets/basket.png',
+                iconName: './assets/basket.png',
                 class: 'top-menu-item',
                 children: [
                     {
                         displayName: 'Order Products',
                         context: 'newProductOrder',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/order-products'
                     },
                     {
                         displayName: 'Product Orders',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/product-ledger'
                     },
                     {
                         displayName: 'Configure Products',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: '/configure-products'
                     },
                 ]
             },
             {
                 displayName: 'Admin',
-                iconName: '../../assets/group.png',
+                iconName: './assets/group.png',
                 class: 'top-menu-item',
                 children: [
                     {
                         displayName: 'Billing',
-                        iconName: '../../assets/money.png',
+                        iconName: './assets/money.png',
                         route: [{outlets: {'modal': 'NewBillingAccountModal'}}]
                     },
                     {
                         displayName: 'Users & Groups',
-                        iconName: '../../assets/group.png',
+                        iconName: './assets/group.png',
                         route: '/UsersGroups'
                     },
                     {
                         displayName: 'Send email to all GNomEx users',
-                        iconName: '../../assets/email_go.png',
+                        iconName: './assets/email_go.png',
                         route: [{outlets: {modal: ['EmailAll']}}]
                     }
                 ]
             },
             {
                 displayName: 'Configure',
-                iconName: '../../assets/page_white_wrench.png',
+                iconName: './assets/page_white_wrench.png',
                 class: 'top-menu-item',
                 children: [
                     {
                         displayName: 'Add/Edit Dictionaries',
-                        iconName: '../../assets/book.png',
+                        iconName: './assets/book.png',
                         route: '/browse-dictionary'
                     },
                     {
                         displayName: 'Configure Core Facilities',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: './configure-core-facility'
                     },
                     {
                         displayName: 'Configure Experiment Platform',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: 'configure-experiment-platform'
                     },
                     {
                         displayName: 'Configure Billing Account Fields',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: ''
                     },
                     {
                         displayName: 'Manage Protocols',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: '/manage-protocols'
                     }
 
@@ -1342,27 +1342,27 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             },
             {
                 displayName: 'Reports',
-                iconName: '../../assets/page.png',
+                iconName: './assets/page.png',
                 class: 'top-menu-item',
                 children: [
                     {
                         displayName: 'Track Usage',
-                        iconName: '../../assets/chart_bar.png',
+                        iconName: './assets/chart_bar.png',
                         route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Progress Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationProgressReport'
                     },
                     {
                         displayName: 'Project/Experiment Report',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/ProjectExperimentReport'
                     }
                 ]
@@ -1373,7 +1373,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.billingAdminNavItems = [
             {
                 displayName: 'Experiments',
-                iconName: '../../assets/flask.png',
+                iconName: './assets/flask.png',
                 class: 'top-menu-item',
                 route: ''
             },
@@ -1381,16 +1381,16 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                 displayName: 'Products',
                 class: 'top-menu-item',
                 context: 'products',
-                iconName: '../../assets/basket.png',
+                iconName: './assets/basket.png',
                 children: [
                     {
                         displayName: 'Product Orders',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/product-ledger'
                     },
                 ]
@@ -1398,44 +1398,44 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             {
                 displayName: 'Billing',
                 class: 'top-menu-item',
-                iconName: '../../assets/money.png',
+                iconName: './assets/money.png',
                 route: '/browse-billing'
             },
             {
                 displayName: 'Users & Groups',
                 class: 'top-menu-item',
-                iconName: '../../assets/group.png',
+                iconName: './assets/group.png',
                 route: '/UsersGroups'
             },
             {
                 displayName: 'New Billing Account',
                 class: 'top-menu-item',
-                iconName: '../../assets/money.png',
+                iconName: './assets/money.png',
                 route: ''
             },
             {
                 displayName: 'Reports',
                 class: 'top-menu-item',
-                iconName: '../../assets/page.png',
+                iconName: './assets/page.png',
                 children: [
                     {
                         displayName: 'Track Usage',
-                        iconName: '../../assets/chart_bar.png',
+                        iconName: './assets/chart_bar.png',
                         route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Progress Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationProgressReport'
                     },
                     {
                         displayName: 'Project/Experiment Report',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/ProjectExperimentReport'
                     }
                 ]
@@ -1446,17 +1446,17 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.billingAdminSubmitterNavItems = [
             {
                 displayName: 'Experiments',
-                iconName: '../../assets/flask.png',
+                iconName: './assets/flask.png',
                 class: 'top-menu-item',
                 children: [
                     {
                         displayName: 'Browse Experiments',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/experiments',
                     },
                     {
                         displayName: 'New Experiment Order',
-                        iconName: '../../assets/flask_add.png',
+                        iconName: './assets/flask_add.png',
                         route: ''
                     }
                 ]
@@ -1465,21 +1465,21 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                 displayName: 'Products',
                 class: 'top-menu-item',
                 context: 'product',
-                iconName: '../../assets/basket.png',
+                iconName: './assets/basket.png',
                 children: [
                     {
                         displayName: 'Order Products',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/order-products'
                     },
                     {
                         displayName: 'Product Orders',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/product-orders'
                     },
                     {
                         displayName: 'Product Ledger',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: '/product-ledger'
                     },
                 ]
@@ -1487,44 +1487,44 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             {
                 displayName: 'Billing',
                 class: 'top-menu-item',
-                iconName: '../../assets/money.png',
+                iconName: './assets/money.png',
                 route: '/browse-billing'
             },
             {
                 displayName: 'Users & Groups',
                 class: 'top-menu-item',
-                iconName: '../../assets/group.png',
+                iconName: './assets/group.png',
                 route: '/UsersGroups'
             },
             {
                 displayName: 'New Billing Account',
                 class: 'top-menu-item',
-                iconName: '../../assets/money.png',
+                iconName: './assets/money.png',
                 route: ''
             },
             {
                 displayName: 'Reports',
                 class: 'top-menu-item',
-                iconName: '../../assets/page.png',
+                iconName: './assets/page.png',
                 children: [
                     {
                         displayName: 'Track Usage',
-                        iconName: '../../assets/chart_bar.png',
+                        iconName: './assets/chart_bar.png',
                         route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Progress Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationProgressReport'
                     },
                     {
                         displayName: 'Project/Experiment Report',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/ProjectExperimentReport'
                     }
                 ]
@@ -1535,28 +1535,28 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.billingAdminESNavItems = [
             {
                 displayName: 'Experiments',
-                iconName: '../../assets/flask.png',
+                iconName: './assets/flask.png',
                 class: 'top-menu-item',
                 children: [
                     {
                         displayName: 'Browse Experiments',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/experiments',
                     },
                     {
                         displayName: 'Create New Experiments and Upload Files',
                         context: 'newExperimentOrder',
-                        iconName: '../../assets/flask_add.png',
+                        iconName: './assets/flask_add.png',
                         route: ''
                     },
                     {
                         displayName: 'New Project',
-                        iconName: '../../assets/folder_add.png',
+                        iconName: './assets/folder_add.png',
                         route: [{outlets: {modal: ['newProject']}}]
                     },
                     {
                         displayName: 'Bulk Sample Sheet Import',
-                        iconName: '../../assets/review.png',
+                        iconName: './assets/review.png',
                         route: [{outlets: {'modal': 'BulkSampleUpload'}}]
                     }
                 ]
@@ -1565,67 +1565,67 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                 displayName: 'Analysis',
                 context: 'bioinformatics',
                 class: 'top-menu-item',
-                iconName: '../../assets/map.png',
+                iconName: './assets/map.png',
                 route: '/analysis'
             },
             {
                 displayName: 'Data Tracks',
                 context: 'bioinformatics',
                 class: 'top-menu-item',
-                iconName: '../../assets/datatrack.png',
+                iconName: './assets/datatrack.png',
                 route: '/datatracks'
             },
             {
                 displayName: 'Topics',
                 context: 'bioinformatics',
                 class: 'top-menu-item',
-                iconName: '../../assets/topic_tag.png',
+                iconName: './assets/topic_tag.png',
                 route: '/topics'
             },
             {
                 displayName: 'Users & Groups',
                 class: 'top-menu-item',
-                iconName: '../../assets/group.png',
+                iconName: './assets/group.png',
                 route: '/UsersGroups'
             },
             {
                 displayName: 'Configure',
                 class: 'top-menu-item',
-                iconName: '../../assets/page_white_wrench.png',
+                iconName: './assets/page_white_wrench.png',
                 children: [
                     {
                         displayName: 'Add/Edit Dictionaries',
-                        iconName: '../../assets/book.png',
+                        iconName: './assets/book.png',
                         route: '/browse-dictionary'
                     },
                     {
                         displayName: 'Configure Core Facilities',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: './configure-core-facility'
                     },
                     {
                         displayName: 'Configure Annotations',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Experiment Platform',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: 'configure-experiment-platform'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: '/configure-organisms'
                     },
                     {
                         displayName: 'Manage Microarray Catalog',
-                        iconName: '../../assets/image.png',
+                        iconName: './assets/image.png',
                         route: ''
                     },
                     {
                         displayName: 'Manage Protocols',
-                        iconName: '../../assets/brick.png',
+                        iconName: './assets/brick.png',
                         route: '/manage-protocols'
                     }
                 ]
@@ -1633,26 +1633,26 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             {
                 displayName: 'Reports',
                 class: 'top-menu-item',
-                iconName: '../../assets/page.png',
+                iconName: './assets/page.png',
                 children: [
                     {
                         displayName: 'Track Usage',
-                        iconName: '../../assets/chart_bar.png',
+                        iconName: './assets/chart_bar.png',
                         route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Progress Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationProgressReport'
                     },
                     {
                         displayName: 'Project/Experiment Report',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/ProjectExperimentReport'
                     }
                 ]
@@ -1663,23 +1663,23 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.userESNavItems = [
             {
                 displayName: 'Experiments',
-                iconName: '../../assets/flask.png',
+                iconName: './assets/flask.png',
                 class: 'top-menu-item',
                 children: [
                     {
                         displayName: 'Browse Experiments',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/experiments',
                     },
                     {
                         displayName: 'Create New Experiment and Upload Files',
                         context: 'newExperimentOrder',
-                        iconName: '../../assets/flask_add.png',
+                        iconName: './assets/flask_add.png',
                         route: ''
                     },
                     {
                         displayName: 'New Project',
-                        iconName: '../../assets/folder_add.png',
+                        iconName: './assets/folder_add.png',
                         route: [{outlets: {modal: ['newProject']}}]
                     }
                 ]
@@ -1687,39 +1687,39 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             {
                 displayName: 'Analysis',
                 class: 'top-menu-item',
-                iconName: '../../assets/map.png',
+                iconName: './assets/map.png',
                 route: '/analysis'
             },
             {
                 displayName: 'Data Tracks',
                 class: 'top-menu-item',
-                iconName: '../../assets/datatrack.png',
+                iconName: './assets/datatrack.png',
                 route: '/datatracks'
             },
             {
                 displayName: 'Topics',
                 class: 'top-menu-item',
-                iconName: '../../assets/topic_tag.png',
+                iconName: './assets/topic_tag.png',
                 route: '/topics'
             },
             {
                 displayName: 'Configure',
                 class: 'top-menu-item',
-                iconName: '../../assets/page_white_wrench.png',
+                iconName: './assets/page_white_wrench.png',
                 children: [
                     {
                         displayName: 'Configure Annotations',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: '/configure-annotations'
                     },
                     {
                         displayName: 'Configure Organisms and Genome Builds',
-                        iconName: '../../assets/page_white_wrench.png',
+                        iconName: './assets/page_white_wrench.png',
                         route: '/configure-organisms'
                     },
                     {
                         displayName: 'Protocols',
-                        iconName: '../../assets/brick.png',
+                        iconName: './assets/brick.png',
                         route: '/manage-protocols'
                     }
                 ]
@@ -1727,26 +1727,26 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             {
                 displayName: 'Reports',
                 class: 'top-menu-item',
-                iconName: '../../assets/page.png',
+                iconName: './assets/page.png',
                 children: [
                     {
                         displayName: 'Track Usage',
-                        iconName: '../../assets/chart_bar.png',
+                        iconName: './assets/chart_bar.png',
                         route: '/TrackUsage'
                     },
                     {
                         displayName: 'Annotation Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationReport'
                     },
                     {
                         displayName: 'Annotation Progress Report',
-                        iconName: '../../assets/page.png',
+                        iconName: './assets/page.png',
                         route: '/AnnotationProgressReport'
                     },
                     {
                         displayName: 'Project/Experiment Report',
-                        iconName: '../../assets/flask.png',
+                        iconName: './assets/flask.png',
                         route: '/ProjectExperimentReport'
                     }
                 ]
@@ -1756,26 +1756,26 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.userNonSubmitterNavItems = [
             {
                 displayName: 'Experiments',
-                iconName: '../../assets/flask.png',
+                iconName: './assets/flask.png',
                 class: 'top-menu-item',
             },
             {
                 displayName: 'Analysis',
                 class: 'top-menu-item',
-                iconName: '../../assets/map.png',
+                iconName: './assets/map.png',
                 route: '/analysis'
             },
 
             {
                 displayName: 'Data Tracks',
                 class: 'top-menu-item',
-                iconName: '../../assets/datatrack.png',
+                iconName: './assets/datatrack.png',
                 route: '/datatracks'
             },
             {
                 displayName: 'Topics',
                 class: 'top-menu-item',
-                iconName: '../../assets/topic_tag.png',
+                iconName: './assets/topic_tag.png',
                 route: '/topics'
             }
         ];

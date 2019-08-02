@@ -77,7 +77,7 @@
         <button mat-button class="link-button underline minimize" (click)="this.showRequestLabMembershipDialog()">Request Membership to Additional Labs</button>
     </div>
     <div class="formRow">
-        <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.allFG.valid" (click)="this.save()"><img class="icon" src="../../assets/action_save.gif">Save</button>
+        <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.allFG.valid" (click)="this.save()"><img class="icon" [src]="'./assets/action_save.gif'">Save</button>
         <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
         <span *ngIf="this.allFG.dirty && !this.showSpinner" class="dirtyNote">Changes Have Not Been Saved</span>
     </div>

@@ -1022,7 +1022,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                 } else {
                     let priceSheets: any[] = Array.isArray(result) ? result : [result.PriceSheet];
                     for (let sheet of priceSheets) {
-                        sheet.icon = "assets/pricesheet.png";
+                        sheet.icon = "./assets/pricesheet.png";
                         if (sheet.PriceCategory) {
                             sheet.PriceCategory = Array.isArray(sheet.PriceCategory) ? sheet.PriceCategory : [sheet.PriceCategory];
                         } else {

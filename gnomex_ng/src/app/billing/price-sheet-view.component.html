@@ -17,8 +17,8 @@
             <label>Price Sheet applies to</label>
         </div>
         <div>
-            <button mat-button (click)="this.addExperimentPlatform()"><img src="../../assets/add.png" class="icon">Add</button>
-            <button mat-button [disabled]="!this.selectedExperimentPlatform" (click)="this.removeExperimentPlatform()"><img src="../../assets/delete.png" class="icon">Remove</button>
+            <button mat-button (click)="this.addExperimentPlatform()"><img [src]="'./assets/add.png'" class="icon">Add</button>
+            <button mat-button [disabled]="!this.selectedExperimentPlatform" (click)="this.removeExperimentPlatform()"><img [src]="'./assets/delete.png'" class="icon">Remove</button>
         </div>
         <div class="grid-div">
             <ag-grid-angular class="ag-theme-balham full-height full-width"

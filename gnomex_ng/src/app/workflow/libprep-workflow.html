@@ -1,6 +1,6 @@
 <div class="flex-container-col full-width full-height">
     <div class="flex-container-row">
-        <img src="../../assets/flask.png" height="16" width="16" style="margin-top: .65em">
+        <img [src]="'./assets/flask.png'" height="16" width="16" style="margin-top: .65em">
         <mat-label style="margin-left: .4em;margin-top: .4em;">{{ label }}</mat-label>
         <mat-label style="justify-content: flex-end;margin-left: 40em;margin-top: .4em;">{{ requestIds.length > 0 ? requestIds.length - 1  : 0 }}
             requests in worklist
@@ -38,7 +38,7 @@
     </div>
     <div class="flex-container-row justify-center">
         <button mat-button  matTooltip="Refresh worklist" (click)="refreshWorklist($event)">
-            <img src="../../assets/action_refresh.gif">Refresh
+            <img [src]="'./assets/action_refresh.gif'">Refresh
         </button>
         <save-footer style="width: 100%" (saveClicked)="areAandBTagsUnique()"
                      [dirty]="this.dirty"

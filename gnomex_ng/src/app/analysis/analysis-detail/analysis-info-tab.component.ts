@@ -97,10 +97,10 @@ import {ConstantsService} from "../../services/constants.service";
                                           displayField="display" [options]="genomeBuildList">
                         </custom-combo-box>
                         <button mat-button (click)="this.addGenomeBuild()" [disabled]="!isEditMode || !canUpdate || !this.form.controls['genomeBuildToAdd'].value">
-                            <img src="../../../assets/add.png" class="icon">Add
+                            <img [src]="'./assets/add.png'" class="icon">Add
                         </button>
                         <button mat-button (click)="this.removeGenomeBuild()" [disabled]="!isEditMode || !canUpdate || !this.genomeBuildToRemove">
-                            <img src="../../../assets/delete.png" class="icon">Remove
+                            <img [src]="'./assets/delete.png'" class="icon">Remove
                         </button>
                         <button mat-button color="accent" [disabled]="!isEditMode || !canUpdate" (click)="this.openEditOrganism()">New/Edit</button>
                     </div>
