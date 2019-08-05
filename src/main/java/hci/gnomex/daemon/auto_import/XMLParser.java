@@ -43,6 +43,7 @@ public class XMLParser {
 
 	private static final String FOUNDATION_FOLDER="Patients - Foundation - NO PHI";
 	private static final String AVATAR_FOLDER="Patients - Avatar - NO PHI";
+	private static final String TEMPUS_FOLDER="Patients - Tempus - NO PHI";
 	private static final String IMPORT_EXPERIMENT_ERROR = "import_experiment_error.log";
 	private static final String IMPORT_ANALYSIS_ERROR = "import_analysis_error.log";
 	private static final String LINK_EXP_ANAL_ERROR = "link_exp_analysis_error.log";
@@ -145,8 +146,10 @@ public class XMLParser {
 				if(importMode.toLowerCase().equals("avatar")) {
 					callXMLImporter(this.AVATAR_FOLDER,personID);
 				}
-				else {
+				else if(importMode.toLowerCase().equals("foundation"))  {
 					callXMLImporter(this.FOUNDATION_FOLDER,personID);
+				}else{
+					callXMLImporter(this.TEMPUS_FOLDER, personID);
 				}
 
 				reader.close();
@@ -235,7 +238,7 @@ public class XMLParser {
 
 			if(i == 0 ) {
 				sampleList.get(i).getAttribute("ccNumber").setValue(entries.get(0).getCcNumber());
-				sampleList.get(i).getAttribute("ANNOT21").setValue(entries.get(0).getAliasType());
+				sampleList.get(i).getAttribute("ANNOT21").setValue(entries.get(0).getTestType());
 				sampleList.get(i).getAttribute("name").setValue(entries.get(0).getSlNumber());
 				sampleList.get(i).getAttribute("ANNOT27").setValue(entries.get(0).getSubmittedDiagnosis());
 				sampleList.get(i).getAttribute("ANNOT66").setValue(entries.get(0).getTissueType());
@@ -245,7 +248,7 @@ public class XMLParser {
 			}else {
 				Element newSample = sampleList.get(0).clone();
 				newSample.getAttribute("ccNumber").setValue(entries.get(0).getCcNumber());
-				newSample.getAttribute("ANNOT21").setValue(entries.get(0).getAliasType());
+				newSample.getAttribute("ANNOT21").setValue(entries.get(0).getTestType());
 				newSample.getAttribute("name").setValue(entries.get(0).getSlNumber());
 				newSample.getAttribute("ANNOT27").setValue(entries.get(0).getSubmittedDiagnosis());
 				newSample.getAttribute("ANNOT66").setValue(entries.get(0).getTissueType());
@@ -268,13 +271,16 @@ public class XMLParser {
 			TreeMap<String,List<PersonEntry>> slMap = this.avEntriesMap.get(key);
 			for(Entry<String, List<PersonEntry>> e : slMap.entrySet()) {
 				List<PersonEntry> personList = e.getValue();
+				if(e.getKey().equals("")){
+					flaggedKeys.add(Arrays.asList(key,e.getKey()));
+					this.flaggedAvatarEntries.add(personList);
+					continue;
+				}
 				if(personList.size() > 1) {
 					flaggedKeys.add(Arrays.asList(key,e.getKey()));
 					this.flaggedAvatarEntries.add(personList);
-					//slMap.remove(e.getKey());
 				}else if(personList.size() == 1) {
-					if(personList.get(0).getMrn().equals("")
-							|| personList.get(0).getPersonId().equals("")
+					if(	personList.get(0).getPersonId().equals("")
 							|| personList.get(0).getFullName().equals("")
 							|| personList.get(0).getGender().equals("")
 					) {
@@ -283,7 +289,7 @@ public class XMLParser {
 					}
 				}
 				else { // there should always be atleast one entry in the list
-					throw new Exception("Error: at least one avatar entry should be associated with it's id number");
+					throw new Exception("Error: at least one person entry should be associated with it's id number");
 				}
 			}
 
@@ -295,9 +301,11 @@ public class XMLParser {
 				this.avEntriesMap.remove("");
 			}else { // if you need to remove both patient id and sample id
 				TreeMap<String, List<PersonEntry>> slMap = this.avEntriesMap.get(flag.get(0));
-				slMap.remove(flag.get(1));
-				if(slMap.size() == 0) {
-					this.avEntriesMap.remove(flag.get(0));
+				if(slMap != null){
+					slMap.remove(flag.get(1));
+					if(slMap.size() == 0) {
+						this.avEntriesMap.remove(flag.get(0));
+					}
 				}
 			}
 		}
@@ -308,8 +316,6 @@ public class XMLParser {
 				strBuildBody.append(person.toString(importMode));
 			}
 		}
-
-
 
 		System.out.println("File path used for majority of input and output files : " + pathOnly);
 
@@ -325,7 +331,7 @@ public class XMLParser {
 
 	private void sendFlaggedIDEmail(StringBuilder strBuildBody){
 
-		String to = "erik.rasmussen@hci.utah.edu, dalton.wilson@hci.utah.edu";
+		String to = "erik.rasmussen@hci.utah.edu";
 		String from = "erik.rasmussen@hci.utah.edu";
 		String subject = "Flagged Sample ID Report PHI";
 
@@ -379,26 +385,37 @@ public class XMLParser {
 					entry.setGender(cleanData(aEntries[3]));
 					entry.setCcNumber(cleanData(aEntries[4]));
 					entry.setShadowId(cleanData(aEntries[5]));
-					entry.setAliasType(cleanData(aEntries[6]));
+					entry.setTestType(cleanData(aEntries[6]));
 					entry.setSlNumber(cleanData(aEntries[7]));
 					entry.setTissueType(cleanData(aEntries[8]));
 					entry.setSampleSubtype(cleanData(aEntries[9]));
 					entry.setSubmittedDiagnosis(cleanData(aEntries[10]));
 
-				}else { // Foundation has less items per entry
+				}else if (importMode.toLowerCase().equals("foundation")) { // Foundation has less items per entry
 					entry.setMrn(cleanData(aEntries[0]));
 					entry.setPersonId(cleanData(aEntries[1]));
 					entry.setFullName(cleanData(aEntries[2]));
 					entry.setGender(cleanData(aEntries[3]));
 					entry.setShadowId(cleanData(aEntries[4]));
-					entry.setAliasType(cleanData(aEntries[5]));
+					entry.setTestType(cleanData(aEntries[5]));
 					entry.setSlNumber(cleanData(aEntries[6]));
 					entry.setSampleSubtype(cleanData(aEntries[7]));
 					entry.setTissueType(cleanData(aEntries[8]));
 					entry.setSubmittedDiagnosis(cleanData(aEntries[9]));
 					entry.setCcNumber("");
 
-
+				}else if(importMode.toLowerCase().equals("tempus")){
+					entry.setMrn(cleanData(aEntries[0]));
+					entry.setPersonId(cleanData(aEntries[1]));
+					entry.setFullName(cleanData(aEntries[2]));
+					entry.setGender(cleanData(aEntries[3]));
+					entry.setShadowId(cleanData(aEntries[4]));
+					entry.setSlNumber(cleanData(aEntries[5]));
+					entry.setSampleSubtype(cleanData(aEntries[6]));
+					entry.setTestType(cleanData(aEntries[7]));
+					entry.setTissueType(cleanData(aEntries[8]));
+					entry.setSubmittedDiagnosis(cleanData(aEntries[9]));
+					entry.setCcNumber("");
 				}
 
 
@@ -536,7 +553,7 @@ public class XMLParser {
 	}
 
 
-	private File createTempScript(List<String> commands) throws IOException {
+	private static File createTempScript(List<String> commands) throws IOException {
 		File tempScript = File.createTempFile("script", null);
 
 		Writer streamWriter = new OutputStreamWriter(new FileOutputStream(tempScript));
@@ -553,7 +570,7 @@ public class XMLParser {
 	}
 
 
-	private void executeCommands(List<String> commands,String outError) throws Exception {
+	public static void executeCommands(List<String> commands,String outError) throws Exception {
 
 		File tempScript = null;
 
@@ -572,17 +589,17 @@ public class XMLParser {
 
 			if(hasSubProccessErrors(errorFile)){
 				System.out.println("Error detected exiting script");
-				System.exit(1);
+				throw new Exception("Error detected in executing subprocess");
 			}
 			System.out.println("finished executing command");
 		}
 
 		catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new Exception(e);
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			throw new Exception(e1);
 		}
 		finally
 
@@ -591,7 +608,7 @@ public class XMLParser {
 		}
 	}
 
-	private boolean hasSubProccessErrors(File errorFile) {
+	private static boolean hasSubProccessErrors(File errorFile) {
 		Scanner scan = null;
 		boolean hasError = false;
 		try{
@@ -678,21 +695,26 @@ public class XMLParser {
 
 			for(int i = 0; i < flaggedIDs.size(); i++) {
 				List<String> slIDs = flaggedIDs.get(i);
-
-
-				if(i < flaggedIDs.size() - 1) {
-					pw.write(slIDs.get(1) + "\n");
-				}else {
-					pw.write(slIDs.get(1) );
+				if(slIDs.get(1) != null && !slIDs.get(1).equals("")){
+					// only true for tempus else no split and index 0 will be the original string
+					String sampleID =  importMode.equals("tempus") ?  slIDs.get(1).split("_")[0] : slIDs.get(1);
+					if(i < flaggedIDs.size() - 1) {
+						pw.write(sampleID + "\n");
+					}else {
+						pw.write(sampleID );
+					}
 				}
+
 			}
 			pw.close();
 			// This the sl or trf list after flagged id's have been removed out
 			String name = "";
 			if(this.importMode.equals("avatar")){
 				name = "importedSLList.out";
-			}else{
+			}else if (importMode.equals("foundation")){
 				name = "importedTRFList.out";
+			}else{
+				name = "importedTLList.out";
 			}
 			pw = new PrintWriter(new FileWriter(path + name));
 
@@ -700,10 +722,12 @@ public class XMLParser {
 			for( String experimentID : this.avEntriesMap.keySet()){
 				Map<String, List<PersonEntry>> personInfo = this.avEntriesMap.get(experimentID);
 				for(String sampleName : personInfo.keySet()){
-					pw.write(sampleName + "\n");
+					if(sampleName != null && !sampleName.equals("")){
+						String sampleID = importMode.equals("tempus") ?  sampleName.split("_")[0] : sampleName;
+						pw.write(sampleID + "\n");
+					}
 				}
 			}
-
 
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -717,10 +741,9 @@ public class XMLParser {
 
 	public static String getPathWithoutName(String fullPathWithFile) {
 
-
-		String[] splitPath = fullPathWithFile.split("/");
-		String filePath = String.join("/", Arrays.copyOfRange(splitPath, 0 , splitPath.length - 1));
-		return filePath + "/";
+		File file = new File(fullPathWithFile);
+		String filePath  = file.getParent();
+		return filePath + File.separator;
 
 	}
 	public static String appendToPathWithoutName(String fullPathWithFileName, String appendedPath) {
