@@ -135,7 +135,6 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     private billingItemList: any[] = [];
     public billingItemGridColumnDefs: any[];
     public billingItemGridData: any[] = [];
-    public getBillingItemNodeChildDetails;
     public billingItemGridLabel: string = '';
     public showRelatedCharges: boolean = true;
     public billingItemGridRowClassRules: any;
@@ -151,9 +150,15 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     public invoiceLabel: string = "";
 
     private billingPeriods: any[] = [];
+    private allStatuses: any[] = [];
     private statuses: any[] = [];
     private statusListShort: any[] = [];
     public changeStatusValue: string = '';
+
+    // This "feature" is currently implemented by commented out. The Angular version behaves like the Flex version.
+    // If in the future we want to add more explicit filtering based on billing status, uncommenting this code will
+    // be a solid start (search for "statusFilter" on this component for more details)
+    //private statusFilter: string = null;
 
     public priceTreeGridData: any[] = [];
     public priceTreeGridColDefs: any[];
@@ -169,6 +174,27 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     private onCoreCommentsWindowRequestSelected: Subscription;
     private refreshSubscription: Subscription;
 
+    public getBillingItemNodeChildDetails: (rowItem) => any | null = (rowItem) => {
+        if (rowItem.BillingItem) {
+            let children: any[] = rowItem.BillingItem;
+            /*
+            if (this.statusFilter) {
+                children = children.filter((billingItem: any) => {
+                    return billingItem.codeBillingStatus === this.statusFilter;
+                });
+            }
+            */
+            return {
+                group: true,
+                expanded: true,
+                children: children,
+                key: rowItem.requestNumber
+            };
+        } else {
+            return null;
+        }
+    };
+
     constructor(private billingService: BillingService,
                 private dialogsService: DialogsService,
                 private constantsService: ConstantsService,
@@ -181,6 +207,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
             .sort((a: any, b: any) => {
                 return a.startDateSort.localeCompare(b.startDateSort);
             });
+        this.allStatuses = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_STATUS);
         this.statuses = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_STATUS).filter((stat: any) => {
             return stat.value === this.STATUS_PENDING || stat.value === this.STATUS_COMPLETED || stat.value === this.STATUS_APPROVED;
         });
@@ -209,20 +236,8 @@ export class NavBillingComponent implements OnInit, OnDestroy {
             {headerName: "Total price", headerTooltip:"Total price", field: "invoicePrice", tooltipField: "invoicePrice", width: 120},
             {headerName: "Status", headerTooltip:"Status", editable: true, field: "codeBillingStatus", width: 150, cellRendererFramework: SelectRenderer,
                 cellEditorFramework: SelectEditor, selectOptions: this.statuses, selectOptionsDisplayField: "display",
-                selectOptionsValueField: "codeBillingStatus"},
+                selectOptionsValueField: "codeBillingStatus", rendererOptions: this.allStatuses},
         ];
-        this.getBillingItemNodeChildDetails = function getBillingItemNodeChildDetails(rowItem) {
-            if (rowItem.BillingItem) {
-                return {
-                    group: true,
-                    expanded: true,
-                    children: rowItem.BillingItem,
-                    key: rowItem.requestNumber
-                };
-            } else {
-                return null;
-            }
-        };
         this.billingItemGridRowClassRules = {
             "otherBillingItem": "data.other === 'Y'"
         };
@@ -234,7 +249,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
             {headerName: "Academic", headerTooltip: "Academic", field: "unitPriceExternalAcademicCurrency", tooltipField: "unitPriceExternalAcademicCurrency", type: "numericColumn", width: 70, maxWidth: 70},
             {headerName: "Commercial", headerTooltip: "Commercial", field: "unitPriceExternalCommercialCurrency", tooltipField: "unitPriceExternalCommercialCurrency", type: "numericColumn", width: 70, maxWidth: 70},
         ];
-        this.getPriceNodeChildDetails = function getBillingItemNodeChildDetails(rowItem) {
+        this.getPriceNodeChildDetails = function getPriceNodeChildDetails(rowItem) {
             if (rowItem.idPriceSheet) {
                 return {
                     group: true,
@@ -419,6 +434,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         this.selectedBillingItems = [];
         this.selectedBillingRequest = null;
         this.billingItemsToDelete = [];
+        //this.statusFilter = null;
 
         this.disableSplitButton = true;
         this.disableAddBillingItemButton = true;
@@ -620,15 +636,18 @@ export class NavBillingComponent implements OnInit, OnDestroy {
 
         this.disableSplitButton = true;
         this.disableAddBillingItemButton = true;
+        //this.statusFilter = null;
 
         let billingItems: any[] = [];
         let requestNumbers: Set<string> = new Set<string>();
         if (node.data.name === 'Status' && node.data.status === this.STATUS_PENDING) {
+            //this.statusFilter = node.data.status;
             let requests: any[] = Array.isArray(node.data.Request) ? node.data.Request : [node.data.Request];
             for (let r of requests) {
                 this.addRequestBillingItems(r.requestNumber, billingItems, requestNumbers);
             }
         } else if (node.data.name === 'Status') {
+            //this.statusFilter = node.data.status;
             let labs: any[] = Array.isArray(node.data.Lab) ? node.data.Lab : [node.data.Lab];
             for (let l of labs) {
                 let requests: any[] = Array.isArray(l.Request) ? l.Request : [l.Request];
