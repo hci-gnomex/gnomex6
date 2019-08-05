@@ -70,7 +70,11 @@ import {CellRendererValidation} from "./cell-renderer-validation";
 		}
 
 		if (this.params && this.params.column && this.params.column.colDef) {
-			this.options             = this.params.column.colDef.selectOptions;
+			if (this.params.column.colDef.rendererOptions) {
+				this.options 		 = this.params.column.colDef.rendererOptions;
+			} else {
+                this.options         = this.params.column.colDef.selectOptions;
+			}
 			this.optionsValueField   = this.params.column.colDef.selectOptionsValueField;
             this.optionsDisplayField = this.params.column.colDef.selectOptionsDisplayField;
             this.defaultDisplayField = this.params.column.colDef.defaultDisplayField;

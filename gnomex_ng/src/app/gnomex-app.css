@@ -114,6 +114,39 @@ div.mainnav {
     height: 100%;
 }
 
+.ag-theme-balham .annotationRequiredRow {
+    font-weight: bold !important;
+    font-style: italic !important;
+    color: black !important;
+}
+
+.ag-theme-balham .annotationActiveRow {
+    font-style: normal !important;
+    color: black !important;
+}
+
+.ag-theme-balham .annotationInactiveRow {
+    font-style: italic !important;
+    color: #647478 !important;
+}
+
+.ag-theme-balham .otherBillingItem {
+    font-style: italic !important;
+    color: grey !important;
+}
+
+.ag-theme-balham .workFlowOnColor {
+    background-color: #f1eed6 !important;
+}
+
+.ag-theme-balham .workFlowOffColor {
+    background-color: white !important;
+}
+
+.ag-theme-balham .workFlowSelectedColor {
+    background-color: deepskyblue !important;
+}
+
 .ag-theme-fresh .annotationRequiredRow {
     font-weight: bold !important;
     font-style: italic !important;
