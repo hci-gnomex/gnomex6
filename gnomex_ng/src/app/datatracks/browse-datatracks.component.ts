@@ -217,8 +217,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
             targetItem: targetItem,
         };
 
-        let title: string = targetItem.label.length > 30 ? targetItem.label.substr(0, 29) + "..." : targetItem.label;
-        title = "Move/Copy to " + title;
+        let title: string = "Move/Copy to " + UtilService.getSubStr(targetItem.label, 30);
 
         this.dialogsService.genericDialogContainer(MoveDataTrackComponent, title, currentItem.icon, configuration).subscribe((result) => {
             if (result) {

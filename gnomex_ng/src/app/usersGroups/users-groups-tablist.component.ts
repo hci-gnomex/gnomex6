@@ -1560,11 +1560,11 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
 
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.height = '16em';
-        configuration.width  = '20em';
+        configuration.width  = '30em';
 
         configuration.data = {
             idLab: theLabId,
-            labName: this.selectedGroup[this.prefService.labDisplayField]
+            labName: mode === 'lab' ? this.selectedGroup[this.prefService.labDisplayField] : ""
         };
 
         this.dialogsService.genericDialogContainer(VerifyUsersDialogComponent, "Send Email",

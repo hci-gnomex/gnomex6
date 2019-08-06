@@ -6,6 +6,7 @@ import {first} from "rxjs/operators";
 import {DialogsService} from "../../../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
 import {BaseGenericContainerDialog} from "../../../util/popup/base-generic-container-dialog";
+import {UtilService} from "../../../services/util.service";
 
 @Component({
     template: `
@@ -123,7 +124,7 @@ export class SequenceFilesDialog extends BaseGenericContainerDialog implements O
     }
 
     ngOnInit(){
-        this.dtName = this.dtName.length > 25 ? this.dtName.substr(0, 25) + "..." : this.dtName;
+        this.dtName = UtilService.getSubStr(this.dtName, 25);
         this.innerTitle = "Upload sequence files for: " + this.dtName;
 
     }
@@ -179,7 +180,7 @@ export class SequenceFilesDialog extends BaseGenericContainerDialog implements O
 
                 });
 
-        } else if( idx == this.fileInfoList.length){
+        } else if( idx === this.fileInfoList.length){
             let params:HttpParams = new HttpParams()
                 .set("idGenomeBuild", this.idGenomeBuild);
             this.datatrackService.getGenomeBuild(params).pipe(first()).subscribe( resp =>{
