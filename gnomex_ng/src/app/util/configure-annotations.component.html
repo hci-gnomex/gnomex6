@@ -1,13 +1,13 @@
 <div class="wholeDocument">
     <div *ngIf="!experimentPlatformMode && !isDialog" class="fullRow">
-        <h5>Configure Annotations</h5> experimentPlatformMode: {{experimentPlatformMode}}
+        <h5>Configure Annotations</h5>
     </div>
     <div class="fullRow">
         <div class="embeddedRow">
-            <button mat-button (click)="this.add()"><img class="icon" src="../../assets/page_add.png">Add</button>
-            <button mat-button (click)="this.deleteAnnotation()" [disabled]="this.selectedProperty == null || this.selectedProperty.canDelete != 'Y'"><img class="icon" src="../../assets/page_remove.png">Remove</button>
+            <button mat-button (click)="this.add()"><img class="icon" [src]="'./assets/page_add.png'">Add</button>
+            <button mat-button (click)="this.deleteAnnotation()" [disabled]="this.selectedProperty == null || this.selectedProperty.canDelete != 'Y'"><img class="icon" [src]="'./assets/page_remove.png'">Remove</button>
         </div>
-        <button mat-button (click)="this.refresh()"><img class="icon" src="../../assets/refresh.png">Refresh</button>
+        <button mat-button (click)="this.refresh()"><img class="icon" [src]="'./assets/refresh.png'">Refresh</button>
     </div>
     <div class="fullRow" *ngIf="!experimentPlatformMode">
         <div class="embeddedRow" >
@@ -101,8 +101,8 @@
                         </mat-radio-group>
                         <div style="height: 100%; width: 100%; display: flex; flex-direction: column;  margin-left: 2%;" *ngIf="this.propertyTypeFC.value === this.TYPE_OPTION || this.propertyTypeFC.value === this.TYPE_MULTI_OPTION">
                             <div style="display: flex; flex-direction: row;">
-                                <button mat-button [disabled]="!this.canUpdateSelectedProperty" (click)="this.addOption()"><img class="icon" src="../../assets/add.png">Add option</button>
-                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedOptionIndex == null" (click)="this.deleteOption()"><img class="icon" src="../../assets/delete.png">Delete option</button>
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty" (click)="this.addOption()"><img class="icon" [src]="'./assets/add.png'">Add option</button>
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedOptionIndex == null" (click)="this.deleteOption()"><img class="icon" [src]="'./assets/delete.png'">Delete option</button>
                             </div>
                             <ag-grid-angular style="width: 30%; height: 100%;"
                                              class="ag-theme-fresh"
@@ -136,8 +136,8 @@
                                               [(ngModel)]="this.appliesToApp">
                             </custom-combo-box>
                             <div class="flex-container-row">
-                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || !this.appliesToPlatform.value" (click)="this.addPlatform()"><img class="icon" src="../../assets/add.png"></button>
-                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedPlatformIndex == null" (click)="this.deletePlatform()"><img class="icon" src="../../assets/delete.png"></button>
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || !this.appliesToPlatform.value" (click)="this.addPlatform()"><img class="icon" [src]="'./assets/add.png'"></button>
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedPlatformIndex == null" (click)="this.deletePlatform()"><img class="icon" [src]="'./assets/delete.png'"></button>
                             </div>
                         </div>
                         <ag-grid-angular style="width: 100%; height: 100%;"
@@ -160,8 +160,8 @@
                                               [(ngModel)]="this.appliesToOrganism">
                             </custom-combo-box>
                             <div class="flex-container-row">
-                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToOrganism == null" (click)="this.addOrganism()"><img class="icon" src="../../assets/add.png"></button>
-                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedOrganismIndex == null" (click)="this.deleteOrganism()"><img class="icon" src="../../assets/delete.png"></button>
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToOrganism == null" (click)="this.addOrganism()"><img class="icon" [src]="'./assets/add.png'"></button>
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedOrganismIndex == null" (click)="this.deleteOrganism()"><img class="icon" [src]="'./assets/delete.png'"></button>
                             </div>
                         </div>
                         <ag-grid-angular style="width: 100%; height: 100%;"
@@ -184,8 +184,8 @@
                                               [(ngModel)]="this.appliesToAnalysisType">
                             </custom-combo-box>
                             <div class="flex-container-row">
-                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToAnalysisType == null" (click)="this.addAnalysisType()"><img class="icon" src="../../assets/add.png"></button>
-                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedAnalysisTypeIndex == null" (click)="this.deleteAnalysisType()"><img class="icon" src="../../assets/delete.png"></button>
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToAnalysisType == null" (click)="this.addAnalysisType()"><img class="icon" [src]="'./assets/add.png'"></button>
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedAnalysisTypeIndex == null" (click)="this.deleteAnalysisType()"><img class="icon" [src]="'./assets/delete.png'"></button>
                             </div>
                         </div>
                         <ag-grid-angular style="width: 100%; height: 100%;"
@@ -207,8 +207,8 @@
                                               [formControl]="this.appliesToUser" class="full-height full-width">
                             </custom-combo-box>
                             <div class="flex-container-row">
-                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToUser.value == null" (click)="this.addUser()"><img class="icon" src="../../assets/add.png"></button>
-                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedUserIndex == null" (click)="this.deleteUser()"><img class="icon" src="../../assets/delete.png"></button>
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.appliesToUser.value == null" (click)="this.addUser()"><img class="icon" [src]="'./assets/add.png'"></button>
+                                <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedUserIndex == null" (click)="this.deleteUser()"><img class="icon" [src]="'./assets/delete.png'"></button>
                             </div>
                         </div>
                         <ag-grid-angular style="width: 100%; height: 100%;"
@@ -241,7 +241,7 @@
         <div *ngIf="!isDialog">
             <div style="display: flex; flex-direction: row;" *ngIf="this.selectedProperty">
                 <span *ngIf="this.formGroup.dirty && !this.showSpinner" class="dirtyNote">Changes Have Not Been Saved</span>
-                <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.formGroup.valid" (click)="this.save()"><img class="icon" src="../../assets/action_save.gif">Save</button>
+                <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.formGroup.valid" (click)="this.save()"><img class="icon" [src]="'./assets/action_save.gif'">Save</button>
                 <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
             </div>
         </div>

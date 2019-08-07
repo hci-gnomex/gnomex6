@@ -76,8 +76,8 @@
                     </div>
                     <div class="special-button-text-alignment-padding">
                         <button mat-button [disabled]="disableViewURLButton" (click)="onViewURLButtonClicked()">
-                            <img *ngIf="!disableViewURLButton" src="../../assets/page_go.png" alt="" />
-                            <img *ngIf="disableViewURLButton"  src="../../assets/page_go_disabled.png" alt="" />
+                            <img *ngIf="!disableViewURLButton" [src]="'./assets/page_go.png'" alt="" />
+                            <img *ngIf="disableViewURLButton"  [src]="'./assets/page_go_disabled.png'" alt="" />
                             View URL
                         </button>
                     </div>
@@ -104,7 +104,7 @@
             <button mat-button
                     [disabled]="!this.form.dirty || this.form.invalid"
                     (click)="onSaveButtonClicked()">
-                <img [src]="this.form.dirty && this.form.valid ? '../../assets/save.png' : '../../assets/save_disable.png'"/>
+                <img [src]="this.form.dirty && this.form.valid ? './assets/save.png' : './assets/save_disable.png'"/>
                 Save
             </button>
         </div>

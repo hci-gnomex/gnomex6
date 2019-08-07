@@ -2,7 +2,7 @@
     <mat-toolbar-row>
         <span class="flex-grow">
             <a [routerLink]="['/home']">
-                <img src="../../assets/gnomex_logo_hdr.png">
+                <img [src]="'./assets/gnomex_logo_hdr.png'">
             </a>
         </span>
         <span class="lookup horizontal-center">
@@ -12,7 +12,7 @@
                     <input matInput type="text" [(ngModel)]="objNumber" placeholder="Lookup by #">
                 </mat-form-field>
                 <button (click)="searchNumber()">
-                    <img src="../../assets/arrow_right.png">
+                    <img [src]="'./assets/arrow_right.png'">
                 </button>
             </div>
             <div class="inline-block horizontal-padding">
@@ -20,7 +20,7 @@
                     <input matInput [(ngModel)]="searchText" placeholder="Search">
                 </mat-form-field>
                 <button (click)="searchByText()">
-                    <img src="../../assets/magnifier.png">
+                    <img [src]="'./assets/magnifier.png'">
                 </button>
             </div>
         </span>

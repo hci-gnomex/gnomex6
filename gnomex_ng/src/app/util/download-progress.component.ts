@@ -4,6 +4,7 @@ import {HttpClient, HttpEvent, HttpEventType, HttpParams, HttpRequest} from "@an
 import {Subscription} from "rxjs";
 import {saveAs} from "file-saver";
 import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
+import {UtilService} from "../services/util.service";
 
 @Component({
     template: `
@@ -60,7 +61,7 @@ export class DownloadProgressComponent extends BaseGenericContainerDialog implem
                         saveAs(event.body, this.filename);
                 }
             });
-            this.innerTitle = "Downloading " + (this.filename.length > 30 ? this.filename.substr(0, 29) + "..." : this.filename);
+            this.innerTitle = "Downloading " + UtilService.getSubStr(this.filename, 30);
         }
     }
 

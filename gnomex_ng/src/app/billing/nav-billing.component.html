@@ -36,8 +36,8 @@
                         <button *ngFor="let sheet of this.priceTreeGridData" mat-button class="minimize font-small price-sheet-link" (click)="this.jumpToPriceSheet(sheet.idPriceSheet)">{{sheet.display}}</button>
                     </div>
                     <div class="flex-container-row align-center justify-space-between">
-                        <label class="font-small padding-left no-margin" matTooltip="Drag-and-drop price category to reorder or attach to another price sheet" [matTooltipPosition]="'right'"><img class="icon" src="../../assets/information.png">Drag-and-drop hint</label>
-                        <button mat-button matTooltip="Create a new billing item with the selected price for the selected experiment" [matTooltipPosition]="'right'" [disabled]="this.disableAddBillingItemButton" (click)="this.addNewBillingItem()" class="font-small"><img src="../../assets/add.png" class="icon">Create new billing item</button>
+                        <label class="font-small padding-left no-margin" matTooltip="Drag-and-drop price category to reorder or attach to another price sheet" [matTooltipPosition]="'right'"><img class="icon" [src]="'./assets/information.png'">Drag-and-drop hint</label>
+                        <button mat-button matTooltip="Create a new billing item with the selected price for the selected experiment" [matTooltipPosition]="'right'" [disabled]="this.disableAddBillingItemButton" (click)="this.addNewBillingItem()" class="font-small"><img [src]="'./assets/add.png'" class="icon">Create new billing item</button>
                     </div>
                     <div class="height-seventy-five">
                         <ag-grid-angular class="ag-theme-balham full-height full-width font-small"
@@ -57,10 +57,10 @@
                         <mat-checkbox [(ngModel)]="this.showInactivePricesCheckbox" (change)="this.refreshPricingGrid()" class="padding-left font-small">Show inactive prices</mat-checkbox>
                     </div>
                     <div class="flex-container-row">
-                        <button mat-button (click)="this.openNewSheetWindow()" class="font-small"><img src="../../assets/pricesheet_add.png" class="icon">New sheet</button>
-                        <button mat-button (click)="this.openNewCategoryWindow()" class="font-small"><img src="../../assets/folder_money_add.png" class="icon">New category</button>
-                        <button mat-button (click)="this.openNewPriceWindow()" class="font-small"><img src="../../assets/money_add.png" class="icon">New price</button>
-                        <button mat-button [disabled]="!this.selectedPriceTreeGridItem" (click)="this.removeFromPriceTree()" class="font-small"><img src="../../assets/delete.png" class="icon">Remove</button>
+                        <button mat-button (click)="this.openNewSheetWindow()" class="font-small"><img [src]="'./assets/pricesheet_add.png'" class="icon">New sheet</button>
+                        <button mat-button (click)="this.openNewCategoryWindow()" class="font-small"><img [src]="'./assets/folder_money_add.png'" class="icon">New category</button>
+                        <button mat-button (click)="this.openNewPriceWindow()" class="font-small"><img [src]="'./assets/money_add.png'" class="icon">New price</button>
+                        <button mat-button [disabled]="!this.selectedPriceTreeGridItem" (click)="this.removeFromPriceTree()" class="font-small"><img [src]="'./assets/delete.png'" class="icon">Remove</button>
                     </div>
                 </mat-tab>
             </mat-tab-group>
@@ -85,11 +85,12 @@
             <div class="flex-ten">
                 <ag-grid-angular class="ag-theme-balham full-height full-width font-small"
                                  (gridReady)="this.onBillingItemGridReady($event)"
-                                 (gridSizeChanged)="this.onGridSizeChanged($event)"
                                  (cellValueChanged)="this.onBillingItemGridChange($event)"
                                  (selectionChanged)="this.onBillingItemGridSelection()"
                                  (rowClicked)="this.onBillingItemGridRowSelection($event)"
                                  [getNodeChildDetails]="this.getBillingItemNodeChildDetails"
+                                 [enableColResize]="true"
+                                 [stopEditingWhenGridLosesFocus]="true"
                                  [rowSelection]="'multiple'"
                                  [singleClickEdit]="true"
                                  [rowClassRules]="this.billingItemGridRowClassRules"
@@ -98,11 +99,11 @@
             </div>
             <div class="flex-container-row align-center flex-one justify-space-between">
                 <div>
-                    <button mat-button [disabled]="this.disableSplitButton" color="accent" (click)="this.openSplitWindow()"><img src="../../assets/account_split.png" class="icon">Reassign/Split</button>
-                    <button mat-button [disabled]="this.selectedBillingItems.length < 1" color="warn" (click)="this.removeBillingItems()"><img src="../../assets/delete.png" class="icon">Remove</button>
+                    <button mat-button [disabled]="this.disableSplitButton" color="accent" (click)="this.openSplitWindow()"><img [src]="'./assets/account_split.png'" class="icon">Reassign/Split</button>
+                    <button mat-button [disabled]="this.selectedBillingItems.length < 1" color="warn" (click)="this.removeBillingItems()"><img [src]="'./assets/delete.png'" class="icon">Remove</button>
                     <span *ngIf="this.showDirtyNote" class="dirtyNote">Changes Have Not Been Saved</span>
                 </div>
-                <button mat-button color="primary" (click)="this.validateAndSave()"><img src="../../assets/action_save.gif" class="icon">Save</button>
+                <button mat-button color="primary" (click)="this.validateAndSave()"><img [src]="'./assets/action_save.gif'" class="icon">Save</button>
             </div>
         </div>
     </div>

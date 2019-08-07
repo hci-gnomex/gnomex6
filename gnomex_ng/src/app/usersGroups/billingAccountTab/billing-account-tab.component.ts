@@ -520,7 +520,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             width: 200,
             minWidth: 10 * this.emToPxConversionRate,
             cellRendererFramework: IconLinkButtonRenderer,
-            icon: "../../../assets/pricesheet.png",
+            icon: "./assets/pricesheet.png",
             onClick: "openChartfieldEditor",
             field: "accountName"
         });
@@ -873,7 +873,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             minWidth: 10 * this.emToPxConversionRate,
             maxWidth: 15 * this.emToPxConversionRate,
 			cellRendererFramework: IconLinkButtonRenderer,
-			icon: "../../../assets/email_open.png",
+			icon: "./assets/email_open.png",
 			onClick: "openPoEditor",
 			field: "accountName"
 		});
@@ -995,7 +995,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             minWidth: 10 * this.emToPxConversionRate,
             maxWidth: 15 * this.emToPxConversionRate,
 			cellRendererFramework: IconLinkButtonRenderer,
-			icon: "../../../assets/creditcards.png",
+			icon: "./assets/creditcards.png",
 			onClick: "openCreditCardEditor",
 			field: "accountName"
 		});

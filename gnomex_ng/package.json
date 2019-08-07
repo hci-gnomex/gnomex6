@@ -78,7 +78,6 @@
     "url-loader": "^1.1.2",
     "webassemblyjs": "1.7.11",
     "webpack": "^4.5.0",
-    "webpack-visualizer-plugin": "^0.1.11",
     "zone.js": "0.8.26"
   },
   "devDependencies": {

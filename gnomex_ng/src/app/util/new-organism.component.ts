@@ -9,6 +9,8 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
 import {GDAction} from "./interfaces/generic-dialog-action.model";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
+import {DictionaryService} from "../services/dictionary.service";
+import {DataTrackService} from "../services/data-track.service";
 
 @Component({
     selector: "new-organism",
@@ -70,6 +72,8 @@ export class NewOrganismComponent extends BaseGenericContainerDialog implements 
                 private dialogsService: DialogsService,
                 private secAdvisor: CreateSecurityAdvisorService,
                 public constantsService: ConstantsService,
+                private dictionaryService: DictionaryService,
+                private dataTrackService: DataTrackService,
                 private fb: FormBuilder) {
         super();
     }
@@ -90,7 +94,7 @@ export class NewOrganismComponent extends BaseGenericContainerDialog implements 
 
 
     public save(): void {
-        this.dialogsService.startDefaultSpinnerDialog();
+        this.dialogsService.addSpinnerWorkItem();
         let params: HttpParams = new HttpParams()
             .set("organism", this.organismForm.get("commonName").value)
             .set("binomialName", this.organismForm.get("binomialName").value)
@@ -98,9 +102,16 @@ export class NewOrganismComponent extends BaseGenericContainerDialog implements 
             .set("isActive", this.organismForm.get("das2Name").value ? "Y" : "N")
             .set("idAppUser", ""+this.secAdvisor.idAppUser);
         this.organismService.saveOrganismNew(params).subscribe((response: any) => {
-            this.dialogsService.stopAllSpinnerDialogs();
             if (response && response.result && response.result === "SUCCESS" && response.idOrganism) {
-                this.dialogRef.close(response.idOrganism);
+                this.dictionaryService.reloadAndRefresh(() => {
+                    this.dialogsService.removeSpinnerWorkItem();
+                    this.dialogRef.close(response.idOrganism);
+                    this.dataTrackService.refreshDatatracksList_fromBackend();
+                }, () => {
+                    this.dialogsService.stopAllSpinnerDialogs();
+                }, DictionaryService.ORGANISM);
+            } else {
+                this.dialogsService.stopAllSpinnerDialogs();
             }
         }, (err: IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();

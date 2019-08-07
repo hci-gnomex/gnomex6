@@ -635,20 +635,12 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
 
     public clickCancel(): void {
-        console.log("Cancel clicked!");
+        this.dialogService.confirm("The experiment has not been saved. Are you sure you want to quit?", "Cancel").subscribe((answer: boolean) => {
+            if (answer) {
+                this.router.navigateByUrl('home');
+            }
+        });
     }
 
-    public onClickDebug() {
-        console.log("Debug clicked!");
-
-        // console.log("Spoofing new experiment!");
-        //
-        // let spoofedExperiment: any = this.newExperimentService.spoofNewExperimentObject();
-        // let spoofedProperties: any = { requestProperties: [] };
-        //
-        // this.newExperimentService.saveNewRequest(62962, '$580.00', '', spoofedExperiment, spoofedProperties).subscribe((response: any) => {
-        //     console.log("SaveRequest returned");
-        // });
-    }
 }
 

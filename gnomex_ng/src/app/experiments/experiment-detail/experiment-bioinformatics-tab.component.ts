@@ -77,6 +77,7 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
         }
 
         if (this._experiment && this._experiment.sequenceLanes) {
+            this._experiment.sequenceLanes = UtilService.getJsonArray(this._experiment.sequenceLanes, this._experiment.sequenceLanes["SequenceLane"]);
             if (this._experiment.sequenceLanes.length === 0) {
                 this.flag_isANewExperiment = true;
             }

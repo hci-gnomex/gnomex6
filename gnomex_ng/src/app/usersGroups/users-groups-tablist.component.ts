@@ -370,13 +370,13 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             for (let lab of this.groupsData) {
                 if (lab.isExternalPricing === 'Y') {
                     lab.pricing = "ext";
-                    lab.icon = "../../assets/graduation_cap.png";
+                    lab.icon = "./assets/graduation_cap.png";
                 } else if (lab.isExternalPricingCommercial === 'Y') {
                     lab.pricing = 'com';
-                    lab.icon = "../../assets/building.png";
+                    lab.icon = "./assets/building.png";
                 } else {
                     lab.pricing = "int";
-                    lab.icon = "../../assets/empty.png";
+                    lab.icon = "./assets/empty.png";
                 }
             }
         }
@@ -1560,11 +1560,11 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
 
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.height = '16em';
-        configuration.width  = '20em';
+        configuration.width  = '30em';
 
         configuration.data = {
             idLab: theLabId,
-            labName: this.selectedGroup[this.prefService.labDisplayField]
+            labName: mode === 'lab' ? this.selectedGroup[this.prefService.labDisplayField] : ""
         };
 
         this.dialogsService.genericDialogContainer(VerifyUsersDialogComponent, "Send Email",

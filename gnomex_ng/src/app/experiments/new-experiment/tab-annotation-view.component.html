@@ -1,21 +1,38 @@
 <div class="full-height full-width double-padded small-font">
     <form [formGroup]="form" class="full-height full-width flex-container-col">
         <div class="flex-container-row flex-grow full-width">
-            <ag-grid-angular class="ag-theme-fresh full-height moderate-width"
-                             [rowSelection]="'multiple'"
-                             [rowMultiSelectWithClick]="true"
-                             (gridReady)="onAddAnnotationGridReady($event)"
-                             (gridSizeChanged)="onGridSizeChanged($event)"
-                             (rowSelected)="onAddAnnotationGridRowSelected($event)">
-            </ag-grid-angular>
+            <div class="flex-container-col">
+                <div class="flex-container-row align-center">
+                    <div>Check sample characteristics</div>
+                    <context-help name="annotationTabHelp"
+                                  [idCoreFacility]="this._experiment.idCoreFacility"
+                                  [isEditMode]="this.secAdvisor.isAdmin"
+                                  popupTitle="Annotation Help">
+                    </context-help>
+                </div>
+                <ag-grid-angular class="ag-theme-fresh moderate-height moderate-width"
+                                 [rowSelection]="'multiple'"
+                                 [rowMultiSelectWithClick]="true"
+                                 (gridReady)="onAddAnnotationGridReady($event)"
+                                 (gridSizeChanged)="onGridSizeChanged($event)"
+                                 (rowSelected)="onAddAnnotationGridRowSelected($event)">
+                </ag-grid-angular>
+            </div>
             <div class="short-width">
             </div>
-            <ag-grid-angular class="ag-theme-fresh full-height moderate-width"
-                             [rowSelection]="'single'"
-                             (gridReady)="onRemoveAnnotationGridReady($event)"
-                             (gridSizeChanged)="onGridSizeChanged($event)"
-                             (rowSelected)="onRemoveAnnotationGridRowSelected($event)">
-            </ag-grid-angular>
+            <div class="flex-container-col">
+                <div class="flex-container-row align-center">
+                    <div class="flex-grow double-padded-top-bottom">
+                        Selected characteristics
+                    </div>
+                </div>
+                <ag-grid-angular class="ag-theme-fresh moderate-height moderate-width"
+                                 [rowSelection]="'single'"
+                                 (gridReady)="onRemoveAnnotationGridReady($event)"
+                                 (gridSizeChanged)="onGridSizeChanged($event)"
+                                 (rowSelected)="onRemoveAnnotationGridRowSelected($event)">
+                </ag-grid-angular>
+            </div>
         </div>
         <div class="flex-container-row padded-top align-baseline">
             <div class="padded-right">
@@ -28,8 +45,13 @@
                     {{ customAnnotLabel }}
                 </button>
             </div>
+            <context-help name="annotationTabAddHelp"
+                          [idCoreFacility]="this._experiment.idCoreFacility"
+                          [isEditMode]="this.secAdvisor.isAdmin"
+                          popupTitle="Add Annotation Help">
+            </context-help>
             <div class="padded-right">
-                <button mat-raised-button class="link-button" (click)="editAnnotations()">
+                <button mat-button class="link-button minimize" (click)="editAnnotations()">
                     {{ editAnnotLabel }}
                 </button>
             </div>

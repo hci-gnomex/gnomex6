@@ -91,7 +91,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
     constructor(private analysisService:AnalysisService,
                 private gnomexService: GnomexService,
-                private secAdvisor: CreateSecurityAdvisorService,
+                public secAdvisor: CreateSecurityAdvisorService,
                 private fb:FormBuilder,
                 private fileService: FileService,
                 public constService:ConstantsService,
@@ -494,12 +494,6 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         this.formGroup.markAsPristine();
 
     }
-
-
-    showHelp(){
-        this.dialogService.info(this.organizeHelp);
-    }
-
 
     requestToCloseDialog(){
         this.closeDialog.emit();

@@ -1,23 +1,31 @@
 <div class="full-height full-width small-font">
     <form [formGroup]="form" class="full-height full-width flex-container-col">
-        <div *ngIf="showInstructions === true" class="full-width padded">
+        <div *ngIf="showIlluminaInstructions" class="full-width padded">
             <div class="sample-instructions allow-line-breaks padded">{{ BASIC_INSTRUCTIONS }}
             </div>
         </div>
         <div class="full-width flex-grow flex-container-col">
             <div class="full-width flex-container-row align-center padded">
-                <button *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && experiment?.isExternal !== 'Y'" mat-button
-                        class="padded-right"
-                        color="link"
-                        matTooltip="{{ TOOLTIP_TEXT }}"
-                        (click)="onClickShowInstructions()">
-                    <img class="icon" [src]="this.constService.ICON_INFORMATION" alt="">
-                    Instructions
-                </button>
-                <button *ngIf="experiment?.isExternal === 'Y'" [disabled]="!(_state === this.STATE_NEW || _state === this.STATE_EDIT)" mat-button class="padded-right" (click)="onAddSample()">
-                    <img class="icon" [src]="this.constService.ICON_ADD" alt="">
-                    Add sample
-                </button>
+                <context-help *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && experiment?.isExternal !== 'Y'"
+                              name="samplesTabHelp" [isEditMode]="this.createSecurityAdvisor.isAdmin"
+                              popupTitle="Samples Tab Instructions" label="Instructions"
+                              [idCoreFacility]="this._experiment.idCoreFacility"
+                              [codeRequestCategory]="this.requestCategoryType">
+                </context-help>
+
+                <div class="flex-container-row" *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && experiment?.isExternal === 'Y'">
+                    <button mat-button class="padded-right" (click)="onAddSample()">
+                        <img class="icon" [src]="this.constService.ICON_ADD" alt="">
+                        Add sample
+                    </button>
+                    <context-help name="addSampleHelp" [isEditMode]="this.createSecurityAdvisor.isAdmin" popupTitle="Add Samples Help">
+                    </context-help>
+                </div>
+
+                <context-help *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && experiment?.isExternal !== 'Y'"
+                              name="addSampleHelp" [isEditMode]="this.createSecurityAdvisor.isAdmin"
+                              popupTitle="Add Samples Help" label="Adding samples">
+                </context-help>
                 <button *ngIf="_state === this.STATE_NEW || _state === this.STATE_EDIT" mat-button
                         class="padded-right"
                         color="link"
@@ -26,6 +34,10 @@
                     <img class="icon" [src]="constService.ICON_UPLOAD">
                     Upload Sample Sheet
                 </button>
+                <context-help *ngIf="_state === this.STATE_NEW || _state === this.STATE_EDIT"
+                              name="uploadSampleSheetHelp" [isEditMode]="this.createSecurityAdvisor.isAdmin"
+                              popupTitle="Upload Sample Sheet Instructions">
+                </context-help>
                 <input type="file" #fileInput accept=".txt" class="hidden" (change)="onFileSelected($event)" multiple>
                 <button mat-button
                         class="padded-right"

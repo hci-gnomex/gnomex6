@@ -203,12 +203,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 this.datatracksService.getDatatracksList_fromBackend(new HttpParams());
             }
         });
-
-        this.datatracksService.startSearchSubject.subscribe((value) => {
-            if (value) {
-                this.dialogsService.startDefaultSpinnerDialog();
-            }
-        });
     }
 
     private moveNode: (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => void = (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => {
@@ -223,8 +217,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
             targetItem: targetItem,
         };
 
-        let title: string = targetItem.label.length > 30 ? targetItem.label.substr(0, 29) + "..." : targetItem.label;
-        title = "Move/Copy to " + title;
+        let title: string = "Move/Copy to " + UtilService.getSubStr(targetItem.label, 30);
 
         this.dialogsService.genericDialogContainer(MoveDataTrackComponent, title, currentItem.icon, configuration).subscribe((result) => {
             if (result) {
@@ -245,11 +238,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     }
 
     treeUpdateData(event) {
-        if (this.datatracksService.startSearchSubject.getValue() === true) {
-            this.dialogsService.stopAllSpinnerDialogs();
-            this.datatracksService.startSearchSubject.next(false);
-            this.changeDetectorRef.detectChanges();
-        }
     }
 
     search() {
@@ -278,6 +266,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     @param
      */
     buildTree(response: any[]) {
+        this.dialogsService.addSpinnerWorkItem();
         this.datatracksCount = 0;
         if (response) {
             this.organisms = [];
@@ -329,7 +318,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 }
             }
         }
-        this.dialogsService.stopAllSpinnerDialogs();
+        this.dialogsService.removeSpinnerWorkItem();
         if(this.treeModel){
             this.treeModel.clearFilter();
         }

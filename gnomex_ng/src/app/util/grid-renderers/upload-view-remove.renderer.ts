@@ -11,21 +11,21 @@ import {DialogsService, DialogType} from "../popup/dialogs.service";
                     <div class="td vertical-center button-container">
                         <input type="file" class="hidden" (change)="selectFile($event)" #fileInput>
                         <button *ngIf="!disableEdit" class="link-button" (click)="onClickUpload()">
-                            <img src="../../../assets/upload.png" alt=""/>
+                            <img [src]="'./assets/upload.png'" alt=""/>
                             <div class="name inline-block">
                                 Upload
                             </div>
                         </button>
                         <button *ngIf="hasPoForm" class="link-button"
                                 (click)="onClickView()">
-                            <img src="../../../assets/page_find.gif" alt=""/>
+                            <img [src]="'./assets/page_find.gif'" alt=""/>
                             <div class="name inline-block">
                                 View
                             </div>
                         </button>
                         <button *ngIf="hasPoForm && !disableEdit" class="link-button"
                                 (click)="onClickRemove()">
-                            <img src="../../../assets/page_cross.gif" alt=""/>
+                            <img [src]="'./assets/page_cross.gif'" alt=""/>
                             <div class="name inline-block">
                                 Remove
                             </div>

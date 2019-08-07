@@ -4,6 +4,7 @@ import {ConstantsService} from "../../services/constants.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {numberRange} from "../../util/validators/number-range-validator";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 
 
 @Component({
@@ -17,6 +18,7 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
 })
 export class IlluminaSeqDialogComponent extends BaseGenericContainerDialog implements OnInit{
 
+    canEnterPrices: boolean = false;
     rowData:any;
     applyFn:any;
     formGroup:FormGroup;
@@ -29,7 +31,8 @@ export class IlluminaSeqDialogComponent extends BaseGenericContainerDialog imple
     constructor(private dialogRef: MatDialogRef<IlluminaSeqDialogComponent>,
                 public constService: ConstantsService,
                 private fb: FormBuilder,
-                @Inject(MAT_DIALOG_DATA) private data) {
+                @Inject(MAT_DIALOG_DATA) private data,
+                public secAdvisor: CreateSecurityAdvisorService) {
         super();
         if (this.data && this.data.rowData) {
             this.rowData = this.data.rowData;
@@ -37,6 +40,7 @@ export class IlluminaSeqDialogComponent extends BaseGenericContainerDialog imple
             this.runOptions = this.data.runOptions;
             this.cycleList = this.data.cycleList;
             this.seqTypeRunList = this.data.seqTypeRunList;
+            this.canEnterPrices = this.data.canEnterPrices === "Y";
         }
     }
 

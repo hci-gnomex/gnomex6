@@ -9,6 +9,7 @@ import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.Lab;
+import hci.gnomex.model.PropertyDictionary;
 import net.sf.json.JSON;
 import net.sf.json.xml.XMLSerializer;
 import org.hibernate.Session;
@@ -17,10 +18,13 @@ import org.jdom.Document;
 import org.jdom.Element;
 
 import javax.json.*;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.io.BufferedReader;
@@ -33,6 +37,8 @@ import java.io.*;
 import static java.lang.Integer.parseInt;
 
 public class Util {
+
+    public static final String[] EMPTY_STRING_ARRAY = new String[0];
 
     private static Map<String, String> iconLookupMap = new HashMap<>();
     static {
@@ -881,6 +887,44 @@ public class Util {
         }
         builder.append("Lab");
         return builder.toString();
+    }
+
+    public static void buildAndSendUploadFileServletURL(HttpServletRequest request, HttpServletResponse response,
+                                                        Session session, String urlServletName, String uploadServletName,
+                                                        String[] fileExtensions) throws IOException {
+
+        boolean requireSecureMode = Constants.REQUIRE_SECURE_REMOTE;
+        boolean isLocalHost = request.getServerName().equalsIgnoreCase("localhost")
+                || request.getServerName().equals("127.0.0.1");
+
+        String portNumber = PropertyDictionaryHelper.getInstance(session).getQualifiedProperty(PropertyDictionary.HTTP_PORT, request.getServerName());
+        if ((portNumber == null || requireSecureMode) && !isLocalHost) {
+            portNumber = "";
+        } else {
+            portNumber = ":" + portNumber;
+        }
+
+        String URL = "http" + (isLocalHost || !requireSecureMode ? "://" : "s://")
+                + request.getServerName() + portNumber + request.getContextPath() + "/" + uploadServletName;
+
+        StringBuilder fileExtensionsBuilder = new StringBuilder();
+        for (String extension : fileExtensions) {
+            if (fileExtensionsBuilder.length() > 0) {
+                fileExtensionsBuilder.append(";");
+            }
+            fileExtensionsBuilder.append("*");
+            fileExtensionsBuilder.append(extension);
+        }
+
+        JsonObject value = Json.createObjectBuilder()
+                .add("name", urlServletName)
+                .add("url", URL)
+                .add("fileExtensions", fileExtensionsBuilder.toString())
+                .build();
+        response.setContentType("application/json");
+        try (JsonWriter jsonWriter = Json.createWriter(response.getOutputStream())) {
+            jsonWriter.writeObject(value);
+        }
     }
 
 }

@@ -1,26 +1,27 @@
 <div class="full-width full-height flex-container-col max-height">
-    <div class="full-width padded">
-        <button [disabled]="!this.organizeSelectedNode" mat-button color="primary"  (click)="addNewFolder()" >
-            <img [src]="constService.ICON_FOLDER_ADD" > New Folder
-        </button>
-        <button mat-button
-                color="primary"
-                [disabled]="disableRemove"
-                (click)="attemptRemove()" >
-            <img [src]="constService.ICON_DELETE" >
-            Remove (from file system)
-        </button>
-        <button mat-button color="primary"
-                [disabled]="disableRename"
-                (click)="rename()"  >
-            <img [src]="constService.SEGMENT_IMPORT" >
-            Rename file </button>
+    <div class="flex-container-row full-width padded justify-space-between">
+        <div class="flex-container-row">
+            <button [disabled]="!this.organizeSelectedNode" mat-button color="primary"  (click)="addNewFolder()" >
+                <img [src]="constService.ICON_FOLDER_ADD" > New Folder
+            </button>
+            <button mat-button
+                    color="primary"
+                    [disabled]="disableRemove"
+                    (click)="attemptRemove()" >
+                <img [src]="constService.ICON_DELETE" >
+                Remove (from file system)
+            </button>
+            <button mat-button color="primary"
+                    [disabled]="disableRename"
+                    (click)="rename()"  >
+                <img [src]="constService.SEGMENT_IMPORT" >
+                Rename file </button>
+            <context-help name="organizeFilesHelp" popupTitle="Organize Files Help"
+                          label="Help" [isEditMode]="this.secAdvisor.isAdmin"></context-help>
+        </div>
         <button mat-button color="primary" (click)="refresh()" >
             <img [src]="constService.ICON_REFRESH" >
             Refresh
-        </button>
-        <button mat-button [matTooltip]="this.organizeHelp" (click)="showHelp()">
-            <img [src]="constService.ICON_INFORMATION">
         </button>
     </div>
 

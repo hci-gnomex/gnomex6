@@ -154,13 +154,16 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     }
 
     public doDuplicate(): void {
+        this.dialogsService.addSpinnerWorkItem();
         let params: HttpParams = new HttpParams()
             .set("idDataTrack", this.selectedNode.data.idDataTrack)
             .set("idDataTrackFolder", this.selectedNode.data.idDataTrackFolder);
 
         this.dataTrackService.duplicateDataTrack(params).subscribe((response: any) => {
+            this.dialogsService.removeSpinnerWorkItem();
             this.dataTrackService.refreshDatatracksList_fromBackend();
         }, (err:IGnomexErrorResponse) => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
     }
 
@@ -371,7 +374,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         }
     }
 
-    private makeNewGenomeBuild(): void {
+    public makeNewGenomeBuild(): void {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = "35em";
         configuration.autoFocus = false;
@@ -390,7 +393,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         });
     }
 
-    private makeNewOrganism(): void {
+    public makeNewOrganism(): void {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.width = "35em";
 
@@ -400,11 +403,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
                 ]}).subscribe((result: any) => {
             if(result) {
-                this.dictionaryService.reloadAndRefresh(() => {
-                    this.dataTrackService.refreshDatatracksList_fromBackend();
-                }, null, DictionaryService.ORGANISM);
-                this.onGenomeBuildCreated.emit(result);
-                this.dialogsService.stopAllSpinnerDialogs();
+                this.onOrganismCreated.emit(result);
             }
         });
     }

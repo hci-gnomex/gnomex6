@@ -779,10 +779,9 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
 
     public setupExpPlatformMode(expPlatform:any){
         this.formGroup.reset();
-        let expPlatCoreFacilityFC = this.expPlatformService.findExpPlatformFormMember("ExperimentPlatformTabComponent.idCoreFacility");
         this.expPlatform = expPlatform;
         this.requestCategory = expPlatform.requestCategory;
-        this.idCoreFacility = expPlatCoreFacilityFC.value;
+        this.idCoreFacility = expPlatform.idCoreFacility;
         this.orderType = this.SHOW_FOR_EXPERIMENTS;
 
         // need to know that getPropertyList has loaded. Also need experiment platform's core facility, platform, and orderType is set before updateDisplayedProperties is ran

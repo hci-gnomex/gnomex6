@@ -132,6 +132,7 @@ export class ConstantsService {
     public readonly ICON_FOLDER_NEW: string = "assets/folder_new.png";
     public readonly ICON_FOLDER_GROUP: string = "assets/folder_group.png";
     public readonly ICON_FOLDER_ADD: string = "assets/folder_add.png";
+    public readonly ICON_NOTE_EDIT: string = "assets/note_edit.png";
     public readonly ICON_FLASK: string = "assets/flask.png";
     public readonly ICON_ORGANISM: string = "assets/organism.jpg";
     public readonly ICON_ORGANISM_NEW: string = "assets/organism_new.png";

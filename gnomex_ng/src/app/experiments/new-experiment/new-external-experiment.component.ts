@@ -216,7 +216,7 @@ export class NewExternalExperimentComponent implements OnInit, OnDestroy {
     }
 
     public promptToCancel(): void {
-        this.dialogsService.confirm("The experiment has not been saved. Are you sure you want to quit?", "Warning").subscribe((answer: boolean) => {
+        this.dialogsService.confirm("The experiment has not been saved. Are you sure you want to quit?", "Cancel").subscribe((answer: boolean) => {
             if (answer) {
                 this.router.navigateByUrl('home');
             }

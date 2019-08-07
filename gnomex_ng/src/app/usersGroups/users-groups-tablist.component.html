@@ -29,10 +29,10 @@
                             <div class="full-width small-font">
                                 <div class="flex-container-row align-center padded">
                                     <div class="padded-right">
-                                        <button mat-button (click)="newUser()"><img src="../../assets/user.png">New User</button>
+                                        <button mat-button (click)="newUser()"><img [src]="'./assets/user.png'">New User</button>
                                     </div>
                                     <div class="padded-right">
-                                        <button mat-button (click)="deleteUser()"><img src="../../assets/delete.png">Delete User</button>
+                                        <button mat-button (click)="deleteUser()"><img [src]="'./assets/delete.png'">Delete User</button>
                                     </div>
                                     <div class="full-height flex-grow"></div>
                                     <div>
@@ -86,13 +86,13 @@
                             <div class="full-width flex-container-row align-center padded">
                                 <div class="padded-right">
                                     <button mat-button (click)="newGroup()">
-                                        <img src="../../assets/group_add.png">
+                                        <img [src]="'./assets/group_add.png'">
                                         New Group
                                     </button>
                                 </div>
                                 <div class="padded-right">
                                     <button mat-button [disabled]="!selectedGroup" (click)="deleteGroup()">
-                                        <img src="../../assets/delete.png">
+                                        <img [src]="'./assets/delete.png'">
                                         Delete Group
                                     </button>
                                 </div>
@@ -104,7 +104,7 @@
                             <div *ngIf="secAdvisor.isSuperAdmin" class="full-width small-font">
                                 <div class="padded-left-right-bottom">
                                     <button mat-button (click)="verify('all')">
-                                        <img src="../../assets/email_go.png">
+                                        <img [src]="'./assets/email_go.png'">
                                         Verify all users
                                     </button>
                                 </div>
@@ -315,7 +315,7 @@
                             <div class="horizontal-spacer">
                             </div>
                             <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.userForm.valid" (click)="saveUser()">
-                                <img src="../../assets/save.png">
+                                <img [src]="'./assets/save.png'">
                                 Save
                             </button>
                         </div>
@@ -377,9 +377,9 @@
                                                     <label>Pricing</label>
                                                     <div class="full-width flex-grow">
                                                         <mat-radio-group class="flex-container-col full-width" formControlName="pricing">
-                                                            <mat-radio-button class="padded-left-right" value="INTERNAL"><img src="../../assets/group.png"> Internal</mat-radio-button>
-                                                            <mat-radio-button class="padded-left-right" value="EXACADEMIC"><img src="../../assets/graduation_cap.png"> External Academic</mat-radio-button>
-                                                            <mat-radio-button class="padded-left-right" value="EXCOMM"><img src="../../assets/building.png"> External Commercial</mat-radio-button>
+                                                            <mat-radio-button class="padded-left-right" value="INTERNAL"><img [src]="'./assets/group.png'"> Internal</mat-radio-button>
+                                                            <mat-radio-button class="padded-left-right" value="EXACADEMIC"><img [src]="'./assets/graduation_cap.png'"> External Academic</mat-radio-button>
+                                                            <mat-radio-button class="padded-left-right" value="EXCOMM"><img [src]="'./assets/building.png'"> External Commercial</mat-radio-button>
                                                         </mat-radio-group>
                                                     </div>
                                                 </div>
@@ -460,7 +460,7 @@
                         <div class="full-height flex-grow">
                             <div class="flex-grow">
                                 <button mat-button (click)="verify('lab')">
-                                    <img src="../../assets/email_go.png">
+                                    <img [src]="'./assets/email_go.png'">
                                     Send email to verify users
                                 </button>
                             </div>
@@ -475,7 +475,7 @@
                         <div class="horizontal-spacer">
                         </div>
                         <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.groupForm.valid" (click)="saveLab()">
-                            <img src="../../assets/save.png">
+                            <img [src]="'./assets/save.png'">
                             Save
                         </button>
                         <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>

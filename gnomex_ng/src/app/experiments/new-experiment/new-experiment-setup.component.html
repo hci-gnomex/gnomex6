@@ -25,6 +25,12 @@
                             </mat-radio-button>
                         </div>
                     </mat-radio-group>
+                    <context-help name="experimentInternalSetupHelp"
+                                  label="Click for Instructions"
+                                  [idCoreFacility]="this.coreFacility.idCoreFacility"
+                                  [isEditMode]="this.createSecurityAdvisor.isAdmin"
+                                  popupTitle="Experiment Help">
+                    </context-help>
                     <ng-template #noPlatforms>
                         No experiment platforms are associated with this lab. Please contact customer support.
                     </ng-template>

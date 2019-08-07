@@ -7,8 +7,8 @@
                       displayField="accountNumberDisplay" [(ngModel)]="this.selectedAccount">
     </custom-combo-box>
     <mat-checkbox [(ngModel)]="this.showInactiveAccounts" (change)="this.loadLabs()">Show inactive accounts</mat-checkbox>
-    <button mat-button (click)="this.addAccount()" [disabled]="!this.selectedAccount"><img src="../../assets/add.png" class="icon">Add</button>
-    <button mat-button (click)="this.removeAccount()" [disabled]="this.selectedRowIndex === null"><img src="../../assets/delete.png" class="icon">Remove</button>
+    <button mat-button (click)="this.addAccount()" [disabled]="!this.selectedAccount"><img [src]="'./assets/add.png'" class="icon">Add</button>
+    <button mat-button (click)="this.removeAccount()" [disabled]="this.selectedRowIndex === null"><img [src]="'./assets/delete.png'" class="icon">Remove</button>
 </div>
 <div class="accounts-grid-div full-width padded">
     <ag-grid-angular class="ag-theme-fresh full-height full-width"

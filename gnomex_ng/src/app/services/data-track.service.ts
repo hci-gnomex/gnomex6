@@ -12,7 +12,6 @@ import {DialogsService} from "../util/popup/dialogs.service";
 @Injectable()
 export class DataTrackService {
     public datatracksList: any[];
-    public startSearchSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     private datatracksListSubject: Subject<any[]> = new Subject();
     private _haveLoadedDatatracksList: boolean = false;
     private _previousURLParams: HttpParams = null;
@@ -120,13 +119,14 @@ export class DataTrackService {
         return this.datatracksListSubject.asObservable();
     }
     getDatatracksList_fromBackend(params: HttpParams): void {
-        this.startSearchSubject.next(true);
+        this.dialogService.addSpinnerWorkItem();
         this._haveLoadedDatatracksList = true;
         this._previousURLParams = params;
 
         this.httpClient.get("/gnomex/GetDataTrackList.gx", {params: params})
             .pipe(map((resp:any) =>{ return resp.Organism}))
             .subscribe((response: any) => {
+                this.dialogService.removeSpinnerWorkItem();
                 this.datatracksList = response;
                 this.emitDatatracksList();
             },(err:IGnomexErrorResponse) => {
@@ -136,10 +136,11 @@ export class DataTrackService {
     }
 
     refreshDatatracksList_fromBackend(): void {
-        this.startSearchSubject.next(true);
+        this.dialogService.addSpinnerWorkItem();
         this.httpClient.get("/gnomex/GetDataTrackList.gx", {params: this._previousURLParams})
             .pipe(map((resp:any) => { return resp.Organism }))
             .subscribe((response: any) => {
+                this.dialogService.removeSpinnerWorkItem();
                 this.datatracksList = response;
                 this.emitDatatracksList();
             }, (err:IGnomexErrorResponse) =>{

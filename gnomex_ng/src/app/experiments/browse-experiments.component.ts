@@ -130,66 +130,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private setActiveNodeId: string;
     private canDeleteProjectSubscription: Subscription;
 
-
-    ngOnInit() {
-        this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
-        this.treeModel = this.treeComponent.treeModel;
-        this.options = {
-            displayField: "label",
-            childrenField: "items",
-            useVirtualScroll: true,
-            nodeHeight: 22,
-            nodeClass: (node: TreeNode) => {
-                return "icon-" + node.data.icon;
-            },
-            allowDrop: (element, { parent, index }) => {
-                this.dragEndItems = _.cloneDeep(this.items);
-                if (parent.data.labName) {
-                    return false;
-                } else {
-                    return true;
-                }
-            },
-
-            allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && node.isLeaf && node.data.idRequest,
-        };
-
-        this.labListService.getLabList_FromBackEnd();
-        this.labListSubscription =  this.labListService.getLabListSubject().subscribe((response: any[]) => {
-            this.labList = response;
-            this.experimentsService.labList = this.labList;
-        });
-        if (this.createSecurityAdvisorService.isGuest) {
-            this.disableAll = true;
-        }
-
-        this.canDeleteProjectSubscription = this.experimentsService.canDeleteProjectSubject.subscribe((canDelete: boolean) => {
-            setTimeout(() => {
-                this.disableDeleteProject = !canDelete;
-            });
-        });
-
-
-        this.navEndSubscription = this.router.events.pipe(filter(event => event instanceof NavigationEnd))
-            .subscribe((event: NavigationEnd) => {
-                if(this.route.snapshot.firstChild) {
-                    let data = this.route.snapshot.firstChild.data;
-                    if (data.experiment && data.experiment.Request) {
-                        this.selectedExperiment = data.experiment.Request;
-                        if (this.selectedExperiment.canDelete === "Y") {
-                            this.disableDeleteExperiment = false;
-                        } else {
-                            this.disableDeleteExperiment = true;
-                        }
-                    }
-                }
-            });
-
-    }
-
-    ngAfterViewInit() {}
-
-
     constructor(public experimentsService: ExperimentsService,
                 private changeDetectorRef: ChangeDetectorRef,
                 private utilService: UtilService,
@@ -203,6 +143,10 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 private router: Router,
                 public constantsService: ConstantsService) {
 
+    }
+
+
+    ngOnInit() {
         this.items = [];
         this.dragEndItems = [];
         this.labMembers = [];
@@ -248,7 +192,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                         if(node) {
                             this.treeModel.getNodeById(id).setIsActive(true);
                             this.treeModel.getNodeById(id).scrollIntoView();
-                            this.gnomexService.orderInitObj = null;
                         } else {
                             let navArray = ["/experiments",  {outlets: {"browsePanel": [this.gnomexService.orderInitObj.idRequest]}}];
                             this.disableNewProject = true;
@@ -293,7 +236,66 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             }
         });
 
+
+        this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
+        this.treeModel = this.treeComponent.treeModel;
+        this.options = {
+            displayField: "label",
+            childrenField: "items",
+            useVirtualScroll: true,
+            nodeHeight: 22,
+            nodeClass: (node: TreeNode) => {
+                return "icon-" + node.data.icon;
+            },
+            allowDrop: (element, { parent, index }) => {
+                this.dragEndItems = _.cloneDeep(this.items);
+                if (parent.data.labName) {
+                    return false;
+                } else {
+                    return true;
+                }
+            },
+
+            allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && node.isLeaf && node.data.idRequest,
+        };
+
+        this.labListService.getLabList_FromBackEnd();
+        this.labListSubscription =  this.labListService.getLabListSubject().subscribe((response: any[]) => {
+            this.labList = response;
+            this.experimentsService.labList = this.labList;
+        });
+        if (this.createSecurityAdvisorService.isGuest) {
+            this.disableAll = true;
+        }
+
+        this.canDeleteProjectSubscription = this.experimentsService.canDeleteProjectSubject.subscribe((canDelete: boolean) => {
+            setTimeout(() => {
+                this.disableDeleteProject = !canDelete;
+            });
+        });
+
+        // to avoid calling get request multiple times gets the request off of route after it has been resolved.
+        this.navEndSubscription = this.router.events.pipe(filter(event => event instanceof NavigationEnd))
+            .subscribe((event: NavigationEnd) => {
+                if(this.route.snapshot.firstChild) {
+                    let data = this.route.snapshot.firstChild.data;
+                    if (data.experiment && data.experiment.Request) {
+                        this.selectedExperiment = data.experiment.Request;
+                        if (this.selectedExperiment.canDelete === "Y") {
+                            this.disableDeleteExperiment = false;
+                        } else {
+                            this.disableDeleteExperiment = true;
+                        }
+                    }
+                }
+            });
+
     }
+
+    ngAfterViewInit() {}
+
+
+
 
     go(event: any) {
     }

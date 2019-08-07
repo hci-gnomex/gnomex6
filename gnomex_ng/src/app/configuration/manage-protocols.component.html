@@ -29,17 +29,17 @@
                     <div class="full-width flex-container-row">
                         <div>
                             <div>
-                                <button mat-button [disabled]="this.disableNew" (click)="onNewProtocolButtonClicked()"><img src="../../assets/brick_add.png" alt="" /> New Protocol</button>
+                                <button mat-button [disabled]="this.disableNew" (click)="onNewProtocolButtonClicked()"><img [src]="'./assets/brick_add.png'" alt="" /> New Protocol</button>
                             </div>
                             <div>
-                                <button mat-button [disabled]="this.disableDelete" (click)="onDeleteProtocolButtonClicked()"><img *ngIf="!disableDelete" src="../../assets/delete.png" alt="" /><img *ngIf="disableDelete"src="../../assets/delete_disable.png" alt="" /> Delete Protocol</button>
+                                <button mat-button [disabled]="this.disableDelete" (click)="onDeleteProtocolButtonClicked()"><img *ngIf="!disableDelete" [src]="'./assets/delete.png'" alt="" /><img *ngIf="disableDelete"[src]="'./assets/delete_disable.png'" alt="" /> Delete Protocol</button>
                             </div>
                         </div>
                         <div>
                             <div class="full-width full-height t">
                                 <div class="tr">
                                     <div class="td vertical-center">
-                                        <button mat-button (click)="onRefreshButtonClicked()"><img src="../../assets/refresh.png" alt="" /> Refresh</button>
+                                        <button mat-button (click)="onRefreshButtonClicked()"><img [src]="'./assets/refresh.png'" alt="" /> Refresh</button>
                                     </div>
                                 </div>
                             </div>

@@ -19,16 +19,16 @@
                                   [(ngModel)]="memberUser">
                 </custom-combo-box>
                 <button mat-button class="minimize" [disabled]="!memberUser" (click)="addUser('member')">
-                    <img *ngIf="memberUser;else addDisable" src="../../../assets/add.png">
+                    <img *ngIf="memberUser;else addDisable" [src]="'./assets/add.png'">
                 </button>
                 <button mat-button class="minimize" [disabled]="selectedMemberRowIndex<=0" (click)="deleteUser('member')">
-                    <img *ngIf="selectedMemberRowIndex>0;else addDeleteDisable" src="../../../assets/delete.png">
+                    <img *ngIf="selectedMemberRowIndex>0;else addDeleteDisable" [src]="'./assets/delete.png'">
                 </button>
                 <ng-template #addDisable>
-                    <img src="../../../assets/add_disable.png">
+                    <img [src]="'./assets/add_disable.png'">
                 </ng-template>
                 <ng-template #addDeleteDisable>
-                    <img src="../../../assets/delete_disable.png">
+                    <img [src]="'./assets/delete_disable.png'">
                 </ng-template>
             </div>
             <div class="flex-container-col flex-grow">
@@ -56,16 +56,16 @@
                                       [(ngModel)]="collUser">
                     </custom-combo-box>
                     <button mat-button class="minimize" [disabled]="!collUser" (click)="addUser('collaborator')">
-                        <img *ngIf="collUser;else addDisable" src="../../../assets/add.png">
+                        <img *ngIf="collUser;else addDisable" [src]="'./assets/add.png'">
                     </button>
                     <button mat-button class="minimize" [disabled]="selectedCollRowIndex<=0" (click)="deleteUser('collaborator')">
-                        <img *ngIf="selectedCollRowIndex>0;else addDeleteDisable" src="../../../assets/delete.png">
+                        <img *ngIf="selectedCollRowIndex>0;else addDeleteDisable" [src]="'./assets/delete.png'">
                     </button>
                     <ng-template #addDisable>
-                        <img src="../../../assets/add_disable.png">
+                        <img [src]="'./assets/add_disable.png'">
                     </ng-template>
                     <ng-template #addDeleteDisable>
-                        <img src="../../../assets/delete_disable.png">
+                        <img [src]="'./assets/delete_disable.png'">
                     </ng-template>
                 </div>
                 <div class="flex-grow">
@@ -91,13 +91,13 @@
                                       [options]="this.users"
                                       [(ngModel)]="manUser">
                     </custom-combo-box>
-                    <button mat-button class="minimize" [disabled]="!manUser" (click)="addUser('manager')"><img *ngIf="manUser;else addDisable" src="../../../assets/add.png"></button>
-                    <button mat-button class="minimize" [disabled]="selectedManRowIndex<=0" (click)="deleteUser('manager')"><img *ngIf="selectedManRowIndex>0;else addDeleteDisable" src="../../../assets/delete.png"></button>
+                    <button mat-button class="minimize" [disabled]="!manUser" (click)="addUser('manager')"><img *ngIf="manUser;else addDisable" [src]="'./assets/add.png'"></button>
+                    <button mat-button class="minimize" [disabled]="selectedManRowIndex<=0" (click)="deleteUser('manager')"><img *ngIf="selectedManRowIndex>0;else addDeleteDisable" [src]="'./assets/delete.png'"></button>
                     <ng-template #addDisable>
-                        <img src="../../../assets/add_disable.png">
+                        <img [src]="'./assets/add_disable.png'">
                     </ng-template>
                     <ng-template #addDeleteDisable>
-                        <img src="../../../assets/delete_disable.png">
+                        <img [src]="'./assets/delete_disable.png'">
                     </ng-template>
                 </div>
                 <div class="flex-grow">

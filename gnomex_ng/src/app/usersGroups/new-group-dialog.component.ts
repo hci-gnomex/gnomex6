@@ -32,9 +32,9 @@ import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-d
                     <mat-error *ngIf="this.emailFC.hasError('email') && !this.emailFC.hasError('required')">Valid Email Required</mat-error>
                 </mat-form-field>
                 <mat-radio-group class="permission-radio-group" [formControl]="pricingFC">
-                    <mat-radio-button value="INTERNAL"><img src="../../assets/group.png"> Internal</mat-radio-button>
-                    <mat-radio-button value="EXACADEMIC"><img src="../../assets/graduation_cap.png"> External Academic</mat-radio-button>
-                    <mat-radio-button value="EXCOMM"><img src="../../assets/building.png"> External Commercial</mat-radio-button>
+                    <mat-radio-button value="INTERNAL"><img [src]="'./assets/group.png'"> Internal</mat-radio-button>
+                    <mat-radio-button value="EXACADEMIC"><img [src]="'./assets/graduation_cap.png'"> External Academic</mat-radio-button>
+                    <mat-radio-button value="EXCOMM"><img [src]="'./assets/building.png'"> External Commercial</mat-radio-button>
                 </mat-radio-group>
             </div>
         </div>

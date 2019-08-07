@@ -24,11 +24,13 @@ export enum DialogType {
 export class DialogsService {
 
     private _spinnerDialogIsOpen: boolean = false;
+    private spinnerWorkItemCount: number = 0;
+    private checkingSpinnerWorkItems: boolean = false;
 
     public spinnerDialogRefs: MatDialogRef<SpinnerDialogComponent>[] = [];
 
     public get spinnerDialogIsOpen(): boolean {
-        return true && this._spinnerDialogIsOpen;
+        return this._spinnerDialogIsOpen;
     }
 
     constructor(private dialog: MatDialog) { }
@@ -105,10 +107,46 @@ export class DialogsService {
 
     // Let there be an alternative, global way to stop all active spinner dialogs.
     public stopAllSpinnerDialogs(): void {
+        this.spinnerWorkItemCount = 0;
         for (let dialogRef of this.spinnerDialogRefs) {
             setTimeout(() => {
                 dialogRef.close();
             });
+        }
+        this.spinnerDialogRefs = [];
+    }
+
+    public addSpinnerWorkItem(): void {
+        this.spinnerWorkItemCount++;
+        if (!this.checkingSpinnerWorkItems) {
+            this.checkingSpinnerWorkItems = true;
+            setTimeout(() => {
+                this.checkSpinnerWorkItems();
+            });
+        }
+    }
+
+    public removeSpinnerWorkItem(): void {
+        this.spinnerWorkItemCount--;
+        if (this.spinnerWorkItemCount < 0) {
+            this.spinnerWorkItemCount = 0;
+        }
+        if (!this.checkingSpinnerWorkItems) {
+            this.checkingSpinnerWorkItems = true;
+            setTimeout(() => {
+                this.checkSpinnerWorkItems();
+            });
+        }
+    }
+
+    private checkSpinnerWorkItems(): void {
+        this.checkingSpinnerWorkItems = false;
+        if (this.spinnerWorkItemCount) {
+            if (!this._spinnerDialogIsOpen) {
+                this.startDefaultSpinnerDialog();
+            }
+        } else if (this._spinnerDialogIsOpen) {
+            this.stopAllSpinnerDialogs();
         }
     }
 

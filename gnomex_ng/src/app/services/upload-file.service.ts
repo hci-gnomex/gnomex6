@@ -72,7 +72,7 @@ export class UploadFileService {
     }
 
     private getFDTJnlpServlet(params:HttpParams): Observable<any>{
-        return this.httpClient.post("/gnomex/FastDataTransferUploadGetJnlpServlet.gx",null,{responseType: 'blob', params: params});
+        return this.httpClient.get("/gnomex/FastDataTransferUploadGetJnlpServlet.gx", {responseType: 'blob', params: params});
     }
 
 

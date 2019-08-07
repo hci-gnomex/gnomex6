@@ -45,7 +45,6 @@ private static Logger LOG = Logger.getLogger(GNomExFrontController.class);
 
   private static String webContextPath;
   private static Session mailSession;
-  private static boolean GNomExLite;
   private static HashMap xmlHintMap = null;
 
 /**
@@ -57,9 +56,6 @@ private static Logger LOG = Logger.getLogger(GNomExFrontController.class);
 public void init(ServletConfig config) throws ServletException {
 	super.init(config);
 	webContextPath = config.getServletContext().getRealPath(Constants.FILE_SEPARATOR);
-
-	// are we really GNomExLite?
-	GNomExLite = areWeLite();
 
 	// Get the mail session
 	try {
@@ -104,13 +100,6 @@ protected static void initLog4j() {
 		System.err.println("[GNomExFrontController] No configuration file specified for log4j!");
 	}
 	org.apache.log4j.PropertyConfigurator.configure(configFile);
-}
-
-public static boolean areWeLite() {
-	boolean glite = true;
-
-
-	return glite;
 }
 
   /**

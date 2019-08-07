@@ -47,10 +47,10 @@
 													[disabled]="!enableChanges || (gridApi?.getSelectedRows().length === 0 || (changeStatus === null || changeStatus === ''))"
 													(click)="goButtonClicked()">
 												<img *ngIf="gridApi?.getSelectedRows().length !== 0 && (changeStatus && changeStatus !== '')"
-													 src="../../../assets/bullet_go.png"
+													 [src]="'./assets/bullet_go.png'"
 													 alt="" />
 												<img *ngIf="gridApi?.getSelectedRows().length === 0 || (!changeStatus || changeStatus === '')"
-													 src="../../../assets/bullet_go_disable.png"
+													 [src]="'./assets/bullet_go_disable.png'"
 													 alt=""/>
 												Go
 											</button>
@@ -59,8 +59,8 @@
 											<button mat-button
 													[disabled]="!enableChanges || gridApi?.getSelectedRows().length === 0"
 													(click)="deleteButtonClicked()">
-												<img *ngIf="gridApi?.getSelectedRows().length !== 0" src="../../../assets/delete.png" alt="" />
-												<img *ngIf="gridApi?.getSelectedRows().length === 0" src="../../../assets/delete_disable.png" alt=""/>
+												<img *ngIf="gridApi?.getSelectedRows().length !== 0" [src]="'./assets/delete.png'" alt="" />
+												<img *ngIf="gridApi?.getSelectedRows().length === 0" [src]="'./assets/delete_disable.png'" alt=""/>
 												Delete
 											</button>
 										</div>
@@ -68,8 +68,8 @@
 											<button mat-button
 													[disabled]="gridApi?.getSelectedRows().length === 0"
 													(click)="emailButtonClicked()">
-												<img *ngIf="gridApi?.getSelectedRows().length !== 0" src="../../../assets/email_go.png" alt="" />
-												<img *ngIf="gridApi?.getSelectedRows().length === 0" src="../../../assets/email_go_disable.png" alt=""/>
+												<img *ngIf="gridApi?.getSelectedRows().length !== 0" [src]="'./assets/email_go.png'" alt="" />
+												<img *ngIf="gridApi?.getSelectedRows().length === 0" [src]="'./assets/email_go_disable.png'" alt=""/>
 												Email
 											</button>
 										</div>

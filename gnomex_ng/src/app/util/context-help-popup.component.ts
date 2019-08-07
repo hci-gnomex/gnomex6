@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, ViewChild} from '@angular/core';
+import {Component, Inject, OnInit, ViewChild} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {FormControl} from "@angular/forms";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
@@ -11,7 +11,7 @@ import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog"
 import {DictionaryService} from "../services/dictionary.service";
 
 @Component({
-    selector: 'context-help-popup',
+    selector: "context-help-popup",
     template: `
         <div class="flex-container-col full-width full-height double-padded">
             <div class="editor-grid">
@@ -26,7 +26,7 @@ import {DictionaryService} from "../services/dictionary.service";
             </div>
         </div>
         <div class="flex-container-row justify-flex-end generic-dialog-footer-colors">
-            <save-footer *ngIf="this.isEditMode" [icon]="this.constService.ICON_SAVE" (saveClicked)="this.save()" name="Save"></save-footer>
+            <save-footer *ngIf="this.isEditMode" [icon]="this.constService.ICON_SAVE" (saveClicked)="this.save()" name="Save" [showSpinner]="this.showSpinner"></save-footer>
             <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="this.onClose()" name="Close"></save-footer>
         </div>
     `,
@@ -37,22 +37,21 @@ import {DictionaryService} from "../services/dictionary.service";
         :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
             display: none;
         }
-        
     `]
 })
 
 export class ContextHelpPopupComponent extends BaseGenericContainerDialog implements OnInit {
-    public actionType: any = ActionType;
+    @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
 
-    private readonly NO_HELP_TEXT: string = "No help available";
-    public popupTitle: string = "";
-    private dictionary: any;
+    public tooltipControl: FormControl;
+    public actionType: any = ActionType;
     public isEditMode: boolean = false;
     public editorConfig: AngularEditorConfig;
-    public descriptionControl:FormControl;
+    public descriptionControl: FormControl;
+    public popupTitle: string = "";
 
-    @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
-    private tooltipControl: FormControl;
+    private readonly NO_HELP_TEXT: string = "No help available";
+    private readonly dictionary: any;
 
     constructor(@Inject(MAT_DIALOG_DATA) private data: any,
                 private httpClient: HttpClient,
@@ -78,10 +77,9 @@ export class ContextHelpPopupComponent extends BaseGenericContainerDialog implem
         };
 
         this.descriptionControl = new FormControl(this.dictionary && this.dictionary.helpText ? this.dictionary.helpText : this.NO_HELP_TEXT);
-        this.tooltipControl = new FormControl(this.dictionary && this.dictionary.toolTipText ? this.dictionary.toolTipText : '');
+        this.tooltipControl = new FormControl(this.dictionary && this.dictionary.toolTipText ? this.dictionary.toolTipText : "");
 
         if (this.isEditMode) {
-            //this.toolbarSettings = this.DEFAULT_TOOLBAR_SETTINGS;
             this.descriptionControl.enable();
 
         } else {
@@ -91,14 +89,13 @@ export class ContextHelpPopupComponent extends BaseGenericContainerDialog implem
         this.descEditor.editorToolbar.showToolbar = this.isEditMode;
         this.editorConfig.editable = this.isEditMode;
 
-
-
     }
 
 
     public save(): void {
 
         if (this.dictionary) {
+            this.showSpinner = true;
             this.cookieUtilService.formatXSRFCookie();
             let params: HttpParams = new HttpParams()
                 .set("idContextSensitiveHelp", this.dictionary.idContextSensitiveHelp ? this.dictionary.idContextSensitiveHelp : "")
@@ -111,15 +108,17 @@ export class ContextHelpPopupComponent extends BaseGenericContainerDialog implem
                 .set("Content-Type", "application/x-www-form-urlencoded");
             this.httpClient.post("/gnomex/UpdateContextSensitiveHelp.gx", params.toString(), {headers: headers}).subscribe((result: any) => {
                 if (result && result.idContextSensitiveHelp) {
-                    this.dictionaryService.reloadAndRefresh(() =>{
+                    this.dictionaryService.reloadAndRefresh(() => {
                         this.dialogRef.close(true);
-                    },null, DictionaryService.CONTEXT_SENSITIVE_HELP)
+                        this.showSpinner = false;
+                    }, null, DictionaryService.CONTEXT_SENSITIVE_HELP);
 
                 } else {
                     let message: string = "";
                     if (result && result.message) {
                         message = ": " + result.message;
                     }
+                    this.showSpinner = false;
                     this.dialogsService.error("An error occurred while saving the context help" + message);
                 }
             });

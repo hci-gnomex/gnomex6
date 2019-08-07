@@ -1300,7 +1300,7 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
                 }
             }
 
-            node.icon = '../../../assets/group.png';
+            node.icon = './assets/group.png';
 
         } else if (backEndData.idProject
             && !backEndData.codeRequestCategory
@@ -1320,7 +1320,7 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
                 }
             }
 
-            node.icon = '../../../assets/folder.png';
+            node.icon = './assets/folder.png';
 
         } else if (backEndData.idProject
             && backEndData.codeRequestCategory
@@ -1340,7 +1340,7 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
                 }
             }
 
-            node.icon = '../../../assets/basket.png';
+            node.icon = './assets/basket.png';
 
         } else if (backEndData.idRequest
             && (backEndData.label || backEndData.displayName)) {
@@ -1353,7 +1353,7 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
 
             node.destination = "" + backEndData.requestNumber;
 
-            node.icon = '../../../assets/flask.png';
+            node.icon = './assets/flask.png';
 
         } else {
             return;  // This is not a recognized node type. Stop.
@@ -1405,7 +1405,7 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
                 }
             }
 
-            node.icon = '../../../assets/group.png';
+            node.icon = './assets/group.png';
 
         } else if (backEndData.idAnalysisGroup
             && !backEndData.codeRequestCategory
@@ -1425,7 +1425,7 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
                 }
             }
 
-            node.icon = '../../../assets/folder.png';
+            node.icon = './assets/folder.png';
 
         } else if (backEndData.idAnalysis
             && (backEndData.label || (backEndData.number && backEndData.name))) {
@@ -1437,7 +1437,7 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
             }
             node.destination = "" + backEndData.number;
 
-            node.icon = '../../../assets/map.png';
+            node.icon = './assets/map.png';
 
         } else {
             return;  // This is not a recognized node type. Stop.
@@ -1480,7 +1480,7 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
                 node.name = backEndData.name;
             }
 
-            node.icon = '../../../assets/brick.png';
+            node.icon = './assets/brick.png';
 
         } else {
             return;  // This is not a recognized node type. Stop.
@@ -1521,9 +1521,9 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
             }
 
             if (backEndData.isPopulated == 'Y') {
-                node.icon = '../../../assets/organism.png';
+                node.icon = './assets/organism.png';
             } else {
-                node.icon = '../../../assets/organism_faded.png';
+                node.icon = './assets/organism_faded.png';
             }
 
         } // For "GenomeBuild"
@@ -1561,9 +1561,9 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
             }
 
             if (inputChildren && inputChildren.length > 0) {
-                node.icon = '../../../assets/genome_build.png';
+                node.icon = './assets/genome_build.png';
             } else {
-                node.icon = '../../../assets/genome_build_faded.png';
+                node.icon = './assets/genome_build_faded.png';
             }
 
         } // For "DataTrackFolder"
@@ -1601,9 +1601,9 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
             }
 
             if (backEndData.idLab != '') {
-                node.icon = '../../../assets/folder_group.png';
+                node.icon = './assets/folder_group.png';
             } else {
-                node.icon = '../../../assets/folder.png';
+                node.icon = './assets/folder.png';
             }
 
         } else if (backEndData.idDataTrack
@@ -1618,20 +1618,20 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
             node.destination = "" + backEndData.number;
 
             if (backEndData.codeVisibility === 'MEM') {
-                node.icon = '../../../assets/datatrack_member.png';
+                node.icon = './assets/datatrack_member.png';
             } else if (backEndData.codeVisibility === 'MEMCOL') {
-                node.icon = '../../../assets/datatrack_member.png';
+                node.icon = './assets/datatrack_member.png';
             } else if (backEndData.codeVisibility === 'OWNER') {
-                node.icon = '../../../assets/datatrack_owner.png';
+                node.icon = './assets/datatrack_owner.png';
             } else if (backEndData.codeVisibility === 'INST') {
-                node.icon = '../../../assets/datatrack_institution.png';
+                node.icon = './assets/datatrack_institution.png';
             } else {
-                node.icon = '../../../assets/datatrack_world.png';
+                node.icon = './assets/datatrack_world.png';
             }
 
         } else {
             node.name = backEndData.label;
-            node.icon = '../../../assets/datatrack.png';
+            node.icon = './assets/datatrack.png';
 
             if (backEndData.DataTrackFolder) {
                 if (Array.isArray(backEndData.DataTrackFolder)) {
@@ -1707,9 +1707,9 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
             }
 
             if (backEndData.idLab != '') {
-                node.icon = '../../../assets/folder_group.png';
+                node.icon = './assets/folder_group.png';
             } else {
-                node.icon = '../../../assets/folder.png';
+                node.icon = './assets/folder.png';
             }
 
         } // For "LabTopic"
@@ -1724,7 +1724,7 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
 
             node.destination = "T" + backEndData.idTopic;
 
-            node.icon = '../../../assets/topic_tag.png';
+            node.icon = './assets/topic_tag.png';
 
         } else {
             return;
