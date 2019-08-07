@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -377,7 +378,7 @@ public class XMLParser {
 				line= scan.next();
 				String[] aEntries= line.split("\t");
 				PersonEntry entry = new PersonEntry();
-
+				// duplicate code
 				if(importMode.toLowerCase().equals("avatar")) { // avatar
 					entry.setMrn(cleanData(aEntries[0]));
 					entry.setPersonId(cleanData(aEntries[1]));
@@ -410,9 +411,9 @@ public class XMLParser {
 					entry.setFullName(cleanData(aEntries[2]));
 					entry.setGender(cleanData(aEntries[3]));
 					entry.setShadowId(cleanData(aEntries[4]));
-					entry.setSlNumber(cleanData(aEntries[5]));
-					entry.setSampleSubtype(cleanData(aEntries[6]));
-					entry.setTestType(cleanData(aEntries[7]));
+					entry.setTestType(cleanData(aEntries[5]));
+					entry.setSlNumber(cleanData(aEntries[6]));
+					entry.setSampleSubtype(cleanData(aEntries[7]));
 					entry.setTissueType(cleanData(aEntries[8]));
 					entry.setSubmittedDiagnosis(cleanData(aEntries[9]));
 					entry.setCcNumber("");
@@ -689,6 +690,7 @@ public class XMLParser {
 
 	private void outFile(String path,String fileName, List<List<String>> flaggedIDs) {
 		PrintWriter pw = null;
+		Set<String> dupIDSet = new HashSet<>();
 
 		try {
 			pw = new PrintWriter(new FileWriter(path + fileName));
@@ -698,10 +700,13 @@ public class XMLParser {
 				if(slIDs.get(1) != null && !slIDs.get(1).equals("")){
 					// only true for tempus else no split and index 0 will be the original string
 					String sampleID =  importMode.equals("tempus") ?  slIDs.get(1).split("_")[0] : slIDs.get(1);
-					if(i < flaggedIDs.size() - 1) {
-						pw.write(sampleID + "\n");
-					}else {
-						pw.write(sampleID );
+					if(dupIDSet.add(sampleID)) {
+						if (i < flaggedIDs.size() - 1) {
+
+							pw.write(sampleID + "\n");
+						} else {
+							pw.write(sampleID);
+						}
 					}
 				}
 
@@ -718,13 +723,17 @@ public class XMLParser {
 			}
 			pw = new PrintWriter(new FileWriter(path + name));
 
+			dupIDSet.clear();
 
 			for( String experimentID : this.avEntriesMap.keySet()){
 				Map<String, List<PersonEntry>> personInfo = this.avEntriesMap.get(experimentID);
 				for(String sampleName : personInfo.keySet()){
 					if(sampleName != null && !sampleName.equals("")){
 						String sampleID = importMode.equals("tempus") ?  sampleName.split("_")[0] : sampleName;
-						pw.write(sampleID + "\n");
+						if(dupIDSet.add(sampleID)){
+							pw.write(sampleID + "\n");
+						}
+
 					}
 				}
 			}
@@ -748,7 +757,8 @@ public class XMLParser {
 	}
 	public static String appendToPathWithoutName(String fullPathWithFileName, String appendedPath) {
 
-		String[] splitPath = fullPathWithFileName.split("/");
+		String pattern = Pattern.quote(System.getProperty("file.separator"));
+		String[] splitPath = fullPathWithFileName.split(pattern);
 		String filePath = "";
 		int index = -1;
 		for(int i = 0; i < splitPath.length; i++){
@@ -758,15 +768,15 @@ public class XMLParser {
 			}
 		}
 		if(index != -1){ // if found don't need to append Path
-			filePath = String.join("/", Arrays.copyOfRange(splitPath, 0 , index + 1));
+			filePath = String.join(pattern, Arrays.copyOfRange(splitPath, 0 , index + 1));
 		}else{// if not found add another subdirectory to path
 			List<String> paths = Arrays.asList( Arrays.copyOfRange(splitPath, 0,splitPath.length - 1));
 			ArrayList<String> p =  new ArrayList<String>(paths);
 			p.add(appendedPath);
-			filePath = String.join("/", p);
+			filePath = String.join(File.separator, p);
 		}
 
-		return filePath + "/";
+		return filePath + File.separator;
 
 	}
 

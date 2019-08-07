@@ -368,7 +368,6 @@ public class DirectoryBuilder {
 				getMatchingDirName(fileChunks,strBuild,dirMap);
 			}else{
 				strBuild.setLength(0);
-				strBuild.append(currentDownloadLocation);
 				strBuild.append(File.separator);
 				strBuild.append("Flagged");
 				strBuild.append(File.separator);
@@ -513,7 +512,9 @@ public class DirectoryBuilder {
 
 
 		for(String file: files) {
-			String[] pWithf = file.split("/");
+
+			String pattern = Pattern.quote(System.getProperty("file.separator"));
+			String[] pWithf = file.split(pattern);
 
 			strBuild.append("mv -vn");
 			strBuild.append(" *");
