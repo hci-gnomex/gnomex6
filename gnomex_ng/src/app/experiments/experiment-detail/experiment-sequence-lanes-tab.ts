@@ -38,7 +38,7 @@ import {AgGridNg2} from "ag-grid-angular";
                 </as-split-area>
                 <as-split-area [size]="100 - this.sampleGridSplitSize">
                     <div class="flex-container-col full-height padded">
-                        <label>Sequence Lanes (to assign sample to lane, select sample in left-hand grid and lane in right-hand grid and press "Assign to lane"</label>
+                        <label>{{this.label}}</label>
                         <div class="flex-container-row">
                             <button mat-button [disabled]="!editMode || !this.canEdit || !this.selectedSample || this.selectedLanes.length !== 1" (click)="this.assignSampleToLane()">Assign to lane</button>
                             <button mat-button [disabled]="!editMode || !this.canEdit" (click)="this.addSequenceLane()"><img [src]="this.constantsService.ICON_ADD" class="icon">Add sequence lane</button>
@@ -73,6 +73,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
     @Input() editMode: boolean;
 
     public sampleGridSplitSize: number = 0;
+    public label: string = 'Sequence Lanes';
     public canEdit: boolean = false;
     private sampleNameMap: Map<string, string>;
 
@@ -186,7 +187,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
     }
 
     public prepareView(): void {
-        this.sampleGridSplitSize = 25;
+        this.sampleGridSplitSize = 0;
     }
 
     public onSamplesGridReady(event: GridReadyEvent): void {
@@ -205,6 +206,11 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
     }
     
     setEditMode() {
+        this.label = 'Sequence Lanes';
+        if (this.editMode) {
+            this.label += ' (to assign sample to lane, select sample in left-hand grid and lane in right-hand grid and press "Assign to lane"';
+        }
+        this.sampleGridSplitSize = this.editMode ? 25 : 0;
         if (this.lanesGrid.columnApi.getColumn("idNumberSequencingCyclesAllowed")) {
             this.lanesGrid.columnApi.getColumn("idNumberSequencingCyclesAllowed").getColDef().editable = this.canEdit && this.editMode;
         }
