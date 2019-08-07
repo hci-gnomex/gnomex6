@@ -112,7 +112,6 @@ export class CreateProjectComponent extends BaseGenericContainerDialog implement
             if (this.data.idProject) {
                 this.isEditMode = true;
                 this.idProject = this.data.idProject;
-                this.form.get("idLab").disable();
             }
             if (this.data.labList) {
                 this.labList = this.data.labList.sort(this.prefService.createLabDisplaySortFunction());
@@ -122,6 +121,9 @@ export class CreateProjectComponent extends BaseGenericContainerDialog implement
             }
             if (this.data.selectedLabItem) {
                 this.form.get("idLab").setValue(this.data.selectedLabItem);
+            }
+            if(this.data.disableLab) {
+                this.form.get("idLab").disable();
             }
         }
 
