@@ -13,7 +13,7 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
 import {DialogsService, DialogType} from "../popup/dialogs.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {AnalysisService} from "../../services/analysis.service";
-import {IActionMapping, ITreeOptions, TREE_ACTIONS, TreeComponent} from "angular-tree-component";
+import {IActionMapping, ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
 import {ConstantsService} from "../../services/constants.service";
 import {first} from "rxjs/operators";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
@@ -108,8 +108,9 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
         this.uploadOpts = {
             displayField: 'displayName',
+            childrenField: "FileDescriptor",
             idField:'idTreeNode',
-            allowDrag: (node: any) =>{return node.level === 1 && node.data.PROTECTED === 'N'},
+            allowDrag: (node: any) =>{return  node.data.PROTECTED === 'N'},
             allowDrop: (element, item: {parent: any, index}) => {
                 return false;
             },
