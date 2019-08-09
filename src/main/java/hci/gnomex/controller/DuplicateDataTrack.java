@@ -60,8 +60,6 @@ public class DuplicateDataTrack extends GNomExCommand implements Serializable {
    }
    if (request.getParameter("idDataTrackFolder") != null && !request.getParameter("idDataTrackFolder").equals("")) {
      idDataTrackFolder = new Integer(request.getParameter("idDataTrackFolder"));
-   } else {
-     this.addInvalidField("idDataTrackFolder", "idDataTrackFolder is required.");
    }
 
   }
@@ -159,17 +157,6 @@ public class DuplicateDataTrack extends GNomExCommand implements Serializable {
         while (cIt.hasNext()) collaborators.add((AppUser)cIt.next());
         dup.setCollaborators(collaborators);
 
-        //folders - only add to the folder that the source data track was selected from.  in other
-        // words, if the source folder is under more that one folder, we don't want to duplicate
-        // to all of the folders, only the one that the user clicked under.
-        Set<DataTrackFolder>  dataTrackFolders= new TreeSet<DataTrackFolder>(new DataTrackFolderComparator());
-        DataTrackFolder dataTrackFolder = DataTrackFolder.class.cast(sess.load(DataTrackFolder.class, idDataTrackFolder));
-        dataTrackFolders.add(dataTrackFolder);
-        dup.setFolders(dataTrackFolders);
-
-        sess.save(dup);
-        sess.flush();
-
         // Get the dataTrack folder this dataTrack is in.
         DataTrackFolder folder = null;
         if (idDataTrackFolder == null) {
@@ -184,6 +171,16 @@ public class DuplicateDataTrack extends GNomExCommand implements Serializable {
           // Otherwise, find the dataTrack folder passed in as a request parameter.
           folder = DataTrackFolder.class.cast(sess.load(DataTrackFolder.class, idDataTrackFolder));
         }
+
+        //folders - only add to the folder that the source data track was selected from.  in other
+        // words, if the source folder is under more that one folder, we don't want to duplicate
+        // to all of the folders, only the one that the user clicked under.
+        Set<DataTrackFolder>  dataTrackFolders= new TreeSet<DataTrackFolder>(new DataTrackFolderComparator());
+        dataTrackFolders.add(folder);
+        dup.setFolders(dataTrackFolders);
+
+        sess.save(dup);
+        sess.flush();
 
         // Add the dataTrack to the  folder
         Set<DataTrack> newDataTracks = new TreeSet<DataTrack>(new DataTrackComparator());

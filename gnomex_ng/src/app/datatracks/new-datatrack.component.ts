@@ -41,7 +41,6 @@ import {GDAction} from "../util/interfaces/generic-dialog-action.model";
 export class NewDataTrackComponent extends BaseGenericContainerDialog implements OnInit {
     private selectedItem: ITreeNode;
 
-    public folder: string = "";
     public form: FormGroup;
     public visibilityList: any[] = [];
     public labList: any[] = [];
@@ -67,7 +66,6 @@ export class NewDataTrackComponent extends BaseGenericContainerDialog implements
         });
 
         this.selectedItem = this.data.selectedItem;
-        this.folder = this.selectedItem.data.label;
         this.labListService.getSubmitRequestLabList().subscribe((response: any[]) => {
             this.labList = response.sort(this.prefService.createLabDisplaySortFunction());
         });
