@@ -19,6 +19,7 @@ import {Router} from "@angular/router";
 import {DictionaryService} from "../../services/dictionary.service";
 import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
 import {ActionType} from "../interfaces/generic-dialog-action.model";
+import {UtilService} from "../../services/util.service";
 
 const DATATRACK = "DATATRACK";
 const GENOMEBUILD = "GENOMEBUILD";
@@ -115,7 +116,14 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     }
 
     public makeNewDataTrack(): void {
-        let title: string = "Add new data track to " + this.selectedNode.data.label;
+        let title: string = "Add new data track to ";
+        if(this.selectedNode.data.isDataTrack) {
+            title += this.selectedNode.parent.data.label;
+        } else {
+            title += this.selectedNode.data.label;
+        }
+        title = UtilService.getSubStr(title, 65);
+
         let config: MatDialogConfig = new MatDialogConfig();
         config.width = "40em";
         config.height = "23em";
@@ -134,7 +142,14 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     }
 
     public makeNewFolder(): void {
-        let title = "Add new data track folder to " + this.selectedNode.data.label;
+        let title: string = "Add new data track folder to ";
+        if(this.selectedNode.data.isDataTrack) {
+            title += this.selectedNode.parent.data.label;
+        } else {
+            title += this.selectedNode.data.label;
+        }
+        title = UtilService.getSubStr(title, 65);
+
         let config: MatDialogConfig = new MatDialogConfig();
         config.width = "40em";
         config.height = "18em";
@@ -161,7 +176,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
 
         this.dataTrackService.duplicateDataTrack(params).subscribe((response: any) => {
             this.dialogsService.removeSpinnerWorkItem();
-            this.dataTrackService.refreshDatatracksList_fromBackend();
+            this.onDataTrackCreated.emit(response.idDataTrack);
         }, (err:IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
         });
@@ -264,15 +279,15 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                 }
             }
 
-            this.dialogsService
-                .confirm(confirmString, level)
-                .subscribe(
-                    res => {
+            if(confirmString) {
+                this.dialogsService.confirm(confirmString, level).subscribe(res => {
                         if (res) {
                             this.deleteDataTrack(type, params);
                         }
-                    }
-                );
+                    });
+            } else {
+                this.dialogsService.alert(level, "Warning", DialogType.WARNING);
+            }
         }
     }
 

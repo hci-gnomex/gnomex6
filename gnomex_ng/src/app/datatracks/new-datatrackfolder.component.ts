@@ -33,7 +33,6 @@ import {GDAction} from "../util/interfaces/generic-dialog-action.model";
 
 export class NewDataTrackFolderComponent extends BaseGenericContainerDialog implements OnInit {
 
-    public label: string = "";
     public form: FormGroup;
     public labList: any[] = [];
     public primaryDisable: (action?: GDAction) => boolean;
@@ -53,7 +52,6 @@ export class NewDataTrackFolderComponent extends BaseGenericContainerDialog impl
 
     ngOnInit(): void {
         this.selectedItem = this.data.selectedItem;
-        this.label = this.selectedItem.data.label;
         this.form = this.formBuilder.group({
             name: ["", [Validators.required, Validators.maxLength(2000)]],
             idLab: ["", Validators.required],
