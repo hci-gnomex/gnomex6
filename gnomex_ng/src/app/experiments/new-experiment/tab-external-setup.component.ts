@@ -14,7 +14,7 @@ import {CreateProjectComponent} from "../create-project.component";
 import {AppUserListService} from "../../services/app-user-list.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {Experiment} from "../../util/models/experiment.model";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 @Component({
@@ -35,10 +35,10 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                                     [formControl]="this.form.get('project')">
                 </custom-combo-box>
                 <div>
-                    <button mat-button [disabled]="!this.form.get('project').value" (click)="this.editProject()">Edit</button>
+                    <button mat-button class="link-button minimize" [disabled]="!this.form.get('project').value" (click)="this.editProject()">Edit</button>
                 </div>
                 <div>
-                    <button mat-button (click)="this.newProject()">New</button>
+                    <button mat-button class="link-button minimize" (click)="this.newProject()">New</button>
                 </div>
             </div>
             <div class="flex-container-row full-width align-center">
@@ -105,7 +105,7 @@ export class TabExternalSetupComponent implements OnInit, OnChanges, OnDestroy {
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private labListService: LabListService,
                 private getLabService: GetLabService,
-                private prefService: UserPreferencesService,
+                public prefService: UserPreferencesService,
                 private topicService: TopicService,
                 private organismService: OrganismService,
                 private dictionaryService: DictionaryService,
@@ -242,6 +242,7 @@ export class TabExternalSetupComponent implements OnInit, OnChanges, OnDestroy {
         config.autoFocus = false;
         config.data = {
             idProject: this.form.get("project").value.idProject,
+            disableLab: true
         };
 
         this.dialogsService.genericDialogContainer(CreateProjectComponent, "Edit Project", this.constantsService.ICON_FOLDER_ADD, config,
@@ -256,19 +257,28 @@ export class TabExternalSetupComponent implements OnInit, OnChanges, OnDestroy {
     }
 
     public newProject(): void {
+        if(!this.form.get("appUser").value) {
+            this.dialogsService.alert("Please select the user submitting the request", null, DialogType.ALERT);
+            return;
+        }
+
         let config: MatDialogConfig = new MatDialogConfig();
         config.width = "45em";
         config.autoFocus = false;
-        config.data = {};
+        config.data = {
+            labList:            this.labList,
+            selectedLabItem:    this.form.get("lab").value.idLab,
+            disableLab: true
+        };
 
         this.dialogsService.genericDialogContainer(CreateProjectComponent, "New Project", this.constantsService.ICON_FOLDER_ADD, config,
             {actions: [
                     {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
                 ]}).subscribe((result: any) => {
-            if(result) {
-                this.getLabProjects(result);
-            }
+                    if(result) {
+                        this.getLabProjects(result);
+                    }
         });
     }
 

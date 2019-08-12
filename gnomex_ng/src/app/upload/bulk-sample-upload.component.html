@@ -2,7 +2,7 @@
     <div class="full-width flex-grow padded no-margin no-max-height background">
         <div class="full-height full-width">
             <div #oneEmWidth class="no-height single-em"></div>
-            <div *ngIf="!fileParsed" class="full-height full-width flex-container-row align-center">
+            <div *ngIf="!fileParsed && !fatalErrorsEncountered" class="full-height full-width flex-container-row align-center">
                 <div class="full-height flex-grow">
                 </div>
                 <div>
@@ -12,7 +12,28 @@
                 <div class="full-height flex-grow">
                 </div>
             </div>
-            <div *ngIf="fileParsed && !fileUploaded" class="full-height full-width">
+            <div *ngIf="!fileParsed && fatalErrorsEncountered" class="full-height full-width">
+                <div class="full-width full-height flex-container-col">
+                    <div class="full-width flex-container-row align-center">
+                        <div class="flex-grow">
+                            Fatal errors detected
+                        </div>
+                    </div>
+                    <div class="full-width flex-grow padded-top">
+                        <ag-grid-angular
+                                class="ag-theme-fresh small-font full-width full-height"
+                                [context]="context"
+                                [singleClickEdit]="true"
+                                [enableSorting]="true"
+                                [enableColResize]="true"
+                                [rowSelection]="'single'"
+                                (gridSizeChanged)="onGridSizeChanged($event)"
+                                (gridReady)="onFatalErrorGridReady($event)">
+                        </ag-grid-angular>
+                    </div>
+                </div>
+            </div>
+            <div *ngIf="!fatalErrorsEncountered && fileParsed && !fileUploaded" class="full-height full-width">
                 <div *ngIf="!showErrorsAndSamplesScreen" class="full-height full-width flex-container-col">
                     <div class="full-width flex-container-row align-center">
                         <div class="flex-grow">
@@ -152,7 +173,7 @@
                     </div>
                 </div>
             </div>
-            <div *ngIf="fileParsed && fileUploaded" class="full-height full-width flex-container-col">
+            <div *ngIf="!fatalErrorsEncountered && fileParsed && fileUploaded" class="full-height full-width flex-container-col">
                 <div class="full-width padded">
                     Import Results
                 </div>
@@ -195,14 +216,14 @@
         </div>
     </div>
     <div class="flex-container-row no-padding no-margin justify-flex-end generic-dialog-footer-colors">
-        <div *ngIf="!fileParsed">
+        <div *ngIf="!fileParsed" class="flex-container-row">
             <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="closeButton()" name="Close"></save-footer>
         </div>
-        <div *ngIf="fileParsed && !fileUploaded">
+        <div *ngIf="!fatalErrorsEncountered && fileParsed && !fileUploaded" class="flex-container-row">
             <save-footer (saveClicked)="importSamplesButton()" name="Import Samples"></save-footer>
             <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="closeButton()" name="Close"></save-footer>
         </div>
-        <div *ngIf="fileParsed && fileUploaded">
+        <div *ngIf="!fatalErrorsEncountered && fileParsed && fileUploaded" class="flex-container-row">
             <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="closeButton()" name="Close"></save-footer>
         </div>
     </div>

@@ -33,8 +33,7 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
             width: 40em;
             min-width: 20em;
         }
-        .moderate-height {
-            height: 95%;
+        .min-height {
             min-height: 20em;
         }
         .double-padded-top-bottom {

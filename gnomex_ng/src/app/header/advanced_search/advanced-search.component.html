@@ -171,9 +171,9 @@
                                            [options]="treeOptions"
                                            (activate)="treeOnSelect($event)">
                                     <ng-template #treeNodeTemplate let-node let-index="index">
-                                        <div style="display: table-cell; vertical-align: middle;">
-                                            <img src="{{node.data.icon}}" alt="" height="16" width="16">
-                                            <span style="padding-top: 0.2em; padding-left: 0.3em;">{{ node.data.name }}</span>
+                                        <div style="display: table-cell; vertical-align: middle;" class="tree-node-font">
+                                            <img src="{{node.data.icon}}" alt="" class="tree-node-icon icon">
+                                            <span style="padding-top: 0.2em;">{{ node.data.name }}</span>
                                         </div>
                                     </ng-template>
                                     <ng-template #loadingTemplate></ng-template>

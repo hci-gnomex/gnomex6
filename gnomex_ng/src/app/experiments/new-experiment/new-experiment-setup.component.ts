@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, Output, ViewChild} from "@angular/core";
+import {Component, EventEmitter, Input, OnDestroy, Output} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {MatDialog, MatDialogConfig} from "@angular/material";
 
@@ -12,7 +12,7 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
 import {HttpParams} from "@angular/common/http";
 import {BillingService} from "../../services/billing.service";
 import {DictionaryService} from "../../services/dictionary.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {WorkAuthorizationTypeSelectorDialogComponent} from "../../products/work-authorization-type-selector-dialog.component";
 
 import {Experiment} from "../../util/models/experiment.model";
@@ -20,6 +20,9 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
 import {ExperimentsService} from "../experiments.service";
 import {PropertyService} from "../../services/property.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {CreateProjectComponent} from "../create-project.component";
+import {ConstantsService} from "../../services/constants.service";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "new-experiment-setup",
@@ -300,7 +303,8 @@ export class NewExperimentSetupComponent implements OnDestroy {
                 private gnomexService: GnomexService,
                 private newExperimentService: NewExperimentService,
                 private propertyService: PropertyService,
-                public prefService: UserPreferencesService) {
+                public prefService: UserPreferencesService,
+                private constService: ConstantsService) {
 
         this.form = this.formBuilder.group({
             selectedCategory: ['', Validators.required],
@@ -621,7 +625,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
 
         this._experiment.idProject          = this.form.get("selectProject").value.idProject;
         this._experiment.project            = this.form.get("selectProject").value;
-        this._experiment.projectName        = this.form.get("selectProject").value.display;
+        this._experiment.projectName        = this.form.get("selectProject").value.name;
         this._experiment.projectDescription = this.form.get("selectProject").value.description;
     }
 
@@ -663,11 +667,69 @@ export class NewExperimentSetupComponent implements OnDestroy {
     }
 
     public onClickEditProject(): void {
-        //TODO: create dialog
+        if(this.form.get("selectLab").value && this.form.get("selectProject").value) {
+            let config: MatDialogConfig = new MatDialogConfig();
+            config.width = "45em";
+            config.autoFocus = false;
+            config.data = {
+                idProject:          this.form.get("selectProject").value.idProject,
+                disableLab:         true
+            };
+
+            this.dialogService.genericDialogContainer(CreateProjectComponent, "Edit Project", this.constService.ICON_FOLDER_ADD, config,
+                {actions: [
+                        {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "save"},
+                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                    ]}).subscribe((result: any) => {
+                        if(result) {
+                            this.getLabProjects(result);
+                        }
+            });
+        }
     }
 
     public onClickNewProject(): void {
-        //TODO: create dialog
+        if(!this.form.get("selectLab").value || !this.form.get("selectName").value) {
+            this.dialogService.alert("Please select the user submitting the request", null, DialogType.ALERT);
+            return;
+        }
+
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "45em";
+        config.autoFocus = false;
+        config.data = {
+            labList:            this.labList,
+            selectedLabItem:    this.form.get("selectLab").value.idLab,
+            disableLab: true
+        };
+
+        this.dialogService.genericDialogContainer(CreateProjectComponent, "New Project", this.constService.ICON_FOLDER_ADD, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.getLabProjects(result);
+                    }
+        });
+
+    }
+
+    private getLabProjects(idProjectToSelect: string): void {
+        this.getLabService.getLabProjects(this.form.get("selectLab").value.idLab).subscribe((result: any[]) => {
+            this.filteredProjectList = result.sort(this.prefService.createDisplaySortFunction("name"));
+            let project = this.filteredProjectList.filter(project => project.idProject === idProjectToSelect);
+            if (project.length === 1) {
+                this.project = project[0];
+                setTimeout(() => {
+                    this.form.get("selectProject").setValue(this.project);
+                    this.onProjectSelection(this.project);
+                });
+            } else {
+                this.dialogService.error("An error occurred while getting lab projects.");
+            }
+        }, (err: IGnomexErrorResponse) => {
+        });
     }
 
     private static sortRequestCategory(obj1: any, obj2: any): number {

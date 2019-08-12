@@ -21,8 +21,10 @@
                     <div class="height-eighty">
                         <tree-root #tree [nodes]="this.billingItemsTreeNodes" [options]="this.billingItemsTreeOptions" (activate)="this.onBillingItemsTreeActivate($event)">
                             <ng-template #treeNodeTemplate  let-node>
-                                <img src="{{node?.data?.icon}}" class="icon">
-                                <span>{{ node?.data?.display }}</span>
+                                <div class="tree-node-font">
+                                    <img src="{{node?.data?.icon}}" class="icon tree-node-icon">
+                                    <span>{{ node?.data?.display }}</span>
+                                </div>
                             </ng-template>
                         </tree-root>
                     </div>

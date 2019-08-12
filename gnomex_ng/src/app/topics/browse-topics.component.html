@@ -18,8 +18,8 @@
                                                (moveNode)="onMoveNode($event)"
                                                (activate)="treeOnSelect($event)">
                                         <ng-template #treeNodeTemplate let-node let-index="index">
-                                            <div class="full-width no-word-wrap">
-                                                <img *ngIf="node.data.icon" src="{{node.data.icon}}" alt="" height="16" width="16">
+                                            <div class="full-width no-word-wrap tree-node-font">
+                                                <img *ngIf="node.data.icon" src="{{node.data.icon}}" alt="" class="tree-node-icon icon">
                                                 <span>{{ node.data.label }}</span>
                                             </div>
                                         </ng-template>
@@ -163,8 +163,10 @@
                                                                        (moveNode)="onMoveExperimentNode($event)"
                                                                        (updateData)="treeUpdateData($event)">
                                                                 <ng-template #treeNodeTemplate let-node let-index="index">
-                                                                    <img src="{{node.data.icon}}" height="16" width="16">
-                                                                    <span>{{ node.data.label }}</span>
+                                                                    <div class="tree-node-font">
+                                                                        <img src="{{node.data.icon}}" class="tree-node-icon icon">
+                                                                        <span>{{ node.data.label }}</span>
+                                                                    </div>
                                                                 </ng-template>
                                                                 <ng-template #loadingTemplate></ng-template>
                                                             </tree-root>
@@ -179,8 +181,10 @@
                                                                        [options]="analysisOptions"
                                                                        (activate)="analTreeOnSelect($event)">
                                                                 <ng-template #treeNodeTemplate let-node let-index="index">
-                                                                    <img src="{{node.data.icon}}" height="16" width="16">
-                                                                    <span>{{ node.data.label }}</span>
+                                                                    <div class="tree-node-font">
+                                                                        <img src="{{node.data.icon}}" class="tree-node-icon icon">
+                                                                        <span>{{ node.data.label }}</span>
+                                                                    </div>
                                                                 </ng-template>
                                                                 <ng-template #loadingTemplate></ng-template>
                                                             </tree-root>
@@ -195,8 +199,10 @@
                                                                        [options]="datatrackOptions"
                                                                        (activate)="dTTreeOnSelect($event)">
                                                                 <ng-template #treeNodeTemplate let-node let-index="index">
-                                                                    <img src="{{node.data.icon}}" height="16" width="16">
-                                                                    <span>{{ node.data.label }}</span>
+                                                                    <div class="tree-node-font">
+                                                                        <img src="{{node.data.icon}}" class="tree-node-icon icon">
+                                                                        <span>{{ node.data.label }}</span>
+                                                                    </div>
                                                                 </ng-template>
                                                                 <ng-template #loadingTemplate></ng-template>
                                                             </tree-root>
