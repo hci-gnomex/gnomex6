@@ -44,8 +44,8 @@
                                            (changeFilter)="treeChangeFilter($event)"
                                            (updateData)="treeUpdateData($event)">
                                     <ng-template #treeNodeTemplate let-node let-index="index">
-                                        <div class="full-width no-word-wrap">
-                                            <img src="{{node.data.icon}}" height="16" width="16">
+                                        <div class="full-width no-word-wrap tree-node-font">
+                                            <img src="{{node.data.icon}}" class="tree-node-icon icon">
                                             <span>{{ node.data.label }}</span>
                                         </div>
                                     </ng-template>

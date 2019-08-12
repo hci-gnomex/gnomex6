@@ -19,8 +19,8 @@
                             <tree-root (activate)="onTreeSelected($event)"
                                        [nodes]="itemList" [options]="options">
                                 <ng-template #treeNodeTemplate let-node let-index="index">
-                                    <div class="truncate">
-                                        <img src="{{node.level === 3 ? this.constService.ICON_GREEN_BULLET : node.data.icon }}" height="16" width="16">
+                                    <div class="truncate tree-node-font">
+                                        <img src="{{node.level === 3 ? this.constService.ICON_GREEN_BULLET : node.data.icon }}" class="tree-node-icon icon">
                                         <span [matTooltip]="node.data.label" >{{ node.data.label }}</span>
                                     </div>
 
