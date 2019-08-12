@@ -24,6 +24,7 @@ import {NameFileDialogComponent} from "./name-file-dialog.component";
 import {FileService} from "../../services/file.service";
 import {IFileParams} from "../interfaces/file-params.model";
 import {ActionType} from "../interfaces/generic-dialog-action.model";
+import {UtilService} from "../../services/util.service";
 
 const actionMapping: IActionMapping = {
     mouse: {
@@ -164,7 +165,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                         let analysisDownloadList = respList[1].Analysis;
 
                         if(analysis && analysisDownloadList){
-                            this.uploadFiles = this.getAnalysisUploadFiles(analysis.ExpandedAnalysisFileList.AnalysisUpload);
+                            this.uploadFiles = this.fileService.getUploadFiles(analysis.ExpandedAnalysisFileList.AnalysisUpload);
                             this.organizeFiles = [analysisDownloadList];
                             this.fileService.emitUpdateFileTab(this.organizeFiles);
                         }
@@ -206,6 +207,21 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     ngAfterViewInit() {
     }
 
+    prepUploadData(files:any[] ):void{
+
+        for(let file of  files){
+            if(file.FileDescriptor){
+                file.FileDescriptor = UtilService.getJsonArray(file.FileDescriptor ,file.FileDescriptor);
+                this.prepUploadData(file.FileDescriptor)
+            }
+
+
+        }
+
+
+    }
+
+
     initOrganizeTree(event){
         event.treeModel.expandAll();
     }
@@ -218,7 +234,9 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
     getAnalysisUploadFiles(analysisUpload:any):any[]{
         if(analysisUpload && analysisUpload.FileDescriptor){
-            return Array.isArray(analysisUpload.FileDescriptor) ? analysisUpload.FileDescriptor : [analysisUpload.FileDescriptor];
+            analysisUpload.FileDescriptor = UtilService.getJsonArray(analysisUpload.FileDescriptor, analysisUpload.FileDescriptor);
+            this.prepUploadData(analysisUpload.FileDescriptor);
+            return analysisUpload.FileDescriptor;
         }
         return [];
     }
