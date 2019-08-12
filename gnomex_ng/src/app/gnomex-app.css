@@ -206,6 +206,10 @@ div.mainnav {
     height: 100%;
 }
 
+.tree-node-font {
+    font-size: small;
+}
+
 .login-background {
     background-color: #ececd9
 }
@@ -290,6 +294,11 @@ div.mainnav {
 
 img.icon {
     margin-right: 0.5em;
+}
+
+img.tree-node-icon {
+    width: 16px;
+    height: 16px;
 }
 
 .ellipsis {

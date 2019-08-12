@@ -31,8 +31,10 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
                                        [nodes]="this.availableFilesNodes"
                                        [options]="this.filesOptions">
                                 <ng-template #treeNodeTemplate let-node>
-                                    <img src="{{node.data.icon}}" class="icon">
-                                    <span>{{node.data.displayName}}</span>
+                                    <div class="tree-node-font">
+                                        <img src="{{node.data.icon}}" class="icon tree-node-icon">
+                                        <span>{{node.data.displayName}}</span>
+                                    </div>
                                 </ng-template>
                             </tree-root>
                         </as-split-area>
@@ -42,8 +44,10 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
                                        [nodes]="this.filesToDownloadNodes"
                                        [options]="this.filesOptions">
                                 <ng-template #treeNodeTemplate let-node>
-                                    <img src="{{node.data.icon}}" class="icon">
-                                    <span>{{node.data.displayName}}</span>
+                                    <div class="tree-node-font">
+                                        <img src="{{node.data.icon}}" class="icon tree-node-icon">
+                                        <span>{{node.data.displayName}}</span>
+                                    </div>
                                 </ng-template>
                             </tree-root>
                         </as-split-area>

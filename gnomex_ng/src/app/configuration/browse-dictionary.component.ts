@@ -49,8 +49,10 @@ import {GDAction} from "../util/interfaces/generic-dialog-action.model";
                                [nodes]="this.dictionaries"
                                [options]="this.treeOptions">
                         <ng-template #treeNodeTemplate let-node>
-                            <img src="{{node.data.icon}}" class="button-image icon">
-                            <span>{{node.data.display}}</span>
+                            <div class="tree-node-font">
+                                <img src="{{node.data.icon}}" class="tree-node-icon icon">
+                                <span>{{node.data.display}}</span>
+                            </div>
                         </ng-template>
                     </tree-root>
                 </div>

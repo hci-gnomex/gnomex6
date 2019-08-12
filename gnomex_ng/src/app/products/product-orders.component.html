@@ -35,8 +35,10 @@
         <div class="full-height flex-one border">
             <tree-root #tree [nodes]="this.productOrderList" [options]="this.treeOptions" (activate)="this.onTreeActivate($event)">
                 <ng-template #treeNodeTemplate  let-node>
-                    <img src="{{node?.data?.icon}}" class="icon">
-                    <span>{{ node?.data?.display }}</span>
+                    <div class="tree-node-font">
+                        <img src="{{node?.data?.icon}}" class="icon tree-node-icon">
+                        <span>{{ node?.data?.display }}</span>
+                    </div>
                 </ng-template>
             </tree-root>
         </div>
