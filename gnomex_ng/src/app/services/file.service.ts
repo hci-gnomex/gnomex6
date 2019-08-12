@@ -10,6 +10,7 @@ import {AnalysisService} from "./analysis.service";
 import {DOCUMENT} from "@angular/common";
 import {Form, FormGroup} from "@angular/forms";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {UtilService} from "./util.service";
 
 @Injectable()
 export class FileService {
@@ -182,6 +183,27 @@ export class FileService {
         this.organizeFilesSubject.next(params);
     }
 
+    prepUploadData(files:any[] ):void{
+        for(let file of  files){
+            if(file.FileDescriptor){
+                file.FileDescriptor = UtilService.getJsonArray(file.FileDescriptor ,file.FileDescriptor);
+                this.prepUploadData(file.FileDescriptor)
+            }
+
+
+        }
+    }
+
+    getUploadFiles(uploadData:any):any[]{
+        if(uploadData && uploadData.FileDescriptor){
+            uploadData.FileDescriptor = UtilService.getJsonArray(uploadData.FileDescriptor, uploadData.FileDescriptor);
+            this.prepUploadData(uploadData.FileDescriptor);
+            return uploadData.FileDescriptor;
+        }
+        return [];
+    }
+
+
     getRequestOrganizeFilesObservable(): Observable<any>{
         return this.organizeFilesSubject.pipe( flatMap((params:any) => {
                 let requestList:Observable<any>[] = [];
@@ -205,7 +227,8 @@ export class FileService {
                         if(resp[0] && resp[0].Request){
                             if(resp[0].Request.RequestUpload && resp[0].Request.RequestUpload.FileDescriptor){
                                 let reqUpload = resp[0].Request.RequestUpload;
-                                resp[0] = Array.isArray(reqUpload.FileDescriptor) ? reqUpload.FileDescriptor : [reqUpload.FileDescriptor];
+                                this.getUploadFiles(reqUpload);
+                                resp[0] = reqUpload.FileDescriptor;
                             }else{
                                 resp[0] = [];
                             }
