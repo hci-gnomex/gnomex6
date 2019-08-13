@@ -41,20 +41,30 @@ import {filter, first} from "rxjs/operators";
         .t  { display: table;      }
         .tr { display: table-row;  }
         .td { display: table-cell; }
+        
         .padded { padding: 0.3em; }
+        
         .left-right-padded {
             padding-left:  0.3em;
             padding-right: 0.3em;
         }
+        
         .major-left-right-padded {
             padding-left: 1em;
             padding-right: 0.3em;
         }
+        
         .no-word-wrap { white-space: nowrap; }
         .no-overflow  { overflow: hidden;    }
+        
         .foreground { background-color: white;   }
         .background { background-color: #EEEEEE; }
-        .vertical-spacer { height: 0.3em; }
+
+        .vertical-spacer {
+            height: 0.3em;
+            min-height: 0.3em;
+        }
+        
         .border { border: #C8C8C8 solid thin; }
         .major-border {
             border-radius: 0.3em;
@@ -72,6 +82,7 @@ import {filter, first} from "rxjs/operators";
         .background-lightyellow {
             background-color: lightyellow;
         }
+
     `]
 })
 
