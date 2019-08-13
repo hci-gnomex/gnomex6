@@ -61,7 +61,7 @@ export class DownloadProgressComponent extends BaseGenericContainerDialog implem
                         saveAs(event.body, this.filename);
                 }
             });
-            this.innerTitle = "Downloading " + UtilService.getSubStr(this.filename, 30);
+            this.innerTitle = "Downloading " + UtilService.getSubStr(this.filename, 35);
         }
     }
 
