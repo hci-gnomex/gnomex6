@@ -1,5 +1,5 @@
-<div class="background background-border full-width full-height flex-container-col padding overflow-auto">
-    <div class="full-height flex-container-col foreground overflow-auto">
+<div class="background background-border full-width full-height flex-container-col padding">
+    <div class="full-height flex-container-col foreground">
         <div class="full-width">
             <browse-filter [label]="'Experiments'"
                            [iconSource]="'assets/flask.png'"
@@ -11,7 +11,7 @@
             <as-split>
                 <as-split-area size="20">
                     <div class="full-height flex-grow border"> <!-- start tree container -->
-                        <div class="full-height flex-container-col foreground" style="max-height: 100%;">
+                        <div class="full-height flex-container-col foreground">
                             <div class="full-width padding">
                                 <div *ngIf="showDragDropHint" class="full-width padded">
                                     <div class="background-lightyellow allow-line-breaks padded">{{this.DRAG_DROP_HINT}}
