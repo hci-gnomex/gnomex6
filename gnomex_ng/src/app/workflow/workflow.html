@@ -3,7 +3,7 @@
         <mat-tab-group id="groupTabGroup"  [selectedIndex]="selectedTab" (selectedTabChange)="onGroupsTabChange($event)">
             <mat-tab>
                 <ng-template mat-tab-label>
-                    <img matTooltip="QC Worklist" src="../../assets/data-accept.png">
+                    <img matTooltip="QC Worklist" [src]="'./assets/data-accept.png'">
                 </ng-template>
                 <div class="flex-container-col">
                     <mat-label>QC Worklist</mat-label>
