@@ -181,7 +181,7 @@ public class FastDataTransferDownloadAnalysisServlet extends HttpServlet {
               
               // Write file with info for the TransferLoggerMain daemon
               theFileTransferLogFile = "fdtDownloadTransferLog_" + uuid.toString();
-              UploadDownloadHelper.writeDownloadInfoFile(softlinks_dir, emailAddress, secAdvisor, (HttpServletWrappedRequest) req, theidRequest, theidLab,theidAnalysis, theFileTransferLogFile);
+              UploadDownloadHelper.writeDownloadInfoFile(softlinks_dir, emailAddress, secAdvisor, req, theidRequest, theidLab,theidAnalysis, theFileTransferLogFile);
               
               // change ownership to HCI_fdt user
               String fdtUser = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.FDT_USER);
