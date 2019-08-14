@@ -176,7 +176,8 @@ export class CreateProjectComponent extends BaseGenericContainerDialog implement
         this.project.name = this.form.get("name").value;
         this.project.description = this.form.get("description").value;
         let params: HttpParams = new HttpParams()
-            .set("projectXMLString", JSON.stringify(this.project))
+            .set("projectJSONString", JSON.stringify(this.project))
+            .set("noJSONToXMLConversionNeeded", "Y")
             .set("parseEntries", "Y");
         this.experimentsService.saveProject(params).pipe(first()).subscribe((response: any) => {
             this.dialogsService.stopAllSpinnerDialogs();
