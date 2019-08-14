@@ -72,7 +72,10 @@ const actionMapping: IActionMapping = {
         .foreground { background-color: white;   }
         .background { background-color: #EEEEEE; }
 
-        .vertical-spacer { height: 0.3em; }
+        .vertical-spacer {
+            height: 0.3em;
+            min-height: 0.3em;
+        }
 
         .border { border: #C8C8C8 solid thin; }
         .major-border {

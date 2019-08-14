@@ -50,7 +50,10 @@ const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
         .vertical-center { vertical-align: middle; }
         .horizontal-center { text-align: center; }
 
-        .vertical-spacer { height: 0.3em; }
+        .vertical-spacer { 
+            height: 0.3em;
+            min-height: 0.3em;
+        }
 
 
         .padding { padding: 0.3em; }
@@ -83,6 +86,7 @@ const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
         .background-lightyellow {
             background-color: lightyellow;
         }
+        
     `]
 })
 

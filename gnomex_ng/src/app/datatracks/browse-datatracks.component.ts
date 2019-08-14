@@ -43,7 +43,10 @@ import {HttpParams} from "@angular/common/http";
             padding-right: 1em;
         }
 
-        .vertical-spacer { height: 0.3em; }
+        .vertical-spacer { 
+            height: 0.3em;
+            min-height: 0.3em;
+        }
 
         .foreground { background-color: white;   }
         .background { background-color: #EEEEEE; }
@@ -60,7 +63,7 @@ import {HttpParams} from "@angular/common/http";
         .no-overflow { overflow: hidden; }
 
         .no-word-wrap { white-space: nowrap; }
-
+        
     `]
 })
 

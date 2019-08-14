@@ -31,7 +31,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="full-width flex-grow left-right-padding no-overflow">
+                            <!-- minimum-nonzero-height-ignored is necessary to keep the tree from overflowing its bounds -->
+                            <div class="full-width flex-grow left-right-padding no-overflow minimum-nonzero-height-ignored">
                                 <div class="full-width full-height border">
                                     <tree-root #tree
                                                (moveNode)="onMoveNode($event)"
