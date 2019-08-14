@@ -331,6 +331,8 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                     this.dialogsService.alert("No data files exist for the selected item(s)", "Data Not Found");
                 } else {
                     let config: MatDialogConfig = new MatDialogConfig();
+                    config.width = "35em";
+                    config.height = "15em";
                     config.data = {
                         estimatedDownloadSize: result.size,
                         uncompressedDownloadSize: result.uncompressedSize
@@ -342,6 +344,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                                     let downloadParams: HttpParams = new HttpParams()
                                         .set("mode", "zip");
                                     let progressWindowConfig: MatDialogConfig = new MatDialogConfig();
+                                    progressWindowConfig.width = "35em";
                                     progressWindowConfig.data = {
                                         url: "DownloadDataTrackFileServlet.gx",
                                         estimatedDownloadSize: parseInt(result.size),
