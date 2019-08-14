@@ -12,6 +12,7 @@ import {DownloadFilesComponent} from "../../util/download-files.component";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {PropertyService} from "../../services/property.service";
 import {DictionaryService} from "../../services/dictionary.service";
+import {UtilService} from "../../services/util.service";
 
 @Component({
     selector: 'experiment-files-tab',
@@ -53,7 +54,7 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
     public getRequestDownloadListResult: any;
     private request:any;
     public canUpdate: boolean = false;
-    private updateFileSubscription:Subscription;
+    private requestDownloadListSubscription:Subscription;
     public isFDTSupported:boolean = false;
     public isClinicalResearch:boolean = false;
 
@@ -117,22 +118,21 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
                 }
 
                 this.canUpdate = this.request.canUpdate && this.request.canUpdate === 'Y';
-                this.experimentsService.getRequestDownloadList(data.experiment.Request.idRequest).subscribe((result: any) => {
-                    this.getRequestDownloadListResult = result;
-                    this.gridData = [result.Request];
-                    setTimeout(() => {
-                        this.determineFileCount();
+
+                UtilService.safelyUnsubscribe(this.requestDownloadListSubscription);
+                this.requestDownloadListSubscription = this.fileService.getRequestOrganizeFilesObservable(true)
+                    .subscribe((result: any) => {
+                        this.getRequestDownloadListResult = result;
+                        this.gridData = [result.Request];
+                        setTimeout(() => {
+                            this.determineFileCount();
+                        });
+                    },(err:IGnomexErrorResponse) => {
                     });
-                },(err:IGnomexErrorResponse) => {
-                });
+                this.fileService.emitGetRequestOrganizeFiles({"idRequest": this.request.idRequest} );
             }
         });
-        this.updateFileSubscription = this.fileService.getUpdateFileTabObservable().subscribe(data =>{
-            this.gridData = data;
-            setTimeout(() => {
-                this.determineFileCount();
-            });
-        });
+
     }
 
     public onGridReady(event: GridReadyEvent): void {
@@ -235,7 +235,7 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.updateFileSubscription.unsubscribe();
+        UtilService.safelyUnsubscribe(this.requestDownloadListSubscription);
     }
 
 }

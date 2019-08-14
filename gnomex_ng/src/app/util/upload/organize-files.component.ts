@@ -2,7 +2,7 @@ import {
     AfterViewInit,
     ChangeDetectorRef,
     Component,
-    EventEmitter,
+    EventEmitter, Inject,
     Input,
     OnInit,
     Output,
@@ -26,15 +26,7 @@ import {IFileParams} from "../interfaces/file-params.model";
 import {ActionType} from "../interfaces/generic-dialog-action.model";
 import {UtilService} from "../../services/util.service";
 
-const actionMapping: IActionMapping = {
-    mouse: {
-        click: (tree, node, $event) => {
-            $event.ctrlKey
-                ? TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event)
-                : TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event)
-        }
-    }
-};
+
 
 @Component({
     selector: "organize-file",
@@ -89,6 +81,17 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     public readonly organizeHelp :string =  "Drag uploaded file into one of the folders on the right." +
         "Protected files (red) cannot be moved or deleted.";
 
+    private  actionMapping: IActionMapping = {
+        mouse: {
+            click: (tree, node, $event) => {
+                $event.ctrlKey
+                    ? TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event)
+                    : TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event)
+            }
+        }
+    };
+
+
 
     constructor(private analysisService:AnalysisService,
                 private gnomexService: GnomexService,
@@ -115,7 +118,8 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
             allowDrop: (element, item: {parent: any, index}) => {
                 return false;
             },
-            actionMapping
+            actionMapping : this.actionMapping
+
         };
 
         this.organizeOpts = {
@@ -139,12 +143,11 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                 }
 
             },
-            actionMapping
+            actionMapping : this.actionMapping
         };
 
 
         if(this.data.type === 'a'){
-
             this.manageFileSubscript = this.fileService.getAnalysisOrganizeFilesObservable().subscribe( (resp) => {
                 this.disableRename = true;
                 this.disableRemove = true;
@@ -167,7 +170,6 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                         if(analysis && analysisDownloadList){
                             this.uploadFiles = this.fileService.getUploadFiles(analysis.ExpandedAnalysisFileList.AnalysisUpload);
                             this.organizeFiles = [analysisDownloadList];
-                            this.fileService.emitUpdateFileTab(this.organizeFiles);
                         }
                     }else{
                         //this.dialogService.alert()
@@ -178,16 +180,12 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
             this.fileService.emitGetAnalysisOrganizeFiles({idAnalysis :this.data.id.idAnalysis});
 
         }else{
-
             this.manageFileSubscript = this.fileService.getRequestOrganizeFilesObservable().subscribe(resp =>{
                 this.dialogService.stopAllSpinnerDialogs();
                 this.disableRename = true;
                 this.disableRemove = true;
                 this.uploadFiles = resp[0];
                 this.organizeFiles = resp[1];
-                this.fileService.emitUpdateFileTab(this.organizeFiles);
-
-
             },error =>{
                 this.dialogService.stopAllSpinnerDialogs();
                 this.dialogService.error(error);
@@ -566,6 +564,8 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     }
 
     ngOnDestroy():void{
-        this.manageFileSubscript.unsubscribe();
+        if(this.manageFileSubscript){
+            this.manageFileSubscript.unsubscribe();
+        }
     }
 }
