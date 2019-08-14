@@ -22,6 +22,7 @@ import {DownloadFilesComponent} from "../../util/download-files.component";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {PropertyService} from "../../services/property.service";
 import {DictionaryService} from "../../services/dictionary.service";
+import {UtilService} from "../../services/util.service";
 
 @Component({
     selector: 'analysis-files-tab',
@@ -63,7 +64,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     private analysis:any;
     public canUpdate: boolean = false;
     private formGroup: FormGroup;
-    private updateFileSubscription: Subscription;
+    private analysisDownloadListSubscription: Subscription;
     public isFDTSupported:boolean = false;
     public isClinicalResearch:boolean = false;
 
@@ -128,24 +129,27 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
             if(data && data.analysis && data.analysis.Analysis){
                 this.analysis = data.analysis.Analysis;
                 this.canUpdate = this.analysis.canUpdate && this.analysis.canUpdate === 'Y';
-                this.analysisService.getAnalysisDownloadList(data.analysis.Analysis.idAnalysis).subscribe((result: any) => {
-                    if (result && result.Analysis) {
-                        this.getAnalysisDownloadListResult = result;
-                        this.gridData = [result.Analysis];
-                        setTimeout(() => {
-                            this.determineFileCount();
-                        });
-                    }
-                },(err:IGnomexErrorResponse) =>{
-                });
+
+                if(this.analysisDownloadListSubscription){ // every time route changes a new subscriber is made we don't want that.
+                    this.analysisDownloadListSubscription.unsubscribe();
+                }
+                this.analysisDownloadListSubscription=  this.fileService.getAnalysisOrganizeFilesObservable(true)
+                    .subscribe((result: any) => {
+                        if (result && result.Analysis) {
+                            this.getAnalysisDownloadListResult = result;
+                            this.gridData = [result.Analysis];
+                            setTimeout(() => {
+                                this.determineFileCount();
+                            });
+                        }
+                    },(err:IGnomexErrorResponse) =>{
+                    });
+                this.fileService.emitGetAnalysisOrganizeFiles({"idAnalysis": this.analysis.idAnalysis});
             }
         });
-        this.updateFileSubscription =  this.fileService.getUpdateFileTabObservable().subscribe(data => {
-            this.gridData = data;
-            setTimeout(() => {
-                this.determineFileCount();
-            });
-        });
+
+
+
     }
 
     public onGridReady(event: GridReadyEvent): void {
@@ -301,7 +305,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         config.height = "40.3em";
         config.width = "70em";
         config.autoFocus = false;
-        this.dialogsService.genericDialogContainer(ManageFilesDialogComponent, "Upload Files", null, config);
+        this.dialogsService.genericDialogContainer(ManageFilesDialogComponent, "Upload Files", null, config)
 
     }
 
@@ -320,7 +324,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.updateFileSubscription.unsubscribe();
+        UtilService.safelyUnsubscribe(this.analysisDownloadListSubscription);
     }
 
 }

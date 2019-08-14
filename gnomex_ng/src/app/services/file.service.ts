@@ -11,12 +11,12 @@ import {DOCUMENT} from "@angular/common";
 import {Form, FormGroup} from "@angular/forms";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {UtilService} from "./util.service";
+import {ConstantsService} from "./constants.service";
 
 @Injectable()
 export class FileService {
     public analysisGroupList: any[];
     private organizeFilesSubject: Subject<any> = new Subject();
-    private updateFileTabSubject : Subject<any> = new Subject();
     private linkedSampleFilesSubject: Subject<any> = new Subject();
     private manageFileSaveSubject: Subject<any> = new Subject();
     private manageFileForm:FormGroup = new FormGroup({});
@@ -29,6 +29,7 @@ export class FileService {
 
     constructor(private httpClient:HttpClient,
                 private experimentService: ExperimentsService,
+                private constService: ConstantsService,
                 private analysisService: AnalysisService,
                 private cookieUtilService:CookieUtilService,
                 @Inject(DOCUMENT) private document: Document) {
@@ -85,29 +86,30 @@ export class FileService {
     }
 
 
-    emitUpdateFileTab(data:any):void{
-        this.updateFileTabSubject.next(data);
-    }
-    getUpdateFileTabObservable(): Observable<any>{
-        return this.updateFileTabSubject.asObservable();
-    }
-
     emitGetAnalysisOrganizeFiles(params:any): void {
         this.organizeFilesSubject.next(params);
     }
-    getAnalysisOrganizeFilesObservable(): Observable<any>{
+    getAnalysisOrganizeFilesObservable(onlyDownloadList?:boolean): Observable<any>{
         return this.organizeFilesSubject.pipe( flatMap(params => {
 
             let analysisParams : HttpParams =  new HttpParams()
                 .append('idAnalysis',params.idAnalysis)
                 .append('showUploads','Y');
             let downloadParams:HttpParams = new HttpParams()
-                .set('idAnalysis',params.idAnalysis)
-                .set('includeUploadStagingDir', 'N')
-                .set('skipUploadStagingDirFiles', 'Y');
+                .set('idAnalysis',params.idAnalysis);
 
-            return forkJoin(this.analysisService.getAnalysis(analysisParams),
-                this.analysisService.getAnalysisDownloadListWithParams(downloadParams));
+            if(onlyDownloadList){
+                downloadParams = downloadParams.set("autoCreate", "Y");
+                downloadParams = downloadParams.set("includeUploadStagingDir", "N");
+                return this.analysisService.getAnalysisDownloadListWithParams(downloadParams);
+            }else{
+                downloadParams = downloadParams.set('includeUploadStagingDir', 'N');
+                downloadParams = downloadParams.set('skipUploadStagingDirFiles', 'Y');
+                return forkJoin(this.analysisService.getAnalysis(analysisParams),
+                    this.analysisService.getAnalysisDownloadListWithParams(downloadParams));
+            }
+
+
         }));
     }
 
@@ -179,9 +181,7 @@ export class FileService {
 
 
 
-    emitGetRequestOrganizeFiles(params:any):void{
-        this.organizeFilesSubject.next(params);
-    }
+
 
     prepUploadData(files:any[] ):void{
         for(let file of  files){
@@ -189,8 +189,6 @@ export class FileService {
                 file.FileDescriptor = UtilService.getJsonArray(file.FileDescriptor ,file.FileDescriptor);
                 this.prepUploadData(file.FileDescriptor)
             }
-
-
         }
     }
 
@@ -203,55 +201,49 @@ export class FileService {
         return [];
     }
 
-
-    getRequestOrganizeFilesObservable(): Observable<any>{
+    emitGetRequestOrganizeFiles(params:any):void{
+        this.organizeFilesSubject.next(params);
+    }
+    getRequestOrganizeFilesObservable(onlyRequestDownloadList?:boolean): Observable<any>{
         return this.organizeFilesSubject.pipe( flatMap((params:any) => {
-                let requestList:Observable<any>[] = [];
-                let expParams : HttpParams =  new HttpParams()
-                    .append('idRequest',params.idRequest)
-                    .append('showUploads','Y');
-                requestList.push( this.experimentService.getExperimentWithParams(expParams));
+                let requestList: Observable<any>[] = [];
+                let expParams: HttpParams = new HttpParams()
+                    .append('idRequest', params.idRequest)
+                    .append('showUploads', 'Y');
+                requestList.push(this.experimentService.getExperimentWithParams(expParams));
 
+                let downloadParams: HttpParams = new HttpParams()
+                    .set('idRequest', params.idRequest);
 
-                let downloadParams:HttpParams = new HttpParams()
-                    .set('idRequest',params.idRequest)
-                    .set('includeUploadStagingDir', 'N');
-                requestList.push(this.experimentService.getRequestDownloadListWithParams(downloadParams));
+                if (onlyRequestDownloadList) {
+                    return this.experimentService.getRequestDownloadListWithParams(downloadParams).pipe(first());
+                } else {
+                    downloadParams = downloadParams.set('includeUploadStagingDir', 'N');
+                    requestList.push(this.experimentService.getRequestDownloadListWithParams(downloadParams));
 
-
-
-                return forkJoin(requestList).pipe(map((resp:any[]) =>{
-                    if(Array.isArray(resp) && resp.length === 2){
-                        let hasError = false;
-                        let errorMessage = "";
-                        if(resp[0] && resp[0].Request){
-                            if(resp[0].Request.RequestUpload && resp[0].Request.RequestUpload.FileDescriptor){
-                                let reqUpload = resp[0].Request.RequestUpload;
-                                this.getUploadFiles(reqUpload);
-                                resp[0] = reqUpload.FileDescriptor;
-                            }else{
-                                resp[0] = [];
+                    return forkJoin(requestList).pipe(map((resp: any[]) => {
+                        if (Array.isArray(resp) && resp.length === 2) {
+                            if (resp[0] && resp[0].Request) {
+                                if (resp[0].Request.RequestUpload) {
+                                    let reqUpload = resp[0].Request.RequestUpload;
+                                    reqUpload = this.getUploadFiles(reqUpload);
+                                    resp[0] = reqUpload;
+                                } else {
+                                    resp[0] = [];
+                                }
                             }
-                        }else{
-                            errorMessage += resp[0].message ? resp[0].message : "";
-                            hasError = true;
-                        }
-                        if(resp[1] && resp[1].Request){ // GetRequestDownloadList doesn't need check for an array
-                            resp[1] = [resp[1].Request];
-                        }else{
-                            errorMessage += resp[1].message ? resp[1].message : "";
-                            hasError = true;
-                        }
 
-                        if(hasError){
-                            throw new Error(errorMessage)
-                        }
-                    }else{
-                        throw new Error("An error occurred please contact GNomEx Support.");
-                    }
-                    return resp;
+                            if (resp[1] && resp[1].Request) { // GetRequestDownloadList doesn't need check for an array
+                                resp[1] = [resp[1].Request];
+                            }
 
-                }), catchError(this.handleError));
+                        } else {
+                            throw new Error("An error occurred please contact GNomEx Support.");
+                        }
+                        return resp;
+
+                    }), catchError(this.handleError));
+                }
             })
         );
     }
@@ -383,10 +375,5 @@ export class FileService {
         return throwError("An error occurred please contact GNomEx Support.");
 
     }
-
-
-
-
-
 
 }
