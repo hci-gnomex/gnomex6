@@ -36,7 +36,8 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="full-width flex-grow no-overflow left-right-padded">
+                        <!-- minimum-nonzero-height-ignored is necessary to keep the tree from overflowing its bounds -->
+                        <div class="full-width flex-grow no-overflow left-right-padded minimum-nonzero-height-ignored">
                             <div class="full-width full-height border">
                                 <tree-root #datatracksTree
                                            [nodes]="items" [options]="options"

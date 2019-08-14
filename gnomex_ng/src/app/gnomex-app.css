@@ -395,6 +395,11 @@ img.tree-node-icon {
     padding-right: 0.6em;
 }
 
+/* minimum-nonzero-height-ignored is necessary to keep the angular tree from overflowing its bounds for some reason */
+.minimum-nonzero-height-ignored {
+    height: 1px;
+}
+
 .warningLabelMinor {
     color: #17871C;
     fontWeight: normal;

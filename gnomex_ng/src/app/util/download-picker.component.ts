@@ -25,7 +25,14 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
             </mat-dialog-actions>
         </div>
     `,
-    styles:[``]
+    styles:[`
+        .no-margin {
+            margin: 0;
+        }
+        .no-padding {
+            padding: 0;
+        }
+    `]
 })
 export class DownloadPickerComponent implements OnInit {
 
