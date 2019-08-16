@@ -778,43 +778,44 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     },
                     {
                         displayName: 'Illumina - Lib Prep',
-                        context: 'HISEQ',
+                        context: 'ILLSEQ',
                         iconName: './assets/flask.png',
                         route: '/libprepWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Lib Prep QC',
-                        context: 'HISEQ',
+                        context: 'ILLSEQ',
                         iconName: './assets/flask.png',
                         route: '/libprepQcWorkFlow'
                     },
                     {
                         displayName: 'Illumina - FlowCell Assembly',
-                        context: 'HISEQ',
+                        context: 'ILLSEQ',
                         iconName: './assets/DNA_diag_lightening.png',
                         route: '/flowcellassmWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Finalize Flow Cell',
-                        context: 'HISEQ',
+                        context: 'ILLSEQ',
                         iconName: './assets/DNA_diag_lightening.png',
                         route: '/finalizeWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Data Pipeline',
-                        context: 'HISEQ',
+                        context: 'ILLSEQ',
                         iconName: './assets/page_go.png',
                         route: '/pipelineWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Flow Cells',
-                        context: 'HISEQ',
+                        context: 'ILLSEQ',
                         iconName: './assets/rectangle.png',
                         route: '/flowcellWorkFlow'
                     },
                     {
                         divider: true
                     },
+/*
                     {
                         displayName: 'Microarray',
                         context: 'microarray',
@@ -840,11 +841,14 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         divider: true
                     },
+
+ */
                     {
                         displayName: 'Workflow (all)',
                         iconName: './assets/building_go.png',
                         route: ''
                     },
+/*
                     {
                         divider: true
                     },
@@ -868,6 +872,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         iconName: './assets/tv_chart_review.png',
                         route: ''
                     },
+*/
                 ]
             },
             {
@@ -886,43 +891,45 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     },
                     {
                         displayName: 'Illumina - Lib Prep',
-                        context: 'HISEQ',
+                        context: 'ILLSEQ',
                         iconName: './assets/flask.png',
                         route: '/libprepWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Lib Prep QC',
-                        context: 'HISEQ',
+                        context: 'ILLSEQ',
                         iconName: './assets/flask.png',
                         route: '/libprepQcWorkFlow'
                     },
                     {
                         displayName: 'Illumina - FlowCell Assembly',
-                        context: 'HISEQ',
+                        context: 'ILLSEQ',
                         iconName: './assets/DNA_diag_lightening.png',
                         route: '/flowcellassmWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Finalize Flow Cell',
-                        context: 'HISEQ',
+                        context: 'ILLSEQ',
                         iconName: './assets/DNA_diag_lightening.png',
                         route: '/finalizeWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Data Pipeline',
-                        context: 'HISEQ',
+                        context: 'ILLSEQ',
                         iconName: './assets/page_go.png',
                         route: '/pipelineWorkFlow'
                     },
                     {
                         displayName: 'Illumina - Flow Cells',
-                        context: 'HISEQ',
+                        context: 'ILLSEQ',
                         iconName: './assets/rectangle.png',
                         route: '/flowcellWorkFlow'
                     },
+
                     {
                         divider: true
                     },
+/*
                     {
                         displayName: 'Microarray',
                         context: 'microarray',
@@ -948,6 +955,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         divider: true
                     },
+ */
                     {
                         displayName: 'Workflow (all)',
                         iconName: './assets/building_go.png',

@@ -1,5 +1,5 @@
 import {OnDestroy} from "@angular/core";
-import {BehaviorSubject} from "rxjs";
+import {BehaviorSubject, Subscription} from "rxjs";
 
 import {DictionaryService} from "../../services/dictionary.service";
 import {Experiment} from "./experiment.model";
@@ -152,6 +152,8 @@ export class Sample implements OnDestroy {
     public get experiment(): Experiment {
         return this._experiment;
     }
+
+    private onChange_codeApplication_subscription:Subscription
 
     public set experiment(value: Experiment) {
         this._experiment = value;

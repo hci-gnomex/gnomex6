@@ -5,7 +5,7 @@
 	    className="org.apache.catalina.valves.AccessLogValve"
 	    directory="${catalina.home}/logs/"
 	    prefix="gnomex-"
-	    suffix=".log"
+	    suffix="log"
 	    pattern="combined" />
 
 	    
@@ -14,7 +14,8 @@
     name="mail/MailSession" 
     type="javax.mail.Session"/>
 
-    
+<Manager pathname="" />
+
   <!-- GNomEx Realm for authenticating user (LDAP) -->    
       
        <Realm className="hci.gnomex.security.tomcat.GNomExLDAPRealm"
