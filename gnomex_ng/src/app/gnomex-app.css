@@ -84,6 +84,10 @@ mat-form-field.dialogFormField {
     margin: 0.4rem 0rem;
 }
 
+mat-form-field.moderate-input {
+    width: 10em;
+}
+
 mat-form-field.short-input {
     width: 10em;
 }
