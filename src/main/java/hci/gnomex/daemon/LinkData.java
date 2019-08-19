@@ -20,6 +20,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -57,6 +59,9 @@ public class LinkData extends TimerTask {
     private String[] requestList = new String[MAXREQUESTS];
     private int nxtRequest = 0;
 
+    private String regex;
+
+
     private String errorMessageString = "Error in LinkData";
 
 
@@ -64,13 +69,15 @@ public class LinkData extends TimerTask {
     public LinkData(String[] args) {
         nxtRequest = 0;
         int i = -1;
+        args[i] = args[i].toLowerCase();
+
         while (i < args.length) {
             i++;
             if (i >= args.length) {
                 break;
             }
 
-            if (args[i].equals("-dataSource")) {                // i.e., 2R (Foundation), 4R (Avatar), 10R (Tempus)
+            if (args[i].equals("-datasource")) {                // i.e., 2R (Foundation), 4R (Avatar), 10R (Tempus)
                 i++;
                 if (i >= args.length) {
                     System.out.println ("-dataSource must be followed by 2R 4R or 10R.");
@@ -92,6 +99,8 @@ public class LinkData extends TimerTask {
                 }
 
                 break;
+            }else if( args[i].equals("-regex")){
+                regex = args[++i];
             }
         }
     }
@@ -226,6 +235,21 @@ public class LinkData extends TimerTask {
             stmt.close();
 
             if (debug) System.out.println("size of names: " + names.size());
+            // match name with regex if specified
+            if(regex != null) {
+                List<String> regexNames = new ArrayList<String>();
+
+                Pattern p = null;
+
+                p = Pattern.compile(regex);
+                for (int i = 0; i < names.size(); i++) {
+                    Matcher m = p.matcher(names.get(i));
+                    if (m.matches()) {
+                        regexNames.add(m.group(1));
+                    }
+                }
+                names = regexNames;
+            }
 
             // now using the list of sample 'names' see if we can find any matching experiment files
             Iterator it = names.iterator();
