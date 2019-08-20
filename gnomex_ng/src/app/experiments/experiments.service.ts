@@ -12,10 +12,9 @@ import {
     HttpRequest
 } from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
-import {first,catchError, map} from "rxjs/operators";
+import {catchError, map} from "rxjs/operators";
 import {Experiment} from "../util/models/experiment.model";
 import {CookieUtilService} from "../services/cookie-util.service";
-import {element} from "@angular/core/src/render3";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {AbstractControl, FormGroup} from "@angular/forms";
 import {saveAs} from "file-saver";
@@ -50,7 +49,6 @@ export class ExperimentsService {
     private experimentOverviewListSubject:BehaviorSubject<any> = new BehaviorSubject([]);
     private filteredExperimentOverviewListSubject:Subject<any> = new Subject();
     private saveManagerSubject:Subject<any> = new Subject();
-    private navInitBrowsExperimentSubject:BehaviorSubject<boolean>= new BehaviorSubject(false);
 
     // conditional params
     browsePanelParams:HttpParams;
@@ -63,6 +61,7 @@ export class ExperimentsService {
     public labList: any[] = [];
     private editMode: boolean = false;
     private _experimentOverviewForm: FormGroup;
+    private _usePreviousURLParams: boolean = false;
 
 
     constructor(private cookieUtilService: CookieUtilService,
@@ -71,6 +70,13 @@ export class ExperimentsService {
                 private dialogService: DialogsService,
                 @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {
         this._experimentOverviewForm = new FormGroup({});
+    }
+
+    set usePreviousURLParams(value: boolean) {
+        this._usePreviousURLParams = value;
+    }
+    get usePreviousURLParams(): boolean {
+        return this._usePreviousURLParams;
     }
 
     getExperimentsObservable(): Observable<any> {
