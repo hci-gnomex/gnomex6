@@ -152,6 +152,10 @@ export class DatatracksOrganismComponent implements OnInit {
         this.dtService.saveOrganism(params).subscribe(resp =>{
             this.showSpinner = false;
             this.orgFormGroup.markAsPristine();
+            this.dtService.activeNodeToSelect = {
+                attribute: "idOrganism",
+                value: resp.idOrganism
+            };
             this.dtService.getDatatracksList_fromBackend(this.dtService.previousURLParams);
         },(err:IGnomexErrorResponse) => {
             this.showSpinner = false;

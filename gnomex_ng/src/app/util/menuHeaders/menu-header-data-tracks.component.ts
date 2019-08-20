@@ -187,6 +187,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         if (type === DATATRACK) {
             this.dialogsService.startDefaultSpinnerDialog();
             this.dataTrackService.deleteDataTrack(params).subscribe((response: any) => {
+                this.dataTrackService.getActiveNodeAttribute(this.selectedNode.parent);
                 this.router.navigateByUrl("/datatracks");
                 this.dataTrackService.refreshDatatracksList_fromBackend();
             }, (err:IGnomexErrorResponse) =>{
@@ -195,6 +196,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         } else if (type === DATATRACKFOLDER) {
             this.dialogsService.startDefaultSpinnerDialog();
             this.dataTrackService.deleteDataTrackFolder(params).subscribe((response: any) => {
+                this.dataTrackService.getActiveNodeAttribute(this.selectedNode.parent);
                 this.router.navigateByUrl("/datatracks");
                 this.dataTrackService.refreshDatatracksList_fromBackend();
             },(err:IGnomexErrorResponse) => {
@@ -203,6 +205,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         } else if (type === GENOMEBUILD) {
             this.dialogsService.startDefaultSpinnerDialog();
             this.dataTrackService.deleteGenomeBuild(params).subscribe((response: any) => {
+                this.dataTrackService.getActiveNodeAttribute(this.selectedNode.parent);
                 this.router.navigateByUrl("/datatracks");
                 this.dictionaryService.reloadAndRefresh(() => {
                     this.dataTrackService.refreshDatatracksList_fromBackend();
@@ -213,6 +216,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         } else if (type === ORGANISM) {
             this.dialogsService.startDefaultSpinnerDialog();
             this.dataTrackService.deleteOrganism(params).subscribe((response: any) => {
+                this.dataTrackService.getActiveNodeAttribute(this.selectedNode.parent);
                 this.router.navigateByUrl("/datatracks");
                 this.dictionaryService.reloadAndRefresh(() => {
                     this.dataTrackService.refreshDatatracksList_fromBackend();

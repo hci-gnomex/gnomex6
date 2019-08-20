@@ -315,6 +315,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
         this._experiment.billingItems = [];
         this.experimentService.saveRequest(this._experiment).subscribe((response) => {
             if (response && response.requestNumber) {
+                this.experimentService.usePreviousURLParams = true;
                 this.gnomexService.navByNumber(response.requestNumber);
                 this.dialogsService.stopAllSpinnerDialogs();
             } else {

@@ -334,15 +334,11 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
             this.showSaveSpinner = false;
             if (response && response.result &&  response.result === "SUCCESS") {
                 this.dtOverviewForm.markAsPristine();
-                let treeNode = this.dataTrackService.datatrackListTreeNode;
-                if (treeNode) {
-                    let params: HttpParams = new HttpParams()
-                        .set("idDataTrack", treeNode.idDataTrack)
-                        .set("idGenomeBuild",treeNode.idGenomeBuild )
-                        .set("idOrganism", treeNode.idOrganism )
-                        .set("idLab", treeNode.idLab);
-                    this.dataTrackService.getDatatracksList_fromBackend(params);
-                }
+                this.dataTrackService.activeNodeToSelect = {
+                    attribute: "idDataTrack",
+                    value: response.idDataTrack
+                };
+                this.dataTrackService.getDatatracksList_fromBackend(this.dataTrackService.previousURLParams);
             }
         },(err:IGnomexErrorResponse) => {
             this.showSaveSpinner = false;
