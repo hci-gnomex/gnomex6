@@ -1,9 +1,7 @@
 import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from "@angular/core";
 import {WorkflowService, qcModes} from "../services/workflow.service";
-import { URLSearchParams } from "@angular/http";
-import {MatSidenav} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
-import {GridOptions, GridApi} from "ag-grid-community";
+import {GridApi, GridSizeChangedEvent} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -18,7 +16,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 @Component({
     selector: 'qc-workflow',
     templateUrl: 'qc-workflow.html',
-    styles: [`        
+    styles: [`
         .flex-row-container {
             display: flex;
             flex-direction: row;
@@ -33,7 +31,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 export class QcWorkflowComponent implements OnInit, AfterViewInit {
     @ViewChild("requestInput") requestInput: ElementRef;
     @ViewChild("coreFacility") coreFacilityInput: ElementRef;
-    @ViewChild('sidenav') sidenav: MatSidenav;
     @Input() mode: string;
 
     private workItemList: any[] = [];
@@ -357,6 +354,10 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
         this.initialize();
+    }
+
+    onGridSizeChanged(event: GridSizeChangedEvent) {
+        event.api.sizeColumnsToFit();
     }
 
     filterAppList(item: any): boolean {

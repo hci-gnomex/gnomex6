@@ -2,7 +2,7 @@ import {AfterViewInit, Component, Inject, OnInit} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
 import {MatDialogConfig} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
-import {GridApi, GridOptions} from "ag-grid-community";
+import {GridApi, GridOptions, GridSizeChangedEvent} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -188,6 +188,10 @@ export class FlowcellWorkflowComponent implements OnInit, AfterViewInit {
         this.gridColumnApi = params.columnApi;
         this.gridApi.setColumnDefs(this.columnDefs);
         params.api.sizeColumnsToFit();
+    }
+
+    onGridSizeChanged(event: GridSizeChangedEvent) {
+        event.api.sizeColumnsToFit();
     }
 
     search() {

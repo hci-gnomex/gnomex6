@@ -1,9 +1,7 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
-import { URLSearchParams } from "@angular/http";
-import {MatSidenav} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
-import {GridOptions, GridApi} from "ag-grid-community";
+import {GridSizeChangedEvent, GridApi} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -17,7 +15,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 @Component({
     selector: 'libprepqc-workflow',
     templateUrl: 'libprepqc-workflow.html',
-    styles: [`        
+    styles: [`
         .flex-row-container {
             display: flex;
             flex-direction: row;
@@ -41,7 +39,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
     @ViewChild("requestInput") requestInput: ElementRef;
     @ViewChild("coreFacility") coreFacilityInput: ElementRef;
-    @ViewChild('sidenav') sidenav: MatSidenav;
 
     private workItemList: any[] = [];
     private workingWorkItemList: any[] = [];
@@ -199,6 +196,10 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
         this.gridColumnApi = params.columnApi;
         this.codeStepNext = this.workflowService.ILLSEQ_PREP_QC;
         this.initialize();
+    }
+
+    onGridSizeChanged(event: GridSizeChangedEvent) {
+        event.api.sizeColumnsToFit();
     }
 
     save() {

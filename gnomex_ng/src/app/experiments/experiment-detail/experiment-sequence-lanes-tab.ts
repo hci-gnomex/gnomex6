@@ -187,7 +187,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
     }
 
     public prepareView(): void {
-        this.sampleGridSplitSize = 0;
+        this.sampleGridSplitSize = this.editMode ? 25 : 0;
     }
 
     public onSamplesGridReady(event: GridReadyEvent): void {
