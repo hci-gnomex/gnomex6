@@ -90,6 +90,10 @@ export class DatatracksFolderComponent implements OnInit {
         this.dtService.saveFolder(params).subscribe(resp =>{
             this.folderFormGroup.markAsPristine();
             this.showSpinner = false;
+            this.dtService.activeNodeToSelect = {
+                attribute: "idDataTrackFolder",
+                value: resp.idDataTrackFolder
+            };
             this.dtService.getDatatracksList_fromBackend(this.dtService.previousURLParams);
         },(err:IGnomexErrorResponse) =>{
             this.showSpinner = false;

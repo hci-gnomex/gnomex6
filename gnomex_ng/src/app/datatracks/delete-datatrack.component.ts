@@ -92,6 +92,7 @@ export class DeleteDataTrackComponent extends BaseGenericContainerDialog {
         this.dataTrackService.deleteDataTrack(params).subscribe((response: any) => {
             this.showSpinner = false;
             this.dialogRef.close();
+            this.dataTrackService.getActiveNodeAttribute(this.selectedItem.parent);
             this.dataTrackService.refreshDatatracksList_fromBackend();
         }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;

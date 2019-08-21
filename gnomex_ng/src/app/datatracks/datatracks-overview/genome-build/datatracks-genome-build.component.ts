@@ -109,6 +109,10 @@ export class DatatracksGenomeBuildComponent implements OnInit {
             });
 
             this.dtService.saveGenomeBuild(params).subscribe(() => {
+                this.dtService.activeNodeToSelect = {
+                    attribute: "idGenomeBuild",
+                    value: idGenomeBuild
+                };
                  this.dtService.getDatatracksList_fromBackend(this.dtService.previousURLParams);
             },(err:IGnomexErrorResponse) => {
             });

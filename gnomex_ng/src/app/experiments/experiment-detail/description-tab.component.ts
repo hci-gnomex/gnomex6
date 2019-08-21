@@ -20,7 +20,7 @@ import {ExperimentsService} from "../experiments.service";
 
 export const EDITOR_HEIGHT = Object.freeze({
     HEIGHT_MAX: "50em",
-    HEIGHT_BIGGER: "25em",
+    HEIGHT_BIGGER: "24.5em",
     HEIGHT_BIG: "15em",
     HEIGHT_MID: "14em",
     HEIGHT_SMALL: "10em",

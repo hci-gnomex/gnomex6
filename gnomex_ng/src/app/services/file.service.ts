@@ -12,6 +12,7 @@ import {Form, FormGroup} from "@angular/forms";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {UtilService} from "./util.service";
 import {ConstantsService} from "./constants.service";
+import {TreeModel, TreeNode} from "angular-tree-component";
 
 @Injectable()
 export class FileService {
@@ -19,32 +20,33 @@ export class FileService {
     private organizeFilesSubject: Subject<any> = new Subject();
     private linkedSampleFilesSubject: Subject<any> = new Subject();
     private manageFileSaveSubject: Subject<any> = new Subject();
-    private manageFileForm:FormGroup = new FormGroup({});
+    private manageFileForm: FormGroup = new FormGroup({});
 
     public static readonly SIZE_GB: number = Math.pow(2, 30);
     public static readonly SIZE_MB: number = Math.pow(2, 20);
     public static readonly SIZE_KB: number = Math.pow(2, 10);
 
 
-
-    constructor(private httpClient:HttpClient,
+    constructor(private httpClient: HttpClient,
                 private experimentService: ExperimentsService,
                 private constService: ConstantsService,
                 private analysisService: AnalysisService,
-                private cookieUtilService:CookieUtilService,
+                private cookieUtilService: CookieUtilService,
                 @Inject(DOCUMENT) private document: Document) {
     }
 
-    public addManageFilesForm(name:string ,form:FormGroup,){
+    public addManageFilesForm(name: string, form: FormGroup,) {
         setTimeout(() => {
             this.manageFileForm.addControl(name, form);
         })
 
     }
-    public getManageFilesForm():FormGroup{
+
+    public getManageFilesForm(): FormGroup {
         return this.manageFileForm;
     }
-    resetManageFilesForm():void{
+
+    resetManageFilesForm(): void {
         this.manageFileForm = new FormGroup({});
     }
 
@@ -80,29 +82,29 @@ export class FileService {
     }
 
 
-
-    getUploadOrderUrl(call:string):Observable<any>{
+    getUploadOrderUrl(call: string): Observable<any> {
         return this.httpClient.get(call);
     }
 
 
-    emitGetAnalysisOrganizeFiles(params:any): void {
+    emitGetAnalysisOrganizeFiles(params: any): void {
         this.organizeFilesSubject.next(params);
     }
-    getAnalysisOrganizeFilesObservable(onlyDownloadList?:boolean): Observable<any>{
-        return this.organizeFilesSubject.pipe( flatMap(params => {
 
-            let analysisParams : HttpParams =  new HttpParams()
-                .append('idAnalysis',params.idAnalysis)
-                .append('showUploads','Y');
-            let downloadParams:HttpParams = new HttpParams()
-                .set('idAnalysis',params.idAnalysis);
+    getAnalysisOrganizeFilesObservable(onlyDownloadList?: boolean): Observable<any> {
+        return this.organizeFilesSubject.pipe(flatMap(params => {
 
-            if(onlyDownloadList){
+            let analysisParams: HttpParams = new HttpParams()
+                .append('idAnalysis', params.idAnalysis)
+                .append('showUploads', 'Y');
+            let downloadParams: HttpParams = new HttpParams()
+                .set('idAnalysis', params.idAnalysis);
+
+            if (onlyDownloadList) {
                 downloadParams = downloadParams.set("autoCreate", "Y");
                 downloadParams = downloadParams.set("includeUploadStagingDir", "N");
                 return this.analysisService.getAnalysisDownloadListWithParams(downloadParams);
-            }else{
+            } else {
                 downloadParams = downloadParams.set('includeUploadStagingDir', 'N');
                 downloadParams = downloadParams.set('skipUploadStagingDirFiles', 'Y');
                 return forkJoin(this.analysisService.getAnalysis(analysisParams),
@@ -113,50 +115,51 @@ export class FileService {
         }));
     }
 
-    organizeExperimentFiles(params:HttpParams):Observable<any>{
-        let headers: HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
-        return this.httpClient.post("/gnomex/OrganizeExperimentUploadFiles.gx",params.toString(),{headers: headers });
+    organizeExperimentFiles(params: HttpParams): Observable<any> {
+        let headers: HttpHeaders = new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded');
+        return this.httpClient.post("/gnomex/OrganizeExperimentUploadFiles.gx", params.toString(), {headers: headers});
     }
 
-    organizeAnalysisUploadFiles(params:HttpParams): Observable<any>{
-        let headers : HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
-        return this.httpClient.post("/gnomex/OrganizeAnalysisUploadFiles.gx",params.toString(),{headers: headers});
+    organizeAnalysisUploadFiles(params: HttpParams): Observable<any> {
+        let headers: HttpHeaders = new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded');
+        return this.httpClient.post("/gnomex/OrganizeAnalysisUploadFiles.gx", params.toString(), {headers: headers});
     }
 
-    emitGetLinkedSampleFiles(params:any):void{
+    emitGetLinkedSampleFiles(params: any): void {
         this.linkedSampleFilesSubject.next(params);
     }
-    getLinkedSampleFilesSubject():Observable<any> {
-        return this.linkedSampleFilesSubject.pipe(flatMap( params => {
-            let requestList:Observable<any>[] = [];
-            let expParams : HttpParams =  new HttpParams()
-                .append('idRequest',params.idRequest)
-                .append('showUploads','Y');
-            let sampleFileParams: HttpParams = new HttpParams().append('idRequest',params.idRequest);
+
+    getLinkedSampleFilesSubject(): Observable<any> {
+        return this.linkedSampleFilesSubject.pipe(flatMap(params => {
+            let requestList: Observable<any>[] = [];
+            let expParams: HttpParams = new HttpParams()
+                .append('idRequest', params.idRequest)
+                .append('showUploads', 'Y');
+            let sampleFileParams: HttpParams = new HttpParams().append('idRequest', params.idRequest);
 
             requestList.push(this.experimentService.getLinkedSampleFiles(sampleFileParams));
-            requestList.push( this.experimentService.getRequestDownloadListWithParams(expParams));
-            try{
-                return forkJoin(requestList).pipe(first(),catchError(this.handleError),
-                    map((resp:any[]) =>{
+            requestList.push(this.experimentService.getRequestDownloadListWithParams(expParams));
+            try {
+                return forkJoin(requestList).pipe(first(), catchError(this.handleError),
+                    map((resp: any[]) => {
                         let errorMessage = "";
-                        if(resp && Array.isArray(resp) ){
-                            if(resp[0] && resp[0].SampleRoot){
-                                let root:any = resp[0].SampleRoot;
-                                let sampleList:any[] = [];
+                        if (resp && Array.isArray(resp)) {
+                            if (resp[0] && resp[0].SampleRoot) {
+                                let root: any = resp[0].SampleRoot;
+                                let sampleList: any[] = [];
                                 Object.keys(root).forEach(key => {
-                                    if(Array.isArray(root[key])){
+                                    if (Array.isArray(root[key])) {
                                         sampleList = sampleList.concat(root[key])
                                     }
                                 });
                                 resp[0] = sampleList;
-                            }else{
+                            } else {
                                 throw new Error(resp[0].message);
                             }
 
-                            if(resp[1] && resp[1].Request){ // GetRequestDownloadList doesn't need check for an array
+                            if (resp[1] && resp[1].Request) { // GetRequestDownloadList doesn't need check for an array
                                 resp[1] = [resp[1].Request];
-                            }else{
+                            } else {
                                 throw new Error(resp[0].message)
                             }
                         }
@@ -164,7 +167,7 @@ export class FileService {
 
                     }));
 
-            }catch(e){
+            } catch (e) {
                 return throwError(e)
             }
 
@@ -172,28 +175,26 @@ export class FileService {
         }))
     }
 
-    emitSaveManageFiles(){
+    emitSaveManageFiles() {
         this.manageFileSaveSubject.next();
     }
-    saveManageFilesObservable(){
+
+    saveManageFilesObservable() {
         return this.manageFileSaveSubject;
     }
 
 
-
-
-
-    prepUploadData(files:any[] ):void{
-        for(let file of  files){
-            if(file.FileDescriptor){
-                file.FileDescriptor = UtilService.getJsonArray(file.FileDescriptor ,file.FileDescriptor);
+    prepUploadData(files: any[]): void {
+        for (let file of  files) {
+            if (file.FileDescriptor) {
+                file.FileDescriptor = UtilService.getJsonArray(file.FileDescriptor, file.FileDescriptor);
                 this.prepUploadData(file.FileDescriptor)
             }
         }
     }
 
-    getUploadFiles(uploadData:any):any[]{
-        if(uploadData && uploadData.FileDescriptor){
+    getUploadFiles(uploadData: any): any[] {
+        if (uploadData && uploadData.FileDescriptor) {
             uploadData.FileDescriptor = UtilService.getJsonArray(uploadData.FileDescriptor, uploadData.FileDescriptor);
             this.prepUploadData(uploadData.FileDescriptor);
             return uploadData.FileDescriptor;
@@ -201,11 +202,12 @@ export class FileService {
         return [];
     }
 
-    emitGetRequestOrganizeFiles(params:any):void{
+    emitGetRequestOrganizeFiles(params: any): void {
         this.organizeFilesSubject.next(params);
     }
-    getRequestOrganizeFilesObservable(onlyRequestDownloadList?:boolean): Observable<any>{
-        return this.organizeFilesSubject.pipe( flatMap((params:any) => {
+
+    getRequestOrganizeFilesObservable(onlyRequestDownloadList?: boolean): Observable<any> {
+        return this.organizeFilesSubject.pipe(flatMap((params: any) => {
                 let requestList: Observable<any>[] = [];
                 let expParams: HttpParams = new HttpParams()
                     .append('idRequest', params.idRequest)
@@ -331,18 +333,18 @@ export class FileService {
         return of({result: "SUCCESS"});
     };
 
-    public startFDTupload(idOrder:string, orderType: string): Observable<any>{
+    public startFDTupload(idOrder: string, orderType: string): Observable<any> {
         let params: HttpParams = new HttpParams();
-        let headers: HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
-        if(orderType === 'e'){
-            params = params.set('idRequest', idOrder );
-        }else{
+        let headers: HttpHeaders = new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded');
+        if (orderType === 'e') {
+            params = params.set('idRequest', idOrder);
+        } else {
             params = params.set('idAnalysis', idOrder);
         }
 
         return this.httpClient.post("/gnomex/FastDataTransferUploadStart.gx", params.toString(), {headers: headers})
-            .pipe(flatMap( (resp:any) =>{
-                let uuid:string = resp.uuid;
+            .pipe(flatMap((resp: any) => {
+                let uuid: string = resp.uuid;
                 let url: string = this.document.location.href;
                 url = url.substring(0, url.indexOf("/gnomex") + 7);
                 url += "/FastDataTransferUploadGetJnlpServlet.gx";
@@ -366,14 +368,45 @@ export class FileService {
         return this.httpClient.post("/gnomex/MakeSoftLinks.gx", params.toString(), {headers: headers});
     };
 
-    private handleError(errorResponse: HttpErrorResponse){
-        if(errorResponse.error instanceof ErrorEvent){
+    private handleError(errorResponse: HttpErrorResponse) {
+        if (errorResponse.error instanceof ErrorEvent) {
             console.error("Client side Error: ", errorResponse.error.message);
-        }else{
+        } else {
             console.error("Server Side Error: ", errorResponse);
         }
         return throwError("An error occurred please contact GNomEx Support.");
 
     }
+
+    public static getFileNodesToDrag(tree: TreeModel): Set<TreeNode> {
+        let nodes: Set<TreeNode> = new Set<TreeNode>();
+
+        // All selected nodes, may have redundant info (e.g. parent and its children selected too)
+        for (let activeNode of tree.activeNodes) {
+            let parentAlreadyInSet: boolean = false;
+            let descendentsAlreadyInSet: any[] = [];
+            for (let nodeInSet of nodes) {
+                // Child node selected after parent node
+                if (activeNode.isDescendantOf(nodeInSet)) {
+                    parentAlreadyInSet = true;
+                    break;
+                }
+                // Parent node selected after children nodes
+                if (nodeInSet.isDescendantOf(activeNode)) {
+                    descendentsAlreadyInSet.push(nodeInSet);
+                }
+            }
+            if (parentAlreadyInSet) {
+                continue;
+            }
+            for (let descendent of descendentsAlreadyInSet) {
+                nodes.delete(descendent);
+            }
+            nodes.add(activeNode);
+        }
+
+        return nodes;
+    }
+
 
 }
