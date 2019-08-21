@@ -54,6 +54,7 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
     public forceShowNone: boolean = false;
 
     @Input() private options: any[] = [];
+    public isOpen: boolean = false;
     public includeLoadingOption: boolean = true;
     public loadedOptions: any[] = [];
 
@@ -106,9 +107,17 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
             if (!optionsChange.currentValue) {
                 this.options = [];
             }
+            this.includeLoadingOption = true;
         }
 
-        this.loadOnlyCurrentValue();
+        setTimeout(() => {
+            if (this.isOpen) {
+                this.filterOptions();
+                this.includeLoadingOption = false;
+            } else {
+                this.loadOnlyCurrentValue();
+            }
+        });
     }
 
     writeValue(obj: any): void {
@@ -177,6 +186,7 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
     }
 
     public onOpened(): void {
+        this.isOpen = true;
         this.onTouchedFn();
         this.inputElement.nativeElement.select(); // Highlights text
 
@@ -187,6 +197,7 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
     }
 
     public onClosed(): void {
+        this.isOpen = false;
         if (!this.innerControl.value && this.outerControl.value) {
             this.selectOption(null);
         }
