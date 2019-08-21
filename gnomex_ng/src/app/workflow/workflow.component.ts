@@ -1,7 +1,6 @@
 import {
-    AfterViewInit, ChangeDetectorRef, Component, ComponentFactoryResolver, ComponentRef, ElementRef, OnInit, ViewChild
+    AfterViewInit, ChangeDetectorRef, Component, ComponentRef, OnInit, ViewChild
 } from "@angular/core";
-import {MatSidenav} from "@angular/material";
 import {ActivatedRoute, Router} from "@angular/router";
 import {QcWorkflowComponent} from "./qc-workflow.component";
 import {LibprepWorkflowComponent} from "./libprep-workflow.component";
@@ -24,28 +23,34 @@ import {FlowcellWorkflowComponent} from "./flowcell-workflow.component";
             height: 100%;
             width: 100%;
         }
-        .sidenav-container {
-            height: 100%;
+
+        .border {
+            border: #C8C8C8 solid thin;
         }
+
+        .background-border {
+            border-radius: 0.3em;
+            border: 1px solid darkgrey;
+        }
+
         #groupTabGroup ::ng-deep.mat-tab-label, ::ng-deep.mat-tab-label-active{
             width: 25%;
             min-width: 0;
             padding: 3px;
             margin: 3px;
-            
         }
     `]
 })
 
 export class WorkflowComponent implements OnInit, AfterViewInit {
-    @ViewChild('sidenav') sidenav: MatSidenav;
     @ViewChild('qcWorkflow') qcWorkflow: QcWorkflowComponent;
     @ViewChild('libPrepWorkflow') libPrepWorkflow: LibprepWorkflowComponent;
     @ViewChild('libPrepQcWorkflow') libPrepQcWorkflow: LibprepQcWorkflowComponent;
     @ViewChild('flowCellAssmWorkflow') flowCellAssmWorkflow: FlowcellassmWorkflowComponent;
     @ViewChild('finalizeWorkflow') finalizeWorkflow: FinalizeWorkflowComponent;
 
-    private showNav: boolean = true;
+    public showNav: boolean = true;
+    public sidenavSplitSize: number = 0;
     private codeStepNext: any = 'QC';
     private selectedTab = 0;
     private resetTab = 0;
@@ -66,7 +71,7 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
-        this.sidenav.open();
+        this.sidenavSplitSize = this.showNav ? 15 : 0;
         this.route
             .data
             .subscribe(v => {
@@ -206,11 +211,11 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
 
     toggle(event) {
         if (this.showNav) {
-            this.sidenav.close();
+            this.sidenavSplitSize = 0;
             this.showNav = false;
 
         } else {
-            this.sidenav.open();
+            this.sidenavSplitSize = 15;
             this.showNav = true;
         }
     }

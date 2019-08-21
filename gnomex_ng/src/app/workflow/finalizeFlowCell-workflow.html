@@ -2,7 +2,7 @@
     <as-split (dragEnd)="sizeGridColumn($event)" style="background-color: white">
         <as-split-area size="50">
             <div class="flex-container-col full-height full-width padded">
-                <div class="flex-row-container">
+                <div class="flex-row-container" style="font-size: medium;">
                     <img [src]="'./assets/DNA_diag.png'" height="16" width="16" style="margin-top: .65em">
                     <mat-label style="margin-left: .4em;margin-top: .4em;">{{label}}</mat-label>
                 </div>
@@ -20,6 +20,7 @@
                                      (rowSelected)="selectedRow($event)"
                                      [rowSelection]="'single'"
                                      (gridReady)="onGridReady($event)"
+                                     (gridSizeChanged)="onGridSizeChanged($event)"
                                      [enableSorting]="true"
                                      [rowClassRules]="this.workflowService.assmGridRowClassRules"
                                      [enableFilter]="true"

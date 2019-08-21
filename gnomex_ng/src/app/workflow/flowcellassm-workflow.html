@@ -2,7 +2,7 @@
     <as-split (dragEnd)="onDragEnd($event)" style="background-color: white">
         <as-split-area size="50">
             <div class="flex-container-col full-height full-width padded">
-                <div class="flex-container-row">
+                <div class="flex-container-row padded-bottom" style="font-size: medium;">
                     <img [src]="'./assets/DNA_diag.png'" height="16" width="16" style="margin-top: .65em">
                     <mat-label style="margin-left: .4em;margin-top: .4em;">{{label}}</mat-label>
                 </div>
@@ -38,6 +38,7 @@
                                      (rowSelected)="selectedRow($event)"
                                      [rowSelection]="'multiple'"
                                      (gridReady)="onGridReady($event)"
+                                     (gridSizeChanged)="onGridSizeChanged($event)"
                                      [enableSorting]="true"
                                      [stopEditingWhenGridLosesFocus]="true"
                                      (cellValueChanged) = "onCellValueChanged($event)"
@@ -88,6 +89,7 @@
                                      [rowData]="assmItemList"
                                      (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
                                      (gridReady)="onAssmGridReady($event)"
+                                     (gridSizeChanged)="onGridSizeChanged($event)"
                                      [stopEditingWhenGridLosesFocus]="true"
                                      [enableSorting]="true"
                                      [enableFilter]="true"

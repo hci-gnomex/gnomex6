@@ -16,7 +16,7 @@ import {IGnomexErrorResponse} from "../../../util/interfaces/gnomex-error.respon
             <div style="padding-bottom: .5em;padding-left:1em;">
                 <img [src]="dtService.datatrackListTreeNode.icon">Genome Build: {{dtService.datatrackListTreeNode.label}}
             </div>
-            <div style="display:flex; flex: 1;">
+            <div class="overflow-auto" style="display:flex; flex: 1;">
 
                 <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border" (selectedTabChange)="tabChanged($event)">
                     <mat-tab style="height:100%" label="Details">
