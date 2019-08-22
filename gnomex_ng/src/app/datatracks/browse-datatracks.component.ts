@@ -43,7 +43,7 @@ import {HttpParams} from "@angular/common/http";
             padding-right: 1em;
         }
 
-        .vertical-spacer { 
+        .vertical-spacer {
             height: 0.3em;
             min-height: 0.3em;
         }
@@ -91,8 +91,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     private navDatatrackList: any;
     private labListSubscription: Subscription;
 
-    private idDataTrackFolderToSelect: string = null;
-    private idDataTrackToSelect: string = null;
 
     ngOnInit() {
         this.options = {
@@ -166,28 +164,27 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                     let idDataTrack: string = this.gnomexService.orderInitObj.idDataTrack;
                     if (this.treeModel && idDataTrack) {
                         let dtNode: ITreeNode = UtilService.findTreeNode(this.treeModel, "idDataTrack", idDataTrack);
-                        if(dtNode) {
+                        if (dtNode) {
                             dtNode.ensureVisible();
                             dtNode.setIsActive(true);
                             dtNode.scrollIntoView();
                         } else {
                             this.disableDelete = false;
-                            let navArray = ["/datatracks",  {outlets: {"datatracksPanel": [idDataTrack]}}];
+                            let navArray = ["/datatracks", {outlets: {"datatracksPanel": [idDataTrack]}}];
                             this.router.navigate(navArray);
                         }
                         this.gnomexService.orderInitObj = null;
                     }
-                } else if (this.idDataTrackToSelect || this.idDataTrackFolderToSelect) {
-                    let attribute = this.idDataTrackToSelect ? "idDataTrack" : "idDataTrackFolder";
-                    let value = this.idDataTrackToSelect ? this.idDataTrackToSelect : this.idDataTrackFolderToSelect;
+                } else if(this.datatracksService.activeNodeToSelect) {
+                    let attribute = this.datatracksService.activeNodeToSelect.attribute;
+                    let value = this.datatracksService.activeNodeToSelect.value;
                     let node: ITreeNode = UtilService.findTreeNode(this.treeModel, attribute, value);
                     if (node) {
                         node.ensureVisible();
                         node.setIsActive(true);
                         node.scrollIntoView();
                     }
-                    this.idDataTrackToSelect = null;
-                    this.idDataTrackFolderToSelect = null;
+                    this.datatracksService.activeNodeToSelect = null;
                 }
             });
 
@@ -225,9 +222,15 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         this.dialogsService.genericDialogContainer(MoveDataTrackComponent, title, currentItem.icon, configuration).subscribe((result) => {
             if (result) {
                 if (currentItem.isDataTrack && currentItem.idDataTrack) {
-                    this.idDataTrackToSelect = currentItem.idDataTrack;
+                    this.datatracksService.activeNodeToSelect = {
+                        attribute: "idDataTrack",
+                        value: currentItem.idDataTrack
+                    };
                 } else if (currentItem.isDataTrackFolder && currentItem.idDataTrackFolder) {
-                    this.idDataTrackFolderToSelect = currentItem.idDataTrackFolder;
+                    this.datatracksService.activeNodeToSelect = {
+                        attribute: "idDataTrackFolder",
+                        value: currentItem.idDataTrackFolder
+                    };
                 }
                 this.datatracksService.refreshDatatracksList_fromBackend();
             }
@@ -471,14 +474,20 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
     public onDataTrackFolderCreated(idDataTrackFolder: string): void {
         if (idDataTrackFolder) {
-            this.idDataTrackFolderToSelect = idDataTrackFolder;
+            this.datatracksService.activeNodeToSelect = {
+                attribute: "idDataTrackFolder",
+                value: idDataTrackFolder
+            };
             this.datatracksService.refreshDatatracksList_fromBackend();
         }
     }
 
     public onDataTrackCreated(idDataTrack: string): void {
         if (idDataTrack) {
-            this.idDataTrackToSelect = idDataTrack;
+            this.datatracksService.activeNodeToSelect = {
+                attribute: "idDataTrack",
+                value: idDataTrack
+            };
             this.datatracksService.refreshDatatracksList_fromBackend();
         }
     }

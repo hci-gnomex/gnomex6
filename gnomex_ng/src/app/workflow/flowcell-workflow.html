@@ -29,6 +29,7 @@
                          (rowSelected)="selectedRow($event)"
                          [rowSelection]="'single'"
                          (gridReady)="onGridReady($event)"
+                         (gridSizeChanged)="onGridSizeChanged($event)"
                          [enableSorting]="true"
                          (cellValueChanged) = "onCellValueChanged($event)"
                          [enableFilter]="true"

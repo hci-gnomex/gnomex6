@@ -39,7 +39,7 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
                     </mat-tab-group>
                 </div>
                 <div class="full-width flex-container-row right-align">
-                    <div class="full-height flex-grow" style="height: 2.85em;">&nbsp;
+                    <div class="full-height flex-grow">
                     </div>
                     <div>
                         <save-footer *ngIf="!this.noSave" (saveClicked)="saveManager()"

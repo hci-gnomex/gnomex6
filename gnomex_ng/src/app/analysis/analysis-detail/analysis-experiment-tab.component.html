@@ -1,34 +1,17 @@
-<div class="full-height full-width flex-column-container">
-    <div class="align-center flex-row-container justify-space-between flex-grow">
-        <custom-combo-box style="width:30%;" placeholder="Lab Filter" [options]="this.labList"
-                            [displayField]="this.prefService.labDisplayField"
-                            [formControl]="this.currentLabFC">
-        </custom-combo-box>
-        <mat-radio-group [(ngModel)]="gridRaidoOpt" class="filter" (change)="onGridTypeChange()">
-            <mat-radio-button [value]="HYBS" class="filterOption" > Microarray Hybridizations{{"(" + this.hybsList.length + ")"}}</mat-radio-button>
-            <mat-radio-button [value]="SEQ_LANES" class="filterOption" > Illumina Sequencing{{"(" + this.lanesList.length + ")"}} </mat-radio-button>
-            <mat-radio-button [value]="SAMPLE" class="filterOption"> Other{{"(" + this.sampleList.length + ")"}} </mat-radio-button>
-        </mat-radio-group>
-
-    </div>
-    <div style="display:flex; margin-top:2em;">
-        <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-        <div style="margin-left:auto; font-size:small;">
-            <button color="primary" mat-button [disabled]="!this.analysisService.getEditMode()" (click)="removeItems()" >
-                <img class="icon" [src]="this.constService.ICON_DELETE"> remove
-            </button>
-            <button color="primary" mat-button [disabled]="!this.analysisService.getEditMode()" (click)="clearAllItems()" >
-                <img class="icon" [src]="this.constService.ICON_FOLDER_DELETE"> Clear all
-            </button>
-
-        </div>
-    </div>
-
-    <div style="flex:10;"class="flex-row-container">
-        <as-split *ngIf="tabVisible" > <!-- split  mat-tabs have issues -->
-            <as-split-area  size="20">
-                <div class="br-exp-item" style="height:100%">
-                    <div class="flex-column-container" style="height:100%;">
+<div class="full-height full-width flex-column-container small-font ">
+    <as-split *ngIf="tabVisible" > <!-- split  mat-tabs have issues -->
+        <as-split-area *ngIf="this.analysisService.getEditMode()" size="20" [order]="1">
+            <div class="full-height full-width flex-container-col">
+                <div class="padded-left-right-top">
+                    <custom-combo-box class="moderate-input"
+                                      placeholder="Lab Filter"
+                                      [options]="this.labList"
+                                      [displayField]="this.prefService.labDisplayField"
+                                      [formControl]="this.currentLabFC">
+                    </custom-combo-box>
+                </div>
+                <div class="flex-grow padded no-overflow minimum-nonzero-height-ignored">
+                    <div class="full-height full-width border-subtle">
                         <tree-root #tree
                                    (activate)="treeOnSelect($event)"
                                    [nodes]="items" [options]="options">
@@ -37,15 +20,34 @@
                                     <img src="{{node.level === 3 ? this.constService.ICON_GREEN_BULLET : node.data.icon }}" class="tree-node-icon icon">
                                     <span [matTooltip]="node.data.label" >{{ node.data.label }}</span>
                                 </div>
-
                             </ng-template>
                         </tree-root>
                     </div>
-                </div> <!-- end tree container -->
-            </as-split-area>
-
-            <as-split-area size="80">
-                <div  class="datatracks-panel">
+                </div>
+            </div> <!-- end tree container -->
+        </as-split-area>
+        <as-split-area size="80" [order]="2">
+            <div class="full-width full-height flex-container-col">
+                <div class="align-baseline flex-row-container">
+                    <div *ngIf="this.analysisService.getEditMode()" class="padded-right">
+                        <button color="primary" mat-button [disabled]="!this.analysisService.getEditMode()" (click)="removeItems()" >
+                            <img class="icon" [src]="this.constService.ICON_DELETE"> Remove
+                        </button>
+                    </div>
+                    <div *ngIf="this.analysisService.getEditMode()" class="padded-right">
+                        <button color="primary" mat-button [disabled]="!this.analysisService.getEditMode()" (click)="clearAllItems()" >
+                            <img class="icon" [src]="this.constService.ICON_FOLDER_DELETE"> Clear all
+                        </button>
+                    </div>
+                    <div class="flex-grow">
+                    </div>
+                    <mat-radio-group [(ngModel)]="gridRaidoOpt" class="flex-container-row padded" (change)="onGridTypeChange()">
+                        <mat-radio-button [value]="HYBS" class="padded-left-right" > Microarray Hybridizations{{"(" + this.hybsList.length + ")"}}</mat-radio-button>
+                        <mat-radio-button [value]="SEQ_LANES" class="padded-left-right" > Illumina Sequencing{{"(" + this.lanesList.length + ")"}} </mat-radio-button>
+                        <mat-radio-button [value]="SAMPLE" class="padded-left-right"> Other{{"(" + this.sampleList.length + ")"}} </mat-radio-button>
+                    </mat-radio-group>
+                </div>
+                <div  class="flex-grow padded">
                     <ag-grid-angular style="width: 100%; height: 100%;" class="ag-theme-fresh"
                                      [gridOptions]="gridOpt"
                                      [rowSelection]="'multiple'"
@@ -57,12 +59,12 @@
                                      [enableColResize]="true"
                                      (treeDrop)="onDrop($event)"
                                      [treeAllowDrop]="allowDrop.bind(this)">
-
                     </ag-grid-angular>
                 </div>
-            </as-split-area>
+            </div>
+        </as-split-area>
         </as-split>
-    </div>
+
 </div>
 
 

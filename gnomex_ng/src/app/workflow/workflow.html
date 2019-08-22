@@ -1,53 +1,61 @@
-<mat-sidenav-container class="full-width full-height" (backdropClick)="close('backdrop')">
-    <mat-sidenav style="width:15%;" #sidenav mode="side" (keydown.escape)="close('escape')">
-        <mat-tab-group id="groupTabGroup"  [selectedIndex]="selectedTab" (selectedTabChange)="onGroupsTabChange($event)">
-            <mat-tab>
-                <ng-template mat-tab-label>
-                    <img matTooltip="QC Worklist" [src]="'./assets/data-accept.png'">
-                </ng-template>
-                <div class="flex-container-col">
-                    <mat-label>QC Worklist</mat-label>
-                    <button mat-button *ngFor="let option of combinedQCTabItems" class="row-one" (click)="onClickQC($event)" [value]="option.label">{{option.label}}</button>
+<div class="full-width full-height background-border padded">
+    <div class="flex-container-row flex-grow full-height">
+        <as-split>
+            <as-split-area [size]=sidenavSplitSize>
+                <div class="full-height flex-grow border">
+                    <mat-tab-group id="groupTabGroup"  [selectedIndex]="selectedTab" (selectedTabChange)="onGroupsTabChange($event)">
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                                <img matTooltip="QC Worklist" [src]="'./assets/data-accept.png'">
+                            </ng-template>
+                            <div class="flex-container-col padded">
+                                <mat-label>QC Worklist</mat-label>
+                                <button mat-button *ngFor="let option of combinedQCTabItems" class="row-one" (click)="onClickQC($event)" [value]="option.label">{{option.label}}</button>
+                            </div>
+                        </mat-tab>
+                        <mat-tab>
+                            <ng-template mat-tab-label>
+                                <img matTooltip="Illumina workflow" [src]="'./assets/DNA_diag_lightening.png'">
+                            </ng-template>
+                            <div class="flex-container-col padded">
+                                <mat-label>Illumina</mat-label>
+                                <button mat-button (click)="onClickLibPrep()"><img class="icon" [src]="'./assets/flask.png'">Lib Prep</button>
+                                <button mat-button (click)="onClickLibPrepQC()"><img class="icon" [src]="'./assets/flask.png'">Lib Prep QC</button>
+                                <button mat-button (click)="onClickFlowCellAssm()"><img class="icon" [src]="'./assets/DNA_diag.png'">Flow Cell Assem</button>
+                                <button mat-button (click)="onClickFinalizedFlowCell()"><img class="icon" [src]="'./assets/DNA_diag.png'">Finalize Flow Cell</button>
+                                <button mat-button (click)="onClickDataPipeline()"><img class="icon"[src]="'./assets/server_go.png'">Data Pipeline</button>
+                                <button mat-button (click)="onClickFlowCells()"><img class="icon" [src]="'./assets/rectangle.png'">Flow Cells</button>
+                            </div>
+                        </mat-tab>
+                        <mat-tab [hidden]="microarrayDisabled" *ngIf="!microarrayDisabled">
+                            <ng-template mat-tab-label>
+                                <img class="icon" matTooltip="Microarray workflow" [src]="'./assets/microarray_small.png'">
+                            </ng-template>
+                            <div class="flex-column-container">
+                                <mat-label>Microarray</mat-label>
+                            </div>
+                        </mat-tab>
+                    </mat-tab-group>
                 </div>
-            </mat-tab>
-            <mat-tab>
-                <ng-template mat-tab-label>
-                    <img matTooltip="Illumina workflow" [src]="'./assets/DNA_diag_lightening.png'">
-                </ng-template>
-                <div class="flex-container-col">
-                    <mat-label>Illumina</mat-label>
-                    <button mat-button (click)="onClickLibPrep()"><img class="icon" [src]="'./assets/flask.png'">Lib Prep</button>
-                    <button mat-button (click)="onClickLibPrepQC()"><img class="icon" [src]="'./assets/flask.png'">Lib Prep QC</button>
-                    <button mat-button (click)="onClickFlowCellAssm()"><img class="icon" [src]="'./assets/DNA_diag.png'">Flow Cell Assem</button>
-                    <button mat-button (click)="onClickFinalizedFlowCell()"><img class="icon" [src]="'./assets/DNA_diag.png'">Finalize Flow Cell</button>
-                    <button mat-button (click)="onClickDataPipeline()"><img class="icon"[src]="'./assets/server_go.png'">Data Pipeline</button>
-                    <button mat-button (click)="onClickFlowCells()"><img class="icon" [src]="'./assets/rectangle.png'">Flow Cells</button>
-                </div>
-            </mat-tab>
-            <mat-tab [hidden]="microarrayDisabled" *ngIf="!microarrayDisabled">
-                <ng-template mat-tab-label>
-                    <img class="icon" matTooltip="Microarray workflow" [src]="'./assets/microarray_small.png'">
-                </ng-template>
-                <div class="flex-column-container">
-                    <mat-label>Microarray</mat-label>
-                </div>
-            </mat-tab>
-        </mat-tab-group>
-    </mat-sidenav>
-    <mat-sidenav-content style="background-color: white">
-        <div class="flex-container-col full-width full-height">
-            <div>
-                <button mat-button [matTooltip]="showNav ? 'Minimize navigation panel' : 'Expand navigation panel'" (click)="toggle($event)">
-                    <img *ngIf="showNav;else closedNav" [src]="'./assets/arrow_left.png'">
-                </button>
-                <ng-template #closedNav>
-                    <img [src]="'./assets/arrow_right.png'">
-                </ng-template>
-            </div>
+            </as-split-area>
+            <as-split-area [size]="100 - sidenavSplitSize">
+                <div  class="full-width full-height border">
+                    <div class="flex-container-col full-width full-height padded">
+                        <div>
+                            <button mat-button [matTooltip]="showNav ? 'Minimize navigation panel' : 'Expand navigation panel'" (click)="toggle($event)">
+                                <img *ngIf="showNav;else closedNav" [src]="'./assets/arrow_left.png'">
+                            </button>
+                            <ng-template #closedNav>
+                                <img [src]="'./assets/arrow_right.png'">
+                            </ng-template>
+                        </div>
 
-            <div class="flex-grow">
-                <ndc-dynamic [ndcDynamicComponent]="workflowOutlet" [ndcDynamicInputs]="inputs" (ndcDynamicCreated)="onCreatedComponent($event)"></ndc-dynamic>
-            </div>
-        </div>
-    </mat-sidenav-content>
-</mat-sidenav-container>
+                        <div class="flex-grow">
+                            <ndc-dynamic [ndcDynamicComponent]="workflowOutlet" [ndcDynamicInputs]="inputs" (ndcDynamicCreated)="onCreatedComponent($event)"></ndc-dynamic>
+                        </div>
+                    </div>
+                </div>
+            </as-split-area>
+        </as-split>
+    </div>
+</div>

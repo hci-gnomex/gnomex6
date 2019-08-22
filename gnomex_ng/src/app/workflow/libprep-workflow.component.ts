@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
 import {GnomexService} from "../services/gnomex.service";
-import {GridApi} from "ag-grid-community";
+import {GridApi, GridSizeChangedEvent} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -266,6 +266,10 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
         this.gridColumnApi = params.columnApi;
         this.codeStepNext =  this.workflowService.ILLSEQ_PREP;
         this.initialize();
+    }
+
+    onGridSizeChanged(event: GridSizeChangedEvent) {
+        event.api.sizeColumnsToFit();
     }
 
     areAandBTagsUnique(): void {

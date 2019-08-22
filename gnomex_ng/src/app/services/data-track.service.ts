@@ -1,8 +1,7 @@
 import {Injectable} from "@angular/core";
-import {Http,Headers, Response, URLSearchParams} from "@angular/http";
+import {Http, Headers, Response} from "@angular/http";
 import {Observable, of, throwError} from "rxjs";
 import {Subject} from "rxjs";
-import {BehaviorSubject} from "rxjs";
 import {CookieUtilService} from "./cookie-util.service";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {catchError, map} from "rxjs/operators";
@@ -17,6 +16,7 @@ export class DataTrackService {
     private _previousURLParams: HttpParams = null;
     private _datatrackListTreeNode: any;
     private _labList: any[] =[];
+    private _activeNodeToSelect: any = {};
 
     constructor(private http: Http, private cookieUtilService: CookieUtilService,
                 private httpClient: HttpClient,
@@ -40,6 +40,13 @@ export class DataTrackService {
     }
     get previousURLParams():HttpParams{
         return this._previousURLParams;
+    }
+
+    set activeNodeToSelect(data: any) {
+        this._activeNodeToSelect = data;
+    }
+    get activeNodeToSelect(): any {
+        return this._activeNodeToSelect;
     }
 
     getDataTrack(params: HttpParams): Observable<any> {
@@ -234,6 +241,31 @@ export class DataTrackService {
     public getDownloadEstimatedSize(keys: string): Observable<any> {
         let params: HttpParams = new HttpParams().set("keys", keys);
         return this.httpClient.get("/gnomex/GetEstimatedDownloadDataTrackSize.gx", {params: params});
+    }
+
+    public getActiveNodeAttribute(node: any): void {
+        this.activeNodeToSelect = null;
+        if(node && node.data) {
+            let attribute: string = "";
+            let value: string = "";
+            if(node.data.isOrganism) {
+                attribute = "idOrganism";
+                value = node.data.idOrganism;
+            } else if(node.data.isGenomeBuild) {
+                attribute = "idGenomeBuild";
+                value = node.data.idGenomeBuild;
+            } else if(node.data.isDataTrackFolder) {
+                attribute = "idDataTrackFolder";
+                value = node.data.idDataTrackFolder;
+            } else if(node.data.isDataTrack) {
+                attribute = "idDataTrack";
+                value = node.data.idDataTrack;
+            }
+            this.activeNodeToSelect = {
+                attribute: attribute,
+                value: value
+            };
+        }
     }
 
 }

@@ -25,6 +25,7 @@
                          [rowData]="workingWorkItemList"
                          (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
                          (rowSelected)="selectedRow($event)"
+                         (gridSizeChanged)="onGridSizeChanged($event)"
                          (gridReady)="onGridReady($event)"
                          [enableSorting]="true"
                          (cellValueChanged) = "onCellValueChanged($event)"

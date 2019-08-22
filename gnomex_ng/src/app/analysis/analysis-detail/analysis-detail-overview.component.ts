@@ -268,7 +268,8 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
         this.analysisService.saveAnalysis(params).pipe(first()).subscribe(resp => {
             if(resp) {
                 if(resp.idAnalysis) {
-                    this.gnomexService.navByNumber("A" + resp.idAnalysis);
+                    this.analysisService.setActiveNodeId = "a" + resp.idAnalysis;
+                    this.analysisService.refreshAnalysisGroupList_fromBackend();
                     this.dialogsService.stopAllSpinnerDialogs();
                 }
             }

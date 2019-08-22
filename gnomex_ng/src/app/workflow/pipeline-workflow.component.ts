@@ -1,8 +1,7 @@
 import {Component, OnInit} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
-import { URLSearchParams } from "@angular/http";
 import {GnomexService} from "../services/gnomex.service";
-import {GridOptions, GridApi} from "ag-grid-community";
+import {GridApi} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -60,38 +59,38 @@ export class PipelineWorkflowComponent implements OnInit {
                     editable: false,
                     field: "flowCellNumber",
                     valueFormatter: this.getFullFlowCellChannelNumber,
-                    width: 100
+                    width: 130
                 },
                 {
                     headerName: "Flow Cell Sample #",
                     editable: false,
                     field: "number",
-                    width: 260
+                    width: 200
                 },
                 {
                     headerName: "Requested # Cycles",
                     editable: false,
                     field: "idNumberSequencingCycles",
                     valueFormatter: this.getNumberSequencingCycles.bind(this),
-                    width: 100
+                    width: 130
                 },
                 {
                     headerName: "Actual # Cycles",
                     editable: false,
                     field: "numberSequencingCyclesActual",
-                    width: 100
+                    width: 130
                 },
                 {
                     headerName: "Folder name",
                     editable: false,
                     field: "fileName",
-                    width: 250
+                    width: 200
                 },
                 {
                     headerName: "Reads PF (M)",
                     editable: true,
                     field: "read1ClustersPassedFilterM",
-                    width: 100,
+                    width: 130,
                     cellRendererFramework: TextAlignLeftMiddleRenderer,
                     valueSetter: PipelineWorkflowComponent.qualCalcValueSetter,
                     validateService: this.gridColumnValidatorService,
@@ -104,12 +103,12 @@ export class PipelineWorkflowComponent implements OnInit {
                     headerName: "Q30 % (eg 88.5)",
                     editable: true,
                     field: "q30PercentForDisplay",
-                    width: 100
+                    width: 130
                 },
                 {
                     headerName: "Pipeline Protocol",
                     editable: false,
-                    width: 290,
+                    width: 200,
                     field: "idPipelineProtocol",
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
@@ -195,7 +194,6 @@ export class PipelineWorkflowComponent implements OnInit {
     onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
-        params.api.setHeaderHeight(50);
         this.initialize();
     }
 
