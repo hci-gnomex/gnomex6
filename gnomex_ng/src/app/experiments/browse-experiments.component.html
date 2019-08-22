@@ -7,7 +7,7 @@
             </browse-filter>
         </div>
         <div class="full-width background vertical-spacer"></div>
-        <div class="flex-container-row flex-grow">
+        <div class="flex-container-row flex-grow full-height">
             <as-split>
                 <as-split-area size="20">
                     <div class="full-height flex-grow border"> <!-- start tree container -->
@@ -31,7 +31,8 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="full-width flex-grow left-right-padding no-overflow">
+                            <!-- minimum-nonzero-height-ignored is necessary to keep the tree from overflowing its bounds -->
+                            <div class="full-width flex-grow left-right-padding no-overflow minimum-nonzero-height-ignored">
                                 <div class="full-width full-height border">
                                     <tree-root #tree
                                                (moveNode)="onMoveNode($event)"
@@ -41,8 +42,8 @@
                                                [nodes]="items"
                                                [options]="options">
                                         <ng-template #treeNodeTemplate let-node let-index="index">
-                                            <div class="full-width no-word-wrap">
-                                                <img src="{{node.data.icon}}" height="16" width="16">
+                                            <div class="full-width no-word-wrap tree-node-font">
+                                                <img src="{{node.data.icon}}" class="tree-node-icon icon">
                                                 <span>{{ node.data.label }}</span>
                                             </div>
                                         </ng-template>

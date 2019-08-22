@@ -19,6 +19,7 @@ import {Router} from "@angular/router";
 import {DictionaryService} from "../../services/dictionary.service";
 import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
 import {ActionType} from "../interfaces/generic-dialog-action.model";
+import {UtilService} from "../../services/util.service";
 
 const DATATRACK = "DATATRACK";
 const GENOMEBUILD = "GENOMEBUILD";
@@ -115,7 +116,14 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     }
 
     public makeNewDataTrack(): void {
-        let title: string = "Add new data track to " + this.selectedNode.data.label;
+        let title: string = "Add new data track to ";
+        if(this.selectedNode.data.isDataTrack) {
+            title += this.selectedNode.parent.data.label;
+        } else {
+            title += this.selectedNode.data.label;
+        }
+        title = UtilService.getSubStr(title, 65);
+
         let config: MatDialogConfig = new MatDialogConfig();
         config.width = "40em";
         config.height = "23em";
@@ -134,7 +142,14 @@ export class MenuHeaderDataTracksComponent implements OnInit {
     }
 
     public makeNewFolder(): void {
-        let title = "Add new data track folder to " + this.selectedNode.data.label;
+        let title: string = "Add new data track folder to ";
+        if(this.selectedNode.data.isDataTrack) {
+            title += this.selectedNode.parent.data.label;
+        } else {
+            title += this.selectedNode.data.label;
+        }
+        title = UtilService.getSubStr(title, 65);
+
         let config: MatDialogConfig = new MatDialogConfig();
         config.width = "40em";
         config.height = "18em";
@@ -161,7 +176,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
 
         this.dataTrackService.duplicateDataTrack(params).subscribe((response: any) => {
             this.dialogsService.removeSpinnerWorkItem();
-            this.dataTrackService.refreshDatatracksList_fromBackend();
+            this.onDataTrackCreated.emit(response.idDataTrack);
         }, (err:IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
         });
@@ -172,6 +187,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         if (type === DATATRACK) {
             this.dialogsService.startDefaultSpinnerDialog();
             this.dataTrackService.deleteDataTrack(params).subscribe((response: any) => {
+                this.dataTrackService.getActiveNodeAttribute(this.selectedNode.parent);
                 this.router.navigateByUrl("/datatracks");
                 this.dataTrackService.refreshDatatracksList_fromBackend();
             }, (err:IGnomexErrorResponse) =>{
@@ -180,6 +196,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         } else if (type === DATATRACKFOLDER) {
             this.dialogsService.startDefaultSpinnerDialog();
             this.dataTrackService.deleteDataTrackFolder(params).subscribe((response: any) => {
+                this.dataTrackService.getActiveNodeAttribute(this.selectedNode.parent);
                 this.router.navigateByUrl("/datatracks");
                 this.dataTrackService.refreshDatatracksList_fromBackend();
             },(err:IGnomexErrorResponse) => {
@@ -188,6 +205,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         } else if (type === GENOMEBUILD) {
             this.dialogsService.startDefaultSpinnerDialog();
             this.dataTrackService.deleteGenomeBuild(params).subscribe((response: any) => {
+                this.dataTrackService.getActiveNodeAttribute(this.selectedNode.parent);
                 this.router.navigateByUrl("/datatracks");
                 this.dictionaryService.reloadAndRefresh(() => {
                     this.dataTrackService.refreshDatatracksList_fromBackend();
@@ -198,6 +216,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         } else if (type === ORGANISM) {
             this.dialogsService.startDefaultSpinnerDialog();
             this.dataTrackService.deleteOrganism(params).subscribe((response: any) => {
+                this.dataTrackService.getActiveNodeAttribute(this.selectedNode.parent);
                 this.router.navigateByUrl("/datatracks");
                 this.dictionaryService.reloadAndRefresh(() => {
                     this.dataTrackService.refreshDatatracksList_fromBackend();
@@ -264,15 +283,15 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                 }
             }
 
-            this.dialogsService
-                .confirm(confirmString, level)
-                .subscribe(
-                    res => {
+            if(confirmString) {
+                this.dialogsService.confirm(confirmString, level).subscribe(res => {
                         if (res) {
                             this.deleteDataTrack(type, params);
                         }
-                    }
-                );
+                    });
+            } else {
+                this.dialogsService.alert(level, "Warning", DialogType.WARNING);
+            }
         }
     }
 
@@ -316,6 +335,8 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                     this.dialogsService.alert("No data files exist for the selected item(s)", "Data Not Found");
                 } else {
                     let config: MatDialogConfig = new MatDialogConfig();
+                    config.width = "35em";
+                    config.height = "15em";
                     config.data = {
                         estimatedDownloadSize: result.size,
                         uncompressedDownloadSize: result.uncompressedSize
@@ -327,6 +348,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
                                     let downloadParams: HttpParams = new HttpParams()
                                         .set("mode", "zip");
                                     let progressWindowConfig: MatDialogConfig = new MatDialogConfig();
+                                    progressWindowConfig.width = "35em";
                                     progressWindowConfig.data = {
                                         url: "DownloadDataTrackFileServlet.gx",
                                         estimatedDownloadSize: parseInt(result.size),

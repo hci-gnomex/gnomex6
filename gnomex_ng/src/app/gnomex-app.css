@@ -84,6 +84,10 @@ mat-form-field.dialogFormField {
     margin: 0.4rem 0rem;
 }
 
+mat-form-field.moderate-input {
+    width: 10em;
+}
+
 mat-form-field.short-input {
     width: 10em;
 }
@@ -112,6 +116,39 @@ div.mainnav {
     transition: 0.5s;
     padding: 1%;
     height: 100%;
+}
+
+.ag-theme-balham .annotationRequiredRow {
+    font-weight: bold !important;
+    font-style: italic !important;
+    color: black !important;
+}
+
+.ag-theme-balham .annotationActiveRow {
+    font-style: normal !important;
+    color: black !important;
+}
+
+.ag-theme-balham .annotationInactiveRow {
+    font-style: italic !important;
+    color: #647478 !important;
+}
+
+.ag-theme-balham .otherBillingItem {
+    font-style: italic !important;
+    color: grey !important;
+}
+
+.ag-theme-balham .workFlowOnColor {
+    background-color: #f1eed6 !important;
+}
+
+.ag-theme-balham .workFlowOffColor {
+    background-color: white !important;
+}
+
+.ag-theme-balham .workFlowSelectedColor {
+    background-color: deepskyblue !important;
 }
 
 .ag-theme-fresh .annotationRequiredRow {
@@ -171,6 +208,10 @@ div.mainnav {
 
 .mat-tab-body-wrapper {
     height: 100%;
+}
+
+.tree-node-font {
+    font-size: small;
 }
 
 .login-background {
@@ -257,6 +298,11 @@ div.mainnav {
 
 img.icon {
     margin-right: 0.5em;
+}
+
+img.tree-node-icon {
+    width: 16px;
+    height: 16px;
 }
 
 .ellipsis {
@@ -351,6 +397,11 @@ img.icon {
 
 .double-padded-right {
     padding-right: 0.6em;
+}
+
+/* minimum-nonzero-height-ignored is necessary to keep the angular tree from overflowing its bounds for some reason */
+.minimum-nonzero-height-ignored {
+    height: 1px;
 }
 
 .warningLabelMinor {

@@ -50,7 +50,10 @@ const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
         .vertical-center { vertical-align: middle; }
         .horizontal-center { text-align: center; }
 
-        .vertical-spacer { height: 0.3em; }
+        .vertical-spacer {
+            height: 0.3em;
+            min-height: 0.3em;
+        }
 
 
         .padding { padding: 0.3em; }
@@ -83,6 +86,7 @@ const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
         .background-lightyellow {
             background-color: lightyellow;
         }
+        
     `]
 })
 
@@ -155,6 +159,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
         this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
             this.buildTree(response.Lab);
+            this.onShowEmptyFolders(this.showEmptyFolders);
             if (response && response.experimentCount) {
                 this.experimentCount = response.experimentCount;
                 this.experimentCountMessage = response.message ? "(" + response.message + ")" : "";
@@ -166,7 +171,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             if (this.experimentsService.browsePanelParams && this.experimentsService.browsePanelParams["refreshParams"]) {
                 this.experimentsService.emitExperimentOverviewList(response.Lab);
 
-                this.showEmptyFolders = this.experimentsService.browsePanelParams.get("showEmptyProjectFolders") === "Y" ? true : false;
                 let navArray: any[] = ["/experiments"];
                 this.experimentsService.browsePanelParams["refreshParams"] = false;
                 this.router.navigate(navArray);
@@ -174,10 +178,10 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 if (this.treeModel && this.treeModel.getActiveNode()) {// Refresh to initial state when search button clicked
                     this.treeModel.getActiveNode().setIsActive(false);
                     this.treeModel.setFocusedNode(null);
-                    this.disableNewProject = true;
-                    this.disableDeleteProject = true;
-                    this.disableDeleteExperiment = true;
                 }
+                this.disableNewProject = true;
+                this.disableDeleteProject = true;
+                this.disableDeleteExperiment = true;
             }
 
 
@@ -217,15 +221,20 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             if (orderInitObj) {
                 console.log("Nav mode: true");
 
-                let idProject = this.gnomexService.orderInitObj.idProject;
+                if(this.experimentsService.usePreviousURLParams) {
+                    this.experimentsService.usePreviousURLParams = false;
+                    this.experimentsService.refreshProjectRequestList_fromBackend();
+                } else {
+                    let idProject = this.gnomexService.orderInitObj.idProject;
 
-                let ids: HttpParams = new HttpParams()
-                    .set("idProject", idProject ? idProject : '')
-                    .set("showEmptyProjectFolders", "Y")
-                    .set("showCategory", "N")
-                    .set("showSamples", "N");
-                this.experimentsService.browsePanelParams = ids;
-                this.experimentsService.getProjectRequestList_fromBackend(ids);
+                    let ids: HttpParams = new HttpParams()
+                        .set("idProject", idProject ? idProject : '')
+                        .set("showEmptyProjectFolders", "Y")
+                        .set("showCategory", "N")
+                        .set("showSamples", "N");
+                    this.experimentsService.browsePanelParams = ids;
+                    this.experimentsService.getProjectRequestList_fromBackend(ids);
+                }
             }
         });
 
@@ -685,7 +694,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         UtilService.safelyUnsubscribe(this.canDeleteProjectSubscription);
     }
 
-    onShowEmptyFolders(event: MatCheckboxChange): void {
+    onShowEmptyFolders(event: any): void {
         const hiddenNodeIds = {};
 
         if(!this.showEmptyFolders) {

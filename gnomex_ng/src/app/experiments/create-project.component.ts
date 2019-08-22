@@ -112,7 +112,6 @@ export class CreateProjectComponent extends BaseGenericContainerDialog implement
             if (this.data.idProject) {
                 this.isEditMode = true;
                 this.idProject = this.data.idProject;
-                this.form.get("idLab").disable();
             }
             if (this.data.labList) {
                 this.labList = this.data.labList.sort(this.prefService.createLabDisplaySortFunction());
@@ -122,6 +121,9 @@ export class CreateProjectComponent extends BaseGenericContainerDialog implement
             }
             if (this.data.selectedLabItem) {
                 this.form.get("idLab").setValue(this.data.selectedLabItem);
+            }
+            if(this.data.disableLab) {
+                this.form.get("idLab").disable();
             }
         }
 
@@ -174,7 +176,8 @@ export class CreateProjectComponent extends BaseGenericContainerDialog implement
         this.project.name = this.form.get("name").value;
         this.project.description = this.form.get("description").value;
         let params: HttpParams = new HttpParams()
-            .set("projectXMLString", JSON.stringify(this.project))
+            .set("projectJSONString", JSON.stringify(this.project))
+            .set("noJSONToXMLConversionNeeded", "Y")
             .set("parseEntries", "Y");
         this.experimentsService.saveProject(params).pipe(first()).subscribe((response: any) => {
             this.dialogsService.stopAllSpinnerDialogs();

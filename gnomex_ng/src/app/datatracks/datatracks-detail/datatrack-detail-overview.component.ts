@@ -182,18 +182,14 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         }
 
         this.dataTrackService.makeUCSCLinks(params).pipe(first()).subscribe(resp => {
+            this.showSpinner = false;
             if (resp && resp.result && resp.result === "SUCCESS") {
                 console.log(resp.ucscURL1);
                 window.open(resp.ucscURL1, "_blank");
 
-            } else {
-
-                let message: string = "";
-                if (resp && resp.message) {
-                    message = ": " + resp.message;
-                }
-                this.dialogService.error("An error occurred while making link. " + message);
             }
+        }, (err: IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
     }
 
@@ -232,6 +228,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
             .set("idDataTrack", this.datatrack.idDataTrack);
 
         this.dataTrackService.makeIOBIOLink(params).pipe(first()).subscribe(resp => {
+            this.showSpinner = false;
             if (resp && resp.result && resp.result === "SUCCESS") {
                 window.open(resp.urlsToLink, "_blank");
 
@@ -247,6 +244,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         let params: HttpParams = new HttpParams().set("idDataTrack", this.datatrack.idDataTrack);
 
         this.dataTrackService.makeURLLink(params).pipe(first()).subscribe(resp => {
+            this.showSpinner = false;
             if (resp && resp.result && resp.result === "SUCCESS") {
                 this.dialogService.alert(resp.urlsToLink, null, DialogType.SUCCESS);
             }
@@ -259,6 +257,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         this.showSpinner = true;
         this.dataTrackService.destroyLinks().pipe(first())
             .subscribe(resp => {
+                this.showSpinner = false;
                 if (resp && resp.result && resp.result === "SUCCESS") {
                     this.dialogService.alert("All Links Destroyed.", null, DialogType.SUCCESS);
                 }
@@ -335,18 +334,14 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
             this.showSaveSpinner = false;
             if (response && response.result &&  response.result === "SUCCESS") {
                 this.dtOverviewForm.markAsPristine();
-                let treeNode = this.dataTrackService.datatrackListTreeNode;
-                if (treeNode) {
-                    let params: HttpParams = new HttpParams()
-                        .set("idDataTrack", treeNode.idDataTrack)
-                        .set("idGenomeBuild",treeNode.idGenomeBuild )
-                        .set("idOrganism", treeNode.idOrganism )
-                        .set("idLab", treeNode.idLab);
-                    this.dataTrackService.getDatatracksList_fromBackend(params);
-                }
+                this.dataTrackService.activeNodeToSelect = {
+                    attribute: "idDataTrack",
+                    value: response.idDataTrack
+                };
+                this.dataTrackService.getDatatracksList_fromBackend(this.dataTrackService.previousURLParams);
             }
         },(err:IGnomexErrorResponse) => {
-            this.showSpinner = false;
+            this.showSaveSpinner = false;
         });
     }
 

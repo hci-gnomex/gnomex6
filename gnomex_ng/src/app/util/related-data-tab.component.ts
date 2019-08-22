@@ -14,8 +14,10 @@ import {DialogsService, DialogType} from "./popup/dialogs.service";
                 <div class="flex-item-tree" [matTooltip]="this.treeNameLookup[key]" *ngIf="this.relatedObjects[key]?.length > 0">
                     <tree-root [nodes]="this.relatedObjects[key]" [options]="options" (activate)="onActivateTree($event)">
                         <ng-template #treeNodeTemplate let-node >
-                            <img src="{{node?.data?.icon}}" height="16" width="16">
-                            <span>{{ node?.data?.label }}</span>
+                            <div class="tree-node-font">
+                                <img src="{{node?.data?.icon}}" class="tree-node-icon icon">
+                                <span>{{ node?.data?.label }}</span>
+                            </div>
                         </ng-template>
                     </tree-root>
                 </div>

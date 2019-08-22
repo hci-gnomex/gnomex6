@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {MatDialog, MatDialogConfig} from '@angular/material';
 
 import {BillingUsageReportComponent} from "../billing-usage-report.component";
@@ -10,13 +10,15 @@ import {NotesToCoreComponent} from "../../billing/notes-to-core.component";
 import {BillingService} from "../../services/billing.service";
 import {ConstantsService} from "../../services/constants.service";
 import {ActionType} from "../interfaces/generic-dialog-action.model";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {UtilService} from "../../services/util.service";
 
 @Component({
     selector: 'menu-header-billing',
     templateUrl: "./menu-header-billing.component.html"
 })
 
-export class MenuHeaderBillingComponent implements OnInit {
+export class MenuHeaderBillingComponent implements OnInit, OnChanges {
 
     @Input() private idBillingPeriod: string = "";
     @Input() private idCoreFacility: string = "";
@@ -27,13 +29,25 @@ export class MenuHeaderBillingComponent implements OnInit {
     @Input() private totalPrice: number;
     @Input() private billingPeriodString: string;
 
+    private coreFacilityList: any[] = [];
+    private coreFacilityDisplay: string = "";
+
     constructor(private dialog: MatDialog,
                 private dialogsService: DialogsService,
                 private billingService: BillingService,
-                private constantsService: ConstantsService) {
+                private constantsService: ConstantsService,
+                private secAdvisor: CreateSecurityAdvisorService) {
     }
 
     ngOnInit() {
+        this.coreFacilityList = this.secAdvisor.coreFacilitiesICanManage;
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if(this.idCoreFacility) {
+            let coreFacility: any[] = this.coreFacilityList.filter((a: any) => {return a.idCoreFacility === this.idCoreFacility; });
+            this.coreFacilityDisplay = coreFacility.length === 1 ? coreFacility[0].display : "";
+        }
     }
 
     public showGeneralLedgerInterface(): void {
@@ -55,9 +69,10 @@ export class MenuHeaderBillingComponent implements OnInit {
         }
 
         let title: string = this.billingPeriodString + " GL Interface " + this.totalPrice.toLocaleString("en-US", {style: "currency", currency: "USD"});
+        title = UtilService.getSubStr(title, 60);
 
         let config: MatDialogConfig = new MatDialogConfig();
-        config.width = "35em";
+        config.width = "40em";
         config.data = {
             totalPrice: this.totalPrice,
             idBillingPeriod: this.idBillingPeriod,
@@ -172,14 +187,16 @@ export class MenuHeaderBillingComponent implements OnInit {
 
     public showBillingByLabReport(): void {
         let config: MatDialogConfig = new MatDialogConfig();
-        config.width = "35em";
+        config.width = "40em";
         config.height = "12em";
         config.autoFocus = false;
         config.data = {
             mode: "Total Billing by Lab",
             idCoreFacility: this.idCoreFacility
         };
-        this.dialogsService.genericDialogContainer(BillingUsageReportComponent, "Total Billing by Lab Report for Bioinformatics", null, config,
+        let title: string = this.coreFacilityDisplay ? "Total Billing by Lab Report for " + this.coreFacilityDisplay : "Total Billing by Lab Report";
+        title = UtilService.getSubStr(title, 60);
+        this.dialogsService.genericDialogContainer(BillingUsageReportComponent, title, null, config,
             {actions: [
                     {type: ActionType.PRIMARY, name: "OK", internalAction: "submit"},
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
@@ -188,14 +205,16 @@ export class MenuHeaderBillingComponent implements OnInit {
 
     public showUsageReport(): void {
         let config: MatDialogConfig = new MatDialogConfig();
-        config.width = "35em";
+        config.width = "40em";
         config.height = "12em";
         config.autoFocus = false;
         config.data = {
             mode: "Lab Usage",
             idCoreFacility: this.idCoreFacility
         };
-        this.dialogsService.genericDialogContainer(BillingUsageReportComponent, "Lab Usage Report for Bioinformatics", null, config,
+        let title: string = this.coreFacilityDisplay ? "Lab Usage Report for " + this.coreFacilityDisplay : "Lab Usage Report";
+        title = UtilService.getSubStr(title, 60);
+        this.dialogsService.genericDialogContainer(BillingUsageReportComponent, title, null, config,
             {actions: [
                     {type: ActionType.PRIMARY, name: "OK", internalAction: "submit"},
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
@@ -213,7 +232,7 @@ export class MenuHeaderBillingComponent implements OnInit {
         config.autoFocus = false;
         config.data = {
         };
-        this.dialogsService.genericDialogContainer(NotesToCoreComponent, "Billing Item Notes to Core", null, config,
+        this.dialogsService.genericDialogContainer(NotesToCoreComponent, "Billing Item Notes to Core", this.constantsService.ICON_NOTE_EDIT, config,
             {actions: [
                     {type: ActionType.SECONDARY, name: "Close", internalAction: "onClose"}
                 ]});

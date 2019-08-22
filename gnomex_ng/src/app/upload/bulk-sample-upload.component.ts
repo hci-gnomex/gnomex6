@@ -106,10 +106,12 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
     public file: any;
     protected fileParsed: boolean = false;
     protected fileUploaded: boolean = false;
+    protected fatalErrorsEncountered: boolean = false;
     protected showErrorsAndSamplesScreen: boolean = false;
     protected showErrorsAboveSamples: boolean = true;
     protected selectedAll: boolean = true;
 
+    protected fatalErrorGridApi: any;
     protected importableGridApi: any;
     protected errorTopGridApi: any;
     protected errorBottomGridApi: any;
@@ -274,6 +276,10 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
         });
 
         return columnDefinitions;
+    }
+
+    private get fatalErrorGridColumnDefs(): any[] {
+        return this.finalErrorGridColumnDefs;
     }
 
     private get finalErrorGridColumnDefs(): any[] {
@@ -519,38 +525,20 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
                         this.importableRows    = result.Requests;
                         this.sampleGridHeaders = result.Headers;
 
-                        for (let error of this.errorRows_original) {
-                            if (error.columnOrdinal && !error.rowOrdinal) {
-                                for (let row of this.rows_original) {
-                                    if (!(row["n"+ error.columnOrdinal + "_errorMessage"])) {
-                                        row["n"+ error.columnOrdinal + "_errorMessage"] = error.message;
-                                    } else {
-                                        row["n"+ error.columnOrdinal + "_errorMessage"] = row["n"+ error.columnOrdinal + "_errorMessage"]
-                                            + "\n\n"
-                                            + error.message;
-                                    }
-                                }
-                            } else if (!error.columnOrdinal && error.rowOrdinal) {
-                                for (let row of this.rows_original) {
-                                    if (row.rowOrdinal === error.rowOrdinal) {
-                                        let i = 0;
+                        if (!this.rows_original && !this.importableRows && !this.sampleGridHeaders) {
+                            // This occurs when the backend encounters what it considers to be a fatal error
 
-                                        while (i < (this.sampleGridHeaders ? this.sampleGridHeaders.length : 0)) {
-                                            if (!(row["n"+ i + "_errorMessage"])) {
-                                                row["n"+ i + "_errorMessage"] = error.message;
-                                            } else {
-                                                row["n"+ i + "_errorMessage"] = row["n"+ i + "_errorMessage"]
-                                                    + "\n\n"
-                                                    + error.message;
-                                            }
+                            if (this.fatalErrorGridApi) {
+                                this.assignFatalErrorGridContents();
+                                this.fatalErrorGridApi.sizeColumnsToFit();
+                            }
 
-                                            i++;
-                                        }
-                                    }
-                                }
-                            } else if (error.columnOrdinal && error.rowOrdinal) {
-                                for (let row of this.rows_original) {
-                                    if (row.rowOrdinal === error.rowOrdinal) {
+                            this.fileParsed = false;
+                            this.fatalErrorsEncountered = true;
+                        } else {
+                            for (let error of this.errorRows_original) {
+                                if (this.rows_original && error.columnOrdinal && !error.rowOrdinal) {
+                                    for (let row of this.rows_original) {
                                         if (!(row["n"+ error.columnOrdinal + "_errorMessage"])) {
                                             row["n"+ error.columnOrdinal + "_errorMessage"] = error.message;
                                         } else {
@@ -559,42 +547,73 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
                                                 + error.message;
                                         }
                                     }
-                                }
-                            } else {
-                                // Do nothing
-                            }
-                        }
+                                } else if (!error.columnOrdinal && error.rowOrdinal) {
+                                    for (let row of this.rows_original) {
+                                        if (row.rowOrdinal === error.rowOrdinal) {
+                                            let i = 0;
 
-                        this.errorRows      = this.errorRows_original;
-                        this.rows           = this.rows_original;
+                                            while (i < (this.sampleGridHeaders ? this.sampleGridHeaders.length : 0)) {
+                                                if (!(row["n"+ i + "_errorMessage"])) {
+                                                    row["n"+ i + "_errorMessage"] = error.message;
+                                                } else {
+                                                    row["n"+ i + "_errorMessage"] = row["n"+ i + "_errorMessage"]
+                                                        + "\n\n"
+                                                        + error.message;
+                                                }
 
-                        if (this.sampleGridHeaders) {
-                            if (!Array.isArray(this.sampleGridHeaders)) {
-                                this.sampleGridHeaders = [this.sampleGridHeaders];
-                            }
-
-                            this.sampleGridHeaders.sort((a, b) => {
-                                if (!a || !b) {
-                                    if (!b) {
-                                        return -1;
-                                    } else if (!a) {
-                                        return 1;
-                                    } else {
-                                        return 0;
+                                                i++;
+                                            }
+                                        }
                                     }
+                                } else if (error.columnOrdinal && error.rowOrdinal) {
+                                    for (let row of this.rows_original) {
+                                        if (row.rowOrdinal === error.rowOrdinal) {
+                                            if (!(row["n"+ error.columnOrdinal + "_errorMessage"])) {
+                                                row["n"+ error.columnOrdinal + "_errorMessage"] = error.message;
+                                            } else {
+                                                row["n"+ error.columnOrdinal + "_errorMessage"] = row["n"+ error.columnOrdinal + "_errorMessage"]
+                                                    + "\n\n"
+                                                    + error.message;
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    // Do nothing
+                                }
+                            }
+
+                            this.errorRows      = this.errorRows_original;
+                            this.rows           = this.rows_original;
+
+                            if (this.sampleGridHeaders) {
+                                if (!Array.isArray(this.sampleGridHeaders)) {
+                                    this.sampleGridHeaders = [this.sampleGridHeaders];
                                 }
 
-                                return +(a.columnOrdinal) - +(b.columnOrdinal);
-                            });
-                        }
+                                this.sampleGridHeaders.sort((a, b) => {
+                                    if (!a || !b) {
+                                        if (!b) {
+                                            return -1;
+                                        } else if (!a) {
+                                            return 1;
+                                        } else {
+                                            return 0;
+                                        }
+                                    }
 
-                        this.dialogService.alert("File uploaded successfully", null, DialogType.SUCCESS).subscribe(() => {
-                            if (this.importableGridApi) {
-                                this.assignImportableGridContents();
-                                this.importableGridApi.sizeColumnsToFit();
+                                    return +(a.columnOrdinal) - +(b.columnOrdinal);
+                                });
                             }
-                        });
-                        this.fileParsed = true;
+
+                            this.dialogService.alert("File uploaded successfully", null, DialogType.SUCCESS).subscribe(() => {
+                                if (this.importableGridApi) {
+                                    this.assignImportableGridContents();
+                                    this.importableGridApi.sizeColumnsToFit();
+                                }
+                            });
+                            this.fileParsed = true;
+                            this.fatalErrorsEncountered = false;
+                        }
                     } else {
                         this.dialogService.alert("File failed to upload.", null, DialogType.FAILED);
                     }
@@ -715,6 +734,15 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
         this.importableGridApi.selectAll();
     }
 
+    public assignFatalErrorGridContents() {
+        if (this.fatalErrorGridApi) {
+            this.fatalErrorGridApi.setColumnDefs(this.fatalErrorGridColumnDefs);
+            this.fatalErrorGridApi.setRowData(this.errorRows_original);
+        }
+
+        this.dialogService.stopAllSpinnerDialogs();
+    }
+
     public assignErrorGridContents() {
         if (this.errorTopGridApi) {
             this.errorTopGridApi.setColumnDefs(this.errorGridColumnDefs);
@@ -759,6 +787,15 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
         this.onGridSizeChanged(event);
 
         this.importableGridApi.hideOverlay();
+    }
+
+    public onFatalErrorGridReady(event: any) {
+        this.fatalErrorGridApi = event.api;
+
+        this.assignFatalErrorGridContents();
+        this.onGridSizeChanged(event);
+
+        this.fatalErrorGridApi.hideOverlay();
     }
 
     public onErrorsTopGridReady(event: any) {

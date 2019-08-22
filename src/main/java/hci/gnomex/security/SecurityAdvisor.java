@@ -34,7 +34,7 @@ import org.hibernate.query.Query;
 
 public class SecurityAdvisor extends DetailObject implements Serializable, hci.framework.security.SecurityAdvisor {
     // Security advisor session variable
-    public static final String SECURITY_ADVISOR_SESSION_KEY = "gnomexSecurityAdvisor";
+    public static final String SECURITY_ADVISOR_SESSION_KEY = "gnomex6SecurityAdvisor";
 
     private static final String RESTRICTED = "(restricted)";
 

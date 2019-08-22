@@ -72,7 +72,10 @@ const actionMapping: IActionMapping = {
         .foreground { background-color: white;   }
         .background { background-color: #EEEEEE; }
 
-        .vertical-spacer { height: 0.3em; }
+        .vertical-spacer {
+            height: 0.3em;
+            min-height: 0.3em;
+        }
 
         .border { border: #C8C8C8 solid thin; }
         .major-border {
@@ -401,8 +404,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                     currentItem: this.currentItem,
                     targetItem: this.targetItem
                 };
-                let title: string = this.targetItem.label.length > 30 ? this.targetItem.label.substr(0, 29) + "..." : this.targetItem.label;
-                title = "Move/Copy to " + title;
+                let title: string = "Move/Copy to " + UtilService.getSubStr(this.targetItem.label, 30);
                 this.dialogService.genericDialogContainer(MoveTopicComponent, title, this.currentItem.icon, config,
                     {actions: []}).subscribe((result: any) => {
                         if (!result) {

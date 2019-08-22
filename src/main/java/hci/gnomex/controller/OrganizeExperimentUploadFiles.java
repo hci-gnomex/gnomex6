@@ -9,8 +9,6 @@ import hci.gnomex.model.ExperimentFile;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.Sample;
 import hci.gnomex.model.SampleExperimentFile;
-import hci.gnomex.model.TransferLog;
-import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.FileDescriptorUploadParser;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
@@ -20,7 +18,6 @@ import java.io.StringReader;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -35,8 +32,6 @@ import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
 
 public class OrganizeExperimentUploadFiles extends GNomExCommand implements Serializable {
 
@@ -51,19 +46,16 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
     private JsonArray linkedSampleFileList;
     private FileDescriptorUploadParser parser;
     private FileDescriptorUploadParser filesToRemoveParser;
-    private List directoryFilesToUnlink = new ArrayList();
-    private List deletedSefEntries = new ArrayList();
+    private List<String> directoryFilesToUnlink = new ArrayList<>();
+    private List<Integer> deletedSefEntries = new ArrayList<>();
 
     private String serverName;
 
-    private DictionaryHelper dictionaryHelper = null;
-
-    private static String flowCellDir = null;
-    private final Map<String, String> sampleHierarchy = new HashMap<String,String>() {{
+    private final Map<String, String> sampleHierarchy = new HashMap<String, String>() {{
         put("SampleGroup", "Sample");
         put("Sample", "SeqRunNumber");
-        put("SeqRunNumber","FileDescriptor");
-    }};;
+        put("SeqRunNumber", "FileDescriptor");
+    }};
 
     public void validate() {
     }
@@ -76,106 +68,73 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
             this.addInvalidField("idRequest", "idRequest is required");
         }
 
-        if (request.getParameter("filesJSONString") != null && !request.getParameter("filesJSONString").equals("")) {
-            String filesJSONString = request.getParameter("filesJSONString");
-//            System.out.println("[OEUF] filesXMLString:\n" + filesXMLString + "\n");
-
-            if(Util.isParameterNonEmpty(filesJSONString)){
-                try(JsonReader jsonReader = Json.createReader(new StringReader(filesJSONString))) {
-                    this.files = jsonReader.readObject();
-                    parser = new FileDescriptorUploadParser(files);
-                } catch (Exception e) {
-                    this.addInvalidField("FilesJSONString", "Invalid files json");
-                    this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesJSONString", e);
-                }
-
-            }
-
-        }
-
-        if (request.getParameter("experimentFileJSONString") != null
-                && !request.getParameter("experimentFileJSONString").equals("")) {
-            String experimentFileJSONString =  request.getParameter("experimentFileJSONString");
-//            System.out.println("[OEUF] experimentFileXMLString:\n" + experimentFileXMLString + "\n");
-            if(Util.isParameterNonEmpty(experimentFileJSONString)){
-                try(JsonReader jsonReader = Json.createReader( new StringReader(experimentFileJSONString))) {
-                    experimentFileList = jsonReader.readArray();
-                } catch (Exception e) {
-                    this.addInvalidField("experimentFileJSONString", "Invalid experiment File json");
-                    this.errorDetails = Util.GNLOG(LOG,"Cannot parse experimentFileJSONString", e);
-                }
-
-            }
-
-        }
-
-        if (request.getParameter("filesToRemoveJSONString") != null
-                && !request.getParameter("filesToRemoveJSONString").equals("")) {
-            String filesToRemoveJSONString = request.getParameter("filesToRemoveJSONString");
-//            System.out.println("[OEUF] filesToRemoveXMLString:\n" + filesToRemoveXMLString + "\n");
-
-            if(Util.isParameterNonEmpty(filesToRemoveJSONString)){
-                try(JsonReader jsonReader = Json.createReader(new StringReader(filesToRemoveJSONString))) {
-                    filesToRemoveList = jsonReader.readArray();
-                    filesToRemoveParser = new FileDescriptorUploadParser(filesToRemoveList);
-                } catch (Exception e) {
-                    this.addInvalidField("FilesToRemoveJSONString", "Invalid filesToRemove json");
-                    this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesToRemoveJSONString", e);
-                }
+        String filesJSONString = request.getParameter("filesJSONString");
+        if (Util.isParameterNonEmpty(filesJSONString)) {
+            try (JsonReader jsonReader = Json.createReader(new StringReader(filesJSONString))) {
+                this.files = jsonReader.readObject();
+                parser = new FileDescriptorUploadParser(files);
+            } catch (Exception e) {
+                this.addInvalidField("FilesJSONString", "Invalid files json");
+                this.errorDetails = Util.GNLOG(LOG, "Cannot parse filesJSONString", e);
             }
         }
 
-        if (request.getParameter("filesToUnlinkJSONString") != null
-                && !request.getParameter("filesToUnlinkJSONString").equals("")) {
-            String filesToUnlinkJSONString = request.getParameter("filesToUnlinkJSONString");
-//            System.out.println("[OEUF] filesToRemoveXMLString:\n" + filesToRemoveXMLString + "\n");
-
-            if(Util.isParameterNonEmpty(filesToUnlinkJSONString)){
-                try(JsonReader jsonReader = Json.createReader(new StringReader(filesToUnlinkJSONString))) {
-                    filesToUnlink = jsonReader.readArray();
-                } catch (Exception e) {
-                    this.addInvalidField("FilesToUnlinkXMLString", "Invalid filesToUnlink json");
-                    this.errorDetails = Util.GNLOG(LOG,"Cannot parse filesToUnlinkJSONString", e);
-                }
+        String experimentFileJSONString = request.getParameter("experimentFileJSONString");
+        if (Util.isParameterNonEmpty(experimentFileJSONString)) {
+            try (JsonReader jsonReader = Json.createReader(new StringReader(experimentFileJSONString))) {
+                experimentFileList = jsonReader.readArray();
+            } catch (Exception e) {
+                this.addInvalidField("experimentFileJSONString", "Invalid experiment File json");
+                this.errorDetails = Util.GNLOG(LOG, "Cannot parse experimentFileJSONString", e);
             }
         }
 
-        if (request.getParameter("linkedSampleFileJSONString") != null
-                && !request.getParameter("linkedSampleFileJSONString").equals("")) {
-            String linkedSampleFileJsonString = request.getParameter("linkedSampleFileJSONString");
-//            System.out.println("[OEUF] linkedSampleFileXMLString:\n" + linkedSampleFileXMLString + "\n");
-
-            if(Util.isParameterNonEmpty(linkedSampleFileJsonString)){
-                try(JsonReader jsonReader = Json.createReader(new StringReader(linkedSampleFileJsonString))) {
-                    linkedSampleFileList = jsonReader.readArray();
-                } catch (Exception je) {
-                    this.addInvalidField("linkedSampleFileJSONString", "Invalid linkedSample json");
-                    this.errorDetails = Util.GNLOG(LOG,"Cannot parse linkedSampleFileJSONString", je);
-                }
-
+        String filesToRemoveJSONString = request.getParameter("filesToRemoveJSONString");
+        if (Util.isParameterNonEmpty(filesToRemoveJSONString)) {
+            try (JsonReader jsonReader = Json.createReader(new StringReader(filesToRemoveJSONString))) {
+                filesToRemoveList = jsonReader.readArray();
+                filesToRemoveParser = new FileDescriptorUploadParser(filesToRemoveList);
+            } catch (Exception e) {
+                this.addInvalidField("FilesToRemoveJSONString", "Invalid filesToRemove json");
+                this.errorDetails = Util.GNLOG(LOG, "Cannot parse filesToRemoveJSONString", e);
             }
+        }
 
+        String filesToUnlinkJSONString = request.getParameter("filesToUnlinkJSONString");
+        if (Util.isParameterNonEmpty(filesToUnlinkJSONString)) {
+            try (JsonReader jsonReader = Json.createReader(new StringReader(filesToUnlinkJSONString))) {
+                filesToUnlink = jsonReader.readArray();
+            } catch (Exception e) {
+                this.addInvalidField("FilesToUnlinkXMLString", "Invalid filesToUnlink json");
+                this.errorDetails = Util.GNLOG(LOG, "Cannot parse filesToUnlinkJSONString", e);
+            }
+        }
 
+        String linkedSampleFileJsonString = request.getParameter("linkedSampleFileJSONString");
+        if (Util.isParameterNonEmpty(linkedSampleFileJsonString)) {
+            try (JsonReader jsonReader = Json.createReader(new StringReader(linkedSampleFileJsonString))) {
+                linkedSampleFileList = jsonReader.readArray();
+            } catch (Exception je) {
+                this.addInvalidField("linkedSampleFileJSONString", "Invalid linkedSample json");
+                this.errorDetails = Util.GNLOG(LOG, "Cannot parse linkedSampleFileJSONString", je);
+            }
         }
 
         serverName = request.getServerName();
-
     }
 
     public Command execute() throws RollBackCommandException {
 
-        List<String> problemFiles = new ArrayList<String>();
-        Session sess = null;
+        List<String> problemFiles = new ArrayList<>();
+        Session sess;
         if (files != null) {
             try {
                 sess = this.getSecAdvisor().getHibernateSession(this.getUsername());
 
-                Request request = (Request) sess.load(Request.class, idRequest);
+                Request request = sess.load(Request.class, idRequest);
                 String baseRequestNumber = Request.getBaseRequestNumber(request.getNumber());
-                String baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName,
-                        request.getIdCoreFacility(), PropertyDictionaryHelper.PROPERTY_EXPERIMENT_DIRECTORY);
-                flowCellDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName,
-                        request.getIdCoreFacility(), PropertyDictionaryHelper.PROPERTY_FLOWCELL_DIRECTORY);
+                String baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, request.getIdCoreFacility(), PropertyDictionaryHelper.PROPERTY_EXPERIMENT_DIRECTORY);
+                String flowCellDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, request.getIdCoreFacility(), PropertyDictionaryHelper.PROPERTY_FLOWCELL_DIRECTORY);
                 baseDir += request.getCreateYear() + Constants.FILE_SEPARATOR + Request.getBaseRequestNumber(request.getNumber());
 
                 if (this.getSecAdvisor().canUploadData(request)) {
@@ -183,8 +142,7 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                     parser.parse();
 
                     // Add new directories to the file system
-                    for (Iterator i = parser.getNewDirectoryNames().iterator(); i.hasNext(); ) {
-                        String directoryName = (String) i.next();
+                    for (String directoryName : parser.getNewDirectoryNames()) {
                         File dir = new File(baseDir + Constants.FILE_SEPARATOR + directoryName);
                         if (!dir.exists()) {
                             boolean success = dir.mkdirs();
@@ -192,30 +150,27 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                                 // File was not successfully created
                                 throw new Exception("Unable to create directory " + directoryName);
                             }
-
                         }
 
-                        // tim 01/28/2019 added
-                        this.xmlResult = "<SUCCESS/>";
-                        System.out.println ("[OEULF] (1) this.xmlResult: " + this.xmlResult);
+                        // tim 01/28/2019 added (converted to json 8/16/2019)
+                        this.jsonResult = Json.createObjectBuilder()
+                                .add("result", "SUCCESS")
+                                .build()
+                                .toString();
                         setResponsePage(this.SUCCESS_JSP);
                         return this;                  // you can only have one...
-
                     }
 
                     // Rename files
-                    for (Iterator i = parser.getFilesToRenameMap().keySet().iterator(); i.hasNext(); ) {
-                        String file = (String) i.next();
-                        String newFileName = (String) parser.getFilesToRenameMap().get(file);
+                    for (String file : parser.getFilesToRenameMap().keySet()) {
+                        String newFileName = parser.getFilesToRenameMap().get(file);
                         File f1 = new File(file);
                         File f2 = new File(newFileName);
                         boolean success = FileUtil.renameTo(f1, f2);
                         if (success) {
-                            for (Iterator k = parser.getFileNameMap().keySet().iterator(); k.hasNext(); ) {
-                                String directory = (String) k.next();
-                                List fileNames = (List) parser.getFileNameMap().get(directory);
-                                for (Iterator i1 = fileNames.iterator(); i1.hasNext(); ) {
-                                    String parserFile = (String) i1.next();
+                            for (String directory : parser.getFileNameMap().keySet()) {
+                                List<String> fileNames = parser.getFileNameMap().get(directory);
+                                for (String parserFile : fileNames) {
                                     if (parserFile.equals(file)) {
                                         fileNames.remove(parserFile);
                                         fileNames.add(f2.getAbsolutePath().replace("\\", Constants.FILE_SEPARATOR));
@@ -226,8 +181,7 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                             }
                             // Update experiment file name if registered in the db
                             String oldExpFileName = file.substring(file.indexOf(baseRequestNumber)).replace("\\", Constants.FILE_SEPARATOR);
-                            String newExpFileName = newFileName.substring(newFileName.indexOf(baseRequestNumber)).replace(
-                                    "\\", Constants.FILE_SEPARATOR);
+                            String newExpFileName = newFileName.substring(newFileName.indexOf(baseRequestNumber)).replace("\\", Constants.FILE_SEPARATOR);
                             String queryBuf = "Select exp from ExperimentFile exp where fileName = :oldExpFileName";
                             Query query = sess.createQuery(queryBuf);
                             query.setParameter("oldExpFileName", oldExpFileName);
@@ -240,24 +194,21 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                         } else {
                             throw new Exception("Unable to rename file.  Invalid file name");
                         }
-
                     }
 
                     // Rename Folders
-                    for (Iterator i = parser.getFoldersToRenameMap().keySet().iterator(); i.hasNext(); ) {
-                        String folder = (String) i.next();
-                        String newFolder = (String) parser.getFoldersToRenameMap().get(folder);
-                        File f1 = new File(baseDir + Constants.FILE_SEPARATOR + folder);
+                    for (String folder : parser.getFoldersToRenameMap().keySet()) {
+                        String newFolder = parser.getFoldersToRenameMap().get(folder);
                         File f2 = new File(baseDir + Constants.FILE_SEPARATOR + newFolder);
                         f2.mkdir();
-                        for (Iterator j = parser.getFileNameMap().keySet().iterator(); j.hasNext(); ) {
-                            String directory = (String) j.next();
+                        for (Iterator<String> j = parser.getFileNameMap().keySet().iterator(); j.hasNext();) {
+                            String directory = j.next();
                             if (directory.contains(folder + Constants.FILE_SEPARATOR)) {
                                 parser.getFileNameMap().remove(directory);
                                 j = parser.getFileNameMap().keySet().iterator();
                             }
                             if (directory.equals(folder)) {
-                                List fileNames = (List) parser.getFileNameMap().get(directory);
+                                List<String> fileNames = parser.getFileNameMap().get(directory);
                                 parser.getFileNameMap().remove(directory);
                                 parser.getFileNameMap().put(newFolder, fileNames);
                                 j = parser.getFileNameMap().keySet().iterator();
@@ -266,22 +217,21 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                     }
 
                     // Move files to designated folder
-                    for (Iterator i = parser.getFileNameMap().keySet().iterator(); i.hasNext(); ) {
-                        String directoryName = (String) i.next();
-                        List fileNames = (List) parser.getFileNameMap().get(directoryName);
-                        String targetDirName = "";
+                    for (String directoryName : parser.getFileNameMap().keySet()) {
+                        List<String> fileNames = parser.getFileNameMap().get(directoryName);
+                        String targetDirName;
                         directoryName = directoryName.replace("\\", Constants.FILE_SEPARATOR);
-                        List<String> path = Arrays.asList(directoryName.split(Pattern.quote(Constants.FILE_SEPARATOR)));
-                        directoryName = "";
-                        for (Iterator<String> iter = path.iterator(); iter.hasNext(); ) {
-                            String s = iter.next();
+                        String[] path = directoryName.split(Pattern.quote(Constants.FILE_SEPARATOR));
+                        StringBuilder directoryNameBuilder = new StringBuilder();
+                        for (String s : path) {
                             if (!baseDir.contains(s)) {
-                                directoryName += s + Constants.FILE_SEPARATOR;
+                                directoryNameBuilder.append(s);
+                                directoryNameBuilder.append(Constants.FILE_SEPARATOR);
                             }
                         }
+                        directoryName = directoryNameBuilder.toString();
 
-                        for (Iterator i1 = fileNames.iterator(); i1.hasNext(); ) {
-                            String fileName = (String) i1.next();
+                        for (String fileName : fileNames) {
                             if (fileName.toUpperCase().contains(flowCellDir.toUpperCase())) {
                                 continue;
                             }
@@ -293,8 +243,7 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                                 continue;
                             }
 
-                            if (baseDir.contains(directoryName)
-                                    || baseDir.contains(directoryName.subSequence(0, directoryName.length() - 1))) {
+                            if (baseDir.contains(directoryName) || baseDir.contains(directoryName.subSequence(0, directoryName.length() - 1))) {
                                 targetDirName = baseDir + Constants.FILE_SEPARATOR;
                             } else {
                                 targetDirName = baseDir + Constants.FILE_SEPARATOR + directoryName;
@@ -320,16 +269,18 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
 
                             if (sourceFile.isDirectory() && destFile.exists() && destFile.isDirectory()) {
                                 // nothing to do, the directory already exists
-//                                System.out.println("[OEUF] renameTo sourceFile: " + sourceFile.getPath() + " targetFile: " + destFile.getPath() + " directory already exists");
                                 continue;
                             }
 
+                            if (!FileUtil.renameTo(sourceFile, destFile)) {
+                                problemFiles.add(fileName);
+                            }
+                            /*
                             if (FileUtil.renameTo(sourceFile, destFile)) {
                                 // If we have renamed a file that is registered in the database
                                 // under the ExperimentFile table, then update the ExperimentFile name
                                 // so that we don't do an unnecessary delete in the register files servlet
 
-/*
                                 String currentExpFileName = fileName.substring(fileName.indexOf(baseRequestNumber))
                                         .replace("\\", Constants.FILE_SEPARATOR); // REMOVE
                                 // REPLACE
@@ -352,19 +303,16 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                                     ef.setFileSize(BigDecimal.valueOf(destFile.length()));
                                     sess.save(ef);
                                 }
-*/
                             } else {
                                 problemFiles.add(fileName);
                             }
-
-                        } // end of for
-
+                             */
+                        }
                     }
 
                     // Remove files from file system
                     if (filesToRemoveParser != null) {
-                        for (Iterator i = filesToRemoveParser.parseFilesToRemove().iterator(); i.hasNext(); ) {
-                            String fileName = (String) i.next();
+                        for (String fileName : filesToRemoveParser.parseFilesToRemove()) {
                             File f = new File(fileName);
 
                             // The "file" might be a directory so we have to delete all of the
@@ -400,11 +348,9 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
 
                                         if (l.size() == 1) {
                                             SampleExperimentFile sef = (SampleExperimentFile) l.get(0);
-                                            if (sef.getIdExpFileRead1() != null
-                                                    && sef.getIdExpFileRead1().equals(ef.getIdExperimentFile())) {
+                                            if (sef.getIdExpFileRead1() != null && sef.getIdExpFileRead1().equals(ef.getIdExperimentFile())) {
                                                 sef.setIdExpFileRead1(null);
-                                            } else if (sef.getIdExpFileRead2() != null
-                                                    && sef.getIdExpFileRead2().equals(ef.getIdExperimentFile())) {
+                                            } else if (sef.getIdExpFileRead2() != null && sef.getIdExpFileRead2().equals(ef.getIdExperimentFile())) {
                                                 sef.setIdExpFileRead2(null);
                                             }
 
@@ -420,11 +366,10 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                                         sess.flush();
                                     }
                                 }
-                            }  // if f.exists
-
-                        }  // end of for
+                            }
+                        }
                         sess.flush();
-                    } // enf of filestoremove
+                    }
 
                     sess.flush();
 
@@ -436,10 +381,8 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                     FileUtil.pruneEmptyDirectories(stagingDirectory);
 
                     if (directoryFilesToUnlink.size() > 0) {
-                        for (Iterator i = directoryFilesToUnlink.iterator(); i.hasNext(); ) {
-                            String fileName = (String) i.next();
-                            String currentFileName = fileName.substring(fileName.indexOf(baseRequestNumber)).replace("\\",
-                                    Constants.FILE_SEPARATOR);
+                        for (String fileName : directoryFilesToUnlink) {
+                            String currentFileName = fileName.substring(fileName.indexOf(baseRequestNumber)).replace("\\", Constants.FILE_SEPARATOR);
                             String queryBuf = "Select exp from ExperimentFile exp where fileName = :currentFileName";
                             Query query = sess.createQuery(queryBuf);
                             query.setParameter("currentFileName", currentFileName);
@@ -454,11 +397,9 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
 
                                 if (l.size() == 1) {
                                     SampleExperimentFile sef = (SampleExperimentFile) l.get(0);
-                                    if (sef.getIdExpFileRead1() != null
-                                            && sef.getIdExpFileRead1().equals(ef.getIdExperimentFile())) {
+                                    if (sef.getIdExpFileRead1() != null && sef.getIdExpFileRead1().equals(ef.getIdExperimentFile())) {
                                         sef.setIdExpFileRead1(null);
-                                    } else if (sef.getIdExpFileRead2() != null
-                                            && sef.getIdExpFileRead2().equals(ef.getIdExperimentFile())) {
+                                    } else if (sef.getIdExpFileRead2() != null && sef.getIdExpFileRead2().equals(ef.getIdExperimentFile())) {
                                         sef.setIdExpFileRead2(null);
                                     }
 
@@ -476,17 +417,14 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                         }
 
                         sess.flush();
-
                     }
 
                     // Unlink experiment files from Samples
                     if (filesToUnlink != null) {
-                        JsonArray root = this.filesToUnlink;
-                        for (int i = 0; i < filesToUnlink.size(); i++ ) {
+                        for (int i = 0; i < filesToUnlink.size(); i++) {
                             JsonObject fileDescriptor = filesToUnlink.getJsonObject(i);
 
-                            if (fileDescriptor.get("idExperimentFile") != null
-                                    && !fileDescriptor.getString("idExperimentFile").equals("")) {
+                            if (fileDescriptor.get("idExperimentFile") != null && !fileDescriptor.getString("idExperimentFile").equals("")) {
                                 Integer idExperimentFile = Integer.parseInt(fileDescriptor.getString("idExperimentFile"));
                                 String queryBuf = "SELECT DISTINCT sef from SampleExperimentFile sef where sef.idExpFileRead1 = :idExperimentFile1 OR sef.idExpFileRead2 = :idExperimentFile2";
                                 Query query = sess.createQuery(queryBuf);
@@ -498,8 +436,7 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                                     SampleExperimentFile sef = (SampleExperimentFile) l.get(0);
                                     if (sef.getIdExpFileRead1() != null && sef.getIdExpFileRead1().equals(idExperimentFile)) {
                                         sef.setIdExpFileRead1(null);
-                                    } else if (sef.getIdExpFileRead2() != null
-                                            && sef.getIdExpFileRead2().equals(idExperimentFile)) {
+                                    } else if (sef.getIdExpFileRead2() != null && sef.getIdExpFileRead2().equals(idExperimentFile)) {
                                         sef.setIdExpFileRead2(null);
                                     }
 
@@ -517,10 +454,10 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
 
                     // Map existing experiment files to file names that are coming in so
                     // we don't create duplicate experiment files
-                    HashMap expFileDictionary = new HashMap();
+                    HashMap<String, ExperimentFile> expFileDictionary = new HashMap<>();
                     if (experimentFileList != null) {
                         JsonArray root = this.experimentFileList;
-                        for (int i = 0 ; i < root.size(); i++) {
+                        for (int i = 0; i < root.size(); i++) {
                             JsonObject fd = root.getJsonObject(i);
                             String fileName = fd.get("zipEntryName") != null ? fd.getString("zipEntryName") : "";
                             fileName = fileName.replace("\\", Constants.FILE_SEPARATOR);
@@ -535,10 +472,10 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                         }
                     }
 
-                    Map<String, List<JsonObject>> sampleGroup = new TreeMap<String, List<JsonObject>>();
+                    Map<String, List<JsonObject>> sampleGroup = new TreeMap<>();
                     if (linkedSampleFileList != null) {
                         JsonArray root = this.linkedSampleFileList;
-                        for (int i =0; i < root.size(); i++) {
+                        for (int i = 0; i < root.size(); i++) {
                             JsonObject child = root.getJsonObject(i);
                             if (Util.getJsonStringSafeNonNull(child, "xmlNodeName").equals("Sample")) {
                                 if (sampleGroup.containsKey("*||*")) {
@@ -546,30 +483,28 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                                     samples.add(child);
                                     sampleGroup.put("*||*", samples);
                                 } else {
-                                    List<JsonObject> samples = new ArrayList<JsonObject>();
+                                    List<JsonObject> samples = new ArrayList<>();
                                     samples.add(child);
                                     sampleGroup.put("*||*", samples);
                                 }
-                            } else if (Util.getJsonStringSafeNonNull(child,"xmlNodeName").equals("SampleGroup")) {
-                                recurseAddSamples(child, sampleGroup, Util.getJsonStringSafeNonNull(child,"displayName"));
+                            } else if (Util.getJsonStringSafeNonNull(child, "xmlNodeName").equals("SampleGroup")) {
+                                recurseAddSamples(child, sampleGroup, Util.getJsonStringSafeNonNull(child, "displayName"));
                             }
                         }
                     }
 
-                    for (Iterator i = sampleGroup.keySet().iterator(); i.hasNext(); ) {
-                        String displayName = (String) i.next();
-                        int fileCount = 1;
+                    for (String displayName : sampleGroup.keySet()) {
+                        int fileCount;
                         List<JsonObject> sampleNodes = sampleGroup.get(displayName);
-                        for (Iterator j = sampleNodes.iterator(); j.hasNext(); ) {
-                            JsonObject sampleNode = (JsonObject) j.next();
-                            Integer idSample = Integer.parseInt(Util.getJsonStringSafeNonNull( sampleNode,"idSample"));
-                            Sample s = (Sample) sess.load(Sample.class, idSample);
+                        for (JsonObject sampleNode : sampleNodes) {
+                            Integer idSample = Integer.parseInt(Util.getJsonStringSafeNonNull(sampleNode, "idSample"));
+                            Sample s = sess.load(Sample.class, idSample);
                             s.setGroupName(displayName);
                             sess.save(s);
                             int seqRunNumber = 0;
 
                             JsonArray sampChildren = getJsonChildren(sampleNode);
-                            for (int k = 0; k < sampChildren.size(); k++ ) {
+                            for (int k = 0; k < sampChildren.size(); k++) {
                                 JsonObject seqRunNode = sampChildren.getJsonObject(k);
                                 SampleExperimentFile sef = new SampleExperimentFile();
                                 Integer idSampleExperimentFile = null;
@@ -580,30 +515,24 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                                 // if you find deleted sef that means the sef has been moved and let it be seen as a new sef
                                 if (!deletedSefEntries.contains(idSampleExperimentFile)) {
                                     seqRunNumber = seqRunNumber + 1;
-                                    if (idSampleExperimentFile != null && !idSampleExperimentFile.equals("")) {
-                                        sef = (SampleExperimentFile) sess.load(SampleExperimentFile.class,
-                                                idSampleExperimentFile);
+                                    if (idSampleExperimentFile != null) {
+                                        sef = sess.load(SampleExperimentFile.class, idSampleExperimentFile);
                                     }
                                 }
 
-
-
                                 fileCount = 1;
                                 JsonArray seqRunChildren = getJsonChildren(seqRunNode);
-                                for (int l = 0; l < seqRunChildren.size(); l++ ) {
+                                for (int l = 0; l < seqRunChildren.size(); l++) {
                                     JsonObject expFile = seqRunChildren.getJsonObject(l);
                                     ExperimentFile ef = new ExperimentFile();
 
                                     // If it is in the dictionary use it.
-                                    String zipEntryName = Util.getJsonStringSafeNonNull(expFile,"zipEntryName");
+                                    String zipEntryName = Util.getJsonStringSafeNonNull(expFile, "zipEntryName");
 
-                                    if (expFileDictionary.containsKey(zipEntryName.replace(
-                                            "\\", Constants.FILE_SEPARATOR))) {
-                                        ef = (ExperimentFile) expFileDictionary.get(zipEntryName.replace("\\", Constants.FILE_SEPARATOR));
-                                    } else if (expFile.get("idExperimentFile") != null
-                                            && !expFile.getString("idExperimentFile").equals("")) {
-                                        ef = (ExperimentFile) sess.get(ExperimentFile.class,
-                                                Integer.parseInt(expFile.getString("idExperimentFile")));
+                                    if (expFileDictionary.containsKey(zipEntryName.replace("\\", Constants.FILE_SEPARATOR))) {
+                                        ef = expFileDictionary.get(zipEntryName.replace("\\", Constants.FILE_SEPARATOR));
+                                    } else if (expFile.get("idExperimentFile") != null && !expFile.getString("idExperimentFile").equals("")) {
+                                        ef = sess.get(ExperimentFile.class, Integer.parseInt(expFile.getString("idExperimentFile")));
                                         // The experiment file may have been deleted from above code
                                         if (ef == null) {
                                             continue;
@@ -617,18 +546,13 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                                         sess.save(ef);
                                     }
                                     if (sef != null && ef != null) {
-                                        if (sef.getIdExpFileRead1() != null && ef.getIdExperimentFile() != null
-                                                && fileCount == 1
-                                                && sef.getIdExpFileRead1().equals(ef.getIdExperimentFile())) {
+                                        if (sef.getIdExpFileRead1() != null && ef.getIdExperimentFile() != null && fileCount == 1 && sef.getIdExpFileRead1().equals(ef.getIdExperimentFile())) {
                                             fileCount++;
                                             continue;
-                                        } else if (sef.getIdExpFileRead2() != null && ef.getIdExperimentFile() != null
-                                                && fileCount == 2
-                                                && sef.getIdExpFileRead2().equals(ef.getIdExperimentFile())) {
+                                        } else if (sef.getIdExpFileRead2() != null && ef.getIdExperimentFile() != null && fileCount == 2 && sef.getIdExpFileRead2().equals(ef.getIdExperimentFile())) {
                                             fileCount++;
                                             continue;
                                         }
-
                                     }
 
                                     if (fileCount == 1) {
@@ -646,10 +570,8 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                                     fileCount++;
                                 }
                             }
-
                         }
                     }
-//				System.out.println ("[OEULF] this.xmlResult: " + this.xmlResult);
 
                     String problemFileWarning = "";
                     if (problemFiles.size() > 0) {
@@ -657,14 +579,13 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                     }
 
                     JsonObjectBuilder valueBuilder = Json.createObjectBuilder().add("result", "SUCCESS");
-                    if(!problemFileWarning.equals("")){
+                    if (!problemFileWarning.equals("")) {
                         valueBuilder.add("warning", problemFileWarning);
                     }
 
                     this.jsonResult = valueBuilder.build().toString();
 
                     setResponsePage(this.SUCCESS_JSP);
-
                 } else {
                     this.addInvalidField("Insufficient permissions", "Insufficient permission to organize uploaded files");
                     setResponsePage(this.ERROR_JSP);
@@ -672,11 +593,9 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
 
             } catch (Exception e) {
                 this.errorDetails = Util.GNLOG(LOG, "An exception has occurred in OrganizeExperimentUploadFiles ", e);
-
                 throw new RollBackCommandException(e.getMessage());
             }
         } else {
-
             JsonObjectBuilder valueBuilder = Json.createObjectBuilder()
                     .add("result", "INVALID")
                     .add("message", "The organize  Files JSON is missing.");
@@ -686,40 +605,41 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
 
         return this;
     }
-    private JsonArray getJsonChildren(JsonObject child){
-        String parentName = Util.getJsonStringSafeNonNull(child,"xmlNodeName");
+
+    private JsonArray getJsonChildren(JsonObject child) {
+        String parentName = Util.getJsonStringSafeNonNull(child, "xmlNodeName");
         String childName = sampleHierarchy.get(parentName);
-        JsonArray children = null;
-        if(childName != null && child.get(childName) != null ){
+        JsonArray children;
+        if (childName != null && child.get(childName) != null) {
             children = child.getJsonArray(childName);
-        }else{
+        } else {
             children = Json.createArrayBuilder().build();
         }
         return children;
     }
 
     private void recurseAddSamples(JsonObject child, Map<String, List<JsonObject>> sampleGroup, String displayName) {
-        JsonArray children  = getJsonChildren(child);
-        for (int i = 0; i < children.size(); i++ ) {
-            JsonObject  subChild = children.getJsonObject(i);
+        JsonArray children = getJsonChildren(child);
+        for (int i = 0; i < children.size(); i++) {
+            JsonObject subChild = children.getJsonObject(i);
             if (Util.getJsonStringSafeNonNull(subChild, "xmlNodeName").equals("Sample")) {
                 if (sampleGroup.containsKey(displayName)) {
                     List<JsonObject> samples = sampleGroup.get(displayName);
                     samples.add(subChild);
                     sampleGroup.put(displayName, samples);
                 } else {
-                    List<JsonObject> samples = new ArrayList<JsonObject>();
+                    List<JsonObject> samples = new ArrayList<>();
                     samples.add(subChild);
                     sampleGroup.put(displayName, samples);
                 }
             } else if (Util.getJsonStringSafeNonNull(subChild, "xmlNodeName").equals("SampleGroup")) {
-                String name =  Util.getJsonStringSafeNonNull(subChild,"displayName");
+                String name = Util.getJsonStringSafeNonNull(subChild, "displayName");
                 recurseAddSamples(subChild, sampleGroup, displayName + Constants.FILE_SEPARATOR + name);
             }
         }
     }
 
-    public void deleteDir(File f, String fileName) throws Exception {
+    private void deleteDir(File f, String fileName) throws Exception {
         for (String file : f.list()) {
             File child = new File(fileName + Constants.FILE_SEPARATOR + file);
             if (child.isDirectory()) {
@@ -736,9 +656,7 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
             if (!f.delete()) {
                 throw new Exception("Unable to delete file " + f.getAbsolutePath().replace("\\", Constants.FILE_SEPARATOR));
             }
-            return;
         }
-
     }
 
 }

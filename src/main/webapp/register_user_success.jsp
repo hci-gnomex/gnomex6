@@ -22,7 +22,7 @@ session.removeAttribute("j_password");
 session.removeAttribute("User");
 session.removeAttribute("user");
 session.removeAttribute("username");
-session.removeAttribute("gnomexSecurityAdvisor");
+session.removeAttribute("gnomex6SecurityAdvisor");
 session.removeAttribute("logined"); 
 session.removeAttribute("context"); 
 

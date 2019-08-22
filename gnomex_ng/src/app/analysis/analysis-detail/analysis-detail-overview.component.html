@@ -1,5 +1,5 @@
-<div style="display:flex; flex-direction:column ; height:100%; width:100%;">
-    <div style="display:flex; font-size:small; " >
+<div class="full-width full-height flex-container-col" >
+    <div class="flex-container-row align-baseline padded small-font">
         <label class="label-title label-title-width">
             <img class="icon" [src]="analysisTreeNode?.icon">
             Analysis {{analysisTreeNode?.number}}
@@ -20,9 +20,8 @@
             Link to Experiment
         </button>
     </div>
-
-    <div style="display:flex; flex: 9">
-        <mat-tab-group class="mat-tab-group-border"  (selectedTabChange)="tabChanged($event)">
+    <div class="flex-grow">
+        <mat-tab-group class="mat-tab-group-border full-height"  (selectedTabChange)="tabChanged($event)">
             <mat-tab label="Info">
                 <analysis-info-tab [isEditMode]="isEditMode"></analysis-info-tab>
             </mat-tab>
@@ -30,22 +29,20 @@
                 <analysis-description-tab [isEditMode]="isEditMode"></analysis-description-tab>
             </mat-tab>
             <mat-tab label="Annotations">
-                <annotation-tab [annotations]="annotations" [disabled]="!isEditMode" [orderType]="types.ANALYSIS"> </annotation-tab>
+                <annotation-tab [annotations]="annotations" [disabled]="!isEditMode" [orderType]="types.ANALYSIS"></annotation-tab>
             </mat-tab>
-            <mat-tab  label="Experiment" style="height:100%;">
-               <analysis-experiment-tab [tabVisible]="showExpAnalysisTab"> </analysis-experiment-tab>
+            <mat-tab  label="Experiment">
+               <analysis-experiment-tab [tabVisible]="showExpAnalysisTab"></analysis-experiment-tab>
             </mat-tab>
             <mat-tab label="Related Data" *ngIf="showRelatedDataTab">
-                <related-data-tab [relatedObjects]="relatedObjects" >
-                </related-data-tab>
+                <related-data-tab [relatedObjects]="relatedObjects" ></related-data-tab>
             </mat-tab>
             <mat-tab label="Files">
                 <analysis-files-tab></analysis-files-tab>
             </mat-tab>
-
         </mat-tab-group>
     </div>
-    <div style="flex:1;">
+    <div>
         <save-footer (saveClicked)="save()"
                      [disableSave]="this.analysisService.analysisOverviewForm.invalid || !isEditMode"
                      [dirty]="this.analysisService.analysisOverviewForm.dirty">

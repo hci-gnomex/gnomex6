@@ -9,12 +9,36 @@ import {HttpParams} from "@angular/common/http";
 import {ConstantsService} from "../../services/constants.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../../util/popup/dialogs.service";
+import {AngularEditorConfig} from "@kolkov/angular-editor";
 
 
 @Component({
     selector: "project-tab",
     templateUrl: "./project-browse.component.html",
     styles: [`
+        :host /deep/ angular-editor#descEditor #editor {
+            resize: none;
+        }
+
+        :host /deep/ angular-editor#descEditor .angular-editor-button[title="Insert Image"],
+        :host /deep/ angular-editor#descEditor .angular-editor-button[title="Unlink"],
+        :host /deep/ angular-editor#descEditor .angular-editor-button[title="Horizontal Line"],
+        :host /deep/ angular-editor#descEditor #strikeThrough-descEditor,
+        :host /deep/ angular-editor#descEditor #subscript-descEditor,
+        :host /deep/ angular-editor#descEditor #superscript-descEditor,
+        :host /deep/ angular-editor#descEditor #link-descEditor,
+        :host /deep/ angular-editor#descEditor #underline-descEditor,
+        :host /deep/ angular-editor#descEditor #justifyLeft-descEditor,
+        :host /deep/ angular-editor#descEditor #justifyCenter-descEditor,
+        :host /deep/ angular-editor#descEditor #justifyRight-descEditor,
+        :host /deep/ angular-editor#descEditor #justifyFull-descEditor,
+        :host /deep/ angular-editor#descEditor #foregroundColorPicker-descEditor,
+        :host /deep/ angular-editor#descEditor #backgroundColorPicker-descEditor,
+        :host /deep/ angular-editor#descEditor #toggleEditorMode-descEditor,
+        :host /deep/ angular-editor#descEditor #customClassSelector-descEditor {
+            display: none;
+        }
+        
         .dirtyWithSave{
             display: flex;
             justify-content: space-between;
@@ -43,6 +67,16 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy {
     formInit: boolean = false;
     private saveManagerSubscription: Subscription;
 
+    descEditorConfig: AngularEditorConfig = {
+        height: "20em",
+        minHeight: "5em",
+        maxHeight: "20em",
+        width: "100%",
+        minWidth: "5em",
+        editable: true,
+        defaultFontName: "Arial",
+        defaultFontSize: "2",
+    };
 
     constructor(protected fb: FormBuilder,
                 private experimentsService: ExperimentsService,
@@ -55,7 +89,7 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy {
     ngOnInit() {
         this.projectBrowseForm = this.fb.group({
             projectName: ["", [Validators.required, Validators.maxLength(this.constantsService.MAX_LENGTH_500)]],
-            description: ["", Validators.maxLength(this.constantsService.MAX_LENGTH_500)]
+            description: ["", Validators.maxLength(this.constantsService.MAX_LENGTH_4000)]
         });
         this.projectBrowseForm.valueChanges.pipe(distinctUntilChanged())
             .subscribe(value => {
@@ -107,9 +141,9 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy {
 
         this.project.name = this.projectBrowseForm.controls["projectName"].value;
         this.project.description = this.projectBrowseForm.controls["description"].value;
-        let stringifiedProject = JSON.stringify(this.project);
         let saveParams: HttpParams = new HttpParams()
-            .set("projectXMLString", stringifiedProject)
+            .set("projectJSONString", JSON.stringify(this.project))
+            .set("noJSONToXMLConversionNeeded", "Y")
             .set("parseEntries", "Y");
 
         this.experimentsService.saveProject(saveParams).pipe(first()).subscribe(response =>{

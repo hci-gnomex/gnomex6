@@ -10,13 +10,15 @@
                                   popupTitle="Annotation Help">
                     </context-help>
                 </div>
-                <ag-grid-angular class="ag-theme-fresh moderate-height moderate-width"
-                                 [rowSelection]="'multiple'"
-                                 [rowMultiSelectWithClick]="true"
-                                 (gridReady)="onAddAnnotationGridReady($event)"
-                                 (gridSizeChanged)="onGridSizeChanged($event)"
-                                 (rowSelected)="onAddAnnotationGridRowSelected($event)">
-                </ag-grid-angular>
+                <div class="flex-grow">
+                    <ag-grid-angular class="ag-theme-fresh full-height min-height moderate-width"
+                                     [rowSelection]="'multiple'"
+                                     [rowMultiSelectWithClick]="true"
+                                     (gridReady)="onAddAnnotationGridReady($event)"
+                                     (gridSizeChanged)="onGridSizeChanged($event)"
+                                     (rowSelected)="onAddAnnotationGridRowSelected($event)">
+                    </ag-grid-angular>
+                </div>
             </div>
             <div class="short-width">
             </div>
@@ -26,12 +28,14 @@
                         Selected characteristics
                     </div>
                 </div>
-                <ag-grid-angular class="ag-theme-fresh moderate-height moderate-width"
-                                 [rowSelection]="'single'"
-                                 (gridReady)="onRemoveAnnotationGridReady($event)"
-                                 (gridSizeChanged)="onGridSizeChanged($event)"
-                                 (rowSelected)="onRemoveAnnotationGridRowSelected($event)">
-                </ag-grid-angular>
+                <div class="flex-grow">
+                    <ag-grid-angular class="ag-theme-fresh full-height min-height moderate-width"
+                                     [rowSelection]="'single'"
+                                     (gridReady)="onRemoveAnnotationGridReady($event)"
+                                     (gridSizeChanged)="onGridSizeChanged($event)"
+                                     (rowSelected)="onRemoveAnnotationGridRowSelected($event)">
+                    </ag-grid-angular>
+                </div>
             </div>
         </div>
         <div class="flex-container-row padded-top align-baseline">

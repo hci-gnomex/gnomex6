@@ -13,11 +13,11 @@ import {HttpParams} from "@angular/common/http";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {BasicEmailDialogComponent} from "../util/basic-email-dialog.component";
 import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
-import {first, map} from "rxjs/operators";
+import {map} from "rxjs/operators";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {AngularEditorConfig} from "@kolkov/angular-editor";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
-import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {UtilService} from "../services/util.service";
 
 @Component({
     templateUrl: "./topics-detail.component.html",
@@ -205,7 +205,7 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         };
 
         let topicName: string = "Topic T" + this.topicNode.idTopic + " - " + this.topicNode.name;
-        topicName = topicName.length > 35 ? topicName.substr(0, 35) + "..." : topicName;
+        topicName = UtilService.getSubStr(topicName, 35);
 
         this.dialogService.genericDialogContainer(ShareLinkDialogComponent,
             "Web Link for " + topicName, null, configuration,

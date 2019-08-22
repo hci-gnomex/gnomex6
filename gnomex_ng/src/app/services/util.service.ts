@@ -97,4 +97,8 @@ export class UtilService {
         }
     }
 
+    public static getSubStr(strItem: string, length: number, fromIndex?: number): string {
+         return strItem.length > length ? strItem.substr(fromIndex ? fromIndex : 0, length) + "..." : strItem;
+    }
+
 }

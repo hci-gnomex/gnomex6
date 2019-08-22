@@ -22,7 +22,7 @@ import org.apache.log4j.Logger;
 public class UploadDownloadHelper {
   private static Logger LOG = Logger.getLogger(UploadDownloadHelper.class);
 
-  public static void writeDownloadInfoFile(String baseDir, String emailAddress, SecurityAdvisor secAdvisor, HttpServletWrappedRequest req, String theidRequest, String theidLab, String theidAnalysis,String theTransferLogFile) throws IOException {
+  public static void writeDownloadInfoFile(String baseDir, String emailAddress, SecurityAdvisor secAdvisor, HttpServletRequest req, String theidRequest, String theidLab, String theidAnalysis,String theTransferLogFile) throws IOException {
 
     if (!baseDir.endsWith("/")) {
       baseDir += "/";

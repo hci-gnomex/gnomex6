@@ -40,6 +40,7 @@ import {CopyAccountsDialogComponent} from "./dialogs/copy-accounts-dialog.compon
 import {UniqueIdGeneratorService} from "../../services/unique-id-generator.service";
 import {ConstantsService} from "../../services/constants.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
     isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -1598,30 +1599,52 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             coreFacilities: this.coreFacilities
         };
 
-        this.dialogsService.genericDialogContainer(CopyAccountsDialogComponent, "", this.constService.ICON_WORK_AUTH_FORM, config,
-            {actions: [
-                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Add to working document", internalAction: "onClickSaveButton"},
-                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
-                ]}).subscribe((data) => {
-                    if(data) {
-                        for (let account of data.chartfieldAccountRowsToCopy) {
-                            this._labInfo.internalBillingAccounts.push(account);
-                            this._labInfo.billingAccounts.push(account);
-                        }
-                        for (let account of data.poAccountRowsToCopy) {
-                            this._labInfo.pOBillingAccounts.push(account);
-                            this._labInfo.billingAccounts.push(account);
-                        }
-                        for (let account of data.creditCardAccountRowsToCopy) {
-                            this._labInfo.creditCardBillingAccounts.push(account);
-                            this._labInfo.billingAccounts.push(account);
-                        }
+        this.dialogsService.genericDialogContainer(CopyAccountsDialogComponent, "", this.constService.ICON_WORK_AUTH_FORM, config, {
+            actions: [
+                {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Add to working document", internalAction: "onClickSaveButton"},
+                {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+            ]
+        }).subscribe((data) => {
+            if(data) {
+                for (let account of data.chartfieldAccountRowsToCopy) {
+                    let copiedAccount = _.cloneDeep(account);
+                    copiedAccount.idBillingAccount = 'BillingAccount' + this.getNextUniqueIdForLab();
 
-                        this.assignChartfieldGridContents(this.selectedCoreFacility);
-                        this.assignPoGridContents(this.selectedCoreFacility);
-                        this.assignCreditCardGridContents(this.selectedCoreFacility);
-                    }
+                    this._labInfo.internalBillingAccounts.push(copiedAccount);
+                    this._labInfo.billingAccounts.push(copiedAccount);
+                }
+                for (let account of data.poAccountRowsToCopy) {
+                    let copiedAccount = _.cloneDeep(account);
+                    copiedAccount.idBillingAccount = 'BillingAccount' + this.getNextUniqueIdForLab();
+
+                    this._labInfo.pOBillingAccounts.push(copiedAccount);
+                    this._labInfo.billingAccounts.push(copiedAccount);
+                }
+                for (let account of data.creditCardAccountRowsToCopy) {
+                    let copiedAccount = _.cloneDeep(account);
+                    copiedAccount.idBillingAccount = 'BillingAccount' + this.getNextUniqueIdForLab();
+
+                    this._labInfo.creditCardBillingAccounts.push(copiedAccount);
+                    this._labInfo.billingAccounts.push(copiedAccount);
+                }
+
+                this.assignChartfieldGridContents(this.selectedCoreFacility);
+                this.assignPoGridContents(this.selectedCoreFacility);
+                this.assignCreditCardGridContents(this.selectedCoreFacility);
+            }
         });
+    }
+
+    private getNextUniqueIdForLab() : number {
+	    if (this._labInfo) {
+	        if (!this._labInfo.latestUniqueIdCreated) {
+                this._labInfo.latestUniqueIdCreated = 1;
+            }
+
+            return this._labInfo.latestUniqueIdCreated++;
+        } else {
+	        return -1;
+        }
     }
 
     private attachUniqueIdsIfNeeded(array: any[]): void {
@@ -1706,9 +1729,5 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
     }
     private markAsDirty(): void {
         this.isDirty = true;
-    }
-
-    testFunction(): void {
-	    console.log('Changed detected');
     }
 }

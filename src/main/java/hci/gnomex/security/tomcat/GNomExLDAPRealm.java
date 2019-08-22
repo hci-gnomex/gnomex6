@@ -84,7 +84,7 @@ public class GNomExLDAPRealm extends RealmBase {
 		return password;
 	}
 
-	@Override
+//	@Override
 	protected String getName() {
 		return this.getClass().getSimpleName();
 	}

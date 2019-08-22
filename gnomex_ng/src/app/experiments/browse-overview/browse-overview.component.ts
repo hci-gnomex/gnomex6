@@ -14,8 +14,8 @@ import {HttpParams} from "@angular/common/http";
 
 @Component({
     template: `
-        <div class="flexbox-column">
-            <div class="flex-container">
+        <div class="flex-container-col full-height full-width">
+            <div class="flex-container-row justify-space-between align-center">
                 <div >
                     {{ nodeTitle}} &nbsp;&nbsp;&nbsp;&nbsp; {{ "(" + this.experimentsService.experimentList.length + " Experiments)"}}
                 </div>
@@ -26,7 +26,7 @@ import {HttpParams} from "@angular/common/http";
                     </custom-combo-box>
                 </div>
             </div>
-            <div class="full-width full-height flex-grow-greater overflow">
+            <div class="full-width full-height flex-grow overflow-auto">
                 <mat-tab-group class="mat-tab-group-border full-height full-width" (selectedTabChange)="tabChanged($event)">
                     <mat-tab class="full-height" label="Experiment">
                         <experiment-browse-tab></experiment-browse-tab>
@@ -50,28 +50,13 @@ import {HttpParams} from "@angular/common/http";
         </div>
 `,
     styles: [`
-
-        .flex-container{
-            display: flex;
-            justify-content: space-between;
-            flex:1;
-        }
-        .flexbox-column{
-            display:flex;
-            flex-direction:column;
-            height:100%;
-            width:100%;
-        }
+        
         /deep/ .mat-tab-body-wrapper {
-            flex-grow: 1 !important;
+            flex: 1 !important;
         }
         .mat-tab-group-border{
             border: 1px solid #e8e8e8;
         }
-
-        .overflow { overflow: auto; }
-
-        .flex-grow-greater { flex: 10; }
 
     `]
 })

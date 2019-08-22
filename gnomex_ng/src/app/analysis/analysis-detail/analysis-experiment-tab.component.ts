@@ -54,10 +54,7 @@ import {UtilService} from "../../services/util.service";
 
 
         .datatracks-panel {
-            height:100%;
-            width:100%;
             border: #C8C8C8 solid thin;
-            padding: 1em;
         }
         .truncate{
             white-space: nowrap;
@@ -71,7 +68,6 @@ import {UtilService} from "../../services/util.service";
 export class AnalysisExperimentTabComponent implements OnInit, OnDestroy {
     private selectedTreeNodeSubscript: Subscription;
     private gridOpt: GridOptions = {};
-    public showSpinner: boolean = false;
     public labList: any[] = [];
     public analysis: any;
     public analysisTreeNode: any;
@@ -350,7 +346,8 @@ export class AnalysisExperimentTabComponent implements OnInit, OnDestroy {
         return itemOne && itemTwo && itemOne.idLab === itemTwo.idLab;
     }
     selectLab($event: any) {
-        this.showSpinner = true;
+        this.dialogService.startDefaultSpinnerDialog();
+
         let idLab: string = "";
         if($event.value ) {
             idLab = $event.value.idLab ? $event.value.idLab : "";
@@ -375,10 +372,10 @@ export class AnalysisExperimentTabComponent implements OnInit, OnDestroy {
                     let projects: any[] = Array.isArray(resp) ? resp : resp.Project ? [resp.Project] : [];
                     this.buildTree(projects);
                 }
-                this.showSpinner = false;
 
+                this.dialogService.stopAllSpinnerDialogs();
             }, (err: IGnomexErrorResponse) => {
-                this.showSpinner = false;
+                this.dialogService.stopAllSpinnerDialogs();
             });
     }
 
