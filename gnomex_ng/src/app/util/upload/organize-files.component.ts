@@ -96,12 +96,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                 }
             }
 
-            let nodesToMove:Set<TreeNode> =  FileService.getFileNodesToDrag(fromTree);
-            let cloneNodes = [];
-
-            for(let n of  nodesToMove ){
-                cloneNodes.push(_.cloneDeep(n.data));
-            }
+            let cloneNodes = FileService.getFileNodesToMove(fromTree);
 
             if(to.parent.data.FileDescriptor){
                 to.parent.data.FileDescriptor.push(...cloneNodes);
@@ -120,9 +115,14 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     private  actionMapping: IActionMapping = {
         mouse: {
             click: (tree:TreeModel, node, $event) => {
-                $event.ctrlKey
-                    ? TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event)
-                    : TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event)
+                if($event.ctrlKey) {
+                   TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event);
+                } else if($event.shiftKey){
+                    TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event);
+                    FileService.makeShiftSelection(tree,node);
+                }else{
+                    TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
+                }
                 this.isLastSelectOrgTree = tree === this.organizeTree.treeModel;
             },
             drop: this.moveNode,

@@ -1,18 +1,17 @@
 import {Inject, Injectable} from "@angular/core";
 import {forkJoin, Observable, of, throwError} from "rxjs";
 import {Subject} from "rxjs";
-import {URLSearchParams} from "@angular/http";
 import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
 import {catchError, first, flatMap, map, mergeMap} from "rxjs/operators";
 import {ExperimentsService} from "../experiments/experiments.service";
 import {AnalysisService} from "./analysis.service";
 import {DOCUMENT} from "@angular/common";
-import {Form, FormGroup} from "@angular/forms";
-import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {FormGroup} from "@angular/forms";
 import {UtilService} from "./util.service";
 import {ConstantsService} from "./constants.service";
 import {TreeModel, TreeNode} from "angular-tree-component";
+import * as _ from "lodash";
 
 @Injectable()
 export class FileService {
@@ -408,5 +407,81 @@ export class FileService {
         return nodes;
     }
 
+    private static recursePurgeDuplicateNodes(node:TreeNode, filterNodesToMove:Set<TreeNode>){
+        if(filterNodesToMove.has(node)){
+            filterNodesToMove.delete(node);
+        }
+        if(node.isLeaf){
+            return;
+        }else{
+            for(let n of node.children){
+                FileService.recursePurgeDuplicateNodes(n,filterNodesToMove);
+            }
+        }
 
+    }
+    private static purgeDuplicateNodes(nodes:TreeNode[], filterNodesToMove){
+        // we need to skip top level node go to immediate children and recurse them
+        for(let n of nodes){
+            FileService.recursePurgeDuplicateNodes(n,filterNodesToMove );
+        }
+
+    }
+
+
+    public static getFileNodesToMove(tree: TreeModel){
+        let toOrderNodes: TreeNode[]  = tree.getActiveNodes();
+        let copyNodesToMove: TreeNode[] = [];
+        toOrderNodes.sort((a,b) => {
+            return b.level - a.level ;
+        });
+
+        let filterNodesToMove: Set<TreeNode> = new Set<TreeNode>(toOrderNodes);
+        for(let n of toOrderNodes ){
+            if(!n.isLeaf){
+                this.purgeDuplicateNodes(n.children,filterNodesToMove);
+            }
+
+        }
+
+        for(let n of filterNodesToMove){
+            copyNodesToMove.push(_.cloneDeep(n.data));
+        }
+
+        return copyNodesToMove;
+
+
+    }
+
+    private static activateNodes(startNode:TreeNode, targetNode:TreeNode){
+        let currentNode = startNode;
+        while(currentNode !== targetNode){
+            //let a1 = performance.now();
+            // calling set active is a taxing process
+            currentNode.setIsActive(true, true );
+            //let a2 = performance.now();
+
+            currentNode = currentNode.findNextNode(true);
+            //console.log("diff for set active " +  (a2 - a1) )
+        }
+
+    }
+
+
+    public static makeShiftSelection(tree: TreeModel, shiftNode:TreeNode) {
+        let clickedNode: TreeNode = tree.getActiveNode();
+        let targetNode: TreeNode = null;
+        let startNode: TreeNode = null;
+
+        if(clickedNode.position - shiftNode.position < 0 ){
+            startNode = clickedNode;
+            targetNode = shiftNode;
+        }else{
+            startNode = shiftNode;
+            targetNode = clickedNode;
+        }
+
+        FileService.activateNodes(startNode,targetNode)
+
+    }
 }
