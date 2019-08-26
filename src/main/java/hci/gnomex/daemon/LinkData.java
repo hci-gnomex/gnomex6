@@ -8,18 +8,12 @@ import hci.gnomex.utility.BatchDataSource;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,6 +54,7 @@ public class LinkData extends TimerTask {
     private int nxtRequest = 0;
 
     private String regex;
+    private boolean linkFolder= false;
 
 
     private String errorMessageString = "Error in LinkData";
@@ -69,10 +64,10 @@ public class LinkData extends TimerTask {
     public LinkData(String[] args) {
         nxtRequest = 0;
         int i = -1;
-        args[i] = args[i].toLowerCase();
 
         while (i < args.length) {
             i++;
+            args[i] = args[i].toLowerCase();
             if (i >= args.length) {
                 break;
             }
@@ -101,6 +96,8 @@ public class LinkData extends TimerTask {
                 break;
             }else if( args[i].equals("-regex")){
                 regex = args[++i];
+            }else if( args[i].equals("-linkfolder")){
+                linkFolder = true;
             }
         }
     }
@@ -298,11 +295,46 @@ public class LinkData extends TimerTask {
                         continue;
                     }
 
-                    String middleOfPath = thePath.substring(ipos + 1, epos);
-                    if (debug) System.out.println("middleOfPath: " + middleOfPath);
+                    String middleOfPath = "";
+                    String filename = "";
+                    String parentFolder = "";
+                    String subCommand = "";
 
-                    String filename = thePath.substring(epos + 1);
-                    if (debug) System.out.println("filename: " + filename);
+                    if(!linkFolder){
+                        middleOfPath = thePath.substring(ipos + 1, epos);
+                        if (debug) System.out.println("middleOfPath: " + middleOfPath);
+
+                        filename = thePath.substring(epos + 1);
+                        if (debug) System.out.println("filename or foldername : " + filename);
+                        subCommand = "-s";
+
+                    }else {
+                        // length - 2 because I don't want filename want its parent folder
+                        File dummyFile = new File(startAvatarPath + "/" + thePath);
+                        if(debug) System.out.println("the absolute path: "  + startAvatarPath + "/" + thePath);
+
+                        filename =  dummyFile.getParentFile().getName();
+                        if(thePath.split("/").length < 6 ){
+                            continue;
+                        }
+
+
+                        if (debug) System.out.println("filename or foldername : " + filename);
+
+                        parentFolder = dummyFile.getParent();
+                        if(debug) System.out.println("parent folder with real path" + parentFolder);
+
+                        epos =  thePath.indexOf(filename);
+                        middleOfPath = thePath.substring(ipos+ 1, epos );
+                        if (debug) System.out.println("middleOfPath: " + middleOfPath);
+                        // need to make sure if you try to run making a symlink more than once it doesn't
+                        // stick a symlink inside the src dir pointing to soft link
+                        // the T stops it from drilling into the 'pointer' that points to src dir if it already exists
+                        subCommand = "-sTf";
+
+                    }
+
+
 
                     String myPath = dirPath + "/" + middleOfPath;
                     if (debug) System.out.println("myPath: " + myPath);
@@ -311,13 +343,14 @@ public class LinkData extends TimerTask {
                     f.mkdirs();
 
                     //  make the soft link
-                    myPath = myPath + "/" + filename;
-                    String pathToRealData = startAvatarPath + "/" + thePath;
+                    myPath =  myPath + "/" +  filename;
+
+                    String pathToRealData = !linkFolder ? startAvatarPath + "/" + thePath  :  parentFolder ;
                     File target = new File(pathToRealData);
                     File linkName = new File(myPath);
                     if (debug) System.out.println("[LinkData] right before makeSoftLinks, target: " + pathToRealData + "\n\t\t\t\t linkName: " + linkName);
 
-                    boolean ok = makeSoftLinks(target, linkName);
+                    boolean ok = makeSoftLinks(target, linkName, subCommand);
                     if (!ok) {
                         System.out.println("makeSoftLinks failed!");
                     }
@@ -335,11 +368,11 @@ public class LinkData extends TimerTask {
     /**
      * Makes a soft link between the realFile and the linked File using the linux 'ln -s' command.
      */
-    public static boolean makeSoftLinks(File realFile, File link) {
+    public static boolean makeSoftLinks(File realFile, File link, String subCommand) {
         try {
 //			String[] cmd1 = { "rm", "-f", link.toString() };
 //			Runtime.getRuntime().exec(cmd1);
-            String[] cmd = {"ln", "-s", realFile.getAbsolutePath(), link.toString()};
+            String[] cmd = {"ln", subCommand, realFile.getAbsolutePath(), link.toString()};
             Runtime.getRuntime().exec(cmd);
             return true;
         } catch (IOException e) {

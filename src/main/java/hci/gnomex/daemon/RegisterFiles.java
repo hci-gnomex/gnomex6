@@ -14,14 +14,7 @@ import hci.gnomex.model.ExperimentFile;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.SampleExperimentFile;
-import hci.gnomex.utility.BatchDataSource;
-import hci.gnomex.utility.BatchMailer;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.FileDescriptor;
-import hci.gnomex.utility.MailUtil;
-import hci.gnomex.utility.MailUtilHelper;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.UploadDownloadHelper;
+import hci.gnomex.utility.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -534,7 +527,7 @@ private void registerAnalysisFiles() throws Exception {
 
 		// Get all of the files from the file system
 		Map fileMap = hashFiles(analysis);
-		for (Iterator i1 = fileMap.keySet().iterator(); i1.hasNext();) {
+		for (Iterator i1 = fileMap.keySet().iterator(); i1.hasNext(); ) {
 			String fileName = (String) i1.next();
 			FileDescriptor fd = (FileDescriptor) fileMap.get(fileName);
 			if (analysisWarnings) {
@@ -544,7 +537,7 @@ private void registerAnalysisFiles() throws Exception {
 
 		// Now compare to the analysis files already registered in the db
 		TreeSet newAnalysisFiles = new TreeSet(new AnalysisFileComparator());
-		for (Iterator i2 = analysis.getFiles().iterator(); i2.hasNext();) {
+		for (Iterator i2 = analysis.getFiles().iterator(); i2.hasNext(); ) {
 
 			AnalysisFile af = (AnalysisFile) i2.next();
 			String directoryName = analysis.getNumber() + "/";
@@ -576,7 +569,7 @@ private void registerAnalysisFiles() throws Exception {
 				if (dataTrackFiles.size() > 0) {
 
 					// Delete the DataTrackFiles and DataTracks
-					for (Iterator i4 = dataTrackFiles.iterator(); i4.hasNext();) {
+					for (Iterator i4 = dataTrackFiles.iterator(); i4.hasNext(); ) {
 						Object[] row = (Object[]) i4.next();
 						DataTrackFile dtf = (DataTrackFile) row[0];
 						DataTrack dt = (DataTrack) row[1];
@@ -658,7 +651,7 @@ private void registerAnalysisFiles() throws Exception {
 		} // end of compare in db
 
 
-		// Now add AnalysisFiles to the db for any files on the file system not found in the db.
+		// Now add AnalysisFiles to the db for any files on the file system not found in the db
 		for (Iterator i3 = fileMap.keySet().iterator(); i3.hasNext();) {
 			String fileName = (String) i3.next();
 			FileDescriptor fd = (FileDescriptor) fileMap.get(fileName);
@@ -666,7 +659,12 @@ private void registerAnalysisFiles() throws Exception {
 				AnalysisFile af = new AnalysisFile();
 				af.setIdAnalysis(analysis.getIdAnalysis());
 				af.setFileName(fd.getDisplayName());
-				af.setQualifiedFilePath(fd.getQualifiedFilePath());
+				String qfpath = fd.getQualifiedFilePath();
+				if (qfpath.length() >= 2000)
+				{
+					System.out.println ("ERROR:  analysis file qualified exceeds 2000 characters: " + qfpath);
+				}
+				af.setQualifiedFilePath(qfpath);
 				af.setBaseFilePath(fd.getBaseFilePath());
 				af.setFileSize(BigDecimal.valueOf(fd.getFileSize()));
 				af.setBaseFilePath(baseAnalysisDir + analysis.getCreateYear() + File.separatorChar
@@ -818,6 +816,11 @@ private Map hashFiles(Session sess, String requestNumber, java.util.Date createD
 	for (Iterator i1 = folders.iterator(); i1.hasNext();) {
 		String folderName = (String) i1.next();
 
+		// avoid loops from symbolic links
+		if ( symlinkLoop(folderName)) {
+			// ignore it
+			continue;
+		}
 		// For each folder under experiment directory, get the files (recursive)
 		Map requestMap = new TreeMap();
 		Map directoryMap = new TreeMap();
@@ -1028,7 +1031,30 @@ private void disconnect() throws Exception {
 	sess.close();
 }
 
-// Bypassed dtd validation when reading data sources.
+	public static boolean symlinkLoop (String filename) {
+		File cfile = new File(filename);
+		return symlinkLoop (cfile) ;
+	}
+
+	public static boolean symlinkLoop(File file) {
+
+		if (file != null && file.exists()) {
+			try {
+				File canonicalizedFile = file.getCanonicalFile();
+				File absoluteFile = file.getAbsoluteFile();
+				if (!canonicalizedFile.getPath().equals(absoluteFile.getPath())) {
+					return absoluteFile.getPath().startsWith(canonicalizedFile.getPath());
+				}
+				return false;
+			} catch (IOException e) {
+				return true;
+			}
+		}
+
+		return true;
+	}
+
+	// Bypassed dtd validation when reading data sources.
 public class DummyEntityRes implements EntityResolver {
 public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
 	return new InputSource(new StringReader(" "));

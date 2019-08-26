@@ -27,9 +27,9 @@ public class DirectoryBuilder {
 
 
 
-	private static final String RNAseq = "RNAseq";
-	private static final String WHOLE_EXOME= "Whole_Exome";
-	private static final String FASTQ="FASTq";
+	private static final String RNAseq = "rnaseq";
+	private static final String WHOLE_EXOME= "whole_exome";
+	private static final String FASTQ="fastq";
 	private static final String DNA_ALIAS="DNA";
 	private static final String RNA_ALIAS="RNA";
 	private static final String FASTQ_ALIAS="Fastq";
@@ -233,7 +233,6 @@ public class DirectoryBuilder {
 
 	public void preparePath() {
 		List<String> localFiles = new ArrayList<String>();
-		Set<String> pathToCreate = new HashSet<String>();
 		List<String> filesWithPaths = new ArrayList<String>();
 		List<String> filteredFiles = new ArrayList<String>();
 		List<String> flaggedIDList = readSampleIDs(flaggedIDFileName);
@@ -243,11 +242,12 @@ public class DirectoryBuilder {
 		try {
 
 			localFiles = this.readFile(this.inFileName);
+
 			boolean test = new File(this.currentDownloadLocation + "Flagged").mkdir();
 
 			//readPathInfo(this.pathCreatorInfo);
 
-			if(mode.equals("avatar")) {
+			/*if(mode.equals("avatar")) {
 				for(String lf: localFiles) {
 					StringBuilder strBuild = new StringBuilder(File.separator);
 
@@ -303,9 +303,9 @@ public class DirectoryBuilder {
 					boolean made = new File(p).mkdirs();
 				}
 
-			}else if(mode.equals("foundation") || mode.equals("tempus")) {
-				preparePath(flaggedIDList,filteredFiles, localFiles,filesWithPaths );
-			}
+			}*/
+			preparePath(flaggedIDList,filteredFiles, localFiles,filesWithPaths );
+
 
 
 		} catch (Exception e) {
@@ -318,6 +318,7 @@ public class DirectoryBuilder {
 
 		try{
 			this.moveTheFiles(filteredFiles, new ArrayList<>()); // These files we want to move into the flagged folder
+			// for tempus anything doesn't get flagged explicitly  but it doesn't get moved is still considered flagged
 			this.moveTheFiles(filesWithPaths, Arrays.asList("echo move left over files to Flagged",
 					"mv -t " + this.currentDownloadLocation + "Flagged" +" " + currentDownloadLocation +"*"));
 
@@ -330,10 +331,11 @@ public class DirectoryBuilder {
 
 	}
 
-	StringBuilder getMatchingDirName(String[] chunks, StringBuilder strBuild, Map<String,String> dirMap){
+	StringBuilder getMatchingDirName(String[] chunks, StringBuilder strBuild, Map<String,String> dirMap, Set<String> dupDirSet ){
+
 		for(String chunk:chunks){
 			String corretCaseDirName = dirMap.get( chunk.toLowerCase());
-			if(corretCaseDirName != null ){
+			if(corretCaseDirName != null && dupDirSet.add(chunk.toLowerCase())){
 				strBuild.append(File.separator);
 				strBuild.append(corretCaseDirName);
 			}
@@ -348,15 +350,17 @@ public class DirectoryBuilder {
 		dirMap.put("xml","Reports");
 		dirMap.put("pdf","Reports");
 		dirMap.put("json","Reports");
+		dirMap.put(WHOLE_EXOME, DNA_ALIAS);
+		dirMap.put(RNAseq, RNA_ALIAS);
 
 		getAllDirs(finalDestinationPath.listFiles(), dirMap);
 
-
 		for(String p: paths) {
 			StringBuilder strBuild = new StringBuilder(root);
+			System.out.println("Path being processed: " + p );
 
 			String pattern = Pattern.quote(System.getProperty("file.separator"));
-			String[] pathChunks = p.split("/");
+			String[] pathChunks = p.split(pattern);
 
 			String file = pathChunks[pathChunks.length - 1];
 			String[] fileChunks = file.split("\\.");
@@ -364,63 +368,27 @@ public class DirectoryBuilder {
 			//find detail from path
 
 			if(!filterOutFlaggedIDs(file, flaggedFiles)){
-				getMatchingDirName(pathChunks,strBuild,dirMap);
-				getMatchingDirName(fileChunks,strBuild,dirMap);
+				Set<String> dupDirSet = new HashSet<>();
+				getMatchingDirName(pathChunks,strBuild,dirMap,dupDirSet);
+				getMatchingDirName(fileChunks,strBuild,dirMap,dupDirSet);
 			}else{
+
 				strBuild.setLength(0);
 				strBuild.append(File.separator);
 				strBuild.append("Flagged");
 				strBuild.append(File.separator);
 				strBuild.append(file);
 				filteredFiles.add(strBuild.toString());
+				System.out.println("Flagged " + strBuild.toString());
 				continue;
 			}
 			String finalPath = strBuild.toString();
+			System.out.println("final path " + strBuild.toString());
 			if(new File(finalPath).exists() && !finalPath.equals(root)) {
 				filesWithPaths.add(strBuild.append(File.separator).append(file).toString());
 			}else {
 				throw new Exception("The path does not exist: " + finalPath +  "\n your directory structure isn't correct");
 			}
-
-
-
-
-
-
-
-			/*if(extChunks.length > 1 ) {
-				if(filterOutFlaggedIDs( fileName , flaggedFiles)) {
-					strBuild.append(currentDownloadLocation);
-					strBuild.append("/Flagged/");
-					strBuild.append(fileName);
-					filteredFiles.add(strBuild.toString());
-					continue;
-				}
-				if(extChunks[1].equals("bam")) {
-					strBuild.append(this.root);
-					strBuild.append("Bams/");
-
-					if(extChunks[length - 1].equals("md5")){
-						strBuild.append("checksums/");
-					}
-					strBuild.append(fileName);
-					filesWithPaths.add(strBuild.toString());
-
-				}else if(extChunks[1].equals("vcf")) {
-					strBuild.append(this.root);
-					strBuild.append("VCF/");
-					strBuild.append(fileName);
-					filesWithPaths.add(strBuild.toString());
-				}
-				else {
-					strBuild.append(this.root);
-					strBuild.append("Reports/");
-					strBuild.append(fileName);
-					filesWithPaths.add(strBuild.toString());
-
-				}
-
-			}*/
 
 		}
 
