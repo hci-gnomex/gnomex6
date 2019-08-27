@@ -77,6 +77,9 @@
                             <div class="td right-align padded">
                                 {{ billingItem.unitPrice ? '' + billingItem.unitPrice : '' }}
                             </div>
+                            <div *ngIf="billingItem.percentagePrice !== '1'" class="td padded">
+                                ({{ billingItem.percentageDisplay ? '' + billingItem.percentageDisplay : '' }})
+                            </div>
                             <div class="td padded heavily-right-padded">
                                 =
                             </div>
