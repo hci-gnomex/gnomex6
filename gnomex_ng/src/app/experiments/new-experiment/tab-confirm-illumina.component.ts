@@ -752,7 +752,14 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             } else {
                 let accountName:String = "";
 
-                if (this._experiment.billingAccount != null) {
+                if (this.experiment.billingTemplate != null && this.experiment.billingTemplate.items != null) {
+                    for (let templateItem of this.experiment.billingTemplate.items) {
+                        if (accountName) {
+                            accountName += ", ";
+                        }
+                        accountName += templateItem.accountNumberDisplay;
+                    }
+                } else if (this._experiment.billingAccount != null) {
                     accountName = this._experiment.billingAccount.accountNumberDisplay;
                 } else if (this.experiment.accountNumberDisplay) {
                     accountName = this.experiment.accountNumberDisplay;
