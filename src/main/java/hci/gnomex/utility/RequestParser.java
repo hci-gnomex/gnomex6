@@ -750,27 +750,34 @@ public class RequestParser implements Serializable {
       billingTemplateItems.add(getBillingTemplateItemForIdBA(newIdBillingAccount));
       isOpeningNewBillingTemplate = true;
       reassignBillingAccount = false;
-    } else if (n.get("isOpeningNewBillingTemplate") != null
-        && n.getString("isOpeningNewBillingTemplate").equals("Y")
-        && (n.getJsonArray("BillingTemplate") != null
-            || (n.getJsonObject("billingTemplate") != null
-                && n.getJsonObject("billingTemplate").getJsonArray("BillingTemplate") != null))) {
-
+    } else if (Util.getJsonStringSafeNonNull(n, "isOpeningNewBillingTemplate").equals("Y") && n.get("BillingTemplate") != null) {
       BillingTemplate oldBillingTemplate = BillingTemplateQueryManager.retrieveBillingTemplate(sess, request);
 
       if (oldBillingTemplate == null || !oldBillingTemplate.canBeDeactivated(sess)) {
         throw new Exception("Current billing template cannot be deactivated");
       }
 
-      JsonArray billingTemplateArray = n.getJsonArray("BillingTemplate") != null ? n.getJsonArray("BillingTemplate") : n.getJsonObject("billingTemplate").getJsonArray("BillingTemplate");
-      JsonObject billingTemplateObject = Json.createObjectBuilder().add("billingTemplate", billingTemplateArray).build();
-      BillingTemplateParser btParser = new BillingTemplateParser(billingTemplateObject);
+      JsonObject billingTemplateJSON = n.getJsonObject("BillingTemplate");
+      BillingTemplateParser btParser = new BillingTemplateParser(billingTemplateJSON);
       btParser.parse(sess);
       billingTemplate = btParser.getBillingTemplate();
       billingTemplate.setOrder(request);
       billingTemplateItems = btParser.getBillingTemplateItems();
       isOpeningNewBillingTemplate = true;
       reassignBillingAccount = false;
+    } else if (n.get("BillingTemplate") != null) {
+      JsonObject billingTemplateJSON = n.getJsonObject("BillingTemplate");
+      BillingTemplateParser btParser = new BillingTemplateParser(billingTemplateJSON);
+      btParser.parse(sess);
+      billingTemplate = btParser.getBillingTemplate();
+      billingTemplateItems = btParser.getBillingTemplateItems();
+      if (!isNewRequest && !this.isExternalExperiment()) {
+        BillingTemplate oldTemplate = BillingTemplateQueryManager.retrieveBillingTemplate(sess, request);
+        if (oldTemplate == null || !oldTemplate.equals(billingTemplate)) {
+          reassignBillingAccount = true;
+        }
+      }
+      billingTemplate.setOrder(request);
     } else if (n.get("idBillingAccount") != null && !n.getString("idBillingAccount").equals("")) {
       Integer newIdBillingAccount = new Integer(n.getString("idBillingAccount"));
       request.setIdBillingAccount(newIdBillingAccount);
@@ -794,20 +801,6 @@ public class RequestParser implements Serializable {
       Hibernate.initialize(billingTemplate.getItems());
       billingTemplateItems = billingTemplate.getItems();
       Hibernate.initialize(billingTemplate.getMasterBillingItems());
-      if (!isNewRequest && !this.isExternalExperiment()) {
-        BillingTemplate oldTemplate = BillingTemplateQueryManager.retrieveBillingTemplate(sess, request);
-        if (oldTemplate == null || !oldTemplate.equals(billingTemplate)) {
-          reassignBillingAccount = true;
-        }
-      }
-      billingTemplate.setOrder(request);
-    } else if (n.getJsonArray("BillingTemplate") != null || (n.getJsonObject("billingTemplate") != null && n.getJsonObject("billingTemplate").getJsonArray("BillingTemplate") != null)) {
-      JsonArray billingTemplateArray = n.getJsonArray("BillingTemplate") != null ? n.getJsonArray("BillingTemplate") : n.getJsonObject("billingTemplate").getJsonArray("BillingTemplate");
-      JsonObject billingTemplateObject = Json.createObjectBuilder().add("billingTemplate", billingTemplateArray).build();
-      BillingTemplateParser btParser = new BillingTemplateParser(billingTemplateObject);
-      btParser.parse(sess);
-      billingTemplate = btParser.getBillingTemplate();
-      billingTemplateItems = btParser.getBillingTemplateItems();
       if (!isNewRequest && !this.isExternalExperiment()) {
         BillingTemplate oldTemplate = BillingTemplateQueryManager.retrieveBillingTemplate(sess, request);
         if (oldTemplate == null || !oldTemplate.equals(billingTemplate)) {

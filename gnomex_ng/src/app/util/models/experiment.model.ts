@@ -7,6 +7,8 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {PropertyService} from "../../services/property.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {BillingTemplate} from "../billing-template-window.component";
+import {BillingService} from "../../services/billing.service";
 
 export class Experiment {
 
@@ -512,6 +514,29 @@ export class Experiment {
     }
     public onChange_selectedProtocol: BehaviorSubject<any> = new BehaviorSubject<any>(this.selectedProtocol);
 
+    public onChange_billingTemplate: Subject<BillingTemplate> = new Subject<BillingTemplate>();
+    private _billingTemplate: BillingTemplate;
+    public get billingTemplate(): BillingTemplate {
+        return this._billingTemplate;
+    }
+    public set billingTemplate(value: BillingTemplate) {
+        this._billingTemplate = value;
+
+        if (value && value.items) {
+            for (let templateItem of value.items) {
+                if (templateItem.acceptBalance === 'Y') {
+                    this.idBillingAccount = templateItem.idBillingAccount;
+                    this.billingAccountName = templateItem.accountName;
+                    this.billingAccountNumber = templateItem.accountNumber;
+                    break;
+                }
+            }
+
+            this.billingAccount = null;
+        }
+
+        this.onChange_billingTemplate.next(value);
+    }
 
     public billingAccountName:                 string = "";
     public billingAccountNumber:               string = "";
@@ -528,6 +553,8 @@ export class Experiment {
             this.idBillingAccount = value.idBillingAccount;
             this.billingAccountName = value.accountName;
             this.billingAccountNumber = value.accountNumber;
+
+            this.billingTemplate = null;
         }
 
         this.onChange_billingAccount.next(value);
@@ -576,8 +603,6 @@ export class Experiment {
         experiment.cloneProperty("isVisibleToMembers", value);
         experiment.cloneProperty("isVisibleToPublic", value);
         experiment.cloneProperty("truncatedLabName", value);
-        experiment.cloneProperty("billingAccountName", value);
-        experiment.cloneProperty("billingAccountNumber", value);
         experiment.cloneProperty("lastModifyDate", value);
         experiment.cloneProperty("codeRequestStatus", value);
         experiment.cloneProperty("idSampleDropOffLocation", value);
@@ -634,7 +659,6 @@ export class Experiment {
         experiment.cloneProperty("privacyExpirationDate", value);
         experiment.cloneProperty("targetClassIdentifier", value);
         experiment.cloneProperty("targetClassName", value);
-        experiment.cloneProperty("idBillingAccount", value);
         experiment.cloneProperty("codeApplication", value);
         experiment.cloneProperty("application_object", value);
         experiment.cloneProperty("codeBioanalyzerChipType", value);
@@ -671,6 +695,14 @@ export class Experiment {
         }
 
         experiment.cloneProperty("samples", value);
+
+        if (value.BillingTemplate) {
+            experiment.billingTemplate = BillingService.parseBillingTemplate(value.BillingTemplate);
+        } else {
+            experiment.cloneProperty("idBillingAccount", value);
+            experiment.cloneProperty("billingAccountName", value);
+            experiment.cloneProperty("billingAccountNumber", value);
+        }
 
         experiment.cloneProperty("hybridizations", value);
         experiment.cloneProperty("labeledSamples", value);
@@ -983,6 +1015,10 @@ export class Experiment {
             workItems:                this.workItems,
             topics:                   this.topics,
         };
+
+        if (this.billingTemplate != null) {
+            temp.BillingTemplate = this.billingTemplate;
+        }
 
         return temp;
     }
