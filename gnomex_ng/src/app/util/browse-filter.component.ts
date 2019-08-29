@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from '@angular/core';
 import {URLSearchParams} from "@angular/http";
 
 import {LabListService} from "../services/lab-list.service";
@@ -107,7 +107,7 @@ import {GnomexService} from "../services/gnomex.service";
     `]
 })
 
-export class BrowseFilterComponent implements OnInit, OnDestroy {
+export class BrowseFilterComponent implements OnInit, OnDestroy, OnChanges {
     readonly SHOW_EMPTY_FOLDERS: string = "Show Empty Folders";
     readonly HIDE_REQUESTS_WITH_NO_BILLING_ITEMS: string = "Hide requests with no billing items?";
     readonly DATA_TRACK_BROWSE: string = "dataTrackBrowse";
@@ -116,17 +116,20 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     readonly EXPERIMENT_BROWSE: string = "experimentBrowse";
     readonly BILLING_BROWSE: string = "billingBrowse";
 
-    @Input() private mode: string = "";
+    @Input() public mode: string = "";
 
-    private showLabelAndIcon: boolean = true;
-    @Input() private label: string = "";
-    @Input() private iconSource: string = "";
-    @Input() private iconAlt: string = "icon";
+    public showLabelAndIcon: boolean = true;
+    @Input() public label: string = "";
+    @Input() public iconSource: string = "";
+    @Input() public iconAlt: string = "icon";
+    @Input() private lookupLab: string = "";
 
-    private showAllCheckbox: boolean = false;
-    private allFlag: boolean;
+    public selectedLab: string = "";
 
-    private showDateRangePicker: boolean = false;
+    public showAllCheckbox: boolean = false;
+    public allFlag: boolean;
+
+    public showDateRangePicker: boolean = false;
     private dateFromString: string;
     private dateToString: string;
 
@@ -154,28 +157,28 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
 
     private showOrganismComboBox: boolean = false;
     private idOrganismString: string;
-    private organismList: any[] = [];
+    public organismList: any[] = [];
 
-    private showGenomeBuildComboBox: boolean = false;
+    public showGenomeBuildComboBox: boolean = false;
     private idGenomeBuildString: string;
-    private genomeBuildList: any[] = [];
+    public genomeBuildList: any[] = [];
 
     public showCCNumberInput: boolean = false;
     public ccNumberString: string;
-
-    private showExperimentsRadioGroup: boolean = false;
-    private experimentsRadioString: string;
+    
+    public showExperimentsRadioGroup: boolean = false;
+    public experimentsRadioString: string;
 
     private showAnalysesRadioGroup: boolean = false;
     private analysesRadioString: string;
 
-    private showWorkflowStateRadioGroup: boolean = false;
-    private workflowStateString: string;
+    public showWorkflowStateRadioGroup: boolean = false;
+    public workflowStateString: string;
 
-    private showRedosCheckbox: boolean = false;
-    private redosFlag: boolean;
+    public showRedosCheckbox: boolean = false;
+    public redosFlag: boolean;
 
-    private showOrderNumberInput: boolean = false;
+    public showOrderNumberInput: boolean = false;
     private orderNumberString: string;
 
     private showExperimentNumberInput: boolean = false;
@@ -190,20 +193,20 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     private visibilityAllLabMembersFlag: boolean;
     private visibilityPublicFlag: boolean;
 
-    private showLabComboBox: boolean = false;
+    public showLabComboBox: boolean = false;
     private showLabMultiSelectComboBox: boolean = false;
     private multiSelectIdLabs: Set<string> = new Set<string>();
-    private labList: any[] = [];
-    private idLabString: string;
-    private ownerList: any[] = [];
-    private showOwnerComboBox: boolean = false;
+    public labList: any[] = [];
+    public idLabString: string;
+    public ownerList: any[] = [];
+    public showOwnerComboBox: boolean = false;
     private showLabMembersComboBox: boolean = false;
     private labMembersList: any[] = [];
     private idAppUserString: string;
 
-    private showBillingAccountComboBox: boolean = false;
+    public showBillingAccountComboBox: boolean = false;
     private idBillingAccountString: string;
-    private billingAccountList: any[] = [];
+    public billingAccountList: any[] = [];
 
     private showEmptyFoldersCheckbox: boolean = false;
     private showEmptyFoldersCheckboxLabel: string = this.SHOW_EMPTY_FOLDERS;
@@ -218,7 +221,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 private experimentsService: ExperimentsService, private analysisService: AnalysisService, private dataTrackService: DataTrackService,
                 private dictionaryService: DictionaryService, private billingService: BillingService,
                 private dialogService: DialogsService, public constantsService: ConstantsService,
-                private propertyService: PropertyService,
+                public propertyService: PropertyService,
                 private gnomexService: GnomexService,
                 public prefService: UserPreferencesService) {
         this.showMore = false;
@@ -246,6 +249,16 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
                     this.labList = response
                         .sort(this.prefService.createLabDisplaySortFunction());
+                    if(this.selectedLab) {
+                        let lab = this.labList.filter((a: any) => {
+                            return a.idLab === this.selectedLab;
+                        });
+                        if (lab.length === 1) {
+                            this.onLabSelect(this.selectedLab);
+                        } else {
+                            this.selectedLab = "";
+                        }
+                    }
                 });
             } else if (isGuestState) {
                 this.showMoreSwitch = true;
@@ -387,6 +400,12 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
             setTimeout(() => {
                 this.search();
             });
+        }
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if (this.lookupLab) {
+            this.selectedLab = this.lookupLab;
         }
     }
 

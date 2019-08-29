@@ -17,7 +17,7 @@ import {Subscription} from "rxjs";
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {CreateProjectComponent} from "./create-project.component";
-import {MatCheckboxChange, MatDialogConfig} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {LabListService} from "../services/lab-list.service";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {DeleteProjectComponent} from "./delete-project.component";
@@ -111,6 +111,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     public disableDeleteProject: boolean = true;
     public disableDeleteExperiment: boolean = true;
     public disableAll: boolean = false;
+    public lookupLab: string = "";
 
     public readonly DRAG_DROP_HINT: string = "Drag-and-drop to move object to another group";
     public showDragDropHint: boolean = false;
@@ -157,16 +158,26 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.billingAccounts = [];
         this.labs = [];
 
+        this.experimentsService.startSearchSubject.subscribe((value) => {
+            if (value) {
+                this.dialogsService.startDefaultSpinnerDialog();
+            }
+        });
+
         this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
+            this.lookupLab = "";
+            this.experimentCount = response.experimentCount ? response.experimentCount : "0";
+            this.experimentCountMessage = response.message ? "(" + response.message + ")" : "";
+
+            if(this.experimentCount === "0" && !response.Lab) {
+                this.gnomexService.orderInitObj = null;
+                this.dialogsService.stopAllSpinnerDialogs();
+                this.dialogsService.error("Insufficient permission to access this request or this lab.", "INVALID");
+                return;
+            }
+
             this.buildTree(response.Lab);
             this.onShowEmptyFolders(this.showEmptyFolders);
-            if (response && response.experimentCount) {
-                this.experimentCount = response.experimentCount;
-                this.experimentCountMessage = response.message ? "(" + response.message + ")" : "";
-            } else {
-                this.experimentCount = "0";
-                this.experimentCountMessage = "";
-            }
 
             if (this.experimentsService.browsePanelParams && this.experimentsService.browsePanelParams["refreshParams"]) {
                 this.experimentsService.emitExperimentOverviewList(response.Lab);
@@ -201,6 +212,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                             this.disableNewProject = true;
                             this.router.navigate(navArray);
                         }
+                        this.lookupLab = this.gnomexService.orderInitObj.idLab ? this.gnomexService.orderInitObj.idLab.toString() : "";
                         this.gnomexService.orderInitObj = null;
 
                     }
@@ -225,10 +237,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                     this.experimentsService.usePreviousURLParams = false;
                     this.experimentsService.refreshProjectRequestList_fromBackend();
                 } else {
+                    let idLab = this.gnomexService.orderInitObj.idLab;
                     let idProject = this.gnomexService.orderInitObj.idProject;
 
                     let ids: HttpParams = new HttpParams()
-                        .set("idProject", idProject ? idProject : '')
+                        .set("idLab", idLab ? idLab : "")
+                        .set("idProject", idProject ? idProject : "")
                         .set("showEmptyProjectFolders", "Y")
                         .set("showCategory", "N")
                         .set("showSamples", "N");
@@ -237,14 +251,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 }
             }
         });
-
-
-        this.experimentsService.startSearchSubject.subscribe((value) => {
-            if (value) {
-                this.dialogsService.startDefaultSpinnerDialog();
-            }
-        });
-
 
         this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
         this.treeModel = this.treeComponent.treeModel;
@@ -713,6 +719,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             ...this.state,
             hiddenNodeIds
         };
+
+        this.changeDetectorRef.detectChanges();
     }
 
     private findNodeById(id: string): TreeNode {

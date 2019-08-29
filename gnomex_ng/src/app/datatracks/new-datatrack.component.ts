@@ -68,6 +68,12 @@ export class NewDataTrackComponent extends BaseGenericContainerDialog implements
         this.selectedItem = this.data.selectedItem;
         this.labListService.getSubmitRequestLabList().subscribe((response: any[]) => {
             this.labList = response.sort(this.prefService.createLabDisplaySortFunction());
+            if(this.selectedItem.data.idLab) {
+                let lab = this.labList.filter(lab => {return lab.idLab === this.selectedItem.data.idLab; });
+                if(lab.length === 1) {
+                    this.form.get("idLab").setValue(lab[0].idLab);
+                }
+            }
         });
         this.visibilityList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.VISIBILITY).filter((vis: any) => {
             return vis.value !== "INST";
