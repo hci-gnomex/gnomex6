@@ -32,13 +32,7 @@ import {FlowcellWorkflowComponent} from "./flowcell-workflow.component";
             border-radius: 0.3em;
             border: 1px solid darkgrey;
         }
-
-        #groupTabGroup ::ng-deep.mat-tab-label, ::ng-deep.mat-tab-label-active{
-            width: 25%;
-            min-width: 0;
-            padding: 3px;
-            margin: 3px;
-        }
+        
     `]
 })
 
