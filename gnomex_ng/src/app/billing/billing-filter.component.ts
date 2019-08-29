@@ -69,7 +69,9 @@ export class BillingFilterComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.coreFacilityList = this.createSecurityAdvisorService.coreFacilitiesICanManage;
+        this.coreFacilityList = this.createSecurityAdvisorService.coreFacilitiesICanManage.sort((a, b) => {
+            return a.sortOrder - b.sortOrder;
+        });
         if (this.coreFacilityList.length > 0) {
             this.form.controls['idCoreFacility'].setValue(this.coreFacilityList[0].idCoreFacility);
         }
