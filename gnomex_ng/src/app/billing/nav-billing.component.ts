@@ -24,7 +24,6 @@ import {SelectEditor} from "../util/grid-editors/select.editor";
 import {DateRenderer} from "../util/grid-renderers/date.renderer";
 import {DateEditor} from "../util/grid-editors/date.editor";
 import {DateParserComponent} from "../util/parsers/date-parser.component";
-import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-renderer.component";
 import {
     BillingTemplate,
     BillingTemplateWindowComponent,
@@ -97,6 +96,9 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
         }
         .no-padding {
             padding: 0;
+        }
+        .side-panel {
+            min-width: 28em;
         }
     `]
 })
@@ -215,6 +217,8 @@ export class NavBillingComponent implements OnInit, OnDestroy {
             return stat.value === this.STATUS_COMPLETED || stat.value === this.STATUS_APPROVED;
         });
 
+        // NOTE - the "Type" column that shows SERVICE, PRODUCT, etc. is commented out to free up grid space
+        // When products are fully re-implemented and in actual use, this column can be uncommented
         this.billingItemGridColumnDefs = [
             {headerName: "#", headerTooltip:"#", field: "requestNumber", tooltipField: "requestNumber", width: 150, cellRenderer: "agGroupCellRenderer",
                 cellRendererParams: {innerRenderer: getGroupRenderer(), suppressCount: true}},
@@ -225,7 +229,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                 cellEditorFramework: SelectEditor, selectOptions: this.billingPeriods, selectOptionsDisplayField: "display",
                 selectOptionsValueField: "idBillingPeriod"},
             {headerName: "%", headerTooltip:"%", field: "percentageDisplay", tooltipField: "percentageDisplay", width: 100},
-            {headerName: "Type", headerTooltip:"Type", field: "codeBillingChargeKind", tooltipField: "codeBillingChargeKind", width: 100},
+            //{headerName: "Type", headerTooltip:"Type", field: "codeBillingChargeKind", tooltipField: "codeBillingChargeKind", width: 100},
             {headerName: "Price Category", headerTooltip:"Price Category", field: "category", tooltipField: "category", width: 150},
             {headerName: "Description", headerTooltip:"Description", editable: true, field: "description", tooltipField: "description", width: 150},
             {headerName: "Complete Date", headerTooltip:"Complete Date", editable: true, field: "completeDate", width: 150, cellRendererFramework: DateRenderer,
@@ -243,11 +247,11 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         };
 
         this.priceTreeGridColDefs = [
-            {headerName: "", field: "display", tooltipField: "display", width: 100, cellRenderer: "agGroupCellRenderer", rowDrag: true},
-            {headerName: "", width: 40, maxWidth: 40, cellRendererFramework: IconTextRendererComponent},
-            {headerName: "Price", headerTooltip: "Price", field: "unitPriceCurrency", tooltipField: "unitPriceCurrency", type: "numericColumn", width: 70, maxWidth: 70},
-            {headerName: "Academic", headerTooltip: "Academic", field: "unitPriceExternalAcademicCurrency", tooltipField: "unitPriceExternalAcademicCurrency", type: "numericColumn", width: 70, maxWidth: 70},
-            {headerName: "Commercial", headerTooltip: "Commercial", field: "unitPriceExternalCommercialCurrency", tooltipField: "unitPriceExternalCommercialCurrency", type: "numericColumn", width: 70, maxWidth: 70},
+            {headerName: "", field: "display", tooltipField: "display", width: 300, rowDrag: true, cellRenderer: "agGroupCellRenderer",
+                cellRendererParams: {innerRenderer: getGroupRenderer(), suppressCount: true}},
+            {headerName: "Price", headerTooltip: "Price", field: "unitPriceCurrency", tooltipField: "unitPriceCurrency", type: "numericColumn", width: 120},
+            {headerName: "Academic", headerTooltip: "Academic", field: "unitPriceExternalAcademicCurrency", tooltipField: "unitPriceExternalAcademicCurrency", type: "numericColumn", width: 120},
+            {headerName: "Commercial", headerTooltip: "Commercial", field: "unitPriceExternalCommercialCurrency", tooltipField: "unitPriceExternalCommercialCurrency", type: "numericColumn", width: 120},
         ];
         this.getPriceNodeChildDetails = function getPriceNodeChildDetails(rowItem) {
             if (rowItem.idPriceSheet) {
@@ -1082,7 +1086,6 @@ export class NavBillingComponent implements OnInit, OnDestroy {
 
     public onPriceTreeGridReady(event: GridReadyEvent): void {
         event.api.setColumnDefs(this.priceTreeGridColDefs);
-        event.api.sizeColumnsToFit();
         this.priceTreeGridApi = event.api;
     }
 
