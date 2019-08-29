@@ -1,4 +1,4 @@
-<div class="full-width full-height flex-container-col background major-border padded">
+<div class="full-width full-height flex-container-col background major-border padded overflow-auto">
     <div class="full-width full-height flex-container-col foreground">
         <div class="full-width">
             <browse-filter [label]="'Analysis'"
@@ -7,79 +7,82 @@
             </browse-filter>
         </div>
         <div class="full-width vertical-spacer background"></div>
-        <div class="full-width flex-container-row flex-grow">
-            <as-split>
-                <as-split-area size="20">
-                    <div class="full-width full-height foreground border flex-container-col"> <!-- start tree container -->
-                        <div *ngIf="showDragDropHint" class="full-width padded">
-                            <div class="background-lightyellow allow-line-breaks padded">{{ this.DRAG_AND_DROP_HINT }}
+        <div class="full-width flex-container-row flex-grow overflow-auto">
+            <div class="full-width full-height max-height">
+                <as-split>
+                    <as-split-area size="20">
+                        <div class="full-width full-height foreground border flex-container-col"> <!-- start tree container -->
+                            <div *ngIf="showDragDropHint" class="full-width padded">
+                                <div class="background-lightyellow allow-line-breaks padded">{{ this.DRAG_AND_DROP_HINT }}
+                                </div>
                             </div>
-                        </div>
-                        <div class="full-width flex-container-row align-center padded">
-                            <div class="full-height flex-grow major-left-right-padded no-word-wrap flex-container-col align-center justify-center">
-                                <label>{{analysisCount}} analyses</label>
-                                <label class="small-font">{{analysisCountMessage}}</label>
+                            <div class="full-width flex-container-row align-center padded">
+                                <div class="full-height major-left-right-padded no-word-wrap flex-container-col align-center justify-center">
+                                    <label>{{analysisCount}} analyses</label>
+                                    <label class="small-font">{{analysisCountMessage}}</label>
+                                </div>
+                                <div class="flex-grow">
+                                </div>
+                                <div>
+                                    <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()"
+                                            [disabled]="this.createSecurityAdvisorService.isGuest" [matTooltip]="this.DRAG_AND_DROP_HINT">
+                                        <img [src]="'./assets/information.png'">
+                                        Drag-and-drop hint
+                                    </button>
+                                </div>
                             </div>
-                            <div>
-                                <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()"
-                                        [disabled]="this.createSecurityAdvisorService.isGuest" [matTooltip]="this.DRAG_AND_DROP_HINT">
-                                    <img [src]="'./assets/information.png'">
-                                    Drag-and-drop hint
-                                </button>
+                            <div class="full-width flex-grow left-right-padded no-overflow">
+                                <div class="full-width full-height border">
+                                    <tree-root #analysisTree
+                                               [nodes]="items"
+                                               [options]="options"
+                                               (activate)="treeOnSelect($event)"
+                                               (updateData)="treeUpdateData($event)">
+                                        <ng-template #treeNodeTemplate let-node let-index="index">
+                                            <div class="full-width no-word-wrap tree-node-font">
+                                                <img src="{{node.data.icon}}" alt="" class="tree-node-icon icon">
+                                                <span>{{ node.data.label }}</span>
+                                            </div>
+                                        </ng-template>
+                                        <ng-template #loadingTemplate></ng-template>
+                                    </tree-root>
+                                </div>
                             </div>
-                        </div>
-                        <!-- minimum-nonzero-height-ignored is necessary to keep the tree from overflowing its bounds -->
-                        <div class="full-width flex-grow left-right-padded no-overflow minimum-nonzero-height-ignored">
-                            <div class="full-width full-height border">
-                                <tree-root #analysisTree
-                                           [nodes]="items"
-                                           [options]="options"
-                                           (activate)="treeOnSelect($event)"
-                                           (updateData)="treeUpdateData($event)">
-                                    <ng-template #treeNodeTemplate let-node let-index="index">
-                                        <div class="full-width no-word-wrap tree-node-font">
-                                            <img src="{{node.data.icon}}" alt="" class="tree-node-icon icon">
-                                            <span>{{ node.data.label }}</span>
+                            <div class="full-width padded">
+                                <div class="t">
+                                    <div class="tr">
+                                        <div class="td">
+                                            <button mat-button [disabled]="disableNewAnalysis || this.disableAll" (click)="createAnalysisClicked($event)">
+                                                <img [src]="'./assets/map.png'" alt="">
+                                                New Analysis
+                                            </button>
                                         </div>
-                                    </ng-template>
-                                    <ng-template #loadingTemplate></ng-template>
-                                </tree-root>
-                            </div>
-                        </div>
-                        <div class="full-width padded">
-                            <div class="t">
-                                <div class="tr">
-                                    <div class="td">
-                                        <button mat-button [disabled]="disableNewAnalysis || this.disableAll" (click)="createAnalysisClicked($event)">
-                                            <img [src]="'./assets/map.png'" alt="">
-                                            New Analysis
-                                        </button>
+                                        <div class="td">
+                                            <button mat-button [disabled]="disableDelete || this.disableAll" (click)="deleteAnalysisClicked($event)">
+                                                <img class="exit" [src]="'./assets/delete.png'" alt="">
+                                                Delete
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div class="td">
-                                        <button mat-button [disabled]="disableDelete || this.disableAll" (click)="deleteAnalysisClicked($event)">
-                                            <img class="exit" [src]="'./assets/delete.png'" alt="">
-                                            Delete
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="tr">
-                                    <div class="td">
-                                        <button mat-button [disabled]="disableNewAnalysisGroup || this.disableAll" (click)="createAnalysisGroupClicked($event)">
-                                            <img [src]="'./assets/folder_add.png'">
-                                            New analysis group
-                                        </button>
+                                    <div class="tr">
+                                        <div class="td">
+                                            <button mat-button [disabled]="disableNewAnalysisGroup || this.disableAll" (click)="createAnalysisGroupClicked($event)">
+                                                <img [src]="'./assets/folder_add.png'">
+                                                New analysis group
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                        </div> <!-- end tree container -->
+                    </as-split-area>
+                    <as-split-area size="80">
+                        <div class="full-width full-height border padded">
+                            <analysis-panel></analysis-panel>
                         </div>
-                    </div> <!-- end tree container -->
-                </as-split-area>
-                <as-split-area size="80">
-                    <div class="full-width full-height border padded">
-                        <analysis-panel></analysis-panel>
-                    </div>
-                </as-split-area>
-            </as-split>
+                    </as-split-area>
+                </as-split>
+            </div>
         </div>
     </div>
 </div>

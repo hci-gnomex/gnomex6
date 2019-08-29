@@ -1,4 +1,4 @@
-<div class="full-height full-width flex-column-container small-font ">
+<div class="full-height full-width flex-column-container small-font overflow-auto">
     <as-split *ngIf="tabVisible" > <!-- split  mat-tabs have issues -->
         <as-split-area *ngIf="this.analysisService.getEditMode()" size="20" [order]="1">
             <div class="full-height full-width flex-container-col">
@@ -10,7 +10,7 @@
                                       [formControl]="this.currentLabFC">
                     </custom-combo-box>
                 </div>
-                <div class="flex-grow padded no-overflow minimum-nonzero-height-ignored">
+                <div class="flex-grow padded no-overflow">
                     <div class="full-height full-width border-subtle">
                         <tree-root #tree
                                    (activate)="treeOnSelect($event)"
