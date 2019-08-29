@@ -5,13 +5,12 @@
         </div>
         <div class="full-width vertical-spacer background">
         </div>
-        <div class="flex-container-row flex-grow">
+        <div class="flex-container-row flex-grow overflow-auto">
             <as-split>
                 <as-split-area [size]="20">
                     <div class="full-width full-height small-font border">
                         <div class="full-height full-width flex-container-col foreground">
-                            <!-- minimum-nonzero-height-ignored is necessary to keep the tree from overflowing its bounds -->
-                            <div class="full-width flex-grow left-right-padded top-padded small-font no-overflow minimum-nonzero-height-ignored">
+                            <div class="full-width flex-grow left-right-padded top-padded small-font no-overflow">
                                 <div class="full-width full-height border">
                                     <tree-root #topicsTree
                                                [nodes]="items"

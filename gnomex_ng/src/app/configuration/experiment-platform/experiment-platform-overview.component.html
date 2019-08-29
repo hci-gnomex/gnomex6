@@ -1,60 +1,57 @@
-<div style="display:flex; flex-direction: column; height:100%; width:100%;">
-    <div *ngIf="secAdvisor.isSuperAdmin" style="display:flex; margin-bottom: 0.5em">
-        <button mat-button color="primary" type="button" (click)="addPlatform($event)">
-            <img class="icon" [src]="constService.ICON_ADD">Add Platform
-        </button>
-        <button [disabled]="selectedPlatformList.length === 0" mat-button color="primary" type="button" (click)="removePlatform($event)">
-            <img class="icon" [src]="constService.ICON_DELETE">Remove Platform
-        </button>
-        <mat-spinner *ngIf="showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-        <div style="margin-left:auto ">
-            <button mat-button color="primary" (click)="refresh()" >
-                <img class="icon" [src]="constService.ICON_REFRESH"> Refresh
-            </button>
-        </div>
-
-
-    </div>
-    <div>
-        <mat-checkbox [(ngModel)]="showInactive" (change)="filterExperimentPlatform()" > Show Inactive Platforms </mat-checkbox>
-    </div>
-    <div  class="flex-container-row full-width flex-grow" >
+<div class="full-width full-height flex-container-col background-border padded background">
+    <div class="flex-container-row full-width flex-grow foreground" >
         <as-split direction="horizontal" (dragEnd)="onSplitDragEnd($event)">
             <as-split-area size="20">
-                <div style="height:100%;width:100%;">
-                    <ag-grid-angular style="width: 100%; height: 90%;" class="ag-theme-fresh"
-                                     [gridOptions]="gridOpt"
-                                     [columnDefs]="columnDefs"
-                                     [rowSelection]="rowSelection"
-                                     (gridReady)="onGridReady($event)"
-                                     (rowSelected)="selectedRow($event)"
-                                     [enableSorting]="true"
-                                     [enableColResize]="true" >
-                    </ag-grid-angular>
-
+                <div class="full-height full-width flex-container-col">
+                    <div class="double-padded">
+                        <mat-checkbox [(ngModel)]="showInactive" (change)="filterExperimentPlatform()" > Show Inactive Platforms </mat-checkbox>
+                    </div>
+                    <div class="flex-grow padded-left-right">
+                        <ag-grid-angular class="ag-theme-fresh full-height full-width"
+                                         [gridOptions]="gridOpt"
+                                         [columnDefs]="columnDefs"
+                                         [rowSelection]="rowSelection"
+                                         (gridReady)="onGridReady($event)"
+                                         (rowSelected)="selectedRow($event)"
+                                         [enableSorting]="true"
+                                         [enableColResize]="true" >
+                        </ag-grid-angular>
+                    </div>
+                    <div *ngIf="secAdvisor.isSuperAdmin" class="flex-container-row padded">
+                        <button mat-button color="primary" type="button" (click)="addPlatform($event)">
+                            <img class="icon" [src]="constService.ICON_ADD"> Add Platform
+                        </button>
+                        <button [disabled]="selectedPlatformList.length === 0" mat-button color="primary" type="button" (click)="removePlatform($event)">
+                            <img class="icon" [src]="constService.ICON_DELETE"> Remove Platform
+                        </button>
+                    </div>
                 </div>
             </as-split-area>
-
             <as-split-area size="80">
-                <div  class="full-height full-width border">
-                    <mat-tab-group [(selectedIndex)]="tabIndex" (selectedTabChange)="tabChanged($event)" class="full-height full-width border">
-                        <mat-tab [label]="tab.name" *ngFor="let tab of experimentPlatformTabs ">
-                            <ndc-dynamic style="height:100%; width: 100%;" [ndcDynamicComponent]="tab.component" (ndcDynamicCreated)="componentCreated($event)">
-                            </ndc-dynamic>
-                        </mat-tab>
-
-                    </mat-tab-group>
+                <div  class="full-height full-width flex-container-col overflow-auto">
+                    <div class="flex-grow">
+                        <mat-tab-group [(selectedIndex)]="tabIndex" (selectedTabChange)="tabChanged($event)" class="full-height full-width border">
+                            <mat-tab [label]="tab.name" *ngFor="let tab of experimentPlatformTabs ">
+                                <ndc-dynamic style="height:100%; width: 100%;" [ndcDynamicComponent]="tab.component" (ndcDynamicCreated)="componentCreated($event)">
+                                </ndc-dynamic>
+                            </mat-tab>
+                        </mat-tab-group>
+                    </div>
+                    <div class="flex-container-row">
+                        <div *ngIf="secAdvisor.isSuperAdmin" class="padded">
+                            <button mat-button color="primary" (click)="refresh()" >
+                                <img class="icon" [src]="constService.ICON_REFRESH"> Refresh
+                            </button>
+                        </div>
+                        <save-footer *ngIf="!removeSave && selectedPlatformList.length > 0" style="width: 100%"
+                                     [disableSave]="this.expPlatformService.expPlatformOverviewForm.invalid"
+                                     [showSpinner]="showSpinner"
+                                     (saveClicked)="save()"
+                                     [dirty]="this.expPlatformService.expPlatformOverviewForm.dirty">
+                        </save-footer>
+                    </div>
                 </div>
-
             </as-split-area>
         </as-split>
-
     </div>
-    <save-footer *ngIf="!removeSave && selectedPlatformList.length > 0" style="width: 100%"
-                 [disableSave]="this.expPlatformService.expPlatformOverviewForm.invalid"
-                 [showSpinner]="showSpinner"
-                 (saveClicked)="save()"
-                 [dirty]="this.expPlatformService.expPlatformOverviewForm.dirty">
-    </save-footer>
-
 </div>

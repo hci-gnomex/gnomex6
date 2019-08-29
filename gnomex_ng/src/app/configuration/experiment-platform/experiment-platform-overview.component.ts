@@ -25,13 +25,23 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {first} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {UtilService} from "../../services/util.service";
 
 @Component({
     templateUrl: './experiment-platform-overview.component.html',
     styles:[`
+        
         .active-item {
             /*color: #636c72;*/
             background-color: #c8c8c8;
+        }
+        
+        .background {
+            background-color: whitesmoke;
+        }
+        
+        .foreground {
+            background-color: white;
         }
 
         .mat-tab-group-border{
@@ -56,7 +66,6 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     public experimentPlatformTabs: any[] = [];
     public platformListSubscription: Subscription;
     private tabComponentRefList:ComponentRef<any>[] = [];
-    public showSpinner:boolean = true;
     public removeSave:boolean = false;
     public tabIndex = 0;
     public showInactive:boolean = false;
@@ -93,11 +102,11 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                 private constService:ConstantsService,
                 public expPlatformService: ExperimentPlatformService,
                 private dialogService:DialogsService,private dialog:MatDialog,
-                private dictionaryService: DictionaryService
-    ){
-    }
+                private dictionaryService: DictionaryService) { }
 
     ngOnInit():void{
+        this.dialogService.startDefaultSpinnerDialog();
+
         this.expPlatformService.getExperimentPlatformList_fromBackend(); // need
         this.expPlatformService.getExperimentPlatformTypeChangeObservable()
             .subscribe((expPlatform) =>{
@@ -107,11 +116,13 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                 this.propagateTabChange();
 
             });
-
     }
 
+    ngOnDestroy(){
+        UtilService.safelyUnsubscribe(this.platformListSubscription);
 
-
+        this.expPlatformService.clearOutExpPlatformForm();
+    }
 
     onGridReady(event){
         this.gridOpt.api.sizeColumnsToFit();
@@ -132,9 +143,10 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                 }
                 this.expPlatformService.expPlatformOverviewForm.markAsPristine();
                 this.expPlatformService.expPlatformOverviewForm.markAsUntouched();
-                this.showSpinner = false;
+
+                this.dialogService.stopAllSpinnerDialogs();
             }, (err:IGnomexErrorResponse) => {
-                this.showSpinner = false;
+                this.dialogService.stopAllSpinnerDialogs();
             });
     }
 
@@ -182,7 +194,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     }
 
     private addedFn = ()=>{
-        this.showSpinner = true;
+        this.dialogService.startDefaultSpinnerDialog();
     };
 
     addPlatform(event:any){
@@ -201,13 +213,15 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                 ]});
 
     }
+
     removePlatform(){
         let expPlatform = this.selectedPlatformList.length > 0 ? this.selectedPlatformList[0] : null;
         if(expPlatform){
             this.dialogService.confirm("Are you sure you want to remove experiment platform " + expPlatform.display + "?", "Remove Platform")
                 .pipe(first()).subscribe((result:boolean) => {
                 if(result){
-                    this.showSpinner = true;
+                    this.dialogService.startDefaultSpinnerDialog();
+
                     let params:HttpParams = new HttpParams().set("codeRequestCategory", expPlatform.codeRequestCategory);
                     this.expPlatformService.deleteExperimentPlatform(params).pipe(first())
                         .subscribe(resp => {
@@ -219,13 +233,10 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                         });
                     this.experimentPlatformTabs = [];
                 }
-
             });
-
         }
-
-
     }
+
     componentCreated(event:ComponentRef<any>){
         this.tabComponentRefList.push(event);
 
@@ -243,7 +254,6 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                 propertyTab.setupExpPlatformMode(this.selectedExpPlatform);
             }
         });
-
     }
 
 
@@ -252,59 +262,53 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
             if(expPlatform){
                 this.expPlatformService.emitExperimentPlatform(expPlatform); // existing platform
             }
+
             let tabList: any[] = [];
             this.expPlatformService.getExperimentPlatformTabList().forEach(tabStr => {
                 tabList.push(this.tabComponentTemplate[tabStr]);
             });
+
             this.tabIndex = 0;
             this.experimentPlatformTabs = tabList;
-
         });
     }
 
     tabChanged(event:MatTabChangeEvent){ // user selected a new tab
         this.removeSave = false;
-        if(event.tab){
-            if(event.tab.textLabel  === "Property"){
+        if (event.tab) {
+            if (event.tab.textLabel  === "Property") {
                 let propertyTabRef:ComponentRef<ConfigureAnnotationsComponent> =
                     this.tabComponentRefList.find(compRef => compRef.instance instanceof ConfigureAnnotationsComponent );
                 propertyTabRef.instance.externallyResizeGrid();
                 this.removeSave = true;
-            }else if (event.tab.textLabel === "Sample Type"){
+            } else if (event.tab.textLabel === "Sample Type") {
                 let sampleTypeTabRef:ComponentRef<EpSampleTypeTabComponent> =
                     this.tabComponentRefList.find(compRef => compRef.instance instanceof EpSampleTypeTabComponent );
                 sampleTypeTabRef.instance.externallyResizeGrid();
-            }else if (event.tab.textLabel === "Library Prep"){
+            } else if (event.tab.textLabel === "Library Prep") {
                 let experimentTypeTabRef: ComponentRef<EpExperimentTypeTabComponent> | ComponentRef<EpExperimentTypeIlluminaTabComponent> =
                     this.tabComponentRefList.find(compRef => compRef.instance instanceof EpExperimentTypeTabComponent
                         || compRef.instance instanceof EpExperimentTypeIlluminaTabComponent );
                 experimentTypeTabRef.instance.externallyResizeGrid();
             }
-
         }
     }
 
     filterExperimentPlatform(){
-        if(this.showInactive){
+        if (this.showInactive) {
             this.rowData = this.allExpPlatorms;
             this.gridOpt.api.setRowData( this.rowData)// = this.allExpPlatorms;
-        }else{
+        } else {
             this.rowData = this.allExpPlatorms.filter(expPlat => expPlat.isActive === 'Y' );
             this.gridOpt.api.setRowData(this.rowData);
         }
-
     }
-
-
 
     onSplitDragEnd(event:any){
         this.gridOpt.api.sizeColumnsToFit();
     }
 
-
-    refresh(event:any){
-
-    }
+    public refresh(event:any){ }
 
     getRequestCategoryList(apps:any[]): any[]{
         let rcAppList:any[] = [];
@@ -326,7 +330,8 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
 
     save(){
-        this.showSpinner = true;
+        this.dialogService.startDefaultSpinnerDialog();
+
         let expPlatformForm:FormGroup = this.expPlatformService.expPlatformOverviewForm;
         let applications = null;
         let rcApplications = null;
@@ -401,18 +406,15 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                 this.dictionaryService.reloadAndRefresh();
             }else if(resp && resp.message){
                 this.dialogService.error(resp.message);
-                this.showSpinner = false;
+
+                this.dialogService.stopAllSpinnerDialogs();
             }else{
                 this.dialogService.error("Unknown Error occurred please contact GNomEx Support.");
-                this.showSpinner = false;
+                this.dialogService.stopAllSpinnerDialogs();
             }
         });
     }
 
-    ngOnDestroy(){
-        this.platformListSubscription.unsubscribe();
-        this.expPlatformService.clearOutExpPlatformForm();
-    }
 
 
 

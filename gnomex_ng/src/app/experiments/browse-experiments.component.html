@@ -8,7 +8,7 @@
             </browse-filter>
         </div>
         <div class="full-width background vertical-spacer"></div>
-        <div class="flex-container-row flex-grow full-height">
+        <div class="flex-container-row flex-grow full-height overflow-auto">
             <as-split>
                 <as-split-area size="20">
                     <div class="full-height flex-grow border"> <!-- start tree container -->
@@ -32,8 +32,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- minimum-nonzero-height-ignored is necessary to keep the tree from overflowing its bounds -->
-                            <div class="full-width flex-grow left-right-padding no-overflow minimum-nonzero-height-ignored">
+                            <div class="full-width flex-grow left-right-padding no-overflow">
                                 <div class="full-width full-height border">
                                     <tree-root #tree
                                                (moveNode)="onMoveNode($event)"

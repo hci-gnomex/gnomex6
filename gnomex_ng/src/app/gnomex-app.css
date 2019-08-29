@@ -399,11 +399,6 @@ img.tree-node-icon {
     padding-right: 0.6em;
 }
 
-/* minimum-nonzero-height-ignored is necessary to keep the angular tree from overflowing its bounds for some reason */
-.minimum-nonzero-height-ignored {
-    height: 1px;
-}
-
 .warningLabelMinor {
     color: #17871C;
     fontWeight: normal;
@@ -424,6 +419,11 @@ button.mat-button.minimize {
 button.mat-button.minimize span {
     min-width: 0;
     padding: 0.3em;
+}
+
+.background-border {
+    border-radius: 0.3em;
+    border: 1px solid darkgrey;
 }
 
 .border-subtle {

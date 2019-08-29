@@ -49,23 +49,8 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
     templateUrl: './users-groups-tablist.component.html',
     styles: [`
         
-        /deep/ .mat-tab-body-wrapper {
-            flex-grow: 1 !important;
-        }
-        
-        mat-form-field.formField {
-            flex: 1;
-            min-width: 15em;
-        }
-        
         .min-width {
             min-width: 15em;
-        }
-        
-        ::ng-deep.mat-tab-label, ::ng-deep.mat-tab-label-active{
-            min-width: 10em;
-            padding: 3px;
-            margin: 3px;
         }
 
         div.institution-div {

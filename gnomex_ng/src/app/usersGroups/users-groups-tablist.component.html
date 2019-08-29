@@ -323,11 +323,9 @@
                 </div>
                 <div *ngIf="isGroupsTab && selectedGroup" class="full-height full-width flex-container-col">
                     <!--groups tab group-->
-                    <mat-tab-group id="groupTabGroup"
-                                   class="full-width flex-grow"
-                                   [selectedIndex]="selectedGroupTab">
-                        <mat-tab groupTab label="Group" class="full-height">
-                            <div #groupsDetail class="full-height full-width background border-padding">
+                    <mat-tab-group class="full-width flex-grow" [selectedIndex]="selectedGroupTab">
+                        <mat-tab label="Group" class="full-height">
+                            <div class="full-height full-width background border-padding">
                                 <div class="full-height full-width foreground flex-container-col">
                                     <form class="full-width padded" [formGroup]="groupForm">
                                         <div class="flex-container-row align-baseline">
@@ -396,39 +394,39 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="horizontal-spacer">
-                                        </div>
-                                        <div class="full-width flex-container-row institution-div" *ngIf="showInstitutions">
-                                            <div class="height-auto flex-grow foreground border-padding">
-                                                <div class="full-width full-height foreground flex-container-col">
-                                                    <div class="flex-container-row align-center spaced-children-margin">
-                                                        <label>Institutions</label>
-                                                        <button mat-button (click)="onEditInstitutions()" class="color-blue">Edit...</button>
-                                                    </div>
-                                                    <div class="flex-container-row align-center spaced-children-margin">
-                                                        <custom-combo-box class="half-width" [formControl]="institutionToAddControl"
-                                                                            placeholder="Institution" [options]="institutions" [displayField]="'display'">
-                                                        </custom-combo-box>
-                                                        <div>
-                                                            <button mat-raised-button (click)="addInstitution()" [disabled]="!institutionToAddControl.value || !institutionToAddControl.value.idInstitution">
-                                                                <img [src]="constantsService.ICON_ADD">
-                                                            </button>
+                                            <div *ngIf="showInstitutions" class="horizontal-spacer">
+                                            </div>
+                                            <div class="full-width flex-container-row institution-div" *ngIf="showInstitutions">
+                                                <div class="height-auto flex-grow foreground border-padding">
+                                                    <div class="full-width full-height foreground flex-container-col">
+                                                        <div class="flex-container-row align-center spaced-children-margin">
+                                                            <label>Institutions</label>
+                                                            <button mat-button (click)="onEditInstitutions()" class="color-blue">Edit...</button>
                                                         </div>
-                                                        <div>
-                                                            <button mat-raised-button (click)="removeInstitution()" [disabled]="!institutionToRemove">
-                                                                <img [src]="constantsService.ICON_DELETE">
-                                                            </button>
+                                                        <div class="flex-container-row align-center spaced-children-margin">
+                                                            <custom-combo-box class="half-width" [formControl]="institutionToAddControl"
+                                                                              placeholder="Institution" [options]="institutions" [displayField]="'display'">
+                                                            </custom-combo-box>
+                                                            <div>
+                                                                <button mat-raised-button (click)="addInstitution()" [disabled]="!institutionToAddControl.value || !institutionToAddControl.value.idInstitution">
+                                                                    <img [src]="constantsService.ICON_ADD">
+                                                                </button>
+                                                            </div>
+                                                            <div>
+                                                                <button mat-raised-button (click)="removeInstitution()" [disabled]="!institutionToRemove">
+                                                                    <img [src]="constantsService.ICON_DELETE">
+                                                                </button>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                    <div class="full-width flex-grow">
-                                                        <ag-grid-angular class="full-height full-width ag-theme-balham"
-                                                                         [columnDefs]="institutionGridColDefs"
-                                                                         [rowSelection]="'single'"
-                                                                         (gridSizeChanged)="onGridSizeChanged($event)"
-                                                                         (rowSelected)="onInstitutionGridRowSelected($event)"
-                                                                         (gridReady)="onInstitutionGridReady($event)">
-                                                        </ag-grid-angular>
+                                                        <div class="full-width flex-grow">
+                                                            <ag-grid-angular class="full-height full-width ag-theme-balham"
+                                                                             [columnDefs]="institutionGridColDefs"
+                                                                             [rowSelection]="'single'"
+                                                                             (gridSizeChanged)="onGridSizeChanged($event)"
+                                                                             (rowSelected)="onInstitutionGridRowSelected($event)"
+                                                                             (gridReady)="onInstitutionGridReady($event)">
+                                                            </ag-grid-angular>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -447,7 +445,7 @@
                                 <membership-tab [memberGroup]="selectedGroup" [users]="rowData" #membershipTab ></membership-tab>
                             </div>
                         </mat-tab>
-                        <mat-tab #groupTab label="Billing Accounts" class="full-height full-width">
+                        <mat-tab label="Billing Accounts" class="full-height full-width">
                             <billing-account-tab #billingAccountTab [labInfo]="selectedGroup" (onDirty)="onManualDirty()"></billing-account-tab>
                         </mat-tab>
                         <mat-tab label="Invoices" class="full-height">
