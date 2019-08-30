@@ -518,8 +518,12 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
     public refreshAll(): void {
         this.selectedDictionary = null;
         this.selectedEntry = null;
+        this.dialogsService.addSpinnerWorkItem();
         this.dictionaryService.reloadAndRefresh(() => {
             this.buildTree();
+            this.dialogsService.removeSpinnerWorkItem();
+        }, () => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
     }
 
