@@ -632,7 +632,7 @@ private boolean processIMG (String imgline, OutputStream out, String dir, String
    *                    returns the properly-formatted filename with a .txt extension.
    *                    Otherwise, returns the original filename.
    */
-  private String SpoofTxtFiles(String fileName) {
+  public static String SpoofTxtFiles(String fileName) {
       String spoofName = fileName;
 
       if (fileName != null && !fileName.equals("")) {
