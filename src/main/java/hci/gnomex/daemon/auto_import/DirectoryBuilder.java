@@ -357,12 +357,7 @@ public class DirectoryBuilder {
 		dirMap.put(RNAseq, RNA_ALIAS);
 
 		getAllDirs(finalDestinationPath.listFiles(), dirMap);
-		for(Map.Entry<String,String > entry  : dirMap.entrySet()){
-			System.out.print(entry.getKey());
-			System.out.print(" : ");
-			System.out.println(entry.getValue());
 
-		}
 
 
 		for(String p: paths) {
