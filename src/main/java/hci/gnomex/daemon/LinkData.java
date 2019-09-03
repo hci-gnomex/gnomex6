@@ -314,9 +314,15 @@ public class LinkData extends TimerTask {
                         if(debug) System.out.println("the absolute path: "  + startAvatarPath + "/" + thePath);
 
                         filename =  dummyFile.getParentFile().getName();
-                        if(thePath.split("/").length < 6 ){
+
+                        try{
+                           int personID = Integer.parseInt(filename); // always hci person id for folder name
+                        }catch(NumberFormatException nfe){
+                            System.out.println("skipping... sample data doesn't have wrapping folder");
                             continue;
                         }
+
+
 
 
                         if (debug) System.out.println("filename or foldername : " + filename);

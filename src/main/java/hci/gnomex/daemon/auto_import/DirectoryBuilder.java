@@ -318,6 +318,7 @@ public class DirectoryBuilder {
 
 		try{
 			this.moveTheFiles(filteredFiles, new ArrayList<>()); // These files we want to move into the flagged folder
+
 			// for tempus anything doesn't get flagged explicitly  but it doesn't get moved is still considered flagged
 			this.moveTheFiles(filesWithPaths, Arrays.asList("echo move left over files to Flagged",
 					"mv -t " + this.currentDownloadLocation + "Flagged" +" " + currentDownloadLocation +"*"));
@@ -335,6 +336,8 @@ public class DirectoryBuilder {
 
 		for(String chunk:chunks){
 			String corretCaseDirName = dirMap.get( chunk.toLowerCase());
+			//System.out.println("chunk in: " + chunk + " chunk out " + corretCaseDirName );
+
 			if(corretCaseDirName != null && dupDirSet.add(chunk.toLowerCase())){
 				strBuild.append(File.separator);
 				strBuild.append(corretCaseDirName);
@@ -354,9 +357,17 @@ public class DirectoryBuilder {
 		dirMap.put(RNAseq, RNA_ALIAS);
 
 		getAllDirs(finalDestinationPath.listFiles(), dirMap);
+		for(Map.Entry<String,String > entry  : dirMap.entrySet()){
+			System.out.print(entry.getKey());
+			System.out.print(" : ");
+			System.out.println(entry.getValue());
+
+		}
+
 
 		for(String p: paths) {
 			StringBuilder strBuild = new StringBuilder(root);
+			System.out.println("-------------------------------------------------------------------------------");
 			System.out.println("Path being processed: " + p );
 
 			String pattern = Pattern.quote(System.getProperty("file.separator"));
@@ -366,14 +377,16 @@ public class DirectoryBuilder {
 			String[] fileChunks = file.split("\\.");
 			String fileName = fileChunks[0].split("_")[0];
 			//find detail from path
+			//System.out.println("The file extension chunks ");
+			//System.out.println( fileChunks.toString());
 
 			if(!filterOutFlaggedIDs(file, flaggedFiles)){
 				Set<String> dupDirSet = new HashSet<>();
 				getMatchingDirName(pathChunks,strBuild,dirMap,dupDirSet);
 				getMatchingDirName(fileChunks,strBuild,dirMap,dupDirSet);
 			}else{
-
 				strBuild.setLength(0);
+				strBuild.append(this.currentDownloadLocation);
 				strBuild.append(File.separator);
 				strBuild.append("Flagged");
 				strBuild.append(File.separator);
@@ -382,10 +395,13 @@ public class DirectoryBuilder {
 				System.out.println("Flagged " + strBuild.toString());
 				continue;
 			}
+
 			String finalPath = strBuild.toString();
-			System.out.println("final path " + strBuild.toString());
+
 			if(new File(finalPath).exists() && !finalPath.equals(root)) {
-				filesWithPaths.add(strBuild.append(File.separator).append(file).toString());
+				if(appendDirPersonID(fileName,strBuild)){
+					filesWithPaths.add(strBuild.append(File.separator).append(file).toString());
+				}
 			}else {
 				throw new Exception("The path does not exist: " + finalPath +  "\n your directory structure isn't correct");
 			}
@@ -394,6 +410,30 @@ public class DirectoryBuilder {
 
 
 
+	}
+
+	private boolean appendDirPersonID(String fileName, StringBuilder strBuild) {
+		Query q = null;
+		File personIDDir =  null;
+		try{
+			String path = XMLParser.getPathWithoutName(this.inFileName);
+			q =  new Query(path+"gnomex-creds.properties");
+			String personID = q.getPersonIDFromSample(fileName);
+			strBuild.append(File.separator);
+			strBuild.append(personID);
+			System.out.println("Full path with PersonID to create " +  strBuild.toString());
+			personIDDir = new File(strBuild.toString());
+			if(!personIDDir.exists()){
+				personIDDir.mkdir();
+			}
+
+		}catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}finally {
+			q.closeConnection();
+		}
+		return true;
 	}
 
 	private void getAllDirs(File[] fList, Map<String,String> dirMap) {
@@ -586,9 +626,6 @@ public class DirectoryBuilder {
 			}
 
 		}
-
-
-
 
 	}
 	public static void sendImportedIDReport(String from,String to, String subject,String body, String testEmail) {
