@@ -170,7 +170,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                         && this.experiment.isExternal !== 'Y';
                 }
 
-                this.showCreateAnalysisButton = !this.secAdvisor.isGuest && this.requestCategory.codeRequestCategory === this.experiment.codeRequestCategory && this.requestCategory.associatedWithAnalysis === "Y";
+                this.showCreateAnalysisButton = !this.secAdvisor.isGuest && this.route.outlet === "browsePanel" && this.requestCategory.codeRequestCategory === this.experiment.codeRequestCategory && this.requestCategory.associatedWithAnalysis === "Y";
                 this.showSequenceLanesTab = this.requestCategory.isIlluminaType === "Y" && this.experiment.isExternal !== "Y";
                 this.showBillingTab = this.experiment.canRead === "Y" && this.experiment.isExternal !== "Y";
 
