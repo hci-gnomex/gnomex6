@@ -23,12 +23,8 @@ import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {GridApi} from "ag-grid-community";
-import {NewExternalExperimentService} from "../../services/new-external-experiment.service";
 import {ConstantsService} from "../../services/constants.service";
 import {PropertyService} from "../../services/property.service";
-import {MatDialogConfig} from "@angular/material";
-import {ReportProblemComponent} from "../../header/reportProblem/report-problem.component";
-import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: "tabConfirmIllumina",
@@ -916,7 +912,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             let bigCanvas = document.createElement("canvas");
             bigCanvas.width = this.BASE_PIX_RESOLUTION;
             bigCanvas.height = this.BASE_PIX_RESOLUTION * heightPerWidthRatio;
-            // bigCanvas.height = 1000;
             bigCanvas.style.width = "" + (bigCanvas.width / 2) + "px";
             bigCanvas.style.height = "" + (bigCanvas.height / 2) + "px";
             let context2 = bigCanvas.getContext('2d');
