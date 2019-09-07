@@ -1,6 +1,9 @@
 import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 
+import * as html2canvas from 'html2canvas';
+import * as jsPDF from 'jspdf';
+
 import {DictionaryService} from "../../services/dictionary.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
@@ -23,6 +26,9 @@ import {GridApi} from "ag-grid-community";
 import {NewExternalExperimentService} from "../../services/new-external-experiment.service";
 import {ConstantsService} from "../../services/constants.service";
 import {PropertyService} from "../../services/property.service";
+import {MatDialogConfig} from "@angular/material";
+import {ReportProblemComponent} from "../../header/reportProblem/report-problem.component";
+import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 @Component({
     selector: "tabConfirmIllumina",
@@ -77,6 +83,8 @@ import {PropertyService} from "../../services/property.service";
 
 export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
+    private readonly BASE_PIX_RESOLUTION: number = 2400;
+
     @Input("experiment") public set experiment(value: Experiment) {
         this._experiment = value;
         if (value.RequestProperties && !this._experimentAnnotations) {
@@ -130,6 +138,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
 
     @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    @ViewChild('forPriceQuote') forPriceQuote: ElementRef;
 
     public get experiment(): Experiment {
         return this._experiment;
@@ -899,7 +908,32 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
     public onClickPriceQuote(event?: any) {
-        this.experimentService.showPriceQuote(this._experiment);
+
+        html2canvas(this.forPriceQuote.nativeElement).then( canvas => {
+
+            let heightPerWidthRatio: number = canvas.height / canvas.width;
+
+            let bigCanvas = document.createElement("canvas");
+            bigCanvas.width = this.BASE_PIX_RESOLUTION;
+            bigCanvas.height = this.BASE_PIX_RESOLUTION * heightPerWidthRatio;
+            // bigCanvas.height = 1000;
+            bigCanvas.style.width = "" + (bigCanvas.width / 2) + "px";
+            bigCanvas.style.height = "" + (bigCanvas.height / 2) + "px";
+            let context2 = bigCanvas.getContext('2d');
+            context2.drawImage(canvas,0,0,canvas.width, canvas.height,0,0,bigCanvas.width,bigCanvas.height);
+            context2.scale(2,2);
+
+            var doc = new jsPDF();
+            doc.addImage(bigCanvas.toDataURL("image/jpeg"), "JPG", 10, 10, 180, 180 * heightPerWidthRatio);
+
+            let today = new Date();
+            let defaultFileName: string = this.labName + " "
+                + today.getFullYear() + "-"
+                + (today.getMonth() + 1) + "-"
+                + (today.getDay() + 1) + ".pdf";
+
+            doc.save(defaultFileName);
+        });
     }
 
     public onGridReady(params: any): void {
@@ -947,5 +981,9 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
         } else {
             this._showGenerateQuote = false;
         }
+    }
+
+    private onClickDownloadSamplePreview(): void {
+        this.experimentService.showPriceQuote(this._experiment);
     }
 }

@@ -51,12 +51,12 @@
                         Select a sequencing experiment type :
                     </div>
                     <div class="full-width flex-container-row significant-left-padding">
-                        <mat-radio-group class="flex-container-row full-width align-center" [(ngModel)]="sequenceType" formControlName="seqType">
-                            <div *ngFor="let theme of themes" class="double-padded bold">
+                        <mat-radio-group class="full-width align-center" [(ngModel)]="sequenceType" formControlName="seqType">
+                            <span *ngFor="let theme of themes" class="double-padded bold">
                                 <mat-radio-button (click)="selectTheme($event)" [value]="theme" ng-style="{'display':'inline'}">
                                     {{ theme.display }}
                                 </mat-radio-button>
-                            </div>
+                            </span>
                         </mat-radio-group>
                     </div>
                 </div>
