@@ -18,7 +18,7 @@ import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-edito
     template: `
         <div class="full-width full-height flex-container-col double-padded-left-right">
             <custom-combo-box class="full-width" placeholder="Lab" [options]="this.labList"
-                                valueField="idLab" [displayField]="this.prefService.labDisplayField"
+                                valueField="idLab" [displayField]="this.labDisplayField"
                                 [formControl]="this.form.get('idLab')">
             </custom-combo-box>
             <mat-form-field class="full-width">
@@ -74,6 +74,7 @@ export class CreateProjectComponent extends BaseGenericContainerDialog implement
     public primaryDisable: (action?: GDAction) => boolean;
     public labList: any[] = [];
     public newProjectId: string = "";
+    public labDisplayField: string = this.prefService.labDisplayField;
     @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
     descEditorConfig: AngularEditorConfig = {
         height: "20em",
@@ -131,6 +132,12 @@ export class CreateProjectComponent extends BaseGenericContainerDialog implement
             this.labListService.getSubmitRequestLabList().subscribe((response: any[]) => {
                 this.labList = response.sort(this.prefService.createLabDisplaySortFunction());
             });
+        }
+
+        if (this.labList && this.labList.length > 0) {
+            if (!this.labList[0][this.labDisplayField]) {
+                this.labDisplayField = "labName";
+            }
         }
 
         if (this.isEditMode) {

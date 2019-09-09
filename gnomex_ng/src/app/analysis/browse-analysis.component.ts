@@ -513,6 +513,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
         this.selectedItem = event.node;
         this.selectedIdLab = this.selectedItem.data.idLab;
+        this.selectedIdAnalysisGroup = null;
         let idAnalysis = this.selectedItem.data.idAnalysis;
         let idAnalysisGroup = this.selectedItem.data.idAnalysisGroup;
         let idLab = this.selectedItem.data.idLab;

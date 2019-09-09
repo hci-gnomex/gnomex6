@@ -62,6 +62,10 @@ export class DataTrackService {
         }));
     }
 
+    public getDataTrackListFull(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetDataTrackList.gx", {params: params});
+    }
+
     public saveDataTrackFolder(params: HttpParams): Observable<any> {
         let headers: HttpHeaders = new HttpHeaders()
             .set("Content-Type", "application/x-www-form-urlencoded");

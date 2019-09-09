@@ -137,6 +137,7 @@ export class ConstantsService {
     public readonly ICON_ORGANISM: string = "assets/organism.jpg";
     public readonly ICON_ORGANISM_NEW: string = "assets/organism_new.png";
     public readonly ICON_GENOME_BUILD: string = "assets/genome_build.png";
+    public readonly ICON_GENOME_BUILD_FADED: string = "assets/genome_build_faded.png";
     public readonly ICON_GENOME_BUILD_NEW: string = "assets/genome_build_new.png";
     public readonly ICON_ADD: string = "assets/add.png";
     public readonly ICON_ADD_DISABLE: string = "assets/add_disable.png";
