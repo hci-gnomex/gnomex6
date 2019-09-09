@@ -34,15 +34,6 @@ const PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE: string = "hci.gnomex.model.In
 
 @Injectable()
 export class GnomexService {
-    public iconTopic: string = "assets/topic_tag.png";
-    public iconTopicPublic: string = "assets/topic_tag_public.png";
-    public iconTopicMember: string = "assets/topic_tag_members.png";
-    public iconTopicOwner: string = "assets/topic_tag_owner.png";
-    public iconTopicInstitution: string = "assets/topic_tag_institution.png";
-
-    public iconDataTrackMember = "assets/datatrack_member.png";
-    public iconDataTrackOwner = "assets/datatrack_owner.png";
-    public iconDataTrackPublic = "assets/datatrack_world.png";
     public readonly PROPERTY_SHOW_SAMPLE_CONC_PM: string = "show_sample_conc_pm";
     public readonly PROPERTY_REQUEST_WORK_AUTH_LINK_TEXT: string = "request_work_auth_link_text";
     public readonly PROPERTY_HISEQ_RUN_TYPE_LABEL_STANDARD: string = "hiseq_run_type_label_standard";
