@@ -22,6 +22,7 @@ import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.
 import {ManagePedFileWindowComponent} from "./manage-ped-file-window.component";
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {AnalysisDescriptionTabComponent} from "./analysis-description-tab.component";
+import {DistributeDatatrackDialogComponent} from "./distribute-datatrack-dialog.component";
 
 
 
@@ -51,12 +52,14 @@ import {AnalysisDescriptionTabComponent} from "./analysis-description-tab.compon
         AnalysisFilesTabComponent,
         ManagePedFileWindowComponent,
         AnalysisDescriptionTabComponent,
+        DistributeDatatrackDialogComponent
     ],
     providers: [],
     entryComponents: [
         LinkToExperimentDialogComponent,
         ManageFilesDialogComponent,
         ManagePedFileWindowComponent,
+        DistributeDatatrackDialogComponent
     ],
     exports: []
 })

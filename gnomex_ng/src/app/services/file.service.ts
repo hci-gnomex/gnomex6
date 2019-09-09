@@ -1,5 +1,5 @@
 import {Inject, Injectable} from "@angular/core";
-import {forkJoin, Observable, of, throwError} from "rxjs";
+import {BehaviorSubject, forkJoin, Observable, of, throwError} from "rxjs";
 import {Subject} from "rxjs";
 import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
@@ -17,6 +17,7 @@ import * as _ from "lodash";
 export class FileService {
     public analysisGroupList: any[];
     private organizeFilesSubject: Subject<any> = new Subject();
+    private cachedOrganizeFilesSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
     private linkedSampleFilesSubject: Subject<any> = new Subject();
     private manageFileSaveSubject: Subject<any> = new Subject();
     private manageFileForm: FormGroup = new FormGroup({});
@@ -85,6 +86,12 @@ export class FileService {
         return this.httpClient.get(call);
     }
 
+    emitCachedAnalysisOrganizeFiles(data:any):void{
+        this.cachedOrganizeFilesSubject.next(data);
+    }
+    cachedAnalysisOrganizeFiles():BehaviorSubject<any>{
+        return this.cachedOrganizeFilesSubject;
+    }
 
     emitGetAnalysisOrganizeFiles(params: any): void {
         this.organizeFilesSubject.next(params);
