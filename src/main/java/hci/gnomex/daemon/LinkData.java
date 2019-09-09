@@ -323,8 +323,6 @@ public class LinkData extends TimerTask {
                         }
 
 
-
-
                         if (debug) System.out.println("filename or foldername : " + filename);
 
                         parentFolder = dummyFile.getParent();
