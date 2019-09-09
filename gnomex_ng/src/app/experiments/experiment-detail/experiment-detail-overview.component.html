@@ -34,7 +34,8 @@
         </div>
     </div>
     <div class="flex-grow-greater overflow-auto">
-        <mat-tab-group class="full-width full-height bordered" (selectedTabChange)="tabChanged($event)">
+        <mat-tab-group class="full-width full-height bordered" [selectedIndex]="this.experimentService.currentTabIndex"
+                       (selectedTabChange)="tabChanged($event)">
             <mat-tab label="Overview">
                 <experiment-overview-tab [experiment]="experiment" [editMode]="isEditMode"></experiment-overview-tab>
             </mat-tab>

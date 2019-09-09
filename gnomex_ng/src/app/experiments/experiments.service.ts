@@ -62,6 +62,7 @@ export class ExperimentsService {
     private editMode: boolean = false;
     private _experimentOverviewForm: FormGroup;
     private _usePreviousURLParams: boolean = false;
+    public currentTabIndex = 0;
 
 
     constructor(private cookieUtilService: CookieUtilService,
