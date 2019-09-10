@@ -48,7 +48,7 @@ import {ConstantsService} from "../../services/constants.service";
                                         valueField="value" displayField="display"
                                         [formControlName]="'idAnalysisType'">
                     </custom-combo-box>
-                    <button mat-button color="accent" [disabled]="!isEditMode || !canUpdate" (click)="this.openEditAnalysisType()">New/Edit</button>
+                    <button mat-button class="link-button minimize" [hidden]="!isEditMode" [disabled]="!isEditMode || !canUpdate" (click)="this.openEditAnalysisType()">New/Edit</button>
                 </div>
                 <span></span>
                 <mat-form-field>
@@ -61,7 +61,7 @@ import {ConstantsService} from "../../services/constants.service";
                                         valueField="id" displayField="label"
                                         [formControlName]="'idAnalysisProtocol'">
                     </custom-combo-box>
-                    <button mat-button color="accent" [disabled]="!isEditMode || !canUpdate" (click)="this.openEditAnalysisProtocol()">New/Edit</button>
+                    <button mat-button class="link-button minimize" [hidden]="!isEditMode" [disabled]="!isEditMode || !canUpdate" (click)="this.openEditAnalysisProtocol()">New/Edit</button>
                 </div>
                 <span></span>
                 <mat-radio-group class="flex-container-col" [formControlName]="'codeVisibility'">
@@ -83,11 +83,11 @@ import {ConstantsService} from "../../services/constants.service";
                                         valueField="value" displayField="display"
                                         [formControlName]="'idOrganism'">
                     </custom-combo-box>
-                    <button mat-button color="accent" [disabled]="!isEditMode || !canUpdate" (click)="this.openEditOrganism()">New/Edit</button>
+                    <button mat-button class="link-button minimize" [hidden]="!isEditMode" [disabled]="!isEditMode || !canUpdate" (click)="this.openEditOrganism()">New/Edit</button>
                 </div>
                 <span></span>
                 <div>
-                    <button mat-button color="accent" [disabled]="!isEditMode || !canUpdate" (click)="this.openCollaboratorsWindow()">Collaborators</button>
+                    <button mat-button class="link-button minimize" [hidden]="!isEditMode" [disabled]="!isEditMode || !canUpdate" (click)="this.openCollaboratorsWindow()">Collaborators</button>
                 </div>
             </div>
             <div class="form-row-children">
@@ -96,13 +96,13 @@ import {ConstantsService} from "../../services/constants.service";
                         <custom-combo-box placeholder="Genome Builds" [formControlName]="'genomeBuildToAdd'"
                                           displayField="display" [options]="genomeBuildList">
                         </custom-combo-box>
-                        <button mat-button (click)="this.addGenomeBuild()" [disabled]="!isEditMode || !canUpdate || !this.form.controls['genomeBuildToAdd'].value">
+                        <button mat-button (click)="this.addGenomeBuild()" [hidden]="!isEditMode" [disabled]="!isEditMode || !canUpdate || !this.form.controls['genomeBuildToAdd'].value">
                             <img [src]="'./assets/add.png'" class="icon">Add
                         </button>
-                        <button mat-button (click)="this.removeGenomeBuild()" [disabled]="!isEditMode || !canUpdate || !this.genomeBuildToRemove">
+                        <button mat-button (click)="this.removeGenomeBuild()" [hidden]="!isEditMode" [disabled]="!isEditMode || !canUpdate || !this.genomeBuildToRemove">
                             <img [src]="'./assets/delete.png'" class="icon">Remove
                         </button>
-                        <button mat-button color="accent" [disabled]="!isEditMode || !canUpdate" (click)="this.openEditOrganism()">New/Edit</button>
+                        <button mat-button class="link-button minimize" [hidden]="!isEditMode" [disabled]="!isEditMode || !canUpdate" (click)="this.openEditOrganism()">New/Edit</button>
                     </div>
                     <div class="genome-build-grid-container">
                         <ag-grid-angular class="ag-theme-balham full-height full-width"
