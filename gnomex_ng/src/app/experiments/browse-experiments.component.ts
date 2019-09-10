@@ -152,6 +152,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
 
     ngOnInit() {
+        this.experimentsService.currentTabIndex = 0;
         this.items = [];
         this.dragEndItems = [];
         this.labMembers = [];

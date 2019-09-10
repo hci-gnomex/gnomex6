@@ -133,7 +133,6 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
 
     ngOnInit(): void {
         this.experimentService.clearExperimentOverviewForm();
-        this.experimentService.currentTabIndex = 0;
 
         this.overviewListSubscription = this.experimentService.getExperimentOverviewListSubject().subscribe(data => {
             this.experimentOverviewNode = data;
