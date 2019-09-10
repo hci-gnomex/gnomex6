@@ -79,6 +79,10 @@ main {
     width: 113px;
 }
 
+input.mat-input-element:disabled {
+    color: rgba(88,88,88,1);
+}
+
 mat-form-field.dialogFormField {
     width: 100%;
     margin: 0.4rem 0rem;
