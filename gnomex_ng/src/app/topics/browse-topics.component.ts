@@ -202,6 +202,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+        this.experimentsService.currentTabIndex = 0;
         this.utilService.registerChangeDetectorRef(this.changeDetector);
         this.treeModel = this.treeComponent.treeModel;
         this.dataTreeModel = this.dataTreeComponent.treeModel;
