@@ -651,6 +651,7 @@ public class Util {
         return builder.build();
     }
 
+
     private static void setElementIconRecursively(Element node) {
         if (node.getAttributeValue("icon") == null) {
             String icon = "";

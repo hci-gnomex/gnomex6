@@ -12,12 +12,14 @@ import hci.gnomex.model.GenomeBuild;
 import hci.gnomex.model.Lab;
 import hci.gnomex.utility.HibernateSession;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.json.Json;
+import javax.json.*;
 import javax.servlet.http.HttpSession;
 
 import org.hibernate.Session;
@@ -58,6 +60,7 @@ public class CreateAllDataTracks extends GNomExCommand implements Serializable {
 
     private Integer idLab;
     private Integer idGenomeBuild;
+    private List<Integer> idAnalysisFiles;
 
     private Session sess;
 
@@ -65,11 +68,33 @@ public class CreateAllDataTracks extends GNomExCommand implements Serializable {
     }
 
     public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
+        idAnalysisFiles = new ArrayList<>();
 
-        if (request.getParameter("idAnalysis") != null && !request.getParameter("idAnalysis").equals("")) {
-            idAnalysis = Integer.valueOf(request.getParameter("idAnalysis"));
-        } else {
-            this.addInvalidField("idAnalysis", "idAnalysis is required.");
+        try(JsonReader reader = Json.createReader(new InputStreamReader(request.getInputStream()))){
+            JsonObject  jsonObject = reader.readObject();
+            String idAnalysisStr = Util.getJsonStringSafe(jsonObject, "idAnalysis");
+            JsonArray idAnalysisFilesJson = jsonObject.get("idAnalysisFileToDistribute") != null ? jsonObject.getJsonArray("idAnalysisFileToDistribute") : null;
+
+            if(idAnalysisStr != null){
+                idAnalysis = Integer.valueOf(idAnalysisStr);
+            }else{
+                this.addInvalidField("idAnalysis", "idAnalysis is required.");
+            }
+
+
+            if(idAnalysisFilesJson != null){
+                for(JsonValue idAnalysisFileJson : idAnalysisFilesJson){
+                    String idAnalyisFile = ((JsonString)idAnalysisFileJson).getString();
+                    idAnalysisFiles.add(new Integer (idAnalyisFile));
+                }
+
+            }else{
+                this.addInvalidField("idAnalysisFileToDistribute", "idAnalysisFileToDistribute is required.");
+            }
+
+
+        }catch (IOException e){
+            this.addInvalidField("CreateAllDataTracks", "failed to read post body");
         }
 
         serverName = request.getServerName();
@@ -79,7 +104,14 @@ public class CreateAllDataTracks extends GNomExCommand implements Serializable {
 
         try {
             sess = HibernateSession.currentSession(this.getUsername());
+
+
             Analysis analysis = sess.load(Analysis.class, idAnalysis);
+            ArrayList<AnalysisFile> fileList = new ArrayList<>();
+            for(Integer idAnalysisFile : idAnalysisFiles){
+                fileList.add( sess.load(AnalysisFile.class, idAnalysisFile));
+            }
+
 
             // get what we need from the database
             String analysisName = analysis.getName();
@@ -94,8 +126,7 @@ public class CreateAllDataTracks extends GNomExCommand implements Serializable {
             GenomeBuild gb = gbs.iterator().next();
             idGenomeBuild = gb.getIdGenomeBuild(); //Just pull the first one, should only be one.
 
-            //fileList
-            ArrayList<AnalysisFile> fileList = new ArrayList<>(analysis.getFiles());
+
             ArrayList<AnalysisFile> bamFiles = new ArrayList<>();
             ArrayList<AnalysisFile> covFiles = new ArrayList<>();
             ArrayList<AnalysisFile> vcfFiles = new ArrayList<>();

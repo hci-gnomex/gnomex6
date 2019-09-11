@@ -234,12 +234,14 @@ export class DataTrackService {
         return this.httpClient.post("/gnomex/DestroyExistingLinks.gx",null);
     }
 
-    public createAllDataTracks(idAnalysis: string): Observable<any> {
-        let params: HttpParams = new HttpParams()
-            .set("idAnalysis", idAnalysis);
-        let headers: HttpHeaders = new HttpHeaders()
-            .set("Content-Type", "application/x-www-form-urlencoded");
-        return this.httpClient.post("/gnomex/CreateAllDataTracks.gx", params.toString(), {headers: headers});
+    public createAllDataTracks(idAnalysis: string, idsToDistrube: string[] ): Observable<any> {
+        let noConvertHeader : HttpHeaders = new HttpHeaders().set( "noJSONToXMLConversionNeeded" , "Y");
+        let body = {
+            idAnalysis: idAnalysis,
+            idAnalysisFileToDistribute: idsToDistrube,
+        };
+
+        return this.httpClient.post("/gnomex/CreateAllDataTracks.gx", body, {headers: noConvertHeader});
     }
 
     public getDownloadEstimatedSize(keys: string): Observable<any> {

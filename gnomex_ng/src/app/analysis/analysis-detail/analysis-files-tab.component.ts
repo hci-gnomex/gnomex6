@@ -138,11 +138,15 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
                         if (result && result.Analysis) {
                             this.getAnalysisDownloadListResult = result;
                             this.gridData = [result.Analysis];
+                            this.fileService.emitCachedAnalysisOrganizeFiles(this.gridData);
+
                             setTimeout(() => {
                                 this.determineFileCount();
+                                this.dialogsService.removeSpinnerWorkItem();
                             });
                         }
                     },(err:IGnomexErrorResponse) =>{
+                        this.dialogsService.stopAllSpinnerDialogs();
                     });
                 this.fileService.emitGetAnalysisOrganizeFiles({"idAnalysis": this.analysis.idAnalysis});
             }
