@@ -221,15 +221,6 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                         List<String> fileNames = parser.getFileNameMap().get(directoryName);
                         String targetDirName;
                         directoryName = directoryName.replace("\\", Constants.FILE_SEPARATOR);
-                        String[] path = directoryName.split(Pattern.quote(Constants.FILE_SEPARATOR));
-                        StringBuilder directoryNameBuilder = new StringBuilder();
-                        for (String s : path) {
-                            if (!baseDir.contains(s)) {
-                                directoryNameBuilder.append(s);
-                                directoryNameBuilder.append(Constants.FILE_SEPARATOR);
-                            }
-                        }
-                        directoryName = directoryNameBuilder.toString();
 
                         for (String fileName : fileNames) {
                             if (fileName.toUpperCase().contains(flowCellDir.toUpperCase())) {
@@ -243,11 +234,8 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                                 continue;
                             }
 
-                            if (baseDir.contains(directoryName) || baseDir.contains(directoryName.subSequence(0, directoryName.length() - 1))) {
-                                targetDirName = baseDir + Constants.FILE_SEPARATOR;
-                            } else {
-                                targetDirName = baseDir + Constants.FILE_SEPARATOR + directoryName;
-                            }
+                            targetDirName = baseDir + Constants.FILE_SEPARATOR + directoryName;
+
                             File targetDir = new File(targetDirName);
 
                             if (!targetDir.exists()) {

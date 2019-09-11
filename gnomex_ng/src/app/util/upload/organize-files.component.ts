@@ -585,6 +585,8 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         }else{
             params = this.makeParams( "idRequest", this.data.id.idRequest);
         }
+        this.organizeSelectedNode = null;
+
         this.formGroup.get("organizeFileParams").setValue(params);
         this.removedChildren.clear();
     }

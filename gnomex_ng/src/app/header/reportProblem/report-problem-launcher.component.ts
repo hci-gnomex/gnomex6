@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnInit} from "@angular/core";
+import {AfterViewInit, Component, OnDestroy, OnInit} from "@angular/core";
 import {MatDialogConfig} from "@angular/material";
 import {Router} from "@angular/router";
 import {ReportProblemComponent} from "./report-problem.component";
@@ -13,7 +13,7 @@ import {ConstantsService} from "../../services/constants.service";
     template: ``,
 })
 
-export class CreateReportProblemLauncherComponent implements OnInit, AfterViewInit {
+export class CreateReportProblemLauncherComponent implements OnInit, OnDestroy {
     private smallImgData: any;
     private bigImgData: any;
 
@@ -44,7 +44,7 @@ export class CreateReportProblemLauncherComponent implements OnInit, AfterViewIn
             let context2 = bigCanvas.getContext('2d');
             context.drawImage(canvas,0,0,canvas.width, canvas.height,0,0,500,300);
             context2.drawImage(canvas,0,0,canvas.width, canvas.height,0,0,2400,1500);
-            context2.scale(2,2)
+            context2.scale(2,2);
             this.smallImgData = littleCanvas.toDataURL("image/png");
             this.bigImgData = bigCanvas.toDataURL("image/png");
 
@@ -67,10 +67,6 @@ export class CreateReportProblemLauncherComponent implements OnInit, AfterViewIn
                     });
             });
         });
-    }
-
-    ngAfterViewInit() {
-
     }
 
     ngOnDestroy(): void {

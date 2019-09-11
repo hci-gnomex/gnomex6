@@ -263,6 +263,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
             console.log("onSelectExperimentDesign");
             this.tabSamplesIlluminaComponent.tabDisplayed();
         }
+        this.experimentService.currentTabIndex = event.index;
     }
 
     save() {
