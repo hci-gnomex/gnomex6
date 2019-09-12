@@ -91,10 +91,10 @@ import {ConstantsService} from "../../services/constants.service";
                 </div>
             </div>
             <div class="form-row-children">
-                <div class="flex-container-col">
+                <div class="flex-container-col" style="font-size: 100%;">
                     <div class="flex-container-row form-entry-children">
                         <custom-combo-box placeholder="Genome Builds" [formControlName]="'genomeBuildToAdd'"
-                                          displayField="display" [options]="genomeBuildList">
+                                          displayField="display" [options]="genomeBuildList" style="flex: 5;">
                         </custom-combo-box>
                         <button mat-button (click)="this.addGenomeBuild()" [hidden]="!isEditMode" [disabled]="!isEditMode || !canUpdate || !this.form.controls['genomeBuildToAdd'].value">
                             <img [src]="'./assets/add.png'" class="icon">Add
@@ -154,7 +154,7 @@ import {ConstantsService} from "../../services/constants.service";
         }
         .form-entry-children > mat-form-field,
         .form-entry-children > custom-combo-box {
-            flex: 4;
+            flex: 8;
         }
         .form-entry-children > button {
             flex: 1;
