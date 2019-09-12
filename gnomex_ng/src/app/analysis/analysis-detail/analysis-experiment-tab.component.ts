@@ -209,7 +209,7 @@ export class AnalysisExperimentTabComponent implements OnInit, OnDestroy {
                 field: "flowCellNumber"
             },
             {
-                headerName: "Channel",
+                headerName: "Lane",
                 field: "flowCellChannelNumber",
                 editable:  false,
                 width: 120,
