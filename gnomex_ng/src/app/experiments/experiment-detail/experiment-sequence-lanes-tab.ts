@@ -149,7 +149,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
                         cellEditorFramework: SelectEditor, selectOptions: sequencingProtocolList,
                         selectOptionsDisplayField: "display", selectOptionsValueField: "value",
                         showFillButton: true, fillAll: true, valueSetter: this.valueChanging},
-                    {headerName: "Status in Workflow", headerTooltip: "Status in Workflow", field: "workflowStatus"},
+// removed per Brian// {headerName: "Status in Workflow", headerTooltip: "Status in Workflow", field: "workflowStatus"},
                     {headerName: "Flow Cell #", headerTooltip: "Flow Cell #", field: "flowCellNumber"},
                     {headerName: "Lane", headerTooltip: "Lane", field: "flowCellChannelNumber"},
 // removed per Brian// {headerName: "# Cycles (actual)", headerTooltip: "# Cycles (actual)", field: "numberSequencingCyclesActual"},
