@@ -49,8 +49,8 @@ import {ConstantsService} from "../../services/constants.service";
             margin-right: 0.3em;
         }
         .mat-dialog-content {
-            max-height: 80vh;
-            max-width: 80vw;
+            max-height: 100vh;
+            max-width: 100vw;
         }
     `]
 })
