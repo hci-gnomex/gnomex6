@@ -72,7 +72,7 @@
         </mat-tab-group>
     </div>
     <div class="full-width">
-        <save-footer (saveClicked)="save()"
+        <save-footer (saveClicked)="save()" [hidden]="routeOutlet !== 'browsePanel'"
                      [disableSave]="this.experimentService.experimentOverviewForm.invalid || !isEditMode"
                      [dirty]="this.experimentService.experimentOverviewForm.dirty">
         </save-footer>

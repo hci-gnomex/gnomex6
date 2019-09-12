@@ -43,7 +43,7 @@
         </mat-tab-group>
     </div>
     <div>
-        <save-footer (saveClicked)="save()"
+        <save-footer (saveClicked)="save()" [hidden]="this.routeOutlet !== 'analysisPanel'"
                      [disableSave]="this.analysisService.analysisOverviewForm.invalid || !isEditMode"
                      [dirty]="this.analysisService.analysisOverviewForm.dirty">
         </save-footer>
