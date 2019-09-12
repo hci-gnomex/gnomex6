@@ -92,6 +92,10 @@ mat-form-field.short-input {
     width: 10em;
 }
 
+.mat-input-element:disabled {
+    color: black !important;
+}
+
 mat-tooltip-component {
     white-space: pre-line;
 }
