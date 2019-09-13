@@ -430,6 +430,11 @@ private void sendRedirect(HttpServletResponse response, String url) {
    */
   public void convertJSONRequesttoXML(HttpServletWrappedRequest httpRequest, String requestName, boolean [] converted) {
   	String noConversionNecessary = httpRequest.getParameter("noJSONToXMLConversionNeeded");
+  	//if not a param look for it in the header
+    if(!Util.isParameterNonEmpty(noConversionNecessary) ){
+    	noConversionNecessary = httpRequest.getHeader("noJSONToXMLConversionNeeded");
+	}
+
   	if (Util.isParameterNonEmpty(noConversionNecessary) && Util.isParameterTrue(noConversionNecessary)) {
   		return;
 	}

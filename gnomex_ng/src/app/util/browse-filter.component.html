@@ -49,6 +49,7 @@
                                       [temporaryPlaceholder]="true"
                                       valueField="idLab"
                                       [displayField]="this.prefService.labDisplayField"
+                                      [(ngModel)]="selectedLab"
                                       (optionSelected)="onLabSelect($event)">
                     </custom-combo-box>
                 </div>

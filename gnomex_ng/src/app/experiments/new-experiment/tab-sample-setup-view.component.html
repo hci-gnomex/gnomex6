@@ -117,24 +117,18 @@
                         </div>
                         <ol class="flex-grow">
                             <li class="full-width align-baseline">
-                                <div class="full-width align-baseline">
-                                    <div>
-                                        Specify the kit or reagents used for the purification of the samples you will be submitting.
-                                    </div>
+                                <div class="full-width flex-container-row align-baseline">
                                     <mat-form-field class="moderate-width">
-                                        <input matInput formControlName="reagent" (change)="onReagentChanged($event)" placeholder="Reagent" required>
+                                        <input matInput formControlName="reagent" (change)="onReagentChanged($event)" placeholder="Specify the kit or reagents used for the purification of the samples you will be submitting." required>
                                         <mat-error *ngIf="form?.get('reagent')?.hasError('required')">Reagent name is required.</mat-error>
                                         <mat-error *ngIf="form?.get('reagent')?.hasError('maxlength')">Reagent name too long, cannot be saved.</mat-error>
                                     </mat-form-field>
                                 </div>
                             </li>
                             <li *ngIf="showElution" class="full-width align-baseline">
-                                <div class="full-width align-baseline">
-                                    <div>
-                                        Specify the elution buffer used for the purification of the samples you will be submitting.
-                                    </div>
+                                <div class="full-width flex-container-row align-baseline">
                                     <mat-form-field class="moderate-width">
-                                        <input matInput formControlName="elution" (change)="onElutionChanged($event)" placeholder="Elution" required>
+                                        <input matInput formControlName="elution" (change)="onElutionChanged($event)" placeholder="Specify the elution buffer used for the purification of the samples you will be submitting." required>
                                         <mat-error *ngIf="form?.get('reagent')?.hasError('required')">Elution buffer name is required.</mat-error>
                                         <mat-error *ngIf="form?.get('reagent')?.hasError('maxlength')">Elution buffer name too long, cannot be saved.</mat-error>
                                     </mat-form-field>

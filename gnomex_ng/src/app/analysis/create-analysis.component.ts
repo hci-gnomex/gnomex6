@@ -355,7 +355,6 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
             }
 
         }, (err) => {
-            this.dialogsService.error(err);
             this.dialogsService.stopAllSpinnerDialogs();
         });
 

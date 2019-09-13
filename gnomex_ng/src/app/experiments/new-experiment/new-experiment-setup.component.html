@@ -60,14 +60,19 @@
             </li>
             <li *ngIf="showBilling" class="full-width align-baseline">
                 <div class="full-width flex-container-row">
-                    <div class="flex-container-row align-baseline">
-                        <div class="heading">
-                            Select a payment method :
+                    <div class="flex-container-col">
+                        <div class="flex-container-row align-baseline">
+                            <div class="heading">
+                                Select a payment method :
+                            </div>
+                            <custom-combo-box class="moderate-width" placeholder="Account" (optionSelected)="onBillingAccountSelection($event)"
+                                              displayField="accountNameDisplay" [options]="authorizedBillingAccounts"
+                                              [formControlName]="'selectAccount'">
+                            </custom-combo-box>
                         </div>
-                        <custom-combo-box class="moderate-width" placeholder="Account" (optionSelected)="onBillingSelection($event)"
-                                          displayField="accountNameDisplay" [options]="authorizedBillingAccounts"
-                                          [formControlName]="'selectAccount'">
-                        </custom-combo-box>
+                        <div class="flex-container-col" *ngIf="this.form.get('selectBillingTemplate').value">
+                            <span *ngFor="let item of this.form.get('selectBillingTemplate').value.items" class="margin-left">{{item.accountNameDisplay}}</span>
+                        </div>
                     </div>
                     <div class="flex-column-container moderate-width major-padding-left">
                         <div class="double-padded-left instructions">

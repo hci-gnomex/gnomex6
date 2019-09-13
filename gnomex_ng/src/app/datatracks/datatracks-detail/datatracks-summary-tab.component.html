@@ -1,26 +1,16 @@
 <form [formGroup]="summaryFormGroup" style="display:flex;flex-direction: column;">
-
-    <mat-form-field style="width:60%;font-size:small;">
+    <mat-form-field style="width:60%;font-size:small;" class="padded">
         <input matInput formControlName="folderName"  type="text" placeholder="Name"/>
         <mat-error *ngIf="summaryFormGroup.get('folderName').hasError('required')">
             The folder name is required
         </mat-error>
     </mat-form-field>
-    <mat-form-field style="width:95%;font-size:small;">
+    <mat-form-field style="width:95%;font-size:small;" class="padded">
         <textarea matInput placeholder="Summary" formControlName="summary" matTextareaAutosize matAutosizeMinRows="1" matAutosizeMaxRows="2"></textarea>
         <mat-error *ngIf="summaryFormGroup.get('summary').hasError('maxlength')"> Summary can be at most 5000 characters</mat-error>
     </mat-form-field>
-
-
-
     <div style="width:100%; font-size:small;">
-
         <angular-editor #descEditorRef id="descEditor" formControlName="description" [config]="this.editorConfig">
         </angular-editor>
-
-
     </div>
-
-
-
 </form>

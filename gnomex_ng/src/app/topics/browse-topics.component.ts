@@ -1,19 +1,13 @@
 import {
-    AfterViewInit,
     ChangeDetectorRef,
     Component,
-    ElementRef,
-    Input,
     OnDestroy,
     OnInit,
     ViewChild,
 } from "@angular/core";
 
-import {URLSearchParams} from "@angular/http";
 import {
-    IActionMapping,
     ITreeOptions,
-    TREE_ACTIONS,
     TreeComponent,
     TreeModel,
     TreeNode,
@@ -34,25 +28,14 @@ import {DataTrackService} from "../services/data-track.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {transaction} from "mobx";
 import {UserPreferencesService} from "../services/user-preferences.service";
-import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {HttpParams} from "@angular/common/http";
 import {UtilService} from "../services/util.service";
-
-const actionMapping: IActionMapping = {
-    mouse: {
-        click: (tree, node, $event) => {
-            $event.ctrlKey
-                ? TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event)
-                : TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
-        }
-    }
-};
+import {ConstantsService} from "../services/constants.service";
 
 @Component({
     selector: "analysis",
     templateUrl: "./browse-topics.component.html",
-    styles: [`
-
+    styles: [`        
         .formField {
             margin: 0 2.0%;
             width: 20%
@@ -64,172 +47,134 @@ const actionMapping: IActionMapping = {
             width: fit-content;
             margin-top: 1.1em;
         }
-
-
-
         .absolute { position: absolute; }
-
         .foreground { background-color: white;   }
         .background { background-color: #EEEEEE; }
-
         .vertical-spacer {
             height: 0.3em;
             min-height: 0.3em;
         }
-
         .border { border: #C8C8C8 solid thin; }
         .major-border {
             border-radius: 0.3em;
             border: 1px solid darkgrey;
         }
-
         .padded { padding: 0.3em; }
-
         .top-padded { padding-top: 0.3em; }
-
         .left-right-padded {
             padding-left:  0.3em;
             padding-right: 0.3em;
         }
-
         .small-font { font-size: small; }
-
         .no-overflow  { overflow:    hidden; }
         .no-word-wrap { white-space: nowrap; }
-
+        img.small-icon {
+            width: 16px;
+            height: 16px;
+        }
     `]
 })
 
-export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
+export class BrowseTopicsComponent implements OnInit, OnDestroy {
     @ViewChild("topicsTree") treeComponent: TreeComponent;
-    @ViewChild("experimentsTree") experimentTreeComponent: TreeComponent;
-    @ViewChild("analysisTree") analysisTreeComponent: TreeComponent;
-    @ViewChild("datatrackTree") datatrackTreeComponent: TreeComponent;
-    @ViewChild("datatrackInput") datatrackInput: ElementRef;
-    @ViewChild("analysisInput") analysisInput: ElementRef;
-    @ViewChild("experimentInput") experimentInput: ElementRef;
-    @Input() childMessage: string;
+    @ViewChild("dataTree") dataTreeComponent: TreeComponent;
 
-    private treeModel: TreeModel;
-    private experimentTreeModel: TreeModel;
-    private analysisTreeModel: TreeModel;
-    private datatrackTreeModel: TreeModel;
-    private experimentLab: any;
-    private analysisLab: any;
-    private datatrackLab: any;
-    private organism: any;
-    private genomeBuild: any;
-    private labs: any[];
-    private analysisLabs: any[] = [];
-    private experimentLabs: any[] = [];
-    private datatrackLabs: any[] = [];
-    private pickerLabs: any[] = [];
-    private genomeBuildList: any[] = [];
-    private isExperimentsTab: boolean;
-    private isAnalysisTab: boolean;
-    private isDatatracksTab: boolean;
-    public selectedGroupTab: number = 0;
-    private linkDataView: boolean = false;
-    private experimentSearchText: string;
-    private analysisSearchText: string;
-    private datatrackSearchText: string;
-    private selectedExpTimeFrame: string = "3 months";
-    private previousExpTimeFrame: string = "";
-    private selectedAnalTimeFrame: string = "3 months";
-    private previousAnalTimeFrame: string = "";
-    private analysisCount: number = 0;
-    private selectedIdLab: any;
-    public organisms: any[] = [];
-    public oldOrganisms: any[] = [];
-    // private showSpinner: boolean = false;
-    private idAnalysis: string = "";
-    private idExperiment: string = "";
-    private previousURLParams: HttpParams;
-    private resetExperiment: boolean = false;
-    private resetAnalysis: boolean = false;
-    private resetDatatrack: boolean = false;
-    private experimentCount: number;
-    private datatracksCount: number;
-    private experimentLabel: string;
-    private analysisLabel: string;
-    private datatrackLabel: string;
-    private navInitSubsciption:Subscription;
-
-
-    timeFrames = [
-        'In last week',
-        'month',
-        '3 months',
-        'year',
+    public readonly MODE_EXPERIMENT: string = "Experiment";
+    public readonly MODE_ANALYSIS: string = "Analysis";
+    public readonly MODE_DATA_TRACK: string = "Data Track";
+    public readonly modes: string[] = [
+        this.MODE_EXPERIMENT,
+        this.MODE_ANALYSIS,
+        this.MODE_DATA_TRACK,
     ];
 
-    /*
-    angular2-tree options
-     */
+    public readonly TIME_FRAME_WEEK: string = "In last week";
+    public readonly TIME_FRAME_MONTH: string = "month";
+    public readonly TIME_FRAME_THREE_MONTH: string = "3 months";
+    public readonly TIME_FRAME_YEAR: string = "year";
+    public readonly TIME_FRAME_ALL: string = "all";
+    public readonly timeFrames: string[] = [
+        this.TIME_FRAME_WEEK,
+        this.TIME_FRAME_MONTH,
+        this.TIME_FRAME_THREE_MONTH,
+        this.TIME_FRAME_YEAR,
+        this.TIME_FRAME_ALL,
+    ];
+
+    private treeModel: TreeModel;
+    private dataTreeModel: TreeModel;
+    public pickerLabs: any[] = [];
+    public genomeBuildList: any[] = [];
+    public linkDataView: boolean = false;
+    public organisms: any[] = [];
+    private previousURLParams: HttpParams;
+    private navInitSubscription: Subscription;
+
+    public addIcon: string = "";
+    public addLabel: string = "";
+    public selectedLab: any = null;
+    public searchText: string = "";
+    public mode: string = this.MODE_EXPERIMENT;
+    public selectedTimeFrame: string = this.TIME_FRAME_THREE_MONTH;
+    public selectedOrganism: any = null;
+    public selectedGenomeBuild: any = null;
+    public countLabel: string = "";
+    public dataTreeItems: any[] = [];
+    public dataTreeOptions: ITreeOptions = null;
+
+    public items: any = [];
+    public currentItem: any;
+    public targetItem: any;
+
+    private itemsCopy: any = [];
+    private dataTreeItemsCopy: any[] = [];
+    private selectedItem: ITreeNode;
+
+    private topicListSubscription: Subscription;
+
     public options: ITreeOptions = {
         displayField: "label",
         childrenField: "items",
         useVirtualScroll: true,
-        nodeHeight: 22,
+        nodeHeight: () => 22,
         nodeClass: (node: TreeNode) => {
             return "icon-" + node.data.icon;
         },
         allowDrop: (element, {parent, index}) => {
-            this.dragEndItems = _.cloneDeep(this.items);
-            if (parent.data.parentid === -1) {
-                return false;
-            } else {
-                return true;
-            }
+            return parent.data.parentid !== -1;
         },
-
         allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && (node.data.idDataTrack || node.data.idRequest || node.data.idAnalysis || node.data.idParentTopic),
-        actionMapping
     };
 
-    public experimentOptions: ITreeOptions = {
+    private experimentTreeOptions: ITreeOptions = {
         displayField: "label",
         childrenField: "experimentItems",
         useVirtualScroll: false,
-        nodeHeight: 22,
+        nodeHeight: () => 22,
         nodeClass: (node: TreeNode) => {
             return "icon-" + node.data.icon;
         },
         allowDrop: (element, {parent, index}) => {
-            // this.dragEndExperimentItems = _.cloneDeep(this.experimentItems);
-            if (element.data.idTopic && element.data.linkData) {
-                return true;
-            } else {
-                return false;
-            }
+            return element.data.idTopic && element.data.linkData;
         },
-
         allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && node.isLeaf,
-        actionMapping
     };
 
-    public analysisOptions: ITreeOptions = {
+    private analysisTreeOptions: ITreeOptions = {
         displayField: "label",
         childrenField: "analysisItems",
         useVirtualScroll: false,
-        nodeHeight: 22,
+        nodeHeight: () => 22,
         nodeClass: (node: TreeNode) => {
             return "icon-" + node.data.icon;
         },
         allowDrop: (element, {parent, index}) => {
-            // this.dragEndAnalysisItems = _.cloneDeep(this.analysisItems);
-            if (element.data.idTopic && element.data.linkData) {
-                return true;
-            } else {
-                return false;
-            }
+            return element.data.idTopic && element.data.linkData;
         },
-
         allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && node.isLeaf,
-        actionMapping
     };
 
-    public datatrackOptions: ITreeOptions = {
+    private datatrackTreeOptions: ITreeOptions = {
         displayField: "label",
         childrenField: "datatrackItems",
         useVirtualScroll: false,
@@ -237,99 +182,10 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
             return "icon-" + node.data.icon;
         },
         allowDrop: (element, {parent, index}) => {
-            // this.dragEndDatatrackItems = _.cloneDeep(this.datatrackItems);
-            if (element.data.idTopic && element.data.linkData) {
-                return true;
-            } else {
-                return false;
-            }
+            return element.data.idTopic && element.data.linkData;
         },
-
         allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && (node.data.isDataTrackFolder || node.data.idDataTrack),
-        actionMapping
     };
-
-    public items: any;
-    public experimentItems: any;
-    public analysisItems: any;
-    public datatrackItems: any;
-    public currentItem: any;
-    public targetItem: any;
-
-    private dragEndItems: any;
-    private dragEndExperimentItems: any;
-    private dragEndAnalysisItems: any;
-    private dragEndDatatrackItems: any;
-    private selectedItem: ITreeNode;
-
-    private topicListSubscription: Subscription;
-
-    ngOnInit() {
-        this.utilService.registerChangeDetectorRef(this.changeDetector);
-        this.treeModel = this.treeComponent.treeModel;
-        setTimeout(() => {
-            this.dialogService.startDefaultSpinnerDialog();
-        });
-
-        this.topicListSubscription = this.topicService.getTopicsListObservable().subscribe(response => {
-            this.items = [].concat([]);
-            this.buildTree(response);
-            setTimeout(() => {
-
-                this.dialogService.stopAllSpinnerDialogs();
-                // this.showSpinner = false;
-                this.treeModel.update();
-                this.treeModel.expandAll();
-
-                if(this.gnomexService.orderInitObj) { // this is if component is being navigated to by url
-                    let id: string = "t" + this.gnomexService.orderInitObj.idTopic;
-                    let capID = id.toUpperCase();
-                    if (this.treeModel && id) {
-                        let tNode = this.treeModel.getNodeById(id);
-                        if(tNode){
-                            tNode.setIsActive(true);
-                            tNode.scrollIntoView();
-                        }else{
-                            this.dialogService.alert("You do not have permission to view Topic " + capID , "INVALID", DialogType.FAILED);
-                        }
-                        this.gnomexService.orderInitObj = null;
-                    }
-                }
-
-            });
-
-        });
-
-        this.navInitSubsciption = this.gnomexService.navInitBrowseTopicSubject
-            .subscribe(orderInitObj =>{
-                this.topicService.refreshTopicsList_fromBackend();
-            });
-
-
-
-        this.pickerLabs = this.pickerLabs.concat(this.gnomexService.labList);
-        this.organisms = this.gnomexService.das2OrganismList;
-        this.isExperimentsTab = true;
-        this.isAnalysisTab = false;
-        this.isDatatracksTab = false;
-
-    }
-
-    ngAfterViewInit() {
-    }
-
-    ngAfterViewChecked() {
-        if (this.resetAnalysis) {
-            this.getAnalysis("", this.selectedAnalTimeFrame);
-            this.resetAnalysis = false;
-        } else if (this.resetExperiment) {
-            this.getExperiments("", this.selectedExpTimeFrame);
-            this.resetExperiment = false;
-        } else if (this.resetDatatrack) {
-            this.getDatatracks("", "", "");
-            this.resetDatatrack = false;
-        }
-    }
 
     constructor(private topicService: TopicService, private router: Router,
                 private dialogService: DialogsService,
@@ -341,60 +197,93 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                 private analysisService: AnalysisService,
                 private utilService: UtilService,
                 private changeDetector: ChangeDetectorRef,
+                public constantsService: ConstantsService,
                 public prefService: UserPreferencesService) {
-
-
-        this.items = [];
-        this.dragEndItems = [];
     }
 
-    resetTree() {
-        this.items = this.dragEndItems;
+    ngOnInit() {
+        this.experimentsService.currentTabIndex = 0;
+        this.utilService.registerChangeDetectorRef(this.changeDetector);
+        this.treeModel = this.treeComponent.treeModel;
+        this.dataTreeModel = this.dataTreeComponent.treeModel;
+
+        this.onModeChange();
+
+        this.dialogService.addSpinnerWorkItem();
+        this.topicListSubscription = this.topicService.getTopicsListObservable().subscribe((response) => {
+            this.items = [];
+            this.buildTree(response);
+            setTimeout(() => {
+                this.dialogService.removeSpinnerWorkItem();
+                this.treeModel.update();
+                this.treeModel.expandAll();
+
+                if(this.gnomexService.orderInitObj) { // this is if component is being navigated to by url
+                    let id: string = "t" + this.gnomexService.orderInitObj.idTopic;
+                    let capID = id.toUpperCase();
+                    if (this.treeModel && id) {
+                        let tNode = this.treeModel.getNodeById(id);
+                        if (tNode) {
+                            tNode.setIsActive(true);
+                            tNode.scrollIntoView();
+                        } else {
+                            this.dialogService.alert("You do not have permission to view Topic " + capID , "INVALID", DialogType.FAILED);
+                        }
+                        this.gnomexService.orderInitObj = null;
+                    }
+                }
+            });
+        }, () => {
+            this.dialogService.stopAllSpinnerDialogs();
+        });
+
+        this.navInitSubscription = this.gnomexService.navInitBrowseTopicSubject.subscribe(() => {
+            this.topicService.refreshTopicsList_fromBackend();
+        });
+
+        this.pickerLabs = [].concat(this.gnomexService.labList);
+        this.organisms = [].concat(this.gnomexService.das2OrganismList);
     }
 
-    resetExperimentTree() {
-        this.experimentItems = this.dragEndExperimentItems;
+    private resetTree(): void {
+        this.items = this.itemsCopy;
     }
 
-    resetAnalysisTree() {
-        this.analysisItems = this.dragEndAnalysisItems;
+    private resetDataTree(): void {
+        this.dataTreeItems = this.dataTreeItemsCopy;
     }
 
-    resetDatatrackTree() {
-        this.datatrackItems = this.dragEndDatatrackItems;
+    public onMoveNode(event): void {
+        this.currentItem = event.node;
+        this.targetItem = event.to.parent;
+        this.doMove(event);
     }
 
-    onMoveNode($event) {
-        this.currentItem = $event.node;
-        this.targetItem = $event.to.parent;
-        this.doMove($event);
-    }
-
-    doMove(event) {
+    private doMove(event): void {
         if (this.currentItem.idTopic === this.targetItem.idTopic) {
-            this.dialogService.alert("Moving or Copying an item to the same topic is not allowed.'.", null, DialogType.WARNING);
+            this.dialogService.alert("Moving or Copying an item to the same topic is not allowed", null, DialogType.WARNING);
         } else {
-            this.dialogService.startDefaultSpinnerDialog();
-            var params: URLSearchParams = new URLSearchParams();
+            let attribute: string = "";
+            let attributeValue: string = "";
 
             if ((event.node.idRequest || event.node.idAnalysis || event.node.idDataTrack) && !this.currentItem.idTopic) {
-                params.set("idTopic", this.targetItem.idTopic);
-
+                this.dialogService.addSpinnerWorkItem();
                 if (this.currentItem.idAnalysis) {
-                    params.set("name", "Analysis");
-                    params.set("idAnalysis0", this.currentItem.idAnalysis);
-                    this.resetAnalysisTree();
+                    attribute = "idAnalysis0";
+                    attributeValue = this.currentItem.idAnalysis;
                 } else if (this.currentItem.idRequest) {
-                    params.set("name", "Request");
-                    params.set("idRequest0", this.currentItem.idRequest);
-                    this.resetExperimentTree();
+                    attribute = "idRequest0";
+                    attributeValue = this.currentItem.idRequest;
                 } else if (this.currentItem.idDataTrack) {
-                    params.set("name", "DataTrack");
-                    params.set("idDataTrack0", this.currentItem.idDataTrack);
-                    this.resetDatatrackTree();
+                    attribute = "idDataTrack0";
+                    attributeValue = this.currentItem.idDataTrack;
                 }
-                this.topicService.addItemToTopic(params).subscribe((response: Response) => {
+                this.resetDataTree();
+                this.topicService.addItemToTopicNew(this.targetItem.idTopic, attribute, attributeValue).subscribe(() => {
+                    this.dialogService.removeSpinnerWorkItem();
                     this.topicService.refreshTopicsList_fromBackend();
+                }, () => {
+                    this.dialogService.stopAllSpinnerDialogs();
                 });
             } else {
                 let config: MatDialogConfig = new MatDialogConfig();
@@ -409,58 +298,40 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                     {actions: []}).subscribe((result: any) => {
                         if (!result) {
                             this.resetTree();
+                            this.resetDataTree();
                         }
                 });
             }
-            this.dialogService.stopAllSpinnerDialogs();
         }
     }
 
+    private buildTree(response: any[]): void {
+        this.items = UtilService.getJsonArray(response, response);
 
-    /*
-    Build the tree data
-    @param
-     */
-    buildTree(response: any[]) {
-        this.items = [].concat(null);
-        if (!this.createSecurityAdvisorService.isArray(response)) {
-            this.items = [response];
-        } else {
-            this.items = response;
-        }
-
-        for (var folder of this.items) {
+        for (let folder of this.items) {
             folder.id = "topic";
             folder.parentid = -1;
             folder.label = "Topics";
 
-            folder.icon = "assets/folder.png";
+            folder.icon = this.constantsService.ICON_FOLDER;
 
             if (folder.Folder.Topic) {
                 this.addTopic(folder, folder.Folder.Topic);
             }
         }
-    };
+    }
 
-    addTopic(root: any, items: any[]) {
-        if (!this.createSecurityAdvisorService.isArray(items)) {
-            root.items = [items];
-        } else {
-            root.items = items;
-        }
+    private addTopic(root: any, items: any[]): void {
+        root.items = UtilService.getJsonArray(items, items);
 
-        for (var topic of items) {
+        for (let topic of items) {
             let topicArray: any[] = [];
             if (topic.Topic) {
-                if (!this.createSecurityAdvisorService.isArray(topic.Topic)) {
-                    topicArray = [topic.Topic];
-                } else {
-                    topicArray = topic.Topic;
-                }
+                topicArray = UtilService.getJsonArray(topic.Topic, topic.Topic);
                 this.addTopic(topic, topicArray);
             }
             this.assignTreeIcon(topic);
-            topic.id = "t"+topic.idTopic;
+            topic.id = "t" + topic.idTopic;
             if (topic.Category) {
                 if (!this.createSecurityAdvisorService.isArray(topic.Category)) {
                     if (topic.items && topic.items.length > 0) {
@@ -475,30 +346,22 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                         topic.items = topic.Category;
                     }
                 }
-                for (var category of topic.items) {
+                for (let category of topic.items) {
                     if (category.Request || category.Analysis || category.DataTrack) {
                         category.idTopic = topic.idTopic;
                         if (category.Request) {
                             category.id = "r" + topic.idTopic;
-                            if (!this.createSecurityAdvisorService.isArray(category.Request)) {
-                                category.items = [category.Request];
-                            } else {
-                                category.items = category.Request;
-                            }
-                            for (var request of category.items) {
+                            category.items = UtilService.getJsonArray(category.Request, category.Request);
+                            for (let request of category.items) {
                                 request.id = request.idRequest + category.id;
                                 this.setLabel(request);
                             }
                         }
                         if (category.Analysis) {
                             category.id = "a" + topic.idTopic;
-                            if (!this.createSecurityAdvisorService.isArray(category.Analysis)) {
-                                category.items = [category.Analysis];
-                            } else {
-                                category.items = category.Analysis;
-                            }
-                            for (var analysis of category.items) {
-                                analysis.icon = "assets/map.png";
+                            category.items = UtilService.getJsonArray(category.Analysis, category.Analysis);
+                            for (let analysis of category.items) {
+                                analysis.icon = this.constantsService.ICON_ANALYSIS;
                                 analysis.id = analysis.idAnalysis + category.id;
                                 this.setLabel(analysis);
                             }
@@ -506,27 +369,21 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
                         }
                         if (category.DataTrack) {
                             category.id = "s" + topic.idTopic;
-                            if (!this.createSecurityAdvisorService.isArray(category.DataTrack)) {
-                                category.items = [category.DataTrack];
-                            } else {
-                                category.items = category.DataTrack;
-                            }
-                            for (var datatrack of category.items) {
+                            category.items = UtilService.getJsonArray(category.DataTrack, category.DataTrack);
+                            for (let datatrack of category.items) {
                                 this.assignIconToDT(datatrack);
                                 datatrack.id = datatrack.idDataTrack + category.id;
                                 this.setLabel(datatrack);
                             }
-
                         }
                     }
                 }
 
             }
         }
-
     }
 
-    setLabel(leaf: any) {
+    private setLabel(leaf: any): void {
         let label: string = "";
         if (leaf.idAnalysis || leaf.idDataTrack) {
             if (leaf.label && leaf.name) {
@@ -538,712 +395,556 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy, AfterViewInit {
         }
     }
 
-    assignTreeIcon(topic: any): void {
+    private assignTreeIcon(topic: any): void {
         if (topic.codeVisibility === "MEM") {
-            topic.icon = this.gnomexService.iconTopicMember;
+            topic.icon = this.constantsService.ICON_TOPIC_MEMBER;
         } else if (topic.codeVisibility === "MEMCOL") {
-            topic.icon = this.gnomexService.iconTopicMember;
+            topic.icon = this.constantsService.ICON_TOPIC_MEMBER;
         } else if (topic.codeVisibility === "OWNER") {
-            topic.icon = this.gnomexService.iconTopicOwner;
+            topic.icon = this.constantsService.ICON_TOPIC_OWNER;
         } else if (topic.codeVisibility == "INST") {
-            topic.icon = this.gnomexService.iconTopicInstitution;
+            topic.icon = this.constantsService.ICON_TOPIC_INSTITUTION;
         } else {
-            topic.icon = this.gnomexService.iconTopicPublic;
+            topic.icon = this.constantsService.ICON_TOPIC_PUBLIC;
         }
     }
 
-
-    assignIconToDT(datatrack: any) {
-        let label = datatrack.name + " ("+datatrack.number + ")";
-        datatrack.label = label;
+    private assignIconToDT(datatrack: any): void {
+        datatrack.label = datatrack.name + " (" + datatrack.number + ")";
         switch (datatrack.codeVisibility) {
             case 'MEM': {
-                datatrack.icon = this.gnomexService.iconDataTrackMember;
+                datatrack.icon = this.constantsService.ICON_DATATRACK_MEMBER;
                 break;
             }
             case 'OWNER': {
-                datatrack.icon = this.gnomexService.iconDataTrackOwner;
+                datatrack.icon = this.constantsService.ICON_DATATRACK_OWNER;
                 break;
             }
             default: {
-                datatrack.icon = this.gnomexService.iconDataTrackPublic;
+                datatrack.icon = this.constantsService.ICON_DATATRACK_PUBLIC;
                 break;
             }
         }
-        this.datatracksCount++;
-        datatrack.id = "d"+datatrack.idDataTrack + datatrack.idDataTrackFolder;
+        datatrack.id = "d" + datatrack.idDataTrack + datatrack.idDataTrackFolder;
     }
 
-    /**
-     * A node is selected in the tree.
-     * @param event
-     */
-    treeOnSelect(event: any) {
+    public treeOnSelect(event: any): void {
         this.selectedItem = event.node;
         this.linkDataView = false;
         let name = this.selectedItem.displayField;
         let topicListNode = _.cloneDeep(this.selectedItem.data);
 
-
-        if(this.selectedItem.isRoot){
+        if (this.selectedItem.isRoot) {
             this.router.navigate(['/topics', { outlets: { topicsPanel: null }}]);
-        }else if(name === "Data Tracks" || name === "Experiments" || name === "Analysis" ){
+        } else if (name === "Data Tracks" || name === "Experiments" || name === "Analysis" ) {
             this.router.navigate(['/topics', { outlets: { topicsPanel: null }}]);
-        }else {
+        } else {
             if ((this.selectedItem.data.label as string).endsWith('(Restricted Visibility)')) {
                 this.dialogService.alert("You do not have permission to view this", null, DialogType.FAILED);
                 return;
             }
 
-            let pathPair:string = '';
-            if(this.selectedItem.data.idAnalysis){
+            let pathPair: string = '';
+            if (this.selectedItem.data.idAnalysis) {
                 pathPair = "analysis/" + this.selectedItem.data.idAnalysis;
                 this.analysisService.emitAnalysisOverviewList(topicListNode);
-            }else if(this.selectedItem.data.idRequest){
+            } else if (this.selectedItem.data.idRequest) {
                 pathPair = "experiment/" + this.selectedItem.data.idRequest;
                 this.experimentsService.emitExperimentOverviewList(topicListNode);
-
-            }else if(this.selectedItem.data.idDataTrack){
+            } else if (this.selectedItem.data.idDataTrack) {
                 pathPair = "datatrack/" + this.selectedItem.data.idDataTrack;
                 this.datatrackService.datatrackListTreeNode = topicListNode;
-
-            }else if(this.selectedItem.data.idTopic){
+            } else if (this.selectedItem.data.idTopic) {
                 pathPair =  this.selectedItem.data.idLab;
                 this.topicService.emitSelectedTreeNode(topicListNode);
-
             }
-            if(pathPair){
+            if (pathPair) {
                 this.router.navigate(['/topics',{outlets:{topicsPanel:pathPair}}])
             }
         }
-
-        //this.router.navigate(['/topics',  {outlets:{'topicsPanel':["experiment/43"]}}]);
-
     }
 
-    expTreeOnSelect(event: any) {
-        this.dragEndExperimentItems = _.cloneDeep(this.experimentItems);
+    public onDataTreeUpdateData(): void {
+        this.updateCountLabel();
+        this.dataTreeItemsCopy = _.clone(this.dataTreeItems);
     }
 
-    analTreeOnSelect(event: any) {
-        this.dragEndAnalysisItems = _.cloneDeep(this.analysisItems);
+    public onTreeUpdateData(): void {
+        this.itemsCopy = _.clone(this.items);
     }
 
-    dTTreeOnSelect(event: any) {
-        this.dragEndDatatrackItems = _.cloneDeep(this.datatrackItems);
-    }
-
-    expandClicked() {
-        if (this.selectedItem)
+    public expandClicked(): void {
+        if (this.selectedItem) {
             this.selectedItem.expandAll();
+        }
     }
 
-    collapseClicked() {
-        if (this.selectedItem)
+    public collapseClicked(): void {
+        if (this.selectedItem) {
             this.selectedItem.collapseAll();
-    }
-
-    ngOnDestroy(): void {
-        this.utilService.removeChangeDetectorRef(this.changeDetector);
-        this.topicListSubscription.unsubscribe();
-        this.navInitSubsciption.unsubscribe();
-        this.gnomexService.navInitBrowseTopicSubject.next(null);
-    }
-
-    selectExperimentLabOption(event) {
-        if (event) {
-            this.dialogService.startDefaultSpinnerDialog();
-            // this.showSpinner = true;
-            this.getExperiments(this.experimentLab.idLab, this.selectedExpTimeFrame);
         }
     }
 
-    selectAnalysisLabOption(event) {
-        if (event && event.idLab !== "0") {
-            this.dialogService.startDefaultSpinnerDialog();
-            // this.showSpinner = true;
-            this.getAnalysis(this.analysisLab.idLab, this.selectedAnalTimeFrame);
+    public onLabSelect(): void {
+        switch (this.mode) {
+            case this.MODE_EXPERIMENT:
+                this.getExperiments();
+                break;
+            case this.MODE_ANALYSIS:
+                this.getAnalysis();
+                break;
+            case this.MODE_DATA_TRACK:
+                this.getDatatracks();
+                break;
         }
     }
 
-    selectDatatrackLabOption(event) {
-        if (event && event.idLab !== "0") {
-            this.oldOrganisms = [];
-            this.dialogService.startDefaultSpinnerDialog();
-            // this.showSpinner = true;
-            this.getDatatracks(this.datatrackLab.idLab, "", "");
-        }
-    }
-
-    selectDatatrackOrgOption(event) {
-        if (event) {
-            let genomeBuilds = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.GENOME_BUILD);
-            this.genomeBuildList = genomeBuilds.filter(gen => {
-                if (gen.isActive === "Y" && !(gen.value === "")) {
-                    return gen.idOrganism === this.organism.idOrganism;
-                }
-                return false;
+    public onOrganismSelect(): void {
+        if (this.selectedOrganism) {
+            this.genomeBuildList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.GENOME_BUILD).filter((gen) => {
+                return gen.isActive === "Y" && gen.value !== "" && gen.idOrganism === this.selectedOrganism;
             });
-            if (this.datatrackLab) {
-                this.getDatatracks(this.datatrackLab.idLab, this.organism.idOrganism, "");
-            } else {
-                this.getDatatracks("", this.organism.idOrganism, "");
+        } else {
+            this.genomeBuildList = [];
+        }
+        this.selectedGenomeBuild = null;
+        this.getDatatracks();
+    }
+
+    public onGenomeBuildSelect(): void {
+        this.getDatatracks();
+    }
+
+    public searchByText(): void {
+        this.search(this.mode === this.MODE_DATA_TRACK);
+    }
+
+    public clearSearchText(): void {
+        this.searchText = "";
+        this.searchByText();
+    }
+
+    public onSearchFilterKeyup(event: any): void {
+        if (event.key === "Enter") {
+            this.searchByText();
+        }
+    }
+
+    private updateCountLabel(): void {
+        let itemType: string = "";
+        switch (this.mode) {
+            case this.MODE_EXPERIMENT:
+                itemType = "experiments";
+                break;
+            case this.MODE_ANALYSIS:
+                itemType = "analyses";
+                break;
+            case this.MODE_DATA_TRACK:
+                itemType = "data tracks";
+                break;
+        }
+        this.countLabel = " (" + this.determineCount().toString() + " " + itemType + ")";
+    }
+
+    private determineCount(): number {
+        let attributeToCheckFor: string = "";
+        switch (this.mode) {
+            case this.MODE_EXPERIMENT:
+                attributeToCheckFor = "idRequest";
+                break;
+            case this.MODE_ANALYSIS:
+                attributeToCheckFor = "idAnalysis";
+                break;
+            case this.MODE_DATA_TRACK:
+                attributeToCheckFor = "idDataTrack";
+                break;
+        }
+
+        let count: number = 0;
+        if (this.dataTreeModel && !this.dataTreeModel.isEmptyTree()) {
+            for (let root of this.dataTreeModel.roots) {
+                count += BrowseTopicsComponent.recursivelyCount(root, attributeToCheckFor);
             }
-        } else {
-            this.resetDatatrackOrganismSelection();
         }
-
+        return count;
     }
 
-    resetDatatrackOrganismSelection(): void {
-        this.organism = null;
-        this.genomeBuildList = [];
-        this.getDatatracks(this.datatrackLab.idLab, "", "");
-    }
-
-    selectDatatrackGenOption() {
-        this.getDatatracks(this.datatrackLab.idLab, this.organism.idOrganism, this.genomeBuild.idGenomeBuild);
-    }
-
-    searchExperiementsOnEnter(event): void {
-        if (event.key === "Enter") {
-            this.searchExperiment();
+    private static recursivelyCount(node: ITreeNode, attributeToCheckFor: string): number {
+        if (node.hasChildren) {
+            let count: number = 0;
+            for (let child of node.children) {
+                count += BrowseTopicsComponent.recursivelyCount(child, attributeToCheckFor);
+            }
+            return count;
+        } else if (node.data.isHidden) {
+            return 0;
+        } else if (node.data[attributeToCheckFor]) {
+            return 1;
         }
+        return 0;
     }
 
-    searchAnalysisOnEnter(event): void {
-        if (event.key === "Enter") {
-            this.searchAnalysis();
-        }
-    }
-
-    searchDatatrackOnEnter(event): void {
-        if (event.key === "Enter") {
-            this.searchDatatrack();
-        }
-    }
-
-    onTabChange(event) {
-        if (event.tab.textLabel === "Experiments") {
-            this.dialogService.startDefaultSpinnerDialog();
-            this.isAnalysisTab = false;
-            this.isDatatracksTab = false;
-            this.isExperimentsTab = true;
-            this.getExperiments("",'3 months');
-        } else if (event.tab.textLabel === "Analysis") {
-            this.dialogService.startDefaultSpinnerDialog();
-            // this.showSpinner = true;
-            this.isAnalysisTab = true;
-            this.isDatatracksTab = false;
-            this.isExperimentsTab = false;
-            this.getAnalysis("",'3 months');
-        } else {
-            this.dialogService.startDefaultSpinnerDialog();
-            // this.showSpinner = true;
-            this.isAnalysisTab = false;
-            this.isDatatracksTab = true;
-            this.isExperimentsTab = false;
-            this.getDatatracks("", "", "");
+    public onModeChange(): void {
+        switch (this.mode) {
+            case this.MODE_EXPERIMENT:
+                this.dataTreeOptions = this.experimentTreeOptions;
+                this.addIcon = this.constantsService.ICON_FLASK;
+                this.addLabel = this.MODE_EXPERIMENT;
+                this.getExperiments();
+                break;
+            case this.MODE_ANALYSIS:
+                this.dataTreeOptions = this.analysisTreeOptions;
+                this.addIcon = this.constantsService.ICON_ANALYSIS;
+                this.addLabel = "Analysis";
+                this.getAnalysis();
+                break;
+            case this.MODE_DATA_TRACK:
+                this.dataTreeOptions = this.datatrackTreeOptions;
+                this.addIcon = this.constantsService.ICON_DATATRACK;
+                this.addLabel = "Data Track";
+                this.getDatatracks();
+                break;
         }
     }
 
-    getExperiments(idLab: string, frame: any) {
-        let params: HttpParams = new HttpParams();
+    private getExperiments(): void {
+        this.dialogService.addSpinnerWorkItem();
 
-        params = params.set("idLab", idLab);
+        this.searchText = "";
 
-        params = params.set("allExperiments", 'Y');
-        params = params.set("excludeClinicResearch", 'Y');
-        params = params.set("isBioanalyzer", 'N');
-        params = params.set("isMicroarray", 'N');
-        params = params.set("isNextGenSeq", 'N');
-        switch(frame) {
-            case "In last week": {
+        let params: HttpParams = new HttpParams()
+            .set("idLab", this.selectedLab ? this.selectedLab : "")
+            .set("allExperiments", 'Y')
+            .set("excludeClinicResearch", 'Y')
+            .set("isBioanalyzer", 'N')
+            .set("isMicroarray", 'N')
+            .set("isNextGenSeq", 'N')
+            .set("publicExperimentsInOtherGroups", 'Y')
+            .set("showCategory", 'N')
+            .set("showMyLabsAlways", 'N')
+            .set("showSamples", 'N');
+        switch (this.selectedTimeFrame) {
+            case this.TIME_FRAME_WEEK: {
                 params = params.set("lastWeek", 'Y');
                 break;
             }
-            case "month": {
+            case this.TIME_FRAME_MONTH: {
                 params = params.set("lastMonth", 'Y');
                 break;
             }
-            case "3 months": {
+            case this.TIME_FRAME_THREE_MONTH: {
                 params = params.set("lastThreeMonths", 'Y');
                 break;
             }
-            case "year": {
+            case this.TIME_FRAME_YEAR: {
                 params = params.set("lastYear", 'Y');
                 break;
             }
         }
-        params = params.set("publicExperimentsInOtherGroups", 'Y');
-        params = params.set("showCategory", 'N');
-        params = params.set("showMyLabsAlways", 'N');
-        params = params.set("showSamples", 'N');
         this.experimentsService.getProjectRequestList(params).subscribe((response:any) => {
             this.buildExperimentsTree(response);
-            this.experimentTreeModel = this.experimentTreeComponent.treeModel;
-
-            this.dialogService.stopAllSpinnerDialogs();
-            // this.showSpinner = false;
             setTimeout(() => {
-                this.expandChildNodes(this.experimentTreeModel);
-                if(this.gnomexService.orderInitObj){
-                    let id:string = "t" + this.gnomexService.orderInitObj.idTopic
-
-                }
+                this.expandChildNodes(this.dataTreeModel);
+                this.dialogService.removeSpinnerWorkItem();
             });
-            this.previousExpTimeFrame = frame;
-        },(err:IGnomexErrorResponse) =>{
+        },() =>{
             this.dialogService.stopAllSpinnerDialogs();
         });
     }
 
-    getAnalysis(idLab: string, frame: any) {
-        let params: HttpParams = new HttpParams();
+    private getAnalysis(): void {
+        this.dialogService.addSpinnerWorkItem();
 
-        params = params.set("allAnalysis", 'Y');
-        params = params.set("labkeys", '');
-        params = params.set("isBioanalyzer", 'N');
-        params = params.set("isMicroarray", 'N');
-        params = params.set("isNextGenSeq", 'N');
-        switch(frame) {
-            case "In last week": {
-                params = params.set("lastWeek", 'Y');
-                params = params.set("lastMonth", 'N');
-                params = params.set("lastThreeMonths", 'N');
-                params = params.set("lastYear", 'N');
+        this.searchText = "";
+
+        let params: HttpParams = new HttpParams()
+            .set("allAnalysis", 'Y')
+            .set("labkeys", '')
+            .set("isBioanalyzer", 'N')
+            .set("isMicroarray", 'N')
+            .set("isNextGenSeq", 'N')
+            .set("showMyLabsAlways", 'N')
+            .set("idLab", this.selectedLab ? this.selectedLab : "");
+        switch (this.selectedTimeFrame) {
+            case this.TIME_FRAME_WEEK: {
+                params = params.set("lastWeek", 'Y')
+                    .set("lastMonth", 'N')
+                    .set("lastThreeMonths", 'N')
+                    .set("lastYear", 'N');
                 break;
             }
-            case "month": {
-                params = params.set("lastWeek", 'N');
-                params = params.set("lastMonth", 'Y');
-                params = params.set("lastThreeMonths", 'N');
-                params = params.set("lastYear", 'N');
+            case this.TIME_FRAME_MONTH: {
+                params = params.set("lastWeek", 'N')
+                    .set("lastMonth", 'Y')
+                    .set("lastThreeMonths", 'N')
+                    .set("lastYear", 'N');
                 break;
             }
-            case "3 months": {
-                params = params.set("lastWeek", 'N');
-                params = params.set("lastMonth", 'N');
-                params = params.set("lastThreeMonths", 'Y');
-                params = params.set("lastYear", 'N');
+            case this.TIME_FRAME_THREE_MONTH: {
+                params = params.set("lastWeek", 'N')
+                    .set("lastMonth", 'N')
+                    .set("lastThreeMonths", 'Y')
+                    .set("lastYear", 'N');
                 break;
             }
-            case "year": {
-                params = params.set("lastWeek", 'N');
-                params = params.set("lastMonth", 'N');
-                params = params.set("lastThreeMonths", 'N');
-                params = params.set("lastYear", 'Y');
+            case this.TIME_FRAME_YEAR: {
+                params = params.set("lastWeek", 'N')
+                    .set("lastMonth", 'N')
+                    .set("lastThreeMonths", 'N')
+                    .set("lastYear", 'Y');
                 break;
             }
         }
-        params = params.set("showMyLabsAlways", 'N');
-        params = params.set("idLab", idLab);
 
-        this.analysisService.getAnalysisGroupList(params).subscribe(response => {
+        this.analysisService.getAnalysisGroupList(params).subscribe((response) => {
             this.buildAnalysisTree(response);
-
-            this.analysisTreeModel = this.analysisTreeComponent.treeModel;
-
-            this.dialogService.stopAllSpinnerDialogs();
-            // this.showSpinner = false;
             setTimeout(() => {
-                this.expandChildNodes(this.analysisTreeModel);
+                this.expandChildNodes(this.dataTreeModel);
+                this.dialogService.removeSpinnerWorkItem();
             });
-            this.previousAnalTimeFrame = frame;
-        },(err:IGnomexErrorResponse) =>{
+        },() =>{
             this.dialogService.stopAllSpinnerDialogs();
         });
     }
 
-    getDatatracks(idLab: string, idOrganism: string, idGenomeBuild: string ) {
+    private getDatatracks(): void {
+        this.dialogService.addSpinnerWorkItem();
+
+        this.searchText = "";
+
         let params: HttpParams = new HttpParams()
             .set("isVisibilityInstitute", 'Y')
             .set("isVisibilityPublic", 'Y')
             .set("isVisibilityOwner", 'Y')
             .set("isVisibilityMembers", 'Y')
-            .set("idOrganism", idOrganism)
-            .set("idGenomeBuild", idGenomeBuild)
-            .set("idLab", idLab);
-        if (!(params === this.previousURLParams)) {
-            this.datatrackService.getDataTrackList(params).subscribe(response => {
+            .set("idOrganism", this.selectedOrganism ? this.selectedOrganism : "")
+            .set("idGenomeBuild", this.selectedGenomeBuild ? this.selectedGenomeBuild : "")
+            .set("idLab", this.selectedLab ? this.selectedLab : "");
+        if (params !== this.previousURLParams) {
+            this.datatrackService.getDataTrackListFull(params).subscribe((response) => {
                 this.buildDatatracksTree(response);
-
-                this.datatrackTreeModel = this.datatrackTreeComponent.treeModel;
-                this.dialogService.stopAllSpinnerDialogs();
-                // this.showSpinner = false;
                 this.previousURLParams = params;
                 setTimeout(() => {
-                    this.expandChildNodes(this.datatrackTreeModel);
+                    this.expandChildNodes(this.dataTreeModel);
+                    this.dialogService.removeSpinnerWorkItem();
                 });
-            }, (err: IGnomexErrorResponse) =>{
+            }, () =>{
                 this.dialogService.stopAllSpinnerDialogs();
             });
         }
     }
 
-    doLinkData($event) {
+    public doLinkData(): void {
         this.linkDataView = true;
-        this.getExperiments("",'3 months');
+        this.getExperiments();
     }
 
-    onMoveExperimentNode($event) {
-    }
-
-    treeUpdateData($event) {
-
-    }
-
-    experimentTreeOnSelect($event) {
-
-    }
-
-    buildExperimentsTree(response: any[]) {
-        this.experimentLabs = [];
-        this.experimentCount = 0;
+    private buildExperimentsTree(response: any): void {
+        let items: any[] = [];
 
         if (response) {
-            if (!this.createSecurityAdvisorService.isArray(response)) {
-                this.experimentItems = [response];
-            } else {
-                this.experimentItems = response;
-            }
-            this.experimentLabs = this.experimentLabs.concat(this.experimentItems);
-            for (var lab of this.experimentItems) {
+            let labs: any[] = UtilService.getJsonArray(response.Lab, response.Lab);
+            for (let lab of labs) {
                 lab.id = "l" + lab.idLab;
                 lab.linkData = "link";
                 lab.parentid = -1;
-
-                lab.icon = "assets/group.png";
+                lab.icon = this.constantsService.ICON_GROUP;
                 // If there is a lab with no Project skip
                 if (lab.Project) {
-                    if (!this.createSecurityAdvisorService.isArray(lab.Project)) {
-                        lab.experimentItems = [lab.Project];
-                    } else {
-                        lab.experimentItems = lab.Project;
-                    }
-                    for (var project of lab.experimentItems) {
-                        project.icon = "assets/folder.png";
+                    items.push(lab);
+                    lab.experimentItems = UtilService.getJsonArray(lab.Project, lab.Project);
+                    for (let project of lab.experimentItems) {
+                        project.icon = this.constantsService.ICON_FOLDER;
                         project.labId = lab.labId;
                         project.linkData = "link";
                         project.id = "p" + project.idProject;
                         project.parentid = lab.id;
                         if (project.Request) {
-                            if (!this.createSecurityAdvisorService.isArray(project.Request)) {
-                                project.experimentItems = [project.Request];
-                            } else {
-                                project.experimentItems = project.Request;
-                            }
-                            for (var request of project.experimentItems) {
-                                if (request) {
-                                    if (request.label) {
-                                        request.label = request.requestNumber + '-' + request.name;
-                                        request.id = "r" + request.idRequest;
-                                        request.linkData = "link";
-                                        request.parentid = project.id;
-                                        this.experimentCount++;
-                                    }
+                            project.experimentItems = UtilService.getJsonArray(project.Request, project.Request);
+                            for (let request of project.experimentItems) {
+                                if (request && request.label) {
+                                    request.label = request.requestNumber + '-' + request.name;
+                                    request.id = "r" + request.idRequest;
+                                    request.linkData = "link";
+                                    request.parentid = project.id;
                                 }
                             }
                         }
                     }
                 }
             }
-        } else {
-            this.experimentItems = [];
         }
-        if (this.experimentTreeModel) {
-            this.experimentTreeModel.clearFilter();
+        this.dataTreeItems = items;
+
+        if (this.dataTreeModel) {
+            this.dataTreeModel.clearFilter();
         }
-        this.experimentLabel = " (" + this.experimentCount.toString() + " experiments)";
-    };
+    }
 
-    buildAnalysisTree(response: any) {
-        this.analysisCount = 0;
-        this.analysisLabs = [];
-        this.analysisItems = [].concat(null);
+    private buildAnalysisTree(response: any): void {
+        let items: any[] = [];
 
-        if (response){
-            if (!this.createSecurityAdvisorService.isArray(response)) {
-                this.analysisItems = [response];
-            } else {
-                this.analysisItems = response;
-            }
+        if (response) {
+            items = UtilService.getJsonArray(response, response);
+            let labs: any[] = [].concat(items);
 
-            this.analysisLabs = this.analysisLabs.concat(this.analysisItems);
-            this.analysisService.emitCreateAnalysisDataSubject({labs:this.analysisLabs,items:this.analysisItems});
-            for (var l of this.analysisItems) {
-                l.id = "l"+l.idLab;
+            this.analysisService.emitCreateAnalysisDataSubject({
+                labs: labs,
+                items: items,
+            });
+            for (let l of items) {
+                l.id = "l" + l.idLab;
                 l.parentid = -1;
                 l.linkData = "link";
 
-                l.icon = "assets/group.png";
+                l.icon = this.constantsService.ICON_GROUP;
 
                 if (l.AnalysisGroup) {
-                    if (!this.createSecurityAdvisorService.isArray(l.AnalysisGroup)) {
-                        l.analysisItems = [l.AnalysisGroup];
-                    } else {
-                        l.analysisItems = l.AnalysisGroup;
-                    }
-                    for (var p of l.analysisItems) {
-                        p.icon = "assets/folder.png";
+                    l.analysisItems = UtilService.getJsonArray(l.AnalysisGroup, l.AnalysisGroup);
+                    for (let p of l.analysisItems) {
+                        p.icon = this.constantsService.ICON_FOLDER;
                         p.idLab = l.idLab;
                         p.linkData = "link";
-                        p.id = "p"+p.idAnalysisGroup;
+                        p.id = "p" + p.idAnalysisGroup;
                         if (p.Analysis) {
-                            if (!this.createSecurityAdvisorService.isArray(p.Analysis)) {
-                                p.analysisItems = [p.Analysis];
-                            } else {
-                                p.analysisItems = p.Analysis;
-                            }
-                            for (var a of p.analysisItems) {
-                                if (a) {
-                                    if (a.label) {
-                                        this.analysisCount++;
-                                        var labelString: string = a.number;
-                                        labelString = labelString.concat(" (");
-                                        labelString = labelString.concat(a.label);
-                                        labelString = labelString.concat(")");
-                                        a.label = labelString;
-                                        a.id = "a"+a.idAnalysis;
-                                        a.linkData = "link";
-                                        a.icon = "assets/map.png";
-                                        a.parentid = p.idLab;
-                                    }
+                            p.analysisItems = UtilService.getJsonArray(p.Analysis, p.Analysis);
+                            for (let a of p.analysisItems) {
+                                if (a && a.label) {
+                                    a.label = a.number + " (" + a.label + ")";
+                                    a.id = "a" + a.idAnalysis;
+                                    a.linkData = "link";
+                                    a.icon = this.constantsService.ICON_ANALYSIS;
+                                    a.parentid = p.idLab;
                                 }
                             }
-
                         }
                     }
                 }
             }
-        } else {
-            this.analysisItems = [];
         }
-        if (this.analysisTreeModel) {
-            this.analysisTreeModel.clearFilter();
+        this.dataTreeItems = items;
+
+        if (this.dataTreeModel) {
+            this.dataTreeModel.clearFilter();
         }
-        this.analysisLabel = " (" + this.analysisCount.toString() + " analyses)";
+    }
 
-    };
-
-
-    /*
-Build the tree data
-@param
- */
-    buildDatatracksTree(response: any) {
-        this.datatracksCount = 0;
+    private buildDatatracksTree(response: any): void {
+        let items: any[] = [];
 
         if (response && response.Organism) {
-            this.datatrackItems = [].concat(null);
-            if (!this.createSecurityAdvisorService.isArray(response.Organism)) {
-                this.datatrackItems = [response.Organism];
-            } else {
-                this.datatrackItems = response.Organism;
-            }
-            for (var org of this.datatrackItems) {
+            items = UtilService.getJsonArray(response.Organism, response.Organism);
+            for (let org of items) {
                 org.id = "o" + org.idOrganism;
                 org.parentid = -1;
                 org.linkData = "link";
 
-                org.icon = "assets/organism.png";
+                org.icon = this.constantsService.ICON_ORGANISM;
                 if (org.GenomeBuild) {
-                    if (!this.createSecurityAdvisorService.isArray(org.GenomeBuild)) {
-                        org.datatrackItems = [org.GenomeBuild];
-                    } else {
-                        org.datatrackItems = org.GenomeBuild;
-                    }
-
-                    for (var gNomeBuild of org.datatrackItems) {
+                    org.datatrackItems = UtilService.getJsonArray(org.GenomeBuild, org.GenomeBuild);
+                    for (let gNomeBuild of org.datatrackItems) {
                         if (gNomeBuild) {
                             this.assignIconToGenomeBuild(gNomeBuild);
                             gNomeBuild.labId = org.labId;
                             gNomeBuild.id = "g" + gNomeBuild.idGenomeBuild;
                             gNomeBuild.linkData = "link";
                             gNomeBuild.parentid = org.id;
-                            if (gNomeBuild.DataTrack) {
-                                if (!this.createSecurityAdvisorService.isArray(gNomeBuild.DataTrack)) {
-                                    gNomeBuild.datatrackItems = [gNomeBuild.DataTrack];
-                                } else {
-                                    gNomeBuild.datatrackItems = gNomeBuild.DataTrack;
-                                }
-                                for (var dataTrack of gNomeBuild.datatrackItems) {
-                                    if (dataTrack) {
-                                        if (dataTrack.label) {
-                                            this.assignIconToDT(dataTrack);
-                                            dataTrack.parentid = gNomeBuild.id;
-                                            dataTrack.linkData = "link";
-                                        }
-                                    }
-                                }
-                            }
-                            if (gNomeBuild.DataTrackFolder) {
-                                this.addDataTracksFromFolder(gNomeBuild, gNomeBuild.datatrackItems);
-                            }
+                            this.addDataTracksRecursively(gNomeBuild);
                         }
                     }
                 }
             }
-        } else {
-            this.datatrackItems = [];
         }
-        if (this.datatrackTreeModel) {
-            this.datatrackTreeModel.clearFilter();
-        }
-        this.datatrackLabel = " (" + this.datatracksCount.toString() + " data tracks)";
-    };
+        this.dataTreeItems = items;
 
-    addDataTracksFromFolder(root, datatrackItems: any[]): any[] {
-        var dtItems: any[] = [];
-        if (!this.createSecurityAdvisorService.isArray(root.DataTrackFolder)) {
-            root.DataTrackFolder = [root.DataTrackFolder];
+        if (this.dataTreeModel) {
+            this.dataTreeModel.clearFilter();
         }
-        if (!datatrackItems) {
-            datatrackItems = [];
-        }
-
-        if (!this.createSecurityAdvisorService.isArray(datatrackItems)) {
-            datatrackItems = [datatrackItems];
-        }
-        for (var dtf of root.DataTrackFolder) {
-            this.assignIconToDTFolder(dtf);
-        }
-        dtItems = dtItems.concat(root.DataTrackFolder);
-        dtItems = dtItems.concat(datatrackItems);
-        root.datatrackItems = dtItems;
-
-        for (var dtf of root.datatrackItems) {
-
-            if (dtf.DataTrackFolder) {
-                this.assignIconToDTFolder(dtf);
-                this.addDataTracksFromFolder(dtf, dtf.DataTracks);
-            }
-            if (dtf.DataTrack) {
-                if (!this.createSecurityAdvisorService.isArray(dtf.DataTrack)) {
-                    dtf.DataTrack = [dtf.DataTrack];
-                }
-                for (var dt of dtf.DataTrack) {
-                    this.assignIconToDT(dt);
-                }
-                if (dtf.datatrackItems) {
-                    dtf.datatrackItems = dtf.datatrackItems.concat(dtf.DataTrack);
-                } else {
-                    dtf.datatrackItems = dtf.DataTrack;
-                }
-            }
-
-        }
-
-        return root;
     }
 
-    assignIconToGenomeBuild(genomeBuild: any): void {
+    private addDataTracksRecursively(root: any): void {
+        let dataTrackFolders: any[] = UtilService.getJsonArray(root.DataTrackFolder, root.DataTrackFolder);
+        for (let folder of dataTrackFolders) {
+            this.assignIconToDTFolder(folder);
+            this.addDataTracksRecursively(folder);
+        }
+
+        let dataTracks: any[] = UtilService.getJsonArray(root.DataTrack, root.DataTrack);
+        for (let dataTrack of dataTracks) {
+            if (dataTrack.label) {
+                this.assignIconToDT(dataTrack);
+                dataTrack.parentid = root.id;
+                dataTrack.linkData = "link";
+            }
+        }
+
+        root.datatrackItems = [].concat(dataTrackFolders).concat(dataTracks);
+    }
+
+    private assignIconToGenomeBuild(genomeBuild: any): void {
         if (genomeBuild.DataTrack || genomeBuild.DataTrackFolder) {
-            genomeBuild.icon = "assets/genome_build.png";
+            genomeBuild.icon = this.constantsService.ICON_GENOME_BUILD;
         } else {
-            genomeBuild.icon = "assets/genome_build_faded.png"
+            genomeBuild.icon = this.constantsService.ICON_GENOME_BUILD_FADED;
         }
         genomeBuild.isGenomeBuild = true;
     }
 
-    assignIconToDTFolder(dtf: any): void {
-        dtf.id = "df"+dtf.idDataTrackFolder;
+    private assignIconToDTFolder(dtf: any): void {
+        dtf.id = "df" + dtf.idDataTrackFolder;
         if (dtf.idLab) {
-            dtf.icon = "assets/folder_group.png";
+            dtf.icon = this.constantsService.ICON_FOLDER_GROUP;
         } else {
-            dtf.icon = "assets/folder.png";
+            dtf.icon = this.constantsService.ICON_FOLDER;
         }
         dtf.isDataTrackFolder = true;
     }
 
-    expandChildNodes(model: TreeModel) {
-        this.dialogService.startDefaultSpinnerDialog();
-        // this.showSpinner = true;
-        if (model) {
+    private expandChildNodes(model: TreeModel): void {
+        this.dialogService.addSpinnerWorkItem();
+        if (model && this.createSecurityAdvisorService.isSuperAdmin && model.roots) {
             if (this.createSecurityAdvisorService.isSuperAdmin) {
-                if (model.roots) {
-                    transaction(() => {
-                        // loop over the nodes recursively and call expand() on each one
-                        for (let node of model.roots) {
-                            node.expand();
-                            // let n = node;
-                            // while (n = n.getFirstChild()) {
-                            //     n.expand();
-                            // }
-                        }
-                    });
-                }
+                transaction(() => {
+                    for (let node of model.roots) {
+                        node.expand();
+                    }
+                });
             } else {
                 model.expandAll();
             }
         }
-        setTimeout(() => {
-            this.dialogService.stopAllSpinnerDialogs();
+        this.dialogService.removeSpinnerWorkItem();
+    }
+
+    private search(collapseIfNoFilter: boolean = false): void {
+        let searchTextLowercase: string = this.searchText.toLowerCase();
+        this.dataTreeModel.filterNodes((node: ITreeNode) => {
+            let show: boolean = node.data.label.toLowerCase().includes(searchTextLowercase);
+            node.data.isHidden = !show;
+            return show;
         });
-        // this.showSpinner = false;
-    }
-
-    searchExperiment() {
-        this.experimentTreeModel.filterNodes((node) => this.searchFn(node, this.experimentSearchText), true);
-    }
-
-    searchAnalysis() {
-        this.analysisTreeModel.filterNodes((node) => this.searchFn(node, this.analysisSearchText), true);
-    }
-
-    searchDatatrack() {
-        this.datatrackTreeModel.filterNodes((node) => this.searchFn(node, this.datatrackSearchText), true);
-        if (this.datatrackSearchText === "") {
-            this.datatrackTreeModel.collapseAll();
+        if (collapseIfNoFilter) {
+            this.dataTreeModel.collapseAll();
         }
+        this.updateCountLabel();
     }
 
-    searchFn(node: any, searchText: string): boolean {
-        if (node) {
-            if (node.data.label.indexOf(searchText) >= 0 ) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-
-    selectFrame(frame: string, mode: string) {
-        switch (mode) {
-            case "experiment": {
-                if (frame === this.previousExpTimeFrame) {
-                    this.selectedExpTimeFrame = '';
-                } else {
-                    this.dialogService.startDefaultSpinnerDialog();
-                    // this.showSpinner = true;
-                    this.getExperiments(this.experimentLab ? this.experimentLab.idLab : "", frame);
-                }
+    public onTimeFrameChange() {
+        switch (this.mode) {
+            case this.MODE_EXPERIMENT:
+                this.getExperiments();
                 break;
-            }
-            case "analysis": {
-                if (frame === this.previousAnalTimeFrame) {
-                    this.selectedAnalTimeFrame = '';
-                } else {
-                    this.dialogService.startDefaultSpinnerDialog();
-                    // this.showSpinner = true;
-                    this.getAnalysis(this.analysisLab ? this.analysisLab.idLab : "", frame);
-                }
+            case this.MODE_ANALYSIS:
+                this.getAnalysis();
                 break;
-            }
         }
     }
 
-    onExpRadioChange(event) {
-        if (event.value === this.previousExpTimeFrame) {
-            this.selectedExpTimeFrame = null;
-            this.getExperiments("", "");
-        }
+    ngOnDestroy(): void {
+        this.utilService.removeChangeDetectorRef(this.changeDetector);
+        UtilService.safelyUnsubscribe(this.topicListSubscription);
+        UtilService.safelyUnsubscribe(this.navInitSubscription);
+        this.gnomexService.navInitBrowseTopicSubject.next(null);
     }
 
-    onAnalRadioChange(event) {
-        if (event.value === this.previousAnalTimeFrame) {
-            this.selectedAnalTimeFrame = null;
-            this.getAnalysis("", "");
-        }
-    }
 }

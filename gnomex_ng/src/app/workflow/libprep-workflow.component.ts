@@ -40,12 +40,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             flex-grow:1;
             text-align:center
         }
-        #groupTabGroup ::ng-deep.mat-tab-label, ::ng-deep.mat-tab-label-active{
-            width: 25%;
-            min-width: 0;
-            padding: 3px;
-            margin: 3px;
-        }
+        
     `]
 })
 

@@ -108,7 +108,8 @@ public class DownloadAnalysisSingleFileServlet extends HttpServlet {
             secAdvisor = (SecurityAdvisor) req.getSession().getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY);
 
             if (secAdvisor != null) {
-                String mimeType = req.getSession().getServletContext().getMimeType(fileName);
+                String mimeSpoofName = DownloadSingleFileServlet.SpoofTxtFiles(fileName);
+                String mimeType = req.getSession().getServletContext().getMimeType(mimeSpoofName);
                 if (view.equals("Y") && mimeType != null) {
                     response.setContentType(mimeType);
                     response.setHeader("Content-Disposition", "filename=" + "\"" + fileName + "\"");

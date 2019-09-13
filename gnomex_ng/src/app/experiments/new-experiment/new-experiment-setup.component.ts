@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, Output} from "@angular/core";
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {MatDialog, MatDialogConfig} from "@angular/material";
 
@@ -23,6 +23,11 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 import {CreateProjectComponent} from "../create-project.component";
 import {ConstantsService} from "../../services/constants.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {
+    BillingTemplate,
+    BillingTemplateWindowComponent,
+    BillingTemplateWindowParams
+} from "../../util/billing-template-window.component";
 
 @Component({
     selector: "new-experiment-setup",
@@ -126,10 +131,14 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
             text-decoration: underline;
             color: blue
         }
+        
+        .margin-left {
+            margin-left: 2em;
+        }
     
     `]
 })
-export class NewExperimentSetupComponent implements OnDestroy {
+export class NewExperimentSetupComponent implements OnInit, OnDestroy {
 
     @Input("experiment") set experiment(value: Experiment) {
         this._experiment = value;
@@ -156,15 +165,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
                 return lab.canGuestSubmit === 'Y' || lab.canSubmitRequests === 'Y';
             });
 
-            this.form = this.formBuilder.group({
-                selectedCategory: ['', Validators.required],
-                selectLab:        ['', Validators.required],
-                selectName:       ['', Validators.required],
-                selectProject:    ['', Validators.required],
-                selectAccount:    ['', Validators.required],
-                experimentName:   [''],
-                description:      ["", Validators.maxLength(5000)]
-            });
+            this.prepareForm();
 
             this.filteredProjectList = this.gnomexService.projectList;
             this.checkSecurity();
@@ -262,16 +263,10 @@ export class NewExperimentSetupComponent implements OnDestroy {
         if (this.authorizedBillingAccounts
             && Array.isArray(this.authorizedBillingAccounts)
             && this.authorizedBillingAccounts.length === 1
-            && this.form.get("selectAccount")
+            && this.form
             && (this._showBilling_previousValue === false && newValue === true)) {
 
-            this.form.get("selectAccount").setValue(this.authorizedBillingAccounts[0]);
-
-            // These spoofedEvents are needed in places where the field is assigned a
-            // default value, because (selectionChanged) does not pick up changes to the
-            // form value.
-            let spoofedEvent = this.authorizedBillingAccounts[0];
-            this.onBillingSelection(spoofedEvent);
+            this.updateBilling(this.authorizedBillingAccounts[0], null);
         }
 
         this._showBilling_previousValue = newValue;
@@ -279,10 +274,7 @@ export class NewExperimentSetupComponent implements OnDestroy {
         return newValue;
     }
     public get showProject(): boolean {
-        return this.showBilling
-            && this.form
-            && this.form.get('selectAccount')
-            && this.form.get('selectAccount').valid;
+        return this.showBilling && this.form && this.form.get("billingSelected").value;
     }
     public get showExperimentName(): boolean {
         return this.showProject;
@@ -305,18 +297,36 @@ export class NewExperimentSetupComponent implements OnDestroy {
                 private propertyService: PropertyService,
                 public prefService: UserPreferencesService,
                 private constService: ConstantsService) {
+    }
 
+    ngOnInit(): void {
+        this.prepareForm();
+    }
+
+    private prepareForm(): void {
         this.form = this.formBuilder.group({
-            selectedCategory: ['', Validators.required],
-            selectLab:        ['', Validators.required],
-            selectName:       ['', Validators.required],
-            selectProject:    ['', Validators.required],
-            selectAccount:    ['', Validators.required],
-            experimentName:   [''],
-            description:      ["", Validators.maxLength(5000)]
+            selectedCategory:       ['', Validators.required],
+            selectLab:              ['', Validators.required],
+            selectName:             ['', Validators.required],
+            selectProject:          ['', Validators.required],
+            selectAccount:          [null],
+            selectBillingTemplate:  [null],
+            billingSelected:        [false, Validators.requiredTrue],
+            experimentName:         [''],
+            description:            ["", Validators.maxLength(5000)]
         });
     }
 
+    private updateBilling(selectedAccount: any, selectedTemplate: BillingTemplate): void {
+        this.form.get("selectAccount").setValue(selectedAccount);
+        this.form.get("selectBillingTemplate").setValue(selectedTemplate);
+        this.form.get("billingSelected").setValue(!!(selectedAccount || selectedTemplate));
+
+        if (this._experiment) {
+            this._experiment.billingAccount = selectedAccount;
+            this._experiment.billingTemplate = selectedTemplate;
+        }
+    }
 
     ngOnDestroy() {
         if (this.submittersSubscription) {
@@ -339,15 +349,14 @@ export class NewExperimentSetupComponent implements OnDestroy {
             if (this.form.get("selectProject")) {
                 this.form.get("selectProject").setValue(null);
             }
-            if (this.form.get("selectAccount")) {
-                this.form.get("selectAccount").setValue(null);
-            }
             if (this.form.get("experimentName")) {
                 this.form.get("experimentName").setValue(null);
             }
             if (this.form.get("description")) {
                 this.form.get("description").setValue(null);
             }
+
+            this.updateBilling(null, null);
         }
 
         this.requestCategories = [];
@@ -610,12 +619,8 @@ export class NewExperimentSetupComponent implements OnDestroy {
         }
     }
 
-    public onBillingSelection(event: any): void {
-        if (!event) {
-            return;
-        }
-
-        setTimeout(() => { this._experiment.billingAccount = this.form.get("selectAccount").value; });
+    public onBillingAccountSelection(event: any): void {
+        this.updateBilling(event, null);
     }
 
     public onProjectSelection(event: any): void {
@@ -663,7 +668,26 @@ export class NewExperimentSetupComponent implements OnDestroy {
     }
 
     public onClickSplitBilling(): void {
-        //TODO: create dialog
+        let params: BillingTemplateWindowParams = new BillingTemplateWindowParams();
+        params.idCoreFacility = this._experiment.idCoreFacility;
+        if (this._experiment.billingTemplate) {
+            params.billingTemplate = this._experiment.billingTemplate;
+        }
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.autoFocus = false;
+        config.data = {
+            params: params
+        };
+
+        this.dialogService.genericDialogContainer(BillingTemplateWindowComponent, "Billing Template", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "promptToSave"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"},
+                ]}).subscribe((result: any) => {
+            if (result) {
+                this.updateBilling(null, result);
+            }
+        });
     }
 
     public onClickEditProject(): void {

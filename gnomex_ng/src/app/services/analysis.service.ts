@@ -7,6 +7,7 @@ import {catchError, map} from "rxjs/operators";
 import {AbstractControl, FormGroup} from "@angular/forms";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {IAnalysisFile} from "../util/interfaces/analysis-file.model";
 
 @Injectable()
 export class AnalysisService {
@@ -253,4 +254,11 @@ export class AnalysisService {
         return this.editMode.getValue();
     }
 
+    public getAnalysisFilesToDistribute(idAnalysis:string) :Observable<any> {
+        let params: HttpParams = new HttpParams()
+            .set("idAnalysis", idAnalysis);
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.get<any>("/gnomex/GetAnalysisFilesToDistribute.gx", {headers: headers,params: params})
+    }
 }

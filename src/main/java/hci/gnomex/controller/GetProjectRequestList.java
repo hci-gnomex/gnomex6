@@ -335,7 +335,12 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
   }
 
   private void addLabNode(Object[] row) {
-    String labName = Util.formatLabDisplayName((String)row[18], (String)row[17], this.getUserPreferences());
+		String labName = "";
+  	if(row[4] == null) {
+			labName = Util.formatLabDisplayName((String)row[21], (String)row[20], this.getUserPreferences());
+		} else {
+			labName = Util.formatLabDisplayName((String)row[18], (String)row[17], this.getUserPreferences());
+		}
     String projectLabName = Lab.formatLabNameFirstLast((String)row[21], (String)row[20]);
 
     labNode = new Element("Lab");
@@ -362,8 +367,8 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
     projectNode.setAttribute("projectName",            row[1] == null ? ""  : (String)row[1]);
     projectNode.setAttribute("label",                  row[1] == null ? ""  : (String)row[1]);
     projectNode.setAttribute("projectDescription",     row[2] == null ? ""  : (String)row[2]);
-    projectNode.setAttribute("ownerFirstName",         row[26] == null ? "" : (String)row[26]);
-    projectNode.setAttribute("ownerLastName",          row[27] == null ? "" : (String)row[27]);
+    projectNode.setAttribute("ownerFirstName",         row[24] == null ? "" : (String)row[24]);
+    projectNode.setAttribute("ownerLastName",          row[25] == null ? "" : (String)row[25]);
 
 
 

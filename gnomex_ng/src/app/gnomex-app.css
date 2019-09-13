@@ -92,6 +92,10 @@ mat-form-field.short-input {
     width: 10em;
 }
 
+.mat-input-element:disabled {
+    color: black !important;
+}
+
 mat-tooltip-component {
     white-space: pre-line;
 }
@@ -399,11 +403,6 @@ img.tree-node-icon {
     padding-right: 0.6em;
 }
 
-/* minimum-nonzero-height-ignored is necessary to keep the angular tree from overflowing its bounds for some reason */
-.minimum-nonzero-height-ignored {
-    height: 1px;
-}
-
 .warningLabelMinor {
     color: #17871C;
     fontWeight: normal;
@@ -417,6 +416,8 @@ img.tree-node-icon {
 
 button.mat-button.minimize {
     min-width: 0;
+    width: auto;
+    height: auto;
     line-height: 1rem;
     padding: 0.3em;
 }
@@ -426,12 +427,13 @@ button.mat-button.minimize span {
     padding: 0.3em;
 }
 
-.border-subtle {
-    border: 1px solid #EEEEEE;
+.background-border {
+    border-radius: 0.3em;
+    border: 1px solid darkgrey;
 }
 
-button.mat-button.minimize {
-    min-width: 0;
+.border-subtle {
+    border: 1px solid #EEEEEE;
 }
 
 button.mat-button.minimize span {

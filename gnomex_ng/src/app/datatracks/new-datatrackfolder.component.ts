@@ -58,6 +58,12 @@ export class NewDataTrackFolderComponent extends BaseGenericContainerDialog impl
         });
         this.labListService.getSubmitRequestLabList().subscribe((response: any[]) => {
             this.labList = response.sort(this.prefService.createLabDisplaySortFunction());
+            if(this.selectedItem.data.idLab) {
+                let lab = this.labList.filter(lab => {return lab.idLab === this.selectedItem.data.idLab; });
+                if(lab.length === 1) {
+                    this.form.get("idLab").setValue(lab[0].idLab);
+                }
+            }
         });
 
         this.primaryDisable = () => {

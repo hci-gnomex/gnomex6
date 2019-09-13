@@ -96,7 +96,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                 }
             }
 
-            let cloneNodes = FileService.getFileNodesToMove(fromTree);
+            let cloneNodes = UtilService.getFileNodesToMove(fromTree);
 
             if(to.parent.data.FileDescriptor){
                 to.parent.data.FileDescriptor.push(...cloneNodes);
@@ -119,7 +119,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                    TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event);
                 } else if($event.shiftKey){
                     TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event);
-                    FileService.makeShiftSelection(tree,node);
+                    UtilService.makeShiftSelection(tree,node);
                 }else{
                     TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
                 }
@@ -585,6 +585,8 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         }else{
             params = this.makeParams( "idRequest", this.data.id.idRequest);
         }
+        this.organizeSelectedNode = null;
+
         this.formGroup.get("organizeFileParams").setValue(params);
         this.removedChildren.clear();
     }

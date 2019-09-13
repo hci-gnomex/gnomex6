@@ -1,7 +1,7 @@
 import {ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {ConstantsService} from "../services/constants.service";
-import {ITreeOptions, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
+import {ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
 import {PropertyService} from "../services/property.service";
 import {FileService} from "../services/file.service";
 import {Observable} from "rxjs";
@@ -147,7 +147,22 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
             allowDrop: true,
             actionMapping: {
                 mouse: {
+                    click: (tree:TreeModel, node, $event) => {
+                        if($event.ctrlKey) {
+                            TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event);
+                        } else if($event.shiftKey){
+                            TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event);
+                            UtilService.makeShiftSelection(tree,node);
+                        }else{
+                            TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
+                        }
+                    },
                     drop: this.moveNode,
+                    dragStart : (tree:TreeModel, node, $event) => {
+                        if(!node.isActive){
+                            TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event)
+                        }
+                    }
                 },
             },
         };
@@ -275,21 +290,27 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     }
 
     private moveNode: (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => void = (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => {
-        let file: any = from.data;
 
         // File selected to be downloaded
-        if (tree === this.filesToDownloadTreeComponent.treeModel && (file.isSelected === 'N' || !this.isFullySelected(file))) {
-            this.selectFilesRecursively(file, 'Y');
-            let n: TreeNode = from;
-            while (n) {
-                n.data.isSelected = 'Y';
-                n = n.parent;
+        if (tree === this.filesToDownloadTreeComponent.treeModel) {
+            let files : TreeNode[] = from.treeModel.getActiveNodes();
+            for(let file of files ){
+                this.selectFilesRecursively(file.data, 'Y');
+                let n: TreeNode = from;
+                while (n) {
+                    n.data.isSelected = 'Y';
+                    n = n.parent;
+                }
             }
             this.updateFilesToDownloadTree();
+
         }
         // File de-selected to be downloaded
-        else if (tree === this.availableFilesTreeComponent.treeModel && file.isSelected === 'Y') {
-            this.selectFilesRecursively(file, 'N');
+        else if (tree === this.availableFilesTreeComponent.treeModel) {
+            let files : TreeNode[] = from.treeModel.getActiveNodes();
+            for(let file of files){
+                this.selectFilesRecursively(file.data, 'N');
+            }
             this.updateFilesToDownloadTree();
         }
     };

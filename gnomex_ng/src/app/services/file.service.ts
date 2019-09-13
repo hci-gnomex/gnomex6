@@ -1,5 +1,5 @@
 import {Inject, Injectable} from "@angular/core";
-import {forkJoin, Observable, of, throwError} from "rxjs";
+import {BehaviorSubject, forkJoin, Observable, of, throwError} from "rxjs";
 import {Subject} from "rxjs";
 import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
@@ -17,6 +17,7 @@ import * as _ from "lodash";
 export class FileService {
     public analysisGroupList: any[];
     private organizeFilesSubject: Subject<any> = new Subject();
+    private cachedOrganizeFilesSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
     private linkedSampleFilesSubject: Subject<any> = new Subject();
     private manageFileSaveSubject: Subject<any> = new Subject();
     private manageFileForm: FormGroup = new FormGroup({});
@@ -85,6 +86,12 @@ export class FileService {
         return this.httpClient.get(call);
     }
 
+    emitCachedAnalysisOrganizeFiles(data:any):void{
+        this.cachedOrganizeFilesSubject.next(data);
+    }
+    cachedAnalysisOrganizeFiles():BehaviorSubject<any>{
+        return this.cachedOrganizeFilesSubject;
+    }
 
     emitGetAnalysisOrganizeFiles(params: any): void {
         this.organizeFilesSubject.next(params);
@@ -377,111 +384,4 @@ export class FileService {
 
     }
 
-    public static getFileNodesToDrag(tree: TreeModel): Set<TreeNode> {
-        let nodes: Set<TreeNode> = new Set<TreeNode>();
-
-        // All selected nodes, may have redundant info (e.g. parent and its children selected too)
-        for (let activeNode of tree.activeNodes) {
-            let parentAlreadyInSet: boolean = false;
-            let descendentsAlreadyInSet: any[] = [];
-            for (let nodeInSet of nodes) {
-                // Child node selected after parent node
-                if (activeNode.isDescendantOf(nodeInSet)) {
-                    parentAlreadyInSet = true;
-                    break;
-                }
-                // Parent node selected after children nodes
-                if (nodeInSet.isDescendantOf(activeNode)) {
-                    descendentsAlreadyInSet.push(nodeInSet);
-                }
-            }
-            if (parentAlreadyInSet) {
-                continue;
-            }
-            for (let descendent of descendentsAlreadyInSet) {
-                nodes.delete(descendent);
-            }
-            nodes.add(activeNode);
-        }
-
-        return nodes;
-    }
-
-    private static recursePurgeDuplicateNodes(node:TreeNode, filterNodesToMove:Set<TreeNode>){
-        if(filterNodesToMove.has(node)){
-            filterNodesToMove.delete(node);
-        }
-        if(node.isLeaf){
-            return;
-        }else{
-            for(let n of node.children){
-                FileService.recursePurgeDuplicateNodes(n,filterNodesToMove);
-            }
-        }
-
-    }
-    private static purgeDuplicateNodes(nodes:TreeNode[], filterNodesToMove){
-        // we need to skip top level node go to immediate children and recurse them
-        for(let n of nodes){
-            FileService.recursePurgeDuplicateNodes(n,filterNodesToMove );
-        }
-
-    }
-
-
-    public static getFileNodesToMove(tree: TreeModel){
-        let toOrderNodes: TreeNode[]  = tree.getActiveNodes();
-        let copyNodesToMove: TreeNode[] = [];
-        toOrderNodes.sort((a,b) => {
-            return b.level - a.level ;
-        });
-
-        let filterNodesToMove: Set<TreeNode> = new Set<TreeNode>(toOrderNodes);
-        for(let n of toOrderNodes ){
-            if(!n.isLeaf){
-                this.purgeDuplicateNodes(n.children,filterNodesToMove);
-            }
-
-        }
-
-        for(let n of filterNodesToMove){
-            copyNodesToMove.push(_.cloneDeep(n.data));
-        }
-
-        return copyNodesToMove;
-
-
-    }
-
-    private static activateNodes(startNode:TreeNode, targetNode:TreeNode){
-        let currentNode = startNode;
-        while(currentNode !== targetNode){
-            //let a1 = performance.now();
-            // calling set active is a taxing process
-            currentNode.setIsActive(true, true );
-            //let a2 = performance.now();
-
-            currentNode = currentNode.findNextNode(true);
-            //console.log("diff for set active " +  (a2 - a1) )
-        }
-
-    }
-
-
-    public static makeShiftSelection(tree: TreeModel, shiftNode:TreeNode) {
-        let clickedNode: TreeNode = tree.getActiveNode();
-        let targetNode: TreeNode = null;
-        let startNode: TreeNode = null;
-
-        if(clickedNode.position - shiftNode.position < 0 ){
-            startNode = clickedNode;
-            targetNode = shiftNode;
-        }else{
-            startNode = shiftNode;
-            targetNode = clickedNode;
-        }
-
-        FileService.activateNodes(startNode,targetNode)
-
-    }
 }

@@ -1,5 +1,5 @@
-import {Component, OnDestroy, OnInit} from "@angular/core";
-import {FormGroup,FormBuilder,Validators } from "@angular/forms"
+import {Component, Input, OnDestroy, OnInit} from "@angular/core";
+import {FormGroup, FormBuilder, Validators } from "@angular/forms"
 import {DataTrackService} from "../../services/data-track.service";
 import {ActivatedRoute} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
@@ -17,14 +17,12 @@ import {UtilService} from "../../services/util.service";
     templateUrl:'./datatracks-visibility-tab.component.html',
     styles: [`
         .flexbox-column{
-
             display:flex;
             flex-direction:column;
             height:100%;
             width:100%;
 
         }
-
     `]
 })
 export class DatatracksVisibilityTabComponent implements OnInit, OnDestroy{
@@ -38,14 +36,27 @@ export class DatatracksVisibilityTabComponent implements OnInit, OnDestroy{
     private possibleCollaborators:Array<any> = [];
     public selectMode:string = "Select All";
     public isSelectable: boolean = true;
+    private _disabled: boolean = false;
     private lab: any;
 
+    @Input()
+    set disabled(value: boolean) {
+        this._disabled = value;
+        if (this.visibilityForm) {
+            if (this._disabled) {
+                this.visibilityForm.disable();
+            } else {
+                this.visibilityForm.enable();
+            }
+        }
+    }
 
-    constructor(protected fb: FormBuilder,private dtService: DataTrackService,
-                private route: ActivatedRoute,private secAdvisor: CreateSecurityAdvisorService,
+
+    constructor(protected fb: FormBuilder, private dtService: DataTrackService,
+                private route: ActivatedRoute, private secAdvisor: CreateSecurityAdvisorService,
                 private propertyService: PropertyService, private constService: ConstantsService,
-                private gnomexService:GnomexService, private getLabService : GetLabService,
-                public prefService: UserPreferencesService){
+                private gnomexService: GnomexService, private getLabService : GetLabService,
+                public prefService: UserPreferencesService) {
     }
 
     ngOnInit():void{ // Note this hook runs once if route changes to another folder you don't recreate component
@@ -105,6 +116,12 @@ export class DatatracksVisibilityTabComponent implements OnInit, OnDestroy{
                 this.updateCollaborators();
             }
 
+            this.visibilityForm.markAsPristine();
+            if (this._disabled) {
+                this.visibilityForm.disable();
+            } else {
+                this.visibilityForm.enable();
+            }
 
         });
 
