@@ -237,45 +237,6 @@
                 </div>
             </div>
         </div>
-        <div *ngIf="!!libraryPreparedBy" class="field-width flex-container-row padded">
-            <div class="label">
-                Library Prep Completed by :
-            </div>
-            <div class="label padded-left allow-line-breaks">
-                {{ libraryPreparedBy }}
-            </div>
-        </div>
-        <div *ngIf="_experiment?.reagent" class="field-width flex-container-row align-center padded">
-            <div class="label label-width">
-                Sample Reagent
-            </div>
-            <div class="flex-grow">
-                {{ _experiment?.reagent }}
-            </div>
-        </div>
-        <div *ngIf="_experiment?.elutionBuffer" class="field-width flex-container-row align-center padded">
-            <div class="label label-width">
-                Elution Buffer
-            </div>
-            <div class="flex-grow">
-                {{ _experiment?.elutionBuffer }}
-            </div>
-        </div>
-        <div *ngIf="_experiment?.usedDnase === 'Y'" class="field-width flex-container-row align-center padded">
-            <div class="label">
-                Samples were treated with DNase
-            </div>
-        </div>
-        <div *ngIf="_experiment?.usedRnase === 'Y'" class="field-width flex-container-row align-center padded">
-            <div class="label">
-                Samples were treated with RNase
-            </div>
-        </div>
-        <div *ngIf="_experiment?.keepSamples" class="field-width flex-container-row align-center padded">
-            <div class="label">
-                {{ _experiment?.keepSamples === 'Y' ? 'Lab has requested to pick up samples' : 'Lab has declined to pick up samples' }}
-            </div>
-        </div>
     </div>
 </div>
 </form>
