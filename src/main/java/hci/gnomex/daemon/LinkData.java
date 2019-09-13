@@ -4,6 +4,7 @@ package hci.gnomex.daemon;
 // 01/30/2019   tim     fix hardwired 2018 year
 
 
+import hci.gnomex.daemon.auto_import.Differ;
 import hci.gnomex.utility.BatchDataSource;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
@@ -55,8 +56,7 @@ public class LinkData extends TimerTask {
 
     private String regex;
     private boolean linkFolder= false;
-
-
+    private List<Integer> captureGroupIndexes = new ArrayList<>();
     private String errorMessageString = "Error in LinkData";
 
 
@@ -96,9 +96,24 @@ public class LinkData extends TimerTask {
                 break;
             }else if( args[i].equals("-regex")){
                 regex = args[++i];
-            }else if( args[i].equals("-linkfolder")){
+            }else if(args[i].equals("-cp")){
+                i++;
+              while(args[i].charAt(0) != '-'){
+                  captureGroupIndexes.add(Integer.parseInt(args[i]));
+                  i++;
+              }
+              if(captureGroupIndexes.size() == 0){
+                  System.out.println("If you want to specify which capture groups. You need to provide atleast one index");
+                  System.exit(1);
+              }
+
+            } else if( args[i].equals("-linkfolder")){
                 linkFolder = true;
             }
+        }
+        // default is just capture group(1);
+        if(regex != null && captureGroupIndexes.size() == 0){
+            captureGroupIndexes.add(1);
         }
     }
 
@@ -241,9 +256,8 @@ public class LinkData extends TimerTask {
                 p = Pattern.compile(regex);
                 for (int i = 0; i < names.size(); i++) {
                     Matcher m = p.matcher(names.get(i));
-                    if (m.matches()) {
-                        regexNames.add(m.group(1));
-                    }
+                    String name = Differ.getNameByExistingCaptureGroup(captureGroupIndexes, m);
+                    regexNames.add(name);
                 }
                 names = regexNames;
             }
@@ -257,7 +271,7 @@ public class LinkData extends TimerTask {
                 stmt = con.createStatement();
 
                 StringBuilder buf1 = new StringBuilder("select filename from ExperimentFile where filename like '");
-                buf1.append(dataType + "%" + theName + "%';");
+                buf1.append(dataType + "%" + theName + "%';"); // case insensitive
                 if (debug) System.out.println("ExperimentFile query: " + buf1.toString());
 
                 List<String> pathnames = new ArrayList<String>();

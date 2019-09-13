@@ -346,7 +346,6 @@ public class LinkFastqData extends TimerTask {
                             if (debug) System.out.println("filename: " + filename);
                         }else{
                             File dummyFile = new File(pathToRealData);
-                            pathToRealData = dummyFile.getParent();
                             filename = dummyFile.getParentFile().getName();
                             try{
                                 int personID = Integer.parseInt(filename);
@@ -382,11 +381,11 @@ public class LinkFastqData extends TimerTask {
                         if (debug)
                             System.out.println("[LinkFastqData] right before makeSoftLinks, target: " + target.getCanonicalPath() + "\n\t\t\t\t linkName: " + linkName);
 
-//                        boolean ok = makeSoftLinks(target, linkName, subCommand);
-//                        if (!ok) {
-//                            System.out.println("makeSoftLinks failed!");
-//                            System.exit(2);
-//                        }
+                        boolean ok = makeSoftLinks(target, linkName, subCommand);
+                        if (!ok) {
+                            System.out.println("makeSoftLinks failed!");
+                            System.exit(2);
+                        }
                     } // end of inner while  (paths)                                                                    // end of fileNames while
 
                 } // end of while for requests                                                                          // end of idrequest while

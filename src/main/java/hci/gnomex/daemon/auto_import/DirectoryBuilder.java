@@ -24,6 +24,7 @@ public class DirectoryBuilder {
 	private String mode;
 	private String accountForFilesMoved;
 	private Set<String> fileTypeCategorySet;
+	private boolean addWrapperFolder = false;
 
 
 
@@ -61,8 +62,9 @@ public class DirectoryBuilder {
 				this.skip = true;
 			}else if(args[i].equals("-mode")) {
 				this.mode = args[++i];
-			}
-			else if (args[i].equals("-help")) {
+			}else if(args[i].equals("-linkfolder")){
+				addWrapperFolder = true;
+			} else if (args[i].equals("-help")) {
 				//printUsage();
 				System.exit(0);
 			}
@@ -242,89 +244,23 @@ public class DirectoryBuilder {
 		try {
 
 			localFiles = this.readFile(this.inFileName);
-
 			boolean test = new File(this.currentDownloadLocation + "Flagged").mkdir();
 
-			//readPathInfo(this.pathCreatorInfo);
-
-			/*if(mode.equals("avatar")) {
-				for(String lf: localFiles) {
-					StringBuilder strBuild = new StringBuilder(File.separator);
-
-					String pattern = Pattern.quote(System.getProperty("file.separator"));
-					String[] pathChunks = lf.split(pattern);
-
-					boolean foundPath = false;
-
-					for(int i = 0; i < pathChunks.length; i++) {
-						if (pathChunks[i].equals(DirectoryBuilder.WHOLE_EXOME)) {
-							strBuild.append(DirectoryBuilder.DNA_ALIAS);
-							strBuild.append(File.separator);
-
-							if(pathChunks[i+1].equals(DirectoryBuilder.FASTQ)) {
-								strBuild.append(DirectoryBuilder.FASTQ_ALIAS);
-							}else {
-								strBuild.append(pathChunks[i+1]);
-							}
-							strBuild.append(File.separator);
-							foundPath = true;
-							break;
-						}
-						else if(pathChunks[i].equals(DirectoryBuilder.RNAseq)){
-							strBuild.append(DirectoryBuilder.RNA_ALIAS);
-							strBuild.append("/");
-							if(pathChunks[i+1].equals(DirectoryBuilder.FASTQ)) {
-								strBuild.append(DirectoryBuilder.FASTQ_ALIAS);
-
-							}else {
-								strBuild.append(pathChunks[i+1]);
-							}
-							strBuild.append(File.separator);
-							foundPath = true;
-							break;
-						}
-					}
-
-					if(foundPath) {
-
-						if(!filterOutFlaggedIDs(pathChunks[pathChunks.length - 1], flaggedIDList)) {
-							pathToCreate.add(this.root + strBuild.toString());
-							filesWithPaths.add(this.root + strBuild.toString() + pathChunks[pathChunks.length - 1]);
-						}else {
-							filteredFiles.add(this.currentDownloadLocation + "Flagged"+File.separator + pathChunks[pathChunks.length - 1] );
-						}
-
-					}
-
-
-				}
-
-				for(String p: pathToCreate ) {
-					boolean made = new File(p).mkdirs();
-				}
-
-			}*/
 			preparePath(flaggedIDList,filteredFiles, localFiles,filesWithPaths );
+
+
+			this.moveTheFiles(filteredFiles, new ArrayList<>()); // These files we want to move into the flagged folder
+			// for tempus anything doesn't get flagged explicitly  but it doesn't get moved is still considered flagged
+			if(mode.equals("tempus")){
+				this.moveTheFiles(filesWithPaths, Arrays.asList("echo move left over files to Flagged",
+						"mv -t " + this.currentDownloadLocation + "Flagged" +" " + currentDownloadLocation +"*"));
+			}
 
 
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
-			e.printStackTrace();
-			System.exit(1);
-
-		}
-
-		try{
-			this.moveTheFiles(filteredFiles, new ArrayList<>()); // These files we want to move into the flagged folder
-
-			// for tempus anything doesn't get flagged explicitly  but it doesn't get moved is still considered flagged
-			this.moveTheFiles(filesWithPaths, Arrays.asList("echo move left over files to Flagged",
-					"mv -t " + this.currentDownloadLocation + "Flagged" +" " + currentDownloadLocation +"*"));
-
-		}catch(Exception e){
-			System.out.println("Moving files failed");
 			e.printStackTrace();
 			System.exit(1);
 
@@ -394,7 +330,9 @@ public class DirectoryBuilder {
 			String finalPath = strBuild.toString();
 
 			if(new File(finalPath).exists() && !finalPath.equals(root)) {
-				if(appendDirPersonID(fileName,strBuild)){
+				if(addWrapperFolder &&  appendDirPersonID(fileName,strBuild)){
+					filesWithPaths.add(strBuild.append(File.separator).append(file).toString());
+				}else if(!addWrapperFolder){
 					filesWithPaths.add(strBuild.append(File.separator).append(file).toString());
 				}
 			}else {

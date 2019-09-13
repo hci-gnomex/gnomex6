@@ -17,8 +17,7 @@ public class FileMover {
 		}else {
 
 			db.preparePath();
-			//db.moveTheFiles(filesToMove);
-			//db.reportWorkSummary();
+			db.reportWorkSummary();
 		}
 
 	}
