@@ -14,14 +14,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -35,6 +28,7 @@ public class LinkFastqData extends TimerTask {
     private static int fONE_DAY = 1;
     private static int wakeupHour = 2; // Default wakupHour is 2 am
     private static int fZERO_MINUTES = 0;
+    private HashMap<String, List<String>> fileExtensionMap;
 
     private BatchDataSource dataSource;
     private Session sess;
@@ -62,6 +56,7 @@ public class LinkFastqData extends TimerTask {
 
     private String errorMessageString = "Error in LinkFastqData";
     public int currentYear= 2019;
+    private boolean linkFolder = false;
 
     // NOTE: -analysis must be the last argument
     public LinkFastqData(String[] args) {
@@ -72,6 +67,8 @@ public class LinkFastqData extends TimerTask {
             if (i >= args.length) {
                 break;
             }
+            args[i] = args[i].toLowerCase();
+
             if (args[i].equals("-debug")) {
                 debug = true;
             } else if (args[i].equals("-analysis")) {
@@ -88,8 +85,15 @@ public class LinkFastqData extends TimerTask {
                 }
 
                 break;
+            }else if(args[i].equals("-linkfolder")){
+                linkFolder = true;
             }
         }
+        fileExtensionMap = new HashMap<String, List<String>>();
+        fileExtensionMap.put("avatar", Arrays.asList("fastq") );
+        fileExtensionMap.put("foundation", Arrays.asList("deident.xml") );
+        fileExtensionMap.put("tempus", Arrays.asList("deident.json", "fastq"));
+
     }
 
     /**
@@ -188,11 +192,9 @@ public class LinkFastqData extends TimerTask {
         // deal with each analysis
         int nxtOne = -1;
         String idAnalysis = null;
-        int mode = 2;
 
         while (nxtOne + 1 < nxtAnalysis) {                                                                                // top (idAnalysis) while
             nxtOne++;
-            mode = 2;
 
             idAnalysis = analysisList[nxtOne];
             System.out.println("[LinkFastqData] processing analysis: " + idAnalysis + " nxtOne: " + nxtOne);
@@ -239,11 +241,13 @@ public class LinkFastqData extends TimerTask {
                     System.out.println("ERROR: getTopDirectory returned null for directory name!");
                     continue;
                 }
-
-                // if it doesn't have avatar then we only look for xml files
-                if (theDirectories[1].contains("Avatar")) {
-                    mode = 1;
+                String vendorType = "";
+                if(theDirectories[1].split("_").length > 1){
+                    vendorType = theDirectories[1].split("_")[1].toLowerCase();
+                }else{
+                    throw new Exception("can't find the vendor type");
                 }
+
 
                 String baseFilePath = theDirectories[0];
                 if (baseFilePath == null) {
@@ -265,7 +269,7 @@ public class LinkFastqData extends TimerTask {
                     System.out.println("topDirectoryData: " + topDirectoryData);
                     System.out.println("baseFilePath: " + baseFilePath);
                 }
-//xxxxxxxxxxxxxxxxx
+                //xxxxxxxxxxxxxxxxx
 
                 List<String> idRequests = getIdRequest(theName, sess);
                 if (debug) System.out.println("size of idRequests: " + idRequests.size());
@@ -279,7 +283,7 @@ public class LinkFastqData extends TimerTask {
 
                     String createYear = "" + getRCreatedYear(idRequest,sess);
 
-                    fileNames = getExperimentFilename(idRequest, sess,mode);
+                    fileNames = getExperimentFilename(idRequest, sess,vendorType);
 
                     if (debug) System.out.println("size of fileNames: " + fileNames.size());
 
@@ -302,7 +306,9 @@ public class LinkFastqData extends TimerTask {
 
                     while (itpn.hasNext()) {                                                                            // fileNames while
                         String thePath = (String) itpn.next();        // for example: 129R/Avatar/DNA/Fastq/SL283716_2.fastq.gz
-                                                                        // 2R/Foundation/Reports/TRF218551.xml
+                        // 2R/Foundation/Reports/TRF218551.xml
+
+                        if (debug) System.out.println("thePath: " + thePath );
 
                         int ipos = thePath.indexOf("/");
                         if (ipos == -1) {
@@ -326,13 +332,37 @@ public class LinkFastqData extends TimerTask {
                             continue;
                         }
 
-                        String middleOfPath = thePath.substring(ipos, epos);        // for example: DNA/Fastq
+                        String middleOfPath = "";
+                        String filename = "";
+                        String subCommand = "";
+
+                        String pathToRealData = startRequestPath + "/" + createYear + "/" + thePath;
+                        middleOfPath = thePath.substring(ipos, epos);        // for example: DNA/Fastq
                         if (debug) System.out.println("middleOfPath: " + middleOfPath);
 
-                        String filename = thePath.substring(epos + 1);
-                        if (debug) System.out.println("filename: " + filename);
 
-                        String myPath = startPath + analysisYear + "/A" + idAnalysis + "/" + topDirectory + "/RawData/" + middleOfPath;
+                        if(!linkFolder){
+                            filename = thePath.substring(epos + 1);
+                            if (debug) System.out.println("filename: " + filename);
+                        }else{
+                            File dummyFile = new File(pathToRealData);
+                            filename = dummyFile.getParentFile().getName();
+                            try{
+                                int personID = Integer.parseInt(filename);
+                            }catch(NumberFormatException nfe){
+                                System.out.println("skipping... experiment file doesn't have wrapping folder");
+                                continue;
+                            }
+                            // need to make sure if you try to run making a symlink more than once it doesn't
+                            // stick a symlink inside the src dir pointing to soft link
+                            // the T stops it from drilling into the 'pointer' that points to src dir if it already exists
+                            subCommand = "-sTf";
+
+                        }
+                        //  make the soft link
+
+
+                        String myPath = dirPath + middleOfPath;
                         if (debug) System.out.println("myPath: " + myPath);
                         File f1 = new File(myPath);
                         if (!f1.exists()) {
@@ -340,17 +370,18 @@ public class LinkFastqData extends TimerTask {
                         }
 
                         //  make the soft link
-                        myPath = myPath + "/" + filename;
-                        String pathToRealData = startRequestPath + "/" + createYear + "/" + thePath;
+                        myPath = !linkFolder?  myPath + "/" + filename : myPath;
+
 
                         // 05/10/2019 tim -- now we get the canonical path so we link to the the actual file not a link to a link to the actual file
+                        // this is still getting the path to the linked data from the person not the overall pot
                         File ttarget = new File(pathToRealData);
                         File  target = ttarget.getCanonicalFile();
                         File linkName = new File(myPath);
                         if (debug)
                             System.out.println("[LinkFastqData] right before makeSoftLinks, target: " + target.getCanonicalPath() + "\n\t\t\t\t linkName: " + linkName);
 
-                        boolean ok = makeSoftLinks(target, linkName);
+                        boolean ok = makeSoftLinks(target, linkName, subCommand);
                         if (!ok) {
                             System.out.println("makeSoftLinks failed!");
                             System.exit(2);
@@ -384,69 +415,41 @@ public class LinkFastqData extends TimerTask {
         theDirectories[1] = theName + "_" + "Avatar";
 
         String analysisGroupName = "";
-        int nnn = 2;
-        if (nnn == 2) {
-            while (true) {
-                try {
-                    SessionImpl sessionImpl = (SessionImpl) sess;
 
-                    ResultSet rs5 = null;
-                    Connection con5 = sessionImpl.connection();
-                    Statement stmt5 = con5.createStatement();
-
-//                    StringBuilder buf3 = null;
+        while (true) {
+            try {
+                SessionImpl sessionImpl = (SessionImpl) sess;
 
 
-//                    buf3 = new StringBuilder();
-//                    buf3.append("select baseFilePath, qualifiedFilePath from AnalysisFile where idAnalysis = " + idAnalysis + " limit 1;");
-//                    if (debug) System.out.println("Analysis getTopDirectory query: " + buf3.toString());
-
-
-                    StringBuilder buf1 = new StringBuilder("select ag.name from AnalysisGroup ag, AnalysisGroupItem agi where agi.idAnalysis = " + idAnalysis +
-                            " and agi.idAnalysisGroup = ag.idAnalysisGroup;");
-                    if (debug) System.out.println("[getTopDirectory] getAnalysisType query: " + buf1.toString());
-
-                    rs5 = stmt5.executeQuery(buf1.toString());
-                    while (rs5.next()) {
-                        analysisGroupName = rs5.getString(1);
-                        break;
-                    }
-
-                    // figure out what type of analysis this is
-                    String analysis_type = getAnalysisType (idAnalysis,sess);
-                    if (debug) System.out.println("[getTopDirectory] analysis_type: " + analysis_type);
-                    if (analysis_type == null || analysis_type.equals("")) {
-                        analysis_type = "Avatar";
-                    }
-
-                    theDirectories[1] = theName + "_" + analysis_type;
-                    if (debug) {
-                        System.out.println("[getTopDirectory]  analysis_type: " + analysis_type + " theDirectories[1]: " + theDirectories[1]);
-                    }
-
-
-//                    rs5 = stmt.executeQuery(buf3.toString());
-//                    System.out.println("[getTopDirectory] after executeQuery");
-
-                    rs5.close();
-                    stmt5.close();
-                    if (debug) System.out.println("[getTopDirectory] after stmt.close");
-                    break;
-
-                } catch (Exception ee) {
-                    if (debug) {
-                        System.out.println("[getTopDirectory] exception: " + ee.toString());
-                    }
-                    numbad++;
-                    // if this is the first failure assume we are really dealing with MSSQL and MYSQL
-                    if (numbad == 1) {
-                        assumeMYSQL = false;
-                        continue;           // try it again
-                    }
-                    // we lose
+                // figure out what type of analysis this is
+                String analysis_type = getAnalysisType (idAnalysis,sess);
+                if (debug) System.out.println("[getTopDirectory] analysis_type: " + analysis_type);
+                if (analysis_type == null || analysis_type.equals("")) {
+                    analysis_type = "Avatar";
                 }
-            } // end of while
-        }
+
+                theDirectories[1] = theName + "_" + analysis_type;
+                if (debug) {
+                    System.out.println("[getTopDirectory]  analysis_type: " + analysis_type + " theDirectories[1]: " + theDirectories[1]);
+                }
+
+
+                break;
+
+            } catch (Exception ee) {
+                if (debug) {
+                    System.out.println("[getTopDirectory] exception: " + ee.toString());
+                }
+                numbad++;
+                // if this is the first failure assume we are really dealing with MSSQL and MYSQL
+                if (numbad == 1) {
+                    assumeMYSQL = false;
+                    continue;           // try it again
+                }
+                // we lose
+            }
+        } // end of while
+
         if (debug)
             System.out.println("[getTopDirectory] ** returning ** theDirectories[0]: " + idAnalysis + " [1]: " + theDirectories[1]);
         return theDirectories;
@@ -561,8 +564,6 @@ public class LinkFastqData extends TimerTask {
             rs.close();
             stmt.close();
 
-            if (debug) System.out.println("size of idRequests: " + idRequests.size());
-
         } catch (Exception ee) {
             System.out.println("ERROR: in getIdRequest: " + ee);
             // we lose
@@ -669,8 +670,9 @@ public class LinkFastqData extends TimerTask {
     }
 
 
-    public List<String> getExperimentFilename(String idRequest, Session sess, int mode) {
+    public List<String> getExperimentFilename(String idRequest, Session sess, String vendorType) {
         List<String> fileNames = new ArrayList<String>();
+        System.out.println("[getExperimentFilename]");
 
         if (idRequest == null) {
             return null;
@@ -684,14 +686,34 @@ public class LinkFastqData extends TimerTask {
             Statement stmt = con.createStatement();
 
             String buf2 = "";
-            if (mode == 1) {
-                buf2 = "select fileName from ExperimentFile where idRequest = " + idRequest + " and (fileName like '%fastq%' or fileName like '%.deident.xml');";
+            if(fileExtensionMap != null){
+                for(Map.Entry<String,List<String>> entry : fileExtensionMap.entrySet() ){
+                    System.out.print(entry.getKey());
+                    System.out.print(" : ");
+                    System.out.println(entry.getValue());
+                }
             }
-            else {
-                buf2 = "select fileName from ExperimentFile where idRequest = " + idRequest + " and fileName like '%.deident.xml';";
+
+
+            List<String> fileExtensions = fileExtensionMap.get(vendorType);
+            if(fileExtensions == null){
+                throw new Exception("Can't find vendor type.");
             }
+            System.out.println("[getExperimentFilename]: fileExtensions length  " + fileExtensions.size() );
+            String vendorFilterStr =  makeVendorFilterStr(fileExtensions);
+            StringBuilder strBuild = new StringBuilder();
+            strBuild.append("SELECT fileName FROM ExperimentFile WHERE idRequest = ");
+            strBuild.append(idRequest);
+            strBuild.append(" AND (");
+            strBuild.append(vendorFilterStr);
+            strBuild.append(");");
+
+            buf2 = strBuild.toString();
+
+
+
 //            StringBuilder buf2 = new StringBuilder("select fileName from ExperimentFile where idRequest = " + idRequest + " and (fileName like '%fastq%' or fileName like '%.deident.xml');");
-            if (debug) System.out.println("mode: " + mode + " Get file query: " + buf2);
+            if (debug) System.out.println("mode: " + vendorType + " Get file query: " + buf2);
 
             rs = stmt.executeQuery(buf2);
             while (rs.next()) {
@@ -700,7 +722,6 @@ public class LinkFastqData extends TimerTask {
             rs.close();
             stmt.close();
 
-            if (debug) System.out.println("size of fileNames: " + fileNames.size());
 
         } catch (Exception ee) {
             System.out.println("ERROR: in getExperimentFilename: " + ee);
@@ -712,15 +733,29 @@ public class LinkFastqData extends TimerTask {
         return fileNames;
     }
 
+    private String makeVendorFilterStr(List<String> extensions) {
+        StringBuilder strBuilder = new StringBuilder();
+        for(int i = 0; i <  extensions.size(); i++){
+            strBuilder.append("fileName LIKE ");
+            strBuilder.append("\'%");
+            strBuilder.append(extensions.get(i));
+            strBuilder.append("%\'");
+
+            if(i  < extensions.size() - 1 ){
+                strBuilder.append(" OR ");
+            }
+        }
+        return strBuilder.toString();
+    }
+
     /**
      * Makes a soft link between the realFile and the linked File using the linux 'ln -s' command.
      */
-    public static boolean makeSoftLinks(File realFile, File link) {
-        System.out.println("[makeSoftLinks] realFile absolutepath : " + realFile.getAbsolutePath() + " realFile.getPath(): " + realFile.getPath() + " link: " + link.getPath());
+    public static boolean makeSoftLinks(File realFile, File link, String subCommand) {
         try {
-            String[] cmd1 = {"rm", "-f", link.toString()};
-            Runtime.getRuntime().exec(cmd1);
-            String[] cmd = {"ln", "-s", realFile.getPath(), link.toString()};
+//			String[] cmd1 = { "rm", "-f", link.toString() };
+//			Runtime.getRuntime().exec(cmd1);
+            String[] cmd = {"ln", subCommand, realFile.getAbsolutePath(), link.toString()};
             Runtime.getRuntime().exec(cmd);
             return true;
         } catch (IOException e) {

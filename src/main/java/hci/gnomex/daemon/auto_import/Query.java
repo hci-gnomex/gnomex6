@@ -549,7 +549,7 @@ public class Query {
         return analysisIDs;
     }
 
-    public void filterPersonIDList(String filterQuery,Set<String> personIDList) throws Exception {
+    public void filterPersonIDList(String filterQuery, Set<String> personIDList) throws Exception {
         Statement stmnt = null;
 
         try {
@@ -565,6 +565,25 @@ public class Query {
             sqlException.printStackTrace();
             throw new Exception(sqlException.getMessage() + " : Could not execute query fo ");
         }
+
+    }
+
+    public String getPersonIDFromSample(String fileName) throws Exception {
+        Statement stmnt = null;
+        String personID = "";
+
+        String query = "Select r.name as personID FROM Request r JOIN Sample s ON s.idRequest = r.idRequest WHERE s.name LIKE \'%"
+                + fileName + "%'";
+        stmnt = this.conn.createStatement();
+        ResultSet rs = stmnt.executeQuery(query);
+        while (rs.next()) {
+            personID = rs.getString("personID");
+            break;
+        }
+        if (personID.equals("")) {
+            throw new Exception("Person ID can't be found from filename: " + fileName);
+        }
+        return personID;
 
     }
 }
