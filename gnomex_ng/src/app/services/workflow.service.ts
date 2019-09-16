@@ -40,8 +40,7 @@ export class WorkflowService {
         {display: 'In Progress', value: 'In Progress'},
         {display: 'Complete', value: 'Completed'},
         {display: 'On Hold', value: 'On Hold'},
-        {display: 'Terminate', value: 'Terminated'},
-        {display: 'Bypass', value: 'Bypassed'}
+        {display: 'Terminate', value: 'Terminated'}
     ];
 
     public readonly pipelineCompletionStatus = [
