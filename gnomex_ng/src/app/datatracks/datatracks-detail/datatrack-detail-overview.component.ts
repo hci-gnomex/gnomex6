@@ -58,6 +58,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     public canWrite = false;
     public folderList: any[];
     public types = OrderType;
+    public routeOutlet: string = "";
 
     private datatrack: any;
     private datatrackFiles: Array<any>;
@@ -77,6 +78,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     ngOnInit() {
 
         this.route.data.forEach(data => {
+            this.routeOutlet = this.route.outlet;
             this.datatrack = data.datatrack;
             this.initLinkVisibility();
             this.dtOverviewForm = new FormGroup({});
@@ -284,7 +286,11 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     }
 
     showFolders(showFolders: any) {
-        this.dialogService.createCustomDialog(showFolders, "Folders for " + this.datatrack.name, this.constService.ICON_FOLDER);
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = "45em";
+        configuration.autoFocus = false;
+        this.datatrack.name = UtilService.getSubStr(this.datatrack.name, 55);
+        this.dialogService.createCustomDialog(showFolders, "Folders for " + this.datatrack.name, this.constService.ICON_FOLDER, configuration);
     }
 
     ngOnDestroy() {

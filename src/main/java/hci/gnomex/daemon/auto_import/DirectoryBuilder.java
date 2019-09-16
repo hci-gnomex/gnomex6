@@ -8,20 +8,13 @@ import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
 import javax.persistence.criteria.CriteriaBuilder;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Writer;
+import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DirectoryBuilder {
+
 
 	private String inFileName;
 	private String root;
@@ -31,18 +24,21 @@ public class DirectoryBuilder {
 	private String mode;
 	private String accountForFilesMoved;
 	private Set<String> fileTypeCategorySet;
+	private boolean addWrapperFolder = false;
 
 
 
-	private static final String RNAseq = "RNAseq";
-	private static final String WHOLE_EXOME= "Whole_Exome";
-	private static final String FASTQ="FASTq";
+	private static final String RNAseq = "rnaseq";
+	private static final String WHOLE_EXOME= "whole_exome";
+	private static final String FASTQ="fastq";
 	private static final String DNA_ALIAS="DNA";
 	private static final String RNA_ALIAS="RNA";
 	private static final String FASTQ_ALIAS="Fastq";
 	private static final Integer AVATAR_GROUP_ID = 11;
 	private static final Integer FOUNDATION_GROUP_ID = 14;
+	private static final Integer TEMPUS_GROUP_ID = 22;
 	private static final int TEST_TYPE_PROPERTY_ID = 21;
+	private boolean isWindows;
 
 
 
@@ -57,20 +53,26 @@ public class DirectoryBuilder {
 			if (args[i].equals("-file")) {
 				this.inFileName = args[++i];
 			} else if (args[i].equals("-root")) {
-				this.root = args[++i];
+				this.root = args[++i] + File.separator;
 			} else if (args[i].equals("-downloadpath")) {
-				this.currentDownloadLocation = args[++i];
+				this.currentDownloadLocation = args[++i] + File.separator;
 			} else if(args[i].equals("-flaggedfile")){
 				flaggedIDFileName = args[++i];
 			}else if(args[i].equals("-skipfirst")){
 				this.skip = true;
 			}else if(args[i].equals("-mode")) {
 				this.mode = args[++i];
-			}
-			else if (args[i].equals("-help")) {
+			}else if(args[i].equals("-linkfolder")){
+				addWrapperFolder = true;
+			} else if (args[i].equals("-help")) {
 				//printUsage();
 				System.exit(0);
 			}
+		}
+		if(System.getProperty("os.name").startsWith("Windows")){
+			isWindows = true;
+		}else{
+			isWindows = false;
 		}
 	}
 
@@ -99,7 +101,7 @@ public class DirectoryBuilder {
 	public void makeAccountingForFiles(){
 		this.fileTypeCategorySet = new HashSet<String>();
 		Map<String,List<String>> missingMap = new TreeMap<String,List<String>>();
-		fileTypeCategorySet = new HashSet<>(Arrays.asList(".pdf", ".xml",".deident.xml", ".bam.bai",".bam",".bam.bai.md5",".bam.md5" ));
+		fileTypeCategorySet = new HashSet<>(Arrays.asList(".pdf", ".xml",".deident.xml", ".bam.bai",".bam",".bam.bai.md5",".bam.md5",".json" ));
 
 
 
@@ -231,9 +233,8 @@ public class DirectoryBuilder {
 		return dataFromFileList;
 	}
 
-	public List<String> preparePath() {
-		List<String> paths = new ArrayList<String>();
-		Set<String> pathToCreate = new HashSet<String>();
+	public void preparePath() {
+		List<String> localFiles = new ArrayList<String>();
 		List<String> filesWithPaths = new ArrayList<String>();
 		List<String> filteredFiles = new ArrayList<String>();
 		List<String> flaggedIDList = readSampleIDs(flaggedIDFileName);
@@ -242,132 +243,100 @@ public class DirectoryBuilder {
 
 		try {
 
-			paths = this.readFile(this.inFileName);
-			boolean test = new File(this.currentDownloadLocation + "/Flagged").mkdir();
+			localFiles = this.readFile(this.inFileName);
+			boolean test = new File(this.currentDownloadLocation + "Flagged").mkdir();
 
-			//readPathInfo(this.pathCreatorInfo);
-
-			if(mode.equals("avatar")) {
-				for(String p: paths) {
-					StringBuilder strBuild = new StringBuilder("/");
-
-					String[] pathChunks = p.split("/");
-					boolean foundPath = false;
-
-					for(int i = 0; i < pathChunks.length; i++) {
-						if (pathChunks[i].equals(DirectoryBuilder.WHOLE_EXOME)) {
-							strBuild.append(DirectoryBuilder.DNA_ALIAS);
-							strBuild.append("/");
-
-							if(pathChunks[i+1].equals(DirectoryBuilder.FASTQ)) {
-								strBuild.append(DirectoryBuilder.FASTQ_ALIAS);
-							}else {
-								strBuild.append(pathChunks[i+1]);
-							}
-							strBuild.append("/");
-							foundPath = true;
-							break;
-						}
-						else if(pathChunks[i].equals(DirectoryBuilder.RNAseq)){
-							strBuild.append(DirectoryBuilder.RNA_ALIAS);
-							strBuild.append("/");
-							if(pathChunks[i+1].equals(DirectoryBuilder.FASTQ)) {
-								strBuild.append(DirectoryBuilder.FASTQ_ALIAS);
-
-							}else {
-								strBuild.append(pathChunks[i+1]);
-							}
-							strBuild.append("/");
-							foundPath = true;
-							break;
-						}
-					}
-
-					if(foundPath) {
-
-						if(!filterOutFlaggedIDs(pathChunks[pathChunks.length - 1], flaggedIDList)) {
-							pathToCreate.add(this.root + strBuild.toString());
-							filesWithPaths.add(this.root + strBuild.toString() + pathChunks[pathChunks.length - 1]);
-						}else {
-							filteredFiles.add(this.currentDownloadLocation + "Flagged/"+ pathChunks[pathChunks.length - 1] );
-						}
-
-					}
+			preparePath(flaggedIDList,filteredFiles, localFiles,filesWithPaths );
 
 
-				}
-
-				for(String p: pathToCreate ) {
-					boolean made = new File(p).mkdirs();
-				}
-
-			}else if(mode.equals("foundation")) {
-				prepareFoundationPath(flaggedIDList,filteredFiles, paths,filesWithPaths );
+			this.moveTheFiles(filteredFiles, new ArrayList<>()); // These files we want to move into the flagged folder
+			// for tempus anything doesn't get flagged explicitly  but it doesn't get moved is still considered flagged
+			if(mode.equals("tempus")){
+				this.moveTheFiles(filesWithPaths, Arrays.asList("echo move left over files to Flagged",
+						"mv -t " + this.currentDownloadLocation + "Flagged" +" " + currentDownloadLocation +"*"));
 			}
 
 
 
-
-
-
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
+			System.out.println(e.getMessage());
 			e.printStackTrace();
+			System.exit(1);
+
 		}
-
-
-		this.moveTheFiles(filteredFiles); // These files we want to move into the flagged folder
-		return filesWithPaths; // These are the files we want to move to where data lives for gnomex
-
-		//boolean made = new File("C:\\Users\\u0566434\\Desktop\\ORIEN\\tEST13\\TESTAGAIN").mkdir();
-
 
 	}
 
+	StringBuilder getMatchingDirName(String[] chunks, StringBuilder strBuild, Map<String,String> dirMap, Set<String> dupDirSet ){
+
+		for(String chunk:chunks){
+			String corretCaseDirName = dirMap.get( chunk.toLowerCase());
+			//System.out.println("chunk in: " + chunk + " chunk out " + corretCaseDirName );
+
+			if(corretCaseDirName != null && dupDirSet.add(chunk.toLowerCase())){
+				strBuild.append(File.separator);
+				strBuild.append(corretCaseDirName);
+			}
+		}
+		return strBuild;
+	}
 
 
-	private void prepareFoundationPath(List<String> flaggedFiles,List<String> filteredFiles, List<String> paths, List<String> filesWithPaths){
+	private void preparePath(List<String> flaggedFiles,List<String> filteredFiles, List<String> paths, List<String> filesWithPaths) throws Exception{
+		File finalDestinationPath = new File(this.root);
+		Map<String,String> dirMap = new HashMap<>();
+		dirMap.put("xml","Reports");
+		dirMap.put("pdf","Reports");
+		dirMap.put("json","Reports");
+		dirMap.put(WHOLE_EXOME, DNA_ALIAS);
+		dirMap.put(RNAseq, RNA_ALIAS);
+
+		getAllDirs(finalDestinationPath.listFiles(), dirMap);
+
+
 
 		for(String p: paths) {
-			StringBuilder strBuild = new StringBuilder("/");
+			StringBuilder strBuild = new StringBuilder(root);
+			System.out.println("-------------------------------------------------------------------------------");
+			System.out.println("Path being processed: " + p );
 
-			String[] pathChunks = p.split("/"); // path doesn't matter just need fileName
-			String fileName = pathChunks[pathChunks.length - 1];
-			String[] extChunks = fileName.split("\\.");
-			int length = extChunks.length;
+			String pattern = Pattern.quote(System.getProperty("file.separator"));
+			String[] pathChunks = p.split(pattern);
 
-			if(extChunks.length > 1 ) {
-				if(filterOutFlaggedIDs( fileName , flaggedFiles)) {
-					strBuild.append(currentDownloadLocation);
-					strBuild.append("/Flagged/");
-					strBuild.append(fileName);
-					filteredFiles.add(strBuild.toString());
-					continue;
+			String file = pathChunks[pathChunks.length - 1];
+			String[] fileChunks = file.split("\\.");
+			String fileName = fileChunks[0].split("_")[0];
+			//find detail from path
+			//System.out.println("The file extension chunks ");
+			//System.out.println( fileChunks.toString());
+
+			if(!filterOutFlaggedIDs(file, flaggedFiles)){
+				Set<String> dupDirSet = new HashSet<>();
+				getMatchingDirName(pathChunks,strBuild,dirMap,dupDirSet);
+				getMatchingDirName(fileChunks,strBuild,dirMap,dupDirSet);
+			}else{
+				strBuild.setLength(0);
+				strBuild.append(this.currentDownloadLocation);
+				strBuild.append(File.separator);
+				strBuild.append("Flagged");
+				strBuild.append(File.separator);
+				strBuild.append(file);
+				filteredFiles.add(strBuild.toString());
+				System.out.println("Flagged " + strBuild.toString());
+				continue;
+			}
+
+			String finalPath = strBuild.toString();
+
+			if(new File(finalPath).exists() && !finalPath.equals(root)) {
+				if(addWrapperFolder &&  appendDirPersonID(fileName,strBuild)){
+					filesWithPaths.add(strBuild.append(File.separator).append(file).toString());
+				}else if(!addWrapperFolder){
+					filesWithPaths.add(strBuild.append(File.separator).append(file).toString());
 				}
-				if(extChunks[1].equals("bam")) {
-					strBuild.append(this.root);
-					strBuild.append("Bams/");
-
-					if(extChunks[length - 1].equals("md5")){
-						strBuild.append("checksums/");
-					}
-					strBuild.append(fileName);
-					filesWithPaths.add(strBuild.toString());
-
-				}else if(extChunks[1].equals("vcf")) {
-					strBuild.append(this.root);
-					strBuild.append("VCF/");
-					strBuild.append(fileName);
-					filesWithPaths.add(strBuild.toString());
-				}
-				else {
-					strBuild.append(this.root);
-					strBuild.append("Reports/");
-					strBuild.append(fileName);
-					filesWithPaths.add(strBuild.toString());
-
-				}
-
+			}else {
+				throw new Exception("The path does not exist: " + finalPath +  "\n your directory structure isn't correct");
 			}
 
 		}
@@ -376,7 +345,42 @@ public class DirectoryBuilder {
 
 	}
 
+	private boolean appendDirPersonID(String fileName, StringBuilder strBuild) {
+		Query q = null;
+		File personIDDir =  null;
+		try{
+			String path = XMLParser.getPathWithoutName(this.inFileName);
+			q =  new Query(path+"gnomex-creds.properties");
+			String personID = q.getPersonIDFromSample(fileName);
+			strBuild.append(File.separator);
+			strBuild.append(personID);
+			System.out.println("Full path with PersonID to create " +  strBuild.toString());
+			personIDDir = new File(strBuild.toString());
+			if(!personIDDir.exists()){
+				personIDDir.mkdir();
+			}
 
+		}catch(Exception e){
+			e.printStackTrace();
+			return false;
+		}finally {
+			q.closeConnection();
+		}
+		return true;
+	}
+
+	private void getAllDirs(File[] fList, Map<String,String> dirMap) {
+
+		for(File file : fList){
+			if(file.isDirectory() ){
+				dirMap.put(file.getName().toLowerCase(), file.getName());
+				getAllDirs(file.listFiles(), dirMap);
+			}else{
+				continue;
+			}
+
+		}
+	}
 
 
 	private boolean filterOutFlaggedIDs(String idToCheck, List<String> flaggedIDList) {
@@ -437,7 +441,8 @@ public class DirectoryBuilder {
 
 	}
 
-	public void moveTheFiles(List<String> files) {
+
+	public void moveTheFiles(List<String> files, List<String> extraCommands) throws Exception{
 		StringBuilder strBuild = new StringBuilder();
 		List<String> commands = new ArrayList<String>();
 
@@ -448,7 +453,9 @@ public class DirectoryBuilder {
 
 
 		for(String file: files) {
-			String[] pWithf = file.split("/");
+
+			String pattern = Pattern.quote(System.getProperty("file.separator"));
+			String[] pWithf = file.split(pattern);
 
 			strBuild.append("mv -vn");
 			strBuild.append(" *");
@@ -462,58 +469,17 @@ public class DirectoryBuilder {
 
 		}
 
-		this.executeCommands(commands);
+		for(String c : extraCommands){
+			commands.add(c);
+		}
 
+		XMLParser.executeCommands(commands,currentDownloadLocation+"tempError.log");
 
 	}
 
 
 
-	private void executeCommands(List<String> commands) {
 
-		File tempScript = null;
-
-		try {
-			System.out.println("started executing command");
-			tempScript = createTempScript(commands);
-			ProcessBuilder pb = new ProcessBuilder("bash", tempScript.toString());
-			pb.inheritIO();
-			Process process;
-			process = pb.start();
-			process.waitFor();
-			System.out.println("finished executing command");
-		}
-
-		catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		finally
-
-		{
-			tempScript.delete();
-		}
-	}
-
-
-	private File createTempScript(List<String> commands) throws IOException {
-		File tempScript = File.createTempFile("script", null);
-
-		Writer streamWriter = new OutputStreamWriter(new FileOutputStream(tempScript));
-		PrintWriter printWriter = new PrintWriter(streamWriter);
-
-
-		for(int i =0; i < commands.size(); i++) {
-			printWriter.println(commands.get(i));
-		}
-
-		printWriter.close();
-
-		return tempScript;
-	}
 
 	private  List<String> readSampleIDs(String fileName){
 		BufferedReader bf = null;
@@ -564,9 +530,12 @@ public class DirectoryBuilder {
 			sampleIDList =  readSampleIDs(path +"importedSLList.out");
 			reportIDList =  q.getImportedIDReport(sampleIDList,DirectoryBuilder.AVATAR_GROUP_ID);
 
-		}else{
+		}else if(mode.equals("foundation")){
 			sampleIDList = readSampleIDs(path + "importedTRFList.out");
 			reportIDList =  q.getImportedIDReport(sampleIDList, DirectoryBuilder.FOUNDATION_GROUP_ID);
+		}else{
+			sampleIDList = readSampleIDs(path + "importedTLList.out");
+			reportIDList =  q.getImportedIDReport(sampleIDList, DirectoryBuilder.TEMPUS_GROUP_ID);
 		}
 
 		//Map<String, HashMap<String,Long>> personMap = q.countPropertyByPerson(TEST_TYPE_PROPERTY_ID);
@@ -591,13 +560,10 @@ public class DirectoryBuilder {
 
 		}
 
-
-
-
 	}
 	public static void sendImportedIDReport(String from,String to, String subject,String body, String testEmail) {
-			//PropertyDictionaryHelper ph = PropertyDictionaryHelper.getInstance(sess);
-			//String gnomexSupportEmail = ph.getProperty(PropertyDictionary.GNOMEX_SUPPORT_EMAIL);
+		//PropertyDictionaryHelper ph = PropertyDictionaryHelper.getInstance(sess);
+		//String gnomexSupportEmail = ph.getProperty(PropertyDictionary.GNOMEX_SUPPORT_EMAIL);
 
 		try {
 			Properties mailProps = new BatchMailer("").getMailProperties();

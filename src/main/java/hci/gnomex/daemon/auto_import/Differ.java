@@ -1,5 +1,6 @@
 package hci.gnomex.daemon.auto_import;
 
+import javax.persistence.criteria.CriteriaBuilder;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -56,7 +57,7 @@ public class Differ {
 					i++;
 					endCaptureGroup = Integer.parseInt(args[i + 1]);
 					i++;
-				}catch(Exception e){
+				}catch(NumberFormatException e){
 					if(startCaptureGroup == null){
 						System.out.println("Please provide at least a starting a range for the capture group");
 						System.exit(1);
@@ -166,7 +167,7 @@ public class Differ {
 				if(matchByName != null && !onlyMatchOn.equals("-r")){
 					Matcher m = p.matcher(line);
 					if(m.matches()){
-						fileMap.put(constructMatchedFileName(m,renameBuildStr), line );
+						fileMap.put(constructMatchedFileName(startCaptureGroup, endCaptureGroup, m,renameBuildStr), line );
 					}else{ // doesn't have to match name so get file plus extension
 						this.addToLocalMap(line);
 					}
@@ -207,7 +208,7 @@ public class Differ {
 				if(matchByName != null && !onlyMatchOn.equals("-l")){
 					Matcher m = p.matcher(line1);
 					if(m.matches()){
-						fileName = constructMatchedFileName(m,renameBuildStr);
+						fileName = constructMatchedFileName(startCaptureGroup, endCaptureGroup, m,renameBuildStr);
 						if(fileMap.get(fileName) == null ){
 							uniqueByName.add(line1);
 						}
@@ -260,7 +261,7 @@ public class Differ {
 
 	}
 
-	private String  constructMatchedFileName( Matcher m, StringBuilder renameBuildStr ){
+	public static String  constructMatchedFileName(Integer startCaptureGroup, Integer endCaptureGroup, Matcher m, StringBuilder renameBuildStr ){
 		int endRange =  0;
 		if(startCaptureGroup == null ){ // if cp wasn't specified in args default to capture all groups
 			startCaptureGroup = 0;
@@ -284,6 +285,29 @@ public class Differ {
 
 		return rename;
 	}
+
+	public static String getNameByExistingCaptureGroup( List<Integer> captureGroups, Matcher m ){
+		String matchedName = "";
+		for(Integer cp : captureGroups){
+			if(m.groupCount() < cp){
+				System.out.println("Error: End Capture Group  cannot greater than actual capture groups length: " +  m.groupCount());
+				System.exit(1);
+			}
+			String name  = m.group(cp);
+			if(name != null || !name.equals("")){
+				matchedName = name;
+				break;
+			}
+
+		}
+		if(matchedName.equals("")){
+			System.out.println("Error: With the given Capture Groups, no match was found");
+			System.exit(1);
+		}
+		return matchedName;
+	}
+
+
 
 	public void writeDiffToFile(List<String> uniqueFiles){ // use if you want to do std.out
 		PrintWriter writer = null;

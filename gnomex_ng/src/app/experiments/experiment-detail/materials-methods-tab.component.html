@@ -1,18 +1,25 @@
 <div class="full-height full-width padded small-font">
     <div class="full-width flex-container-col">
-
+        <div class="full-width flex-container-row align-center padded">
+            <div class="gx-label label-width">
+                Name
+            </div>
+            <div class="flex-grow padded-left">
+                {{_experiment?.name}}
+            </div>
+        </div>
         <div class="full-width flex-container-row align-center padded">
             <div class="gx-label label-width">
                 Experiment
             </div>
-            <div class="flex-grow">
+            <div class="flex-grow padded-left">
                 {{requestCategoryName}}
             </div>
         </div>
         <div class="full-width flex-container-row align-center padded"
              *ngIf="experimentCategoryName">
             <div class="gx-label label-width"></div>
-            <div class="flex-grow">
+            <div class="flex-grow padded-left">
                 {{experimentCategoryName}}
             </div>
         </div>
@@ -21,7 +28,7 @@
             <div class="gx-label label-width">
                 {{designAndInsertLabel}}
             </div>
-            <div class="flex-grow">
+            <div class="flex-grow padded-left">
                 {{designAndInsertText}}
             </div>
         </div>
@@ -30,13 +37,13 @@
             <div class="gx-label label-width">
                 Isolation prep type
             </div>
-            <div class="flex-grow">
+            <div class="flex-grow padded-left">
                 {{codeIsolationPrepType}}
             </div>
         </div>
         <div class="full-width flex-container-row padded" *ngIf="protocols.length > 0">
             <div class="flex-container-col">
-                <div class="flex-container-row padded" *ngFor="let protocol of protocols">
+                <div class="flex-container-row padded-top-bottom" *ngFor="let protocol of protocols">
                     <div class="flex-container-col">
                         <div class="gx-label label-width">
                             {{protocol.label}}
@@ -66,6 +73,45 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center padded" *ngIf="libraryPreparedBy">
+            <div class="gx-label">
+                Library Prep Completed by
+            </div>
+            <div class="flex-grow">
+                &nbsp;&nbsp;&nbsp;&nbsp;{{libraryPreparedBy}}
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center padded" *ngIf="_experiment?.reagent">
+            <div class="gx-label label-width">
+                Sample Reagent
+            </div>
+            <div class="flex-grow padded-left">
+                {{_experiment?.reagent}}
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center padded" *ngIf="_experiment?.elutionBuffer">
+            <div class="gx-label label-width">
+                Elution Buffer
+            </div>
+            <div class="flex-grow padded-left">
+                {{_experiment?.elutionBuffer}}
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center padded" *ngIf="_experiment?.usedDnase === 'Y'">
+            <div class="gx-label">
+                Samples were treated with DNase
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center padded" *ngIf="_experiment?.usedRnase === 'Y'">
+            <div class="gx-label">
+                Samples were treated with RNase
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center padded" *ngIf="_experiment?.keepSamples">
+            <div class="gx-label">
+                {{_experiment?.keepSamples === 'Y' ? 'Lab has requested to pick up samples' : 'Lab has declined to pick up samples'}}
             </div>
         </div>
     </div>

@@ -141,7 +141,7 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
     initializeAssm() {
         this.flowCellColDefs = [
             {
-                headerName: "Channel",
+                headerName: "Lane",
                 editable: false,
                 field: "number",
                 width: 100,
@@ -256,7 +256,7 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
 
     checkForDuplicateBarcode(): boolean {
         if (this.hasDuplicateSampleBarcodeSequence()) {
-            this.dialogsService.confirm("Some of the samples to be multiplexed in one flow cell channel have the same index tag.  This should only occur when samples (and their sequence reads) are meant to be pooled."
+            this.dialogsService.confirm("Some of the samples to be multiplexed in one flow cell lane have the same index tag.  This should only occur when samples (and their sequence reads) are meant to be pooled."
                 + "<br> Proceed with duplicate index tags?").subscribe((answer: boolean) => {
                 if (answer) {
                     return true;

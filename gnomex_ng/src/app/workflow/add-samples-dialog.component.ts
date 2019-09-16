@@ -179,7 +179,7 @@ export class AddSamplesDialogComponent extends BaseGenericContainerDialog implem
 
                 }else{
                     if(items.length === 1){
-                        this.dialogsService.alert("Sample " + item.label + " has already been assigned to another flow cell channel.",
+                        this.dialogsService.alert("Sample " + item.label + " has already been assigned to another flow cell lane.",
                             "Sample(s) not added", DialogType.FAILED);
                     }else{
                         errMessage +=  "\'" + item.itemNumber +  "\' ";

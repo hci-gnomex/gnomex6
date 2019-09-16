@@ -16,8 +16,7 @@ public class FileMover {
 			db.makeAccountingForFiles();
 		}else {
 
-			List<String> filesToMove = db.preparePath();
-			db.moveTheFiles(filesToMove);
+			db.preparePath();
 			db.reportWorkSummary();
 		}
 

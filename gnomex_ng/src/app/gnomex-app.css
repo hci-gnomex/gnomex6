@@ -79,6 +79,10 @@ main {
     width: 113px;
 }
 
+input.mat-input-element:disabled {
+    color: rgba(88,88,88,1);
+}
+
 mat-form-field.dialogFormField {
     width: 100%;
     margin: 0.4rem 0rem;
@@ -91,6 +95,10 @@ mat-form-field.moderate-input {
 mat-form-field.short-input {
     width: 10em;
 }
+
+/*.mat-input-element:disabled {*/
+    /*color: black !important;*/
+/*}*/
 
 mat-tooltip-component {
     white-space: pre-line;
@@ -412,6 +420,8 @@ img.tree-node-icon {
 
 button.mat-button.minimize {
     min-width: 0;
+    width: auto;
+    height: auto;
     line-height: 1rem;
     padding: 0.3em;
 }
@@ -428,10 +438,6 @@ button.mat-button.minimize span {
 
 .border-subtle {
     border: 1px solid #EEEEEE;
-}
-
-button.mat-button.minimize {
-    min-width: 0;
 }
 
 button.mat-button.minimize span {
