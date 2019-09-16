@@ -52,7 +52,7 @@ public class GetAnalysisFilesToDistribute extends GNomExCommand implements Seria
             ObjectMapper mapper = new ObjectMapper();
             ArrayNode jsonAnalysisFiles = mapper.createArrayNode();
             for(AnalysisFile af : fileList ){
-                ObjectNode obj = (ObjectNode)af.toJsonObject();
+                ObjectNode obj = (ObjectNode)mapper.readTree(af.toJsonObject());
                 String afFileNameUpperCase = af.getFileName().toUpperCase();
                 if (afFileNameUpperCase.endsWith(".BAM")) {
                     // is it already a data track?

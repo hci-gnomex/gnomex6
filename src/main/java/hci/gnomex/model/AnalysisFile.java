@@ -78,6 +78,8 @@ public class AnalysisFile extends GnomexFile implements JsonDetailObject {
 
   public void registerMethodsToExcludeFromXML() {
     this.excludeMethodFromXML("getAnalysis");
+    this.excludeMethodFromXML("toJsonObject");
+
   }
 
 
@@ -106,7 +108,7 @@ public class AnalysisFile extends GnomexFile implements JsonDetailObject {
   }
 
   @Override
-  public JsonNode toJsonObject() {
+  public String toJsonObject() {
     ObjectMapper mapper = new ObjectMapper();
     ObjectNode node = mapper.createObjectNode();
     node.put("idAnalysisFile", idAnalysisFile.toString()); // expect these not to be null
@@ -119,7 +121,7 @@ public class AnalysisFile extends GnomexFile implements JsonDetailObject {
     node.put("uploadDate", uploadDate != null ?  uploadDate.toString() : "");
     node.put("createDate", createDate != null ? createDate.toString() : "");
     node.put("qualifiedFilePath", qualifiedFilePath != null ? qualifiedFilePath : "");
-    return node;
+    return node.toString();
 
   }
 }
