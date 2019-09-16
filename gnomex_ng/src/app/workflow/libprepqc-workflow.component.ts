@@ -100,13 +100,6 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
                     field: "appUserName",
                 },
                 {
-                    headerName: "Vol. (uL)",
-                    editable: false,
-                    width: 150,
-                    field: "sampleVolume",
-                    cellRendererFramework: TextAlignLeftMiddleRenderer,
-                },
-                {
                     headerName: "Library QC Protocol",
                     editable:  true,
                     width: 400,
