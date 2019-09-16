@@ -217,29 +217,6 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                 });
             }
 
-            if (this._experiment && this._experiment.samples) {
-
-                let samplesRef: any[] = Array.isArray(this._experiment.samples) ? this._experiment.samples : [this._experiment.samples.Sample];
-                let addedIds: string[] = [];
-
-                this.libraryPreparedBy = '';
-
-                for (let sample of samplesRef) {
-                    if (sample.idLibPrepPerformedBy && !addedIds.find((a) => { return a === sample.idLibPrepPerformedBy}) ) {
-                        let libraryPreparer: any = this.dictionaryService.getEntry('hci.gnomex.model.AppUserLite', sample.idLibPrepPerformedBy);
-
-                        if (libraryPreparer && (libraryPreparer.firstName || libraryPreparer.lastName)) {
-                            if (this.libraryPreparedBy.length > 0) {
-                                this.libraryPreparedBy += '\n';
-                            }
-                            this.libraryPreparedBy += this.prefService.formatUserName(libraryPreparer.firstName, libraryPreparer.lastName);
-                        }
-
-                        addedIds.push('' + sample.idLibPrepPerformedBy);
-                    }
-                }
-            }
-
             this.workflowSteps = [];
             this.progresses = [];
             this.numberOfSteps = 0;
@@ -322,7 +299,6 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
     public experimentCategoryName: string = '';
     public visibility:             string = '';
     public institutionName:        string = '';
-    public libraryPreparedBy:      string = '';
 
     public isExternal: boolean = false;
 

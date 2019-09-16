@@ -1,20 +1,19 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.Util;
+import hci.gnomex.utility.*;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
-import hci.gnomex.utility.FileDescriptor;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.gnomex.utility.Util;
 
 import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -170,6 +169,8 @@ public class GetExpandedAnalysisFileList extends GNomExCommand implements Serial
     return this;
   }
 
+
+
   public static void getFileNamesToDownload(String baseDir, String keysString, List analysisNumbers, Map analysisMap, Map directoryMap, boolean flattenSubDirs) {
     String[] keys = keysString.split(":");
     for (int i = 0; i < keys.length; i++) {
@@ -223,14 +224,23 @@ public class GetExpandedAnalysisFileList extends GNomExCommand implements Serial
       Arrays.sort(fileList, new Comparator<File>(){
         public int compare(File f1, File f2)     {
           return f1.getName().compareTo(f2.getName());
-          } });
+        } });
 
 
       for (int x = 0; x < fileList.length; x++) {
         File f1 = fileList[x];
-//        if (k(f1)) {
-//          continue;
-//        }
+
+        if (f1.isDirectory()) {
+          Path p = Paths.get(f1.getAbsolutePath());
+
+          if (Files.isSymbolicLink(p) && FileUtil.symlinkLoop(f1.getAbsolutePath()) ) {
+            continue;
+          }
+        }
+
+
+
+
 
         String fileName = directoryName + Constants.FILE_SEPARATOR + f1.getName();
 

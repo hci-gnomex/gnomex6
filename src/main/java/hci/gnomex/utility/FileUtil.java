@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class FileUtil {
 
@@ -18,6 +19,7 @@ public class FileUtil {
 				return false;
 			}
 			File canon;
+
 			if (file.getParent() == null) {
 				canon = file;
 			} else {
@@ -51,7 +53,7 @@ public class FileUtil {
 	 * Recursively finds and removes any empty subdirectories in the provided directory.
 	 * Removes the provided directory if it is (or becomes) empty.
 	 * @param directoryName The path of the directory to be pruned
-     */
+	 */
 	public static void pruneEmptyDirectories(String directoryName) {
 		File directory = new File(directoryName);
 		String directoryPath = directory.getAbsolutePath().replace("\\", Constants.FILE_SEPARATOR);
@@ -68,6 +70,49 @@ public class FileUtil {
 
 		}
 
+	}
+
+	public static boolean symlinkLoop(String filename) {
+		File file = new File(filename);
+		if (!file.exists() || !file.isDirectory()) {
+			return false;
+		}
+		return symlinkLoop(file);
+	}
+
+	public static boolean symlinkLoop(File file) {
+
+		if (file != null && file.exists() && file.isDirectory()) {
+			try {
+				Path p = Paths.get(file.getAbsolutePath());
+				if (!Files.isSymbolicLink(p)) {
+					return false;
+				}
+
+				Path rp = p.toRealPath();
+
+				Path sl = Files.readSymbolicLink(p);
+				Path slrp = sl.toRealPath();
+				Path cd = Paths.get(".");
+				Path cdrp = cd.toRealPath();
+
+				if (Files.isSymbolicLink(p) && Files.isSymbolicLink(rp)) {
+//          System.out.println("Found a loop");
+					return true;
+				}
+
+				if (slrp.toString().equals(cdrp.toString())) {
+//          System.out.println("Found a loop!");
+					return true;
+				}
+
+				return false;
+			} catch (IOException e) {
+				return false;
+			}
+		}
+
+		return false;
 	}
 
 }

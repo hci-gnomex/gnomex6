@@ -11,6 +11,7 @@ import {ProtocolDialogComponent} from "./protocol-dialog.component";
 import {first} from "rxjs/operators";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {UserPreferencesService} from "../../services/user-preferences.service";
 
 
 @Component({
@@ -38,7 +39,7 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
         }
     `],
 })
-export class MaterialsMethodsTabComponent implements OnInit, AfterViewInit, OnDestroy {
+export class MaterialsMethodsTabComponent implements OnInit {
 
     public requestCategoryName: string = "";
     public experimentCategoryName: string = "";
@@ -48,20 +49,25 @@ export class MaterialsMethodsTabComponent implements OnInit, AfterViewInit, OnDe
     public designAndInsertText: string = "";
     public codeIsolationPrepType: string = "";
     public protocols: any[] = [];
+    public _experiment: any = {};
+    public libraryPreparedBy: string = "";
 
 
     constructor(private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private protocolService: ProtocolService,
                 private matDialog: MatDialog,
-                private route: ActivatedRoute) {
+                private route: ActivatedRoute,
+                private prefService: UserPreferencesService) {
     }
 
     ngOnInit() {
         this.route.data.forEach((data: any) => {
             let exp: any = data.experiment;
             if (exp && exp.Request) {
+                this._experiment = exp.Request;
                 this.getMaterialsMethodsData(exp.Request);
+                this.getLibraryPreparer();
             } else {
                 this.dialogService.alert("Cannot load experiment data", null, DialogType.FAILED);
                 throwError(new Error("Cannot load experiment data"));
@@ -69,12 +75,6 @@ export class MaterialsMethodsTabComponent implements OnInit, AfterViewInit, OnDe
             }
         });
 
-    }
-
-    ngAfterViewInit () {
-    }
-
-    ngOnDestroy (): void {
     }
 
     getMaterialsMethodsData(experiment: any): void {
@@ -119,6 +119,31 @@ export class MaterialsMethodsTabComponent implements OnInit, AfterViewInit, OnDe
             }
         }
 
+    }
+
+    getLibraryPreparer(): void {
+        if (this._experiment && this._experiment.samples) {
+
+            let samplesRef: any[] = Array.isArray(this._experiment.samples) ? this._experiment.samples : [this._experiment.samples.Sample];
+            let addedIds: string[] = [];
+
+            this.libraryPreparedBy = "";
+
+            for (let sample of samplesRef) {
+                if (sample.idLibPrepPerformedBy && !addedIds.find((a) => { return a === sample.idLibPrepPerformedBy}) ) {
+                    let libraryPreparer: any = this.dictionaryService.getEntry("hci.gnomex.model.AppUserLite", sample.idLibPrepPerformedBy);
+
+                    if (libraryPreparer && (libraryPreparer.firstName || libraryPreparer.lastName)) {
+                        if (this.libraryPreparedBy.length > 0) {
+                            this.libraryPreparedBy += "\n";
+                        }
+                        this.libraryPreparedBy += this.prefService.formatUserName(libraryPreparer.firstName, libraryPreparer.lastName);
+                    }
+
+                    addedIds.push("" + sample.idLibPrepPerformedBy);
+                }
+            }
+        }
     }
 
     showProtocol(protocol: any): void {
