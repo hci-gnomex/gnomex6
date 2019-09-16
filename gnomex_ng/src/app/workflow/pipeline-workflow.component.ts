@@ -55,7 +55,7 @@ export class PipelineWorkflowComponent implements OnInit {
 
             this.columnDefs = [
                 {
-                    headerName: "Flow Cell Channel #",
+                    headerName: "Flow Cell Lane #",
                     editable: false,
                     field: "flowCellNumber",
                     valueFormatter: this.getFullFlowCellChannelNumber,

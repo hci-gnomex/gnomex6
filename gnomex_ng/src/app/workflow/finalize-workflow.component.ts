@@ -501,7 +501,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             if(this.lanes.length > 1) {
                 warningMessage = "Not all " + this.lanes.length + " lanes are populated.\n\n";
             } else {
-                warningMessage = "The channel is not populated.\n\n";
+                warningMessage = "The lane is not populated.\n\n";
             }
         }
         return  {errorMessage: errorMessage, warningMessage: warningMessage};
@@ -665,7 +665,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
 
             let i: string = channelNumber;
             if (!this.areBarcodeSequenceTagsUnique(i)) {
-                warningMessage += "Two or more samples in channel " + i + " do not differ by at least 3 base pairs.\n\n";
+                warningMessage += "Two or more samples in lane " + i + " do not differ by at least 3 base pairs.\n\n";
             }
         }
         return  {errorMessage: errorMessage, warningMessage: warningMessage};

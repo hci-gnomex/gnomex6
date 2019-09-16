@@ -92,7 +92,7 @@ export class SequenceLanesTabComponent extends PrimaryTab implements OnInit, OnD
         {headerName: "Sequencing Protocol", field: "sequencingProtocolDisplay"},
         {headerName: "Status in Workflow",  field: "workflowStatus"},
         {headerName: "Flow Cell #",         field: "flowCellNumber"},
-        {headerName: "Channel",             field: "flowCellChannelNumber"},
+        {headerName: "Lane",                field: "flowCellChannelNumber"},
         {headerName: "Last Cycle Status",   field: "lastCycleStatus"},
     ];
 

@@ -10,11 +10,11 @@ public class PersonEntry {
 	private String gender; // n
 	private String ccNumber;
 	private String slNumber;
-	private String aliasType;
+	private String testType; //testType
 	private String tissueType; // tissueType
 	public final static String AVATAR = "avatar";
 	public final static String FOUNDATION = "foundation";
-	public final static String TEMPEST = "tempest";
+	public final static String TEMPUS = "tempus";
 
 
 
@@ -25,14 +25,14 @@ public class PersonEntry {
 	PersonEntry(){
 	
 	}
-	PersonEntry(String mrn, String fullName, String gender,String ccNumber,String aliasType, String tissueType,String sampleSubtype, String submittedDiagnosis,String slNumber,String shadowId,String personId ){
+	PersonEntry(String mrn, String fullName, String gender,String ccNumber,String testType, String tissueType,String sampleSubtype, String submittedDiagnosis,String slNumber,String shadowId,String personId ){
 		this.mrn = mrn;
 		this.shadowId = shadowId;
 		this.personId = personId;
 		this.fullName = fullName;
 		this.gender = gender;
 		this.ccNumber = ccNumber;
-		this.aliasType = aliasType;
+		this.testType = testType;
 		this.slNumber = slNumber;
 		this.tissueType = tissueType;
 		this.sampleSubtype = sampleSubtype;
@@ -94,12 +94,12 @@ public class PersonEntry {
 		this.slNumber = slNumber;
 	}
 
-	public String getAliasType() {
-		return aliasType;
+	public String getTestType() {
+		return testType;
 	}
 
-	public void setAliasType(String aliasType) {
-		this.aliasType = aliasType;
+	public void setTestType(String aliasType) {
+		this.testType = aliasType;
 	}
 	public String getTissueType() {
 		return tissueType;
@@ -139,19 +139,20 @@ public class PersonEntry {
 			strBuild.append(setEmptyToNull(this.gender) +"\t");
 			strBuild.append(setEmptyToNull(this.ccNumber) +"\t");
 			strBuild.append(setEmptyToNull(this.shadowId) +"\t");
-			strBuild.append(setEmptyToNull(this.aliasType) +"\t");
+			strBuild.append(setEmptyToNull(this.testType) +"\t");
 			strBuild.append(setEmptyToNull(this.slNumber) +"\t");
 			strBuild.append(setEmptyToNull(this.tissueType) +"\t");
 			strBuild.append(setEmptyToNull(this.sampleSubtype) +"\t");
 			strBuild.append(setEmptyToNull(this.submittedDiagnosis) +"\n");
 		}
-		else if (PersonEntry.FOUNDATION.equals(personType)){
+		else if (PersonEntry.FOUNDATION.equals(personType)
+		|| PersonEntry.TEMPUS.equals(personType)){
 			strBuild.append(setEmptyToNull(this.mrn) +"\t");
 			strBuild.append(setEmptyToNull(this.personId) +"\t");
 			strBuild.append(setEmptyToNull(this.fullName) +"\t");
 			strBuild.append(setEmptyToNull(this.gender) +"\t");
 			strBuild.append(setEmptyToNull(this.shadowId) +"\t");
-			strBuild.append(setEmptyToNull(this.aliasType) +"\t");
+			strBuild.append(setEmptyToNull(this.testType) +"\t");
 			strBuild.append(setEmptyToNull(this.slNumber) +"\t");
 			strBuild.append(setEmptyToNull(this.sampleSubtype) +"\t");
 			strBuild.append(setEmptyToNull(this.tissueType) +"\t");

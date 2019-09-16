@@ -1,14 +1,9 @@
-
 import {AfterViewInit, Component, Input, OnInit, ViewChild} from "@angular/core";
 import {FormGroup, FormBuilder, Validators, FormControl} from "@angular/forms"
 import {DataTrackService} from "../../services/data-track.service";
 import {ActivatedRoute} from "@angular/router";
-import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {URLSearchParams} from "@angular/http";
 import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
 import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
-
-
 
 
 @Component({
@@ -24,30 +19,25 @@ import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-edito
     `]
 
 })
-export class DatatracksSummaryTabComponent implements OnInit,  AfterViewInit{
+export class DatatracksSummaryTabComponent implements OnInit {
     //Override
-    public showSpinner:boolean = false;
+    public showSpinner: boolean = false;
     public editorConfig: AngularEditorConfig;
-    public edit = false;
     public summaryFormGroup: FormGroup;
-    description:string = "";
+    description: string = "";
     @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
-    // todo need editable/viewable toggle for datatracks overview
-    @Input() editable;
+    @Input() private editable: boolean = false;
 
 
 
-    constructor(protected fb: FormBuilder,private dtService: DataTrackService,
+    constructor(protected fb: FormBuilder, private dtService: DataTrackService,
                 private orderValidateService: BrowseOrderValidateService,
-                private route: ActivatedRoute,
-                private secAdvisor: CreateSecurityAdvisorService){
+                private route: ActivatedRoute) {
     }
 
 
 
     ngOnInit():void{
-        this.edit = !this.secAdvisor.isGuest;
-
         this.editorConfig = {
             spellcheck: true,
             height: "25em",
@@ -55,21 +45,11 @@ export class DatatracksSummaryTabComponent implements OnInit,  AfterViewInit{
             enableToolbar: true,
         };
 
-
         this.summaryFormGroup=  this.fb.group({
             folderName:[ '', [ Validators.required, Validators.maxLength(100)]],
             summary:['', [ Validators.maxLength(5000)]],
             description:''
         });
-        if(!this.edit){
-            this.summaryFormGroup.disable();
-            this.editorConfig.editable = false;
-        }else{
-            this.summaryFormGroup.enable();
-            this.summaryFormGroup.get("description").enable();
-            this.editorConfig.editable = true;
-        }
-
 
         this.route.data.forEach(params =>{
             this.orderValidateService.dirtyNote = false;
@@ -82,16 +62,18 @@ export class DatatracksSummaryTabComponent implements OnInit,  AfterViewInit{
             this.summaryFormGroup.get("description").setValue(description);
         });
 
+        this.summaryFormGroup.markAsPristine();
+        if(this.editable) {
+            this.summaryFormGroup.enable();
+            this.editorConfig.editable = true;
+            this.editorConfig.showToolbar = true;
+        } else {
+            this.summaryFormGroup.disable();
+            this.editorConfig.editable = false;
+            this.editorConfig.showToolbar = false;
+        }
 
     }
-
-
-
-    ngAfterViewInit():void{
-
-    }
-
-
 
 }
 

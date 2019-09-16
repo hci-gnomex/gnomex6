@@ -9,7 +9,7 @@
             <img *ngIf="isEditMode" class="icon" [src]="this.constService.PAGE">
             {{isEditMode ? "View" : "Edit"}}
         </button>
-        <button mat-button *ngIf="this.showAutoDistributeDataTracks" (click)="this.autoDistributeDataTracks()"><img class="icon" [src]="constService.ICON_DATATRACK_NEW">Auto Distribute All Data Tracks</button>
+        <button mat-button *ngIf="this.showAutoDistributeDataTracks" (click)="this.distributeDataTracks()"><img class="icon" [src]="constService.ICON_DATATRACK_NEW"> Distribute Data Tracks</button>
         <button mat-button *ngIf="this.showManagePEDFile" (click)="this.showManagePEDFileWindow()"><img class="icon" [src]="constService.ICON_CHART_ORGANIZATION">Manage Ped File</button>
         <button mat-button (click)="this.shareWebLink()"><img class="icon" [src]="constService.GLOBE_LINK">Share URL</button>
         <button *ngIf="showLinkToExp"
@@ -43,7 +43,7 @@
         </mat-tab-group>
     </div>
     <div>
-        <save-footer (saveClicked)="save()"
+        <save-footer (saveClicked)="save()" [hidden]="this.routeOutlet !== 'analysisPanel'"
                      [disableSave]="this.analysisService.analysisOverviewForm.invalid || !isEditMode"
                      [dirty]="this.analysisService.analysisOverviewForm.dirty">
         </save-footer>

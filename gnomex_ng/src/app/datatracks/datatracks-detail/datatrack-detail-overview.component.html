@@ -64,16 +64,16 @@
 
         <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border" >
             <mat-tab style="height:100%" label="Summary">
-                <dt-summary-tab ></dt-summary-tab>
+                <dt-summary-tab [editable]="routeOutlet === 'datatracksPanel' && !this.secAdvisorService.isGuest"></dt-summary-tab>
             </mat-tab>
             <mat-tab style="height:100%" label="Annotations">
-                <annotation-tab [annotations]="annotations" [orderType]="types.DATATRACK"> </annotation-tab>
+                <annotation-tab [annotations]="annotations" [orderType]="types.DATATRACK" [disabled]="routeOutlet !== 'datatracksPanel'"> </annotation-tab>
             </mat-tab>
             <mat-tab class="full-height" label="Files">
                 <datatracks-files-tab></datatracks-files-tab>
             </mat-tab>
             <mat-tab style="height:100%;" label="Visibility">
-                <dt-visibility-tab></dt-visibility-tab>
+                <dt-visibility-tab [disabled]="routeOutlet !== 'datatracksPanel'"></dt-visibility-tab>
             </mat-tab>
             <mat-tab *ngIf="showRelatedDataTab" style="height:100%;" label="Related Data">
                 <related-data-tab [relatedObjects]="relatedObjects" >
@@ -96,7 +96,7 @@
             Show Folder(s)
         </button>
 
-        <save-footer (saveClicked)="save()"
+        <save-footer (saveClicked)="save()" [hidden]="routeOutlet !== 'datatracksPanel'"
                      [disableSave]="this.dtOverviewForm.invalid || !this.canWrite"
                      [showSpinner]="showSaveSpinner"
                      [dirty]="this.dtOverviewForm.dirty || this.orderValidateService.dirtyNote ">

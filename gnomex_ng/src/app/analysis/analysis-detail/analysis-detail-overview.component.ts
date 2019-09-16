@@ -21,7 +21,11 @@ import {HttpParams} from "@angular/common/http";
 import {first} from "rxjs/operators";
 import {GnomexService} from "../../services/gnomex.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
-import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {ActionType, GDActionConfig} from "../../util/interfaces/generic-dialog-action.model";
+import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
+import {FileService} from "../../services/file.service";
+import {UtilService} from "../../services/util.service";
+import {DistributeDatatrackDialogComponent} from "./distribute-datatrack-dialog.component";
 
 
 @Component({
@@ -60,9 +64,11 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
     public showManagePEDFile: boolean = false;
     public showEdit: boolean = false;
     public isEditMode: boolean = false;
+    public routeOutlet: string = "";
 
     public analysisTreeNode: any;
     private analysisTreeNodeSubscription: Subscription;
+    private cachedDistributeFilesSubscription: Subscription;
 
 
 
@@ -75,6 +81,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
                 private propertyService: PropertyService,
                 private dialogsService: DialogsService,
                 private gnomexService: GnomexService,
+                private fileService: FileService,
                 private dataTrackService: DataTrackService) {
     }
 
@@ -87,13 +94,14 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
         });
 
         this.route.data.forEach((data: any) => {
+            this.routeOutlet = this.route.outlet;
             this.analysisService.analysisOverviewForm.reset();
             this.analysis = data.analysis ? data.analysis.Analysis : null;
             if(this.analysis) {
                 let annots = this.analysis.AnalysisProperties;
                 this.showRelatedDataTab = this.initRelatedData(this.analysis);
                 this.showLinkToExp = !this.secAdvisor.isGuest && this.analysis.canRead === "Y";
-                this.showEdit = this.analysis.canUpdate === "Y";
+                this.showEdit = this.analysis.canUpdate === "Y" && this.routeOutlet === "analysisPanel";
                 this.isEditMode = this.analysisService.getEditMode();
 
                 if(annots) {
@@ -201,25 +209,48 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
                 ]});
     }
 
-    public autoDistributeDataTracks(): void {
+    public distributeDataTracks(): void {
         if (this.analysis && this.analysis.idAnalysis) {
-            let genomeBuilds: any[] = this.analysis.genomeBuilds ? (Array.isArray(this.analysis.genomeBuilds) ? this.analysis.genomeBuilds : [this.analysis.genomeBuilds.GenomeBuild]) : [];
-            let genomeBuild: any = genomeBuilds.length > 0 ? genomeBuilds[0] : null;
-            if (!genomeBuild || !genomeBuild.isActive || genomeBuild.isActive !== "Y") {
-                this.dialogsService.alert("An active genome build is required to create data tracks", "Invalid");
-                return;
-            }
+
+            this.fileService.cachedAnalysisOrganizeFiles().pipe(first()).subscribe(data =>{
+                let genomeBuilds: any[] = this.analysis.genomeBuilds ? (Array.isArray(this.analysis.genomeBuilds) ? this.analysis.genomeBuilds : [this.analysis.genomeBuilds.GenomeBuild]) : [];
+                let genomeBuild: any = genomeBuilds.length > 0 ? genomeBuilds[0] : null;
+                if (!genomeBuild || !genomeBuild.isActive || genomeBuild.isActive !== "Y") {
+                    this.dialogsService.alert("An active genome build is required to create data tracks", "Invalid");
+                    return;
+                }
+                if(data){
+                    let config: MatDialogConfig = new MatDialogConfig();
+                    config.data = {
+                        gridData: data,
+                        analysis: this.analysis
+                    };
+                    config.width = "70em";
+                    config.height = "50em";
+
+
+                    let actionConfig :GDActionConfig  = {actions: [
+                            {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save" , internalAction: "save"},
+                            {type: ActionType.SECONDARY,  name: "Cancel", internalAction: "cancel"}
+                        ]};
+
+                    this.dialogsService.genericDialogContainer(DistributeDatatrackDialogComponent, "Distribute DataTracks For " + this.analysis.number,
+                        null, config, actionConfig );
+                }
+
+
+            });
+
+
+
+
+
+            //this.dialogsService.genericDialogContainer()
+
 
             // TODO check files tab does not have unregistered files. If so, save files and then call auto distribute data tracks
 
-            this.dataTrackService.createAllDataTracks(this.analysis.idAnalysis).subscribe((result: any) => {
-                if (result && result.result && result.result === "SUCCESS") {
 
-                    // TODO refresh download list of analysis files
-                    this.dialogsService.alert("Data tracks created for all applicable files", null, DialogType.SUCCESS);
-                }
-            }, (err: IGnomexErrorResponse) => {
-            });
         }
     }
 
@@ -300,9 +331,11 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
     }
 
     ngOnDestroy() {
-        this.analysisTreeNodeSubscription.unsubscribe();
+        UtilService.safelyUnsubscribe(this.analysisTreeNodeSubscription);
+        UtilService.safelyUnsubscribe(this.cachedDistributeFilesSubscription);
         this.analysisService.clearAnalysisOverviewForm();
         this.analysisService.setEditMode(false);
+
     }
 
 }
