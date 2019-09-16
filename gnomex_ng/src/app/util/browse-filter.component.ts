@@ -396,11 +396,12 @@ export class BrowseFilterComponent implements OnInit, OnDestroy, OnChanges {
             }
         }
 
-        if (isGuestState && !this.gnomexService.orderInitObj) {
+        if ((isGuestState || !this.createSecurityAdvisorService.isAdmin) && !this.gnomexService.orderInitObj) {
             setTimeout(() => {
                 this.search();
             });
         }
+
     }
 
     ngOnChanges(changes: SimpleChanges): void {
