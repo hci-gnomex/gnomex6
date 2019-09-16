@@ -222,12 +222,12 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
 
     setChannelLabel(){
         let selectedType = this.formGroup.get("type").value;
-        this.channelLabel = this.expPlatformService.isIllumina ? " Number of Lanes on Flowcell " : "Number of channels";
-        if(this.expPlatformService.isIllumina){
+
+        if (this.expPlatformService.isIllumina) {
             this.channelLabel = "Number of Lanes on Flowcell";
             this.channelMax = 8;
-        }else{
-            this.channelLabel = "Number of channels";
+        } else {
+            this.channelLabel = "Number of Lanes";
             this.channelMax = 2;
         }
 
