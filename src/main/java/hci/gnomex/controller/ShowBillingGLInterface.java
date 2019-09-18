@@ -530,13 +530,6 @@ public class ShowBillingGLInterface extends ReportCommand implements Serializabl
     values.add(getFixedWidthEmptyValue(16)); //statistics amount (blank)
     values.add(getFixedWidthValue(this.journalLineRef, 10)); //journal line ref
     values.add(getFixedWidthValue(description, 30)); //journal line description
-    values.add(getFixedWidthEmptyValue(5)); // foreign currency rate type (blank)
-    values.add(getFixedWidthEmptyValue(16)); // foreign currency exchange rate (blank)
-    values.add(getFixedWidthEmptyValue(16)); // base currency amount (blank)
-    values.add(getFixedWidthEmptyValue(3)); 
-    values.add(getFixedWidthEmptyValue(3));
-    values.add(getFixedWidthEmptyValue(3)); 
-    values.add(getFixedWidthEmptyValue(3));
 
     reportRow.setValues(values);
     tray.addRow(reportRow);
@@ -594,18 +587,18 @@ public class ShowBillingGLInterface extends ReportCommand implements Serializabl
   private Object[] getFixedWidthValue(String buf, int len) {
     ArrayList valueInfo = new ArrayList();
     valueInfo.add(getString(buf, len, true));
-    valueInfo.add(getString(buf, len, false));
+    valueInfo.add(getString(buf, len, false));// alignment works at the cost putting space in every cell string
     valueInfo.add(new Integer(len));
-    valueInfo.add("left");
+    valueInfo.add("left"); // on the element later in jsp <td align='left'> is default for string so doesn't affect anything>
     return valueInfo.toArray();
   }
 
   private Object[] getFixedWidthValueRightJustify(String buf, int len) {
     ArrayList valueInfo = new ArrayList();
     valueInfo.add(getStringRightJustify(buf, len, true));
-    valueInfo.add(getStringRightJustify(buf, len, false));
+    valueInfo.add(getStringRightJustify(buf, len, false));// aligntment works at the cost putting space in every cell string
     valueInfo.add(new Integer(len));
-    valueInfo.add("right");
+    valueInfo.add("right");// on the element later in jsp <td align='right'> doesn't actually align right>
     return valueInfo.toArray();
   }
 
