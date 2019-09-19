@@ -54,7 +54,7 @@ public class GetCoreAdmins extends GNomExCommand implements Serializable {
                     AppUser au = i.next();
                     Element admin = new Element("Admin");
                     admin.setAttribute("idAppUser", au.getIdAppUser().toString());
-                    admin.setAttribute("display", au.getDisplayNameXMLSafe());
+                    admin.setAttribute("display", au.getFirstLastDisplayName());
                     doc.getRootElement().addContent(admin);
                 }
 
