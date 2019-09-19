@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, Inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatDialogConfig} from "@angular/material";
 import {ActivatedRoute, Router} from "@angular/router";
 
@@ -11,8 +11,12 @@ import {DictionaryService} from "../services/dictionary.service";
 import {ProtocolService} from "../services/protocol.service";
 import {CreateProtocolDialogComponent} from "./create-protocol-dialog.component";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
-import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {ActionType, GDAction} from "../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../services/constants.service";
+import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
+import {HttpParams} from "@angular/common/http";
+import {EditProtocolComponent} from "./edit-protocol.component";
 
 @Component({
     selector: 'manage-protocols',
@@ -71,9 +75,10 @@ import {ConstantsService} from "../services/constants.service";
         }
     `]
 })
-export class ManageProtocolsComponent implements OnInit, OnDestroy{
+export class ManageProtocolsComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
     @ViewChild("navigationTree") treeComponent: TreeComponent;
+    @ViewChild("editProtocolCmp") editProtocolCmp: EditProtocolComponent;
 
     private protocolSubscription: Subscription;
     private protocolListSubscription: Subscription;
@@ -105,14 +110,26 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
 
     public disableDelete: boolean = true;
     public disableNew: boolean = true;
+    public isDialog: boolean = false;
+    private preSelectedDictionary: string;
+    private preSelectedEntry: string;
 
-    constructor(private dialogService: DialogsService,
+    constructor(private dialogRef: MatDialogRef<ManageProtocolsComponent>,
+                @Inject(MAT_DIALOG_DATA) private data: any,
+                private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private protocolService: ProtocolService,
                 private route: ActivatedRoute,
                 private router: Router,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
-                private constService: ConstantsService) { }
+                private constService: ConstantsService) {
+        super();
+        if(this.data && Object.keys(this.data).length > 0) {
+            this.isDialog = this.data.isDialog;
+            this.preSelectedDictionary = this.data.preSelectedDictionary;
+            this.preSelectedEntry = this.data.preSelectedEntry;
+        }
+    }
 
     ngOnInit(): void {
         this.treeModel = this.treeComponent.treeModel;
@@ -131,7 +148,10 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
                     this.treeModel.expandAll();
 
                     this.dialogService.stopAllSpinnerDialogs();
-                    if (this.treeModel && this.treeModel.getNodeById('' + this.mostRecentlyDisplayedProtocolId + this.mostRecentlyDisplayedProtocolProtocolClassName)) {
+                    if(this.treeModel && this.preSelectedEntry && this.preSelectedDictionary) {
+                        this.treeModel.getNodeById(this.preSelectedEntry + this.preSelectedDictionary).setIsActive(true, false);
+                        this.preSelectedEntry = "";
+                    } else if (this.treeModel && this.treeModel.getNodeById('' + this.mostRecentlyDisplayedProtocolId + this.mostRecentlyDisplayedProtocolProtocolClassName)) {
                         this.treeModel.getNodeById('' + this.mostRecentlyDisplayedProtocolId + this.mostRecentlyDisplayedProtocolProtocolClassName).setIsActive(true, false);
                     }
                 });
@@ -140,7 +160,7 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
             setTimeout(() => {
                 this.dialogService.startDefaultSpinnerDialog();
 
-                this.protocolService.getProtocolList();
+                this.protocolService.getProtocolList(this.isDialog && this.preSelectedDictionary ? new HttpParams().set("protocolClassName", this.preSelectedDictionary) : null);
             });
         }
 
@@ -160,14 +180,18 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
                 this.mostRecentlyDisplayedProtocolId = '';
 
                 this.refresh();
-
-                this.router.navigate(['/manage-protocols', { outlets: { 'browsePanel': ['overview'] } }]);
+                if(!this.isDialog) {
+                    this.router.navigate(['/manage-protocols', { outlets: { 'browsePanel': ['overview'] } }]);
+                }
             });
         }
 
         this.experimentPlatformList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY);
         this.analysisTypeList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ANALYSIS_TYPE);
         this.userList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.APP_USER);
+
+        this.dirty = () => {return this.editProtocolCmp.form.dirty; };
+        this.primaryDisable = ((action?: GDAction) => {return !this.editProtocolCmp.form.dirty || this.editProtocolCmp.form.invalid});
     }
 
     ngOnDestroy(): void {
@@ -182,6 +206,13 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
         }
         if (this.deleteProtocolSubscription) {
             this.deleteProtocolSubscription.unsubscribe();
+        }
+        this.protocolService.setMainPaneTitle(null);
+    }
+
+    save(): void {
+        if(this.isDialog) {
+            this.editProtocolCmp.onSaveButtonClicked();
         }
     }
 
@@ -232,6 +263,10 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
             }
         }
 
+        if (event && event.node && event.node.data) {
+            this.mostRecentlySelectedTreeItem = event.node.data;
+        }
+
         if (event
             && event.node
             && event.node.data
@@ -261,25 +296,28 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
             this.mostRecentlyDisplayedProtocolProtocolClassName = event.node.data.protocolClassName;
 
             setTimeout(() => {
-                this.router.navigate([
-                    '/manage-protocols',
-                    {
-                        outlets: {
-                            'browsePanel': ['details', event.node.data.protocolClassName,  event.node.data.id]
+                if(this.isDialog) {
+                    this.dialogService.stopAllSpinnerDialogs();
+                } else {
+                    this.router.navigate([
+                        '/manage-protocols',
+                        {
+                            outlets: {
+                                'browsePanel': ['details', event.node.data.protocolClassName,  event.node.data.id]
+                            }
                         }
-                    }
-                ]);
+                    ]);
+                }
             });
         } else {
             this.protocolService.setMainPaneTitle("Protocol:");
             this.mostRecentlyDisplayedProtocolId = "";
             this.mostRecentlyDisplayedProtocolProtocolClassName = event.node.data.protocolClassName;
-            this.router.navigate(['/manage-protocols', { outlets: { 'browsePanel': ['overview'] } }]);
+            if(!this.isDialog) {
+                this.router.navigate(['/manage-protocols', { outlets: { 'browsePanel': ['overview'] } }]);
+            }
         }
 
-        if (event && event.node && event.node.data) {
-            this.mostRecentlySelectedTreeItem = event.node.data;
-        }
     }
 
     private programaticallySelectTreeNode(idProtocol: string, protocolClassName: string): void {
@@ -356,7 +394,7 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
         this.dialogService.startDefaultSpinnerDialog();
 
         setTimeout(() => {
-            if (this.mostRecentlyDisplayedProtocolProtocolClassName && this.mostRecentlyDisplayedProtocolId) {
+            if (!this.isDialog && this.mostRecentlyDisplayedProtocolProtocolClassName && this.mostRecentlyDisplayedProtocolId) {
                 this.router.navigate([
                     '/manage-protocols',
                     {
@@ -375,7 +413,7 @@ export class ManageProtocolsComponent implements OnInit, OnDestroy{
                 this.protocolService.getProtocolByIdAndClass(this.mostRecentlyDisplayedProtocolId, this.mostRecentlyDisplayedProtocolProtocolClassName);
             }
 
-            this.protocolService.getProtocolList();
+            this.protocolService.getProtocolList(this.isDialog && this.preSelectedDictionary ? new HttpParams().set("protocolClassName", this.preSelectedDictionary) : null);
         });
     }
 }

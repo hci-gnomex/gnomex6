@@ -61,14 +61,14 @@ import {GDAction} from "../util/interfaces/generic-dialog-action.model";
                 <div [hidden]="!this.dictionaryName">
                     <label>{{this.dictionaryName}}</label>
                 </div>
-                <div [hidden]="!this.selectedDictionary" class="flex-one">
+                <div [hidden]="!this.selectedDictionary" class="flex-one extra-padded-top">
                     <ag-grid-angular class="ag-theme-balham full-height full-width"
                                      (gridReady)="this.onGridReady($event)"
                                      [enableSorting]="true"
                                      [enableColResize]="true">
                     </ag-grid-angular>
                 </div>
-                <form [hidden]="!this.selectedEntry" class="flex-one overflow-auto" [formGroup]="this.entryForm">
+                <form [hidden]="!this.selectedEntry" class="flex-one overflow-auto extra-padded-top" [formGroup]="this.entryForm">
                     <ng-container *ngFor="let field of this.visibleEntryFields">
                         <div [ngSwitch]="field.dataType" class="full-width">
                             <mat-form-field *ngSwitchCase="'text'" class="full-width">
@@ -108,6 +108,9 @@ import {GDAction} from "../util/interfaces/generic-dialog-action.model";
     styles: [`
         .extra-padded {
             padding: 1em;
+        }
+        .extra-padded-top {
+            padding-top: 1em;
         }
         .flex-one {
             flex: 1;
@@ -212,6 +215,9 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
 
     private buildTree(): void {
         let dictionariesTemp: Dictionary[] = this.dictionaryService.getEditableDictionaries();
+        if(this.isDialog) {
+            dictionariesTemp = dictionariesTemp.filter((value: Dictionary) => (value.className === this.preSelectedDictionary));
+        }
         for (let dictionary of dictionariesTemp) {
             dictionary.display = dictionary.displayName;
             dictionary.icon = "./assets/folder.png";
@@ -420,31 +426,26 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
 
             let className: string = this.selectedTreeNode.data.className ? this.selectedTreeNode.data.className : this.selectedTreeNode.parent.data.className;
             this.dictionaryService.save(isInsertMode, object, className, () => {
-                if(this.isDialog) {
-                    this.showSpinner = false;
-                    this.dialogRef.close();
-                } else {
-                    this.buildTree();
-                    this.showSpinner = false;
-                    setTimeout(() => {
-                        for (let dict of this.treeComponent.treeModel.roots) {
-                            if (dict.data.className === className) {
-                                dict.expand();
-                                if (isInsertMode) {
-                                    dict.toggleActivated(null);
-                                } else {
-                                    for (let entry of dict.children) {
-                                        if (entry.data[dataKeyField] === dataKeyValue) {
-                                            entry.toggleActivated(null);
-                                            break;
-                                        }
+                this.buildTree();
+                this.showSpinner = false;
+                setTimeout(() => {
+                    for (let dict of this.treeComponent.treeModel.roots) {
+                        if (dict.data.className === className) {
+                            dict.expand();
+                            if (isInsertMode) {
+                                dict.toggleActivated(null);
+                            } else {
+                                for (let entry of dict.children) {
+                                    if (entry.data[dataKeyField] === dataKeyValue) {
+                                        entry.toggleActivated(null);
+                                        break;
                                     }
                                 }
-                                break;
                             }
+                            break;
                         }
-                    });
-                }
+                    }
+                });
             }, () => {
                 this.showSpinner = false;
                 this.dialogsService.error("An error occurred while saving dictionary");

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from "@angular/core";
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild} from "@angular/core";
 import {ProtocolService} from "../services/protocol.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {Subscription} from "rxjs";
@@ -10,6 +10,7 @@ import {DictionaryService} from "../services/dictionary.service";
 import {AppUserListService} from "../services/app-user-list.service";
 import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
 import {UserPreferencesService} from "../services/user-preferences.service";
+import {HttpParams} from "@angular/common/http";
 
 @Component({
     selector: "edit-protocol",
@@ -76,10 +77,12 @@ import {UserPreferencesService} from "../services/user-preferences.service";
         }
     `]
 })
-export class EditProtocolComponent implements OnInit, OnDestroy {
+export class EditProtocolComponent implements OnInit, OnDestroy, OnChanges {
 
     @Output("protocolLoaded") protocolLoaded: EventEmitter<boolean> = new EventEmitter<boolean>();
     @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
+    @Input() public isDialog: boolean = false;
+    @Input() private selectedItem: any = null;
 
     public form: FormGroup;
 
@@ -94,9 +97,9 @@ export class EditProtocolComponent implements OnInit, OnDestroy {
 
     editorConfig: AngularEditorConfig = {
         spellcheck: true,
-        height: "100%",
+        height: "23em",
         minHeight: "5em",
-        maxHeight: "100%",
+        maxHeight: "23em",
         width: "100%",
         minWidth: "5em",
         enableToolbar: true,
@@ -187,7 +190,7 @@ export class EditProtocolComponent implements OnInit, OnDestroy {
             user[this.prefService.userDisplayField] = this.prefService.formatUserName(user.firstName, user.lastName);
         }));
 
-        if (this.route && this.route.params && !this.routeParameterSubscription) {
+        if (!this.isDialog && this.route && this.route.params && !this.routeParameterSubscription) {
             this.routeParameterSubscription = this.route.params.subscribe((params) => {
 
                 setTimeout(() => {
@@ -203,6 +206,23 @@ export class EditProtocolComponent implements OnInit, OnDestroy {
                     }
                 });
 
+            });
+        }
+    }
+
+    ngOnChanges(changes: SimpleChanges): void {
+        if(this.isDialog) {
+            setTimeout(() => {
+                if (this.selectedItem && this.selectedItem.id && this.selectedItem.protocolClassName) {
+                    this.protocolId = this.selectedItem.id;
+                    this.protocolClassName = this.selectedItem.protocolClassName;
+                    this.spinnerRef = this.dialogService.startDefaultSpinnerDialog();
+                    this.protocolService.getProtocolByIdAndClass(this.protocolId, this.protocolClassName);
+                } else if(this.selectedItem && this.selectedItem.isProtocol === "N") {
+                    this.selectedProtocol = null;
+                    this.protocolId = "";
+                    this.protocolClassName = this.selectedItem.protocolClassName;
+                }
             });
         }
     }
@@ -227,7 +247,7 @@ export class EditProtocolComponent implements OnInit, OnDestroy {
         if (this.protocolId && this.protocolClassName) {
             this.protocolService.getProtocolByIdAndClass(this.protocolId, this.protocolClassName);
         }
-        this.protocolService.getProtocolList();
+        this.protocolService.getProtocolList(this.isDialog && this.protocolClassName ? new HttpParams().set("protocolClassName", this.protocolClassName) : null);
     }
 
     public checkToEnableViewURLButton(event: any): void {

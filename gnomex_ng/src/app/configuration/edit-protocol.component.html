@@ -5,7 +5,7 @@
     <div class="full-width flex-grow no-overflow">
         <form [formGroup]="this.form" class="full-width full-height">
         <div class="full-width full-height border">
-            <div *ngIf="!!selectedProtocol" class="full-width full-height padded">
+            <div *ngIf="!!selectedProtocol" class="full-width full-height padded overflow-auto">
 
                 <div class="full-width flex-container-row">
                     <div class="flex-grow padded">
@@ -96,7 +96,7 @@
         </div>
         </form>
     </div>
-    <div class="full-width no-overflow padded-top-bottom right-align">
+    <div class="full-width no-overflow padded-top-bottom right-align" *ngIf="!isDialog">
         <div class="inline-block minimize padded-left-right ">
             <div *ngIf="this.form.dirty" class="inline-block padded warning-block">Your changes have not been saved</div>
         </div>
