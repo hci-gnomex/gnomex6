@@ -18,6 +18,7 @@ import {AnalysisService} from "../../services/analysis.service";
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../../services/constants.service";
+import {ManageProtocolsComponent} from "../../configuration/manage-protocols.component";
 
 @Component({
     selector: "analysis-info-tab",
@@ -418,7 +419,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
         config.disableClose = true;
         config.data = {
             isDialog: true,
-            preSelectedDictionary: "hci.gnomex.model.AnalysisType",
+            preSelectedDictionary: DictionaryService.ANALYSIS_TYPE,
             preSelectedEntry: this.form.controls["idAnalysisType"].value
         };
 
@@ -434,16 +435,29 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     public openEditAnalysisProtocol(): void {
-        let manageProtocolsRoute: string = "/manage-protocols";
-        if (this.form.dirty) {
+        if(this.form.dirty) {
             this.dialogsService.confirm("Unsaved changes will be lost. Proceed?").subscribe((result: any) => {
-                if (result) {
-                    this.router.navigateByUrl(manageProtocolsRoute);
+                if(!result) {
+                    return;
                 }
             });
-        } else {
-            this.router.navigateByUrl(manageProtocolsRoute);
         }
+
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "75em";
+        config.height = "50em";
+        config.autoFocus = false;
+        config.data = {
+            isDialog: true,
+            preSelectedDictionary: ProtocolService.ANALYSIS_PROTOCOL_CLASS_NAME,
+            preSelectedEntry: this.form.controls["idAnalysisProtocol"].value
+        };
+
+        this.dialogsService.genericDialogContainer(ManageProtocolsComponent, "Analysis Protocols", null, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: null, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]});
     }
 
     public openEditOrganism(): void {

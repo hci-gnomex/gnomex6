@@ -1,6 +1,6 @@
 <div class="full-width full-height" style="max-height: 100%;">
     <as-split>
-        <as-split-area [size]="20">
+        <as-split-area [size]="25">
             <div class="flex-container-col full-width full-height padded-left-right border">
                 <div class="full-width no-overflow padded-top-bottom">
                     Protocols
@@ -44,8 +44,9 @@
                 </div>
             </div>
         </as-split-area>
-        <as-split-area [size]="80">
-            <configuration-browse-panel></configuration-browse-panel>
+        <as-split-area [size]="75">
+            <configuration-browse-panel *ngIf="!isDialog"></configuration-browse-panel>
+            <edit-protocol #editProtocolCmp *ngIf="isDialog" [isDialog]="isDialog" [selectedItem]="mostRecentlySelectedTreeItem"></edit-protocol>
         </as-split-area>
     </as-split>
 </div>
