@@ -25,6 +25,7 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
 import {GridApi} from "ag-grid-community";
 import {ConstantsService} from "../../services/constants.service";
 import {PropertyService} from "../../services/property.service";
+import {NewExperimentService} from "../../services/new-experiment.service";
 
 @Component({
     selector: "tabConfirmIllumina",
@@ -656,7 +657,11 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
         this.tabIndexToInsertAnnotations = 150;
 
-        if (this._experiment) {
+        if (this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.type !== NewExperimentService.TYPE_QC
+            && this._experiment.requestCategory.type !== NewExperimentService.TYPE_GENERIC) {
+
             for (let sampleAnnotation of this._experiment.getSelectedSampleAnnotations()) {
                 let fullProperty = this.propertyList.filter((value: any) => {
                     return value.idProperty === sampleAnnotation.idProperty;
@@ -884,7 +889,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     public displayAnnotationValue(annotation: any): string {
         if (annotation && annotation.codePropertyType) {
             switch (annotation.codePropertyType) {
-                case 'TEXT'    : return annotation.value ? annotation.value : '';
+                case 'TEXT'    :
+                case 'CHECK'   : return annotation.value ? annotation.value : ''; break;
                 case 'OPTION'  :
                 case 'MOPTION' :
                     let temp: string = '';
