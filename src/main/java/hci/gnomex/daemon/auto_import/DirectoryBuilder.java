@@ -254,6 +254,10 @@ public class DirectoryBuilder {
 			if(mode.equals("tempus")){
 				this.moveTheFiles(filesWithPaths, Arrays.asList("echo move left over files to Flagged",
 						"mv -t " + this.currentDownloadLocation + "Flagged" +" " + currentDownloadLocation +"*"));
+
+
+			}else{
+				this.moveTheFiles(filesWithPaths,  new ArrayList<>());
 			}
 
 

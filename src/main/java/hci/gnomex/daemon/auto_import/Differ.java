@@ -288,11 +288,14 @@ public class Differ {
 
 	public static String getNameByExistingCaptureGroup( List<Integer> captureGroups, Matcher m ){
 		String matchedName = "";
+
+
 		for(Integer cp : captureGroups){
 			if(m.groupCount() < cp){
 				System.out.println("Error: End Capture Group  cannot greater than actual capture groups length: " +  m.groupCount());
 				System.exit(1);
 			}
+
 			String name  = m.group(cp);
 			if(name != null || !name.equals("")){
 				matchedName = name;

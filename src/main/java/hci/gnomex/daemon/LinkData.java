@@ -64,7 +64,6 @@ public class LinkData extends TimerTask {
     public LinkData(String[] args) {
         nxtRequest = 0;
         int i = -1;
-
         while (i < args.length) {
             i++;
             args[i] = args[i].toLowerCase();
@@ -98,14 +97,14 @@ public class LinkData extends TimerTask {
                 regex = args[++i];
             }else if(args[i].equals("-cp")){
                 i++;
-              while(args[i].charAt(0) != '-'){
-                  captureGroupIndexes.add(Integer.parseInt(args[i]));
-                  i++;
-              }
-              if(captureGroupIndexes.size() == 0){
-                  System.out.println("If you want to specify which capture groups. You need to provide atleast one index");
-                  System.exit(1);
-              }
+                while(args[i].charAt(0) != '-'){
+                    captureGroupIndexes.add(Integer.parseInt(args[i]));
+                    i++;
+                }
+                if(captureGroupIndexes.size() == 0){
+                    System.out.println("If you want to specify which capture groups. You need to provide atleast one index");
+                    System.exit(1);
+                }
 
             } else if( args[i].equals("-linkfolder")){
                 linkFolder = true;
@@ -237,7 +236,7 @@ public class LinkData extends TimerTask {
             buf.append(requestList[nxtOne] + ";");
             if (debug) System.out.println("ExperimentFile query: " + buf.toString());
 
-            List<String> names = new ArrayList<String>();
+            Set<String> names = new HashSet<>();
 
             rs = stmt.executeQuery(buf.toString());
             while (rs.next()) {
@@ -249,15 +248,21 @@ public class LinkData extends TimerTask {
             if (debug) System.out.println("size of names: " + names.size());
             // match name with regex if specified
             if(regex != null) {
-                List<String> regexNames = new ArrayList<String>();
+                Set<String> regexNames = new HashSet<String>();
 
                 Pattern p = null;
 
                 p = Pattern.compile(regex);
-                for (int i = 0; i < names.size(); i++) {
-                    Matcher m = p.matcher(names.get(i));
-                    String name = Differ.getNameByExistingCaptureGroup(captureGroupIndexes, m);
-                    regexNames.add(name);
+                if (debug) System.out.println("Pattern: " + p.toString());
+                for (String name : names) {
+                    Matcher m = p.matcher(name);
+                    if(m.matches()){
+                        String capturedName = Differ.getNameByExistingCaptureGroup(captureGroupIndexes, m);
+                        regexNames.add(capturedName);
+                    }else{
+                        regexNames.add(name);
+                        continue;
+                    }
                 }
                 names = regexNames;
             }
@@ -330,7 +335,7 @@ public class LinkData extends TimerTask {
                         filename =  dummyFile.getParentFile().getName();
 
                         try{
-                           int personID = Integer.parseInt(filename); // always hci person id for folder name
+                            int personID = Integer.parseInt(filename); // always hci person id for folder name
                         }catch(NumberFormatException nfe){
                             System.out.println("skipping... sample data doesn't have wrapping folder");
                             continue;
