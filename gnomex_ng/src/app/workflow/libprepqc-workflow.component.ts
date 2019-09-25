@@ -49,18 +49,18 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
     private dirty: boolean = false;
     private showSpinner: boolean = false;
     private workItem: any;
-    private gridApi:GridApi;
+    private gridApi: GridApi;
     private gridColumnApi;
     private label: string = "Illumina Library Prep QC";
     private codeStepNext: string;
-    private libraryPrepQCProtocols: any[] =[];
+    private libraryPrepQCProtocols: any[] = [];
     private coreAdmins: any[] = [];
     // left to have nova, hi, mi until we phase them out
-    public readonly codeStepArray:any[] = [
-        { label:"Illumina Seq ", codeStepNext: this.workflowService.ILLSEQ_PREP_QC  },
-        { label:"Illumina NovaSeq", codeStepNext: "NOSEQPREPQC" },
-        { label:"Illumina HiSeq", codeStepNext: "HSEQPREPQC" },
-        { label:"Illumina MiSeq", codeStepNext:"MISEQPREPQC"}
+    public readonly codeStepArray: any[] = [
+        { label: "Illumina Seq ", codeStepNext: this.workflowService.ILLSEQ_PREP_QC  },
+        { label: "Illumina NovaSeq", codeStepNext: this.workflowService.NOSEQ_PREP_QC},
+        { label: "Illumina HiSeq", codeStepNext: this.workflowService.HSEQ_PREP_QC },
+        { label: "Illumina MiSeq", codeStepNext: this.workflowService.MISEQ_PREP_QC}
     ];
 
 
@@ -169,6 +169,9 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     selectCodeOption() {
+        if(!this.codeStepNext) {
+            this.codeStepNext = this.workflowService.ALL_PREP_QC;
+        }
         this.initialize();
     }
 

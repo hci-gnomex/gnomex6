@@ -366,10 +366,11 @@ public class WorkItemFilter extends DetailObject {
       queryBuf.append("    h.extractionFailed, ");
       queryBuf.append("    h.extractionBypassed ");
     } else if (this.codeStepNext.equals(Step.SEQ_PREP) ||
+                this.codeStepNext.equals(Step.NOSEQ_PREP) ||
                 this.codeStepNext.equals(Step.HISEQ_PREP) ||
                 this.codeStepNext.equals(Step.ALL_PREP) ||
-            this.codeStepNext.equals(Step.MISEQ_PREP) ||
-      this.codeStepNext.equals(Step.ILLSEQ_PREP) ) {
+                this.codeStepNext.equals(Step.MISEQ_PREP) ||
+                this.codeStepNext.equals(Step.ILLSEQ_PREP) ) {
       queryBuf.append("      , ");
       queryBuf.append("    s.idSeqLibProtocol, ");
       queryBuf.append("    s.seqPrepByCore, ");
@@ -394,8 +395,7 @@ public class WorkItemFilter extends DetailObject {
             this.codeStepNext.equals(Step.ILLSEQ_PREP_QC) ||
             this.codeStepNext.equals(Step.NOSEQ_PREP_QC) ||
             this.codeStepNext.equals(Step.ALL_PREP_QC) ||
-            this.codeStepNext.equals(Step.MISEQ_PREP_QC) ||
-      this.codeStepNext.equals(Step.ILLSEQ_PREP_QC)){
+            this.codeStepNext.equals(Step.MISEQ_PREP_QC)){
 
       queryBuf.append("      , ");
       queryBuf.append("    s.idSampleType, ");

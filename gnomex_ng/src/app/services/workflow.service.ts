@@ -26,11 +26,22 @@ export class WorkflowService {
     public readonly ILLSEQ_CLUSTER_GEN = "ILLSEQASSEM";
     public readonly ILLSEQ_FINALIZE_FC = "ILLSEQFINFC";
     public readonly ILLSEQ_DATA_PIPELINE = "ILLSEQPIPE";
+
+    public readonly HSEQ_PREP = "HSEQPREP";
+    public readonly MISEQ_PREP = "MISEQPREP";
+    public readonly NOSEQ_PREP = "NOSEQPREP";
+
+    public readonly HSEQ_PREP_QC = "HSEQPREPQC";
+    public readonly MISEQ_PREP_QC = "MISEQPREPQC";
+    public readonly NOSEQ_PREP_QC = "NOSEQPREPQC";
+
     public readonly FLOWCELL = "FLOWCELL";
     public readonly QC = "QC";
     public readonly MICROARRAY = "MICROARRAY";
     public readonly NANOSTRING = "NANO";
     public readonly ALL = "ALL";
+    public readonly ALL_PREP = "ALLPREP";
+    public readonly ALL_PREP_QC = "ALLPREPQC";
     public assmGridRowClassRules: any;
     public static readonly COLOR = '#f1eed6';
     public static readonly OFFCOLOR = 'white';
