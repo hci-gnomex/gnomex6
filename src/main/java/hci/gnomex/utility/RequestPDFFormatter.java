@@ -22,6 +22,7 @@ import hci.dictionary.utility.DictionaryManager;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.BillingAccount;
+import hci.gnomex.model.BillingItem;
 import hci.gnomex.model.Hybridization;
 import hci.gnomex.model.LabeledSample;
 import hci.gnomex.model.PropertyDictionary;
@@ -50,7 +51,7 @@ public class RequestPDFFormatter extends RequestPDFFormatterBase {
 	protected static final String HEADER_QUALITY_METHOD = "QC meth";
 	protected static final String HEADER_QUALITY_FRAGMENT_ANALYSIS = "Frag size";
 	protected static final String HEADER_QUALITY_RIN_NUMBER = "RIN #";
-	
+
 	protected static final BaseColor LABEL_BLUE = new BaseColor( 52, 102, 153 );
 	protected static final float     TABLE_PERCENT_WIDTH_100 = 100;
 	protected static final float     TABLE_PERCENT_WIDTH_80 = 80;
@@ -237,6 +238,28 @@ public class RequestPDFFormatter extends RequestPDFFormatterBase {
 				tables.add(e);
 			}
 		}
+
+		// The estimated billing portion of this report is currently only supposed to run for experiments
+		// that have not been submitted.
+		if (request.getIdRequest() == null) {
+			Element temp = makeTableBillingItems();
+			if (temp != null) {
+				BigDecimal totalCost = new BigDecimal(0);
+
+				for (Object obj : this.request.getBillingItems()) {
+					BillingItem billingItem = (BillingItem) obj;
+
+					totalCost = totalCost.add(
+							BigDecimal.valueOf(billingItem.getQty())
+												.multiply(billingItem.getUnitPrice())
+												.multiply((billingItem.getPercentagePrice() != null ? billingItem.getPercentagePrice() : new BigDecimal(1))));
+				}
+
+				tables.add(Chunk.NEWLINE);
+				tables.add(PDFFormatterUtil.makeTableTitle("Estimated Total : $" + String.format("%.2f", totalCost) , FONT_TITLE));
+				tables.add(temp);
+			}
+		}
 		
 		// Experiment type-specific notes and tables
 		if (request.getRequestCategory().getType() != null) {
@@ -317,6 +340,36 @@ public class RequestPDFFormatter extends RequestPDFFormatterBase {
 		
 		return tables;
 	}
+
+
+	private Element makeTableBillingItems() {
+		if (this.request == null || this.request.getBillingItems() == null) {
+			return null;
+		}
+
+		PdfPTable table = new PdfPTable(36);
+
+		Font tableValueFont = FONT_TABLE_VALUES_VERY_SMALL;
+		PDFFormatterUtil.formatTable( table, TABLE_PERCENT_WIDTH_100 );
+
+		// Headers
+		table.setHeaderRows(0);
+
+		// Populate table
+		for (Object obj : this.request.getBillingItems()) {
+			BillingItem billingItem = (BillingItem) obj;
+
+			// Add data to table
+			PDFFormatterUtil.addToTable(table, billingItem.getCategory(), tableValueFont, Element.ALIGN_LEFT, Element.ALIGN_MIDDLE, true, true, true, true, BaseColor.WHITE, 8, 1);
+			PDFFormatterUtil.addToTable(table, billingItem.getDescription(), tableValueFont, Element.ALIGN_LEFT, Element.ALIGN_MIDDLE, true, true, true, true, BaseColor.WHITE, 18, 1);
+			PDFFormatterUtil.addToTable(table, (("" + billingItem.getQty()) + " x "), tableValueFont, Element.ALIGN_RIGHT, Element.ALIGN_MIDDLE, true, true, true, true, BaseColor.WHITE, 2, 1);
+			PDFFormatterUtil.addToTable(table, ("$" + String.format("%.2f", billingItem.getUnitPrice()) + " " + (billingItem.getPercentagePrice() != null && !billingItem.getPercentageDisplay().equals("100.0%") ? "(" + billingItem.getPercentageDisplay() + ")" : "")), tableValueFont, Element.ALIGN_RIGHT, Element.ALIGN_MIDDLE, true, true, true, true, BaseColor.WHITE, 5, 1);
+			PDFFormatterUtil.addToTable(table, ("$" + String.format("%.2f", (BigDecimal.valueOf(billingItem.getQty()).multiply(billingItem.getUnitPrice()).multiply((billingItem.getPercentagePrice() != null ? billingItem.getPercentagePrice() : new BigDecimal(1)))))), tableValueFont, Element.ALIGN_RIGHT, Element.ALIGN_MIDDLE, true, true, true, true, BaseColor.WHITE, 3, 1);
+		}
+
+		return table;
+	}
+
 	
 	private Element makeTableCAPSEQ() {
 		Set samples = request.getSamples();

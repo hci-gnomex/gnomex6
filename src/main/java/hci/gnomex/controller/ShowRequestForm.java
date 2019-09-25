@@ -2,13 +2,18 @@ package hci.gnomex.controller;
 
 import java.io.Serializable;
 import java.io.StringReader;
+import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
+import java.util.Vector;
 
 import javax.json.Json;
+import javax.json.JsonObject;
 import javax.json.JsonReader;
+import javax.json.JsonValue;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -112,6 +117,8 @@ public class ShowRequestForm extends ReportCommand implements Serializable {
                     if (request.getIdLab() != null) {
                         request.setLab((Lab) sess.get(Lab.class, request.getIdLab()));
                     }
+
+                    this.request.setBillingItems(this.parseBillingItems());
 
                     HashSet<Sample> samples = new HashSet(requestParser.getSampleMap().values());
 
@@ -358,4 +365,78 @@ public class ShowRequestForm extends ReportCommand implements Serializable {
     public void loadContextPermissions(String userName) throws SQLException {
     }
 
+
+    /* (non-Javadoc)
+     * This code is specifically excluded from the RequestParser, because we should never be
+     * importing billing items directly from the front end.  This is only used for creating
+     * price estimates, which is the purview of this class.
+     */
+    private Set parseBillingItems() {
+
+        HashSet<BillingItem> billingItems = new HashSet<>();
+
+        try (JsonReader jsonReader2 = Json.createReader(new StringReader(this.requestJSONString))) {
+            JsonObject requestObject = jsonReader2.readObject();
+
+            if (requestObject.getJsonArray("billingItems") != null) {
+                for (JsonValue val: requestObject.getJsonArray("billingItems")) {
+                    JsonObject obj = val.asJsonObject();
+
+                    BillingItem temp = new BillingItem();
+
+                    if (obj.getString("description") != null && !obj.getString("description").equals("")) {
+                        temp.setDescription(obj.getString("description"));
+                    } else {
+                        temp.setDescription("");
+                    }
+
+                    if (obj.getString("idPrice") != null && !obj.getString("idPrice").equals("")) {
+                        temp.setIdPrice(Integer.parseInt(obj.getString("idPrice")));
+                    }
+                    if (obj.getString("qty") != null && !obj.getString("qty").equals("")) {
+                        temp.setQty(Integer.parseInt(obj.getString("qty")));
+                    }
+                    if (obj.getString("idBillingAccount") != null && !obj.getString("idBillingAccount").equals("")) {
+                        temp.setIdBillingAccount(Integer.parseInt(obj.getString("idBillingAccount")));
+                    }
+                    if (obj.getString("category") != null && !obj.getString("category").equals("")) {
+                        temp.setCategory(obj.getString("category"));
+                    }
+                    if (obj.getString("idLab") != null && !obj.getString("idLab").equals("")) {
+                        temp.setIdLab(Integer.parseInt(obj.getString("idLab")));
+                    }
+                    if (obj.getString("idPriceCategory") != null && !obj.getString("idPriceCategory").equals("")) {
+                        temp.setIdPriceCategory(Integer.parseInt(obj.getString("idPriceCategory")));
+                    }
+                    if (obj.getString("idBillingPeriod") != null && !obj.getString("idBillingPeriod").equals("")) {
+                        temp.setIdBillingPeriod(Integer.parseInt(obj.getString("idBillingPeriod")));
+                    }
+                    if (obj.getString("idMasterBillingItem") != null && !obj.getString("idMasterBillingItem").equals("")) {
+                        temp.setIdMasterBillingItem(Integer.parseInt(obj.getString("idMasterBillingItem")));
+                    }
+                    if (obj.getString("percentagePrice") != null && !obj.getString("percentagePrice").equals("")) {
+                        temp.setPercentagePrice(new BigDecimal(obj.getString("percentagePrice")));
+                    }
+                    if (obj.getString("unitPrice") != null && !obj.getString("unitPrice").equals("")) {
+                        temp.setUnitPrice(new BigDecimal(obj.getString("unitPrice")));
+                    }
+                    if (obj.getString("totalPrice") != null && !obj.getString("totalPrice").equals("")) {
+                        temp.setTotalPrice(new BigDecimal(obj.getString("totalPrice")));
+                    }
+                    if (obj.getString("invoicePrice") != null && !obj.getString("invoicePrice").equals("")) {
+                        temp.setInvoicePrice(new BigDecimal(obj.getString("invoicePrice").replace("$", "").replace(",","")));
+                    }
+                    if (obj.getString("splitType") != null && !obj.getString("splitType").equals("")) {
+                        temp.setSplitType(obj.getString("splitType"));
+                    }
+
+                    billingItems.add(temp);
+                }
+            }
+        } catch (Exception e) {
+            // Do nothing - continue without billing item.
+        }
+
+        return billingItems;
+    }
 }
