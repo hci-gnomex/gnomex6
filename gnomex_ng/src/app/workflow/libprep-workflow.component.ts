@@ -60,18 +60,18 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
     private dirty: boolean = false;
     private showSpinner: boolean = false;
     private workItem: any;
-    private gridApi:GridApi;
+    private gridApi: GridApi;
     private gridColumnApi;
     private barCodes: any[] = [];
     private coreAdmins: any[] = [];
     private label = "Illumina Library Prep";
-    public codeStepNext:any;
+    public codeStepNext: string;
     // left to have nova, hi, mi until we phase them out
-    public readonly codeStepArray:any[] = [
-        { label:"Illumina Seq ", codeStepNext: this.workflowService.ILLSEQ_PREP  },
-        { label:"Illumina NovaSeq", codeStepNext: "NOSEQPREP" },
-        { label:"Illumina HiSeq", codeStepNext: "HSEQPREP" },
-        { label:"Illumina MiSeq", codeStepNext:"MISEQPREP"}
+    public readonly codeStepArray: any[] = [
+        { label: "Illumina Seq ", codeStepNext: this.workflowService.ILLSEQ_PREP  },
+        { label: "Illumina NovaSeq", codeStepNext: this.workflowService.NOSEQ_PREP },
+        { label: "Illumina HiSeq", codeStepNext: this.workflowService.HSEQ_PREP },
+        { label: "Illumina MiSeq", codeStepNext: this.workflowService.MISEQ_PREP}
     ];
 
 
@@ -242,6 +242,9 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     selectCodeOption() {
+        if(!this.codeStepNext) {
+            this.codeStepNext = this.workflowService.ALL_PREP;
+        }
         this.initialize();
     }
 

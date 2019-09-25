@@ -93,6 +93,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         experiment: {
             idCoreFacility: '',
             PropertyEntries: [],
+            billingItems: [],
             codeRequestCategory: '',
             requestCategory: {
                 display: '',
@@ -628,6 +629,10 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
     public SaveNewExperiment(): void {
         this.dialogService.startDefaultSpinnerDialog();
+
+        // Billing items should not be sent to the backend (though they should be ignored by the RequestParser),
+        // but are used to create Price Quotes on the confirm tab in the new experiment
+        this.inputs.experiment.billingItems = [];
 
         this.experimentService.saveRequest(this.inputs.experiment).subscribe((response) => {
             this.dialogService.stopAllSpinnerDialogs();
