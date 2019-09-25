@@ -775,6 +775,12 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 this.showKeepSample = false;
             }
 
+            if (this.requestCategory.codeRequestCategory === "DDPCR BR") {
+                this.showSamplePurification = false;
+                this.showKeepSample = false;
+                this.showSamplePrepContainer = false;
+            }
+
             if (this.form && this.form.get('showSampleQuality')) {
                 this.form.get('showSampleQuality').setValue(this.requestCategory.type === "QC");
             }
