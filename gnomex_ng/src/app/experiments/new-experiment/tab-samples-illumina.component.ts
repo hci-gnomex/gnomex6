@@ -402,7 +402,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
         return this._experiment
             && this._experiment.requestCategory
             && this._experiment.requestCategory.isIlluminaType
-            && this._experiment.requestCategory.isIlluminaType === 'N';
+            && this._experiment.requestCategory.isIlluminaType === 'N'
+            && this._experiment.requestCategory.type !== NewExperimentService.TYPE_GENERIC;
     }
 
     public get showLinkToCCNumber(): boolean {
@@ -413,7 +414,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
         return this._experiment
             && this._experiment.requestCategory
             && this._experiment.requestCategory.isIlluminaType
-            && this._experiment.requestCategory.isIlluminaType === 'N';
+            && this._experiment.requestCategory.isIlluminaType === 'N'
+            && this._experiment.requestCategory.type !== NewExperimentService.TYPE_GENERIC;
     }
 
 
@@ -1169,23 +1171,29 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 sortOrder: 505
             });
         } else if (!isExternal) {
-            temp.push({
-                headerName: "QC Status",
-                field: "qualStatus",
-                width:    8.5 * this.emToPxConversionRate,
-                minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor,
-                selectOptions: this.workflowStatus,
-                selectOptionsDisplayField: "display",
-                selectOptionsValueField: "value",
-                suppressSizeToFit: true,
-                editable: true,
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup',
-                sortOrder: 500
-            });
+
+            if (this._experiment
+                && this._experiment.requestCategory
+                && this._experiment.requestCategory.type !== NewExperimentService.TYPE_GENERIC) {
+
+                temp.push({
+                    headerName: "QC Status",
+                    field: "qualStatus",
+                    width:    8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    maxWidth: 10 * this.emToPxConversionRate,
+                    cellRendererFramework: SelectRenderer,
+                    cellEditorFramework: SelectEditor,
+                    selectOptions: this.workflowStatus,
+                    selectOptionsDisplayField: "display",
+                    selectOptionsValueField: "value",
+                    suppressSizeToFit: true,
+                    editable: true,
+                    showFillButton: true,
+                    fillGroupAttribute: 'frontEndGridGroup',
+                    sortOrder: 500
+                });
+            }
         }
 
         return temp;
@@ -1695,7 +1703,11 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
         let temp: any[]  = this.defaultSampleColumnDefinitions;
 
-        if (temp && this._experiment && this._experiment.requestCategory && this._experiment.requestCategory.type !== "QC") {
+        if (temp && this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.type !== NewExperimentService.TYPE_QC
+            && this._experiment.requestCategory.type !== NewExperimentService.TYPE_GENERIC) {
+
             for (let sampleAnnotation of this._experiment.getSelectedSampleAnnotations()) {
                 let fullProperty = this.propertyList.filter((value: any) => {
                     return value.idProperty === sampleAnnotation.idProperty;
@@ -1906,7 +1918,11 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 annotationFieldsAreEditable = false;
             }
 
-            if (temp && this._experiment && this._experiment.requestCategory && this._experiment.requestCategory.type !== "QC") {
+            if (temp && this._experiment
+                && this._experiment.requestCategory
+                && this._experiment.requestCategory.type !== NewExperimentService.TYPE_QC
+                && this._experiment.requestCategory.type !== NewExperimentService.TYPE_GENERIC) {
+
                 for (let sampleAnnotation of this._experiment.getSelectedSampleAnnotations()) {
                     let fullProperty = this.propertyList.filter((value: any) => {
                         return value.idProperty === sampleAnnotation.idProperty;

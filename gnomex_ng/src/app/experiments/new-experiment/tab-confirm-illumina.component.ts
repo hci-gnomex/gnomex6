@@ -25,6 +25,7 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
 import {GridApi} from "ag-grid-community";
 import {ConstantsService} from "../../services/constants.service";
 import {PropertyService} from "../../services/property.service";
+import {NewExperimentService} from "../../services/new-experiment.service";
 
 @Component({
     selector: "tabConfirmIllumina",
@@ -656,7 +657,11 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
         this.tabIndexToInsertAnnotations = 150;
 
-        if (this._experiment) {
+        if (this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.type !== NewExperimentService.TYPE_QC
+            && this._experiment.requestCategory.type !== NewExperimentService.TYPE_GENERIC) {
+
             for (let sampleAnnotation of this._experiment.getSelectedSampleAnnotations()) {
                 let fullProperty = this.propertyList.filter((value: any) => {
                     return value.idProperty === sampleAnnotation.idProperty;
@@ -801,6 +806,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                             this.billingItems = [response.Request.BillingItem];
                         }
                     }
+
+                    this._experiment.billingItems = this.billingItems;
                 });
             }
         }
@@ -884,7 +891,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     public displayAnnotationValue(annotation: any): string {
         if (annotation && annotation.codePropertyType) {
             switch (annotation.codePropertyType) {
-                case 'TEXT'    : return annotation.value ? annotation.value : '';
+                case 'TEXT'    :
+                case 'CHECK'   : return annotation.value ? annotation.value : ''; break;
                 case 'OPTION'  :
                 case 'MOPTION' :
                     let temp: string = '';
@@ -901,34 +909,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                     return temp;
             }
         }
-    }
-
-    public onClickPriceQuote(event?: any) {
-
-        html2canvas(this.forPriceQuote.nativeElement).then( canvas => {
-
-            let heightPerWidthRatio: number = canvas.height / canvas.width;
-
-            let bigCanvas = document.createElement("canvas");
-            bigCanvas.width = this.BASE_PIX_RESOLUTION;
-            bigCanvas.height = this.BASE_PIX_RESOLUTION * heightPerWidthRatio;
-            bigCanvas.style.width = "" + (bigCanvas.width / 2) + "px";
-            bigCanvas.style.height = "" + (bigCanvas.height / 2) + "px";
-            let context2 = bigCanvas.getContext('2d');
-            context2.drawImage(canvas,0,0,canvas.width, canvas.height,0,0,bigCanvas.width,bigCanvas.height);
-            context2.scale(2,2);
-
-            var doc = new jsPDF();
-            doc.addImage(bigCanvas.toDataURL("image/jpeg"), "JPG", 10, 10, 180, 180 * heightPerWidthRatio);
-
-            let today = new Date();
-            let defaultFileName: string = this.labName + " "
-                + today.getFullYear() + "-"
-                + (today.getMonth() + 1) + "-"
-                + (today.getDay() + 1) + ".pdf";
-
-            doc.save(defaultFileName);
-        });
     }
 
     public onGridReady(params: any): void {
@@ -978,7 +958,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
         }
     }
 
-    private onClickDownloadSamplePreview(): void {
+    private onClickPriceQuote(): void {
         this.experimentService.showPriceQuote(this._experiment);
     }
 }
