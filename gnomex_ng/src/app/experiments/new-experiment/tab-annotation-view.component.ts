@@ -1,5 +1,5 @@
 import {Component, Input, OnDestroy} from "@angular/core";
-import {Response, URLSearchParams} from "@angular/http";
+import {HttpParams} from "@angular/common/http";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {MatDialogConfig} from "@angular/material";
 
@@ -18,6 +18,7 @@ import {ConfigureAnnotationsComponent} from "../../util/configure-annotations.co
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../../services/constants.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 
 @Component({
@@ -231,57 +232,50 @@ export class TabAnnotationViewComponent implements OnDestroy {
 
     }
 
-    onCustomAnnot(event) {
+    onCustomAnnot(event?: any) {
         this.dialogsService.startDefaultSpinnerDialog();
         this.currentUsers = [];
         let userObj = {idAppUser: this._experiment.idAppUser};
         this.currentUsers.push(userObj);
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idProperty", "");
-        params.set("name", this.form.get("customAnnot").value);
-        params.set("isActive", "Y");
-        params.set("isRequired", "N");
-        params.set("forSample", "Y");
-        params.set("forDataTrack", "N");
-        params.set("forAnalysis", "N");
-        params.set("forRequest", "N");
-        params.set("idCoreFacility", this._experiment.idCoreFacility);
-        params.set("idAppUser", this._experiment.idAppUser);
-        params.set("codePropertyType", "TEXT");
-        params.set("noJSONToXMLConversionNeeded", "Y");
-        params.set("optionsJSONString", JSON.stringify([]));
-        params.set("organismsJSONString", JSON.stringify([]));
-        params.set("platformsJSONString", JSON.stringify([]));
-        params.set("analysisTypesJSONString", JSON.stringify([]));
-        params.set("appUsersJSONString", JSON.stringify(this.currentUsers));
+        let params: HttpParams = new HttpParams()
+            .set("idProperty", "")
+            .set("name", this.form.get("customAnnot").value)
+            .set("isActive", "Y")
+            .set("isRequired", "N")
+            .set("forSample", "Y")
+            .set("forDataTrack", "N")
+            .set("forAnalysis", "N")
+            .set("forRequest", "N")
+            .set("idCoreFacility", this._experiment.idCoreFacility)
+            .set("idAppUser", this._experiment.idAppUser)
+            .set("codePropertyType", "TEXT")
+            .set("noJSONToXMLConversionNeeded", "Y")
+            .set("optionsJSONString", JSON.stringify([]))
+            .set("organismsJSONString", JSON.stringify([]))
+            .set("platformsJSONString", JSON.stringify([]))
+            .set("analysisTypesJSONString", JSON.stringify([]))
+            .set("appUsersJSONString", JSON.stringify(this.currentUsers));
 
-        this.propertyService.savePropertyAnnotation(params).pipe(first()).subscribe((response: Response) => {
-            let error: boolean = false;
-
-            if (response) {
-                let responseJSON: any = response.json();
-                if (responseJSON && responseJSON.result && responseJSON.result === "SUCCESS") {
-                    if (responseJSON.inactivate === "true") {
-                        this.dialogsService.alert("Certain options were inactivated instead of deleted because they are associated with existing samples", "Succeed With Warning", DialogType.SUCCESS);
-                    }
-                } else {
-                    error = true;
+        this.propertyService.savePropertyAnnotation(params).pipe(first()).subscribe((response: any) => {
+            if (response && response.result === "SUCCESS") {
+                if (response.inactivate === "true") {
+                    this.dialogsService.alert("Certain options were inactivated instead of deleted because they are associated with existing samples", "Succeed With Warning", DialogType.SUCCESS);
                 }
-            } else {
-                error = true;
-            }
 
-            if (error) {
-                this.dialogsService.error("An error occurred while saving the annotation");
-            }
-
-            this._experiment.refreshSampleAnnotationList();
-
-            this.propertyService.getPropertyList(false).pipe(first()).subscribe((response: any[]) => {
-                this.gnomexService.propertyList = response;
                 this._experiment.refreshSampleAnnotationList();
+
+                this.propertyService.getPropertyList(false).pipe(first()).subscribe((response: any[]) => {
+                    this.gnomexService.propertyList = response;
+                    this._experiment.refreshSampleAnnotationList();
+                    this.dialogsService.stopAllSpinnerDialogs();
+                });
+            } else {
+                let message: string = response && response.message ? " " + response.message : "";
+                this.dialogsService.error("An error occurred while saving the annotation." + message);
                 this.dialogsService.stopAllSpinnerDialogs();
-            });
+            }
+        }, (err: IGnomexErrorResponse) => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
     }
 }

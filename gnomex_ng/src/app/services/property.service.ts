@@ -1,9 +1,10 @@
 import {Injectable} from "@angular/core";
-import {Http, Response, URLSearchParams, Headers} from "@angular/http";
+import {Http, Response, URLSearchParams} from "@angular/http";
 import {DictionaryService} from "./dictionary.service";
 import {Observable} from "rxjs";
 import {CookieUtilService} from "./cookie-util.service";
 import {map} from "rxjs/operators";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 
 export enum annotType
 {
@@ -72,6 +73,7 @@ export class PropertyService {
 
     constructor(private dictionaryService: DictionaryService,
                 private http: Http,
+                private httpClient: HttpClient,
                 private cookieUtilService: CookieUtilService) {}
 
     /**
@@ -167,20 +169,20 @@ export class PropertyService {
         }));
     }
 
-    public savePropertyAnnotation(params: URLSearchParams):  Observable<Response> {
+    public savePropertyAnnotation(params: HttpParams):  Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
 
-        let headers: Headers = new Headers();
-        headers.set("Content-Type", "application/x-www-form-urlencoded");
-        return this.http.post("/gnomex/SaveProperty.gx", params.toString(), {headers: headers});
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/SaveProperty.gx", params.toString(), {headers: headers});
     }
 
-    public deletePropertyAnnotation(params: URLSearchParams):  Observable<Response> {
+    public deletePropertyAnnotation(params: HttpParams):  Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
 
-        let headers: Headers = new Headers();
-        headers.set("Content-Type", "application/x-www-form-urlencoded");
-        return this.http.post("/gnomex/DeleteProperty.gx", params.toString(), {headers: headers});
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/DeleteProperty.gx", params.toString(), {headers: headers});
     }
 
     public isPublicVisbility(): boolean{
