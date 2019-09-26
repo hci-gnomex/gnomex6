@@ -669,15 +669,22 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         }
 
         this.totalPrice = 0;
+        let billingItemsSet: Set<string> = new Set();
+
         for (let r of billingItems) {
             if (r.totalPrice) {
-                let price: string = r.totalPrice;
-                price = price
-                    .replace('$', '')
-                    .replace(',', '')
-                    .replace("(", "-")
-                    .replace(")", "");
-                this.totalPrice += Number(price);
+                // split billing totalPrice on BillingItem is duplicated. only add it up once then
+                if(!billingItemsSet.has(r.requestNumber)){
+                    billingItemsSet.add(r.requestNumber);
+
+                    let price: string = r.totalPrice;
+                    price = price
+                        .replace('$', '')
+                        .replace(',', '')
+                        .replace("(", "-")
+                        .replace(")", "");
+                    this.totalPrice += Number(price);
+                }
             }
         }
 
@@ -999,21 +1006,21 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                                 {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "promptToSave"},
                                 {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"},
                             ]}).subscribe((result: any) => {
-                                if (result) {
-                                    this.billingService.saveBillingTemplate(result).subscribe((result: any) => {
-                                        if (result && result.result === "SUCCESS") {
-                                            if (this.lastFilterEvent) {
-                                                this.onFilterChange(this.lastFilterEvent, selectedTreeNode);
-                                            }
-                                        } else {
-                                            let message: string = "";
-                                            if (result && result.message) {
-                                                message = ": " + result.message;
-                                            }
-                                            this.dialogsService.error("An error occurred while saving the billing template" + message);
-                                        }
-                                    });
+                        if (result) {
+                            this.billingService.saveBillingTemplate(result).subscribe((result: any) => {
+                                if (result && result.result === "SUCCESS") {
+                                    if (this.lastFilterEvent) {
+                                        this.onFilterChange(this.lastFilterEvent, selectedTreeNode);
+                                    }
+                                } else {
+                                    let message: string = "";
+                                    if (result && result.message) {
+                                        message = ": " + result.message;
+                                    }
+                                    this.dialogsService.error("An error occurred while saving the billing template" + message);
                                 }
+                            });
+                        }
                     });
                 } else {
                     this.dialogsService.error("There was an error retrieving the billing template");
@@ -1122,9 +1129,9 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                         {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
                         {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
                     ]}).subscribe((result: any) => {
-                        if(result) {
-                            this.refreshPricingGrid();
-                        }
+                if(result) {
+                    this.refreshPricingGrid();
+                }
             });
         } else if (event.data.idPriceCategory && !event.data.idPrice) {
             dialogConfig.data = {
@@ -1136,9 +1143,9 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                         {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
                         {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
                     ]}).subscribe((result: any) => {
-                        if(result) {
-                            this.refreshPricingGrid();
-                        }
+                if(result) {
+                    this.refreshPricingGrid();
+                }
             });
         } else if (event.data.idPrice) {
             dialogConfig.data = {
@@ -1151,9 +1158,9 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                         {type: ActionType.PRIMARY, icon: null, name: "Save", internalAction: "save"},
                         {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
                     ]}).subscribe((result: any) => {
-                        if(result) {
-                            this.refreshPricingGrid();
-                        }
+                if(result) {
+                    this.refreshPricingGrid();
+                }
             });
         }
     }
@@ -1217,9 +1224,9 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                     {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
                 ]}).subscribe((result: any) => {
-                    if(result) {
-                        this.refreshPricingGrid();
-                    }
+            if(result) {
+                this.refreshPricingGrid();
+            }
         });
     }
 
@@ -1250,9 +1257,9 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                     {type: ActionType.PRIMARY, name: "Save", internalAction: "save"},
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
                 ]}).subscribe((result: any) => {
-                    if (result) {
-                        this.refreshPricingGrid();
-                    }
+            if (result) {
+                this.refreshPricingGrid();
+            }
         });
     }
 
