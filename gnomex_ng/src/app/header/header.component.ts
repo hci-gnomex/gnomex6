@@ -369,7 +369,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         displayName: 'Order Products',
                         context: 'newProductOrder',
                         iconName: './assets/review.png',
-                        route: '/order-products'
+                        route: ''
                     },
                     {
                         displayName: 'Product Orders',
@@ -507,7 +507,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         displayName: 'Order Products',
                         context: 'newProductOrder',
                         iconName: './assets/review.png',
-                        route: '/order-products'
+                        route: ''
                     },
                     {
                         displayName: 'Product Orders',
@@ -973,7 +973,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         displayName: 'Order Products',
                         context: 'newProductOrder',
                         iconName: './assets/review.png',
-                        route: '/order-products'
+                        route: ''
                     },
                     {
                         displayName: 'Product Orders',
@@ -1274,7 +1274,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         displayName: 'Order Products',
                         context: 'newProductOrder',
                         iconName: './assets/review.png',
-                        route: '/order-products'
+                        route: ''
                     },
                     {
                         displayName: 'Product Orders',
@@ -1462,11 +1462,13 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         iconName: './assets/flask.png',
                         route: '/experiments',
                     },
-                    {
-                        displayName: 'New Experiment Order',
-                        iconName: './assets/flask_add.png',
-                        route: ''
-                    }
+                    // A Billing Admin user should not have permission to create a new experiment.
+                    // {
+                    //     displayName: 'New Experiment Order',
+                    //     context: "newExperimentOrder",
+                    //     iconName: './assets/flask_add.png',
+                    //     route: ''
+                    // }
                 ]
             },
             {
@@ -1475,11 +1477,13 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                 context: 'product',
                 iconName: './assets/basket.png',
                 children: [
-                    {
-                        displayName: 'Order Products',
-                        iconName: './assets/review.png',
-                        route: '/order-products'
-                    },
+                    // A Billing Admin user should not have permission to order a new product.
+                    // {
+                    //     displayName: 'Order Products',
+                    //     context: "newProductOrder",
+                    //     iconName: './assets/review.png',
+                    //     route: ''
+                    // },
                     {
                         displayName: 'Product Orders',
                         iconName: './assets/review.png',
@@ -1908,10 +1912,11 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         for (let menuItem of navMenu) {
             if (menuItem.context === "newExperimentOrder") {
                 if (this.gnomexService.myCoreFacilities) {
-                    if (this.gnomexService.myCoreFacilities.length === 1) {
-                        menuItem.route = "/newExperiment/" + this.gnomexService.myCoreFacilities[0].idCoreFacility;
-                    } else if (this.gnomexService.myCoreFacilities.length > 1) {
-                        menuItem.children = this.addCoreNewExperiments(menuItem, []);
+                    let myActiveCoreFacilities = this.gnomexService.myCoreFacilities.filter((core: any) => core.isActive === "Y");
+                    if (myActiveCoreFacilities.length === 1) {
+                        menuItem.route = "/newExperiment/" + myActiveCoreFacilities[0].idCoreFacility;
+                    } else if (myActiveCoreFacilities.length > 1) {
+                        menuItem.children = this.addCoreNewExperiments(menuItem, [], myActiveCoreFacilities);
                     }
                 }
             }
@@ -1927,10 +1932,10 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
      * @param {any[]} children
      * @returns {any[]}
      */
-    private addCoreNewExperiments(template: any, children: any[]): any[] {
+    private addCoreNewExperiments(template: any, children: any[], myActiveCoreFacilities: any[]): any[] {
         let coreCtr: number = 0;
 
-        for (let core of this.gnomexService.myCoreFacilities) {
+        for (let core of myActiveCoreFacilities) {
             if (core.hasRequestCategories === 'Y') {
                 let label: string = template.displayName + " for " + core.facilityName;
                 let route: string = "/newExperiment";
@@ -1946,10 +1951,11 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         for (let menuItem of navMenu) {
             if (menuItem.context === "newProductOrder") {
                 if (this.gnomexService.myCoreFacilities) {
-                    if (this.gnomexService.myCoreFacilities.length === 1) {
-                        menuItem.route = "/order-products/" + this.gnomexService.myCoreFacilities[0].idCoreFacility;
-                    } else if (this.gnomexService.myCoreFacilities.length > 1) {
-                        menuItem.children = this.addCoreNewProducts(menuItem, []);
+                    let myActiveCoreFacilities = this.gnomexService.myCoreFacilities.filter((core: any) => core.isActive === "Y");
+                    if (myActiveCoreFacilities.length === 1) {
+                        menuItem.route = "/order-products/" + myActiveCoreFacilities[0].idCoreFacility;
+                    } else if (myActiveCoreFacilities.length > 1) {
+                        menuItem.children = this.addCoreNewProducts(menuItem, [], myActiveCoreFacilities);
                     }
                 }
             }
@@ -1966,13 +1972,14 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
      * @param {any[]} children
      * @returns {any[]}
      */
-    private addCoreNewProducts(template: any, children: any[]): any[] {
+    private addCoreNewProducts(template: any, children: any[], myActiveCoreFacilities: any[]): any[] {
         let coreCtr: number = 0;
-        for (let core  of this.gnomexService.myCoreFacilities) {
+        for (let core  of myActiveCoreFacilities) {
             for (let pt of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.ProductType")) {
                 if (pt.idCoreFacility === core.idCoreFacility) {
                     let label: string = template.displayName + " for " + core.facilityName;
-                    children[coreCtr] = this.createMenuItem(label, "", template.iconName, template.route + '/' + core.idCoreFacility, core.idCoreFacility,  []);
+                    let route: string = "/order-products/";
+                    children[coreCtr] = this.createMenuItem(label, "", template.iconName, route + core.idCoreFacility, core.idCoreFacility,  []);
                     coreCtr++;
                     break;
                 }
