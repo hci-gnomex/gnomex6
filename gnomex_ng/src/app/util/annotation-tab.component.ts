@@ -117,9 +117,7 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
 
                 if (annot.isRequired === 'Y') {
                     if (annot.codePropertyType === this.TEXT) {
-                        // Actually, the "is Required" flag on these annotations seems to only actually
-                        // fully apply to single-selection dropdowns.
-                        // this.form.controls[annot.name].setValidators([Validators.required]);
+                        this.form.controls[annot.name].setValidators([Validators.required]);
                     } else if (annot.codePropertyType === this.CHECK) {
                         // this.form.controls[annot.name].setValidators([Validators.requiredTrue]);
                     } else if (annot.codePropertyType === this.MOPTION || annot.codePropertyType === this.OPTION) {
@@ -127,6 +125,12 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
                     }
                 }
             });
+        }
+
+        if (this._disabled) {
+            this.form.disable();
+        } else {
+            this.form.enable();
         }
 
         this.form.markAsPristine();

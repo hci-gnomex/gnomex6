@@ -1,4 +1,4 @@
-<div style="display:flex">
+<div class="overflow-auto" style="display:flex">
     <form [formGroup]="form" style=" height:100%;width:100%; display:flex; flex-direction:column;">
         <div [ngSwitch]="annot.codePropertyType" *ngFor="let annot of annotations" class="full-width full-height small-font padded">
             <div class="display-white-space">{{ annot && annot.description ? annot.description : '' }}</div>

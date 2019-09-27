@@ -67,7 +67,7 @@
                         <mat-checkbox style="margin-right: 2%;" [formControl]="this.forSampleFC">Sample</mat-checkbox>
                         <mat-checkbox style="margin-right: 2%;" [formControl]="this.forDataTrackFC">Data Track</mat-checkbox>
                         <mat-checkbox style="margin-right: 2%;" [formControl]="this.forAnalysisFC">Analysis</mat-checkbox>
-                        <mat-checkbox [formControl]="this.forRequestFC">Experiment</mat-checkbox>
+                        <mat-checkbox [formControl]="this.forRequestFC" disabled="!this.canAccessAnyObject">Experiment</mat-checkbox>
                     </div>
                     <div class="tabRow">
                         <mat-checkbox [formControl]="this.requiredFC">Required (Annotation must be filled in)</mat-checkbox>
@@ -241,7 +241,7 @@
         <div *ngIf="!isDialog">
             <div style="display: flex; flex-direction: row;" *ngIf="this.selectedProperty">
                 <span *ngIf="this.formGroup.dirty && !this.showSpinner" class="dirtyNote">Changes Have Not Been Saved</span>
-                <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.formGroup.valid" (click)="this.save()"><img class="icon" [src]="'./assets/action_save.gif'">Save</button>
+                <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.formGroup.valid || !this.formGroup.dirty" (click)="this.save()"><img class="icon" [src]="'./assets/action_save.gif'">Save</button>
                 <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
             </div>
         </div>
