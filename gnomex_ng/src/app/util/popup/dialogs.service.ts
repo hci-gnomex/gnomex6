@@ -191,9 +191,9 @@ export class DialogsService {
         configuration.data["icon"] = icon ? icon : "";
         configuration.data["dialogType"] = type ? type : "";
 
-        configuration.maxWidth = configuration.maxWidth ? configuration.maxWidth : "35em";
-        configuration.minWidth = configuration.minWidth ?  configuration.minWidth : "10em";
-        configuration.width = configuration.width ? configuration.width : "30em";
+        configuration.maxWidth = configuration.maxWidth ? configuration.maxWidth : "80vw";
+        configuration.maxHeight = configuration.maxHeight ? configuration.maxHeight : "80vh";
+        configuration.minWidth = configuration.minWidth ?  configuration.minWidth : "30em";
 
         configuration.panelClass = "no-padding";
         configuration.disableClose = true;
