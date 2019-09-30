@@ -55,7 +55,7 @@ public class DirectoryBuilder {
 			} else if (args[i].equals("-root")) {
 				this.root = args[++i] + File.separator;
 			} else if (args[i].equals("-downloadpath")) {
-				this.currentDownloadLocation = args[++i] + File.separator;
+				this.currentDownloadLocation = args[++i];
 			} else if(args[i].equals("-flaggedfile")){
 				flaggedIDFileName = args[++i];
 			}else if(args[i].equals("-skipfirst")){
@@ -235,32 +235,20 @@ public class DirectoryBuilder {
 
 	public void preparePath() {
 		List<String> localFiles = new ArrayList<String>();
-		List<String> filesWithPaths = new ArrayList<String>();
-		List<String> filteredFiles = new ArrayList<String>();
+		Map<String,String> toFromMap = new TreeMap<>();
+		Map<String,String> toFromFilteredMap = new TreeMap<>();
 		List<String> flaggedIDList = readSampleIDs(flaggedIDFileName);
-
-
 
 		try {
 
 			localFiles = this.readFile(this.inFileName);
 			boolean test = new File(this.currentDownloadLocation + "Flagged").mkdir();
 
-			preparePath(flaggedIDList,filteredFiles, localFiles,filesWithPaths );
-
-
-			this.moveTheFiles(filteredFiles, new ArrayList<>()); // These files we want to move into the flagged folder
+			preparePath(flaggedIDList,toFromFilteredMap, localFiles,toFromMap );
+			this.moveTheFiles(toFromFilteredMap, new ArrayList<>()); // These files we want to move into the flagged folder
 			// for tempus anything doesn't get flagged explicitly  but it doesn't get moved is still considered flagged
-			if(mode.equals("tempus")){
-				this.moveTheFiles(filesWithPaths, Arrays.asList("echo move left over files to Flagged",
-						"mv -t " + this.currentDownloadLocation + "Flagged" +" " + currentDownloadLocation +"*"));
 
-
-			}else{
-				this.moveTheFiles(filesWithPaths,  new ArrayList<>());
-			}
-
-
+			this.moveTheFiles(toFromMap, new ArrayList<>());
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -287,7 +275,7 @@ public class DirectoryBuilder {
 	}
 
 
-	private void preparePath(List<String> flaggedFiles,List<String> filteredFiles, List<String> paths, List<String> filesWithPaths) throws Exception{
+	private void preparePath(List<String> flaggedFiles,Map<String,String> toFromFilteredMap, List<String> paths, Map<String,String> toFromMap) throws Exception{
 		File finalDestinationPath = new File(this.root);
 		Map<String,String> dirMap = new HashMap<>();
 		dirMap.put("xml","Reports");
@@ -326,7 +314,7 @@ public class DirectoryBuilder {
 				strBuild.append("Flagged");
 				strBuild.append(File.separator);
 				strBuild.append(file);
-				filteredFiles.add(strBuild.toString());
+				toFromFilteredMap.put(currentDownloadLocation +File.separator + p, strBuild.toString());
 				System.out.println("Flagged " + strBuild.toString());
 				continue;
 			}
@@ -335,9 +323,9 @@ public class DirectoryBuilder {
 
 			if(new File(finalPath).exists() && !finalPath.equals(root)) {
 				if(addWrapperFolder &&  appendDirPersonID(fileName,strBuild)){
-					filesWithPaths.add(strBuild.append(File.separator).append(file).toString());
+					toFromMap.put(currentDownloadLocation +File.separator + p, strBuild.append(File.separator).append(file).toString());
 				}else if(!addWrapperFolder){
-					filesWithPaths.add(strBuild.append(File.separator).append(file).toString());
+					toFromMap.put(currentDownloadLocation +File.separator + p, strBuild.append(File.separator).append(file).toString());
 				}
 			}else {
 				throw new Exception("The path does not exist: " + finalPath +  "\n your directory structure isn't correct");
@@ -446,31 +434,20 @@ public class DirectoryBuilder {
 	}
 
 
-	public void moveTheFiles(List<String> files, List<String> extraCommands) throws Exception{
+	public void moveTheFiles(Map<String,String> filesMap, List<String> extraCommands) throws Exception{
 		StringBuilder strBuild = new StringBuilder();
 		List<String> commands = new ArrayList<String>();
 
-		strBuild.append("cd " );
-		strBuild.append(this.currentDownloadLocation);
-		commands.add(strBuild.toString());
-		strBuild = new StringBuilder();
-
-
-		for(String file: files) {
-
-			String pattern = Pattern.quote(System.getProperty("file.separator"));
-			String[] pWithf = file.split(pattern);
+		for(String fileKey: filesMap.keySet()) {
 
 			strBuild.append("mv -vn");
-			strBuild.append(" *");
-			strBuild.append(pWithf[pWithf.length- 1]);
 			strBuild.append(" ");
-			strBuild.append(file);
+			strBuild.append(fileKey);
+			strBuild.append(" ");
+			strBuild.append(filesMap.get(fileKey));
 			System.out.println(strBuild.toString());
 			commands.add(strBuild.toString());
 			strBuild = new StringBuilder();
-
-
 		}
 
 		for(String c : extraCommands){

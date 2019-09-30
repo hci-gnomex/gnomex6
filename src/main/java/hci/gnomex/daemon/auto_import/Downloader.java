@@ -89,9 +89,7 @@ public class Downloader {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		finally
-
-		{
+		finally {
 			tempScript.delete();
 		}
 	}
@@ -217,12 +215,12 @@ public class Downloader {
 		
 	}
 
-	public void loadFileNames(){
+	public void loadFileNames(String downloadListFile ){
 		
 		
 		FileReader reader = null;
 		try {
-			reader = new FileReader(new File(this.dependentDataPath + "uniqueFilesToDownload.out"));
+			reader = new FileReader(new File(downloadListFile));
 			BufferedReader buffReader = new BufferedReader(reader);
 			
 			String line = "";
@@ -254,7 +252,7 @@ public class Downloader {
 			}
 
 
-			writeToFile(this.dependentDataPath + "uniqueFilesToDownload.out", new ArrayList<String>());
+			writeToFile(downloadListFile, new ArrayList<String>());
 		
 		
 		}

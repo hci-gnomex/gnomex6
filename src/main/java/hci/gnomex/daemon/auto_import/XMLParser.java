@@ -699,7 +699,7 @@ public class XMLParser {
 				List<String> slIDs = flaggedIDs.get(i);
 				if(slIDs.get(1) != null && !slIDs.get(1).equals("")){
 					// only true for tempus else no split and index 0 will be the original string
-					String sampleID =  importMode.equals("tempus") ?  slIDs.get(1).split("_")[0] : slIDs.get(1);
+					String sampleID =  importMode.equals("tempus") && !slIDs.get(1).startsWith("result") ?  slIDs.get(1).split("_")[0] : slIDs.get(1);
 					if(dupIDSet.add(sampleID)) {
 						if (i < flaggedIDs.size() - 1) {
 
