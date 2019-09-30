@@ -70,7 +70,7 @@ import {NewExperimentService} from "../../services/new-experiment.service";
             background-color: lightyellow;
         }
         
-        .minheight { min-height: 3em; }
+        .minheight { min-height: 8em; }
         
         .font-bold { font-weight: bold; }
         
@@ -135,7 +135,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
 
     @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
-    @ViewChild('forPriceQuote') forPriceQuote: ElementRef;
 
     public get experiment(): Experiment {
         return this._experiment;
