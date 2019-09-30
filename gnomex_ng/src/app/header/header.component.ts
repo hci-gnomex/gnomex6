@@ -1462,13 +1462,14 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         iconName: './assets/flask.png',
                         route: '/experiments',
                     },
-                    // A Billing Admin user should not have permission to create a new experiment.
-                    // {
-                    //     displayName: 'New Experiment Order',
-                    //     context: "newExperimentOrder",
-                    //     iconName: './assets/flask_add.png',
-                    //     route: ''
-                    // }
+/*                    // A Billing Admin user should not have permission to create a new experiment.
+                    {
+                        displayName: 'New Experiment Order',
+                        context: "newExperimentOrder",
+                        iconName: './assets/flask_add.png',
+                        route: ''
+                    }
+ */
                 ]
             },
             {
@@ -1477,13 +1478,12 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                 context: 'product',
                 iconName: './assets/basket.png',
                 children: [
-                    // A Billing Admin user should not have permission to order a new product.
-                    // {
-                    //     displayName: 'Order Products',
-                    //     context: "newProductOrder",
-                    //     iconName: './assets/review.png',
-                    //     route: ''
-                    // },
+                    {
+                        displayName: 'Order Products',
+                        context: "newProductOrder",
+                        iconName: './assets/review.png',
+                        route: ''
+                    },
                     {
                         displayName: 'Product Orders',
                         iconName: './assets/review.png',
