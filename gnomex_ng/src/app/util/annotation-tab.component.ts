@@ -119,12 +119,18 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
                     if (annot.codePropertyType === this.TEXT) {
                         this.form.controls[annot.name].setValidators([Validators.required]);
                     } else if (annot.codePropertyType === this.CHECK) {
-                        this.form.controls[annot.name].setValidators([Validators.requiredTrue]);
+                        // this.form.controls[annot.name].setValidators([Validators.requiredTrue]);
                     } else if (annot.codePropertyType === this.MOPTION || annot.codePropertyType === this.OPTION) {
                         this.form.controls[annot.name].setValidators(selectRequired());
                     }
                 }
             });
+        }
+
+        if (this._disabled) {
+            this.form.disable();
+        } else {
+            this.form.enable();
         }
 
         this.form.markAsPristine();

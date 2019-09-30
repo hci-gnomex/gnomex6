@@ -1,5 +1,4 @@
 import {Component, Inject, OnInit} from "@angular/core";
-import {Response, URLSearchParams} from "@angular/http";
 import {DictionaryService} from "../services/dictionary.service";
 import {PropertyService} from "../services/property.service";
 import {ActivatedRoute, Params} from "@angular/router";
@@ -11,6 +10,8 @@ import {MAT_DIALOG_DATA, MatDialogRef, MatSnackBar} from "@angular/material";
 import {ExperimentPlatformService} from "../services/experiment-platform.service";
 import {first, take} from "rxjs/operators";
 import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
+import {HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "./interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'configure-annotations',
@@ -99,7 +100,7 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
     public propertyTypeFC: FormControl;
     public mageOntologyCodeFC: FormControl;
     public mageOntologyDefFC: FormControl;
-
+    public canAccessAnyObject: boolean = false;
 
 
     constructor(private dictionaryService: DictionaryService,
@@ -201,9 +202,11 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
         this.appliesToPlatform.valueChanges.subscribe(() => {
             this.refreshListFilteredApplication();
         });
+
         this.formGroup.markAsPristine();
-        this.primaryDisable = (action) => (this.formGroup.invalid || !this.selectedProperty) && !this.formGroup.dirty;
+        this.primaryDisable = (action) => this.formGroup.invalid || !this.selectedProperty || !this.formGroup.dirty;
         this.dirty = () => this.formGroup.dirty;
+        this.canAccessAnyObject = this.createSecurityAdvisorService.hasPermission(CreateSecurityAdvisorService.CAN_ACCESS_ANY_OBJECT);
     }
 
     private annotFormatter(params: any) {
@@ -479,8 +482,8 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
         this.propertyTypeFC.setValue(prop ? prop.codePropertyType : "");
         this.mageOntologyCodeFC.setValue(prop ? prop.mageOntologyCode : "");
         this.mageOntologyDefFC.setValue(prop ? prop.mageOntologyDefinition : "");
-        if(this.experimentPlatformMode){
-            this.appliesToPlatform.setValue(this.expPlatform ? this.expPlatform: "");
+        if(this.experimentPlatformMode) {
+            this.appliesToPlatform.setValue(this.expPlatform ? this.expPlatform : "");
         }
 
     }
@@ -588,55 +591,54 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
                 this.dialogsService.alert("Annotations for experiment requests require at least 1 experiment platform", null, DialogType.VALIDATION);
                 return;
             }
+
+            if(this.forRequestFC.value && !this.createSecurityAdvisorService.hasPermission(CreateSecurityAdvisorService.CAN_ACCESS_ANY_OBJECT)) {
+                this.dialogsService.alert("Insufficient permissions: Non-admins cannot edit annotations for experiment requests.", null, DialogType.VALIDATION);
+                return;
+            }
         }
 
         this.showSpinner = true;
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idProperty", this.selectedProperty.idProperty);
-        params.set("name", this.nameFC.value);
-        params.set("isActive", this.activeFC.value ? "Y" : "N");
-        params.set("isRequired", this.requiredFC.value ? "Y" : "N");
-        params.set("sortOrder", this.sortOrderFC.value);
-        params.set("forSample", this.forSampleFC.value ? "Y" : "N");
-        params.set("forDataTrack", this.forDataTrackFC.value ? "Y" : "N");
-        params.set("forAnalysis", this.forAnalysisFC.value ? "Y" : "N");
-        params.set("forRequest", this.forRequestFC.value ? "Y" : "N");
-        params.set("mageOntologyCode", this.mageOntologyCodeFC.value);
-        params.set("mageOntologyDefinition", this.mageOntologyDefFC.value);
-        params.set("description", this.descriptionFC.value);
-        params.set("idCoreFacility", this.coreFacilityFC.value);
-        params.set("idAppUser", this.ownerFC.value);
-        params.set("codePropertyType", this.propertyTypeFC.value);
-        params.set("noJSONToXMLConversionNeeded", "Y");
-        params.set("optionsJSONString", JSON.stringify(this.currentOptions));
-        params.set("organismsJSONString", JSON.stringify(this.currentOrganisms));
-        params.set("platformsJSONString", JSON.stringify(this.currentPlatforms));
-        params.set("analysisTypesJSONString", JSON.stringify(this.currentAnalysisTypes));
-        params.set("appUsersJSONString", JSON.stringify(this.currentUsers));
+        let params: HttpParams = new HttpParams()
+            .set("idProperty", this.selectedProperty.idProperty)
+            .set("name", this.nameFC.value)
+            .set("isActive", this.activeFC.value ? "Y" : "N")
+            .set("isRequired", this.requiredFC.value ? "Y" : "N")
+            .set("sortOrder", this.sortOrderFC.value)
+            .set("forSample", this.forSampleFC.value ? "Y" : "N")
+            .set("forDataTrack", this.forDataTrackFC.value ? "Y" : "N")
+            .set("forAnalysis", this.forAnalysisFC.value ? "Y" : "N")
+            .set("forRequest", this.forRequestFC.value ? "Y" : "N")
+            .set("mageOntologyCode", this.mageOntologyCodeFC.value)
+            .set("mageOntologyDefinition", this.mageOntologyDefFC.value)
+            .set("description", this.descriptionFC.value)
+            .set("idCoreFacility", this.coreFacilityFC.value)
+            .set("idAppUser", this.ownerFC.value)
+            .set("codePropertyType", this.propertyTypeFC.value)
+            .set("noJSONToXMLConversionNeeded", "Y")
+            .set("optionsJSONString", JSON.stringify(this.currentOptions))
+            .set("organismsJSONString", JSON.stringify(this.currentOrganisms))
+            .set("platformsJSONString", JSON.stringify(this.currentPlatforms))
+            .set("analysisTypesJSONString", JSON.stringify(this.currentAnalysisTypes))
+            .set("appUsersJSONString", JSON.stringify(this.currentUsers));
 
-        this.propertyService.savePropertyAnnotation(params).subscribe((response: Response) => {
-            let error: boolean = false;
-            if (response) {
-                let responseJSON: any = response.json();
-                if (responseJSON && responseJSON.result && responseJSON.result === "SUCCESS") {
-                    this.formGroup.markAsPristine();
-                    this.snackBar.open("Annotation Saved", "Configure Annotations", {
-                        duration: 2000,
-                    });
-                    if (responseJSON.inactivate === "true") {
-                        this.dialogsService.alert("Certan options were inactivated instead of deleted because they are associated with existing samples", null, DialogType.WARNING);
-                    }
-                    this.selectedProperty = null;
-                    this.refreshPropertyList();
-                } else {
-                    error = true;
+        this.propertyService.savePropertyAnnotation(params).subscribe((response: any) => {
+            if (response && response.result === "SUCCESS") {
+                this.formGroup.markAsPristine();
+                this.snackBar.open("Annotation Saved", "Configure Annotations", {
+                    duration: 2000,
+                });
+                if (response.inactivate === "true") {
+                    this.dialogsService.alert("Certan options were inactivated instead of deleted because they are associated with existing samples", null, DialogType.WARNING);
                 }
+                this.selectedProperty = null;
+                this.refreshPropertyList();
             } else {
-                error = true;
+                let message: string = response && response.message ? " " + response.message : "";
+                this.dialogsService.error("An error occurred while saving the annotation." + message);
             }
-            if (error) {
-                this.dialogsService.error("An error occurred while saving the annotation");
-            }
+            this.showSpinner = false;
+        }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
     }
@@ -654,7 +656,7 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
         newProp.forSample = this.orderType === this.SHOW_FOR_SAMPLES ? "Y" : "N";
         newProp.forDataTrack = this.orderType === this.SHOW_FOR_DATA_TRACKS ? "Y" : "N";
         newProp.forAnalysis = this.orderType === this.SHOW_FOR_ANALYSIS ? "Y" : "N";
-        newProp.forRequest = this.orderType === this.SHOW_FOR_EXPERIMENTS ? "Y" : "N";
+        newProp.forRequest = this.canAccessAnyObject ? (this.orderType === this.SHOW_FOR_EXPERIMENTS ? "Y" : "N") : "N";
         newProp.mageOntologyCode = "";
         newProp.mageOntologyDefinition = "";
         newProp.description = "";
@@ -676,52 +678,46 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
         if (this.selectedProperty && this.selectedProperty.canDelete === "Y" && this.selectedProperty.idProperty) {
             this.dialogsService.confirm("Are you sure you want to remove annotation '" + this.selectedProperty.name + "'?").subscribe((result: boolean) => {
                 if (result) {
-                    let params: URLSearchParams = new URLSearchParams();
-                    params.set("idProperty", this.selectedProperty.idProperty);
-                    params.set("deleteAll", "N");
-                    this.propertyService.deletePropertyAnnotation(params).subscribe((response: Response) => {
-                        let error: boolean = false;
+                    this.dialogsService.startDefaultSpinnerDialog();
+                    let params: HttpParams = new HttpParams()
+                        .set("idProperty", this.selectedProperty.idProperty)
+                        .set("deleteAll", "N");
+                    this.propertyService.deletePropertyAnnotation(params).subscribe((response: any) => {
                         if (response) {
-                            let responseJSON: any = response.json();
-                            if (responseJSON && responseJSON.result && responseJSON.result === "SUCCESS") {
+                            if (response.result === "SUCCESS") {
                                 this.snackBar.open("Annotation Deleted", "Configure Annotations", {
                                     duration: 2000,
                                 });
                                 this.selectedProperty = null;
                                 this.refreshPropertyList();
-                            } else if (responseJSON && responseJSON.result && responseJSON.result === "NONBLANKVALUES") {
-                                let sampleCount: string = responseJSON.sampleCount;
-                                let analysisCount: string = responseJSON.analysisCount;
-                                let dataTrackCount: string = responseJSON.dataTrackCount;
+                            } else if (response.result === "NONBLANKVALUES") {
+                                let sampleCount: string = response.sampleCount;
+                                let analysisCount: string = response.analysisCount;
+                                let dataTrackCount: string = response.dataTrackCount;
                                 let deleteAllowed: boolean = this.createSecurityAdvisorService.isSuperAdmin
                                     || (sampleCount === "0" && analysisCount === "0" && dataTrackCount === "0");
                                 let associatedWarningMessage = "This annotation is associated with " + sampleCount + " sample(s), " +
-                                    analysisCount + " analys(es), and " + dataTrackCount + " data track(s).";
+                                    analysisCount + " analys(es), and " + dataTrackCount + " data track(s). ";
                                 if (deleteAllowed) {
                                     this.dialogsService.confirm(associatedWarningMessage + " Are you sure you want to delete?").subscribe((answer: boolean) => {
                                         if (answer) {
-                                            let params2: URLSearchParams = new URLSearchParams();
-                                            params2.set("idProperty", responseJSON.idProperty);
-                                            params2.set("deleteAll", "Y");
-                                            this.propertyService.deletePropertyAnnotation(params2).subscribe((response2: Response) => {
-                                                let error2: boolean = false;
-                                                if (response2) {
-                                                    let responseJSON2: any = response2.json();
-                                                    if (responseJSON2 && responseJSON2.result && responseJSON2.result === "SUCCESS") {
-                                                        this.snackBar.open("Annotation Deleted", "Configure Annotations", {
-                                                            duration: 2000,
-                                                        });
-                                                        this.selectedProperty = null;
-                                                        this.refreshPropertyList();
-                                                    } else {
-                                                        error2 = true;
-                                                    }
+                                            let params2: HttpParams = new HttpParams()
+                                                .set("idProperty", response.idProperty)
+                                                .set("deleteAll", "Y");
+                                            this.propertyService.deletePropertyAnnotation(params2).subscribe((response2: any) => {
+                                                if (response2 && response2.result === "SUCCESS") {
+                                                    this.snackBar.open("Annotation Deleted", "Configure Annotations", {
+                                                        duration: 2000,
+                                                    });
+                                                    this.selectedProperty = null;
+                                                    this.refreshPropertyList();
                                                 } else {
-                                                    error2 = true;
+                                                    let message: string = response2 && response2.message ? " " + response2.message : "";
+                                                    this.dialogsService.error("An error occurred while deleting the annotation." + message);
                                                 }
-                                                if (error2) {
-                                                    this.dialogsService.error("An error occurred while deleting the annotation");
-                                                }
+                                                this.dialogsService.stopAllSpinnerDialogs();
+                                            }, (err: IGnomexErrorResponse) => {
+                                                this.dialogsService.stopAllSpinnerDialogs();
                                             });
                                         } else {
                                             this.selectedProperty = null;
@@ -730,17 +726,16 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
                                     });
                                 } else {
                                     this.dialogsService.alert(associatedWarningMessage
-                                        + "Please contact an administrator if you would like to delete the annotation and all its associated values", null, DialogType.FAILED);
+                                        + "Please contact an administrator if you would like to delete the annotation and all its associated values", null, DialogType.WARNING);
                                 }
                             } else {
-                                error = true;
+                                let message: string = response && response.message ? " " + response.message : "";
+                                this.dialogsService.error("An error occurred while deleting the annotation." + message);
                             }
-                        } else {
-                            error = true;
                         }
-                        if (error) {
-                            this.dialogsService.error("An error occurred while deleting the annotation");
-                        }
+                        this.dialogsService.stopAllSpinnerDialogs();
+                    }, (err: IGnomexErrorResponse) => {
+                        this.dialogsService.stopAllSpinnerDialogs();
                     });
                 }
             });

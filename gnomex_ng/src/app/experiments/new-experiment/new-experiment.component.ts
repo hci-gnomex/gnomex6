@@ -93,6 +93,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         experiment: {
             idCoreFacility: '',
             PropertyEntries: [],
+            billingItems: [],
             codeRequestCategory: '',
             requestCategory: {
                 display: '',
@@ -419,6 +420,33 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         } else if (category.type === NewExperimentService.TYPE_GENERIC) {
             this.gnomexService.submitInternalExperiment() ? this.newExperimentService.currentState = 'GenericState' :
                 this.newExperimentService.currentState = 'GenericExternalState';
+
+            this.tabs.push({
+                label: "Sample Details",
+                disabled: true,
+                component: TabSampleSetupViewComponent
+            });
+            if (this.annotationInputs
+                && this.annotationInputs.annotations
+                && Array.isArray(this.annotationInputs.annotations)
+                && this.annotationInputs.annotations.length) {
+
+                this.tabs.push({
+                    label: "Other Details",
+                    disabled: true,
+                    component: AnnotationTabComponent
+                });
+            }
+            this.tabs.push({
+                label: "Samples",
+                disabled: true,
+                component: TabSamplesIlluminaComponent
+            });
+            this.tabs.push({
+                label: "Confirm",
+                disabled: true,
+                component: TabConfirmIlluminaComponent
+            });
         } else if (category.type === NewExperimentService.TYPE_CAP_SEQ) {
             this.newExperimentService.currentState = "CapSeqState";
         } else if (category.type === NewExperimentService.TYPE_FRAG_ANAL) {
@@ -601,6 +629,10 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
     public SaveNewExperiment(): void {
         this.dialogService.startDefaultSpinnerDialog();
+
+        // Billing items should not be sent to the backend (though they should be ignored by the RequestParser),
+        // but are used to create Price Quotes on the confirm tab in the new experiment
+        this.inputs.experiment.billingItems = [];
 
         this.experimentService.saveRequest(this.inputs.experiment).subscribe((response) => {
             this.dialogService.stopAllSpinnerDialogs();
