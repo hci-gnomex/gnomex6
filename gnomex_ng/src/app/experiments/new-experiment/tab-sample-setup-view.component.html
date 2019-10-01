@@ -22,7 +22,44 @@
                         </div>
                     </div>
                 </li>
-                <li class="full-width align-baseline">
+                <li *ngIf="showSequenomExperimentType" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline double-left-padded">
+                        <div class="heading">
+                            Select an Experiment Type.
+                        </div>
+                        <div>
+                            <mat-radio-group class="flex-container-col"
+                                             formControlName="selectedApp"
+                                             (change)="onAppChange($event)">
+                                <div *ngFor="let app of filteredApplications">
+                                    <mat-radio-button [value]="app">
+                                        <div class="inline-block short-width">
+                                            {{ app.display }}
+                                        </div>
+                                        <div class="inline-block" *ngIf="app.samplesPerBatch && app.samplesPerBatch !== '1'">
+                                            {{ app.samplesPerBatch }} samples/batch
+                                        </div>
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                            <div *ngIf="form?.get('selectedApp')?.value?.codeApplication === 'OTHER'" class="double-padded flex-container-row align-baseline">
+                                <div class="padded-left-right">
+                                    Please specify :
+                                </div>
+                                <mat-form-field>
+                                    <input matInput
+                                           placeholder=""
+                                           formControlName="customSpecification"
+                                           (change)="onChange_otherSpecification($event)">
+                                    <mat-error *ngIf="form?.get('customSpecification')?.hasError('required')">
+                                        Please explain
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li *ngIf="showDefaultSampleNumber" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
                         <div class="heading">
                             How many samples will be sequenced in this experiment order?
@@ -79,6 +116,27 @@
                         </div>
                     </div>
                 </li>
+                <li *ngIf="!showDefaultSampleNumber" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            How many samples will you be submitting?
+                        </div>
+                        <mat-form-field>
+                            <input matInput
+                                   placeholder="Number of samples."
+                                   formControlName="numSamples"
+                                   maxlength="4"
+                                   required
+                                   (change)="onChange_numberOfSamples($event)">
+                            <mat-error *ngIf="form?.get('numSamples')?.hasError('pattern')">
+                                Please check number of samples
+                            </mat-error>
+                        </mat-form-field>
+                        <div *ngIf="showSpecialSampleNumberBatchWarning" class="double-left-padded green">
+                            You have selected a panel which runs in batches of {{ form.get('selectedApp').value.samplesPerBatch }} samples. Please note you will be responsible to pay for unused wells.
+                        </div>
+                    </div>
+                </li>
                 <li *ngIf="showSampleNotes" >
                     <mat-form-field class="long-width">
                         <textarea matInput
@@ -90,6 +148,77 @@
                         </textarea>
                     </mat-form-field>
                 </li>
+                <li *ngIf="showSequenomExperimentType" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline double-left-padded">
+                        <div class="heading">
+                            The samples will be delivered in what container?
+                        </div>
+                        <div>
+                            <mat-radio-group class="flex-container-col"
+                                             (change)="onContainerChange($event)">
+                                <span class="padded">
+                                    <mat-radio-button checked [value]="'TUBE'">
+                                        <div class="inline-block short-width">
+                                            Tubes
+                                        </div>
+                                    </mat-radio-button>
+                                </span>
+                                <span class="padded">
+                                    <mat-radio-button [value]="'PLATE'">
+                                        <div class="inline-block short-width">
+                                            Plates
+                                        </div>
+                                    </mat-radio-button>
+                                </span>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                </li>
+                <li *ngIf="showSequenomExperimentType && showNumberPlatesPrompt" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline double-left-padded">
+                        <div class="heading">
+                            How many source plates will you be submitting?
+                        </div>
+                        <mat-form-field>
+                            <input matInput
+                                   placeholder="Number of plates"
+                                   formControlName="numPlates"
+                                   (change)="onChange_numberOfPlates($event)">
+                            <mat-error *ngIf="form?.get('numPlates')?.hasError('pattern')">
+                                Please check number of plates
+                            </mat-error>
+                            <mat-error *ngIf="form?.get('numPlates')?.hasError('requireNumberPlatesIfShownAndAvailableOptions_AND_checkMinimumNeededPlates')">
+                                You will need at least {{ numberOfNecessaryPlates }} for this number of samples (96 samples/plate)
+                            </mat-error>
+                            <mat-error *ngIf="form?.get('numPlates')?.hasError('maximum')">
+                                The maximum number of plates supported is twelve
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+                <li *ngIf="allPlates && allPlates.length > 0" class="full-width align-baseline">
+                    <div class="full-width double-left-padded">
+                        <div class="heading">
+                            Name your plates :
+                        </div>
+                        <div class="full-width">
+                            <div *ngFor="let plate of allPlates" class="inline-block padded">
+                                <div class="inline-block minwidth">
+                                    {{ plate.label }}
+                                </div>
+                                <div class="inline-block">
+                                    <mat-form-field>
+                                        <input matInput
+                                               placeholder="Plate name"
+                                               [value]="plate.plateName"
+                                               (change)="onChangePlateName($event, plate)">
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
                 <li *ngIf="showOrganism" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
                         <div class="heading">

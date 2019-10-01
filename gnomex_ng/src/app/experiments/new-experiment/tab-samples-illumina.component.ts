@@ -285,6 +285,30 @@ export class TabSamplesIlluminaComponent implements OnInit {
             && this._experiment.requestCategory.isIlluminaType === 'Y';
     }
 
+    public get usingPlates(): boolean {
+        if(this._experiment
+            && this._experiment.plates
+            && Array.isArray(this._experiment.plates)
+            && this._experiment.plates.length > 0) {
+
+            return true;
+        }
+
+        if (this._experiment
+            && this._experiment.samples
+            && Array.isArray(this._experiment.samples)
+            && this._experiment.samples.length > 0) {
+
+            for (let sample of this._experiment.samples) {
+                if (sample.plateName) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public get showIlluminaInstructions(): boolean {
         return this.usingMultiplexGroupGroups
             && !this.hideMultiplexGroupColumn
@@ -520,17 +544,49 @@ export class TabSamplesIlluminaComponent implements OnInit {
     private get defaultSampleColumnDefinitions(): any[] {
         let temp: any[] = [];
 
-        temp.push({
-            headerName: "",
-            field: "index",
-            width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
-            minWidth: 4 * this.emToPxConversionRate,
-            cellRendererFramework: TextAlignRightMiddleRenderer,
-            suppressSizeToFit: true,
-            pinned: "left",
-            sortOrder: 5
-        });
+        if (this.usingPlates) {
+            temp.push({
+                headerName: "Plate",
+                editable: false,
+                field: "plateName",
+                pinned: "left",
+                width:    6.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                sortOrder: 7,
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework:   SelectEditor,
+                selectOptions: this._experiment.plates,
+                selectOptionsDisplayField: "plateName",
+                selectOptionsValueField: "plateName"
+            });
+            temp.push({
+                headerName: "Well",
+                editable: false,
+                field: "wellName",
+                pinned: "left",
+                width:    6.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                sortOrder: 9,
+                cellRendererFramework: TextAlignLeftMiddleRenderer
+            });
+        } else {
+            // This is the far more common case at time of writing
+            temp.push({
+                headerName: "",
+                field: "index",
+                width:    4 * this.emToPxConversionRate,
+                maxWidth: 4 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                cellRendererFramework: TextAlignRightMiddleRenderer,
+                suppressSizeToFit: true,
+                pinned: "left",
+                sortOrder: 5
+            });
+        }
 
         if (this.usingMultiplexGroupGroups && !this.hideMultiplexGroupColumn) {
             temp.push({
@@ -560,24 +616,45 @@ export class TabSamplesIlluminaComponent implements OnInit {
             });
         }
 
-        temp.push({
-            headerName: "Sample Name",
-            field: "name",
-            width:    9 * this.emToPxConversionRate,
-            minWidth: 6.5 * this.emToPxConversionRate,
-            maxWidth: 12 * this.emToPxConversionRate,
-            editable: true,
-            cellRendererFramework: TextAlignLeftMiddleRenderer,
-            cellEditorFramework: TextAlignLeftMiddleEditor,
-            validators: [ Validators.required ],
-            errorNameErrorMessageMap: [
-                { errorName: 'required', errorMessage: 'Sample Name required' }
-            ],
-            pinned: "left",
-            outerForm: this.form,
-            formName:  "gridFormGroup",
-            sortOrder: 15
-        });
+        if (this.usingPlates) {
+            temp.push({
+                headerName: "Sample Name",
+                field: "name",
+                width: 9 * this.emToPxConversionRate,
+                minWidth: 6.5 * this.emToPxConversionRate,
+                maxWidth: 12 * this.emToPxConversionRate,
+                editable: true,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                // validators: [Validators.required],
+                // errorNameErrorMessageMap: [
+                //     {errorName: 'required', errorMessage: 'Sample Name required'}
+                // ],
+                pinned: "left",
+                outerForm: this.form,
+                formName: "gridFormGroup",
+                sortOrder: 15
+            });
+        } else {
+            temp.push({
+                headerName: "Sample Name",
+                field: "name",
+                width: 9 * this.emToPxConversionRate,
+                minWidth: 6.5 * this.emToPxConversionRate,
+                maxWidth: 12 * this.emToPxConversionRate,
+                editable: true,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                validators: [Validators.required],
+                errorNameErrorMessageMap: [
+                    {errorName: 'required', errorMessage: 'Sample Name required'}
+                ],
+                pinned: "left",
+                outerForm: this.form,
+                formName: "gridFormGroup",
+                sortOrder: 15
+            });
+        }
 
         let isExternal: boolean = this.experiment && this.experiment.isExternal === 'Y';
 
@@ -814,18 +891,54 @@ export class TabSamplesIlluminaComponent implements OnInit {
     private get editSampleColumnDefinitions(): any[] {
         let temp: any[] = [];
 
-        temp.push({
-            headerName: "",
-            field: "counter",
-            width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
-            minWidth: 4 * this.emToPxConversionRate,
-            cellRendererFramework: TextAlignLeftMiddleRenderer,
-            suppressSizeToFit: true,
-            editable: false,
-            sortOrder: 5,
-            pinned: "left"
-        });
+        if (this.usingPlates) {
+            temp.push({
+                headerName: "Plate",
+                editable: true,
+                field: "plateName",
+                pinned: "left",
+                width:    6.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                sortOrder: 7,
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework:   SelectEditor,
+                selectOptions: this._experiment.getAllUsedPlates(),
+                selectOptionsDisplayField: "value",
+                selectOptionsValueField: "value"
+            });
+            temp.push({
+                headerName: "Well",
+                editable: true,
+                field: "wellName",
+                pinned: "left",
+                width:    6.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                sortOrder: 9,
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework:   SelectEditor,
+                selectOptions: this._experiment.getAllPossibleWellNames(),
+                selectOptionsDisplayField: "value",
+                selectOptionsValueField: "value"
+            });
+        } else {
+            temp.push({
+                headerName: "",
+                field: "counter",
+                width:    4 * this.emToPxConversionRate,
+                maxWidth: 4 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                suppressSizeToFit: true,
+                editable: false,
+                sortOrder: 5,
+                pinned: "left"
+            });
+        }
+
 
         if (this.usingMultiplexGroupGroups && !this.hideMultiplexGroupColumn) {
             temp.push({
@@ -1174,7 +1287,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
             if (this._experiment
                 && this._experiment.requestCategory
-                && this._experiment.requestCategory.type !== NewExperimentService.TYPE_GENERIC) {
+                && this._experiment.requestCategory.type !== NewExperimentService.TYPE_GENERIC
+                && !this.usingPlates) {
 
                 temp.push({
                     headerName: "QC Status",
@@ -1216,6 +1330,20 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 },
                 pinned: 'left'
             });
+        } else if (this.usingPlates) {
+            temp.push({
+                headerName: "Plate",
+                field: "mainMultiplexGroupNumber",
+                width: 5 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                minWidth: 5 * this.emToPxConversionRate,
+                cellRenderer: "agGroupCellRenderer",
+                cellRendererParams: {
+                    innerRenderer: getGroupRenderer(),
+                    suppressCount: true
+                },
+                pinned: 'left'
+            });
         }
 
         temp.push({
@@ -1228,6 +1356,20 @@ export class TabSamplesIlluminaComponent implements OnInit {
             suppressSizeToFit: true,
             pinned: 'left'
         });
+
+        if (this.usingPlates) {
+            temp.push({
+                headerName: "Well",
+                field: "wellName",
+                width:    5 * this.emToPxConversionRate,
+                maxWidth: 5 * this.emToPxConversionRate,
+                minWidth: 5 * this.emToPxConversionRate,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                suppressSizeToFit: true,
+                pinned: 'left'
+            });
+        }
+
         temp.push({
             headerName: "Sample Name",
             field: "name",
@@ -1441,7 +1583,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 suppressSizeToFit: true,
                 editable: false,
             });
-        } else {
+        } else if (!this.usingPlates) {
             if (this.showQCStatus) {
                 temp.push({
                     headerName: "QC Status",
@@ -1479,6 +1621,22 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     suppressSizeToFit: true,
                     editable: false,
                     cellRendererFramework: TextAlignLeftMiddleRenderer
+                });
+            }
+        } else {
+            if (this.showLinkToCCNumber) {
+                temp.push({
+                    headerName: "CC Number",
+                    field: "ccNumber",
+                    width:    8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    maxWidth: 10 * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: false,
+                    cellRendererFramework: LinkButtonRenderer,
+                    onClickButton: 'onClickCCNumberLink',
+                    ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
+                    buttonValueLabel: 'ccNumber'
                 });
             }
         }
@@ -1521,7 +1679,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             );
         }
 
-        this.samplesGridColumnDefs = this.defaultSampleColumnDefinitions;
+        this.samplesGridColumnDefs = TabSamplesIlluminaComponent.sortColumns(this.defaultSampleColumnDefinitions);
         this.nodeChildDetails = this.getItemNodeChildDetails;
 
         setTimeout(() => {
@@ -1978,6 +2136,39 @@ export class TabSamplesIlluminaComponent implements OnInit {
             for (let sample of this._experiment.samples) {
                 let search: any[] = rowData.filter((a: any) => {
                     return a.mainMultiplexGroupNumber === sample.multiplexGroupNumber;
+                });
+
+                if (search && Array.isArray(search) && search.length === 1) {
+                    search[0].samples.push(sample);
+                }
+            }
+
+            this.samplesGridApi.setRowData(rowData);
+        } else if (this.usingPlates && state === TabSamplesIlluminaComponent.STATE_VIEW) {
+            let keysUsed: string[] = [];
+
+            for (let sample of this._experiment.samples) {
+                let search: string[] = keysUsed.filter((a: string) => {
+                    return a === sample.plateName;
+                });
+
+                if (search && Array.isArray(search) && search.length < 1) {
+                    keysUsed.push(sample.plateName);
+                }
+            }
+
+            let rowData: any[] = [];
+
+            for (let key of keysUsed) {
+                rowData.push({
+                    mainMultiplexGroupNumber: key,
+                    samples: []
+                });
+            }
+
+            for (let sample of this._experiment.samples) {
+                let search: any[] = rowData.filter((a: any) => {
+                    return a.mainMultiplexGroupNumber === sample.plateName;
                 });
 
                 if (search && Array.isArray(search) && search.length === 1) {
