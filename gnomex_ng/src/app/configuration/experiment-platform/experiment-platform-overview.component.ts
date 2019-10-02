@@ -129,8 +129,14 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         this.platformListSubscription = this.expPlatformService.getExperimentPlatformListObservable()
             .subscribe(resp =>{
                 if(resp){
+                    let coresICanManage:any[] = this.secAdvisor.coreFacilitiesICanManage;
+                    this.allExpPlatorms = (<Array<any>>resp).filter((exPlatform:any) =>{
+                        let showPlatform: boolean = !!(coresICanManage.find((cManage:any) =>{
+                            return cManage.idCoreFacility === exPlatform.idCoreFacility
+                        }));
+                        return showPlatform;
+                    });
 
-                    this.allExpPlatorms = <Array<any>>resp; //(<Array<any>>resp).filter(exPlatform => exPlatform.isActive === 'Y' );
                     this.filterExperimentPlatform();
                     for(let row of this.allExpPlatorms){
                         this.constService.getTreeIcon(row,'RequestCategory');
