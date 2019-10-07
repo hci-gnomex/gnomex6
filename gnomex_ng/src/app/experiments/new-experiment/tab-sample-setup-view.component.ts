@@ -119,6 +119,10 @@ import {TabSeqSetupViewComponent} from "./tab-seq-setup-view.component";
             min-width: 40em;
         }
         
+        .minwidth {
+            min-width: 5em;
+        }
+        
         
         /************************/
         
@@ -169,6 +173,12 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 }
             }
 
+            if (this.experimentTypeUsesPlates) {
+                this.form.get("canUsePlates").setValue(true);
+            } else {
+                this.form.get("canUsePlates").setValue(false);
+            }
+
             if (this.form && this.form.get("hasIsolationTypes")) {
                 this.form.get("hasIsolationTypes").setValue(false);
             }
@@ -210,6 +220,8 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     public showKeepSample: boolean = true;
     public requireSamplePrepContainer: boolean = false;
     public showSampleQualityExperimentType: boolean = false;
+    public showSequenomExperimentType: boolean = false;
+    public showDefaultSampleNumber: boolean = true;
     private showOrganism: boolean = true;
     private showSamplePurification: boolean = true;
     private showQcInstructions: boolean = true;
@@ -224,6 +236,8 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
 
     public isolationTypes: any[] = [];
     public sampleSources: any[] = [];
+
+    public allPlates: any[] = [];
 
     private emToPxConversionRate: number = 13;
 
@@ -276,6 +290,40 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     public get showElution(): boolean {
         return this.newExperimentService.currentState !== 'QCState';
     }
+
+    public get showNumberPlatesPrompt(): boolean {
+        // return true;
+        return this._experiment
+            && this._experiment.containerType
+            && this._experiment.containerType === 'PLATE';
+    }
+
+    get experimentTypeUsesPlates(): boolean {
+        return this.requestCategory
+            && this.requestCategory.type === NewExperimentService.TYPE_SEQUENOM
+    }
+
+    public get showSpecialSampleNumberBatchWarning(): boolean {
+        return this.form
+            && this.form.get('selectedApp')
+            && this.form.get('selectedApp').value
+            && this.form.get('selectedApp').value.samplesPerBatch
+            && this.form.get('selectedApp').value.samplesPerBatch !== '1';
+    }
+
+    public get numberOfNecessaryPlates(): number {
+        if (this.form && this.form.get('numSamples') && this.form.get('numSamples').value) {
+            if (+this.form.get('numSamples').value % 96 === 0) {
+                return Math.trunc(+this.form.get('numSamples').value / 96);
+            } else {
+                return Math.trunc(+this.form.get('numSamples').value / 96) + 1;
+            }
+        }
+
+        return 1;
+    }
+
+
 
     private get bioanalyzerColumnDefs(): any[] {
         let temp: any[] = [];
@@ -334,6 +382,9 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
 
         this.form = this.fb.group({
                 numSamples:                        ['', [Validators.pattern(/^\d+$/)]],
+                numPlates:                         ['', [Validators.pattern(/^\d+$/)]],
+                canUsePlates:                      [''],
+                isUsingPlates:                     [''],
                 showSampleQuality:                 [''],
                 selectedApp:                       [''],
                 selectedDna:                       [''],
@@ -355,6 +406,8 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 rnaseBox:                          [''],
                 keepSample:                        [''],
                 acid:                              [''],
+                requiresCustomSpecification:       [''],
+                customSpecification:               [''],
                 coreNotes:                         ['', [Validators.maxLength(5000)]]
             },
             { validator: TabSampleSetupViewComponent.validatorWrapper }
@@ -413,6 +466,24 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             return temp;
         } else {
             temp = TabSampleSetupViewComponent.requireIsolationTypeIfShownAndAvailableOptions(group);
+        }
+
+        if (temp) {
+            return temp;
+        } else {
+            temp = TabSampleSetupViewComponent.requireOtherSpecificationIfShown(group);
+        }
+
+        if (temp) {
+            return temp;
+        } else {
+            temp = TabSampleSetupViewComponent.requireNumberPlatesIfShownAndAvailableOptions_AND_checkMinimumNeededPlates(group);
+        }
+
+        if (temp) {
+            return temp;
+        } else {
+            temp = TabSampleSetupViewComponent.maxNumberOfPlates(group);
         }
 
         return temp;
@@ -498,6 +569,92 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             return {
                 'error': true,
                 'requireIsolationTypeIfShownAndAvailableOptions': true
+            };
+        }
+
+        return null;
+    }
+
+    private static requireOtherSpecificationIfShown(group: FormGroup): { [s:string]: boolean } {
+        if (group
+            && group.controls["requiresCustomSpecification"]
+            && group.controls["requiresCustomSpecification"].value === true
+            && group.controls["customSpecification"]
+            && !(group.controls["customSpecification"].value)) {
+
+            group.controls["customSpecification"].setErrors({
+                'error': true,
+                'required': true
+            });
+
+            return {
+                'error': true,
+                'required': true
+            };
+        }
+
+        return null;
+    }
+
+    private static requireNumberPlatesIfShownAndAvailableOptions_AND_checkMinimumNeededPlates(group: FormGroup): { [s:string]: boolean } {
+        if (group
+            && group.controls["canUsePlates"]
+            && group.controls["canUsePlates"].value === true
+            && group.controls["isUsingPlates"]
+            && group.controls["isUsingPlates"].value === true
+            && group.controls["numSamples"]
+            && group.controls["numSamples"].value
+            && group.controls["numPlates"]
+            && !(group.controls["numPlates"].value)) {
+
+            group.controls["numPlates"].setErrors({
+                'error': true,
+                'required': true
+            });
+
+            return {
+                'error': true,
+                'required': true
+            };
+        }
+
+        if (group
+            && group.controls["canUsePlates"]
+            && group.controls["canUsePlates"].value === true
+            && group.controls["numSamples"]
+            && group.controls["numSamples"].value
+            && group.controls["numPlates"]
+            && group.controls["numPlates"].value
+            && +(group.controls["numSamples"].value) > +(group.controls["numPlates"].value) * 12 * 8 ) {
+
+            group.controls["numPlates"].setErrors({
+                'error': true,
+                'requireNumberPlatesIfShownAndAvailableOptions_AND_checkMinimumNeededPlates': 'true'
+            });
+
+            return {
+                'error': true,
+                'requireNumberPlatesIfShownAndAvailableOptions_AND_checkMinimumNeededPlates': true
+            };
+        }
+
+        return null;
+    }
+
+    private static maxNumberOfPlates(group: FormGroup): { [s:string]: boolean } {
+        if (group
+            && group.controls["numPlates"]
+            && group.controls["numPlates"].value
+            && +(group.controls["numPlates"].value) > 12) {
+
+            group.controls["numPlates"].setErrors({
+                'error': true,
+                'maximum': true
+            });
+
+            return {
+                'error': true,
+                'maximum': true
             };
         }
 
@@ -614,9 +771,66 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
 
     public onChange_numberOfSamples(event: any): void {
         this.numberOfSamples = this.form.get("numSamples").value;
+
+        if (this.form && this.form.get("numPlates")) {
+            this.form.get("numPlates").updateValueAndValidity();
+        }
+    }
+
+    public onChange_numberOfPlates(event: any): void {
+
+        if (this.form
+            && this.form.get("numPlates")
+            && this.form.get("numPlates").value
+            && +this.form.get("numPlates").value >= 0) {
+
+            let numberOfPlatesToHave: number = +this.form.get("numPlates").value;
+
+            if (numberOfPlatesToHave > 12) {
+                numberOfPlatesToHave = 12;
+            }
+            if (numberOfPlatesToHave < 0) {
+                numberOfPlatesToHave = 0;
+            }
+
+            while (numberOfPlatesToHave > this.allPlates.length) {
+                this.allPlates.push({
+                    label: ('Plate ' + (1 + this.allPlates.length)) + ' : ',
+                    plateName: ('Plate ' + (1 + this.allPlates.length))
+                });
+            }
+
+            if (numberOfPlatesToHave < this.allPlates.length) {
+                this.allPlates.splice(+this.form.get("numPlates").value);
+            }
+        } else {
+            this.allPlates = [];
+        }
+
+        this._experiment.generateHypotheticalSamplesBasedOnPlates(this.allPlates);
+    }
+
+    public onChangePlateName(event: any, plate: any): void {
+        if (event
+            && event.currentTarget
+            && event.currentTarget.value
+            && plate) {
+
+            plate.plateName = event.currentTarget.value;
+        }
+
+        this._experiment.generateHypotheticalSamplesBasedOnPlates(this.allPlates);
     }
 
     public onAppChange(event): void {
+        if (this.form
+            && this.form.get("selectedApp")
+            && this.form.get("selectedApp").value
+            && this._experiment) {
+
+            this._experiment.application_object = this.form.get("selectedApp").value;
+        }
+
         if (this.form
             && this.form.get("selectedApp")
             && this.form.get("selectedApp").value
@@ -645,12 +859,20 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 this.bioanalyzerChips = this.bioanalyzerChips.sort(TabSeqSetupViewComponent.sortBySortOrderThenDisplay);
             }
 
-            if (this._experiment) {
-                this._experiment.codeApplication = this.form.get("selectedApp").value.codeApplication;
-            }
-
             if (this.gridApi) {
                 this.gridApi.setRowData(this.bioanalyzerChips);
+            }
+        }
+
+        if (this.form && this.form.get("requiresCustomSpecification")) {
+            if (this.form.get("selectedApp")
+                && this.form.get("selectedApp").value
+                && this.form.get("selectedApp").value.codeApplication
+                && this.form.get("selectedApp").value.codeApplication === "OTHER") {
+
+                this.form.get("requiresCustomSpecification").setValue(true);
+            } else {
+                this.form.get("requiresCustomSpecification").setValue(false);
             }
         }
 
@@ -773,6 +995,16 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 this.requireSamplePrepContainer = true;
                 this.showSamplePurification = false;
                 this.showKeepSample = false;
+            }
+
+            if (this.requestCategory.type === NewExperimentService.TYPE_SEQUENOM) {
+                this.showSamplePrepContainer = false;
+                this.requireSamplePrepContainer = false;
+                this.showSamplePurification = false;
+                this.showKeepSample = false;
+                this.showSequenomExperimentType = true;
+                this.showDefaultSampleNumber = false;
+                this.showOrganism = false;
             }
 
             if (this.requestCategory.codeRequestCategory === "DDPCR BR") {
@@ -937,6 +1169,53 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 this._experiment.corePrepInstructions = this.form.get("coreNotes").value;
             } else {
                 this._experiment.corePrepInstructions = '';
+            }
+        }
+    }
+
+    public onContainerChange(event: any): void {
+        if (this._experiment) {
+            if (event && event.value) {
+                this._experiment.containerType = '' + event.value;
+
+                if (this.form && this.form.get("isUsingPlates")) {
+                    if (event.value === "PLATE") {
+                        this.form.get("isUsingPlates").setValue(true);
+                    } else {
+                        this.form.get("isUsingPlates").setValue(false);
+
+                        this._experiment.numberOfSamples = '' + this._experiment.requiredNumberOfSamples;
+                    }
+                }
+            } else {
+                this._experiment.containerType = '';
+
+                if (this.form && this.form.get("isUsingPlates")) {
+                    this.form.get("isUsingPlates").setValue(false);
+                }
+            }
+        }
+
+        // Spoofing selecting 1 to create a default plate
+        if (this.form && this.form.get("numPlates")) {
+            if (event.value === "PLATE") {
+                this.form.get("numPlates").setValue('1');
+                this.onChange_numberOfPlates({ value: '1' });
+            } else {
+                this.form.get("numPlates").setValue('');
+                this.onChange_numberOfPlates({ value: '' });
+            }
+        }
+    }
+
+    public onChange_otherSpecification(event: any): void {
+        if (this._experiment) {
+            if (event && event.value) {
+                this._experiment.applicationNotes       = '' + event.value;
+                this._experiment.applicationDescription = '' + event.value;
+            } else {
+                this._experiment.applicationNotes = '';
+                this._experiment.applicationDescription = '';
             }
         }
     }
