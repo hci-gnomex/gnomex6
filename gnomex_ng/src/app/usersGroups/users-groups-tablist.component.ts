@@ -48,7 +48,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
     selector: 'users-groups-tablist',
     templateUrl: './users-groups-tablist.component.html',
     styles: [`
-        
+
         .min-width {
             min-width: 15em;
         }
@@ -56,31 +56,27 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
         div.institution-div {
             height: 18em;
         }
-        
+
         .color-blue {
             color: blue;
         }
 
-        
+
         label {
             font-style: italic;
             color: #1601db;
         }
-        
+
         .height-auto { height: auto; }
-        
-        .reserve-height {
-            height:     fit-content;
-            min-height: fit-content;
-        }
-        
+
+
         .small-width { width: 12em; }
 
         .horizontal-spacer {
             height: 100%;
             width: 0.3em;
         }
-        
+
         .foreground { background-color: white;   }
         .background { background-color: #EEEEEE; }
 
@@ -89,32 +85,32 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             border-radius: 0.3em;
             border: 1px solid darkgrey;
         }
-        
+
         .right-align { text-align: right; }
-        
+
         .small-font { font-size: small; }
-        
+
         .margin-left { margin-left: 0.3em; }
-        
+
         .large-margin-left  { margin-left:  2em; }
         .large-margin-right { margin-right: 2em; }
-        
+
         .padded { padding: 0.3em; }
-        
+
         .padded-right  { padding-right:  0.3em; }
         .padded-bottom { padding-bottom: 0.3em; }
-        
+
         .padded-left-right {
             padding-left:   0.3em;
             padding-right:  0.3em;
         }
-        
+
         .padded-left-right-bottom {
             padding-left:   0.3em;
             padding-right:  0.3em;
             padding-bottom: 0.3em;
         }
-        
+
         .large-padding-right { padding-right: 2em; }
 
     `]
@@ -440,8 +436,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             } else {
                 this.groupsData = this.secAdvisor.groupsToManage;
             }
-            this.isGroupsTab = true;
-            this.isUserTab = false;
+            this.isGroupsTab = false;
+            this.isUserTab = true;
 
             this.groupLabel = this.groupsData.length + " lab groups";
             this.createGroupForm();
@@ -724,7 +720,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     }
 
 
-        /**
+    /**
      *
      * @param permissionKind
      */
@@ -922,7 +918,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                     {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
                 ]}).subscribe((result: any) => {
-                    this.buildUsers(result);
+            this.buildUsers(result);
         });
 
     }
@@ -942,9 +938,9 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                     {type: ActionType.PRIMARY, name: "Yes", internalAction: "delete"},
                     {type: ActionType.SECONDARY, name: "No", internalAction: "onClose"}
                 ]}).subscribe((result: any) => {
-                    if(result) {
-                        this.buildUsers();
-                    }
+            if(result) {
+                this.buildUsers();
+            }
         });
 
     }
@@ -1023,33 +1019,33 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         let stringifiedSF: string = "";
         let stringifiedMF: string = "";
         this.showSpinner = true;
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idAppUser", this.idAppUser);
-        params.set("codeUserPermissionKind", this.codeUserPermissionKind);
-        params.set("idAppUser", this.selectedUser.idAppUser.toString());
-        params.set("firstName", this.userForm.controls['firstName'].value);
-        params.set("lastName", this.userForm.controls['lastName'].value);
-        params.set("institute", this.userForm.controls['institute'].value);
-        params.set("department", this.userForm.controls['department'].value);
-        params.set("email", this.userForm.controls['email'].value);
-        params.set("phone", this.userForm.controls['phone'].value);
-        params.set("ucscUrl", this.userForm.controls['ucscUrl'].value);
+        let params: HttpParams = new HttpParams()
+            .set("idAppUser", this.idAppUser)
+            .set("codeUserPermissionKind", this.codeUserPermissionKind)
+            .set("idAppUser", this.selectedUser.idAppUser.toString())
+            .set("firstName", this.userForm.controls['firstName'].value)
+            .set("lastName", this.userForm.controls['lastName'].value)
+            .set("institute", this.userForm.controls['institute'].value)
+            .set("department", this.userForm.controls['department'].value)
+            .set("email", this.userForm.controls['email'].value)
+            .set("phone", this.userForm.controls['phone'].value)
+            .set("ucscUrl", this.userForm.controls['ucscUrl'].value);
         if (this.isActiveFC.value === false) {
-            params.set("isActive", 'N');
+            params = params.set("isActive", 'N');
         } else {
-            params.set("isActive", 'Y');
+            params = params.set("isActive", 'Y');
         }
         if (this.beingIsActive === false) {
-            params.set("beingInactivated", 'N');
+            params = params.set("beingInactivated", 'N');
         } else {
-            params.set("beingInactivated", 'Y');
+            params = params.set("beingInactivated", 'Y');
         }
         if (this.usertypeFC.value === this.USER_TYPE_UNIVERSITY) {
-            params.set("uNID", this.userForm.controls['uNid'].value);
+            params = params.set("uNID", this.userForm.controls['uNid'].value);
         } else if (this.usertypeFC.value === this.USER_TYPE_EXTERNAL) {
-            params.set("userNameExternal", this.userForm.controls['userName'].value);
-            params.set("passwordExternal", this.userForm.controls['password'].value === this.DUMMY_PASSWORD ? this.PASSWORD_MASKED : this.userForm.controls['password'].value);
-            params.set("uNID", "");
+            params = params.set("userNameExternal", this.userForm.controls['userName'].value);
+            params = params.set("passwordExternal", this.userForm.controls['password'].value === this.DUMMY_PASSWORD ? this.PASSWORD_MASKED : this.userForm.controls['password'].value);
+            params = params.set("uNID", "");
         }
         if (this.coreFacilitiesICanSubmitTo.length > 0) {
             stringifiedSF = JSON.stringify(this.coreFacilitiesICanSubmitTo);
@@ -1057,22 +1053,21 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         if (this.coreFacilitiesIManage.length > 0) {
             stringifiedMF = JSON.stringify(this.coreFacilitiesIManage);
         }
-        params.set("coreFacilitiesUserCanSubmitTo", stringifiedSF);
-        params.set("userManagingCoreFacilities", stringifiedMF);
-        this.appUserListService.saveAppUser(params).subscribe((response: Response) => {
-            if (response.status === 200) {
-                let responseJSON: any = response.json();
-                if (responseJSON.result && responseJSON.result === "SUCCESS") {
-                    this.userForm.markAsPristine();
-                    this.touchUserFields();
+        params = params.set("coreFacilitiesUserCanSubmitTo", stringifiedSF);
+        params = params.set("userManagingCoreFacilities", stringifiedMF);
+        this.appUserListService.saveAppUser(params).subscribe((response: any) => {
+            this.userForm.markAsPristine();
+            this.touchUserFields();
 
-                    let config: MatSnackBarConfig = new MatSnackBarConfig();
-                    config.duration = 3000;
+            let config: MatSnackBarConfig = new MatSnackBarConfig();
+            config.duration = 3000;
 
-                    this.snackBar.open("Changes Saved", "User", config);
-                    this.buildUsers(responseJSON.idAppUser);
-                }
-            }
+            this.snackBar.open("Changes Saved", "User", config);
+            this.buildUsers(response.idAppUser);
+
+            this.showSpinner = false;
+        }, (error:IGnomexErrorResponse) =>{
+            this.userForm.markAsPristine()
             this.showSpinner = false;
         });
     }
@@ -1481,9 +1476,9 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                     {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
                 ]}).subscribe((result: any) => {
-                    if (result) {
-                        this.buildInstitutions();
-                    }
+            if (result) {
+                this.buildInstitutions();
+            }
         });
     }
 
@@ -1514,9 +1509,9 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                     {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
                 ]}).subscribe((result: any) => {
-                    if(result) {
-                        this.buildLabList(result);
-                    }
+            if(result) {
+                this.buildLabList(result);
+            }
         });
 
     }
@@ -1536,9 +1531,9 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                     {type: ActionType.PRIMARY, name: "Yes", internalAction: "delete"},
                     {type: ActionType.SECONDARY, name: "No", internalAction: "onClose"}
                 ]}).subscribe((result: any) => {
-                    if(result) {
-                        this.buildLabList();
-                    }
+            if(result) {
+                this.buildLabList();
+            }
         });
 
     }
