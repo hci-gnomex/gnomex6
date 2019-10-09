@@ -1,30 +1,26 @@
 buildscript {
     repositories {
-        maven { url 'http://repo.spring.io/plugins-release' }
-    }
-    dependencies {
-        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
+        mavenCentral()
     }
 }
 
-apply plugin: 'propdeps'
-apply plugin: 'java'
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
 
 dependencies {
-
-    /*wildfly
-    if (gnomex_server == 'wildfly') {
-        provided group: 'commons-codec', name: 'commons-codec', version: '1.10'
-    }*/
-
     compile group: 'commons-codec', name: 'commons-codec', version: '1.10'
 }
 
 jar {
     manifest {
         attributes([
-                'Built-By': ant.properties['user.name'],
+                'Built-By'              : repo_user,
                 'Implementation-Version': gnomex_version
-        ],'gnomex_crypt')
+        ], 'gnomex_crypt')
     }
 }
