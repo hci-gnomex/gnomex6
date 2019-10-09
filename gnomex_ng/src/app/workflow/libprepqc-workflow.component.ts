@@ -52,7 +52,8 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
     private gridApi: GridApi;
     private gridColumnApi;
     private label: string = "Illumina Library Prep QC";
-    private codeStepNext: string;
+    private codeStepNext: string = "";
+    private preCodeStepNext: string = "";
     private libraryPrepQCProtocols: any[] = [];
     private coreAdmins: any[] = [];
     // left to have nova, hi, mi until we phase them out
@@ -78,6 +79,13 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
 
     initialize() {
         this.dialogsService.startDefaultSpinnerDialog();
+        if(!this.codeStepNext) {
+            this.codeStepNext = this.workflowService.ALL_PREP_QC;
+        }
+        
+        this.preCodeStepNext = this.codeStepNext;
+        this.workItem = "";
+        
         let params: HttpParams = new HttpParams()
             .set("codeStepNext", this.codeStepNext );
         this.workflowService.getWorkItemList(params).subscribe((response: any) => {
@@ -172,6 +180,10 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
         if(!this.codeStepNext) {
             this.codeStepNext = this.workflowService.ALL_PREP_QC;
         }
+        if(this.codeStepNext === this.preCodeStepNext) {
+            return;
+        }
+        
         this.initialize();
     }
 
@@ -190,7 +202,6 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
     onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
-        this.codeStepNext = this.workflowService.ILLSEQ_PREP_QC;
         this.initialize();
     }
 
