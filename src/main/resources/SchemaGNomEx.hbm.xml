@@ -1792,7 +1792,7 @@
     </class>
 
     <!-- hci.gnomex.model.NumberSequencingCyclesAllowed -->
-    <class name="hci.gnomex.model.NumberSequencingCyclesAllowed" table="NumberSequencingCyclesAllowed6">
+    <class name="hci.gnomex.model.NumberSequencingCyclesAllowed" table="NumberSequencingCyclesAllowed">
         <id name="idNumberSequencingCyclesAllowed" column="idNumberSequencingCyclesAllowed" type="integer">
             <generator class="native"/>
         </id>
@@ -2008,7 +2008,7 @@
     </class>
 
     <!-- hci.gnomex.model.PropertyDictionary -->
-    <class name="hci.gnomex.model.PropertyDictionary" table="PropertyDictionary6">
+    <class name="hci.gnomex.model.PropertyDictionary" table="PropertyDictionary">
         <id name="idPropertyDictionary" column="idPropertyDictionary" type="integer">
             <generator class="native"/>
         </id>
@@ -2105,7 +2105,7 @@
     </class>
 
     <!-- hci.gnomex.model.RequestCategoryApplication -->
-    <class name="hci.gnomex.model.RequestCategoryApplication" table="RequestCategoryApplication6">
+    <class name="hci.gnomex.model.RequestCategoryApplication" table="RequestCategoryApplication">
         <composite-id>
             <key-property name="codeRequestCategory" column="codeRequestCategory" type="string"/>
             <key-property name="codeApplication" column="codeApplication" type="string"/>
