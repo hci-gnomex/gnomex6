@@ -75,6 +75,7 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
         { label: "Illumina MiSeq", codeStepNext: this.workflowService.MISEQ_PREP}
     ];
 
+    public allRequestCategories: any[] = [];
 
 
     constructor(public workflowService: WorkflowService,
@@ -91,6 +92,8 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
             code.idOligoBarcodeB = code.idOligoBarcode;
             this.barCodes.push(code);
         }
+
+        this.allRequestCategories = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY);
     }
 
     initialize() {
@@ -146,10 +149,40 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
                         cellRendererFramework: SelectRenderer,
                         cellEditorFramework: SelectEditor,
                         selectOptions: this.seqLibProtocols,
+                        selectOptionsPerRowFilterFunction: (context, rowData, option) => {
+
+                            if (context
+                                && context.allRequestCategories
+                                && rowData
+                                && option) {
+
+                                // specifically allow the extra blank row through the filter
+                                if (!option.idCoreFacility && !option.display) {
+                                    return true;
+                                }
+
+                                let tempSamplesRequestCategories: any[] = context.allRequestCategories.filter((value: any) => {
+                                    return rowData.codeRequestCategory === value.codeRequestCategory;
+                                });
+
+                                for (let requestCategory of tempSamplesRequestCategories) {
+                                    if (requestCategory.idCoreFacility
+                                        && requestCategory.idCoreFacility === option.idCoreFacility) {
+
+                                        return true;
+                                    }
+                                }
+
+                                return false;
+                            }
+
+                            return true;
+                        },
                         selectOptionsDisplayField: "display",
                         selectOptionsValueField: "idSeqLibProtocol",
                         showFillButton: true,
                         fillGroupAttribute: 'idRequest',
+                        context: this
                     },
                     {
                         headerName: "Index A",
