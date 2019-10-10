@@ -65,7 +65,8 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
     private barCodes: any[] = [];
     private coreAdmins: any[] = [];
     private label = "Illumina Library Prep";
-    public codeStepNext: string;
+    public codeStepNext: string = "";
+    private preCodeStepNext: string = "";
     // left to have nova, hi, mi until we phase them out
     public readonly codeStepArray: any[] = [
         { label: "Illumina Seq ", codeStepNext: this.workflowService.ILLSEQ_PREP  },
@@ -94,6 +95,11 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
 
     initialize() {
         this.dialogsService.startDefaultSpinnerDialog();
+        if(!this.codeStepNext) {
+            this.codeStepNext = this.workflowService.ALL_PREP;
+        }
+        this.preCodeStepNext = this.codeStepNext;
+        this.workItem = "";
         let params: HttpParams = new HttpParams()
             .set("codeStepNext", this.codeStepNext);
 
@@ -245,6 +251,10 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
         if(!this.codeStepNext) {
             this.codeStepNext = this.workflowService.ALL_PREP;
         }
+        if(this.codeStepNext === this.preCodeStepNext) {
+            return;
+        }
+        
         this.initialize();
     }
 
@@ -262,7 +272,6 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
     onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
-        this.codeStepNext =  this.workflowService.ILLSEQ_PREP;
         this.initialize();
     }
 

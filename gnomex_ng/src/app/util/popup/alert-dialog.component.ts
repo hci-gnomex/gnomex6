@@ -37,10 +37,10 @@ import {DialogType} from "./dialogs.service";
             <mat-dialog-content class="flex-grow no-margin no-padding" style="min-height: 6em;">
                 <hr>
                 <div *ngIf="message.length === 1"
-                     class="flex-grow full-height full-width extra-padded message"
+                     class="flex-grow full-height full-width extra-padded message overflow-auto"
                      [innerHTML]="message"></div>
                 <div *ngIf="message.length > 1"
-                     class="flex-grow full-height full-width extra-padded message">
+                     class="flex-grow full-height full-width extra-padded message overflow-auto">
                     <div *ngFor="let line of message" class="full-width">
                         {{ line }}
                     </div>

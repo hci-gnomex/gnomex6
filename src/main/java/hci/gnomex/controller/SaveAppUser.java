@@ -349,9 +349,9 @@ public class SaveAppUser extends GNomExCommand implements Serializable {
 
               }
               if (isNullEmail) {
-                this.xmlResult = "<NULL_EMAIL_ERROR message=\"" + outMsg + "\"/>";
+                this.xmlResult = "<NULL_EMAIL_ERROR result=\"INVALID\" message=\"" + outMsg + "\"/>";
               } else {
-                this.xmlResult = "<ERROR message=\"" + outMsg + "\"/>";
+                this.xmlResult = "<ERROR result=\"INVALID\" message=\"" + outMsg + "\"/>";
               }
               setResponsePage(this.SUCCESS_JSP);
             } else {

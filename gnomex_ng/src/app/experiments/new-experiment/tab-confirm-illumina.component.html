@@ -1,5 +1,5 @@
 <div class="full-height full-width padded">
-    <form [formGroup]="form" class="full-height full-width flex-container-col small-font">
+    <form [formGroup]="form" class="full-height full-width flex-container-col overflow-auto small-font">
         <div class="full-width flex-container-row">
             <div class="instructions-background bordered padded minimal">
                 <ol class="no-margin">
@@ -16,7 +16,7 @@
             </div>
             <div class="flex-grow">
             </div>
-            <div *ngIf="showGenerateQuote" class="flex-container-row">
+            <div *ngIf="showGenerateQuote">
                 <div class="padded">
                     <button mat-raised-button (click)="onClickPriceQuote($event)">
                         <img class="padded" [alt]="" [src]="constantService.ICON_MONEY">
@@ -27,93 +27,83 @@
                 </div>
             </div>
         </div>
-        <div class="flex-container-row">
-            <div #forPriceQuote class="flex-container-col">
-                <div class="top-margin font-bold">
-                    Experiment Details
+        <div class="top-margin font-bold">
+            Experiment Details
+        </div>
+        <div class="padded heavily-left-padded">
+            <div class="full-width flex-container-row padded">
+                <div class="font-bold moderate-width">
+                    Name :
                 </div>
-                <div class="padded heavily-left-padded">
-                    <div class="full-width flex-container-row padded">
-                        <div class="font-bold moderate-width">
-                            Name :
-                        </div>
-                        <div class="flex-grow">
-                            {{ experiment && experiment.experimentOwner ? experiment.experimentOwner[this.prefService.userDisplayField] : '' }}
-                        </div>
-                    </div>
-                    <div class="full-width flex-container-row padded">
-                        <div class="font-bold moderate-width">
-                            Group :
-                        </div>
-                        <div class="flex-grow">
-                            {{ labName }}
-                        </div>
-                    </div>
-                    <div *ngIf="billingAccountName && billingAccountNumber" class="padded">
-                        {{ billingAccountName }}({{ billingAccountNumber }})
-                    </div>
-                    <div *ngIf="experiment && experiment.requestCategory && experiment.requestCategory.display" class="padded">
-                        {{ experiment?.requestCategory?.display }}
-                    </div>
-                    <div *ngIf="experiment && experiment.application" class="padded">
-                        {{ experiment?.application }}
-                    </div>
-                    <div *ngIf="experiment && experiment.selectedProtocol && experiment.selectedProtocol.display" class="padded">
-                        {{ experiment?.selectedProtocol?.display }}
-                    </div>
-                    <div *ngIf="experiment?.seqPrepByCore_forSamples === 'Y'" class="padded">
-                        Library Prepared By Client
-                    </div>
-                </div>
-                <div class="top-margin font-bold" *ngIf="experiment?.isExternal !== 'Y'">
-                    Estimated Charges : {{ totalEstimatedCharges }}
-                </div>
-                <div class="padded heavily-left-padded">
-                    {{ estimatedChargesWarning }}
-                </div>
-                <div class="flex-container-row">
-                    <div>
-                        <div class="padded heavily-left-padded">
-                            <div class="t">
-                                <div *ngFor="let billingItem of billingItems" class="tr">
-                                    <div class="td padded heavily-right-padded">
-                                        {{ billingItem.category ? '' + billingItem.category : '' }}
-                                    </div>
-                                    <div class="td padded heavily-right-padded">
-                                        {{ billingItem.description ? '' + billingItem.description : '' }}
-                                    </div>
-                                    <div class="td padded">
-                                        {{ billingItem.qty ? '' + billingItem.qty : '' }}
-                                    </div>
-                                    <div class="td padded heavily-right-padded">
-                                        &#215;
-                                    </div>
-                                    <div class="td right-align padded">
-                                        {{ billingItem.unitPrice ? '' + billingItem.unitPrice : '' }}
-                                    </div>
-                                    <div *ngIf="billingItem.percentagePrice !== '1'" class="td padded">
-                                        ({{ billingItem.percentageDisplay ? '' + billingItem.percentageDisplay : '' }})
-                                    </div>
-                                    <div class="td padded heavily-right-padded">
-                                        =
-                                    </div>
-                                    <div class="td right-align padded">
-                                        {{ billingItem.invoicePriceDisplay ? '' + billingItem.invoicePriceDisplay : '' }}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="flex-grow">
+                    {{ experiment && experiment.experimentOwner ? experiment.experimentOwner[this.prefService.userDisplayField] : '' }}
                 </div>
             </div>
-            <div class="flex-grow">
+            <div class="full-width flex-container-row padded">
+                <div class="font-bold moderate-width">
+                    Group :
+                </div>
+                <div class="flex-grow">
+                    {{ labName }}
+                </div>
+            </div>
+            <div *ngIf="billingAccountName && billingAccountNumber" class="padded">
+                {{ billingAccountName }}({{ billingAccountNumber }})
+            </div>
+            <div *ngIf="experiment && experiment.requestCategory && experiment.requestCategory.display" class="padded">
+                {{ experiment?.requestCategory?.display }}
+            </div>
+            <div *ngIf="experiment && experiment.application" class="padded">
+                {{ experiment?.application }}
+            </div>
+            <div *ngIf="experiment && experiment.selectedProtocol && experiment.selectedProtocol.display" class="padded">
+                {{ experiment?.selectedProtocol?.display }}
+            </div>
+            <div *ngIf="experiment?.seqPrepByCore_forSamples === 'Y'" class="padded">
+                Library Prepared By Client
+            </div>
+        </div>
+        <div class="top-margin font-bold" *ngIf="experiment?.isExternal !== 'Y'">
+            Estimated Charges : {{ totalEstimatedCharges }}
+        </div>
+        <div class="padded heavily-left-padded">
+            {{ estimatedChargesWarning }}
+        </div>
+        <div class="padded heavily-left-padded">
+            <div class="t">
+                <div *ngFor="let billingItem of billingItems" class="tr">
+                    <div class="td padded heavily-right-padded">
+                        {{ billingItem.category ? '' + billingItem.category : '' }}
+                    </div>
+                    <div class="td padded heavily-right-padded">
+                        {{ billingItem.description ? '' + billingItem.description : '' }}
+                    </div>
+                    <div class="td padded">
+                        {{ billingItem.qty ? '' + billingItem.qty : '' }}
+                    </div>
+                    <div class="td padded heavily-right-padded">
+                        &#215;
+                    </div>
+                    <div class="td right-align padded">
+                        {{ billingItem.unitPrice ? '' + billingItem.unitPrice : '' }}
+                    </div>
+                    <div *ngIf="billingItem.percentagePrice !== '1'" class="td padded">
+                        ({{ billingItem.percentageDisplay ? '' + billingItem.percentageDisplay : '' }})
+                    </div>
+                    <div class="td padded heavily-right-padded">
+                        =
+                    </div>
+                    <div class="td right-align padded">
+                        {{ billingItem.invoicePrice ? '' + billingItem.invoicePrice : '' }}
+                    </div>
+                </div>
             </div>
         </div>
         <div *ngIf="showExperimentDescription" class="top-margin font-bold">
             Experiment Description :
         </div>
         <div *ngIf="showExperimentDescription" class="padded heavily-left-padded">
-            <div class="full-width flex-container-row padded">
+            <div class="full-width padded">
                 {{ experiment?.description }}
             </div>
         </div>
@@ -121,7 +111,7 @@
             Notes for Core Facility :
         </div>
         <div *ngIf="showNotesForCoreFacility" class="padded heavily-left-padded">
-            <div class="full-width flex-container-row padded">
+            <div class="full-width padded">
                 {{ experiment?.corePrepInstructions }}
             </div>
         </div>
@@ -141,7 +131,7 @@
         <div class="top-margin font-bold">
             Experiment Design :
         </div>
-        <div class="flex-container-row full-height full-width small-font minheight">
+        <div class="full-height full-width small-font minheight">
             <div #oneEmWidth class="no-height single-em"></div>
             <ag-grid-angular class="ag-theme-fresh full-height full-width"
                              [columnDefs]="this.samplesGridConfirmColumnDefs"

@@ -1,29 +1,20 @@
-var webpack = require("webpack");
-var helpers = require("./helpers");
-var path = require("path");
+const Webpack = require("webpack");
+const Helpers = require("./helpers");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
-const autoprefixer = require("autoprefixer");
-var CopyWebpackPlugin = require("copy-webpack-plugin");
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
-var HtmlWebpackPlugin = require("html-webpack-plugin");
-const LoaderOptionsPlugin = require("webpack/lib/LoaderOptionsPlugin");
-const ProvidePlugin = require("webpack/lib/ProvidePlugin");
-
-
-module.exports = function (options) {
-
+module.exports = () => {
     return {
         entry: {
             polyfills: "./src/polyfills.ts",
             vendor: "./src/vendor.ts",
             app: "./src/main.ts"
         },
-
         resolve: {
             extensions: [".ts", ".js"],
-            modules: [helpers.root("src"), helpers.root("node_modules")]
+            modules: [Helpers.root("src"), Helpers.root("node_modules")]
         },
-
         devServer: {
             host: '0.0.0.0',
             port: 8080,
@@ -35,8 +26,6 @@ module.exports = function (options) {
             },
             contentBase: './dist'
         },
-
-
         module: {
             rules: [
                 {
@@ -64,12 +53,12 @@ module.exports = function (options) {
                 },
                 {
                     test: /\.css$/,
-                    use: ExtractTextPlugin.extract({ fallback: "style-loader", use: "css-loader?sourceMap" }),
-                    exclude: [helpers.root("src", "assets")]
+                    use: ExtractTextPlugin.extract({fallback: "style-loader", use: "css-loader?sourceMap"}),
+                    exclude: [Helpers.root("src", "assets")]
                 },
                 {
                     test: /\.less$/,
-                    use: ExtractTextPlugin.extract({use:[ "css-loader", "less-loader" ], fallback: "style-loader"})
+                    use: ExtractTextPlugin.extract({use: ["css-loader", "less-loader"], fallback: "style-loader"})
                 },
                 {
                     test: /\.scss$/,
@@ -83,7 +72,7 @@ module.exports = function (options) {
                                 includePaths: ["node_modules"]
                             }
                         }
-                        ]
+                    ]
                 },
                 {
                     test: /bootstrap\/dist\/js\/umd\//,
@@ -115,13 +104,10 @@ module.exports = function (options) {
                 }
             ]
         },
-
         plugins: [
-
             new HtmlWebpackPlugin({
                 template: "src/index.html",
             }),
-
             new CopyWebpackPlugin([
                 {
                     from: "src/favicon.ico",
@@ -136,10 +122,8 @@ module.exports = function (options) {
                     to: "data"
                 }
             ]),
-
-            new webpack.NamedModulesPlugin(),
-
-            new webpack.ProvidePlugin({
+            new Webpack.NamedModulesPlugin(),
+            new Webpack.ProvidePlugin({
                 $: "jquery",
                 jQuery: "jquery",
                 "window.jQuery": "jquery",
@@ -157,5 +141,4 @@ module.exports = function (options) {
             })
         ]
     };
-}
-
+};

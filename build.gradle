@@ -16,19 +16,29 @@ buildscript {
     }
 }
 
-apply plugin: 'war'
-apply plugin: 'idea'
-apply plugin: 'maven'
-apply from: 'common.gradle'
-import org.apache.tools.ant.filters.*;
+plugins {
+    id 'war'
+    id 'idea'
+    id 'maven'
+}
 
-allprojects {
-    apply plugin: 'hci-conventions'
+apply from: 'common.gradle'
+
+import org.apache.tools.ant.filters.*
+
+repositories {
+    maven {
+        credentials {
+            username = repo_user
+            password = repo_password
+        }
+        url repo_resolve_url
+    }
+    maven { url 'http://repo.spring.io/plugins-release' }
+    mavenCentral()
 }
 
 dependencies {
-
-    //All
     runtime group: 'hci', name: 'hci-servlet-filter-nocache', version: '1.+'
     runtime group: 'hci', name: 'hci-servlet-filter-cors', version: '1.+'
     runtime group: 'hci', name: 'hci-servlet-filter-pushstate', version: '1.+'
@@ -52,19 +62,19 @@ dependencies {
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
 
     providedRuntime group: 'com.sun.mail', name: 'javax.mail', version: '1.5.0'
-    
+
     compile group: 'jline', name: 'jline', version: '0.9.94'
     compile group: 'xom', name: 'xom', version: '1.2.5'
 
     //lib & libEnv
-    compile fileTree (dir: 'libEnv', include: 'hci-hibernate5-utils-1.0.jar');
-    compile fileTree (dir: 'lib', include: 'biojava.jar')
-    compile fileTree (dir: 'lib', include: 'metrixClient-1.4.jar')
-    compile fileTree (dir: 'libEnv', include: 'hci_framework.jar')
-    compile fileTree (dir: 'libEnv', include: 'hci_utils.jar')
-    compile fileTree (dir: 'libEnv', include: 'HCIReport.jar')
-    compile fileTree (dir: 'libEnv', include: 'jdom-2.0.6.jar')
-    compile fileTree (dir: 'libEnv', include: 'jaxen-1.1.6.jar')
+    compile fileTree(dir: 'libEnv', include: 'hci-hibernate5-utils-1.0.jar')
+    compile fileTree(dir: 'lib', include: 'biojava.jar')
+    compile fileTree(dir: 'lib', include: 'metrixClient-1.4.jar')
+    compile fileTree(dir: 'libEnv', include: 'hci_framework.jar')
+    compile fileTree(dir: 'libEnv', include: 'hci_utils.jar')
+    compile fileTree(dir: 'libEnv', include: 'HCIReport.jar')
+    compile fileTree(dir: 'libEnv', include: 'jdom-2.0.6.jar')
+    compile fileTree(dir: 'libEnv', include: 'jaxen-1.1.6.jar')
     compile fileTree(dir: 'libEnv', include: 'poi-3.10-FINAL.jar')
     compile fileTree(dir: 'libEnv', include: 'javax.json-api-jdk8-1.1.3.jar')
     compile fileTree(dir: 'libEnv', include: 'javax.json-jdk8-1.1.3.jar')
@@ -73,8 +83,8 @@ dependencies {
     //Realm stuff
     providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
     providedCompile group: 'log4j', name: 'log4j', version: '1.2.12'
-    providedCompile 'org.apache.tomcat:tomcat-jdbc:9.0.0.M10'
-    providedCompile 'org.apache.tomcat:tomcat-catalina:7.0.68'
+    providedCompile group: 'org.apache.tomcat', name: 'tomcat-jdbc', version: '9.0.0.M10'
+    providedCompile group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '7.0.68'
 
     //Subprojects
     providedCompile project(':gnomex_crypt')
@@ -101,103 +111,204 @@ dependencies {
     runtime group: 'org.jboss.weld.servlet', name: 'weld-servlet', version: '2.4.1.Final'
 }
 
-def buildAliases = [
-        'gnomex_all'           : ['clean', 'clean_tomcat', 'makeSQLServer', 'jar', 'clientJar', 'copyScripts', 'war', 'gnomex_deploy'],
-        'gnomex_all_opensource': ['clean', 'clean_tomcat', 'makeMySQL', 'jar', 'clientJar', 'copyScripts', 'opensourceWar', 'gnomex_deploy', 'createOpenSourceZip'],
-        'gnomex_clean'         : ['clean', 'clean_tomcat']
-]
-def expandedTaskList = []
-
-gradle.startParameter.taskNames.each {
-    expandedTaskList << (buildAliases[it] ? buildAliases[it] : it)
+// Main build tasks are named starting with "gnomex"
+task gnomexWindowsWDS(type: GradleBuild) {
+    tasks = ['adjustShiroForWindows', 'buildWar', 'copyAngularQuick', 'copyWar']
 }
 
-gradle.startParameter.taskNames = expandedTaskList.flatten()
-
-task clean_tomcat << {
-    delete "${gnomexServerHome}/webapps/gnomex"
+task gnomexWindowsTomcat(type: GradleBuild) {
+    tasks = ['adjustShiroForWindows', 'buildWar', 'copyAngular', 'copyWar']
 }
 
-// replace string  helper function
-def replaceString(fileName, fromString, toString) {
-    def file = new File(fileName)
-    def fileText = file.text
-    fileText = fileText.replace(fromString, toString);
-    new File(fileName).write(fileText)
+task gnomexLinuxTomcat(type: GradleBuild) {
+    tasks = ['adjustShiroForLinux', 'buildWar', 'copyAngular', 'copyWar']
 }
 
-task makeMySQL <<{
-    replaceString("${rescDir}/hibernate.tomcat.cfg.xml", "SQLServerDialect", "MySQLDialect")
+task gnomexOpensource(type: GradleBuild) {
+    tasks = ['adjustShiroForLinux', 'buildWarOpensource', 'copyAngular', 'copyWar', 'createOpenSourceZip']
 }
 
-task makeSQLServer <<{
-    replaceString("${rescDir}/hibernate.tomcat.cfg.xml", "MySQLDialect", "SQLServerDialect")
-}
-
-jar {
-    archiveName = jarName
-    manifest {
-        attributes(
-                'Class-Path':'log4j.jar'
-        )
-        attributes([
-                'Built-By': ant.properties['user.name'],
-                'Implementation-Version': "${gnomex_version}    (${formattedDate})"
-        ],'gnomex')
-    }
-}
-
-task clientJar (type: Jar) {
-    println buildDir.getAbsolutePath()
-    from buildDir.getAbsolutePath() + "/classes/main/"
-    include "hci/gnomex/httpclient/*.class"
-    archiveName = clientJarName
-
-    manifest {
-        attributes([
-                'Built-By': ant.properties['user.name'],
-                'Implementation-Version': gnomex_version
-        ],'gnomexClient')
-    }
-}
-
-//helper task for war plugin
-task copyScripts {
+task adjustShiroForLinux() {
     doLast {
         copy {
-            from 'scripts'
-            include '*.*'
-            into buildDir.getAbsolutePath() + "/scripts"
-            filter(FixCrLfFilter)
+            from "src/main/webapp/WEB-INF"
+            include "shiro.ini"
+            filter { line -> line.replace(" C:/properties", " /properties")}
+            into "src/main/webapp/WEB-INF/temp"
+        }
+        copy {
+            from "src/main/webapp/WEB-INF/temp"
+            include "shiro.ini"
+            into "src/main/webapp/WEB-INF"
+        }
+        delete {
+            delete "src/main/webapp/WEB-INF/temp"
         }
     }
 }
 
-task opensourceWar (type: War) {
-    archiveName = warName
-    //classpath = classpath - sourceSets.main.output
+task adjustShiroForWindows() {
+    doLast {
+        copy {
+            from "src/main/webapp/WEB-INF"
+            include "shiro.ini"
+            filter { line -> line.replace(" /properties", " C:/properties")}
+            into "src/main/webapp/WEB-INF/temp"
+        }
+        copy {
+            from "src/main/webapp/WEB-INF/temp"
+            include "shiro.ini"
+            into "src/main/webapp/WEB-INF"
+        }
+        delete {
+            delete "src/main/webapp/WEB-INF/temp"
+        }
+    }
+}
 
-    // Need to depend on the child project build tasks in order to build their products into the war
-    dependsOn 'gnomex_ng:webpack'
+task buildWar(type: GradleBuild) {
+    mustRunAfter(adjustShiroForWindows, adjustShiroForLinux)
+    tasks = ['clean', 'cleanTomcat', 'makeSQLServer', 'jar', 'clientJar', 'copyScripts', 'copyTomcatJars', 'war']
+}
+
+task buildWarOpensource(type: GradleBuild) {
+    mustRunAfter(adjustShiroForWindows, adjustShiroForLinux)
+    tasks = ['clean', 'cleanTomcat', 'makeMySQL', 'jar', 'clientJar', 'copyScripts', 'copyTomcatJars', 'opensourceWar']
+}
+
+task cleanTomcat(type: Delete) {
+    delete "${gnomexServerHome}/${gnomexDeployDir}/gnomex"
+}
+
+static void replaceString(String fileName, String fromString, String toString) {
+    File file = new File(fileName)
+    String fileText = file.text
+    fileText = fileText.replace(fromString, toString)
+    new File(fileName).write(fileText)
+}
+
+task makeMySQL() {
+    replaceString("${rescDir}/hibernate.tomcat.cfg.xml", "SQLServerDialect", "MySQLDialect")
+}
+
+task makeSQLServer() {
+    replaceString("${rescDir}/hibernate.tomcat.cfg.xml", "MySQLDialect", "SQLServerDialect")
+}
+
+jar {
+    archiveFileName = jarName
+    manifest {
+        attributes(
+                'Class-Path': 'log4j.jar'
+        )
+        attributes([
+                'Built-By'              : repo_user,
+                'Implementation-Version': "${gnomex_version} (${formattedDate})"
+        ], 'gnomex')
+    }
+}
+
+task clientJar(type: Jar) {
+    from buildDir.getAbsolutePath() + "/classes/main/"
+    include "hci/gnomex/httpclient/*.class"
+    archiveFileName = clientJarName
 
     manifest {
-        attributes (
-                'Built-By': ant.properties['user.name'],
-                'Implementation-Version': "${gnomex_version}    (${formattedDate})"
+        attributes([
+                'Built-By'              : repo_user,
+                'Implementation-Version': gnomex_version
+        ], 'gnomexClient')
+    }
+}
+
+task copyScripts(type: Copy) {
+    from 'scripts'
+    include '*.*'
+    into buildDir.getAbsolutePath() + "/scripts"
+    filter(FixCrLfFilter)
+}
+
+task copyTomcatJars(type: Copy) {
+    dependsOn ':gnomex_tomcat_support:jar', ':gnomex_crypt:jar'
+    from 'gnomex_tomcat_support/build/libs'
+    from 'gnomex_crypt/build/libs'
+    into "${gnomexServerHome}/lib"
+}
+
+war {
+    archiveFileName = warNameTemp
+    classpath = classpath - sourceSets.main.output
+
+    manifest {
+        attributes(
+                'Built-By': repo_user,
+                'Implementation-Version': "${gnomex_version} (${formattedDate})",
+                'Dependencies': 'org.dom4j, org.apache.log4j'
         )
     }
 
-    //use UNIX eol convention
+    rootSpec.exclude("**/tomcat-annotations-api-7.0.68.jar")
+    rootSpec.exclude("**/tomcat-api-7.0.68.jar")
+    rootSpec.exclude("**/tomcat-catalina-7.0.68.jar")
+    rootSpec.exclude("**/tomcat-servlet-api-7.0.68.jar")
+    rootSpec.exclude("**/tomcat-util-7.0.68.jar")
+
+    from(buildDir.getAbsolutePath() + "/libs") {
+        include "${jarName}"
+        include "${clientJarName}"
+        into 'WEB-INF/lib'
+    }
+
+    from("$projectDir/META-INF") {
+        include "context.xml"
+        into 'META-INF'
+    }
+
+    from("$buildDir/scripts") {
+        into "scripts"
+    }
+
+    from(rescDir) {
+        include '*.*'
+        into 'WEB-INF/classes'
+    }
+
+    from("${rescDir}/hci/gnomex") {
+        include 'Dictionaries.xml'
+        into 'WEB-INF/classes'
+    }
+
+    from("$projectDir") {
+        include "UCSCExecutables/**"
+    }
+
+    from("$projectDir/src/main/webapp") {
+        include "getXML.jsp"
+        include "getHTML.jsp"
+        into 'WEB-INF/classes'
+    }
+}
+
+task opensourceWar(type: War) {
+    archiveFileName = warNameTemp
+
+    manifest {
+        attributes(
+                'Built-By': repo_user,
+                'Implementation-Version': "${gnomex_version} (${formattedDate})"
+        )
+    }
+
+    // Use UNIX eol convention
     from("${buildDir}/scripts") {
         include "*.sh"
-        filter(FixCrLfFilter.class,
-                eol: FixCrLfFilter.CrLf.newInstance("lf"))
+        filter(FixCrLfFilter.class, eol: FixCrLfFilter.CrLf.newInstance("lf"))
         into 'scripts'
     }
 
-    from(buildDir.getAbsolutePath() + "/libs"){
-        include jarName
-        include clientJarName
+    from(buildDir.getAbsolutePath() + "/libs") {
+        include "${jarName}"
+        include "${clientJarName}"
         into 'WEB-INF/lib'
     }
 
@@ -226,85 +337,49 @@ task opensourceWar (type: War) {
         include "getHTML.jsp"
         into 'WEB-INF/classes'
     }
-
 }
 
-war {
-    archiveName = warName
-    classpath = classpath - sourceSets.main.output
-
-    // Need to depend on the child project build tasks in order to build their products into the war
-    dependsOn 'gnomex_ng:webpack'
-    // FOR FAST BUILD - uncomment below and comment out dependsOn above
-    //from("gnomex_ng/src") {
-    //    include "assets/**"
-    //    include "favicon.ico"
-    //    include "index.html"
-    //}
-
-    manifest {
-        attributes (
-                'Built-By': ant.properties['user.name'],
-                'Implementation-Version': "${gnomex_version}    (${formattedDate})",
-                'Dependencies': 'org.dom4j, org.apache.log4j'
-        )
-    }
-
-    rootSpec.exclude("**/tomcat-annotations-api-7.0.68.jar")
-    rootSpec.exclude("**/tomcat-api-7.0.68.jar")
-    rootSpec.exclude("**/tomcat-catalina-7.0.68.jar")
-    rootSpec.exclude("**/tomcat-servlet-api-7.0.68.jar")
-    rootSpec.exclude("**/tomcat-util-7.0.68.jar")
-
-    // Look here for the product of the gulpBuild
+task copyAngular(type: Zip) {
+    mustRunAfter(buildWar, buildWarOpensource)
+    dependsOn ':gnomex_ng:buildWebpackDevTomcat'
+    from zipTree("build/libs/${warNameTemp}")
     from("gnomex_ng/dist") {
         include "**/*"
     }
-
-    from(buildDir.getAbsolutePath() + "/libs"){
-        include jarName
-        include clientJarName
-        into 'WEB-INF/lib'
-    }
-
-    from("$projectDir/META-INF") {
-        include "context.xml"
-        into 'META-INF'
-    }
-
-    from("$buildDir/scripts"){
-        into "scripts"
-    }
-    // move these files to src/main/resources file
-    from(rescDir) {
-        include '*.*'
-        into 'WEB-INF/classes'
-    }
-
-    from("${rescDir}/hci/gnomex") {
-        include 'Dictionaries.xml'
-        into 'WEB-INF/classes'
-    }
-
-    from("$projectDir") {
-        include "UCSCExecutables/**"
-    }
-
-    from("$projectDir/src/main/webapp") {
-        include "getXML.jsp"
-        include "getHTML.jsp"
-        into 'WEB-INF/classes'
-    }
+    exclude 'WEB-INF/lib/hibernate-entitymanager-5.0.10.Final.jar'
+    destinationDir(file("build/libs"))
+    archiveName("${warName}")
 }
 
+task copyAngularQuick(type: Zip) {
+    mustRunAfter(buildWar, buildWarOpensource)
+    from zipTree("build/libs/${warNameTemp}")
+    from("gnomex_ng/src") {
+        include "assets/**"
+        include "favicon.ico"
+        include "index.html"
+    }
+    exclude 'WEB-INF/lib/hibernate-entitymanager-5.0.10.Final.jar'
+    destinationDir(file("build/libs"))
+    archiveName("${warName}")
+}
 
-task createOpenSourceZip(type: Zip){
-    archiveName = openSourceZipName
+task copyWar(type: Copy) {
+    mustRunAfter(copyAngular, copyAngularQuick)
+    from ("build/libs") {
+        include "${warName}"
+    }
+    into "${gnomexServerHome}/${gnomexDeployDir}"
+}
+
+task createOpenSourceZip(type: Zip) {
+    mustRunAfter(copyAngular, copyAngularQuick)
+
+    archiveFileName = openSourceZipName
 
     from("$projectDir") {
         include "README_INSTALL.txt"
-        filter(FixCrLfFilter.class,
-                eol: FixCrLfFilter.CrLf.newInstance("lf"))
+        filter(FixCrLfFilter.class, eol: FixCrLfFilter.CrLf.newInstance("lf"))
         into openSourceName
     }
 
@@ -329,8 +404,8 @@ task createOpenSourceZip(type: Zip){
     }
 
     from(buildDir.getAbsolutePath() + "/libs") {
-        include warName
-        include clientJarName
+        include "${warName}"
+        include "${clientJarName}"
         into "${openSourceName}/gnomex/build"
     }
 
@@ -350,27 +425,5 @@ task createOpenSourceZip(type: Zip){
     from("$projectDir/sql") {
         include "*/**"
         into "${openSourceName}/gnomex/sql"
-    }
-
-}
-
-task gnomex_deploy {
-    dependsOn ':gnomex_tomcat_support:jar', ':gnomex_crypt:jar'
-
-    doLast {
-    copy {
-        from war
-            into "${gnomexServerHome}/${gnomexDeployDir}"
-    }
-
-    copy {
-            from 'gnomex_tomcat_support/build/libs'
-            into "${gnomexServerHome}/lib"
-    }
-
-    copy {
-            from 'gnomex_crypt/build/libs'
-            into "${gnomexServerHome}/lib"
-        }
     }
 }

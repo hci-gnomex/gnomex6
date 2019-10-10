@@ -1,27 +1,29 @@
 buildscript {
     repositories {
-        maven { url 'http://repo.spring.io/plugins-release' }
-    }
-    dependencies {
-        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
+        mavenCentral()
     }
 }
 
-apply plugin: 'propdeps'
-apply plugin: 'java'
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
 
 dependencies {
-    provided 'org.apache.tomcat:tomcat-jdbc:9.0.0.M10'
-    provided 'org.apache.tomcat:tomcat-catalina:7.0.68'
-    provided 'log4j:log4j:1.2.12'
+    compileOnly group: 'org.apache.tomcat', name: 'tomcat-jdbc', version: '9.0.0.M10'
+    compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '7.0.68'
+    compileOnly group: 'log4j', name: 'log4j', version: '1.2.12'
     compile project(':gnomex_crypt')
 }
 
 jar {
     manifest {
         attributes([
-                'Built-By': ant.properties['user.name'],
+                'Built-By'              : repo_user,
                 'Implementation-Version': gnomex_version
-        ],'gnomex_tomcat_support')
+        ], 'gnomex_tomcat_support')
     }
 }

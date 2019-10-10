@@ -159,32 +159,34 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
     public prepAnnotationForSave = () => {
         let annotationToSave: IAnnotation[] = [];
 
-        for (let annot of this._annotations) {
+        if (this._annotations && Array.isArray(this._annotations)) {
+            for (let annot of this._annotations) {
 
-            if (annot.codePropertyType === this.TEXT) {
-                annot.value = this.form.controls[annot.name].value;
-                annotationToSave.push(annot);
-            } else if (annot.codePropertyType === this.CHECK) {
-                annot.value = this.form.controls[annot.name].value ? 'Y' : 'N';
-                annotationToSave.push(annot);
-            } else if (annot.codePropertyType === this.OPTION) {
-                annot.value = '';
-                annotationToSave.push(annot);
+                if (annot.codePropertyType === this.TEXT) {
+                    annot.value = this.form.controls[annot.name].value;
+                    annotationToSave.push(annot);
+                } else if (annot.codePropertyType === this.CHECK) {
+                    annot.value = this.form.controls[annot.name].value ? 'Y' : 'N';
+                    annotationToSave.push(annot);
+                } else if (annot.codePropertyType === this.OPTION) {
+                    annot.value = '';
+                    annotationToSave.push(annot);
 
-            } else if (annot.codePropertyType === this.MOPTION) {
-                let mOptList = <IAnnotationOption[]>this.form.controls[annot.name].value;
-                annot.value = '';
-                for (let i = 0; i < mOptList.length; i++) {
-                    if (i < mOptList.length - 1) {
-                        annot.value += mOptList[i].name + ","
-                    } else {
-                        annot.value += mOptList[i].name;
+                } else if (annot.codePropertyType === this.MOPTION) {
+                    let mOptList = <IAnnotationOption[]>this.form.controls[annot.name].value;
+                    annot.value = '';
+                    for (let i = 0; i < mOptList.length; i++) {
+                        if (i < mOptList.length - 1) {
+                            annot.value += mOptList[i].name + ","
+                        } else {
+                            annot.value += mOptList[i].name;
+                        }
                     }
-                }
-                annotationToSave.push(annot);
+                    annotationToSave.push(annot);
 
-            } else if (annot.codePropertyType === this.URL) {
-                annotationToSave.push(this.form.controls[annot.name].value);
+                } else if (annot.codePropertyType === this.URL) {
+                    annotationToSave.push(this.form.controls[annot.name].value);
+                }
             }
         }
 
@@ -201,6 +203,10 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+        if (!this.form) {
+            this.form = new FormGroup({});
+        }
+
         if (this._disabled) {
             this.form.disable();
         } else {
@@ -257,6 +263,5 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
             this.getExperimentAnnotationsSubject_subscription.unsubscribe();
         }
     }
-
 }
 

@@ -119,7 +119,6 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
             {value: this.constantsService.STATUS_COMPLETED, display: "Complete"},
             {value: this.constantsService.STATUS_ON_HOLD, display: "On Hold"},
             {value: this.constantsService.STATUS_TERMINATED, display: "Terminate"},
-            {value: this.constantsService.STATUS_BYPASSED, display: "Bypass"},
         ];
         const sequencingProtocolList: any[] = this.dictionaryService.getEntries(DictionaryService.NUMBER_SEQUENCING_CYCLES_ALLOWED);
 
