@@ -1,32 +1,64 @@
-<div class="flex-container-row align-center padded bordered">
-    <label class="small-margin-right"><img [src]="'./assets/money.png'" class="icon">Billing</label>
-    <div class="flex-container-col">
-        <div class="flex-container-row">
-            <menu-header-billing class="large-margin-right"
+<div class="full-width flex-container-row padded overflow-auto foreground bordered small-font">
+    <label class="padded medium-font min-width">
+        <img [src]="'./assets/money.png'" class="icon">
+        Billing
+    </label>
+    <div class="flex-grow">
+        <div class="flex-container-row align-baseline">
+            <menu-header-billing class="padded bordered large-margin-right"
                                  [idBillingPeriod]="this.form.controls['idBillingPeriod'].value"
-                                 [filterByOrderType]="this.filterByOrderType" [showRelatedCharges]="this.showRelatedCharges"
-                                 [totalPrice]="this.totalPrice" [billingPeriodString]="this.billingPeriodString"
-                                 [idCoreFacility]="this.form.controls['idCoreFacility'].value" [selectedItem]="this.selectedItem" [isDirty]="this.isDirty">
+                                 [filterByOrderType]="this.filterByOrderType"
+                                 [showRelatedCharges]="this.showRelatedCharges"
+                                 [totalPrice]="this.totalPrice"
+                                 [billingPeriodString]="this.billingPeriodString"
+                                 [idCoreFacility]="this.form.controls['idCoreFacility'].value"
+                                 [selectedItem]="this.selectedItem"
+                                 [isDirty]="this.isDirty">
             </menu-header-billing>
-            <div>
-                <mat-form-field class="small-margin-right">
-                    <input matInput placeholder="Experiment #" (change)="this.onRequestNumberChange()" [ngModelOptions]="{standalone: true}" [(ngModel)]="this.requestNumberModel">
-                </mat-form-field>
-                <mat-form-field>
-                    <input matInput placeholder="Invoice #" (change)="this.onInvoiceNumberChange()" [ngModelOptions]="{standalone: true}" [(ngModel)]="this.invoiceNumberModel">
-                </mat-form-field>
+            <div class="flex-grow">
             </div>
+            <mat-form-field class="padded-left experiment-width">
+                <input matInput placeholder="Experiment #"
+                       [(ngModel)]="this.requestNumberModel"
+                       [ngModelOptions]="{standalone: true}"
+                       (change)="this.onRequestNumberChange()">
+            </mat-form-field>
+            <mat-form-field class="padded-left experiment-width">
+                <input matInput placeholder="Invoice #"
+                       [(ngModel)]="this.invoiceNumberModel"
+                       [ngModelOptions]="{standalone: true}"
+                       (change)="this.onInvoiceNumberChange()">
+            </mat-form-field>
         </div>
-        <div class="flex-container-row align-center children-flex-grow children-margin-right">
-            <custom-combo-box placeholder="Core Facility" [options]="this.coreFacilityList" displayField="display"
-                              valueField="idCoreFacility" [formControl]="this.form.get('idCoreFacility')">
+        <div class="flex-container-row align-center">
+            <custom-combo-box class="core-facility-width padded-left-right"
+                              placeholder="Core Facility"
+                              [customOptionClasses]="'small-font padded inline-block full-width'"
+                              [allowNone]="false"
+                              [options]="this.coreFacilityList"
+                              displayField="display"
+                              valueField="idCoreFacility"
+                              [formControl]="this.form.get('idCoreFacility')">
             </custom-combo-box>
-            <billing-period-selector (onChange)="this.onBillingPeriodChange($event)"></billing-period-selector>
-            <custom-combo-box placeholder="Lab Group" [options]="this.filteredLabList" valueField="idLab"
-                              [formControl]="this.form.get('idLab')" [displayField]="this.prefService.labDisplayField">
+            <div class="padded-left-right">
+                <billing-period-selector (onChange)="this.onBillingPeriodChange($event)">
+                </billing-period-selector>
+            </div>
+            <custom-combo-box class="lab-display-width padded-left-right"
+                              placeholder="Lab Group"
+                              [options]="this.filteredLabList"
+                              [customOptionClasses]="'small-font padded inline-block full-width'"
+                              valueField="idLab"
+                              [formControl]="this.form.get('idLab')"
+                              [displayField]="this.prefService.labDisplayField">
             </custom-combo-box>
-            <custom-combo-box placeholder="Account" [options]="this.billingAccountList" displayField="accountNameDisplay"
-                              valueField="idBillingAccount" [formControl]="this.form.get('idBillingAccount')">
+            <custom-combo-box class="account-display-width padded-left-right"
+                              placeholder="Account"
+                              [options]="this.billingAccountList"
+                              [customOptionClasses]="'small-font padded inline-block full-width'"
+                              displayField="accountNameDisplay"
+                              valueField="idBillingAccount"
+                              [formControl]="this.form.get('idBillingAccount')">
             </custom-combo-box>
         </div>
     </div>

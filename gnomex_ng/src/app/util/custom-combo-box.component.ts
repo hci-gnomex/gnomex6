@@ -19,7 +19,7 @@ import {debounceTime} from "rxjs/operators";
 @Component({
     selector: "custom-combo-box",
     template: `
-        <mat-form-field class="full-width full-height" [matTooltip]="this.tooltip">
+        <mat-form-field [classList]="'full-width full-height ' + customFieldClasses" [matTooltip]="this.tooltip">
             <input #input matInput class="full-width full-height"
                    name="customComboBoxFilter"
                    autocomplete="off"
@@ -28,11 +28,11 @@ import {debounceTime} from "rxjs/operators";
             <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete"
                               (optionSelected)="this.selectOption($event.option.value)"
                               (opened)="this.onOpened()" (closed)="this.onClosed()" [displayWith]="this.displayFn">
-                <mat-option *ngIf="this.allowNone && (this.forceShowNone || !this.innerControl.value)">None</mat-option>
-                <mat-option *ngFor="let opt of this.loadedOptions" [value]="opt">
+                <mat-option [classList]="customOptionClasses" *ngIf="this.allowNone && (this.forceShowNone || !this.innerControl.value)">None</mat-option>
+                <mat-option [classList]="customOptionClasses" *ngFor="let opt of this.loadedOptions" [value]="opt">
                     {{this.displayField ? opt[this.displayField] : opt}}
                 </mat-option>
-                <mat-option *ngIf="this.includeLoadingOption">Loading...</mat-option>
+                <mat-option [classList]="customOptionClasses" *ngIf="this.includeLoadingOption">Loading...</mat-option>
             </mat-autocomplete>
             <mat-error *ngIf="this.innerControl.hasError('required')">{{this.placeholder}} is required</mat-error>
         </mat-form-field>
@@ -61,6 +61,24 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
     @Input() private valueField: string;
     @Input() private forceEmitObject: boolean = false;
     @Input() public displayField: string;
+
+    @Input() public set customFieldClasses(value: string) {
+        this._customFieldClasses = value ? value : "";
+    }
+    public get customFieldClasses(): string {
+        return !!this._customFieldClasses ? this._customFieldClasses : 'mat-form-field-should-float';
+    }
+
+    private _customFieldClasses: string = "";
+
+    @Input() public set customOptionClasses(value: string) {
+        this._customOptionClasses = value ? value : "";
+    }
+    public get customOptionClasses(): string {
+        return !!this._customOptionClasses ? this._customOptionClasses : 'mat-option';
+    }
+
+    private _customOptionClasses: string = "";
 
     private outerControl: AbstractControl = new FormControl();
     public innerControl: FormControl = new FormControl(null);
