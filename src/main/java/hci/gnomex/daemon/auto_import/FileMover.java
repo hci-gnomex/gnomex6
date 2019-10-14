@@ -17,7 +17,7 @@ public class FileMover {
 		}else {
 
 			db.preparePath();
-			//db.reportWorkSummary();
+			db.reportWorkSummary();
 		}
 
 	}

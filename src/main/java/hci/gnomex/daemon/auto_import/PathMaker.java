@@ -190,11 +190,19 @@ public class PathMaker {
 		StringBuilder strBuild = new StringBuilder();
 		int spaceCount = 0;
 		boolean countSpaces = true;
+		int softLinkeIndex= -1;
 
 
 		for (int j = 0; j < lineCharArray.length; j++) {
 			int asciiChar = (int) lineCharArray[j];
 			char cd = (char) asciiChar;
+
+			if((asciiChar == 62 )){
+				// remove space and -
+				softLinkeIndex = strBuild.length() - 2;
+				//spaceCount--;
+				break;
+			}
 
 			if ((asciiChar > 126 || asciiChar == 32) && countSpaces) {
 				spaceCount++;
@@ -206,6 +214,10 @@ public class PathMaker {
 				strBuild.append(Character.toString(c));
 			}
 		}
+		if(softLinkeIndex != -1){
+			strBuild.delete(softLinkeIndex, strBuild.length());
+		}
+
 		spaceCount--;
 		lineInfo.add(strBuild.toString());
 		lineInfo.add(spaceCount);

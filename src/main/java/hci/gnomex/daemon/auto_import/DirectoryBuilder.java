@@ -233,22 +233,36 @@ public class DirectoryBuilder {
 		return dataFromFileList;
 	}
 
+	List<String> makeFileImmutableCmd(Map<String,String> fromToMap){
+		List<String> iCmdList = new ArrayList<>();
+		for(Map.Entry<String,String> entry : fromToMap.entrySet()){
+			String toFile = entry.getValue();
+			iCmdList.add("chattr +i " + toFile);
+		}
+		return iCmdList;
+	}
+
+
 	public void preparePath() {
 		List<String> localFiles = new ArrayList<String>();
-		Map<String,String> toFromMap = new TreeMap<>();
-		Map<String,String> toFromFilteredMap = new TreeMap<>();
+		Map<String,String> fromToMap = new TreeMap<>();
+		Map<String,String> fromToFilteredMap = new TreeMap<>();
 		List<String> flaggedIDList = readSampleIDs(flaggedIDFileName);
 
 		try {
 
 			localFiles = this.readFile(this.inFileName);
-			boolean test = new File(this.currentDownloadLocation + "Flagged").mkdir();
+			File flaggedDir = new File(this.currentDownloadLocation + "Flagged");
+			if(!flaggedDir.exists()){
+				flaggedDir.mkdir();
+			}
 
-			preparePath(flaggedIDList,toFromFilteredMap, localFiles,toFromMap );
-			this.moveTheFiles(toFromFilteredMap, new ArrayList<>()); // These files we want to move into the flagged folder
-			// for tempus anything doesn't get flagged explicitly  but it doesn't get moved is still considered flagged
+			preparePath(flaggedIDList,fromToFilteredMap, localFiles,fromToMap );
+			this.moveTheFiles(fromToFilteredMap, new ArrayList<>()); // These files we want to move into the flagged folder
 
-			this.moveTheFiles(toFromMap, new ArrayList<>());
+			this.moveTheFiles(fromToMap,makeFileImmutableCmd(fromToMap));
+
+
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -275,7 +289,7 @@ public class DirectoryBuilder {
 	}
 
 
-	private void preparePath(List<String> flaggedFiles,Map<String,String> toFromFilteredMap, List<String> paths, Map<String,String> toFromMap) throws Exception{
+	private void preparePath(List<String> flaggedFiles,Map<String,String> fromToFilteredMap, List<String> paths, Map<String,String> fromToMap) throws Exception{
 		File finalDestinationPath = new File(this.root);
 		Map<String,String> dirMap = new HashMap<>();
 		dirMap.put("xml","Reports");
@@ -293,15 +307,28 @@ public class DirectoryBuilder {
 			System.out.println("-------------------------------------------------------------------------------");
 			System.out.println("Path being processed: " + p );
 
+
+			//todo verify this approach works for tempus. I think that tempus hands file of real relative paths not s3 path
+			File stageFile =  new File(this.currentDownloadLocation + File.separator + p);
+
+
 			String pattern = Pattern.quote(System.getProperty("file.separator"));
 			String[] pathChunks = p.split(pattern);
+
 
 			String file = pathChunks[pathChunks.length - 1];
 			String[] fileChunks = file.split("\\.");
 			String fileName = fileChunks[0].split("_")[0];
-			//find detail from path
-			//System.out.println("The file extension chunks ");
-			//System.out.println( fileChunks.toString());
+
+			String staged = "";
+			//sometimes the file in read in has the relative path on the stage folder others it is the remote path
+			// need to determine if path is sudo or real but just relative to stage directory
+			if(stageFile.exists()){
+				staged = stageFile.getCanonicalPath();
+			}else{
+				staged = currentDownloadLocation +File.separator + file;
+			}
+
 
 			if(!filterOutFlaggedIDs(file, flaggedFiles)){
 				Set<String> dupDirSet = new HashSet<>();
@@ -314,7 +341,7 @@ public class DirectoryBuilder {
 				strBuild.append("Flagged");
 				strBuild.append(File.separator);
 				strBuild.append(file);
-				toFromFilteredMap.put(currentDownloadLocation +File.separator + p, strBuild.toString());
+				fromToFilteredMap.put(staged, strBuild.toString());
 				System.out.println("Flagged " + strBuild.toString());
 				continue;
 			}
@@ -323,9 +350,9 @@ public class DirectoryBuilder {
 
 			if(new File(finalPath).exists() && !finalPath.equals(root)) {
 				if(addWrapperFolder &&  appendDirPersonID(fileName,strBuild)){
-					toFromMap.put(currentDownloadLocation +File.separator + p, strBuild.append(File.separator).append(file).toString());
+					fromToMap.put(staged, strBuild.append(File.separator).append(file).toString());
 				}else if(!addWrapperFolder){
-					toFromMap.put(currentDownloadLocation +File.separator + p, strBuild.append(File.separator).append(file).toString());
+					fromToMap.put(staged, strBuild.append(File.separator).append(file).toString());
 				}
 			}else {
 				throw new Exception("The path does not exist: " + finalPath +  "\n your directory structure isn't correct");
@@ -445,9 +472,10 @@ public class DirectoryBuilder {
 			strBuild.append(fileKey);
 			strBuild.append(" ");
 			strBuild.append(filesMap.get(fileKey));
-			System.out.println(strBuild.toString());
 			commands.add(strBuild.toString());
+			System.out.println(strBuild.toString());
 			strBuild = new StringBuilder();
+
 		}
 
 		for(String c : extraCommands){

@@ -215,12 +215,12 @@ public class Downloader {
 		
 	}
 
-	public void loadFileNames(String downloadListFile ){
+	public void loadFileNames(){
 		
 		
 		FileReader reader = null;
 		try {
-			reader = new FileReader(new File(downloadListFile));
+			reader = new FileReader(new File(this.dependentDataPath + "uniqueFilesToDownload.out"));
 			BufferedReader buffReader = new BufferedReader(reader);
 			
 			String line = "";
@@ -252,7 +252,7 @@ public class Downloader {
 			}
 
 
-			writeToFile(downloadListFile, new ArrayList<String>());
+			writeToFile(this.dependentDataPath + "uniqueFilesToDownload.out", new ArrayList<String>());
 		
 		
 		}

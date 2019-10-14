@@ -581,17 +581,22 @@ public class XMLParser {
 			ProcessBuilder pb = new ProcessBuilder("bash", tempScript.toString());
 			pb.inheritIO();
 			Process process;
-			File errorFile = new File(outError);
-			pb.redirectError(errorFile);
+			File errorFile = null;
 
+			if(outError != null){
+				errorFile = new File(outError);
+				pb.redirectError(errorFile);
+			}
 
 			process = pb.start();
 			process.waitFor();
-
-			if(hasSubProccessErrors(errorFile)){
-				System.out.println("Error detected exiting script");
-				throw new Exception("Error detected in executing subprocess");
+			if(outError != null){
+				if(hasSubProccessErrors(errorFile)){
+					System.out.println("Error detected exiting script");
+					throw new Exception("Error detected in executing subprocess");
+				}
 			}
+
 			System.out.println("finished executing command");
 		}
 
@@ -602,9 +607,7 @@ public class XMLParser {
 			// TODO Auto-generated catch block
 			throw new Exception(e1);
 		}
-		finally
-
-		{
+		finally {
 			tempScript.delete();
 		}
 	}
