@@ -5,16 +5,18 @@ package hci.gnomex.daemon;
 
 
 import hci.gnomex.daemon.auto_import.Differ;
+import hci.gnomex.daemon.auto_import.XMLParser;
 import hci.gnomex.utility.BatchDataSource;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,6 +60,8 @@ public class LinkData extends TimerTask {
     private boolean linkFolder= false;
     private List<Integer> captureGroupIndexes = new ArrayList<>();
     private String errorMessageString = "Error in LinkData";
+    private boolean deleteLinks = false;
+    private static String startAvatarPath = "/Repository/PersonData";
 
 
     // NOTE: -requests must be the last argument
@@ -78,6 +82,9 @@ public class LinkData extends TimerTask {
                     System.exit(1);
                 }
                 dataType = args[i];
+            } else if(args[i].equals("-deletelinks")){
+                this.deleteLinks = true;
+                break;
             } else if (args[i].equals("-debug")) {
                 debug = true;
             } else if (args[i].equals("-requests")) {
@@ -138,6 +145,7 @@ public class LinkData extends TimerTask {
 
             app.initialize();
 
+            if(!this.deleteLinks){
             if (dataType == null) {
                 System.out.println("-dataSource is required");
                 System.out.println("Usage: sh ./LinkData.sh -dataSource (either 2R 4R or 10R) -requests idRequest [list as many as you want]");
@@ -152,6 +160,10 @@ public class LinkData extends TimerTask {
 
             // do the work
             app.linkData();
+            }else{
+                app.removeRequestLinks();
+            }
+
 
             app.disconnect();
             System.out.println("Exiting...");
@@ -198,12 +210,102 @@ public class LinkData extends TimerTask {
 
     }
 
+    public void removeRequestLinks(){
+        System.out.print("This will delete all request symbolic links. Are you sure you want to continue? ");
+
+        Scanner scanner = new Scanner(System.in);
+        String answer = scanner.next().toLowerCase();
+        if(answer.equals("y") || answer.equals("yes")){
+            SessionImpl sessionImpl = (SessionImpl) sess;
+            Connection con = sessionImpl.connection();
+            StringBuilder strBuild = new StringBuilder();
+            Set<String> unlinkCMds = new TreeSet<>();
+            Set<String> rmCMDs = new TreeSet<>();
+            List<String> orderedCMDS = new ArrayList<>();
+
+            //todo change the project folder name as a commandline arg
+            String query =
+                    "SELECT Year(fe.createDate) as year, fe.idRequest, fe.number,  fe.idProject, fe.name, ef.fileName as path\n " +
+                            "FROM ( SELECT r.createDate,  r.idRequest, r.number, r.name, r.idProject\n " +
+                            "       FROM Request r JOIN Project p ON p.idProject = r.idProject\n " +
+                            "       WHERE p.name = 'HCI PERSON' ) as fe \n " +
+                            "JOIN ExperimentFile ef ON ef.idRequest = fe.idRequest;";
+            try(Statement stmt = con.createStatement()){
+                try(ResultSet rs = stmt.executeQuery(query)){
+                    while(rs.next()){
+                        String year = rs.getString("year");
+                        String path = rs.getString("path");
+                        String number = rs.getString("number");
+
+                        strBuild.append(startAvatarPath);
+                        strBuild.append(File.separator);
+                        strBuild.append(year);
+                        strBuild.append(File.separator);
+                        strBuild.append(path);
+                        String upath =  returnSymLinkInPath(strBuild.toString());
+                        strBuild.setLength(0);
+                        if(!upath.equals("")){
+                            strBuild.append("unlink ");
+                            strBuild.append(upath);
+                            unlinkCMds.add(strBuild.toString());
+                            strBuild.setLength(0);
+                        }else{
+                            System.out.println("for " + number +  " no symLink found ");
+                        }
+                        // new command
+                        strBuild.append("rm -rf ");
+                        strBuild.append(startAvatarPath);
+                        strBuild.append(File.separator);
+                        strBuild.append(year);
+                        strBuild.append(File.separator);
+                        strBuild.append(number);
+                        rmCMDs.add(strBuild.toString());
+                        strBuild.setLength(0);
+
+                    }
+                    // have to unlink before removing folder or the rm might try to go into a softlink
+                    orderedCMDS.addAll(unlinkCMds);
+
+                    for(String cmd : rmCMDs ){
+                        orderedCMDS.add(cmd);
+                    }
+                    for(String cmd : orderedCMDS){
+                        System.out.println("look " + cmd);
+                    }
+
+
+                    XMLParser.executeCommands(orderedCMDS,null);
+                }
+            }catch (SQLException e){
+                e.printStackTrace();
+            }catch(Exception e){
+                e.printStackTrace();
+                System.exit(1);
+            }
+
+
+
+        }
+    }
+
+    private String returnSymLinkInPath(String pathToData) {
+        Path pData = Paths.get(pathToData);
+
+        if(Files.isSymbolicLink(pData)){
+            return pData.toAbsolutePath().toString();
+        }
+        if(pData.getParent() == null){
+            return "";
+        }
+
+        return returnSymLinkInPath(pData.getParent().toAbsolutePath().toString());
+    }
+
     private void linkData() throws Exception {
 
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
         String startPath = "/Repository/PersonData/" + currentYear + "/";
-        String startAvatarPath = "/Repository/PersonData/2017";
-
+        startAvatarPath += "/2017";
         StringBuilder buf = new StringBuilder();
 
         // deal with each request
