@@ -229,6 +229,14 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
 
+    public get usingPlates(): boolean {
+        return this._experiment
+            && this._experiment.plates
+            && Array.isArray(this._experiment.plates)
+            && this._experiment.plates.length > 0;
+    }
+
+
     constructor(private annotationService: AnnotationService,
                 private dialogsService: DialogsService,
                 private dictionaryService: DictionaryService,
@@ -502,7 +510,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
         let temp: any[] = [];
 
-        if (this.showRowNumberColumn) {
+        if (this.showRowNumberColumn || this.usingPlates) {
             temp.push({
                 headerName: "",
                 field: "index",
@@ -515,6 +523,49 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 sortOrder: 5
             });
         }
+
+        if (this.usingPlates) {
+            temp.push({
+                headerName: "Container",
+                editable: false,
+                field: "containerType",
+                pinned: "left",
+                width:    6.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                sortOrder: 6,
+                cellRendererFramework: TextAlignLeftMiddleRenderer
+            });
+            temp.push({
+                headerName: "Plate",
+                editable: false,
+                field: "plateName",
+                pinned: "left",
+                width:    6.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                sortOrder: 7,
+                cellRendererFramework: SelectRenderer,
+                selectOptions: this._experiment.plates,
+                selectOptionsDisplayField: "plateName",
+                selectOptionsValueField: "plateName"
+            });
+            temp.push({
+                headerName: "Well",
+                editable: false,
+                field: "wellName",
+                pinned: "left",
+                width:    6.5 * this.emToPxConversionRate,
+                minWidth: 4 * this.emToPxConversionRate,
+                maxWidth: 9 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                sortOrder: 9,
+                cellRendererFramework: TextAlignLeftMiddleRenderer
+            });
+        }
+
         temp.push({
             headerName: "Sample Name",
             field: "name",
@@ -724,11 +775,11 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
         this.clientPrepLib = false;
 
-        if (this._experiment.samples
-            && Array.isArray(this._experiment.samples)
-            && this._experiment.samples.length > 0) {
+        if (this._experiment.finalSamples
+            && Array.isArray(this._experiment.finalSamples)
+            && this._experiment.finalSamples.length > 0) {
 
-            let s1 = this._experiment.samples[0];
+            let s1 = this._experiment.finalSamples[0];
 
             let nsca: any = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.NumberSequencingCyclesAllowed").filter(nsca2 =>
                 nsca2.value != "" && nsca2.idSampleType === s1.idNumberSequencingCyclesAllowed
@@ -815,9 +866,10 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     private getSequenceLanes(): void {
         if (this.experiment.isExternal === 'Y' || this.isAmendState) {
             let lanes = [];
-            for (let index = 0; index < this.experiment.samples.length; index++) {
-                let lane: any = this.experiment.samples[index].getJSONObjectRepresentation();
+            for (let index = 0; index < this.experiment.finalSamples.length; index++) {
+                let lane: any = this.experiment.finalSamples[index].getJSONObjectRepresentation();
                 lane.sampleId = "X" + (index + 1);
+                lane.index = index + 1;
                 lanes.push(lane);
             }
             this.sequenceLanes = lanes;
@@ -839,7 +891,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 let sequenceLanes = [];
                 let sampleNumber: number = 0;
 
-                for (let sample of this._experiment.samples) {
+                for (let sample of this._experiment.finalSamples) {
                     let lane = sample.getJSONObjectRepresentation();
                     lane.sampleId = "X" + ++sampleNumber;
                     sequenceLanes.push(lane);
@@ -852,9 +904,11 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             let sampleNumber: number = 0;
             let sequenceLanes = [];
 
-            for (let sample of this._experiment.samples) {
+            for (let sample of this._experiment.finalSamples) {
                 let lane = sample.getJSONObjectRepresentation();
-                lane.sampleId = "X" + ++sampleNumber;
+                lane.sampleId = "X" + sampleNumber;
+                lane.index = sampleNumber + 1;
+                sampleNumber++;
                 sequenceLanes.push(lane);
             }
 
@@ -924,7 +978,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
     private prepareAmendSequenceLanes(): void {
-        if (this.experiment && this.experiment.samples && this.experiment.sequenceLanes) {
+        if (this.experiment && this.experiment.finalSamples && this.experiment.sequenceLanes) {
             // Remove existing "dummy" sequence lanes if the samples grid has changed
             let seqLanesToRemove: any[] = [];
             for (let seqLane of this.experiment.sequenceLanes) {
@@ -937,7 +991,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             }
 
             // Add "dummy" sequence lane for each sample that will be re-sequenced
-            for (let sample of this.experiment.samples) {
+            for (let sample of this.experiment.finalSamples) {
                 if (sample.numberSequencingLanes) {
                     let additionalSequencingNumber: number = parseInt(sample.numberSequencingLanes);
                     for (let i = 0; i < additionalSequencingNumber; i++) {

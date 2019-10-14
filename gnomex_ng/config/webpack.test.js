@@ -1,25 +1,19 @@
-/**
- * Based on https://github.com/AngularClass/angular-starter/blob/master
- */
-const helpers = require("./helpers");
-const ProvidePlugin = require("webpack/lib/ProvidePlugin");
+const Helpers = require("./helpers");
 const DefinePlugin = require("webpack/lib/DefinePlugin");
 const LoaderOptionsPlugin = require("webpack/lib/LoaderOptionsPlugin");
 const ContextReplacementPlugin = require("webpack/lib/ContextReplacementPlugin");
-const ENV = process.env.ENV = process.env.NODE_ENV = "test";
 
-module.exports = function(options) {
+module.exports = (options) => {
+    const Env = process.env.ENV = process.env.NODE_ENV = options.env;
     return {
         /**
          * Source map for Karma from the help of karma-sourcemap-loader & karma-webpack
          */
         devtool: "inline-source-map",
-
         resolve: {
             extensions: [".ts", ".js"],
-            modules: [helpers.root("src"), "node_modules"]
+            modules: [Helpers.root("src"), "node_modules"]
         },
-
         module: {
             rules: [
                 /**
@@ -36,12 +30,11 @@ module.exports = function(options) {
                         /**
                          * These packages have problems with their sourcemaps.  @hci doesn't include source.
                          */
-                        helpers.root("node_modules/@angular"),
-                        helpers.root("node_modules/rxjs"),
-                        helpers.root("node_modules/@hci")
+                        Helpers.root("node_modules/@angular"),
+                        Helpers.root("node_modules/rxjs"),
+                        Helpers.root("node_modules/@hci")
                     ]
                 },
-
                 /**
                  * Typescript loader support for .ts and Angular 2 async routes via .async.ts
                  *
@@ -70,7 +63,7 @@ module.exports = function(options) {
                 {
                     test: /\.css$/,
                     use: ["to-string-loader", "css-loader"],
-                    exclude: [helpers.root("src/index.html")]
+                    exclude: [Helpers.root("src/index.html")]
                 },
                 {
                     test: /\.scss$/,
@@ -87,13 +80,11 @@ module.exports = function(options) {
                     test: /\.less$/,
                     use: "raw-loader"
                 },
-
                 /**
                  * Instruments JS files with Istanbul for subsequent code coverage reporting.  Instrument only testing sources.
                  * See: https://github.com/deepsweet/istanbul-instrumenter-loader
                  */
                 // Commenting out for now. "istanbul-instrumenter-loader" makes it so that source is not loaded
-
                 // {
                 //     enforce: "post",
                 //     test: /\.(js|ts)$/,
@@ -107,42 +98,36 @@ module.exports = function(options) {
                 //         /node_modules/
                 //     ]
                 // }
-
             ]
         },
-
         plugins: [
             new DefinePlugin({
-                "ENV": JSON.stringify(ENV),
+                "ENV": JSON.stringify(Env),
                 "process.env": {
-                    "ENV": JSON.stringify(ENV),
-                    "NODE_ENV": JSON.stringify(ENV)
+                    "ENV": JSON.stringify(Env),
+                    "NODE_ENV": JSON.stringify(Env)
                 }
             }),
-
             new ContextReplacementPlugin(
                 /**
                  * The (\\|\/) piece accounts for path separators in *nix and Windows
                  */
                 /angular(\\|\/)core(\\|\/)@angular/,
-                helpers.root("src"),
+                Helpers.root("src"),
                 {
                     /**
                      * your Angular Async Route paths relative to this root directory
                      */
                 }
             ),
-
             new LoaderOptionsPlugin({
                 debug: false,
                 options: {}
             }),
         ],
-
         performance: {
             hints: false
         },
-
         node: {
             global: true,
             process: false,
@@ -151,6 +136,5 @@ module.exports = function(options) {
             clearImmediate: false,
             setImmediate: false
         }
-
     };
-}
+};

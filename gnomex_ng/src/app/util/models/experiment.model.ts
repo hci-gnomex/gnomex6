@@ -28,10 +28,19 @@ export class Experiment {
         return this._numberOfSamples;
     }
     public set numberOfSamples(value: string) {
+        this._requiredNumberOfSamples = value;
         this._numberOfSamples = value;
         this.onChange_numberOfSamples.next(value);
     }
     private _numberOfSamples:                    string = ''; // "0",
+    // this field is used for validation on new experiments that use plates
+    public get requiredNumberOfSamples(): number {
+        return +this._requiredNumberOfSamples;
+    }
+    public set requiredNumberOfSamples(value: number) {
+        this._requiredNumberOfSamples = '' + value;
+    }
+    private _requiredNumberOfSamples:            string = ''; // "0",
     public onChange_numberOfSamples: Subject<string> = new Subject<string>();
 
     public idSampleTypeDefault:                string = ''; // "1"
@@ -50,6 +59,22 @@ export class Experiment {
         this.onChange_sampleType.next(value);
     }
     public onChange_sampleType: Subject<string> = new Subject<string>();
+
+
+    private _containerType: any;
+    public get containerType(): any {
+        return this._containerType;
+    }
+    public set containerType(value: any) {
+
+        for (let sample of this.samples) {
+            sample.containerType = value;
+        }
+
+        this._containerType = value;
+        this.onChange_containerType.next(value);
+    }
+    public onChange_containerType: BehaviorSubject<string> = new BehaviorSubject<string>(this._containerType);
 
 
     private _idSampleSource: string = '';
@@ -83,6 +108,7 @@ export class Experiment {
     public submitterInstitution:               string = "";
     public isDNASeqExperiment:                 string = ''; // "N"
     public applicationNotes:                   string = "";
+    public applicationDescription:             string = "";
     public coreToExtractDNA:                   string = ''; // "N"
     public processingDate:                     string = "";
     public codeIsolationPrepType:              string = "";
@@ -356,8 +382,31 @@ export class Experiment {
         }
     }
 
+    public get finalSamples(): Sample[] {
+        if (this.plates
+            && Array.isArray(this.plates)
+            && this.plates.length > 0
+            && this._hypothetical_samples_plate
+            && Array.isArray(this._hypothetical_samples_plate)
+            && this._hypothetical_samples_plate.length > 0) {
+
+            this.samples = this._hypothetical_samples_plate.filter((value) => {
+                return value && value.name;
+            });
+        }
+
+        return this._samples
+    }
+
     // Really this will always return a Sample[]...
     public get samples(): any|any[] {
+        if (this._hypothetical_samples_plate
+            && Array.isArray(this._hypothetical_samples_plate)
+            && this._hypothetical_samples_plate.length > 0) {
+
+            return this._hypothetical_samples_plate;
+        }
+
         return this._samples
     }
     public set samples(value :any|any[]) {
@@ -379,7 +428,200 @@ export class Experiment {
 
         this._samples = temp;
     }
-    public _samples:                 Sample[] = [];
+    private _samples:                    Sample[] = [];
+    public _hypothetical_samples_plate: Sample[] = [];
+
+    public getAllUsedPlates(): any[] {
+        let results: any[] = [];
+
+        for (let sample of this._samples) {
+            if (sample.plateName) {
+                let temp = results.filter((a: any) => {
+                    return a.value === sample.plateName;
+                });
+
+                if (temp.length === 0) {
+                    results.push({value: sample.plateName});
+                }
+            }
+        }
+
+        return results;
+    }
+
+    public getAllPossibleWellNames(): any[] {
+
+        let results: any[] = [];
+
+        let numberOfRows: number = 8;
+        let numberOfColumns: number = 12;
+
+        for (let i: number = 0; i < numberOfColumns; i++) {
+            for (let j: number = 0; j < numberOfRows; j++) {
+                let obj: any = {value: ''};
+
+                switch (j) {
+                    case 0 :
+                        obj.value = 'A';
+                        break;
+                    case 1 :
+                        obj.value = 'B';
+                        break;
+                    case 2 :
+                        obj.value = 'C';
+                        break;
+                    case 3 :
+                        obj.value = 'D';
+                        break;
+                    case 4 :
+                        obj.value = 'E';
+                        break;
+                    case 5 :
+                        obj.value = 'F';
+                        break;
+                    case 6 :
+                        obj.value = 'G';
+                        break;
+                    case 7 :
+                        obj.value = 'H';
+                        break;
+                    default:
+                        obj.value = '?';
+                }
+
+                obj.value = obj.value + (i + 1);
+
+                results.push(obj);
+            }
+        }
+
+        return results;
+    }
+
+    public get plates(): any[] {
+        return this._plates;
+    }
+    public set plates(value: any[]) {
+        this._plates = value;
+    }
+
+    public generateHypotheticalSamplesBasedOnPlates(plates: any[]) {
+        this._plates = plates;
+
+        this._hypothetical_samples_plate = [];
+
+        let numberOfRows: number = 8;
+        let numberOfColumns: number = 12;
+
+
+        let idSampleType: string = '';
+        let idOrganism: string = '';
+        let idNumberSequencingCycles: string = '';
+        let idNumberSequencingCyclesAllowed: string = '';
+        let idSeqRunType: string = '';
+        let protocol: any = '';
+        let numberSequencingLanes: string = this.isRapidMode === 'Y' ? '2' : '1';
+        let seqPrepByCore: any = '';
+
+        if (this.gnomexService.submitInternalExperiment() && this.sampleType) {
+            idSampleType = this.sampleType.idSampleType;
+        } else if (this.idSampleTypeDefault != null) {
+            idSampleType = this.idSampleTypeDefault
+        } else {
+            // do nothing, leave idSampleType as default.
+        }
+
+        if (this.gnomexService.submitInternalExperiment() && this.organism) {
+            idOrganism = this.organism.idOrganism;
+        } else if (this.idOrganismSampleDefault != null) {
+            idOrganism = this.idOrganismSampleDefault;
+        } else {
+            // do nothing, leave idOrganism as default.
+        }
+
+        if (this.gnomexService.submitInternalExperiment() && this.selectedProtocol) {
+            idNumberSequencingCycles = this.selectedProtocol.idNumberSequencingCycles;
+        }
+
+        if (this.gnomexService.submitInternalExperiment() && this.selectedProtocol) {
+            idNumberSequencingCyclesAllowed = this.selectedProtocol.idNumberSequencingCyclesAllowed
+        }
+
+        if (this.gnomexService.submitInternalExperiment() && this.selectedProtocol) {
+            idSeqRunType = this.selectedProtocol.idSeqRunType
+        }
+
+        if (this.codeApplication) {
+            protocol = this.dictionaryService.getProtocolFromApplication(this.codeApplication)
+        }
+
+        if (this.seqPrepByCore_forSamples) {
+            seqPrepByCore = this.seqPrepByCore_forSamples;
+        }
+
+        for (let plate of this._plates) {
+            if (plate.plateName) {
+                for (let i: number = 0; i < numberOfColumns; i++) {
+                    for (let j: number = 0; j < numberOfRows; j++) {
+                        let newSample: Sample = new Sample(this.dictionaryService);
+
+                        newSample.experiment = this;
+
+                        newSample.plateName = plate.plateName;
+
+                        switch(j) {
+                            case 0 : newSample.wellName = 'A'; break;
+                            case 1 : newSample.wellName = 'B'; break;
+                            case 2 : newSample.wellName = 'C'; break;
+                            case 3 : newSample.wellName = 'D'; break;
+                            case 4 : newSample.wellName = 'E'; break;
+                            case 5 : newSample.wellName = 'F'; break;
+                            case 6 : newSample.wellName = 'G'; break;
+                            case 7 : newSample.wellName = 'H'; break;
+                            default: newSample.wellName = '?';
+                        }
+
+                        newSample.wellName = newSample.wellName + '' + (i + 1);
+
+                        newSample.index = this.samples.length + 1;
+                        newSample.idSample = 'Sample' + Sample.getNextSampleId(this).toString();
+                        newSample.multiplexGroupNumber = "";
+                        newSample.name = "";
+                        newSample.canChangeSampleName = 'Y';
+                        newSample.canChangeSampleType = 'Y';
+                        newSample.canChangeSampleConcentration = 'Y';
+                        newSample.canChangeSampleSource = 'Y';
+                        newSample.canChangeNumberSequencingCycles = 'Y';
+                        newSample.canChangeNumberSequencingLanes = 'Y';
+                        newSample.concentration = "";
+                        newSample.label = '';
+                        newSample.idOligoBarcode = '';
+                        newSample.barcodeSequence = '';
+                        newSample.idOligoBarcodeB = '';
+                        newSample.barcodeSequenceB = '';
+                        newSample.idNumberSequencingCycles = idNumberSequencingCycles;
+                        newSample.idNumberSequencingCyclesAllowed = idNumberSequencingCyclesAllowed;
+                        newSample.idSeqRunType = idSeqRunType;
+                        newSample.numberSequencingLanes = numberSequencingLanes;
+                        newSample.idSampleSource = this.idSampleSource;
+                        newSample.idSampleType = idSampleType;
+                        newSample.idSeqLibProtocol = protocol.idSeqLibProtocol;
+                        newSample.seqPrepByCore = seqPrepByCore;
+                        newSample.idOrganism = idOrganism;
+                        newSample.prepInstructions = '';
+                        newSample.otherOrganism = '';
+                        newSample.treatment = '';
+                        newSample.frontEndGridGroup = '0';
+                        newSample.codeBioanalyzerChipType = this.codeBioanalyzerChipType;
+
+                        this._hypothetical_samples_plate.push(newSample);
+                    }
+                }
+            }
+        }
+    }
+
+    private _plates:                 any[] = [];
 
     public hybridizations:          any[] = [];
     public labeledSamples:          any[] = [];
@@ -897,11 +1139,11 @@ export class Experiment {
     public getJSONObjectRepresentation(): any {
         let tempSamples: any[] = [];
 
-        for (let sample of this.samples) {
+        for (let sample of this._samples) {
             sample.experiment = this;
         }
 
-        for (let sample of this.samples) {
+        for (let sample of this._samples) {
             tempSamples.push(sample.getJSONObjectRepresentation());
         }
 

@@ -65,7 +65,8 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
     private barCodes: any[] = [];
     private coreAdmins: any[] = [];
     private label = "Illumina Library Prep";
-    public codeStepNext: string;
+    public codeStepNext: string = "";
+    private preCodeStepNext: string = "";
     // left to have nova, hi, mi until we phase them out
     public readonly codeStepArray: any[] = [
         { label: "Illumina Seq ", codeStepNext: this.workflowService.ILLSEQ_PREP  },
@@ -74,6 +75,7 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
         { label: "Illumina MiSeq", codeStepNext: this.workflowService.MISEQ_PREP}
     ];
 
+    public allRequestCategories: any[] = [];
 
 
     constructor(public workflowService: WorkflowService,
@@ -90,10 +92,17 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
             code.idOligoBarcodeB = code.idOligoBarcode;
             this.barCodes.push(code);
         }
+
+        this.allRequestCategories = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY);
     }
 
     initialize() {
         this.dialogsService.startDefaultSpinnerDialog();
+        if(!this.codeStepNext) {
+            this.codeStepNext = this.workflowService.ALL_PREP;
+        }
+        this.preCodeStepNext = this.codeStepNext;
+        this.workItem = "";
         let params: HttpParams = new HttpParams()
             .set("codeStepNext", this.codeStepNext);
 
@@ -140,10 +149,40 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
                         cellRendererFramework: SelectRenderer,
                         cellEditorFramework: SelectEditor,
                         selectOptions: this.seqLibProtocols,
+                        selectOptionsPerRowFilterFunction: (context, rowData, option) => {
+
+                            if (context
+                                && context.allRequestCategories
+                                && rowData
+                                && option) {
+
+                                // specifically allow the extra blank row through the filter
+                                if (!option.idCoreFacility && !option.display) {
+                                    return true;
+                                }
+
+                                let tempSamplesRequestCategories: any[] = context.allRequestCategories.filter((value: any) => {
+                                    return rowData.codeRequestCategory === value.codeRequestCategory;
+                                });
+
+                                for (let requestCategory of tempSamplesRequestCategories) {
+                                    if (requestCategory.idCoreFacility
+                                        && requestCategory.idCoreFacility === option.idCoreFacility) {
+
+                                        return true;
+                                    }
+                                }
+
+                                return false;
+                            }
+
+                            return true;
+                        },
                         selectOptionsDisplayField: "display",
                         selectOptionsValueField: "idSeqLibProtocol",
                         showFillButton: true,
                         fillGroupAttribute: 'idRequest',
+                        context: this
                     },
                     {
                         headerName: "Index A",
@@ -245,6 +284,10 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
         if(!this.codeStepNext) {
             this.codeStepNext = this.workflowService.ALL_PREP;
         }
+        if(this.codeStepNext === this.preCodeStepNext) {
+            return;
+        }
+        
         this.initialize();
     }
 
@@ -262,7 +305,6 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
     onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
-        this.codeStepNext =  this.workflowService.ILLSEQ_PREP;
         this.initialize();
     }
 

@@ -3,7 +3,7 @@
         <as-split (dragEnd)="onSplitDragEnd($event)">
             <as-split-area size="20">
                 <mat-tab-group class="full-height" [selectedIndex]="selectedTab" (selectedTabChange)="onTabChange($event)">
-                    <mat-tab *ngIf="rowData.length > 0" #userTab label="Users" class="full-height">
+                    <mat-tab #userTab label="Users" class="full-height">
                         <div class="full-height full-width flex-container-col foreground small-font">
                             <div class="full-width small-font padded">
                                 <mat-form-field>
@@ -301,24 +301,14 @@
                             </as-split-area>
                         </as-split>
                     </div>
-                    <div class="full-width right-align foreground padded-left-right-bottom reserve-height">
-                        <div class="flex-container-row">
-                            <div class="full-height flex-grow">
-                            </div>
-                            <div *ngIf="userForm.dirty" class="height-auto" style="background:#feec89; padding: 0 1em;">
-                                <div class="full-height full-width flex-container-row align-center">
-                                    <div>
-                                        Your changes have not been saved
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="horizontal-spacer">
-                            </div>
-                            <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.userForm.valid" (click)="saveUser()">
-                                <img [src]="'./assets/save.png'">
-                                Save
-                            </button>
-                        </div>
+                    <div class="full-width right-align foreground padded-left-right-bottom">
+                        <save-footer [disableSave]="this.userForm.invalid"
+                                     [showSpinner]="this.showSpinner"
+                                     [dirty]="this.userForm.dirty"
+                                     [icon]="this.constantsService.ICON_SAVE"
+                                     (saveClicked)="saveUser()">
+                            Save
+                        </save-footer>
                     </div>
                 </div>
                 <div *ngIf="isGroupsTab && selectedGroup" class="full-height full-width flex-container-col">

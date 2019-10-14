@@ -459,6 +459,38 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             this.newExperimentService.currentState = "IScanState";
         } else if (category.type === NewExperimentService.TYPE_SEQUENOM) {
             this.newExperimentService.currentState = "SequenomState";
+
+            this.tabs.push({
+                label: "Sample Details",
+                disabled: true,
+                component: TabSampleSetupViewComponent
+            });
+            if (this.annotationInputs
+                && this.annotationInputs.annotations
+                && Array.isArray(this.annotationInputs.annotations)
+                && this.annotationInputs.annotations.length > 0) {
+
+                this.tabs.push({
+                    label: "Other Details",
+                    disabled: true,
+                    component: AnnotationTabComponent
+                });
+            }
+            this.tabs.push({
+                label: "Annotations",
+                disabled: true,
+                component: TabAnnotationViewComponent
+            });
+            this.tabs.push({
+                label: "Samples",
+                disabled: true,
+                component: TabSamplesIlluminaComponent
+            });
+            this.tabs.push({
+                label: "Confirm",
+                disabled: true,
+                component: TabConfirmIlluminaComponent
+            });
         } else if (category.type === NewExperimentService.TYPE_ISOLATION) {
             this.newExperimentService.currentState = "IsolationState";
 

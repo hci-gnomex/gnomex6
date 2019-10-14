@@ -57,6 +57,8 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         display: "High Throughput Genomics"
     };
 
+    public allRequestCategories: any[] = [];
+
     constructor(public workflowService: WorkflowService,
                 private gnomexService: GnomexService,
                 private dialogsService: DialogsService,
@@ -67,6 +69,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
+        this.allRequestCategories = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY);
     }
 
     ngOnChanges() {
@@ -157,6 +160,37 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                     selectOptions: this.filteredQcProtocolList,
                     selectOptionsDisplayField: "bioanalyzerChipType",
                     selectOptionsValueField: "datakey",
+                    selectOptionsPerRowFilterFunction: (context, rowData, option) => {
+
+                        if (!context || !rowData || !option) {
+                            return true;
+                        }
+
+                        if (option.value == "") {
+                            return true;
+                        }
+
+                        if (option.isActive === 'Y' && rowData) {
+                            let tempSamplesRequestCategories: any[] = context.allRequestCategories.filter((value: any) => {
+                                return value.codeRequestCategory === option.codeRequestCategory;
+                            });
+
+                            // There shouldn't ever be more than one entry in tempSamplesRequestCategories, but just in case...
+                            for (let requestCategory of tempSamplesRequestCategories) {
+                                let appCodes: any[] = context.coreFacilityAppMap.get(requestCategory.idCoreFacility);
+
+                                if (appCodes && appCodes.length > 0) {
+                                    for (var code of appCodes) {
+                                        if (option.codeApplication === code) {
+                                            return true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        return false;
+                    },
                     showFillButton: true,
                     fillGroupAttribute: 'idRequest',
                 },

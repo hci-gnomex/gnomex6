@@ -2,7 +2,7 @@ import {Injectable} from "@angular/core";
 import {Http, Response, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
 import {map} from "rxjs/operators";
-import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 
 @Injectable()
 export class AppUserListService {
@@ -39,8 +39,9 @@ export class AppUserListService {
         }));
     }
 
-    saveAppUser(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/SaveAppUser.gx", {search: params});
+    saveAppUser(params: HttpParams): Observable<any> {
+        let headers : HttpHeaders = new HttpHeaders().set('Content-Type','application/x-www-form-urlencoded');
+        return this.httpClient.post("/gnomex/SaveAppUser.gx", params.toString(), {headers: headers});
     }
 
     getFullAppUserList(): Observable<any> {

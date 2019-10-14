@@ -93,6 +93,7 @@ export class TextAlignRightMiddleEditor implements ICellEditorAngularComp {
                 if (rowNode && rowNode.data && thisRowNode && thisRowNode.data
                     && rowNode.data[this.fillGroupAttribute] === thisRowNode.data[this.fillGroupAttribute]) {
                     rowNode.setDataValue(this.gridFieldName, this.value);
+                    rowNode.setDataValue(this.gridFieldName + "_1", this.value);
                 }
             });
 

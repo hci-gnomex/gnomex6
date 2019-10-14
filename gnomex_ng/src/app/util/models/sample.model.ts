@@ -36,6 +36,9 @@ export class Sample implements OnDestroy {
     public qualStatus:                      string = '';
     public seqPrepStatus:                   string = '';
     public sequenceLaneCount:               string = ''; // "1";
+    public containerType:                   string = ''; // "1";
+    public plateName:                       string = ''; // "1";
+    public wellName:                        string = ''; // "1";
 
     public get numberSequencingLanes(): string {
         return this._numberSequencingLanes;
@@ -98,6 +101,7 @@ export class Sample implements OnDestroy {
     public multiplexGroupNumber:            string = ''; // "10";
     public qualCalcConcentration:           string = '';
     public qual260nmTo230nmRatio:           string = '';
+    public qual260nmTo280nmRatio:           string = '';
     public qualRINNumber:                   string = '';
     public otherSamplePrepMethod:           string = '';
     public isDirty:                         string = ''; // "Y";
@@ -153,7 +157,8 @@ export class Sample implements OnDestroy {
         return this._experiment;
     }
 
-    private onChange_codeApplication_subscription:Subscription
+    private onChange_codeApplication_subscription:Subscription;
+    private onChange_containerType_subscription:Subscription;
 
     public set experiment(value: Experiment) {
         this._experiment = value;
@@ -176,6 +181,16 @@ export class Sample implements OnDestroy {
 
             this.application_object = lookup;
         });
+
+        UtilService.safelyUnsubscribe(this.onChange_containerType_subscription);
+
+        this.onChange_containerType_subscription = this._experiment.onChange_containerType.subscribe((value: string) => {
+            if (value && value === "PLATE") {
+                this.containerType = "Plate";
+            } else {
+                this.containerType = value;
+            }
+        });
     }
 
     private _experiment: Experiment;
@@ -186,6 +201,7 @@ export class Sample implements OnDestroy {
 
     ngOnDestroy(): void {
         UtilService.safelyUnsubscribe(this.onChange_codeApplication_subscription);
+        UtilService.safelyUnsubscribe(this.onChange_containerType_subscription);
     }
 
     public static createSampleObjectFromAny(dictionaryService: DictionaryService, source: any): Sample {
@@ -233,6 +249,7 @@ export class Sample implements OnDestroy {
         sample.cloneProperty("customColor", source);
         sample.cloneProperty("qualCalcConcentration", source);
         sample.cloneProperty("qual260nmTo230nmRatio", source);
+        sample.cloneProperty("qual260nmTo280nmRatio", source);
         sample.cloneProperty("qualRINNumber", source);
         sample.cloneProperty("otherSamplePrepMethod", source);
         sample.cloneProperty("multiplexGroupNumber", source);
@@ -243,6 +260,9 @@ export class Sample implements OnDestroy {
         sample.cloneProperty("index", source);
         sample.cloneProperty("prepInstructions", source);
         sample.cloneProperty("frontEndGridGroup", source);
+        sample.cloneProperty("containerType", source);
+        sample.cloneProperty("plateName", source);
+        sample.cloneProperty("wellName", source);
 
         if (source) {
             for (let attribute of Object.keys(source)) {
@@ -426,10 +446,15 @@ export class Sample implements OnDestroy {
             multiplexGroupNumber:            this.multiplexGroupNumber,
             qualCalcConcentration:           this.qualCalcConcentration,
             qual260nmTo230nmRatio:           this.qual260nmTo230nmRatio,
+            qual260nmTo280nmRatio:           this.qual260nmTo280nmRatio,
             qualRINNumber:                   this.qualRINNumber,
             otherSamplePrepMethod:           this.otherSamplePrepMethod,
-            isDirty:                         this.isDirty
-        };
+            isDirty:                         this.isDirty,
+            containerType:                   this.containerType,
+            plateName:                       this.plateName,
+            wellName:                        this.wellName,
+            // index:                           "" + this.index
+            };
 
         for (let key of Object.keys(this)) {
             if (key.startsWith("ANNOT")) {
@@ -440,7 +465,7 @@ export class Sample implements OnDestroy {
         return temp;
     }
 
-    protected static getNextSampleId(experiment: Experiment): number {
+    public static getNextSampleId(experiment: Experiment): number {
         let lastId: number = -1;
 
         for (let sample of experiment.samples) {
