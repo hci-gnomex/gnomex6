@@ -1,6 +1,6 @@
-//version=5.36
-ext{
+ext {
     warName="${rootProject.name}.war"
+    warNameTemp="${rootProject.name}-temp.war"
     jarName="${rootProject.name}.jar"
     clientJarName="${rootProject.name}_client.jar"
     buildHibernateDir="${buildDir}/hibernate"

@@ -4,9 +4,9 @@
   "repository": "https://github.com/hci-gnomex/gnomex.git",
   "private": true,
   "scripts": {
-    "build:dev": "npm run clean:dist && webpack --mode development --config config/webpack.dev.js --progress --profile  --json > stats.json",
-    "build:prod": "npm run clean:dist && webpack --config config/webpack.prod.js  --progress --profile --bail",
-    "build": "npm run build:dev",
+    "build:dev:wds": "webpack --env development --progress --profile --json > stats.json",
+    "build:dev:tomcat": "webpack --env developmentTomcat --progress --profile --json > stats.json",
+    "build:prod": "webpack --env productionTomcat --progress --profile --json > stats.json",
     "clean:dist": "npm run rimraf -- dist",
     "clean:install": "npm set progress=false && npm install",
     "clean": "npm cache clean && npm run rimraf -- node_modules doc coverage dist compiled dll",
@@ -14,7 +14,7 @@
     "rimraf": "rimraf",
     "webpack": "webpack",
     "webpack-defaults": "webpack-defaults",
-    "webpack-dev-server": "webpack-dev-server --mode development --inline --hot"
+    "webpack-dev-server": "webpack-dev-server --env development --inline --hot"
   },
   "dependencies": {
     "@angular/animations": "7.0.3",
