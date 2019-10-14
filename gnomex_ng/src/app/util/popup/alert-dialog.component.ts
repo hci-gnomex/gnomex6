@@ -34,17 +34,18 @@ import {DialogType} from "./dialogs.service";
                     </div>
                 </div>
             </div>
-            <mat-dialog-content class="flex-grow no-margin no-padding" style="min-height: 6em;">
+            <mat-dialog-content class="flex-grow no-margin no-padding">
                 <hr>
                 <div *ngIf="message.length === 1"
-                     class="flex-grow full-height full-width extra-padded message overflow-auto"
-                     [innerHTML]="message"></div>
+                     class="flex-grow full-width extra-padded message"
+                     [innerHTML]="message" style="white-space: pre-line"></div>
                 <div *ngIf="message.length > 1"
-                     class="flex-grow full-height full-width extra-padded message overflow-auto">
+                     class="flex-grow full-width extra-padded message">
                     <div *ngFor="let line of message" class="full-width">
                         {{ line }}
                     </div>
                 </div>
+                <br>
             </mat-dialog-content>
             <mat-dialog-actions class="flex-container-row justify-center no-margin no-padding">
                 <save-footer *ngIf="dialogType !== type.CONFIRM" class="centered-text large-size"
@@ -148,6 +149,9 @@ import {DialogType} from "./dialogs.service";
     ngOnInit(): void {
         if(this.dialogType) {
             this.defaultTitle = this.dialogType;
+        }
+        if(this.message.length === 1) {
+            this.message[0] = this.message[0].replace(/\n/g, "<br>");
         }
     }
 
