@@ -11,12 +11,14 @@
                 type="button">
             <img [src]="this.constService.ICON_DELETE"> Remove
         </button>
+        <mat-checkbox (change)="filterAppOptions($event)" [(ngModel)]="showInactive">Show Inactive</mat-checkbox>
 
     </div>
     <div style="flex:9" class="full-width">
         <ag-grid-angular class="full-height full-width ag-theme-balham"
                          (cellValueChanged)="onCellValueChanged($event)"
                          [enableColResize]="true"
+                         [rowData]="rowData"
                          (gridReady)="onGridReady($event)"
                          (gridSizeChanged)="onGridSizeChanged($event)"
                          [rowDeselection]="true"

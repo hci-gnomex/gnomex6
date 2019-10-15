@@ -8,7 +8,7 @@ import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {ConstantsService} from "../../services/constants.service";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {DictionaryService} from "../../services/dictionary.service";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import {MatDialog} from "@angular/material";
 import {DialogsService} from "../../util/popup/dialogs.service";
 
 @Component({
@@ -94,9 +94,6 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
 
     ngOnInit(){
         this.formGroup = this.fb.group({applications:[]});
-
-
-
     }
 
     setColumnDefByState():any[]{
@@ -225,6 +222,7 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
     onRowSelected(event){
         if(event.node.selected){
             this.selectedLibPrepIndex = event.rowIndex;
+            this.gridApi.selectIndex(this.selectedLibPrepIndex, false, null);
         }
         this.selectedLibPrep = this.gridApi.getSelectedRows();
     }
@@ -237,14 +235,16 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                 if(data && data.applications){
                     this.newAppNumber = 0;
                     this.expPlatfromNode = data;
-                    this.applicationList = Array.isArray(data.applications) ? data.applications : [data.applications.Application];
+                    let allApps = Array.isArray(data.applications) ? data.applications : [data.applications.Application];
+                    this.applicationList = allApps.filter((app: any) => (app.isActive === "Y"));
                     this.showInactive = false;
+                    this.filterAppOptions();
                     this.selectedLibPrep = [];
                     this.formGroup.get('applications').setValue(this.applicationList);
                     this.formGroup.markAsPristine();
                     this.columnDefs =  this.setColumnDefByState();
                     this.gridApi.setColumnDefs(this.columnDefs);
-                    this.gridApi.setRowData(this.applicationList);
+                    this.gridApi.setRowData(this.rowData);
 
                 }
             });
@@ -254,6 +254,15 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                 this.columnDefs = this.setColumnDefByState();
                 this.gridApi.setColumnDefs(this.columnDefs);
             });
+    }
+
+    filterAppOptions(event?: any) {
+        // This is to filter the data that is executive(selected), but not to filter the data that is active in database.
+        if(this.showInactive) {
+            this.rowData = this.applicationList;
+        } else {
+            this.rowData = this.applicationList.filter(app => app.isSelected === "Y");
+        }
     }
 
     externallyResizeGrid(){
@@ -288,13 +297,17 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
             idHybProtocolDefault:'',
             idScanProtocolDefault:'',
             idFeatureExtractionProtocolDefault:'',
-            isActive:'Y'
+            isActive:'Y',
+            RequestCategoryApplication: []
         };
-        this.applicationList.splice(0,0,newLibPrep);
-        this.gridApi.setRowData(this.applicationList);
+        this.applicationList.splice(0, 0, newLibPrep);
+        this.filterAppOptions();
+        this.gridApi.setRowData(this.rowData);
+        this.gridApi.forEachNode(node => node.rowIndex ? 0 : node.setSelected(true, true));
         this.formGroup.markAsDirty();
 
     }
+
     remove(){
         let libPrep = this.selectedLibPrep[0];
         this.dialogService.confirm("Are you sure you want to remove experiment type named "
@@ -305,15 +318,13 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                     this.applicationList.splice(removeIndex,1);
                     this.formGroup.markAsDirty();
                     this.selectedLibPrep = [];
-                    this.gridApi.setRowData(this.applicationList);
+                    this.filterAppOptions();
+                    this.gridApi.setRowData(this.rowData);
                 }
             }
         });
 
     }
-
-
-
 
     ngOnDestroy(){
         this.expPlatformSubscription.unsubscribe();

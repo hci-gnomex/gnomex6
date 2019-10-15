@@ -9,7 +9,7 @@ import {ConstantsService} from "../../services/constants.service";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {DictionaryService} from "../../services/dictionary.service";
 import {MatDialogConfig} from "@angular/material";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {PrepTypePricingDialogComponent} from "./prep-type-pricing-dialog.component";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
@@ -38,6 +38,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                         (click)="openPricingEditor()"
                         [disabled]="selectedPrepTypeRow.length === 0"
                         type="button"> Edit Pricing </button>
+                <mat-checkbox (change)="filterOptions($event)" [(ngModel)]="showInactive">Show Inactive</mat-checkbox>
 
             </div>
             <div style="flex:9" class="full-width">
@@ -63,6 +64,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
     public formGroup:FormGroup;
+    public showInactive: boolean = false;
     private expPlatformSubscription: Subscription;
     private expPlatfromNode:any;
     private gridApi: GridApi;
@@ -70,6 +72,7 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
     private selectedPrepTypeRowIndex:number = -1;
     public selectedState:string = "Select all";
     public rowData:any[]= [];
+    private prepTypeList: any[] = [];
     private extractionTypeList = [{type:'DNA'},{type:'RNA'},{type:'BOTH'}];
 
     public columnDefs: any[] = [
@@ -117,20 +120,30 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
             .subscribe(data =>{
                 if(data &&( data.prepTypes || data.prepTypes) ){
                     this.expPlatfromNode = data;
-                    this.rowData = Array.isArray(data.prepTypes) ? data.prepTypes : [data.prepTypes.IsolationPrepType];
+                    this.prepTypeList = Array.isArray(data.prepTypes) ? data.prepTypes : [data.prepTypes.IsolationPrepType];
+                    this.showInactive = false;
+                    this.filterOptions();
                     this.selectedPrepTypeRow = [];
-                    this.formGroup.get('prepTypes').setValue(this.rowData);
+                    this.formGroup.get('prepTypes').setValue(this.prepTypeList);
                     this.formGroup.markAsPristine()
                 }
             });
 
     }
 
+    filterOptions() {
+        if(this.showInactive) {
+            this.rowData = this.prepTypeList;
+        } else {
+            this.rowData = this.prepTypeList.filter(seqOpt => seqOpt.isActive === "Y" );
+        }
+    }
 
 
     onPrepTypeRowSelected(event){
         if(event.node.selected){
             this.selectedPrepTypeRowIndex = event.rowIndex;
+            this.gridApi.selectIndex(this.selectedPrepTypeRowIndex, false, null);
         }
         this.selectedPrepTypeRow = this.gridApi.getSelectedRows();
     }
@@ -157,6 +170,7 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
             prepType.unitPriceInternal = dialogFormGroup.get('unitPriceInternal').value;
             prepType.unitPriceExternalAcademic = dialogFormGroup.get('unitPriceExternalAcademic').value;
             prepType.unitPriceExternalCommercial = dialogFormGroup.get('unitPriceExternalCommercial').value;
+            this.filterOptions();
             this.formGroup.markAsDirty();
         }
 
@@ -189,8 +203,10 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
             type:'DNA',
             codeRequestCategory: this.expPlatfromNode.codeRequestCategory
         };
-        this.rowData.splice(0,0,newPrepType);
+        this.prepTypeList.splice(0, 0, newPrepType);
+        this.filterOptions();
         this.gridApi.setRowData(this.rowData);
+        this.gridApi.forEachNode(node => node.rowIndex ? 0 : node.setSelected(true, true));
         this.formGroup.markAsDirty();
 
     }
@@ -199,9 +215,11 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
         this.dialogService.confirm("Are you sure you want to remove prep type named \'" + prepType.isolationPrepType +'\'?', "Remove Prep Type")
             .subscribe((result: any) =>{
             if(result){
-                let removeIndex:number = this.rowData.indexOf(prepType);
+                let removeIndex:number = this.prepTypeList.indexOf(prepType);
                 if(removeIndex > -1){
-                    this.rowData.splice(removeIndex,1);
+                    this.prepTypeList.splice(removeIndex, 1);
+                    this.filterOptions();
+                    this.selectedPrepTypeRow = [];
                     this.gridApi.setRowData(this.rowData);
                     this.formGroup.markAsDirty();
                 }
@@ -212,23 +230,25 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
     select(){
         if( this.selectedState ===  "Select all"){
             this.selectedState = "Unselect all";
-            this.rowData.map(prep => {
+            this.prepTypeList.map(prep => {
                 prep.isActive = "Y";
                 return prep;
             });
 
         }else{
             this.selectedState = "Select all";
-            this.rowData.map(prep => {
+            this.prepTypeList.map(prep => {
                 prep.isActive = "N";
                 return prep;
             });
         }
+
+        this.filterOptions();
         this.gridApi.setRowData(this.rowData);
+        if(this.rowData.length === 0 && !this.showInactive) {
+            this.dialogService.alert("Check Show Inactive box to see all inactive data.", null, DialogType.INFO);
+        }
     }
-
-
-
 
     ngOnDestroy(){
         this.expPlatformSubscription.unsubscribe();
