@@ -36,7 +36,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                         [disabled]="selectedSeqOpt.length === 0"
                         type="button"> Edit Sequencing Options </button>
 
-                <mat-checkbox (change)="filterSeqOptions($event)" [(ngModel)]="showInactive"> Show Inactive </mat-checkbox>
+                <mat-checkbox (change)="filterSeqOptions()" [(ngModel)]="showInactive"> Show Inactive </mat-checkbox>
 
             </div>
             <div style="flex:9" class="full-width">
@@ -228,6 +228,7 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
                     this.expPlatfromNode = data;
                     this.seqOptionsList = Array.isArray(data.sequencingOptions) ? data.sequencingOptions :
                         [data.sequencingOptions.NumberSequencingCyclesAllowed];
+                    this.seqOptionsList = this.seqOptionsList.sort(this.sortSeqOptions);
                     this.showInactive = false;
                     this.selectedSeqOpt = [];
                     this.formGroup.get('sequencingOptions').setValue(this.seqOptionsList);
@@ -238,21 +239,20 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
 
     }
 
-    filterSeqOptions(event){
-        if(this.showInactive){
-            this.rowData = this.seqOptionsList.sort(this.sortSeqOptions);
-            this.gridApi.setRowData(this.rowData);
-        }else{
-            let activeSeqOptList = this.seqOptionsList.filter(seqOpt => seqOpt.isActive === 'Y' );
-            this.rowData = activeSeqOptList.sort(this.sortSeqOptions);
-            this.gridApi.setRowData(this.rowData);
+    filterSeqOptions() {
+        if(this.showInactive) {
+            this.rowData = this.seqOptionsList;
+        } else {
+            this.rowData = this.seqOptionsList.filter(seqOpt => seqOpt.isActive === 'Y' );
         }
+        this.gridApi.setRowData(this.rowData);
     }
 
 
     onSeqOptionsRowSelected(event){
         if(event.node.selected){
             this.selectedSeqOptIndex = event.rowIndex;
+            this.gridApi.selectIndex(this.selectedSeqOptIndex, false, null);
         }
         this.selectedSeqOpt = this.gridApi.getSelectedRows();
     }
@@ -262,7 +262,7 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
         //if hiseq, extra column is added for it
         this.expPlatform2Subscription = this.expPlatfromService.getExperimentPlatformObservable().subscribe(data =>{
             let tempColDefs:any[] =[];
-            this.filterSeqOptions(null);
+            this.filterSeqOptions();
             if(this.expPlatfromService.isHiSeq){
                 tempColDefs = this.columnDefs.slice();
                 tempColDefs.splice(1,0, this.runModeColumn);
@@ -303,7 +303,7 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
             seqOpt.unitPriceInternal = dialogFormGroup.get('unitPriceInternal').value;
             seqOpt.unitPriceExternalAcademic = dialogFormGroup.get('unitPriceExternalAcademic').value;
             seqOpt.unitPriceExternalCommercial = dialogFormGroup.get('unitPriceExternalCommercial').value;
-            this.filterSeqOptions(null);
+            this.filterSeqOptions();
             this.formGroup.markAsDirty();
         }
 
@@ -340,9 +340,11 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
             isActive:'Y',
             sortOrder:'0',
         };
-        this.seqOptionsList.splice(0,0,newSeqOpt);
+        this.seqOptionsList.splice(0,0, newSeqOpt);
+        this.filterSeqOptions();
         this.selectedSeqOpt = [newSeqOpt];
-        this.gridApi.setRowData(this.seqOptionsList);
+        this.gridApi.setRowData(this.rowData);
+        this.gridApi.forEachNode(node => node.rowIndex ? 0 : node.setSelected(true, true));
         this.openSeqEditor();
 
     }
@@ -353,16 +355,13 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
             if(result){
                 let i:number = this.seqOptionsList.indexOf(seqOpt);
                 this.seqOptionsList.splice(i,1);
-                this.filterSeqOptions(null);
+                this.filterSeqOptions();
                 this.formGroup.markAsDirty();
                 this.selectedSeqOpt = [];
             }
         });
 
     }
-
-
-
 
     ngOnDestroy(){
         this.expPlatform1Subscription.unsubscribe();

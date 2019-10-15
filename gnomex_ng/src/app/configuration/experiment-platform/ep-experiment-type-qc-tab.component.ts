@@ -31,6 +31,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                         (click)="openQCEditor()"
                         [disabled]="selectedApp.length === 0"
                         type="button"> Edit QC Assay </button>
+                <mat-checkbox (change)="filterAppOptions($event)" [(ngModel)]="showInactive"> Show Inactive </mat-checkbox>
 
             </div>
             <div style="flex:9" class="full-width">
@@ -38,6 +39,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                                  [columnDefs]="columnDefs"
                                  (cellValueChanged)="onCellValueChanged($event)"
                                  [enableColResize]="true"
+                                 [rowData]="rowData"
                                  (gridReady)="onGridReady($event)"
                                  (gridSizeChanged)="onGridSizeChanged($event)"
                                  [rowDeselection]="true"
@@ -63,6 +65,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
     public formGroup:FormGroup;
+    public showInactive = false;
     private expPlatformSubscription: Subscription;
     private expPlatfromNode:any;
     private gridApi: GridApi;
@@ -70,6 +73,7 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
     private nextAppNumb:number=0;
 
     public rowData:any[]= [];
+    private refinedAllApps: any[] = [];
 
 
     private parseSortOrder(params){
@@ -167,6 +171,9 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
 
 
     onRowSelected(event){
+        if(event.node.selected) {
+            this.gridApi.selectIndex(event.rowIndex, false, null);
+        }
         this.selectedApp = this.gridApi.getSelectedRows();
     }
 
@@ -182,14 +189,15 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
                 this.nextAppNumb = 0;
                 this.expPlatfromNode = data;
                 let allApps = (Array.isArray(data.applications) ? data.applications : [data.applications.ApplicationTheme]);
-                let refinedAllApps = this.formatChipsForApps(allApps);
-                this.rowData = refinedAllApps.filter(app => app.isActive === 'Y').sort(this.compareApplications);
+                this.refinedAllApps = this.formatChipsForApps(allApps).filter(app => app.isActive === "Y").sort(this.compareApplications);
+                this.showInactive = false;
+                this.filterAppOptions();
                 this.selectedApp = [];
             }
 
             this.gridApi.setColumnDefs(this.columnDefs);
             this.gridApi.setRowData(this.rowData);
-            this.formGroup.get('applications').setValue(this.rowData);
+            this.formGroup.get('applications').setValue(this.refinedAllApps);
             this.formGroup.markAsPristine();
 
         });
@@ -222,6 +230,13 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
         return apps;
     }
 
+    filterAppOptions(event?: any) {
+        if(this.showInactive) {
+            this.rowData = this.refinedAllApps;
+        } else {
+            this.rowData = this.refinedAllApps.filter(app => app.isSelected === "Y");
+        }
+    }
 
 
     private applyQCAssayFn = (qcDialogForm:FormGroup,committedChipTypes:any[])=> {
@@ -245,7 +260,7 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
 
             }
             this.formGroup.markAsDirty();
-            this.rowData.sort(this.compareApplications);
+            this.filterAppOptions();
             this.gridApi.setRowData(this.rowData);
         }
 
@@ -287,8 +302,10 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
             ChipTypes:[]
         };
 
-        this.rowData.splice(0,0,newApp);
+        this.refinedAllApps.splice(0, 0, newApp);
+        this.filterAppOptions();
         this.gridApi.setRowData(this.rowData);
+        this.gridApi.forEachNode(node => node.rowIndex ? 0 : node.setSelected(true, true, true));
         this.selectedApp = [newApp];
         this.openQCEditor();
 
@@ -299,9 +316,10 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
         this.dialogService.confirm("Are you sure you want to remove experiment type \'"
             + app.display + "\'?", "Warning").subscribe(result =>{
             if(result){
-                let i:number = this.rowData.indexOf(app);
+                let i:number = this.refinedAllApps.indexOf(app);
                 if(i > -1 ){
-                    this.rowData.splice(i,1);
+                    this.refinedAllApps.splice(i, 1);
+                    this.filterAppOptions();
                     this.gridApi.setRowData(this.rowData);
                     this.formGroup.markAsDirty();
                     this.selectedApp = [];

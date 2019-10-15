@@ -119,30 +119,33 @@ export class ExperimentPlatformService implements OnDestroy{
     getExperimentPlatformTabList():string[]{
         if(this.isIllumina || this.isNanoString || this.isSequenom){
             let illuminaLikeList:string[] = [
-                'ExperimentPlatformTabComponent',
-                'EpSampleTypeTabComponent',
-                'EpExperimentTypeIlluminaTabComponent',
+                "ExperimentPlatformTabComponent",
+                "EpSampleTypeTabComponent",
+                "EpExperimentTypeTabComponent",
+                "EpExperimentTypeIlluminaTabComponent",
                 "EpIlluminaSeqTabComponent",
                 "EpLibraryPrepQCTabComponent",
                 "EpPipelineProtocolTabComponent",
                 "ConfigureAnnotationsComponent"
             ];
-            if(!this.isIllumina){
-                illuminaLikeList.splice(2,1);
+            if(!this.isIllumina) {
+                illuminaLikeList.splice(3, 2);
+            } else {
+                illuminaLikeList.splice(2, 1);
             }
             return illuminaLikeList;
-        }else if(this.isQC){
+        } else if(this.isQC) {
             return [
-                'ExperimentPlatformTabComponent',
-                'EpSampleTypeTabComponent',
+                "ExperimentPlatformTabComponent",
+                "EpSampleTypeTabComponent",
                 "EpExperimentTypeQcTabComponent",
                 "ConfigureAnnotationsComponent"];
-        }else{
+        } else {
             return [
-                'ExperimentPlatformTabComponent',
-                'EpSampleTypeTabComponent',
-                'EpExperimentTypeTabComponent',
-                'ConfigureAnnotationsComponent',
+                "ExperimentPlatformTabComponent",
+                "EpSampleTypeTabComponent",
+                "EpExperimentTypeTabComponent",
+                "ConfigureAnnotationsComponent",
                 "EpPrepTypesTabComponent"
             ];
         }

@@ -37,7 +37,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                         [disabled]="selectedApp.length === 0"
                         type="button"> Edit Library Prep </button>
 
-                <!--<mat-checkbox (change)="filterSeqOptions($event)" [(ngModel)]="showInactive"> Show Inactive </mat-checkbox>-->
+                <mat-checkbox (change)="filterAppOptions($event)" [(ngModel)]="showInactive">Show Inactive</mat-checkbox>
 
             </div>
             <div style="flex:9" class="full-width">
@@ -45,6 +45,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                                  [columnDefs]="columnDefs"
                                  (cellValueChanged)="onCellValueChanged($event)"
                                  [enableColResize]="true"
+                                 [rowData]="rowData"
                                  (gridReady)="onGridReady($event)"
                                  (gridSizeChanged)="onGridSizeChanged($event)"
                                  [rowDeselection]="true"
@@ -70,9 +71,11 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
     public formGroup:FormGroup;
+    public showInactive = false;
     private expPlatformSubscription: Subscription;
     private expPlatfromNode:any;
     private gridApi: GridApi;
+    private unrefinedApps: any[] = [];
     public appList:any[] = [];
     public selectedApp:any[]=[];
     private selectedAppIndex:number = -1;
@@ -213,6 +216,7 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
     onRowSelected(event){
         if(event.node.selected){
             this.selectedAppIndex = event.rowIndex;
+            this.gridApi.selectIndex(this.selectedAppIndex, false, null);
         }
         this.selectedApp = this.gridApi.getSelectedRows();
     }
@@ -228,9 +232,10 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
             if(data && data.applications ){
                 this.nextAppNumb = 0;
                 this.expPlatfromNode = data;
-                let unrefinedApps = (Array.isArray(data.applications) ? data.applications : [data.applications.ApplicationTheme]);
-                this.rowData = this.flattenApplication(unrefinedApps).filter(app => app.isActive === 'Y')
-                    .sort(this.compareApplications); // map cause backend sending data in weird format
+                this.unrefinedApps = (Array.isArray(data.applications) ? data.applications : [data.applications.ApplicationTheme]);
+                this.appList = this.flattenApplication(this.unrefinedApps).filter(app => app.isActive === "Y").sort(this.compareApplications); //FIXME: This needs to be fixed if it's required to show the apps that are not active in database.
+                this.showInactive = false;
+                this.filterAppOptions();
                 this.selectedApp = [];
                 let sampleBatch = { headerName: "Samples Per Batch", field: "samplesPerBatch", editable:true, width: 200};
                 if(this.expPlatfromService.isNanoString) {
@@ -241,7 +246,7 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
 
             this.gridApi.setColumnDefs(this.columnDefs);
             this.gridApi.setRowData(this.rowData);
-            this.formGroup.get('applications').setValue(this.rowData);
+            this.formGroup.get('applications').setValue(this.appList);
             this.formGroup.markAsPristine();
 
         });
@@ -264,6 +269,15 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
             }
         }
 
+    }
+
+    filterAppOptions(event?: any) {
+        // This is to filter the data that is executive(selected), but not to filter the data that is active in database.
+        if(this.showInactive) {
+            this.rowData = this.appList;
+        } else {
+            this.rowData = this.appList.filter(app => app.isSelected === "Y");
+        }
     }
 
     private applyLibPrepFn = (libPrepDialogForm:FormGroup)=> {
@@ -297,7 +311,7 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
                     }
                 }
             });
-            this.rowData.sort(this.compareApplications);
+            this.filterAppOptions();
             this.gridApi.setRowData(this.rowData);
             this.formGroup.markAsDirty();
         }
@@ -352,20 +366,25 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
             }
         }
         newApp.RequestCategoryApplication = rcAppList;
-        this.rowData.splice(0,0,newApp);
+        this.appList.splice(0, 0, newApp);
+        this.filterAppOptions();
         this.gridApi.setRowData(this.rowData);
+        this.formGroup.markAsDirty();
+        this.gridApi.forEachNode(node => node.rowIndex ? 0 : node.setSelected(true, true));
         this.selectedApp = [newApp];
         this.openLibPrepEditor();
 
     }
+
     removeApplication(){
         let app = this.selectedApp[0];
         this.dialogService.confirm("Are you sure you want to remove experiment type "
             + app.display + "?", "Warning").subscribe(result =>{
             if(result){
-                let i:number = this.rowData.indexOf(app);
+                let i:number = this.appList.indexOf(app);
                 if(i > -1 ){
-                    this.rowData.splice(i,1);
+                    this.appList.splice(i, 1);
+                    this.filterAppOptions();
                     this.gridApi.setRowData(this.rowData);
                     this.formGroup.markAsDirty();
                 }
@@ -374,7 +393,6 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
         });
 
     }
-
 
     flattenApplication(appThemes: any[]): any[]{
         let flatApps:any[] =[];
@@ -388,9 +406,6 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
         });
         return flatApps;
     }
-
-
-
 
     ngOnDestroy(){
         this.expPlatformSubscription.unsubscribe();

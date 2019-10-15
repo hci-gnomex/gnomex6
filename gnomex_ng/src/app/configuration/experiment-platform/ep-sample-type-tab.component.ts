@@ -10,7 +10,7 @@ import {MatDialogConfig} from "@angular/material";
 import {SampleTypeDetailDialogComponent} from "./sample-type-detail-dialog.component";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {Subscription} from "rxjs";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 //assets/page_add.png
@@ -18,8 +18,8 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 @Component({
     template: `
         <div class="full-height full-width flex-container-col">
-            <div class="flex-grow flex-container-row"  >
-                <button type="button" mat-button color="primary" (click)="select()" >
+            <div class="flex-grow flex-container-row align-center">
+                <button type="button" mat-button color="primary" (click)="select()" [disabled]="sampleTypeRowData.length === 0">
                     {{selectedState}}
                 </button>
                 <button mat-button color="primary"
@@ -38,7 +38,8 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                         (click)="openSampleTypeEditor()"
                         [disabled]="selectedSampleTypeRows.length === 0"
                         type="button"> Edit Notes </button>
-                
+                <mat-checkbox (change)="filterOptions($event)" [(ngModel)]="showInactive">Show Inactive</mat-checkbox>
+
             </div>
             <div style="flex:9" class="full-width">
                 <ag-grid-angular class="full-height full-width ag-theme-fresh"
@@ -69,12 +70,14 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
 export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
     public formGroup:FormGroup;
+    public showInactive: boolean = false;
     private expPlatformSubscription: Subscription;
     public selectedState:string = "Select all";
     public currentSelectedIndex:number = -1;
     public selectedSampleTypeRows:any[] = [];
     private gridApi:GridApi;
-    private sampleTypeList:any[];
+    private sampleTypeListAll: any[];
+    private sampleTypeList: any[];
     private _nucleotideTypeDataProvider:any[];
     public context;
     private expPlatformNode: any;
@@ -196,15 +199,25 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
             .subscribe(resp =>{
                 if(resp.sampleTypes && !resp.message) {
                     this.expPlatformNode = resp;
-                    this.sampleTypeList = Array.isArray(resp.sampleTypes) ? resp.sampleTypes : [resp.sampleTypes.SampleType];
-                    this.sampleTypeList.sort(this.sortSampleTypefn);
-                    this.sampleTypeRowData = this.sampleTypeList;
-                    this.formGroup.get('sampleTypes').setValue(this.sampleTypeRowData);
+                    this.sampleTypeListAll = Array.isArray(resp.sampleTypes) ? resp.sampleTypes : [resp.sampleTypes.SampleType];
+                    this.sampleTypeList = this.sampleTypeListAll.filter((samType: any) => (samType.isActive === "Y")).sort(this.sortSampleTypefn);
+                    this.showInactive = false;
+                    this.filterOptions();
+                    this.formGroup.get('sampleTypes').setValue(this.sampleTypeList);
                    this.formGroup.markAsPristine();
 
                 }
             });
 
+    }
+
+    filterOptions(event?: any) {
+        // This is to filter the data that is executive(selected), but not to filter the data that is active in database.
+        if(this.showInactive) {
+            this.sampleTypeRowData = this.sampleTypeList;
+        } else {
+            this.sampleTypeRowData = this.sampleTypeList.filter((samType: any) => (samType.isSelected === "Y"));
+        }
     }
 
     onGridReady(params:any){
@@ -227,15 +240,19 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
                 return type;
             });
         }
+        this.filterOptions();
         this.gridApi.setRowData(this.sampleTypeRowData);
         this.expPlatfromService.findExpPlatformFormMember(this.constructor.name).markAsDirty();
+        if(this.sampleTypeRowData.length === 0 && !this.showInactive) {
+            this.dialogsService.alert("Check Show Inactive box to see all inactive data.", null, DialogType.INFO);
+        }
 
     }
 
     addSampleType(){
         if(this.expPlatformNode){
             let newSampleType = {
-                isSelected:'N',
+                isSelected:'Y',
                 idSampleType:'SampleType',
                 display:'enter sample type here...',
                 isActive: 'Y',
@@ -244,8 +261,10 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
                 notes:'',
                 idCoreFacility: this.expPlatformNode.idCoreFacility
             };
-            this.sampleTypeRowData.splice(0,0,newSampleType);
+            this.sampleTypeList.splice(0, 0, newSampleType);
+            this.filterOptions();
             this.gridApi.setRowData(this.sampleTypeRowData);
+            this.gridApi.forEachNode(node => node.rowIndex ? 0 : node.setSelected(true, true));
             this.expPlatfromService.findExpPlatformFormMember(this.constructor.name).markAsDirty();
 
         }
@@ -253,11 +272,13 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
     }
 
     removeSampleType(){
-        let removeIndex = this.sampleTypeRowData.indexOf(this.selectedSampleTypeRows[0]);
+        let removeIndex = this.sampleTypeList.indexOf(this.selectedSampleTypeRows[0]);
         if(removeIndex > -1){
-            this.sampleTypeRowData.splice(removeIndex,1);
+            this.sampleTypeList.splice(removeIndex, 1);
+            this.filterOptions();
             this.gridApi.setRowData(this.sampleTypeRowData);
             this.expPlatfromService.findExpPlatformFormMember(this.constructor.name).markAsDirty();
+            this.selectedSampleTypeRows = [];
         }
 
     }
@@ -282,6 +303,7 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
     onSampleTypeRowSelected(event:any){
         if(event.node.selected){
             this.currentSelectedIndex = event.rowIndex;
+            this.gridApi.selectIndex(this.currentSelectedIndex, false, null);
         }
         this.selectedSampleTypeRows = this.gridApi.getSelectedRows();
     }
