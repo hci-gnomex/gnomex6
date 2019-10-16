@@ -28,20 +28,41 @@ import {ICellEditorAngularComp} from "ag-grid-angular";
     `]
 })
 export class SelectEditor implements ICellEditorAngularComp, OnDestroy {
-    params: any;
-    value: any;
-    options: any;
-    optionsValueField: string;
-    optionsDisplayField: string;
-    gridValueField: string;
+    public params: any;
+    public value: any;
+    private _options: any[];
+    public get options(): any[] {
+        if (this.using_selectOptionsPerRowFilterFunction) {
+            return this._filteredOptions;
+        } else {
+            return this._options;
+        }
+    }
+    public set options(value: any[]) {
+        this._options = value;
+    }
 
-    showFillButton: boolean;		// This represents whether the editor should show the "Fill" button,
-                                    // which is used to copy the value of this cell to other cells in this column in the grid
-    fillGroupAttribute: string;		// This attribute is used to specify which "Group" a particular
-                                    // row belongs to, which is used when the fill button is active.
-                                    // When clicked, the fill button will copy the data in that cell
-                                    // to the corresponding cells in rows of the same group.
-    fillAll: boolean;               // If fillAll is set, all data will automatically be grouped together
+    public optionsValueField: string;
+    public optionsDisplayField: string;
+
+    // variables used for the optional per-row-filtering
+    public context: any;
+    protected using_selectOptionsPerRowFilterFunction: boolean = false;
+    protected selectOptionsPerRowFilterFunction: (context:any, rowData: any, option: any) => boolean;
+    private _filteredOptions: any[];
+
+
+
+    public gridValueField: string;
+
+    public showFillButton: boolean;		// This represents whether the editor should show the "Fill" button,
+                                        // which is used to copy the value of this cell to other cells in this column in the grid
+    public fillGroupAttribute: string;		// This attribute is used to specify which "Group" a particular
+                                            // row belongs to, which is used when the fill button is active.
+                                            // When clicked, the fill button will copy the data in that cell
+                                            // to the corresponding cells in rows of the same group.
+    public fillAll: boolean;                // If fillAll is set, all data will automatically be grouped together
+
 
     agInit(params: any): void {
         this.params = params;
@@ -56,10 +77,36 @@ export class SelectEditor implements ICellEditorAngularComp, OnDestroy {
             this.optionsValueField = this.params.column.colDef.selectOptionsValueField;
             this.optionsDisplayField = this.params.column.colDef.selectOptionsDisplayField;
 
+            if (this.params.column.colDef.selectOptionsPerRowFilterFunction) {
+                let backup = this.selectOptionsPerRowFilterFunction;
+                try {
+                    this.selectOptionsPerRowFilterFunction = this.params.column.colDef.selectOptionsPerRowFilterFunction;
+                    this.using_selectOptionsPerRowFilterFunction = !!this.selectOptionsPerRowFilterFunction;
+                } catch (e) {
+                    console.error("selectOptionsPerRowFilterFunction option has wrong signature for column : " + this.params.column.colDef.headerName + "\n"
+                        + "  Requires signature (context:any, rowData: any, option: any) => boolean"
+                    );
+                    this.selectOptionsPerRowFilterFunction = backup;
+                    this.using_selectOptionsPerRowFilterFunction = !!backup;
+                }
+            }
+
+            this.context = this.params.column.colDef.context;
+
             this.fillGroupAttribute = this.params.column.colDef.fillGroupAttribute;
             this.fillAll = this.params.column.colDef.fillAll && ("" + this.params.column.colDef.fillAll).toLowerCase() !== "false";
 
             this.showFillButton = this.params.column.colDef.showFillButton && ("" + this.params.column.colDef.showFillButton).toLowerCase() !== "false";
+
+            if (this._options
+                && this.params.node
+                && this.params.node.data
+                && this.using_selectOptionsPerRowFilterFunction) {
+
+                this._filteredOptions = this._options.filter((option: any) => {
+                    return this.selectOptionsPerRowFilterFunction(this.context, this.params.node.data, option);
+                });
+            }
         }
 
         if (this.params) {

@@ -418,6 +418,8 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                 this.dialogService.error("Unknown Error occurred please contact GNomEx Support.");
                 this.dialogService.stopAllSpinnerDialogs();
             }
+        }, (err: IGnomexErrorResponse) => {
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
 

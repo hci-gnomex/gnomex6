@@ -881,17 +881,45 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         }
 
         this.totalPrice = 0;
+        let billingItemsMap: Map<string,any[]> = new Map();
+        let splitKeyList: string[] = [];
+
         for (let r of billingItems) {
             if (r.totalPrice) {
-                let price: string = r.totalPrice;
-                price = price
-                    .replace('$', '')
-                    .replace(',', '')
-                    .replace("(", "-")
-                    .replace(")", "");
-                this.totalPrice += Number(price);
+                // split billing totalPrice on BillingItem is duplicated. only add it up once then
+                if(!billingItemsMap.has(r.requestNumber)){
+                    billingItemsMap.set(r.requestNumber,r.BillingItem);
+                    let price: string = r.totalPrice;
+                    price = price
+                        .replace('$', '')
+                        .replace(',', '')
+                        .replace("(", "-")
+                        .replace(")", "");
+                    this.totalPrice += Number(price);
+                }else{
+                    splitKeyList.push(r.requestNumber);
+                    billingItemsMap.get(r.requestNumber).push(...r.BillingItem);
+                }
             }
         }
+
+        //handling split billing items that have mixed status ex APPROVED AND APPROVEDEX
+        for(let splitKey of splitKeyList){
+            let negateMixedBillingStatus = 0;
+            let biList:any[] = billingItemsMap.get(splitKey);
+            for(let bi of biList){
+                if(node.data.status !== bi.codeBillingStatus){
+                    let price = bi.invoicePrice;
+                    price = price.replace('$', '')
+                        .replace(',', '')
+                        .replace("(", "-")
+                        .replace(")", "");
+                    negateMixedBillingStatus += Number(price);
+                }
+            }
+            this.totalPrice = this.totalPrice - negateMixedBillingStatus;
+        }
+
 
         // TODO this is a temporary fix until the total price of split billing items is correctly displayed
         //this.billingItemGridLabel = node.data.label + " " + this.totalPrice.toLocaleString('en-US', {style: 'currency', currency: 'USD'});
