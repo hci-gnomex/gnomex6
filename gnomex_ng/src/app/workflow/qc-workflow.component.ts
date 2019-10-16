@@ -38,7 +38,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     private coreIds: any[] = [];
     private cores: any[] = [];
     private requestIds: any[] = [];
-    private filteredQcProtocolList: any[] = [];
+    private qcProtocolList: any[] = [];
     private coreFacilityAppMap: Map<string, any[]> = new Map<string, any[]>();
     private changedRowMap: Map<string, any> = new Map<string, any>();
     public columnDefs;
@@ -111,27 +111,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
             this.workingWorkItemList = this.filterWorkItems();
             this.workingWorkItemList = this.workingWorkItemList.sort(this.workflowService.sortSampleNumber);
 
-            this.filteredQcProtocolList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.BioanalyzerChipType").filter((item: any) => {
-                // let retVal: boolean = false;
-                // if (item.value == "") {
-                //     retVal = true;
-                // } else {
-                //     if (item.isActive === 'Y' && this.core) {
-                //         let appCodes: any[] = [];
-                //         appCodes = this.coreFacilityAppMap.get(this.core.idCoreFacility);
-                //         if (appCodes && appCodes.length > 0) {
-                //             for (var code of appCodes) {
-                //                 if (item.codeApplication.toString() === code) {
-                //                     retVal = true;
-                //                     break;
-                //                 }
-                //             }
-                //         }
-                //     }
-                // }
-                // return retVal;
-                return true;
-            });
+            this.qcProtocolList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.BioanalyzerChipType");
 
             this.columnDefs = [
                 {
@@ -158,7 +138,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                     field: "qualCodeBioanalyzerChipType",
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
-                    selectOptions: this.filteredQcProtocolList,
+                    selectOptions: this.qcProtocolList,
                     selectOptionsDisplayField: "bioanalyzerChipType",
                     selectOptionsValueField: "datakey",
                     selectOptionsPerRowFilterFunction: (context, rowData, option) => {
