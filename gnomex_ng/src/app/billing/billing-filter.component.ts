@@ -12,21 +12,37 @@ import {UserPreferencesService} from "../services/user-preferences.service";
     selector: 'billing-filter',
     templateUrl: "./billing-filter.component.html",
     styles: [`
-        .children-margin-right > *:not(:last-child) {
-            margin-right: 1em;
+
+        .mat-autocomplete-panel > .mat-option.ng-star-inserted {
+            line-height: initial;
+            padding: 0.3em;
+            font-size: small;
         }
-        .small-margin-right {
-            margin-right: 2em;
+        
+        
+        .min-width { min-width: 10em; }
+        
+        .experiment-width {
+            width: 8em;
+            min-width: 8em;
         }
-        .large-margin-right {
-            margin-right: 10em;
+        
+        .core-facility-width {
+            width: 16em;
+            min-width: 16em;
         }
-        .padded {
-            padding: 0.5em;
+        
+        .lab-display-width {
+            width: 20em;
+            min-width: 20em;
         }
-        .bordered {
-            border: grey solid 1px;
+        
+        .account-display-width {
+            width: 25em;
+            min-width: 25em;
         }
+        
+        
     `]
 })
 

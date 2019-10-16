@@ -7,12 +7,18 @@ import {DictionaryEntry} from "../configuration/dictionary-entry.type";
 @Component({
     selector: 'billing-period-selector',
     template: `
-        <div class="full-height full-width flex-container-row align-center justify-center">
-            <label>Billing Period: <button mat-button type="button" (click)="this.showPopup()">{{this.label}}</button></label>
+        
+        <div class="full-height full-width double-padded align-baseline">
+            <label class="double-padded-right">
+                Billing Period :
+            </label> 
+            <button mat-raised-button type="button" class="minimize" (click)="this.showPopup()">
+                {{this.label}}
+            </button>
         </div>
+        
     `,
-    styles: [`
-    `]
+    styles: [``]
 })
 
 export class BillingPeriodSelectorComponent implements OnInit {
