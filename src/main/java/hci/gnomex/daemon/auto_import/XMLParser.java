@@ -578,6 +578,7 @@ public class XMLParser {
 		try {
 			System.out.println("started executing command");
 			tempScript = createTempScript(commands);
+			System.out.println("from this temp file " + tempScript.getCanonicalPath() );
 			ProcessBuilder pb = new ProcessBuilder("bash", tempScript.toString());
 			pb.inheritIO();
 			Process process;

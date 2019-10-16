@@ -61,6 +61,7 @@ public class LinkData extends TimerTask {
     private List<Integer> captureGroupIndexes = new ArrayList<>();
     private String errorMessageString = "Error in LinkData";
     private boolean deleteLinks = false;
+    private String linkType;
     private static String startAvatarPath = "/Repository/PersonData";
 
 
@@ -84,6 +85,7 @@ public class LinkData extends TimerTask {
                 dataType = args[i];
             } else if(args[i].equals("-deletelinks")){
                 this.deleteLinks = true;
+                this.linkType = args[++i].toLowerCase().trim();
                 break;
             } else if (args[i].equals("-debug")) {
                 debug = true;
@@ -146,22 +148,22 @@ public class LinkData extends TimerTask {
             app.initialize();
 
             if(!this.deleteLinks){
-            if (dataType == null) {
-                System.out.println("-dataSource is required");
-                System.out.println("Usage: sh ./LinkData.sh -dataSource (either 2R 4R or 10R) -requests idRequest [list as many as you want]");
-                System.exit(1);
-            }
+                if (dataType == null) {
+                    System.out.println("-dataSource is required");
+                    System.out.println("Usage: sh ./LinkData.sh -dataSource (either 2R 4R or 10R) -requests idRequest [list as many as you want]");
+                    System.exit(1);
+                }
 
-            if (nxtRequest == 0) {
-                System.out.println("-requests is required");
-                System.out.println("Usage: sh ./LinkData.sh -dataSource (either 2R 4R or 10R) -requests idRequest [list as many as you want]");
-                System.exit(1);
-            }
+                if (nxtRequest == 0) {
+                    System.out.println("-requests is required");
+                    System.out.println("Usage: sh ./LinkData.sh -dataSource (either 2R 4R or 10R) -requests idRequest [list as many as you want]");
+                    System.exit(1);
+                }
 
-            // do the work
-            app.linkData();
+                // do the work
+                app.linkData();
             }else{
-                app.removeRequestLinks();
+                app.removeLinks(linkType);
             }
 
 
@@ -210,7 +212,7 @@ public class LinkData extends TimerTask {
 
     }
 
-    public void removeRequestLinks(){
+    public void removeLinks(String linkType){
         System.out.print("This will delete all request symbolic links. Are you sure you want to continue? ");
 
         Scanner scanner = new Scanner(System.in);
@@ -220,16 +222,39 @@ public class LinkData extends TimerTask {
             Connection con = sessionImpl.connection();
             StringBuilder strBuild = new StringBuilder();
             Set<String> unlinkCMds = new TreeSet<>();
-            Set<String> rmCMDs = new TreeSet<>();
-            List<String> orderedCMDS = new ArrayList<>();
 
             //todo change the project folder name as a commandline arg
-            String query =
+            String rquery =
                     "SELECT Year(fe.createDate) as year, fe.idRequest, fe.number,  fe.idProject, fe.name, ef.fileName as path\n " +
                             "FROM ( SELECT r.createDate,  r.idRequest, r.number, r.name, r.idProject\n " +
                             "       FROM Request r JOIN Project p ON p.idProject = r.idProject\n " +
                             "       WHERE p.name = 'HCI PERSON' ) as fe \n " +
                             "JOIN ExperimentFile ef ON ef.idRequest = fe.idRequest;";
+            String aquery =
+                   " SELECT  Year(fa.createDate) as year, fa.idAnalysis, fa.number,  fa.idAnalysisGroup, fa.name, CONCAT( af.qualifiedFilePath,'/',af.fileName) as path\n" +
+                           "FROM (select a.createDate,  a.idAnalysis,a.number, ag.idAnalysisGroup, a.name   from Analysis a\n" +
+                            "JOIN AnalysisGroupItem agi ON agi.idAnalysis = a.idAnalysis\n" +
+                            "JOIN AnalysisGroup ag ON ag.idAnalysisGroup = agi.idAnalysisGroup\n" +
+                            "WHERE ag.idAnalysisGroup IN (11,14,22) ) as fa\n" +
+                    "JOIN AnalysisFile af ON af.idAnalysis = fa.idAnalysis\n" +
+                    " WHERE af.qualifiedFilePath like CONCAT(fa.name,'_', '%/RawData%'); ";
+
+            String query =  "";
+            if(linkType == null || linkType.equals("")){
+                System.out.println("Please specify either request or analysis for  the link type");
+                return;
+            }
+
+            if (linkType.equals("request")) {
+                query = rquery;
+            }else if (linkType.equals("analysis")){
+                startAvatarPath = "/Repository/AnalysisData";
+                query = aquery;
+            }else{
+                System.out.println("Please specify either request or analysis for  the link type");
+                return;
+            }
+
             try(Statement stmt = con.createStatement()){
                 try(ResultSet rs = stmt.executeQuery(query)){
                     while(rs.next()){
@@ -241,7 +266,7 @@ public class LinkData extends TimerTask {
                         strBuild.append(File.separator);
                         strBuild.append(year);
                         strBuild.append(File.separator);
-                        strBuild.append(path);
+                        strBuild.append(linkType.equals("analysis")? number + File.separator +  path : path);
                         String upath =  returnSymLinkInPath(strBuild.toString());
                         strBuild.setLength(0);
                         if(!upath.equals("")){
@@ -252,29 +277,15 @@ public class LinkData extends TimerTask {
                         }else{
                             System.out.println("for " + number +  " no symLink found ");
                         }
-                        // new command
-                        strBuild.append("rm -rf ");
-                        strBuild.append(startAvatarPath);
-                        strBuild.append(File.separator);
-                        strBuild.append(year);
-                        strBuild.append(File.separator);
-                        strBuild.append(number);
-                        rmCMDs.add(strBuild.toString());
-                        strBuild.setLength(0);
 
                     }
                     // have to unlink before removing folder or the rm might try to go into a softlink
-                    orderedCMDS.addAll(unlinkCMds);
 
-                    for(String cmd : rmCMDs ){
-                        orderedCMDS.add(cmd);
-                    }
-                    for(String cmd : orderedCMDS){
+                    for(String cmd : unlinkCMds){
                         System.out.println("look " + cmd);
                     }
 
-
-                    XMLParser.executeCommands(orderedCMDS,null);
+                    //XMLParser.executeCommands(unlinkCMds,null);
                 }
             }catch (SQLException e){
                 e.printStackTrace();
@@ -290,12 +301,13 @@ public class LinkData extends TimerTask {
 
     private String returnSymLinkInPath(String pathToData) {
         Path pData = Paths.get(pathToData);
-
+        // avoid unlinking root as it is commonly a link
+        if(pData.getFileName().toString().toLowerCase().equals("repository")
+            ||  pData.getParent() == null){
+            return "";
+        }
         if(Files.isSymbolicLink(pData)){
             return pData.toAbsolutePath().toString();
-        }
-        if(pData.getParent() == null){
-            return "";
         }
 
         return returnSymLinkInPath(pData.getParent().toAbsolutePath().toString());
