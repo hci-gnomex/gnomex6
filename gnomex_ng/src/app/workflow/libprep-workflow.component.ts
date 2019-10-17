@@ -76,8 +76,6 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
     ];
 
     public allRequestCategories: any[] = [];
-    // public allRequestCategoryApplications: any[] = [];
-    // public allSeqLibProtocolApplications: any[] = [];
 
 
     constructor(public workflowService: WorkflowService,
