@@ -1,4 +1,11 @@
-import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    OnDestroy,
+    OnInit,
+    ViewChild
+} from "@angular/core";
 import {BillingFilterEvent} from "./billing-filter.component";
 import {ITreeOptions, TreeComponent} from "angular-tree-component";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
@@ -36,75 +43,52 @@ import {PriceViewComponent} from "./price-view.component";
 import {UtilService} from "../services/util.service";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignLeftMiddleEditor} from "../util/grid-editors/text-align-left-middle.editor";
+import {TextAlignRightMiddleRenderer} from "../util/grid-renderers/text-align-right-middle.renderer";
+import {TextAlignRightMiddleEditor} from "../util/grid-editors/text-align-right-middle.editor";
 
 @Component({
     selector: 'nav-billing',
     templateUrl: "./nav-billing.component.html",
     styles: [`
+
+        .no-height { height: 0;  }
+        .single-em { width: 1em; }
+        
+        .min-grid-width {
+            min-width: 27em;
+        }
+        
+        .min-grid-height {
+            min-height: 7em;
+        }
+        
+        
         mat-radio-button.filter-by-order-type-opt {
             margin-right: 0.5em;
         }
-        .padding {
-            padding: 0.5em;
-        }
+        
         .padding-left {
             padding-left: 1em;
         }
-        .height-eighty {
-            height: 80%;
+
+        .vertical-spacer {
+            height: 0.3em;
         }
-        .height-seventy-five {
-            height: 75%;
-        }
-        .flex-one {
-            flex: 1;
-        }
-        .flex-three {
-            flex: 3;
-        }
-        .flex-seven {
-            flex: 7;
-        }
-        .flex-ten {
-            flex: 10;
-        }
-        div.bordered {
-            border: gray solid 1px;
-        }
-        .justify-end {
-            justify-content: flex-end;
-        }
-        .truncate {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        span.dirtyNote {
-            background: yellow;
-            padding: 0.5rem;
-            margin-left: 1rem;
-        }
-        .font-small {
-            font-size: 0.7em;
-        }
+                
         button.price-sheet-link {
             margin: 0 1em;
             padding: 0;
             text-decoration: underline;
         }
-        .no-margin {
-            margin: 0;
-        }
-        .no-padding {
-            padding: 0;
-        }
-        .side-panel {
-            min-width: 28em;
-        }
     `]
 })
 
 export class NavBillingComponent implements OnInit, OnDestroy {
+
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    private emToPxConversionRate: number = 13;
 
     private lastFilterEvent: BillingFilterEvent = null;
 
@@ -136,11 +120,14 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     public hideEmptyRequests: boolean = false;
 
     private billingItemList: any[] = [];
-    public billingItemGridColumnDefs: any[];
     public billingItemGridData: any[] = [];
     public billingItemGridLabel: string = '';
     public showRelatedCharges: boolean = true;
-    public billingItemGridRowClassRules: any;
+
+    public billingItemGridRowClassRules: any = {
+        "otherBillingItem": "data.other === 'Y'"
+    };
+
     public billingItemGridApi: GridApi;
 
     public showDirtyNote: boolean = false;
@@ -154,7 +141,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
 
     private billingPeriods: any[] = [];
     private allStatuses: any[] = [];
-    private statuses: any[] = [];
+    public statuses: any[] = [];
     private statusListShort: any[] = [];
     public changeStatusValue: string = '';
 
@@ -164,7 +151,6 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     //private statusFilter: string = null;
 
     public priceTreeGridData: any[] = [];
-    public priceTreeGridColDefs: any[];
     public priceTreeGridApi: GridApi;
     public getPriceNodeChildDetails;
     public selectedPriceTreeGridItem: RowNode;
@@ -176,6 +162,264 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     public totalPrice: number = 0;
     private onCoreCommentsWindowRequestSelected: Subscription;
     private refreshSubscription: Subscription;
+
+
+    public get billingItemGridColumnDefs(): any[] {
+        let columnDefs: any[] = [];
+
+        columnDefs.push({
+            headerName: "#",
+            headerTooltip: "#",
+            field: "requestNumber",
+            tooltipField: "requestNumber",
+            width:    1,
+            minWidth: 7 * this.emToPxConversionRate,
+            cellRenderer: "agGroupCellRenderer",
+            cellRendererParams: {
+                innerRenderer: getGroupRenderer(),
+                suppressCount: true
+            }
+        });
+
+        columnDefs.push({
+            headerName: "Group",
+            headerTooltip:"Group",
+            field: "labName",
+            tooltipField: "labName",
+            editable: false,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            width:    7 * this.emToPxConversionRate,
+            minWidth: 10 * this.emToPxConversionRate
+        });
+
+        columnDefs.push({
+            headerName: "Client",
+            headerTooltip:"Client",
+            field: "submitter",
+            tooltipField: "submitter",
+            editable: false,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            width:    5 * this.emToPxConversionRate,
+            minWidth: 10 * this.emToPxConversionRate
+        });
+
+        columnDefs.push({
+            headerName: "Acct",
+            headerTooltip:"Acct",
+            field: "billingAccountName",
+            tooltipField: "billingAccountName",
+            editable: false,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            width:    5 * this.emToPxConversionRate,
+            minWidth: 12 * this.emToPxConversionRate
+        });
+
+        columnDefs.push({
+            headerName: "Period",
+            headerTooltip:"Period",
+            editable: true,
+            field: "idBillingPeriod",
+            cellRendererFramework: SelectRenderer,
+            cellEditorFramework: SelectEditor,
+            selectOptions: this.billingPeriods,
+            selectOptionsDisplayField: "display",
+            selectOptionsValueField: "idBillingPeriod",
+            width:    1,
+            minWidth: 4.5 * this.emToPxConversionRate
+        });
+
+        columnDefs.push({
+            headerName: "%",
+            headerTooltip:"%",
+            field: "percentageDisplay",
+            tooltipField: "percentageDisplay",
+            editable: false,
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            cellEditorFramework: TextAlignRightMiddleEditor,
+            width:    1,
+            minWidth: 4 * this.emToPxConversionRate
+        });
+
+        //{headerName: "Type", headerTooltip:"Type", field: "codeBillingChargeKind", tooltipField: "codeBillingChargeKind", width: 100},
+        columnDefs.push({
+            headerName: "Price Category",
+            headerTooltip:"Price Category",
+            field: "category",
+            tooltipField: "category",
+            editable: false,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            width:    5 * this.emToPxConversionRate,
+            minWidth: 10 * this.emToPxConversionRate
+        });
+
+        columnDefs.push({
+            headerName: "Description",
+            headerTooltip:"Description",
+            field: "description",
+            tooltipField: "description",
+            editable: true,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            width:    8 * this.emToPxConversionRate,
+            minWidth: 5 * this.emToPxConversionRate
+        });
+
+        columnDefs.push({
+            headerName: "Complete Date",
+            headerTooltip:"Complete Date",
+            editable: true,
+            field: "completeDate",
+            cellRendererFramework: DateRenderer,
+            cellEditorFramework: DateEditor,
+            dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
+            width:    1 * this.emToPxConversionRate,
+            minWidth: 6 * this.emToPxConversionRate
+        });
+
+        columnDefs.push({
+            headerName: "Notes",
+            headerTooltip:"Notes",
+            field: "notes",
+            tooltipField: "notes",
+            editable: true,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            width:    8 * this.emToPxConversionRate,
+            minWidth: 5 * this.emToPxConversionRate
+        });
+
+        columnDefs.push({
+            headerName: "Unit price",
+            headerTooltip:"Unit Price",
+            field: "unitPrice",
+            tooltipField: "unitPrice",
+            editable: true,
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            cellEditorFramework: TextAlignRightMiddleEditor,
+            width:    2 * this.emToPxConversionRate,
+            minWidth: 6 * this.emToPxConversionRate
+        });
+
+        columnDefs.push({
+            headerName: "Qty",
+            headerTooltip:"Qty",
+            field: "qty",
+            tooltipField: "qty",
+            editable: true,
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            cellEditorFramework: TextAlignRightMiddleEditor,
+            width:    1,
+            minWidth: 4 * this.emToPxConversionRate
+        });
+
+        columnDefs.push({
+            headerName: "Total price",
+            headerTooltip: "Total price",
+            field: "invoicePrice",
+            tooltipField: "invoicePrice",
+            editable: false,
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            cellEditorFramework: TextAlignRightMiddleEditor,
+            width:    2 * this.emToPxConversionRate,
+            minWidth: 6 * this.emToPxConversionRate
+        });
+
+        columnDefs.push({
+            headerName: "Status",
+            headerTooltip:"Status",
+            editable: true,
+            field: "codeBillingStatus",
+            cellRendererFramework: SelectRenderer,
+            cellEditorFramework: SelectEditor,
+            selectOptions: this.statuses,
+            selectOptionsDisplayField: "display",
+            selectOptionsValueField: "codeBillingStatus",
+            rendererOptions: this.allStatuses,
+            width:    3 * this.emToPxConversionRate,
+            minWidth: 7 * this.emToPxConversionRate
+        });
+
+        // Brian asked for another one of these columns, but we probably would rather do pinning, etc.
+
+        // columnDefs.push({
+        //     headerName: "Acct",
+        //     headerTooltip:"Acct",
+        //     field: "billingAccountName",
+        //     tooltipField: "billingAccountName",
+        //     editable: false,
+        //     cellRendererFramework: TextAlignLeftMiddleRenderer,
+        //     cellEditorFramework: TextAlignLeftMiddleEditor,
+        //     width:    5 * this.emToPxConversionRate,
+        //     minWidth: 12 * this.emToPxConversionRate
+        // });
+
+        return columnDefs;
+    }
+
+    public get priceTreeGridColDefs(): any[] {
+        let columnDefs: any[] = [];
+
+        columnDefs.push({
+            headerName: "",
+            field: "display",
+            tooltipField: "display",
+            rowDrag: true,
+            cellRenderer: "agGroupCellRenderer",
+            cellRendererParams: {
+                innerRenderer: getGroupRenderer(),
+                suppressCount: true
+            },
+            editable: false,
+            width:    1000,
+            minWidth: 12 * this.emToPxConversionRate
+        });
+
+        columnDefs.push({
+            headerName: "Price",
+            headerTooltip: "Price",
+            field: "unitPriceCurrency",
+            tooltipField: "unitPriceCurrency",
+            type: "numericColumn",
+            editable: false,
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            cellEditorFramework: TextAlignRightMiddleEditor,
+            width:    1,
+            minWidth: 4 * this.emToPxConversionRate
+        });
+
+        columnDefs.push({
+            headerName: "Academic",
+            headerTooltip: "Academic",
+            field: "unitPriceExternalAcademicCurrency",
+            tooltipField: "unitPriceExternalAcademicCurrency",
+            type: "numericColumn",
+            editable: false,
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            cellEditorFramework: TextAlignRightMiddleEditor,
+            width:    1,
+            minWidth: 4 * this.emToPxConversionRate
+        });
+
+        columnDefs.push({
+            headerName: "Commercial",
+            headerTooltip: "Commercial",
+            field: "unitPriceExternalCommercialCurrency",
+            tooltipField: "unitPriceExternalCommercialCurrency",
+            type: "numericColumn",
+            editable: false,
+            cellRendererFramework: TextAlignRightMiddleRenderer,
+            cellEditorFramework: TextAlignRightMiddleEditor,
+            width:    1,
+            minWidth: 4 * this.emToPxConversionRate
+        });
+
+        return columnDefs;
+    }
+
 
     public getBillingItemNodeChildDetails: (rowItem) => any | null = (rowItem) => {
         if (rowItem.BillingItem) {
@@ -205,11 +449,10 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                 private utilService: UtilService,
                 private changeDetector: ChangeDetectorRef,
                 private dictionaryService: DictionaryService) {
-        this.billingPeriods = this.dictionaryService
-            .getEntriesExcludeBlank(DictionaryService.BILLING_PERIOD)
-            .sort((a: any, b: any) => {
-                return a.startDateSort.localeCompare(b.startDateSort);
-            });
+
+        this.billingPeriods = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_PERIOD).sort((a: any, b: any) => {
+            return a.startDateSort.localeCompare(b.startDateSort);
+        });
         this.allStatuses = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_STATUS);
         this.statuses = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_STATUS).filter((stat: any) => {
             return stat.value === this.STATUS_PENDING || stat.value === this.STATUS_COMPLETED || stat.value === this.STATUS_APPROVED;
@@ -220,40 +463,9 @@ export class NavBillingComponent implements OnInit, OnDestroy {
 
         // NOTE - the "Type" column that shows SERVICE, PRODUCT, etc. is commented out to free up grid space
         // When products are fully re-implemented and in actual use, this column can be uncommented
-        this.billingItemGridColumnDefs = [
-            {headerName: "#", headerTooltip:"#", field: "requestNumber", tooltipField: "requestNumber", width: 150, cellRenderer: "agGroupCellRenderer",
-                cellRendererParams: {innerRenderer: getGroupRenderer(), suppressCount: true}},
-            {headerName: "Group", headerTooltip:"Group", field: "labName", tooltipField: "labName", width: 150},
-            {headerName: "Client", headerTooltip:"Client", field: "submitter", tooltipField: "submitter", width: 150},
-            {headerName: "Acct", headerTooltip:"Acct", field: "billingAccountName", tooltipField: "billingAccountName", width: 200},
-            {headerName: "Period", headerTooltip:"Period", editable: true, field: "idBillingPeriod", width: 100, cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor, selectOptions: this.billingPeriods, selectOptionsDisplayField: "display",
-                selectOptionsValueField: "idBillingPeriod"},
-            {headerName: "%", headerTooltip:"%", field: "percentageDisplay", tooltipField: "percentageDisplay", width: 100},
-            //{headerName: "Type", headerTooltip:"Type", field: "codeBillingChargeKind", tooltipField: "codeBillingChargeKind", width: 100},
-            {headerName: "Price Category", headerTooltip:"Price Category", field: "category", tooltipField: "category", width: 150},
-            {headerName: "Description", headerTooltip:"Description", editable: true, field: "description", tooltipField: "description", width: 150},
-            {headerName: "Complete Date", headerTooltip:"Complete Date", editable: true, field: "completeDate", width: 150, cellRendererFramework: DateRenderer,
-                cellEditorFramework: DateEditor, dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY")},
-            {headerName: "Notes", headerTooltip:"Notes", editable: true, field: "notes", tooltipField: "notes", width: 150},
-            {headerName: "Unit price", headerTooltip:"Unit Price", editable: true, field: "unitPrice", tooltipField: "unitPrice", width: 120},
-            {headerName: "Qty", headerTooltip:"Qty", editable: true, field: "qty", tooltipField: "qty", width: 100},
-            {headerName: "Total price", headerTooltip:"Total price", field: "invoicePrice", tooltipField: "invoicePrice", width: 120},
-            {headerName: "Status", headerTooltip:"Status", editable: true, field: "codeBillingStatus", width: 150, cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor, selectOptions: this.statuses, selectOptionsDisplayField: "display",
-                selectOptionsValueField: "codeBillingStatus", rendererOptions: this.allStatuses},
-        ];
-        this.billingItemGridRowClassRules = {
-            "otherBillingItem": "data.other === 'Y'"
-        };
 
-        this.priceTreeGridColDefs = [
-            {headerName: "", field: "display", tooltipField: "display", width: 300, rowDrag: true, cellRenderer: "agGroupCellRenderer",
-                cellRendererParams: {innerRenderer: getGroupRenderer(), suppressCount: true}},
-            {headerName: "Price", headerTooltip: "Price", field: "unitPriceCurrency", tooltipField: "unitPriceCurrency", type: "numericColumn", width: 120},
-            {headerName: "Academic", headerTooltip: "Academic", field: "unitPriceExternalAcademicCurrency", tooltipField: "unitPriceExternalAcademicCurrency", type: "numericColumn", width: 120},
-            {headerName: "Commercial", headerTooltip: "Commercial", field: "unitPriceExternalCommercialCurrency", tooltipField: "unitPriceExternalCommercialCurrency", type: "numericColumn", width: 120},
-        ];
+        this.billingItemGridRowClassRules =
+
         this.getPriceNodeChildDetails = function getPriceNodeChildDetails(rowItem) {
             if (rowItem.idPriceSheet) {
                 return {
@@ -312,10 +524,8 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     public onBillingItemGridReady(event: GridReadyEvent): void {
         event.api.setColumnDefs(this.billingItemGridColumnDefs);
         this.billingItemGridApi = event.api;
-    }
 
-    public onGridSizeChanged(event: GridSizeChangedEvent): void {
-        event.api.sizeColumnsToFit();
+        this.registerPixelWidths();
     }
 
     public onBillingItemGridChange(event: CellValueChangedEvent): void {
@@ -628,7 +838,8 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         if (this.hideEmptyRequests && requestNode.hasBillingItems && requestNode.hasBillingItems === 'N') {
             return null;
         }
-        requestNode.display = belongsToLabNode ? requestNode.label : requestNode.label + " " + requestNode.labBillingName;
+
+        requestNode.display = !!belongsToLabNode ? requestNode.label : requestNode.label + " " + requestNode.labName;
         return requestNode;
     }
 
@@ -1135,6 +1346,16 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     public onPriceTreeGridReady(event: GridReadyEvent): void {
         event.api.setColumnDefs(this.priceTreeGridColDefs);
         this.priceTreeGridApi = event.api;
+
+        this.registerPixelWidths();
+    }
+
+    public onGridSizeChanged(event: any) {
+        this.registerPixelWidths();
+
+        if (event && event.api) {
+            event.api.sizeColumnsToFit();
+        }
     }
 
     public onPriceTreeGridSelection(event: RowClickedEvent): void {
@@ -1420,11 +1641,15 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         }
     }
 
+    private registerPixelWidths(): void {
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+    }
 }
 
 function getGroupRenderer() {
-    function GroupRenderer() {
-    }
+    function GroupRenderer() { }
 
     GroupRenderer.prototype.init = function(params) {
         let tempDiv = document.createElement("div");
