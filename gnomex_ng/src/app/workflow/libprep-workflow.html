@@ -1,49 +1,60 @@
-<div class="flex-container-col full-width full-height">
-    <div class="flex-container-row">
-        <img [src]="'./assets/flask.png'" height="16" width="16" style="margin-top: .65em">
-        <mat-label style="margin-left: .4em;margin-top: .4em;">{{ label }}</mat-label>
-        <mat-label style="justify-content: flex-end;margin-left: 40em;margin-top: .4em;">{{ requestIds.length > 0 ? requestIds.length - 1  : 0 }}
-            requests in worklist
+<div class="flex-container-col full-width full-height small-font">
+    <div class="flex-container-row align-center">
+        <img [src]="'./assets/flask.png'" alt="" height="16" width="16">
+        <mat-label class="medium-font padded">
+            {{ label }}
         </mat-label>
-
     </div>
-    <div class="flex-container-row">
-        <div class="formField">
-            <custom-combo-box placeholder="Request #" (optionSelected)="selectRequestOption()"
-                              [options]="this.requestIds" displayField="requestNumber" valueField="requestNumber"
-                              [(ngModel)]="workItem" [allowNone]="false">
+    <div class="flex-container-row align-baseline">
+        <div class="request-number-width padded">
+            <custom-combo-box placeholder="Request #"
+                              displayField="requestNumber"
+                              valueField="requestNumber"
+                              [(ngModel)]="selectedRequestNumber"
+                              [options]="this.requestIds"
+                              [allowNone]="false"
+                              (optionSelected)="selectRequestOption()">
             </custom-combo-box>
         </div>
-        <div class="formField">
+        <div class="experiment-type-width padded">
             <custom-combo-box placeholder="Experiment Type"
-                              valueField="codeStepNext" displayField="label"
-                              [options]="this.codeStepArray"
+                              displayField="label"
+                              valueField="codeStepNext"
                               [(ngModel)]="codeStepNext"
-                              (optionSelected)="selectCodeOption()">
+                              [options]="this.codeStepArray"
+                              (optionSelected)="selectExperimentType()">
             </custom-combo-box>
         </div>
+        <div class="flex-grow">
+        </div>
+        <mat-label class="italic">
+            {{ requestIds.length > 0 ? requestIds.length - 1  : 0 }} requests in worklist
+        </mat-label>
     </div>
-    <div class="flex-grow">
-        <ag-grid-angular class="ag-theme-balham full-height"
-                         [rowData]="workingWorkItemList"
-                         (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
-                         (gridReady)="onGridReady($event)"
-                         (gridSizeChanged)="onGridSizeChanged($event)"
+    <div class="flex-grow padded-bottom">
+        <div #oneEmWidth class="no-height single-em"></div>
+        <ag-grid-angular class="ag-theme-fresh full-height full-width grid-min-height"
                          [enableSorting]="true"
-                         (cellValueChanged)="onCellValueChanged($event)"
-                         [enableFilter]="true"
                          [stopEditingWhenGridLosesFocus]="true"
                          [rowClassRules]="this.workflowService.assmGridRowClassRules"
-                         [enableColResize]="true">
+                         [enableColResize]="true"
+                         (cellValueChanged)="onCellValueChanged($event)"
+                         (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
+                         (gridReady)="onGridReady($event)"
+                         (gridSizeChanged)="onGridSizeChanged($event)">
         </ag-grid-angular>
     </div>
-    <div class="flex-container-row justify-center">
-        <button mat-button  matTooltip="Refresh worklist" (click)="refreshWorklist($event)">
-            <img [src]="'./assets/action_refresh.gif'">Refresh
+    <div class="flex-container-row align-baseline">
+        <button mat-raised-button
+                matTooltip="Reload experiment lists, discarding changes"
+                (click)="refreshWorklist($event)">
+            <img [src]="'./assets/action_refresh.gif'" alt="">
+            Refresh
         </button>
-        <save-footer style="width: 100%" (saveClicked)="areAandBTagsUnique()"
-                     [dirty]="this.dirty"
-                     [showSpinner]="this.showSpinner">
+        <save-footer class="flex-grow"
+                     [dirty]="dirty"
+                     [showSpinner]="showSpinner"
+                     (saveClicked)="areAandBTagsUnique()">
         </save-footer>
     </div>
 </div>
