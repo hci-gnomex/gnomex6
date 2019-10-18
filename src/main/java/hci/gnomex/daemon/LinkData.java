@@ -231,13 +231,13 @@ public class LinkData extends TimerTask {
                             "       WHERE p.name = 'HCI PERSON' ) as fe \n " +
                             "JOIN ExperimentFile ef ON ef.idRequest = fe.idRequest;";
             String aquery =
-                   " SELECT  Year(fa.createDate) as year, fa.idAnalysis, fa.number,  fa.idAnalysisGroup, fa.name, CONCAT( af.qualifiedFilePath,'/',af.fileName) as path\n" +
-                           "FROM (select a.createDate,  a.idAnalysis,a.number, ag.idAnalysisGroup, a.name   from Analysis a\n" +
+                    " SELECT  Year(fa.createDate) as year, fa.idAnalysis, fa.number,  fa.idAnalysisGroup, fa.name, CONCAT( af.qualifiedFilePath,'/',af.fileName) as path\n" +
+                            "FROM (select a.createDate,  a.idAnalysis,a.number, ag.idAnalysisGroup, a.name   from Analysis a\n" +
                             "JOIN AnalysisGroupItem agi ON agi.idAnalysis = a.idAnalysis\n" +
                             "JOIN AnalysisGroup ag ON ag.idAnalysisGroup = agi.idAnalysisGroup\n" +
                             "WHERE ag.idAnalysisGroup IN (11,14,22) ) as fa\n" +
-                    "JOIN AnalysisFile af ON af.idAnalysis = fa.idAnalysis\n" +
-                    " WHERE af.qualifiedFilePath like CONCAT(fa.name,'_', '%/RawData%'); ";
+                            "JOIN AnalysisFile af ON af.idAnalysis = fa.idAnalysis\n" +
+                            " WHERE af.qualifiedFilePath like CONCAT(fa.name,'_', '%/RawData%'); ";
 
             String query =  "";
             if(linkType == null || linkType.equals("")){
@@ -303,7 +303,7 @@ public class LinkData extends TimerTask {
         Path pData = Paths.get(pathToData);
         // avoid unlinking root as it is commonly a link
         if(pData.getFileName().toString().toLowerCase().equals("repository")
-            ||  pData.getParent() == null){
+                ||  pData.getParent() == null){
             return "";
         }
         if(Files.isSymbolicLink(pData)){
@@ -477,7 +477,9 @@ public class LinkData extends TimerTask {
                     if (debug) System.out.println("myPath: " + myPath);
 
                     f = new File(myPath);
-                    f.mkdirs();
+                    if(!f.exists()){
+                        f.mkdirs();
+                    }
 
                     //  make the soft link
                     myPath =  myPath + "/" +  filename;
