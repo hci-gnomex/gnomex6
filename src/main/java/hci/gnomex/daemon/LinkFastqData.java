@@ -338,17 +338,22 @@ public class LinkFastqData extends TimerTask {
 
                         String pathToRealData = startRequestPath + "/" + createYear + "/" + thePath;
                         middleOfPath = thePath.substring(ipos, epos);        // for example: DNA/Fastq
-                        if (debug) System.out.println("middleOfPath: " + middleOfPath);
+
 
 
                         if(!linkFolder){
                             filename = thePath.substring(epos + 1);
                             if (debug) System.out.println("filename: " + filename);
                         }else{
+                            epos = middleOfPath.lastIndexOf("/");
+
+
                             File dummyFile = new File(pathToRealData);
                             filename = dummyFile.getParentFile().getName();
                             try{
                                 int personID = Integer.parseInt(filename);
+                                pathToRealData = dummyFile.getParentFile().getCanonicalPath();
+                                middleOfPath = middleOfPath.substring(0,epos);
                             }catch(NumberFormatException nfe){
                                 System.out.println("skipping... experiment file doesn't have wrapping folder");
                                 continue;
@@ -360,7 +365,7 @@ public class LinkFastqData extends TimerTask {
 
                         }
                         //  make the soft link
-
+                        if (debug) System.out.println("middleOfPath: " + middleOfPath);
 
                         String myPath = dirPath + middleOfPath;
                         if (debug) System.out.println("myPath: " + myPath);
@@ -370,7 +375,7 @@ public class LinkFastqData extends TimerTask {
                         }
 
                         //  make the soft link
-                        myPath = !linkFolder?  myPath + "/" + filename : myPath;
+                        myPath =  myPath + "/" + filename;
 
 
                         // 05/10/2019 tim -- now we get the canonical path so we link to the the actual file not a link to a link to the actual file
