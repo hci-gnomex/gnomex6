@@ -42,6 +42,8 @@ export class WorkflowService {
     public readonly ALL = "ALL";
     public readonly ALL_PREP = "ALLPREP";
     public readonly ALL_PREP_QC = "ALLPREPQC";
+    public readonly ALL_CLUSTER_GEN = "ALLASSEM";
+    public readonly ALL_DATA_PIPELINE = "ALLPIPE";
     public assmGridRowClassRules: any;
     public static readonly COLOR = '#f1eed6';
     public static readonly OFFCOLOR = 'white';

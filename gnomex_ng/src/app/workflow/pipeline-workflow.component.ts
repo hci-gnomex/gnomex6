@@ -46,7 +46,7 @@ export class PipelineWorkflowComponent implements OnInit {
     initialize() {
         this.dialogsService.startDefaultSpinnerDialog();
         let params: HttpParams = new HttpParams()
-            .set("codeStepNext", this.workflowService.ILLSEQ_DATA_PIPELINE);
+            .set("codeStepNext", this.workflowService.ALL_DATA_PIPELINE);
         this.workflowService.getWorkItemList(params).subscribe((response: any) => {
             this.workItemList = response ? UtilService.getJsonArray(response, response.WorkItem) : [];
             this.workingWorkItemList = this.workItemList;
