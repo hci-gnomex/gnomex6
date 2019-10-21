@@ -161,22 +161,20 @@ export class LibprepWorkflowComponent implements OnInit, AfterViewInit {
                                     return true;
                                 }
 
+                                // should be size 1.
                                 let tempSamplesRequestCategories: any[] = context.allRequestCategories.filter((value: any) => {
                                     return rowData.codeRequestCategory === value.codeRequestCategory;
                                 });
 
                                 for (let requestCategory of tempSamplesRequestCategories) {
-                                    if (requestCategory.idCoreFacility
-                                        && requestCategory.idCoreFacility === option.idCoreFacility) {
+                                    if (requestCategory.idCoreFacility && requestCategory.idCoreFacility === option.idCoreFacility) {
 
                                         return true;
                                     }
                                 }
-
-                                return false;
                             }
 
-                            return true;
+                            return false;
                         },
                         selectOptionsDisplayField: "display",
                         selectOptionsValueField: "idSeqLibProtocol",

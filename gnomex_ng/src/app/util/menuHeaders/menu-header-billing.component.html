@@ -1,14 +1,45 @@
-<div>
-    <button mat-button (click)="showBillingInvoice(false)"><img class="icon" [src]="'./assets/page_white_acrobat.png'">Printable PDF Invoice</button>
-    <button mat-button (click)="showBillingInvoice(true)"><img class="icon" [src]="'./assets/email_open.png'">Email Invoice</button>
-    <button mat-button (click)="showGeneralLedgerInterface()"><img class="icon" [src]="'./assets/feed_disk.png'">General Ledger Interface</button>
-    <button mat-button [matMenuTriggerFor]="reportsMenu"><img class="icon" [src]="'./assets/page.png'">Reports...</button>
+<div class="fit-content flex-container-row">
+    <button mat-raised-button class="minimize" (click)="showBillingInvoice(false)">
+        <img class="icon" [src]="'./assets/page_white_acrobat.png'" alt="">
+        Printable PDF Invoice
+    </button>
+    <button mat-raised-button class="minimize" (click)="showBillingInvoice(true)">
+        <img class="icon" [src]="'./assets/email_open.png'" alt="">
+        Email Invoice
+    </button>
+    <button mat-raised-button class="minimize" (click)="showGeneralLedgerInterface()">
+        <img class="icon" [src]="'./assets/feed_disk.png'" alt="">
+        General Ledger Interface
+    </button>
+    <button mat-raised-button class="minimize" [matMenuTriggerFor]="reportsMenu">
+        <img class="icon" [src]="'./assets/page.png'" alt="">
+        Reports...
+    </button>
     <mat-menu #reportsMenu="matMenu">
-        <button mat-menu-item (click)="showMonthendBillingReport()">Invoice Report</button>
-        <button mat-menu-item matTooltip="Monthend Billing Report (uMerge Format)" matTooltipPosition="right" (click)="showMonthendBillingReport(true)">Monthend Billing Report (uMerge Format)</button>
-        <button mat-menu-item matTooltip="Billing by Lab and Experiment Platform" matTooltipPosition="right" (click)="showBillingByLabReport()">Billing by Lab and Experiment Platform</button>
-        <button mat-menu-item (click)="showUsageReport()">Usage Report</button>
-        <button mat-menu-item (click)="showNotesToCore()">Notes to Core</button>
+        <button mat-menu-item (click)="showMonthendBillingReport()">
+            Invoice Report
+        </button>
+        <button mat-menu-item
+                matTooltip="Monthend Billing Report (uMerge Format)"
+                matTooltipPosition="right"
+                (click)="showMonthendBillingReport(true)">
+            Monthend Billing Report (uMerge Format)
+        </button>
+        <button mat-menu-item
+                matTooltip="Billing by Lab and Experiment Platform"
+                matTooltipPosition="right"
+                (click)="showBillingByLabReport()">
+            Billing by Lab and Experiment Platform
+        </button>
+        <button mat-menu-item (click)="showUsageReport()">
+            Usage Report
+        </button>
+        <button mat-menu-item (click)="showNotesToCore()">
+            Notes to Core
+        </button>
     </mat-menu>
-    <button mat-button (click)="refresh()"><img class="icon" [src]="'./assets/refresh.png'">Refresh</button>
+    <button mat-raised-button class="minimize" (click)="refresh()">
+        <img class="icon" [src]="'./assets/refresh.png'" alt="">
+        Refresh
+    </button>
 </div>

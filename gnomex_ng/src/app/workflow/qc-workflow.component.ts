@@ -38,7 +38,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     private coreIds: any[] = [];
     private cores: any[] = [];
     private requestIds: any[] = [];
-    private filteredQcProtocolList: any[] = [];
+    private qcProtocolList: any[] = [];
     private coreFacilityAppMap: Map<string, any[]> = new Map<string, any[]>();
     private changedRowMap: Map<string, any> = new Map<string, any>();
     public columnDefs;
@@ -111,26 +111,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
             this.workingWorkItemList = this.filterWorkItems();
             this.workingWorkItemList = this.workingWorkItemList.sort(this.workflowService.sortSampleNumber);
 
-            this.filteredQcProtocolList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.BioanalyzerChipType").filter((item: any) => {
-                let retVal: boolean = false;
-                if (item.value == "") {
-                    retVal = true;
-                } else {
-                    if (item.isActive === 'Y' && this.core) {
-                        let appCodes: any[] = [];
-                        appCodes = this.coreFacilityAppMap.get(this.core.idCoreFacility);
-                        if (appCodes && appCodes.length > 0) {
-                            for (var code of appCodes) {
-                                if (item.codeApplication.toString() === code) {
-                                    retVal = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                return retVal;
-            });
+            this.qcProtocolList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.BioanalyzerChipType");
 
             this.columnDefs = [
                 {
@@ -157,7 +138,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                     field: "qualCodeBioanalyzerChipType",
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
-                    selectOptions: this.filteredQcProtocolList,
+                    selectOptions: this.qcProtocolList,
                     selectOptionsDisplayField: "bioanalyzerChipType",
                     selectOptionsValueField: "datakey",
                     selectOptionsPerRowFilterFunction: (context, rowData, option) => {
@@ -171,19 +152,12 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                         }
 
                         if (option.isActive === 'Y' && rowData) {
-                            let tempSamplesRequestCategories: any[] = context.allRequestCategories.filter((value: any) => {
-                                return value.codeRequestCategory === option.codeRequestCategory;
-                            });
+                            let appCodes: any[] = context.coreFacilityAppMap.get(rowData.idCoreFacility);
 
-                            // There shouldn't ever be more than one entry in tempSamplesRequestCategories, but just in case...
-                            for (let requestCategory of tempSamplesRequestCategories) {
-                                let appCodes: any[] = context.coreFacilityAppMap.get(requestCategory.idCoreFacility);
-
-                                if (appCodes && appCodes.length > 0) {
-                                    for (var code of appCodes) {
-                                        if (option.codeApplication === code) {
-                                            return true;
-                                        }
+                            if (appCodes && appCodes.length > 0) {
+                                for (var code of appCodes) {
+                                    if (option.codeApplication === code) {
+                                        return true;
                                     }
                                 }
                             }
@@ -191,6 +165,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
 
                         return false;
                     },
+                    context: this,
                     showFillButton: true,
                     fillGroupAttribute: 'idRequest',
                 },
