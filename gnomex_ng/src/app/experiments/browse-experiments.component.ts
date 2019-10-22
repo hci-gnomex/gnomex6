@@ -14,7 +14,7 @@ import {ITreeOptions, ITreeState, TreeComponent, TreeModel, TreeNode} from "angu
 import {BrowseFilterComponent} from "../util/browse-filter.component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
-import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
+import {ActivatedRoute, NavigationEnd, NavigationExtras, Router} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {CreateProjectComponent} from "./create-project.component";
 import {MatDialogConfig} from "@angular/material";
@@ -164,6 +164,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 this.dialogsService.startDefaultSpinnerDialog();
             }
         });
+        //todo determine switch for when navigating via url or lookup/search vs user moving through app. What does url look like
+        //todo one idea, if initiated via navigation then it has an id other than 0 (any id identifier) then It uses it to look up auery backend with id
+        //todo have a seperate route experiment vs experiment/id but routes to same component had issues with this approach
 
         this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
             this.lookupLab = "";
@@ -179,7 +182,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
             this.buildTree(response.Lab);
             this.onShowEmptyFolders(this.showEmptyFolders);
-
+            //todo current approach to determining if it is in a nav mode. this is
             if (this.experimentsService.browsePanelParams && this.experimentsService.browsePanelParams["refreshParams"]) {
                 this.experimentsService.emitExperimentOverviewList(response.Lab);
 
@@ -229,7 +232,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 this.dialogsService.stopAllSpinnerDialogs();
             });
         });
-
+        //todo need to build params for back call getProjectRequestList from route not ordInitObj
         this.navInitSubscription = this.gnomexService.navInitBrowseExperimentSubject.subscribe( orderInitObj => {
             if (orderInitObj) {
                 console.log("Nav mode: true");
@@ -630,6 +633,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      * @param event
      */
     treeOnSelect(event: any) {
+        //todo this is where path is currently fully created to get right request loaded and auxilary route is routed to
+        //todo this conflicts with having getRequest have resolver tied to route. A race condition will occur if both
+        //todo the tree programmatically tries to route and the url navigation attempts to load getRequest
+        //todo may do away with getRequest resolver and just let BrowseOrder components handle tree selection and initated loading data for
+        //todo experiment detail panel. This would impact components that
+
         this.selectedItem = event.node;
         let idLab = this.selectedItem.data.idLab;
         let idProject = this.selectedItem.data.idProject;
@@ -638,6 +647,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         let projectRequestListNode: Array<any> = _.cloneDeep(this.selectedItem.data);
         this.experimentsService.emitExperimentOverviewList(projectRequestListNode);
         let navArray: Array<any> = [];
+        let navExtras: NavigationExtras = {};
 
         this.disableDeleteProject = true;
 
@@ -655,7 +665,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.disableNewProject = !this.gnomexService.canSubmitRequests(idLab);
             this.disableDeleteExperiment = true;
 
-            navArray = ["/experiments" , {outlets: {"browsePanel": ["overview", {"idLab": idLab, "idProject": idProject}]}}];
+            navArray = ["/experiments/0/overview" ];
+            navExtras = {queryParams: {idLab: idLab, idProject:idProject}};
 
             //Experiment
         } else {
@@ -665,8 +676,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
 
         }
-
-        this.router.navigate(navArray);
+        //todo this is the endall to loading the data and the experiment detail component
+        this.router.navigate(navArray,navExtras);
 
 
     }

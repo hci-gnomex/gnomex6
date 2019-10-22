@@ -112,6 +112,9 @@ export class AuthRouteGuardService implements CanActivate {
     private determineIfPublic(queryParam: any, isAuthed: boolean, url: string): Observable<boolean> {
         return this.gnomexService.getLoginPropertiesObservable().pipe(flatMap((loginPropResp:any)=>{
             let noPublicVis:boolean = loginPropResp[PropertyService.PROPERTY_NO_PUBLIC_VISIBILITY];
+            //todo need to make route programmatically with more details of ids
+            //todo urlSegList is too basic right now
+
 
             let numberObj: any = {};
             if (queryParam["requestNumber"]) {

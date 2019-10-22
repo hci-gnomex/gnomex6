@@ -25,16 +25,18 @@ const ROUTES: Routes = [
 
 
 
-    { path: 'experiments', component: BrowseExperimentsComponent , children:[ // for stepping through app to this page
-        {path: '', pathMatch: 'full', redirectTo: '/experiments/(browsePanel:overview)' },
-        {path:'overview',component: BrowseOverviewComponent, outlet: 'browsePanel', resolve:{project:ProjectResolverService}},
-        {path:':id', component: ExperimentDetailOverviewComponent, outlet: 'browsePanel',resolve: {experiment: ExperimentResolverService}}],
-        canActivate: [SubRouteGuardService]
-    },
+    // { path: 'experiments', component: BrowseExperimentsComponent , children:[ // for stepping through app to this page
+    //     {path: '', pathMatch: 'full', redirectTo: '/experiments/(browsePanel:overview)' },
+    //     {path:'overview',component: BrowseOverviewComponent, outlet: 'browsePanel', resolve:{project:ProjectResolverService}},
+    //     {path:':id', component: ExperimentDetailOverviewComponent, outlet: 'browsePanel',resolve: {experiment: ExperimentResolverService}}],
+    //     canActivate: [SubRouteGuardService]
+    // },
+
+    { path: "experiments", pathMatch: 'full', redirectTo:"experiments/0"},
     { path: "experiments/:idProject", component:BrowseExperimentsComponent, children:[
-        {path: '', pathMatch: 'full', redirectTo: '/experiments/:idProject/(browsePanel:overview)' },
-        {path:'overview',component: BrowseOverviewComponent, outlet: 'browsePanel', resolve:{project:ProjectResolverService}},
-        {path:':id', component: ExperimentDetailOverviewComponent, outlet: 'browsePanel',resolve: {experiment: ExperimentResolverService}}],
+        {path: '', pathMatch: 'full', redirectTo: 'overview' },
+        {path:'overview',component: BrowseOverviewComponent, resolve:{project:ProjectResolverService}},
+        {path:':id', component: ExperimentDetailOverviewComponent, resolve: {experiment: ExperimentResolverService}}],
         canActivate: [SubRouteGuardService], resolve:{projectList:ProjectListResolverService}, runGuardsAndResolvers: 'paramsChange'
     },
 

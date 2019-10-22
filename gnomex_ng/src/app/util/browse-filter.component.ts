@@ -395,7 +395,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy, OnChanges {
                 }
             }
         }
-
+        //todo need to rework logic not to depend on orderInitObject maybe just ask route
         if ((isGuestState || !this.createSecurityAdvisorService.isAdmin) && !this.gnomexService.orderInitObj) {
             setTimeout(() => {
                 this.search();
@@ -633,6 +633,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     getExperimentBrowseParameters(): HttpParams {
+        //todo should be able to make params from user selection and from existing route params
         let params: HttpParams = new HttpParams();
 
         if (this.showCoreFacilityComboBox && !(this.idCoreFacilityString === "")) {
@@ -876,6 +877,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     search(): void {
+
+        //todo thi
         if (this.mode === this.EXPERIMENT_BROWSE) {
             let params: HttpParams = this.getExperimentBrowseParameters();
             this.experimentsService.browsePanelParams = params;
