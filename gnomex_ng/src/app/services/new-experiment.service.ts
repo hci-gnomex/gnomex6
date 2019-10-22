@@ -41,6 +41,7 @@ export class NewExperimentService {
     public static readonly TYPE_MICROARRAY: string = 'MICROARRAY';
     public static readonly TYPE_HISEQ: string = 'HISEQ';  // I think these were wrapped into an ILLSEQ state?
     public static readonly TYPE_MISEQ: string = 'MISEQ';  // I think these were wrapped into an ILLSEQ state?
+    public static readonly TYPE_ILLSEQ: string = 'ILLSEQ';  // I think these were wrapped into an ILLSEQ state?
     public static readonly TYPE_QC: string = 'QC';
     public static readonly TYPE_CAP_SEQ: string = "CAPSEQ";
     public static readonly TYPE_FRAG_ANAL: string = "FRAGANAL";

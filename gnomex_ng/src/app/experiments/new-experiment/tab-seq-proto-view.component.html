@@ -2,7 +2,7 @@
     <form [formGroup]="form" class="full-height full-width">
         <ol class="full-width three-depth-numbering">
             <li class="full-width align-baseline">
-                <div class="full-width flex-container-row align-baseline">
+                <div *ngIf="!useAlternateDisplay" class="full-width flex-container-row align-baseline">
                     <div class="heading">
                         Select a Sequencing Protocol
                     </div>
@@ -10,6 +10,93 @@
                         <mat-radio-group formControlName="selectedProto" (change)="onProtoChange()">
                             <div *ngFor="let proto of filteredNumberSequencingCyclesAllowedList; let index=index; let odd=odd; let even=even;"
                                  class="flex-container-row"
+                                 [ngClass]="{ odd: odd, even: even }">
+                                <div class="flex-grow padded">
+                                    <mat-radio-button [value]="proto">
+                                        <span>
+                                            {{ proto.display }}
+                                        </span>
+                                    </mat-radio-button>
+                                </div>
+                                <div class="padded right-align major-padded-left">
+                                    <span>
+                                        {{ ('' + proto?.price).startsWith('$') ? proto?.price : ( proto?.price ? '$' + proto?.price : '') }}
+                                    </span>
+                                </div>
+                            </div>
+                        </mat-radio-group>
+                        <div class="flex-grow">
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="useAlternateDisplay" class="full-width flex-container-row align-baseline">
+                    <div class="heading">
+                        Select a Sequencing Protocol
+                    </div>
+                    <div class="flex-grow flex-container-row">
+                        <mat-radio-group formControlName="selectedProto" (change)="onProtoChange()">
+                            <div class="medium-font padded italic underlined">
+                                Illumina NovaSeq Sequencing Options :
+                            </div>
+                            <div *ngFor="let proto of alternateDisplaySequencingOptions_Novaseq; let index=index; let odd=odd; let even=even;"
+                                 class="flex-container-row left-spacer"
+                                 [ngClass]="{ odd: odd, even: even }">
+                                <div class="flex-grow padded">
+                                    <mat-radio-button [value]="proto">
+                                        <span>
+                                            {{ proto.display.substr(8) }}
+                                        </span>
+                                    </mat-radio-button>
+                                </div>
+                                <div class="padded right-align major-padded-left">
+                                    <span>
+                                        {{ ('' + proto?.price).startsWith('$') ? proto?.price : ( proto?.price ? '$' + proto?.price : '') }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="medium-font padded italic underlined">
+                                Illumina HiSeq Sequencing Options :
+                            </div>
+                            <div *ngFor="let proto of alternateDisplaySequencingOptions_Hiseq; let index=index; let odd=odd; let even=even;"
+                                 class="flex-container-row left-spacer"
+                                 [ngClass]="{ odd: odd, even: even }">
+                                <div class="flex-grow padded">
+                                    <mat-radio-button [value]="proto">
+                                        <span>
+                                            {{ proto.display.substr(6) }}
+                                        </span>
+                                    </mat-radio-button>
+                                </div>
+                                <div class="padded right-align major-padded-left">
+                                    <span>
+                                        {{ ('' + proto?.price).startsWith('$') ? proto?.price : ( proto?.price ? '$' + proto?.price : '') }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="medium-font padded italic underlined">
+                                Illumina MiSeq Sequencing Options :
+                            </div>
+                            <div *ngFor="let proto of alternateDisplaySequencingOptions_Miseq; let index=index; let odd=odd; let even=even;"
+                                 class="flex-container-row left-spacer"
+                                 [ngClass]="{ odd: odd, even: even }">
+                                <div class="flex-grow padded">
+                                    <mat-radio-button [value]="proto">
+                                        <span>
+                                            {{ proto.display.substr(6) }}
+                                        </span>
+                                    </mat-radio-button>
+                                </div>
+                                <div class="padded right-align major-padded-left">
+                                    <span>
+                                        {{ ('' + proto?.price).startsWith('$') ? proto?.price : ( proto?.price ? '$' + proto?.price : '') }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div *ngIf="alternateDisplaySequencingOptions_Other && alternateDisplaySequencingOptions_Other.length > 0" class="medium-font padded italic underlined">
+                                Other Sequencing Options :
+                            </div>
+                            <div *ngFor="let proto of alternateDisplaySequencingOptions_Other; let index=index; let odd=odd; let even=even;"
+                                 class="flex-container-row left-spacer"
                                  [ngClass]="{ odd: odd, even: even }">
                                 <div class="flex-grow padded">
                                     <mat-radio-button [value]="proto">
