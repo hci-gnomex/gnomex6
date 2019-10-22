@@ -116,7 +116,7 @@ export class FlowcellassmWorkflowComponent implements OnInit, AfterViewInit {
     initialize() {
         this.dialogsService.startDefaultSpinnerDialog();
         let params: HttpParams = new HttpParams()
-            .set("codeStepNext", this.workflowService.ILLSEQ_CLUSTER_GEN);
+            .set("codeStepNext", this.workflowService.ALL_CLUSTER_GEN);
         this.workflowService.getWorkItemList(params).subscribe((response: any) => {
             if (response) {
                 this.workItemList = response;

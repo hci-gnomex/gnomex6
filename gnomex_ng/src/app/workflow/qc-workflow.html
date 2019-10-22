@@ -15,8 +15,8 @@
         </div>
         <div class="formField">
             <custom-combo-box placeholder="Core facility" (optionSelected)="selectCoreOption()"
-                              [options]="filterCores()"displayField="display"
-                              [(ngModel)]="core">
+                              [options]="filterCores()" displayField="display"
+                              [(ngModel)]="core" [disabled]="filterCores().length === 1 ? true : false">
             </custom-combo-box>
         </div>
     </div>
