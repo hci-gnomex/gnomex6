@@ -582,7 +582,9 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
           continue;
         } else {
           if (getPriceBillingItems(existingPrice, sess) == null || getPriceBillingItems(existingPrice, sess).size() == 0) {
-            sess.delete(existingPrice);
+            if(existingPrice != null) {
+              sess.delete(existingPrice);
+            }
           } else {
             existingPrice.setIsActive("N");
             sess.save(existingPrice);
@@ -912,13 +914,15 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
             // and update accordingly before we delete the chip type.
             // If a price has no current billing items we delete otherwise we
             // set it to inactive.
-            Price p1 = illuminaLibPrepPriceMap.get(application.getCodeApplication());
-            Price p2 = qcLibPrepPriceMap.get(application.getCodeApplication() + "&" + (x != null ? x.getCodeBioanalyzerChipType() : ""));
-            Price p3 = sequenomPriceMap.get(application.getCodeApplication());
-            deleteOrInactivatePrice(deleteApplication, sess, p1, p2, p3);
+            if(illuminaLibPrepPriceMap != null && qcLibPrepPriceMap != null && sequenomPriceMap != null) {
+              Price p1 = illuminaLibPrepPriceMap.get(application.getCodeApplication());
+              Price p2 = qcLibPrepPriceMap.get(application.getCodeApplication() + "&" + (x != null ? x.getCodeBioanalyzerChipType() : ""));
+              Price p3 = sequenomPriceMap.get(application.getCodeApplication());
+              deleteOrInactivatePrice(deleteApplication, sess, p1, p2, p3);
+            }
             sess.delete(x);
           }
-        } else {
+        } else if (illuminaLibPrepPriceMap != null && qcLibPrepPriceMap != null && sequenomPriceMap != null) {
           Price p1 = illuminaLibPrepPriceMap.get(application.getCodeApplication());
           Price p2 = qcLibPrepPriceMap.get(application.getCodeApplication() + "&");
           Price p3 = sequenomPriceMap.get(application.getCodeApplication());

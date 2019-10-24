@@ -364,13 +364,13 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         });
 
 
-        if(this.expPlatformService.isIllumina && !this.expPlatformService.isNanoString){
+        if(this.expPlatformService.isIllumina){
             applications = expPlatformForm.get('EpExperimentTypeIlluminaTabComponent.applications').value;
             params = params.set("applicationsJSONString",JSON.stringify(applications));
         }else if(this.expPlatformService.isQC){
             applications = expPlatformForm.get('EpExperimentTypeQcTabComponent.applications').value;
             params = params.set("applicationsJSONString",JSON.stringify(applications))
-        }else if(!this.expPlatformService.isNanoString){
+        }else {
             applications = expPlatformForm.get('EpExperimentTypeTabComponent.applications').value;
             params = params.set("applicationsJSONString",JSON.stringify(applications));
         }
