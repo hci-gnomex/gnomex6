@@ -38,7 +38,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     private coreIds: any[] = [];
     private cores: any[] = [];
     private requestIds: any[] = [];
-    private filteredQcProtocolList: any[] = [];
+    private qcProtocolList: any[] = [];
     private coreFacilityAppMap: Map<string, any[]> = new Map<string, any[]>();
     private changedRowMap: Map<string, any> = new Map<string, any>();
     public columnDefs;
@@ -47,15 +47,14 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     public showSpinner: boolean = false;
     public workItem: any;
     public core: any;
+    private preSelectedCore: any;
     private hide260230: boolean = true;
     private gridApi:GridApi;
     private gridColumnApi;
     private label: string = "Combined Sample Quality";
     private codeStepNext: string = "ALL";
-    private hiSeqCoreObject = {
-        idCoreFacility: "1",
-        display: "High Throughput Genomics"
-    };
+
+    public allRequestCategories: any[] = [];
 
     constructor(public workflowService: WorkflowService,
                 private gnomexService: GnomexService,
@@ -67,6 +66,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     ngOnInit() {
+        this.allRequestCategories = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY);
     }
 
     ngOnChanges() {
@@ -86,11 +86,12 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         }
     }
 
-    initialize() {
+    initialize(refreshMode?: boolean) {
         this.dialogsService.startDefaultSpinnerDialog();
         let params: HttpParams = new HttpParams()
             .set("codeStepNext", this.workflowService.QC);
         this.cores = [];
+        this.workItem = "";
         this.workflowService.getWorkItemList(params).subscribe((response: any) => {
             this.workItemList = response ? UtilService.getJsonArray(response, response.WorkItem) : [];
 
@@ -102,32 +103,23 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                 this.coreFacilityAppMap.set(coreId, this.gnomexService.getQCAppCodesForCore(coreId));
             }
             this.workingWorkItemList = this.workItemList;
-            if (!this.core) {
-                this.core = this.cores[0];
+            if (this.cores.length > 0) {
+                if(this.preSelectedCore) {
+                    this.core = this.cores.find((core: any) => {return core.idCoreFacility === this.preSelectedCore.idCoreFacility});
+                } else if(this.preSelectedCore === undefined) {
+                    this.core = this.cores[0];
+                } else {
+                    this.core = null;
+                }
             }
+            this.preSelectedCore = this.core;
             this.workingWorkItemList = this.filterWorkItems();
             this.workingWorkItemList = this.workingWorkItemList.sort(this.workflowService.sortSampleNumber);
+            if(refreshMode) {
+                this.ngOnChanges();
+            }
 
-            this.filteredQcProtocolList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.BioanalyzerChipType").filter((item: any) => {
-                let retVal: boolean = false;
-                if (item.value == "") {
-                    retVal = true;
-                } else {
-                    if (item.isActive === 'Y' && this.core) {
-                        let appCodes: any[] = [];
-                        appCodes = this.coreFacilityAppMap.get(this.core.idCoreFacility);
-                        if (appCodes && appCodes.length > 0) {
-                            for (var code of appCodes) {
-                                if (item.codeApplication.toString() === code) {
-                                    retVal = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                return retVal;
-            });
+            this.qcProtocolList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.BioanalyzerChipType");
 
             this.columnDefs = [
                 {
@@ -154,9 +146,34 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                     field: "qualCodeBioanalyzerChipType",
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
-                    selectOptions: this.filteredQcProtocolList,
+                    selectOptions: this.qcProtocolList,
                     selectOptionsDisplayField: "bioanalyzerChipType",
                     selectOptionsValueField: "datakey",
+                    selectOptionsPerRowFilterFunction: (context, rowData, option) => {
+
+                        if (!context || !rowData || !option) {
+                            return true;
+                        }
+
+                        if (option.value == "") {
+                            return true;
+                        }
+
+                        if (option.isActive === 'Y' && rowData) {
+                            let appCodes: any[] = context.coreFacilityAppMap.get(rowData.idCoreFacility);
+
+                            if (appCodes && appCodes.length > 0) {
+                                for (var code of appCodes) {
+                                    if (option.codeApplication === code) {
+                                        return true;
+                                    }
+                                }
+                            }
+                        }
+
+                        return false;
+                    },
+                    context: this,
                     showFillButton: true,
                     fillGroupAttribute: 'idRequest',
                 },
@@ -258,7 +275,10 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
             items = this.workItemList.filter(workItem =>
                 workItem.idCoreFacility === this.core.idCoreFacility
             )
+        } else {
+            items = this.workItemList;
         }
+        
         items = items.filter((request) => {
             if (type === "MICROARRAY") {
                 if (request.codeStepNext === this.workflowService.QC && request.requestCategoryType !== this.workflowService.QC) {
@@ -286,6 +306,8 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
             items = this.workItemList.filter(workItem =>
                 workItem.idCoreFacility === this.core.idCoreFacility
             )
+        } else {
+            items = this.workItemList;
         }
         items = items.filter(workItem =>
             workItem.codeStepNext === code
@@ -302,6 +324,8 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                     request.idCoreFacility === this.core.idCoreFacility
                 )
 
+            } else {
+                wItems = items;
             }
         } else {
             wItems = items;
@@ -327,16 +351,21 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     selectCoreOption() {
-        if (this.core) {
-            if (this.codeStepNext == this.workflowService.ALL) {
-                this.workingWorkItemList = this.filterWorkItems();
-            } else if (this.codeStepNext === this.workflowService.ILLUMINA_SEQQC){
-                this.workingWorkItemList = this.filterByCodeStepNext(this.workflowService.ILLUMINA_SEQQC);
-            } else {
-                this.workingWorkItemList = this.filterByRequestCategory(this.codeStepNext);
-            }
-            this.buildRequestIds(this.workingWorkItemList, "main");
+        if(this.preSelectedCore === this.core) {
+            return;
         }
+    
+        this.workItem = "";
+    
+        if (this.codeStepNext == this.workflowService.ALL) {
+            this.workingWorkItemList = this.filterWorkItems();
+        } else if (this.codeStepNext === this.workflowService.ILLUMINA_SEQQC){
+            this.workingWorkItemList = this.filterByCodeStepNext(this.workflowService.ILLUMINA_SEQQC);
+        } else {
+            this.workingWorkItemList = this.filterByRequestCategory(this.codeStepNext);
+        }
+        this.buildRequestIds(this.workingWorkItemList, "main");
+        this.preSelectedCore = this.core;
     }
 
     onNotifyGridRowDataChanged(event) {
@@ -396,7 +425,7 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
                 this.changedRowMap = new Map<string, any>();
                 this.dirty = false;
                 this.workItem = "";
-                this.initialize();
+                this.initialize(true);
             }, (err:IGnomexErrorResponse) => {
                 this.showSpinner = false;
             });
@@ -430,7 +459,6 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         this.workItem = "";
         this.label = "Illumina Sample Quality";
         this.codeStepNext = this.workflowService.ILLUMINA_SEQQC;
-        this.core = this.hiSeqCoreObject;
         this.workingWorkItemList = this.filterByCodeStepNext(this.workflowService.ILLUMINA_SEQQC);
         this.buildRequestIds(this.workingWorkItemList, '');
     }
@@ -438,7 +466,6 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     onClickMicroarrayQC() {
         this.workItem = "";
         this.label = "Microarray Sample Quality";
-        this.core = this.hiSeqCoreObject;
         this.codeStepNext = this.workflowService.MICROARRAY;
         this.workingWorkItemList = this.filterByRequestCategory(this.workflowService.MICROARRAY);
         this.buildRequestIds(this.workingWorkItemList, "");
@@ -447,7 +474,6 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     onClickSampleQualityQC() {
         this.workItem = "";
         this.label = "Sample Quality";
-        this.core = this.hiSeqCoreObject;
         this.codeStepNext = this.workflowService.QC;
         this.workingWorkItemList = this.filterByRequestCategory(this.workflowService.QC);
         this.buildRequestIds(this.workingWorkItemList, "");
@@ -456,13 +482,12 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     onClickNanostringQC() {
         this.workItem = "";
         this.label = "Nanostring";
-        this.core = this.hiSeqCoreObject;
         this.codeStepNext = this.workflowService.NANOSTRING;
         this.workingWorkItemList = this.filterByRequestCategory(this.workflowService.NANOSTRING);
         this.buildRequestIds(this.workingWorkItemList, "");
     }
 
     refreshWorklist(event) {
-        this.initialize();
+        this.initialize(true);
     }
 }

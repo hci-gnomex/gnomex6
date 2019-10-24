@@ -304,6 +304,14 @@ div.mainnav {
     overflow: auto;
 }
 
+.overflow-visible {
+    overflow: visible;
+}
+
+.overflow-hidden {
+    overflow: hidden;
+}
+
 img.icon {
     margin-right: 0.5em;
 }
@@ -315,6 +323,10 @@ img.tree-node-icon {
 
 .ellipsis {
     text-overflow: ellipsis;
+}
+
+.single-line {
+    white-space: nowrap;
 }
 
 .spaced-children-margin > *:not(:last-child) {
@@ -341,8 +353,16 @@ img.tree-node-icon {
     padding: 0;
 }
 
+.medium-font {
+    font-size: medium;
+}
+
 .small-font {
     font-size: small;
+}
+
+.smaller-font {
+    font-size: x-small;
 }
 
 .title-size {
@@ -403,6 +423,10 @@ img.tree-node-icon {
     padding-left: 0.6em;
 }
 
+.double-padded-left {
+    padding-left: 0.6em;
+}
+
 .double-padded-right {
     padding-right: 0.6em;
 }
@@ -426,9 +450,37 @@ button.mat-button.minimize {
     padding: 0.3em;
 }
 
+button.mat-raised-button.minimize {
+    min-width: 0;
+    width: auto;
+    height: auto;
+    line-height: 1rem;
+    padding: 0.3em;
+}
+
 button.mat-button.minimize span {
     min-width: 0;
     padding: 0.3em;
+}
+
+button.mat-raised-button.minimize span {
+    min-width: 0;
+    padding: 0.3em;
+}
+
+.bordered {
+    border: 1px solid silver;
+}
+
+.foreground {
+    background: white;
+}
+
+.background {
+    background-color: #EEEEEE;
+    padding: 0.3em;
+    border-radius: 0.3em;
+    border: 1px solid darkgrey;
 }
 
 .background-border {

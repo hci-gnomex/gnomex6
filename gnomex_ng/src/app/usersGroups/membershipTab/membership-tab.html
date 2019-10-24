@@ -103,7 +103,7 @@
                 <div class="flex-grow">
                     <mat-table class="full-width" [dataSource]="managersDataSource">
                         <ng-container matColumnDef="name">
-                            <mat-header-cell *matHeaderCellDef> Collaborators </mat-header-cell>
+                            <mat-header-cell *matHeaderCellDef> Managers </mat-header-cell>
                             <mat-cell *matCellDef="let member"> {{member[this.prefService.userDisplayField]}} </mat-cell>
                         </ng-container>
                         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
