@@ -33,10 +33,10 @@ const ROUTES: Routes = [
     // },
 
     { path: "experiments", pathMatch: 'full', redirectTo:"experiments/0"},
-    { path: "experiments/:idProject", component:BrowseExperimentsComponent, children:[
+    { path: "experiments/:idLab", component:BrowseExperimentsComponent, children:[
         {path: '', pathMatch: 'full', redirectTo: 'overview' },
         {path:'overview',component: BrowseOverviewComponent, resolve:{project:ProjectResolverService}},
-        {path:':id', component: ExperimentDetailOverviewComponent, resolve: {experiment: ExperimentResolverService}}],
+        {path:'detail:id', component: ExperimentDetailOverviewComponent, resolve: {experiment: ExperimentResolverService}}],
         canActivate: [SubRouteGuardService], resolve:{projectList:ProjectListResolverService}, runGuardsAndResolvers: 'paramsChange'
     },
 

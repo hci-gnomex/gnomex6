@@ -170,7 +170,7 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
                         return true;
                     }
                 } else {
-                    return optValue === this.outerControl.value;
+                    return this.valueField ? optValue === this.outerControl.value[this.valueField] : optValue === this.outerControl.value;
                 }
             });
             if (currentlySelected) {

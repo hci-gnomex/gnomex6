@@ -63,6 +63,7 @@ export class ExperimentsService {
     private _experimentOverviewForm: FormGroup;
     private _usePreviousURLParams: boolean = false;
     public currentTabIndex = 0;
+    public navMode: boolean = false;
 
 
     constructor(private cookieUtilService: CookieUtilService,
@@ -167,6 +168,7 @@ export class ExperimentsService {
 
     getProjectRequestList_fromBackend(params: HttpParams,allowRefresh?:boolean): void {
         this.startSearchSubject.next(true);
+        console.log("hello")
 
         this.haveLoadedExperimentOrders = true;
         this.previousURLParams = params;

@@ -86,7 +86,7 @@ const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
         .background-lightyellow {
             background-color: lightyellow;
         }
-        
+
     `]
 })
 
@@ -158,6 +158,10 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.labMembers = [];
         this.billingAccounts = [];
         this.labs = [];
+
+
+
+
 
         this.experimentsService.startSearchSubject.subscribe((value) => {
             if (value) {
@@ -237,22 +241,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             if (orderInitObj) {
                 console.log("Nav mode: true");
 
-                if(this.experimentsService.usePreviousURLParams) {
-                    this.experimentsService.usePreviousURLParams = false;
-                    this.experimentsService.refreshProjectRequestList_fromBackend();
-                } else {
-                    let idLab = this.gnomexService.orderInitObj.idLab;
-                    let idProject = this.gnomexService.orderInitObj.idProject;
 
-                    let ids: HttpParams = new HttpParams()
-                        .set("idLab", idLab ? idLab : "")
-                        .set("idProject", idProject ? idProject : "")
-                        .set("showEmptyProjectFolders", "Y")
-                        .set("showCategory", "N")
-                        .set("showSamples", "N");
-                    this.experimentsService.browsePanelParams = ids;
-                    this.experimentsService.getProjectRequestList_fromBackend(ids);
-                }
             }
         });
 
@@ -326,6 +315,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     buildTree(response: any[]) {
         this.labs = [];
         this.experimentsService.filteredLabs = [];
+
 
         if (response) {
             if (!this.isArray(response)) {
@@ -665,8 +655,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.disableNewProject = !this.gnomexService.canSubmitRequests(idLab);
             this.disableDeleteExperiment = true;
 
-            navArray = ["/experiments/0/overview" ];
-            navExtras = {queryParams: {idLab: idLab, idProject:idProject}};
+            navArray = ["experiments", idLab , "overview" ]; //["/experiments" , {outlets: {"browsePanel": ["overview", {"idLab": idLab, "idProject": idProject}]}}];
+            navExtras = {queryParams: { idProject:idProject}};
 
             //Experiment
         } else {
