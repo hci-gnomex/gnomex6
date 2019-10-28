@@ -11,25 +11,28 @@ import java.util.regex.Pattern;
 public class FilterFile {
 
 	public static void main(String[] args) {
-		/* filter file was written for filter out files that don't have their associated checksum and vice versa.
-		*  It also serves to write all non filter files and put the checksums into one file so the next script can ingest it   */
+		/* filter file was written for filtering out files that don't have their associated checksum and vice versa.
+		*  It also serves to write all non filter files and put the checksums into one file so the next script can ingest it
+		*  Update we no longer enforce there to be a checksum with the file because we don't run the checksum against */
 
 		String inFile = "";
 		String remoteFileList = ""; // the list of only xml and pdf files (small files)
 		String credFile ="";
 		String filteredFile = "";
+		String filterRegex = "";
 
 
 		List<String> smallFilesList = new ArrayList<String>();
 		List<String> filterOutList = new ArrayList<String>();
 
 
-		if(args.length == 4) {
+		if(args.length == 5) {
 			inFile = args[0];
 			remoteFileList = args[1]; //output: pdf and xml files
 			credFile=args[2];
 			filteredFile=args[3]; // output: The files that were filtered out
 			System.out.println("credFile: " + credFile);
+			filterRegex=args[4];
 
 
 		}else {
@@ -52,9 +55,10 @@ public class FilterFile {
 			e.printStackTrace();
 		}
 		String currentLine = "";
-		String regex = "^(.*)([TCQ]RF[0-9]+_?[a-zA-Z]*)\\.(.*)$";
-		Pattern r = Pattern.compile(regex);
+
+		Pattern r = Pattern.compile(filterRegex);
 		Query query = new Query(credFile);
+		System.out.println(r.toString());
 
 		String newGroup = "";
 
@@ -65,15 +69,29 @@ public class FilterFile {
 			Matcher m = r.matcher(currentLine);
 
 			String path = "";
+			String fileID = "";
+			String nucType = "";
 			String fileName = "";
 			String extension ="";
 			String fullFileName = "";
 
 			if(m.matches()) {
 				path = m.group(1);
-				fileName = m.group(2);
-				extension= m.group(3);
+				fileID = m.group(2);
+				nucType= m.group(3);
+				fileName = nucType.equals("") ? fileID : fileID + nucType;
+				extension = m.group(4);
+
+//				System.out.println("path: " + path);
+//				System.out.println("filename: " + fileName);
+//				System.out.println("extension: " + extension);
+
 				fullFileName =  fileName+"."+extension;
+			}else{
+				System.out.println();
+				System.out.println("The current path doesn't match anything: ");
+				System.out.println(currentLine);
+				continue;
 			}
 
 

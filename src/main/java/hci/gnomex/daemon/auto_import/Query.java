@@ -270,16 +270,18 @@ public class Query {
             String sampleName = "";
 
             if (idAnalysisGroup == 11) { //avatar project
-                sampleName = "SL";
+                sampleName = "(s.name LIKE \'SL%\')";
             } else if (idAnalysisGroup == 14) {// foundation project{
-                sampleName = "RF"; //TRF, CRF, QRF
+                sampleName = "(s.name LIKE \'%RF%\' OR s.name LIKE \'ORD%\' );";
+            }else if(idAnalysisGroup == 22){ //tempus project
+                sampleName = "(s.name LIKE \'TL%\')";
             }
 
             String query = "SELECT r.idRequest, a.idAnalysis, s.name, a.name FROM Sample s \n" +
                     "JOIN Request r ON s.idRequest = r.idRequest \n" +
                     "JOIN Analysis a ON a.name = r.name \n" +
                     "JOIN AnalysisGroupItem agi ON agi.idAnalysis = a.idAnalysis AND agi.idAnalysisGroup = " + idAnalysisGroup + "\n" +
-                    "WHERE s.name IN " + strIDList + " AND s.name LIKE \'%" + sampleName + "%\'";
+                    "WHERE s.name IN " + strIDList + " AND " + sampleName;
             System.out.println("The report query: " + query);
             Statement stat = null;
 

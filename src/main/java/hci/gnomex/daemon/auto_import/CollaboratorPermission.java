@@ -300,11 +300,12 @@ public class CollaboratorPermission {
 
 
         if (dataVendor.equals("avatar")) {
-            strBuild.append(" s.name LIKE 'SL%' ");
+            strBuild.append(" s.name LIKE \'SL%\' ");
         } else if (dataVendor.equals("foundation")) {
-            strBuild.append(" s.name  REGEXP '^T?C?Q?RF[0-9]+' ");
+            strBuild.append(" ( s.name  REGEXP \'^T?C?Q?RF[0-9]+\' ");
+            strBuild.append(" OR s.name LIKE \'ORD%\' ) ");
         } else if (dataVendor.equals("tempus")){
-            strBuild.append(" s.name LIKE 'TL%' ");
+            strBuild.append(" s.name LIKE \'TL%\' ");
         }else if(dataVendor.equals("all")) {
             return " ";
         }

@@ -122,7 +122,7 @@ public class DirectoryBuilder {
 				}
 
 			}
-
+			// prints out the missing file type sets like for example ID has except missing its xml
 			printAccoutedForFiles(missingMap);
 
 
