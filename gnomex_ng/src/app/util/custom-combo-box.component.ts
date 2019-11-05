@@ -102,14 +102,6 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
     constructor(private injector: Injector) {
     }
 
-    ngOnInit(){
-        this.innerControl.valueChanges.pipe(debounceTime(2000)).subscribe( val => {
-            if(val !== this.innerControl.value){
-                this.onChangeFn(val);
-            }
-        })
-    }
-
     ngAfterViewInit(): void {
         let ngControl: NgControl = this.injector.get(NgControl, null);
         if (ngControl && ngControl.control) {
