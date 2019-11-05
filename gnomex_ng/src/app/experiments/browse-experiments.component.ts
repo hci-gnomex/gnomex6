@@ -86,7 +86,7 @@ const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
         .background-lightyellow {
             background-color: lightyellow;
         }
-        
+
     `]
 })
 
@@ -158,6 +158,10 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.labMembers = [];
         this.billingAccounts = [];
         this.labs = [];
+
+
+
+
 
         this.experimentsService.startSearchSubject.subscribe((value) => {
             if (value) {
@@ -323,6 +327,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     buildTree(response: any[]) {
         this.labs = [];
         this.experimentsService.filteredLabs = [];
+
 
         if (response) {
             if (!this.isArray(response)) {
