@@ -10,9 +10,7 @@ import {ExperimentsService} from "./experiments.service";
     selector: 'browse-panel',
     template: `        
         <div class="full-height full-width">
-            <!-- todo possibly take away named outlet.... this is preference because url seem more simple and clear -->
-            <!-- todo name of outlet is abstracted away and () aren't shown -->
-            <router-outlet></router-outlet>
+            <router-outlet name="browsePanel"></router-outlet>
         </div>
 `
 })

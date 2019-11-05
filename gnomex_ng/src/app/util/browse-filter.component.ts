@@ -19,7 +19,6 @@ import {UtilService} from "../services/util.service";
 import {PropertyService} from "../services/property.service";
 import {ConstantsService} from "../services/constants.service";
 import {GnomexService} from "../services/gnomex.service";
-import {ActivatedRoute, ParamMap} from "@angular/router";
 
 @Component({
     selector: 'browse-filter',
@@ -108,7 +107,7 @@ import {ActivatedRoute, ParamMap} from "@angular/router";
     `]
 })
 
-export class BrowseFilterComponent implements OnInit, OnDestroy {
+export class BrowseFilterComponent implements OnInit, OnDestroy, OnChanges {
     readonly SHOW_EMPTY_FOLDERS: string = "Show Empty Folders";
     readonly HIDE_REQUESTS_WITH_NO_BILLING_ITEMS: string = "Hide requests with no billing items?";
     readonly DATA_TRACK_BROWSE: string = "dataTrackBrowse";
@@ -125,7 +124,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     @Input() public iconAlt: string = "icon";
     @Input() private lookupLab: string = "";
 
-    public selectedLab: any;
+    public selectedLab: string = "";
 
     public showAllCheckbox: boolean = false;
     public allFlag: boolean;
@@ -217,11 +216,6 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
 
     public isCollapsed: boolean = false;
 
-    private paramMap:ParamMap;
-    private qParamMap:ParamMap;
-
-
-
     constructor(private labListService: LabListService, private getLabService: GetLabService,
                 private appUserListService: AppUserListService, private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private experimentsService: ExperimentsService, private analysisService: AnalysisService, private dataTrackService: DataTrackService,
@@ -229,7 +223,6 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 private dialogService: DialogsService, public constantsService: ConstantsService,
                 public propertyService: PropertyService,
                 private gnomexService: GnomexService,
-                private route:ActivatedRoute,
                 public prefService: UserPreferencesService) {
         this.showMore = false;
         this.resetFields();
@@ -239,8 +232,6 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         let isAdminState: boolean = this.createSecurityAdvisorService.isSuperAdmin || this.createSecurityAdvisorService.isAdmin;
         let isBillingAdminState: boolean = this.createSecurityAdvisorService.isBillingAdmin;
         let isGuestState: boolean = this.createSecurityAdvisorService.isGuest;
-        this.setNavParams();
-
         if (this.mode === this.EXPERIMENT_BROWSE) {
             let isBSTLinkageSupported: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_BST_LINKAGE_SUPPORTED);
             let canAccessBSTX: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_ACCESS_BSTX);
@@ -256,11 +247,17 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showCCNumberInput = isBSTLinkageSupported && canAccessBSTX;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
-                    if(response.length > 0){
                         this.labList = response
                             .sort(this.prefService.createLabDisplaySortFunction());
-                        this.preselectOnBrowseFilter();
-
+                    if(this.selectedLab) {
+                        let lab = this.labList.filter((a: any) => {
+                            return a.idLab === this.selectedLab;
+                        });
+                        if (lab.length === 1) {
+                            this.onLabSelect(this.selectedLab);
+                        } else {
+                            this.selectedLab = "";
+                        }
                     }
                 });
             } else if (isGuestState) {
@@ -402,29 +399,19 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 }
             }
         }
-        //todo need to rework logic not to depend on orderInitObject maybe just ask route
+
         if ((isGuestState || !this.createSecurityAdvisorService.isAdmin) && !this.gnomexService.orderInitObj) {
             setTimeout(() => {
                 this.search();
             });
         }
 
-
-
-
     }
-    //todo this can be removed as it serves to get the idLab from browse-experiment to set it in the browse-filter
-    //todo the router holds that info now so it can be set in this component
 
-    setNavParams():void{
-        this.route.paramMap.subscribe(params =>{
-            this.paramMap = params;
-        });
-        this.route.queryParamMap.subscribe(qParams =>{
-            this.qParamMap = qParams;
-        });
-        this.experimentsService.navMode = !!(this.paramMap && this.paramMap.get("idLab") !== '0');
-
+    ngOnChanges(changes: SimpleChanges): void {
+        if (this.lookupLab) {
+            this.selectedLab = this.lookupLab;
+        }
     }
 
 
@@ -650,31 +637,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         }
     }
 
-    private preselectOnBrowseFilter() {
-        let idLab = this.paramMap.get("idLab");
-        if(this.experimentsService.navMode){
-            for(let k of this.paramMap.keys){
-                if(k === 'idLab'){
-                    this.selectedLab=  this.labList.find(labView => ( labView.idLab === idLab ));
-                    if(this.selectedLab){
-                        this.onLabSelect(this.selectedLab);
-                    }
-                }
-
-            }
-            // need to give ngModel time to run
-            setTimeout(()=>{
-                this.search();
-            });
-
-        }
-
-
-
-    }
-
     getExperimentBrowseParameters(): HttpParams {
-        //todo should be able to make params from user selection and from existing route params
         let params: HttpParams = new HttpParams();
 
         if (this.showCoreFacilityComboBox && !(this.idCoreFacilityString === "")) {
@@ -918,8 +881,6 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     }
 
     search(): void {
-
-        //todo thi
         if (this.mode === this.EXPERIMENT_BROWSE) {
             let params: HttpParams = this.getExperimentBrowseParameters();
             this.experimentsService.browsePanelParams = params;
