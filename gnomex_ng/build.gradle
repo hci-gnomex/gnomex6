@@ -25,17 +25,17 @@ task cleanAll(type: NpmTask) {
 }
 
 task buildWebpackDevWDS(type: NpmTask) {
-    dependsOn(cleanAngular)
+    dependsOn(cleanAngular, npmInstall)
     args = ['run', 'build:dev:wds']
 }
 
 task buildWebpackDevTomcat(type: NpmTask) {
-    dependsOn(cleanAngular)
+    dependsOn(cleanAngular, npmInstall)
     args = ['run', 'build:dev:tomcat']
 }
 
 task buildWebpackProd(type: NpmTask) {
-    dependsOn(cleanAngular)
+    dependsOn(cleanAngular, npmInstall)
     args = ['run', 'build:prod']
 }
 
