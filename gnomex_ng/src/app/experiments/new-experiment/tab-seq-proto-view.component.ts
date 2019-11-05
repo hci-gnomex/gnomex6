@@ -5,6 +5,7 @@ import {HttpParams} from "@angular/common/http";
 import {BillingService} from "../../services/billing.service";
 import {Subscription} from "rxjs/index";
 import {Experiment} from "../../util/models/experiment.model";
+import {NewExperimentService} from "../../services/new-experiment.service";
 
 @Component({
     selector: "tabSeqProtoView",
@@ -18,8 +19,8 @@ import {Experiment} from "../../util/models/experiment.model";
             margin-bottom: 2em;
         }
 
-        .odd  { background-color: #edede9; }
-        .even { background-color: white; }
+        .odd  { background-color: white; }
+        .even { background-color: #edede9; }
         
         ol.three-depth-numbering {
             padding: 0;
@@ -78,7 +79,7 @@ import {Experiment} from "../../util/models/experiment.model";
         
         .right-align { text-align: right; }
         
-        
+        .left-spacer { margin-left: 4em; }
         
         .inline-block {
             width: 20em;
@@ -108,8 +109,14 @@ export class TabSeqProtoViewComponent implements OnInit, OnDestroy {
                 this.codeRequestCategory_subscription.unsubscribe();
             }
 
-            this.codeRequestCategory_subscription = this._experiment.onChange_codeRequestCategory.subscribe(() => {
+            this.codeRequestCategory_subscription = this._experiment.onChange_codeRequestCategory.subscribe((codeRequestCategory) => {
                 this.changePrices();
+
+                if (codeRequestCategory && codeRequestCategory === NewExperimentService.TYPE_ILLSEQ) {
+                    this.useAlternateDisplay = true;
+                } else {
+                    this.useAlternateDisplay = false;
+                }
             })
         }
 
@@ -125,8 +132,40 @@ export class TabSeqProtoViewComponent implements OnInit, OnDestroy {
     private codeRequestCategory_subscription: Subscription;
 
     public form: FormGroup;
+
+    public useAlternateDisplay: boolean = false;
+
     private filteredNumberSequencingCyclesAllowedList: any[] = [];
     private priceMap: Map<string, string> = new Map<string, string>();
+
+    // TODO Replace this "alternate display node" per GNOM6-1204, replacing this front-end specific sorting
+    // TODO   with a generic property on the backend.
+
+    public get alternateDisplaySequencingOptions_Novaseq(): any[] {
+        return this.filteredNumberSequencingCyclesAllowedList.filter((a: any) => {
+            return a.display && a.display.toLowerCase().substr(0, 8) === 'novaseq ';
+        });
+    }
+
+    public get alternateDisplaySequencingOptions_Hiseq(): any[] {
+        return this.filteredNumberSequencingCyclesAllowedList.filter((a: any) => {
+            return a.display && a.display.toLowerCase().substr(0, 6) === 'hiseq ';
+        });
+    }
+
+    public get alternateDisplaySequencingOptions_Miseq(): any[] {
+        return this.filteredNumberSequencingCyclesAllowedList.filter((a: any) => {
+            return a.display && a.display.toLowerCase().substr(0, 6) === 'miseq ';
+        });
+    }
+
+    public get alternateDisplaySequencingOptions_Other(): any[] {
+        return this.filteredNumberSequencingCyclesAllowedList.filter((a: any) => {
+            return (a.display && !(a.display.toLowerCase().substr(0, 8) === 'novaseq '))
+                && (a.display && !(a.display.toLowerCase().substr(0, 6) === 'hiseq '))
+                && (a.display && !(a.display.toLowerCase().substr(0, 6) === 'miseq '));
+        });
+    }
 
     constructor(private billingService: BillingService,
                 private dictionaryService: DictionaryService,

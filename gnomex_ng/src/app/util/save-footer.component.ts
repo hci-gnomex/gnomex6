@@ -7,7 +7,7 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
     selector: 'save-footer',
     template: `
         <div class="full-height full-width">
-            <div class="flex-container-row right-align padded">
+            <div class="flex-container-row align-center right-align padded">
                 <div *ngIf="this.dirty" class="warning-background padded">
                     {{this.message}}
                 </div>
