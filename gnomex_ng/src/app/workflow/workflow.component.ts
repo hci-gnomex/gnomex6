@@ -33,6 +33,11 @@ import {FlowcellWorkflowComponent} from "./flowcell-workflow.component";
             border: 1px solid darkgrey;
         }
         
+        .vertical-spacer {
+            height: 2em;
+            max-height: 2em;
+        }
+        
     `]
 })
 

@@ -165,7 +165,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy, OnChanges {
 
     public showCCNumberInput: boolean = false;
     public ccNumberString: string;
-    
+
     public showExperimentsRadioGroup: boolean = false;
     public experimentsRadioString: string;
 
@@ -247,8 +247,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy, OnChanges {
                 this.showCCNumberInput = isBSTLinkageSupported && canAccessBSTX;
 
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
-                    this.labList = response
-                        .sort(this.prefService.createLabDisplaySortFunction());
+                        this.labList = response
+                            .sort(this.prefService.createLabDisplaySortFunction());
                     if(this.selectedLab) {
                         let lab = this.labList.filter((a: any) => {
                             return a.idLab === this.selectedLab;
@@ -287,7 +287,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy, OnChanges {
                 });
             }
             this.coreFacilityList = this.createSecurityAdvisorService.myCoreFacilities;
-        } else if (this.mode === this.ORDER_BROWSE) {
+        }
+        else if (this.mode === this.ORDER_BROWSE) {
             if (isAdminState) {
                 this.showWorkflowStateRadioGroup = true;
                 this.showRedosCheckbox = true;
@@ -301,7 +302,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy, OnChanges {
 
                 this.coreFacilityList = this.createSecurityAdvisorService.myCoreFacilities;
             }
-        } else if (this.mode === this.ANALYSIS_BROWSE) {
+        }
+        else if (this.mode === this.ANALYSIS_BROWSE) {
             if (isAdminState) {
                 this.showMoreSwitch = true;
                 this.showAllCheckbox = true;
@@ -344,7 +346,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy, OnChanges {
             }
 
             this.organismList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ORGANISM);
-        } else if (this.mode === this.DATA_TRACK_BROWSE) {
+        }
+        else if (this.mode === this.DATA_TRACK_BROWSE) {
             if (isAdminState) {
                 this.showOrganismComboBox = true;
                 this.showGenomeBuildComboBox = true;
@@ -374,7 +377,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy, OnChanges {
             }
 
             this.organismList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ORGANISM);
-        } else if (this.mode === this.BILLING_BROWSE) {
+        }
+        else if (this.mode === this.BILLING_BROWSE) {
             if (isAdminState || isBillingAdminState) {
                 this.showMoreSwitch = true;
                 this.showMore = true;
@@ -409,6 +413,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy, OnChanges {
             this.selectedLab = this.lookupLab;
         }
     }
+
 
     resetFields(): void {
         this.allFlag = false;
@@ -881,6 +886,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy, OnChanges {
             this.experimentsService.browsePanelParams = params;
             this.experimentsService.browsePanelParams["refreshParams"] = true;
             this.experimentsService.getProjectRequestList_fromBackend(params);
+
+
         } else if (this.mode === this.ORDER_BROWSE) {
             this.dialogService.startDefaultSpinnerDialog();
 
@@ -924,4 +931,6 @@ export class BrowseFilterComponent implements OnInit, OnDestroy, OnChanges {
             this.labListSubscription.unsubscribe();
         }
     }
+
+
 }
