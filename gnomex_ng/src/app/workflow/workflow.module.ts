@@ -30,7 +30,7 @@ import {WorkflowComponent} from "./workflow.component";
 import {LibprepWorkflowComponent} from "./libprep-workflow.component";
 import {BarcodeSelectEditor} from "../util/grid-editors/barcode-select.editor";
 import {LibprepQcWorkflowComponent} from "./libprepqc-workflow.component";
-import {FlowcellassmWorkflowComponent} from "./flowcellassm-workflow.component";
+import {FlowcellAssemblyWorkflowComponent} from "./flowcell-assembly-workflow.component";
 import {AngularSplitModule} from "angular-split";
 import {SeqlaneSelectEditor} from "../util/grid-editors/seqlane-select.editor";
 import {DeleteSeqlaneDialogComponent} from "./delete-seqlane-dialog.component";
@@ -81,16 +81,16 @@ import {AddSamplesDialogComponent} from "./add-samples-dialog.component";
         ReactiveFormsModule,
         TreeModule.forRoot(),
         DynamicModule.withComponents([QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
-            FlowcellassmWorkflowComponent,  FinalizeWorkflowComponent])
+            FlowcellAssemblyWorkflowComponent,  FinalizeWorkflowComponent])
     ],
     declarations: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
-                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent, PipelineWorkflowComponent,
+                    FlowcellAssemblyWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent, PipelineWorkflowComponent,
                     FlowcellWorkflowComponent, EditFlowcellDialogComponent, AddSamplesDialogComponent],
     entryComponents: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
-                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent, PipelineWorkflowComponent,
+                    FlowcellAssemblyWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent, PipelineWorkflowComponent,
                     FlowcellWorkflowComponent, EditFlowcellDialogComponent, AddSamplesDialogComponent],
     exports: [WorkflowComponent, QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
-                    FlowcellassmWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent, PipelineWorkflowComponent,
+                    FlowcellAssemblyWorkflowComponent, DeleteSeqlaneDialogComponent, FinalizeWorkflowComponent, PipelineWorkflowComponent,
                     FlowcellWorkflowComponent, EditFlowcellDialogComponent]
 })
 export class WorkflowModule {

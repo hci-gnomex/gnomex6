@@ -373,7 +373,6 @@ public class SequenceLane extends HibernateDetailObject {
     }
   }
 
-
   public String getSampleName() {
     if (sample != null) {
       return sample.getName();
@@ -381,6 +380,15 @@ public class SequenceLane extends HibernateDetailObject {
       return "";
     }
   }
+
+  public String getCodeRequestCategory() {
+    if (request != null) {
+      return request.getCodeRequestCategory();
+    } else {
+      return "";
+    }
+  }
+
   public String getSampleBarcodeSequence() {
     if (sample != null) {
       return sample.getBarcodeSequence();

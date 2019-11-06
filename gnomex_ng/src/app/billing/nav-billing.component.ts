@@ -60,10 +60,6 @@ import {TextAlignRightMiddleEditor} from "../util/grid-editors/text-align-right-
             min-width: 27em;
         }
         
-        .min-grid-height {
-            min-height: 7em;
-        }
-        
         
         mat-radio-button.filter-by-order-type-opt {
             margin-right: 0.5em;

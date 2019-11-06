@@ -1,4 +1,11 @@
-import {AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild} from "@angular/core";
+import {
+    Component,
+    ElementRef,
+    Input,
+    OnChanges,
+    OnInit,
+    ViewChild
+} from "@angular/core";
 import {WorkflowService, qcModes} from "../services/workflow.service";
 import {GnomexService} from "../services/gnomex.service";
 import {GridApi, GridSizeChangedEvent} from "ag-grid-community";
@@ -17,31 +24,45 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
     selector: 'qc-workflow',
     templateUrl: 'qc-workflow.html',
     styles: [`
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
+
+
+        .request-number-width {
+            min-width: 4em;
+            width: fit-content;
+            max-width: 6em;
         }
-        .formField {
-            width: 20%;
-            margin: 0 0.5%;
+        .core-facility-width {
+            min-width: 15em;
+            width: fit-content;
+            max-width: 15em;
         }
+
+        .grid-min-height { min-height: 8em; }
+        
+        .no-height { height: 0; }
+
+        .single-em { width: 1em; }
+        
+        
     `]
 })
 
-export class QcWorkflowComponent implements OnInit, AfterViewInit {
+export class QcWorkflowComponent implements OnInit, OnChanges {
     @ViewChild("requestInput") requestInput: ElementRef;
     @ViewChild("coreFacility") coreFacilityInput: ElementRef;
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+
     @Input() mode: string;
 
-    private workItemList: any[] = [];
+    private emToPxConversionRate: number = 13;
+
+    public requestIds: any[] = [];
     public workingWorkItemList: any[] = [];
+
+    private workItemList: any[] = [];
     private coreIds: any[] = [];
-    private cores: any[] = [];
-    private requestIds: any[] = [];
-    private qcProtocolList: any[] = [];
     private coreFacilityAppMap: Map<string, any[]> = new Map<string, any[]>();
     private changedRowMap: Map<string, any> = new Map<string, any>();
-    public columnDefs;
     private emptyRequest = {requestNumber: ""};
     public dirty: boolean = false;
     public showSpinner: boolean = false;
@@ -50,20 +71,140 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
     private preSelectedCore: any;
     private hide260230: boolean = true;
     private gridApi:GridApi;
-    private gridColumnApi;
     private label: string = "Combined Sample Quality";
     private codeStepNext: string = "ALL";
 
     public allRequestCategories: any[] = [];
+
+
+    private _cores: any[] = [];
+
+    public get cores(): any[] {
+        return this._cores;
+    }
+
+    public get columnDefs(): any[] {
+
+        let result: any[] = [];
+
+        result.push({
+            headerName: "Sample #",
+            editable: false,
+            field: "sampleNumber",
+            width:    1,
+            minWidth: 5 * this.emToPxConversionRate
+        });
+        result.push({
+            headerName: "Sample Type",
+            editable: false,
+            field: "sampleType",
+            width:    1,
+            minWidth: 12 * this.emToPxConversionRate
+        });
+        result.push({
+            headerName: "Client",
+            editable: false,
+            field: "appUserName",
+            width:    600,
+            minWidth: 8 * this.emToPxConversionRate
+        });
+        result.push({
+            headerName: "QC Protocol",
+            editable:  true,
+            width:    900,
+            minWidth: 9 * this.emToPxConversionRate,
+            field: "qualCodeBioanalyzerChipType",
+            cellRendererFramework: SelectRenderer,
+            cellEditorFramework: SelectEditor,
+            selectOptions: this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.BioanalyzerChipType"),
+            selectOptionsDisplayField: "bioanalyzerChipType",
+            selectOptionsValueField: "datakey",
+            selectOptionsPerRowFilterFunction: (context, rowData, option) => {
+                if (!context || !rowData || !option) {
+                    return true;
+                }
+
+                if (option.value == "") {
+                    return true;
+                }
+
+                if (option.isActive === 'Y' && rowData) {
+                    let appCodes: any[] = context.coreFacilityAppMap.get(rowData.idCoreFacility);
+
+                    if (appCodes && appCodes.length > 0) {
+                        for (var code of appCodes) {
+                            if (option.codeApplication === code) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+
+                return false;
+            },
+            context: this,
+            showFillButton: true,
+            fillGroupAttribute: 'idRequest',
+        });
+        result.push({
+            headerName: "Conc. ng/uL",
+            editable: true,
+            width:    1,
+            minWidth: 6 * this.emToPxConversionRate,
+            field: "qualCalcConcentration",
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            valueSetter: QcWorkflowComponent.qualCalcValueSetter,
+            validateService: this.gridColumnValidatorService,
+            maxValue: 99999,
+            minValue: 0,
+            allowNegative: false
+        });
+        result.push({
+            headerName: "260/230",
+            editable: true,
+            width:    1,
+            minWidth: 6 * this.emToPxConversionRate,
+            field: "qual260nmTo230nmRatio",
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            hide: this.hide260230,  // TODO Hide for now until I can get the core facility property
+            valueSetter: QcWorkflowComponent.qualCalcValueSetter,
+            validateService: this.gridColumnValidatorService,
+            maxValue: 99999,
+            minValue: 0,
+            allowNegative: false
+        });
+        result.push({
+            headerName: "RIN #",
+            editable: true,
+            width:    1,
+            minWidth: 6 * this.emToPxConversionRate,
+            field: "qualRINNumber",
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+        });
+        result.push({
+            headerName: "Status",
+            editable:  true,
+            width:    1,
+            minWidth: 10 * this.emToPxConversionRate,
+            field: "qualStatus",
+            cellRendererFramework: SelectRenderer,
+            cellEditorFramework: SelectEditor,
+            selectOptions: this.workflowService.workflowCompletionStatus,
+            selectOptionsDisplayField: "display",
+            selectOptionsValueField: "value",
+            showFillButton: true,
+            fillGroupAttribute: 'idRequest',
+        });
+
+        return result;
+    }
 
     constructor(public workflowService: WorkflowService,
                 private gnomexService: GnomexService,
                 private dialogsService: DialogsService,
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private gridColumnValidatorService: GridColumnValidateService,
-                private dictionaryService: DictionaryService) {
-
-    }
+                private dictionaryService: DictionaryService) { }
 
     ngOnInit() {
         this.allRequestCategories = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY);
@@ -88,269 +229,149 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
 
     initialize(refreshMode?: boolean) {
         this.dialogsService.startDefaultSpinnerDialog();
-        let params: HttpParams = new HttpParams()
-            .set("codeStepNext", this.workflowService.QC);
-        this.cores = [];
+
+        this._cores = [];
         this.workItem = "";
+
+        let params: HttpParams = new HttpParams().set("codeStepNext", this.workflowService.QC);
+
         this.workflowService.getWorkItemList(params).subscribe((response: any) => {
             this.workItemList = response ? UtilService.getJsonArray(response, response.WorkItem) : [];
 
             this.coreIds = [...new Set(this.workItemList.map(item => item.idCoreFacility))];
+
             for (let coreId of this.coreIds) {
                 let coreObj = {idCoreFacility: coreId,
                     display: this.gnomexService.getCoreFacilityName(coreId)};
-                this.cores.push(coreObj);
+                this._cores.push(coreObj);
                 this.coreFacilityAppMap.set(coreId, this.gnomexService.getQCAppCodesForCore(coreId));
             }
+
             this.workingWorkItemList = this.workItemList;
-            if (this.cores.length > 0) {
+
+            if (this._cores.length > 0) {
                 if(this.preSelectedCore) {
-                    this.core = this.cores.find((core: any) => {return core.idCoreFacility === this.preSelectedCore.idCoreFacility});
+                    this.core = this._cores.find((core: any) => {return core.idCoreFacility === this.preSelectedCore.idCoreFacility});
                 } else if(this.preSelectedCore === undefined) {
-                    this.core = this.cores[0];
+                    this.core = this._cores[0];
                 } else {
                     this.core = null;
                 }
             }
+
             this.preSelectedCore = this.core;
-            this.workingWorkItemList = this.filterWorkItems();
+
+            if (this.codeStepNext == this.workflowService.ALL) {
+                this.workingWorkItemList = this.filterWorkItems();
+            } else if (this.codeStepNext === this.workflowService.ILLUMINA_SEQQC){
+                this.workingWorkItemList = this.filterByCodeStepNext(this.workflowService.ILLUMINA_SEQQC);
+            } else {
+                this.workingWorkItemList = this.filterByRequestCategory(this.codeStepNext);
+            }
+
             this.workingWorkItemList = this.workingWorkItemList.sort(this.workflowService.sortSampleNumber);
+
             if(refreshMode) {
                 this.ngOnChanges();
             }
 
-            this.qcProtocolList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.BioanalyzerChipType");
-
-            this.columnDefs = [
-                {
-                    headerName: "Sample #",
-                    editable: false,
-                    field: "sampleNumber",
-                    width: 100
-                },
-                {
-                    headerName: "Sample Type",
-                    editable: false,
-                    field: "sampleType",
-                    width: 200
-                },
-                {
-                    headerName: "Client",
-                    editable: false,
-                    field: "appUserName",
-                },
-                {
-                    headerName: "QC Protocol",
-                    editable:  true,
-                    width: 400,
-                    field: "qualCodeBioanalyzerChipType",
-                    cellRendererFramework: SelectRenderer,
-                    cellEditorFramework: SelectEditor,
-                    selectOptions: this.qcProtocolList,
-                    selectOptionsDisplayField: "bioanalyzerChipType",
-                    selectOptionsValueField: "datakey",
-                    selectOptionsPerRowFilterFunction: (context, rowData, option) => {
-
-                        if (!context || !rowData || !option) {
-                            return true;
-                        }
-
-                        if (option.value == "") {
-                            return true;
-                        }
-
-                        if (option.isActive === 'Y' && rowData) {
-                            let appCodes: any[] = context.coreFacilityAppMap.get(rowData.idCoreFacility);
-
-                            if (appCodes && appCodes.length > 0) {
-                                for (var code of appCodes) {
-                                    if (option.codeApplication === code) {
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-
-                        return false;
-                    },
-                    context: this,
-                    showFillButton: true,
-                    fillGroupAttribute: 'idRequest',
-                },
-                {
-                    headerName: "Conc. ng/uL",
-                    editable: true,
-                    width: 125,
-                    field: "qualCalcConcentration",
-                    cellRendererFramework: TextAlignLeftMiddleRenderer,
-                    valueSetter: QcWorkflowComponent.qualCalcValueSetter,
-                    validateService: this.gridColumnValidatorService,
-                    maxValue: 99999,
-                    minValue: 0,
-                    allowNegative: false
-                },
-                {
-                    headerName: "260/230",
-                    editable: true,
-                    width: 125,
-                    field: "qual260nmTo230nmRatio",
-                    cellRendererFramework: TextAlignLeftMiddleRenderer,
-                    hide: this.hide260230,  // TODO Hide for now until I can get the core facility property
-                    valueSetter: QcWorkflowComponent.qualCalcValueSetter,
-                    validateService: this.gridColumnValidatorService,
-                    maxValue: 99999,
-                    minValue: 0,
-                    allowNegative: false
-
-                },
-                {
-                    headerName: "RIN #",
-                    editable: true,
-                    width: 125,
-                    field: "qualRINNumber",
-                    cellRendererFramework: TextAlignLeftMiddleRenderer,
-                },
-                {
-                    headerName: "Status",
-                    editable:  true,
-                    width: 200,
-                    field: "qualStatus",
-                    cellRendererFramework: SelectRenderer,
-                    cellEditorFramework: SelectEditor,
-                    selectOptions: this.workflowService.workflowCompletionStatus,
-                    selectOptionsDisplayField: "display",
-                    selectOptionsValueField: "value",
-                    showFillButton: true,
-                    fillGroupAttribute: 'idRequest',
-
-                }
-
-            ];
             this.gridApi.setColumnDefs(this.columnDefs);
+            this.gridApi.setRowData(this.workingWorkItemList);
             this.gridApi.sizeColumnsToFit();
 
             this.requestIds = Array.from(this.workingWorkItemList.reduce((m, t) => m.set(t.requestNumber, t), new Map()).values());
             this.requestIds.unshift(this.emptyRequest);
+
             this.dialogsService.stopAllSpinnerDialogs();
             // TODO Need to get hide260230 and hide that column appropriately
             // var hide260230:String = parentApplication.getCoreFacilityProperty(selectedIdCoreFacility, parentApplication.PROPERTY_HIDE_260_230_QC_WORKFLOW);
         },(err:IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
         });
-
     }
 
-    ngAfterViewInit() {
-
-    }
-
-    filterWorkItems(): any[] {
+    private filterWorkItems(): any[] {
         let items: any[] = [];
 
         if (this.workItem) {
-            items = this.workItemList.filter(request =>
-                request.requestNumber === this.workItem
-            )
+            items = this.workItemList.filter((request) => { return request.requestNumber === this.workItem; })
         } else {
             items = this.workItemList;
         }
+
         if (this.core) {
-            items = items.filter(request =>
-                request.idCoreFacility === this.core.idCoreFacility
-            )
+            items = items.filter((request) => { return request.idCoreFacility === this.core.idCoreFacility; });
         }
+
         if (this.codeStepNext && this.codeStepNext !== this.workflowService.ALL) {
-            items = items.filter(request =>
-                request.codeStepNext === this.codeStepNext
-            );
+            items = items.filter((request) => { return request.codeStepNext === this.codeStepNext; });
         }
+
         this.workflowService.assignBackgroundColor(items, "idRequest");
+
         return items;
     }
 
-    filterByRequestCategory(type: string): any[] {
+    private filterByRequestCategory(type: string): any[] {
         let items: any[] = [];
 
         if (this.core) {
-            items = this.workItemList.filter(workItem =>
-                workItem.idCoreFacility === this.core.idCoreFacility
-            )
+            items = this.workItemList.filter((workItem) => { return workItem.idCoreFacility === this.core.idCoreFacility; });
         } else {
             items = this.workItemList;
         }
         
         items = items.filter((request) => {
-            if (type === "MICROARRAY") {
-                if (request.codeStepNext === this.workflowService.QC && request.requestCategoryType !== this.workflowService.QC) {
-                    return true;
-                }
-            } else if (type === this.workflowService.QC) {
-                if (request.codeStepNext === this.workflowService.QC && request.requestCategoryType === this.workflowService.QC) {
-                    return true;
-                }
-            } else if (type === this.workflowService.NANOSTRING) {
-                if (request.codeStepNext == this.workflowService.QC && request.requestCategoryType == this.workflowService.NANOSTRING) {
-                    return true;
-                }
-            }
-            return false;
+            return request.codeStepNext === this.workflowService.QC
+                && ((type === this.workflowService.MICROARRAY && request.requestCategoryType !== this.workflowService.QC)
+                    || (type === this.workflowService.QC && request.requestCategoryType === this.workflowService.QC)
+                    || (type === this.workflowService.NANOSTRING && request.requestCategoryType === this.workflowService.NANOSTRING));
         });
+
         this.workflowService.assignBackgroundColor(items, "idRequest");
+
         return items;
     }
 
-    filterByCodeStepNext(code: string): any[] {
+    private filterByCodeStepNext(code: string): any[] {
         let items: any[] = [];
 
         if (this.core) {
-            items = this.workItemList.filter(workItem =>
-                workItem.idCoreFacility === this.core.idCoreFacility
-            )
+            items = this.workItemList.filter((workItem) => { return workItem.idCoreFacility === this.core.idCoreFacility; });
         } else {
             items = this.workItemList;
         }
-        items = items.filter(workItem =>
-            workItem.codeStepNext === code
-        );
+
+        items = items.filter((workItem) => { return workItem.codeStepNext === code; });
+
         this.workflowService.assignBackgroundColor(items, "idRequest");
         return items;
     }
 
-    buildRequestIds(items: any[], mode: string) {
+    private buildRequestIds(items: any[], mode: string): void {
         let wItems: any[] = [];
+
         if (mode === "main") {
             if (this.core) {
-                wItems = items.filter(request =>
-                    request.idCoreFacility === this.core.idCoreFacility
-                )
-
+                wItems = items.filter((request) => { return request.idCoreFacility === this.core.idCoreFacility; });
             } else {
                 wItems = items;
             }
         } else {
             wItems = items;
         }
+
         this.requestIds = Array.from(wItems.reduce((m, t) => m.set(t.requestNumber, t), new Map()).values());
         this.requestIds.unshift(this.emptyRequest);
     }
 
-    filterCores(): any[] {
-        return this.cores;
-    }
-
-    compareByID(core1,core2) {
-        return core1 && core2 && core1.idCoreFacility == core2.idCoreFacility;
-    }
-
-    selectRequestOption() {
+    public selectRequestOption(): void {
         this.workingWorkItemList = this.filterWorkItems();
+
+        this.gridApi.setRowData(this.workingWorkItemList);
     }
 
-    selectedRow(event) {
-        this.gridApi.redrawRows();
-    }
-
-    selectCoreOption() {
+    public selectCoreOption(): void {
         if(this.preSelectedCore === this.core) {
             return;
         }
@@ -366,60 +387,54 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         }
         this.buildRequestIds(this.workingWorkItemList, "main");
         this.preSelectedCore = this.core;
+
+        this.gridApi.setRowData(this.workingWorkItemList);
     }
 
-    onNotifyGridRowDataChanged(event) {
+    public onNotifyGridRowDataChanged(event): void {
         if (this.gridApi) {
             this.gridApi.hideOverlay();
         }
     }
 
-    onCellValueChanged(event) {
+    public onCellValueChanged(event): void {
         this.changedRowMap.set(event.data.key, event.data);
         this.dirty = true;
     }
 
-    onGridReady(params) {
+    public onGridReady(params): void {
         this.gridApi = params.api;
-        this.gridColumnApi = params.columnApi;
+
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
         this.initialize();
     }
 
-    onGridSizeChanged(event: GridSizeChangedEvent) {
+    public onGridSizeChanged(event: GridSizeChangedEvent): void {
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
         event.api.sizeColumnsToFit();
     }
 
-    filterAppList(item: any): boolean {
-        let retVal: boolean = false;
-        if (item.value == "") {
-            retVal = true;
-        } else {
-            if (item.isActive === 'Y' && this.core) {
-                let appCodes: any[] = this.coreFacilityAppMap[this.core];
-                if (appCodes.length > 0) {
-                    for (var code of appCodes) {
-                        if (item.codeApplication.toString() === code) {
-                            retVal = true;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        return retVal;
-    }
-
-    save() {
+    public save(): void {
         this.gridApi.stopEditing();
+
         setTimeout(() => {
-            let params: HttpParams = new HttpParams();
             let workItems: any[] = [];
+
             for(let value of Array.from( this.changedRowMap.values()) ) {
                 this.setQualCodeApplication(value);
                 workItems.push(value);
             }
-            params = params.set("workItemXMLString", JSON.stringify(workItems));
+
+            let params: HttpParams = new HttpParams().set("workItemXMLString", JSON.stringify(workItems));
+
             this.showSpinner = true;
+
             this.workflowService.saveCombinedWorkItemQualityControl(params).subscribe((response: Response) => {
                 this.showSpinner = false;
                 this.changedRowMap = new Map<string, any>();
@@ -429,15 +444,14 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
             }, (err:IGnomexErrorResponse) => {
                 this.showSpinner = false;
             });
-        })
-
+        });
     }
 
-    static qualCalcValueSetter(params: any) {
+    public static qualCalcValueSetter(params: any) {
         return params.colDef.validateService.validate(params);
     }
 
-    setQualCodeApplication(item: any) {
+    private setQualCodeApplication(item: any): void {
         let warningMessage: string = "";
         if (item.qualCodeBioanalyzerChipType) {
             item.qualCodeApplication = this.gnomexService.getCodeApplicationForBioanalyzerChipType(item.qualCodeBioanalyzerChipType);
@@ -447,47 +461,47 @@ export class QcWorkflowComponent implements OnInit, AfterViewInit {
         }
     }
 
-    onClickAll() {
+    private onClickAll(): void {
         this.workItem = "";
         this.label = "Combined Sample Quality";
         this.codeStepNext = this.workflowService.ALL;
         this.workingWorkItemList = this.filterWorkItems();
         this.buildRequestIds(this.workItemList, "main");
+
+        this.gridApi.setRowData(this.workingWorkItemList);
     }
 
-    onClickIlluminaQC() {
+    private onClickIlluminaQC(): void {
         this.workItem = "";
         this.label = "Illumina Sample Quality";
         this.codeStepNext = this.workflowService.ILLUMINA_SEQQC;
         this.workingWorkItemList = this.filterByCodeStepNext(this.workflowService.ILLUMINA_SEQQC);
         this.buildRequestIds(this.workingWorkItemList, '');
+
+        this.gridApi.setRowData(this.workingWorkItemList);
     }
 
-    onClickMicroarrayQC() {
-        this.workItem = "";
-        this.label = "Microarray Sample Quality";
-        this.codeStepNext = this.workflowService.MICROARRAY;
-        this.workingWorkItemList = this.filterByRequestCategory(this.workflowService.MICROARRAY);
-        this.buildRequestIds(this.workingWorkItemList, "");
-    }
-
-    onClickSampleQualityQC() {
+    private onClickSampleQualityQC(): void {
         this.workItem = "";
         this.label = "Sample Quality";
         this.codeStepNext = this.workflowService.QC;
         this.workingWorkItemList = this.filterByRequestCategory(this.workflowService.QC);
         this.buildRequestIds(this.workingWorkItemList, "");
+
+        this.gridApi.setRowData(this.workingWorkItemList);
     }
 
-    onClickNanostringQC() {
+    private onClickNanostringQC(): void {
         this.workItem = "";
         this.label = "Nanostring";
         this.codeStepNext = this.workflowService.NANOSTRING;
         this.workingWorkItemList = this.filterByRequestCategory(this.workflowService.NANOSTRING);
         this.buildRequestIds(this.workingWorkItemList, "");
+
+        this.gridApi.setRowData(this.workingWorkItemList);
     }
 
-    refreshWorklist(event) {
+    public refreshWorklist(event): void {
         this.initialize(true);
     }
 }

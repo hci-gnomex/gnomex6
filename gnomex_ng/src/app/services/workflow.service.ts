@@ -78,6 +78,7 @@ export class WorkflowService {
     /**
      *  Alternate background colors in the grid of items.
      * @param {any[]} items
+     * @param {string} alternateAttribute
      */
     assignBackgroundColor (items: any[], alternateAttribute: string) {
         let first: boolean = true;

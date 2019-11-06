@@ -1,16 +1,23 @@
 <div class="full-width full-height background padded">
+    <div #oneEmWidth class="no-height single-em"></div>
     <div class="flex-container-row flex-grow full-height foreground">
-        <as-split>
-            <as-split-area [size]=sidenavSplitSize>
-                <div class="full-height flex-grow border">
-                    <mat-tab-group id="groupTabGroup"  [selectedIndex]="selectedTab" (selectedTabChange)="onGroupsTabChange($event)">
+        <as-split unit="pixel">
+            <as-split-area [size]=sidenavSplitSize [minSize]="sidenavSplitSize">
+                <div class="full-height flex-grow bordered">
+                    <mat-tab-group [selectedIndex]="selectedTab" (selectedTabChange)="onGroupsTabChange($event)" class="flex-style">
                         <mat-tab>
                             <ng-template mat-tab-label>
                                 <img matTooltip="QC Worklist" [src]="'./assets/data-accept.png'" alt="">
                             </ng-template>
                             <div class="flex-container-col padded">
-                                <mat-label>QC Worklist</mat-label>
-                                <button mat-button *ngFor="let option of combinedQCTabItems" class="row-one" (click)="onClickQC($event)" [value]="option.label">{{option.label}}</button>
+                                <mat-label class="medium-font italic">
+                                    QC Worklist
+                                </mat-label>
+                                <button mat-button *ngFor="let option of combinedQCTabItems"
+                                        [value]="option.label"
+                                        (click)="onClickQC($event)">
+                                    {{ option.label }}
+                                </button>
                             </div>
                         </mat-tab>
                         <mat-tab>
@@ -53,15 +60,15 @@
                             <ng-template mat-tab-label>
                                 <img class="icon" matTooltip="Microarray workflow" [src]="'./assets/microarray_small.png'" alt="">
                             </ng-template>
-                            <div class="flex-column-container">
+                            <div class="flex-container-col full-height full-width foreground">
                                 <mat-label>Microarray</mat-label>
                             </div>
                         </mat-tab>
                     </mat-tab-group>
                 </div>
             </as-split-area>
-            <as-split-area [size]="100 - sidenavSplitSize">
-                <div  class="full-width full-height border">
+            <as-split-area [size]="'*'">
+                <div  class="full-width full-height bordered">
                     <div class="flex-container-col full-width full-height padded">
                         <!--<div>-->
                             <!--<button mat-button [matTooltip]="showNav ? 'Minimize navigation panel' : 'Expand navigation panel'" (click)="toggle($event)">-->
