@@ -27,6 +27,10 @@ export class WorkflowService {
     public readonly ILLSEQ_FINALIZE_FC = "ILLSEQFINFC";
     public readonly ILLSEQ_DATA_PIPELINE = "ILLSEQPIPE";
 
+    public readonly NOSEQ_FINALIZE_FC = "NOSEQFINFC";
+    public readonly HISEQ_FINALIZE_FC = "HSEQFINFC";
+    public readonly MISEQ_FINALIZE_FC = "MISEQFINFC";
+
     public readonly HSEQ_PREP = "HSEQPREP";
     public readonly MISEQ_PREP = "MISEQPREP";
     public readonly NOSEQ_PREP = "NOSEQPREP";

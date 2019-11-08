@@ -1,40 +1,74 @@
-<div class="flex-container-col full-height full-width">
+<div class="flex-container-col full-height full-width small-font">
     <div class="flex-container-row padded align-center">
-        <img class="icon" [src]="'./assets/rectangle.png'" height="16" width="16">
-        <mat-label>{{label}}</mat-label>
+        <img class="icon" [src]="'./assets/rectangle.png'" alt="" height="16" width="16">
+        <mat-label class="medium-font">
+            {{ label }}
+        </mat-label>
     </div>
     <div class="flex-container-row spaced-children-margin align-center">
-
-        <mat-form-field class="formField ">
-            <input matInput [(ngModel)]="searchText" (input)="search($event)" placeholder="Experiment or FlowCell #">
+        <date-range-filter (onChange)="dateRangeChange($event)"></date-range-filter>
+        <div class="flex-grow">
+        </div>
+        <mat-form-field>
+            <input matInput
+                   placeholder="Experiment or FlowCell #"
+                   [(ngModel)]="searchText"
+                   (input)="search($event)">
         </mat-form-field>
-        <date-range-filter (onChange)="this.dateRangeChange($event)"></date-range-filter>
-        <button mat-button (click)="onFind($event)">
-            <img class="icon" [src]="this.constService.ICON_MAGNIFIER">Find
-        </button>
-        <div class="justify-flex-end"> {{this.workingWorkItemList.length}} Flow Cells</div>
+        <!--<button mat-button (click)="onFind($event)">-->
+            <!--<img class="icon" [src]="constService.ICON_MAGNIFIER" alt="">-->
+            <!--Find-->
+        <!--</button>-->
     </div>
-    <div *ngIf="selectedFlowCell&&selectedFlowCell.number" class="flex-container-row">
-        <span style="font-weight: bold;margin-left: .3em">Flow Cell {{selectedFlowCell.number}}
-        </span>
-        <button mat-button (click)="onClickPrepReport()"><mat-icon>launch</mat-icon>Preparation Report</button>
-        <button mat-button (click)="onClickRunReport()"><mat-icon>launch</mat-icon>Run Report</button>
-        <button mat-button (click)="onClickEditFlowCell()"><mat-icon>edit</mat-icon>Edit Flow Cell</button>
-    </div>
-    <div class="flex-grow">
-        <ag-grid-angular class="ag-theme-balham full-height full-width"
-                         [gridOptions]="gridOptions"
-                         [rowData]="workingWorkItemList"
-                         (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
-                         (rowSelected)="selectedRow($event)"
-                         [rowSelection]="'single'"
-                         (gridReady)="onGridReady($event)"
-                         (gridSizeChanged)="onGridSizeChanged($event)"
-                         [enableSorting]="true"
-                         (cellValueChanged) = "onCellValueChanged($event)"
-                         [enableFilter]="true"
-                         (cellDoubleClicked)="launchEditFlowCell($event)"
-                         [enableColResize]="true">
-        </ag-grid-angular>
+    <div class="flex-container-col flex-grow bordered padded">
+        <div class="flex-container-row padded-bottom align-center margin-children">
+            <div class="reserved-space">
+                <div *ngIf="isRowSelected" class="bold padded">
+                    Flow Cell {{ selectedFlowCell?.number }}
+                </div>
+                <div *ngIf="!isRowSelected" class="bold padded">
+                    No selection
+                </div>
+            </div>
+            <button mat-raised-button
+                    [disabled]="!isRowSelected"
+                    (click)="onClickPrepReport()">
+                <img *ngIf="isRowSelected" [src]="'./assets/page_go.png'" alt="" height="16" width="16">
+                <img *ngIf="!isRowSelected" [src]="'./assets/page_go_disabled.png'" alt="" height="16" width="16">
+                Preparation Report
+            </button>
+            <button mat-raised-button
+                    [disabled]="!(isRowSelected)"
+                    (click)="onClickRunReport()">
+                <img *ngIf="isRowSelected" [src]="'./assets/page_go.png'" alt="" height="16" width="16">
+                <img *ngIf="!isRowSelected" [src]="'./assets/page_go_disabled.png'" alt="" height="16" width="16">
+                Run Report
+            </button>
+            <button mat-raised-button
+                    [disabled]="!(isRowSelected)"
+                    (click)="onClickEditFlowCell()">
+                <img *ngIf="isRowSelected" [src]="'./assets/page_new.png'" alt="" height="16" width="16">
+                <img *ngIf="!isRowSelected" [src]="'./assets/page_new_disable.png'" alt="" height="16" width="16">
+                Edit Flow Cell
+            </button>
+            <div class="flex-grow">
+            </div>
+            <div class="italic padded">
+                {{ workItemList.length }} Flow Cells
+            </div>
+        </div>
+        <div class="flex-grow">
+            <div #oneEmWidth class="no-height single-em"></div>
+            <ag-grid-angular class="ag-theme-fresh full-height full-width min-grid-size"
+                             [enableColResize]="true"
+                             [enableSorting]="true"
+                             [rowSelection]="'single'"
+                             (cellDoubleClicked)="launchEditFlowCell($event)"
+                             (cellValueChanged) = "onCellValueChanged($event)"
+                             (rowSelected)="onRowSelected($event)"
+                             (gridReady)="onGridReady($event)"
+                             (gridSizeChanged)="onGridSizeChanged($event)">
+            </ag-grid-angular>
+        </div>
     </div>
 </div>

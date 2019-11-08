@@ -20,6 +20,7 @@ import {UserPreferencesService} from "../services/user-preferences.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../services/constants.service";
+import {UtilService} from "../services/util.service";
 
 @Component({
     selector: 'flowcell-assembly-workflow',
@@ -88,7 +89,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             selectOptionsValueField: "value",
             showFillButton: true,
             fillGroupAttribute: 'idRequest',
-            cellStyle: FlowcellAssemblyWorkflowComponent.shrinkCellText
+            cellStyle: UtilService.shrinkCellText
         });
         result.push({
             headerName: "Experiment",
@@ -98,7 +99,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             maxWidth: 9 * this.emToPxConversionRate1,
             field: "number",
             cellRendererFramework: TextAlignLeftMiddleRenderer,
-            cellStyle: FlowcellAssemblyWorkflowComponent.shrinkCellText
+            cellStyle: UtilService.shrinkCellText
         });
         result.push({
             headerName: "Experiment Type",
@@ -111,7 +112,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             selectOptions: this.experimentTypes,
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "codeRequestCategory",
-            cellStyle: FlowcellAssemblyWorkflowComponent.shrinkCellText
+            cellStyle: UtilService.shrinkCellText
         });
         result.push({
             headerName: "Index A",
@@ -125,7 +126,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "idOligoBarcode",
             indexTagLetter: 'A',
-            cellStyle: FlowcellAssemblyWorkflowComponent.shrinkCellText
+            cellStyle: UtilService.shrinkCellText
         });
         result.push({
             headerName: "Index B",
@@ -139,7 +140,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "idOligoBarcodeB",
             indexTagLetter: 'B',
-            cellStyle: FlowcellAssemblyWorkflowComponent.shrinkCellText
+            cellStyle: UtilService.shrinkCellText
         });
         result.push({
             headerName: "Library Protocol",
@@ -154,7 +155,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             selectOptionsValueField: "idNumberSequencingCyclesAllowed",
             showFillButton: true,
             fillGroupAttribute: 'idRequest',
-            cellStyle: FlowcellAssemblyWorkflowComponent.shrinkCellText
+            cellStyle: UtilService.shrinkCellText
         });
 
         return result;
@@ -171,7 +172,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             maxWidth: 9 * this.emToPxConversionRate1,
             field: "number",
             cellRendererFramework: TextAlignLeftMiddleRenderer,
-            cellStyle: FlowcellAssemblyWorkflowComponent.shrinkCellText
+            cellStyle: UtilService.shrinkCellText
         });
         result.push({
             headerName: "Lane",
@@ -187,7 +188,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             selectOptionsValueField: "value",
             showFillButton: true,
             fillGroupAttribute: 'idRequest',
-            cellStyle: FlowcellAssemblyWorkflowComponent.shrinkCellText
+            cellStyle: UtilService.shrinkCellText
         });
         result.push({
             headerName: "Index A",
@@ -201,7 +202,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "idOligoBarcode",
             indexTagLetter: 'A',
-            cellStyle: FlowcellAssemblyWorkflowComponent.shrinkCellText
+            cellStyle: UtilService.shrinkCellText
         });
         result.push({
             headerName: "Index B",
@@ -215,7 +216,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "idOligoBarcodeB",
             indexTagLetter: 'B',
-            cellStyle: FlowcellAssemblyWorkflowComponent.shrinkCellText
+            cellStyle: UtilService.shrinkCellText
         });
         result.push({
             headerName: "Library Protocol",
@@ -230,7 +231,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             selectOptionsValueField: "idNumberSequencingCyclesAllowed",
             showFillButton: true,
             fillGroupAttribute: 'idRequest',
-            cellStyle: FlowcellAssemblyWorkflowComponent.shrinkCellText
+            cellStyle: UtilService.shrinkCellText
         });
 
         return result;
@@ -285,7 +286,6 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
         this.workflowService.assignBackgroundColor(results, "idRequest");
 
         return results;
-        // return this.paintItemList(results);
     }
 
 
@@ -450,25 +450,6 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
         if (this.allRequestGridApi) {
             this.allRequestGridApi.setRowData(this.workingWorkItemList);
         }
-    }
-
-    private paintItemList(list: any[]): any[] {
-        let workItems: any[] = [];
-
-        // for (let item of list) {
-        //     if (!Array.isArray(item.MultiplexLane)) {
-        //         item.MultiplexLane = [item.MultiplexLane];
-        //     }
-        //
-        //     for (let multiplex of item.MultiplexLane) {
-        //         workItems = workItems.concat(multiplex.WorkItem);
-        //     }
-        // }
-
-        this.workflowService.assignBackgroundColor(list, "idRequest");
-        // this.workflowService.assignBackgroundColor(workItems, "idRequest");
-
-        return workItems;
     }
 
 
@@ -824,7 +805,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
         return true;
     }
 
-    private static atLeastThreeUnique(sequenceOne: any[], sequenceTwo: any[]): boolean{
+    private static atLeastThreeUnique(sequenceOne: any[], sequenceTwo: any[]): boolean {
         let uniqueBaseCount: number = 0;
 
         for(var i: number = 0; i < sequenceOne.length; i++){
@@ -834,9 +815,5 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
         }
 
         return (uniqueBaseCount >= 3);
-    }
-
-    public static shrinkCellText(params): any {
-        return {'font-size': '.70rem'};
     }
 }
