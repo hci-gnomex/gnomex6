@@ -19,6 +19,7 @@ import {AuthenticationService} from "../auth/authentication.service";
 import {PropertyService} from "../services/property.service";
 import {Subscription} from "rxjs/index";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {NavigationService} from "../services/navigation.service";
 
 @Component({
     selector: "gnomex-header",
@@ -113,7 +114,8 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                 private labListService: LabListService,
                 private gnomexService: GnomexService,
                 private formBuilder: FormBuilder,
-                private dialogsService: DialogsService) {
+                private dialogsService: DialogsService,
+                private navService:NavigationService) {
 
         this.options = this.formBuilder.group({
             hideRequired: false,
@@ -2099,6 +2101,9 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         if (this.gnomexService.allowExternal === false) {
             this.hideMenusByContext(navMenu, "newExternalExperiment");
         }
+    }
+    setNavModeType(){
+        this.navService.navMode = NavigationService.USER;
     }
 
     /**

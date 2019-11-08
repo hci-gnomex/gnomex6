@@ -10,7 +10,7 @@ import {ExperimentsService} from "./experiments.service";
     selector: 'browse-panel',
     template: `        
         <div class="full-height full-width">
-            <router-outlet name="browsePanel"></router-outlet>
+            <router-outlet></router-outlet>
         </div>
 `
 })

@@ -11,14 +11,8 @@ export class AppUserListService {
                 private httpClient: HttpClient) {
     }
 
-    getAppUserList(params: URLSearchParams): Observable<any[]> {
-        return this.http.get("/gnomex/GetAppUserList.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }));
+    getAppUserList(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetAppUserList.gx", {params:params});
     }
 
     getAppUser(params: URLSearchParams): Observable<any[]> {
@@ -55,8 +49,8 @@ export class AppUserListService {
     }
 
     getMembersOnly(): Observable<any> {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("membersOnly", "Y");
+        let params: HttpParams = new HttpParams()
+            .set("membersOnly", "Y");
         return this.getAppUserList(params);
     }
 

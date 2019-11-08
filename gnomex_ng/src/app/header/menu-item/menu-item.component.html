@@ -14,6 +14,7 @@
       <span *ngIf="child.divider===undefined;else divider">
         <button mat-menu-item
                 class="child.class" [hidden]="child.hidden"
+                (click)="setNavModeType()"
                 [routerLink]="child.route" [queryParams]="{id:child.idCoreFacility}">
           <img class="icon" *ngIf="child.iconName" src="{{child.iconName}}">
           <span>{{child.displayName}}</span>

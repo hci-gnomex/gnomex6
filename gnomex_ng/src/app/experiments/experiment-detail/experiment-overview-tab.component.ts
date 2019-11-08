@@ -141,7 +141,6 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
             this.dialogService.startDefaultSpinnerDialog();
         });
 
-        this.labListService.getLabList_FromBackEnd();
 
         this._experiment = experiment;
 
@@ -469,7 +468,6 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
             this.filterLabDictionary();
         });
 
-        this.labListService.getLabList_FromBackEnd();
 
         if (this._experiment && this._experiment.idLab && !this.labSubscription) {
             this.labSubscription = this.getLabService.getLabById(this._experiment.idLab).subscribe((result) => {

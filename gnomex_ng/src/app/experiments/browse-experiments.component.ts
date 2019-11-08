@@ -14,7 +14,7 @@ import {ITreeOptions, ITreeState, TreeComponent, TreeModel, TreeNode} from "angu
 import {BrowseFilterComponent} from "../util/browse-filter.component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
-import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
+import {ActivatedRoute, NavigationEnd, NavigationExtras, Router} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {CreateProjectComponent} from "./create-project.component";
 import {MatDialogConfig} from "@angular/material";
@@ -32,6 +32,7 @@ import {filter} from "rxjs/operators";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../services/constants.service";
+import {NavigationService} from "../services/navigation.service";
 
 const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
 
@@ -128,7 +129,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private labList: any[] = [];
     private selectedExperiment: any;
     private projectRequestListSubscription: Subscription;
-    private navInitSubscription: Subscription;
     private labListSubscription: Subscription;
     private navEndSubscription: Subscription;
     private parentProject: any;
@@ -146,6 +146,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 private propertyService: PropertyService,
                 private route: ActivatedRoute,
                 private router: Router,
+                private navService:NavigationService,
                 public constantsService: ConstantsService) {
 
     }
@@ -159,8 +160,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.billingAccounts = [];
         this.labs = [];
 
-
-
+        this.navService.navMode = this.navService.navMode !== NavigationService.USER ? NavigationService.URL : NavigationService.USER ;
 
 
         this.experimentsService.startSearchSubject.subscribe((value) => {
@@ -186,10 +186,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
             if (this.experimentsService.browsePanelParams && this.experimentsService.browsePanelParams["refreshParams"]) {
                 this.experimentsService.emitExperimentOverviewList(response.Lab);
-
-                let navArray: any[] = ["/experiments"];
-                this.experimentsService.browsePanelParams["refreshParams"] = false;
-                this.router.navigate(navArray);
 
                 if (this.treeModel && this.treeModel.getActiveNode()) {// Refresh to initial state when search button clicked
                     this.treeModel.getActiveNode().setIsActive(false);
@@ -234,28 +230,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             });
         });
 
-        this.navInitSubscription = this.gnomexService.navInitBrowseExperimentSubject.subscribe( orderInitObj => {
-            if (orderInitObj) {
-                console.log("Nav mode: true");
-
-                if(this.experimentsService.usePreviousURLParams) {
-                    this.experimentsService.usePreviousURLParams = false;
-                    this.experimentsService.refreshProjectRequestList_fromBackend();
-                } else {
-                    let idLab = this.gnomexService.orderInitObj.idLab;
-                    let idProject = this.gnomexService.orderInitObj.idProject;
-
-                    let ids: HttpParams = new HttpParams()
-                        .set("idLab", idLab ? idLab : "")
-                        .set("idProject", idProject ? idProject : "")
-                        .set("showEmptyProjectFolders", "Y")
-                        .set("showCategory", "N")
-                        .set("showSamples", "N");
-                    this.experimentsService.browsePanelParams = ids;
-                    this.experimentsService.getProjectRequestList_fromBackend(ids);
-                }
-            }
-        });
 
         this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
         this.treeModel = this.treeComponent.treeModel;
@@ -643,6 +617,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         let projectRequestListNode: Array<any> = _.cloneDeep(this.selectedItem.data);
         this.experimentsService.emitExperimentOverviewList(projectRequestListNode);
         let navArray: Array<any> = [];
+        let navExtras: NavigationExtras = {};
 
         this.disableDeleteProject = true;
 
@@ -652,7 +627,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.disableNewProject = !this.gnomexService.canSubmitRequests(idLab);
             this.disableDeleteExperiment = true;
 
-            navArray = ["/experiments", {outlets: {"browsePanel": "overview"}}];
+            navArray = ["/experiments",  "overview"];
 
             //Project
         } else if (this.selectedItem.level === 2) {
@@ -660,18 +635,18 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.disableNewProject = !this.gnomexService.canSubmitRequests(idLab);
             this.disableDeleteExperiment = true;
 
-            navArray = ["/experiments" , {outlets: {"browsePanel": ["overview", {"idLab": idLab, "idProject": idProject}]}}];
+            navArray = ["/experiments", "overview" ]; //["/experiments" , {outlets: {"browsePanel": ["overview", {"idLab": idLab, "idProject": idProject}]}}];
+            navExtras = {queryParams: { idProject:idProject}};
 
             //Experiment
         } else {
-            navArray = ["/experiments",  {outlets: {"browsePanel": [idRequest]}}];
+            navArray = ["/experiments", "detail" , idRequest]; //["/experiments",  {outlets: {"browsePanel": [idRequest]}}];
             this.parentProject = event.node.parent;
             this.disableNewProject = true;
 
-
         }
 
-        this.router.navigate(navArray);
+        this.router.navigate(navArray,navExtras);
 
 
     }
@@ -695,15 +670,16 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     }
 
     ngOnDestroy(): void {
+
+        UtilService.safelyUnsubscribe(this.navEndSubscription);
+        UtilService.safelyUnsubscribe(this.projectRequestListSubscription);
+        UtilService.safelyUnsubscribe(this.labListSubscription);
+        UtilService.safelyUnsubscribe(this.canDeleteProjectSubscription);
         this.utilService.removeChangeDetectorRef(this.changeDetectorRef);
-        this.navInitSubscription.unsubscribe();
-        this.navEndSubscription.unsubscribe();
         this.gnomexService.navInitBrowseExperimentSubject.next(null);
-        this.projectRequestListSubscription.unsubscribe();
-        this.labListSubscription.unsubscribe();
         this.experimentsService.filteredLabs = undefined;
         this.experimentsService.labList = [];
-        UtilService.safelyUnsubscribe(this.canDeleteProjectSubscription);
+
     }
 
     onShowEmptyFolders(event: any): void {

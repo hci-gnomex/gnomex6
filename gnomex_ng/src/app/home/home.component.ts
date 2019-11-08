@@ -11,6 +11,7 @@ import {AuthenticationService} from "../auth/authentication.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {PropertyService} from "../services/property.service";
 import {UtilService} from "../services/util.service";
+import {NavigationService} from "../services/navigation.service";
 
 @Component({
     selector: "gnomex-home",
@@ -161,6 +162,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     constructor(private launchPropertiesService: LaunchPropertiesService,
                 private progressService: ProgressService,
                 private gnomexService: GnomexService,
+                private navService:NavigationService,
                 private createSecurityAdvisor: CreateSecurityAdvisorService,
                 private router:Router,
                 private authService: AuthenticationService,
@@ -180,6 +182,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         });
     }
     ngOnInit() {
+        this.navService.resetNavModeFN();
 
         if(!this.progressService.hideLoader){
             this.progressService.hideLoader = new BehaviorSubject<boolean>(false);
