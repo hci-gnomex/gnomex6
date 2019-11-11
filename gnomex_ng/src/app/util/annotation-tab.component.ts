@@ -219,8 +219,8 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
 
     loadConfigAnnotations() {
         let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.width = "80em";
-        configuration.height = "56em";
+        configuration.width = "82em";
+        configuration.height = "60em";
         configuration.autoFocus = false;
         configuration.data = {
             isDialog: true,
