@@ -22,148 +22,22 @@ import {ManageProtocolsComponent} from "../../configuration/manage-protocols.com
 
 @Component({
     selector: "analysis-info-tab",
-    template: `
-        <form [formGroup]="this.form" class="padded flex-container-row-children">
-            <div class="form-row-children">
-                <mat-form-field>
-                    <input matInput placeholder="Lab Group" [formControlName]="'labName'">
-                </mat-form-field>
-                <span></span>
-                <custom-combo-box placeholder="Owner" [options]="this.labUsers"
-                                    valueField="idAppUser" [displayField]="this.prefService.userDisplayField"
-                                    [formControlName]="'idAppUser'">
-                </custom-combo-box>
-            </div>
-            <div class="form-row-children">
-                <mat-form-field>
-                    <input matInput placeholder="Name" [formControlName]="'name'">
-                </mat-form-field>
-                <span></span>
-                <mat-form-field>
-                    <input matInput placeholder="Submitter" [formControlName]="'submitterName'">
-                </mat-form-field>
-            </div>
-            <div class="form-row-children">
-                <div class="flex-container-row form-entry-children">
-                    <custom-combo-box placeholder="Analysis Type" [options]="this.analysisTypes"
-                                        valueField="value" displayField="display"
-                                        [formControlName]="'idAnalysisType'">
-                    </custom-combo-box>
-                    <button mat-button class="link-button" [hidden]="!isEditMode" [disabled]="!isEditMode || !canUpdate" (click)="this.openEditAnalysisType()">New/Edit</button>
-                </div>
-                <span></span>
-                <mat-form-field>
-                    <input matInput placeholder="Submit Date" [formControlName]="'submitDate'">
-                </mat-form-field>
-            </div>
-            <div class="form-row-children">
-                <div class="flex-container-row form-entry-children">
-                    <custom-combo-box placeholder="Analysis Protocol" [options]="this.protocolList"
-                                        valueField="id" displayField="label"
-                                        [formControlName]="'idAnalysisProtocol'">
-                    </custom-combo-box>
-                    <button mat-button class="link-button" [hidden]="!isEditMode" [disabled]="!isEditMode || !canUpdate" (click)="this.openEditAnalysisProtocol()">New/Edit</button>
-                </div>
-                <span></span>
-                <mat-radio-group class="flex-container-col" [formControlName]="'codeVisibility'">
-                    <mat-radio-button *ngFor="let vis of this.visibilityList" [value]="vis.codeVisibility" matTooltip="{{vis.tooltip}}" [matTooltipPosition]="'left'">{{vis.display}}</mat-radio-button>
-                </mat-radio-group>
-            </div>
-            <div *ngIf="this.propertyService.isPrivacyExpirationSupported && this.analysis.codeVisibility !== 'PUBLIC'">
-                <span class="flex-two"></span>
-                <span class="flex-one"></span>
-                <mat-form-field matTooltip="Public visibility date (visibility automatically changes to public on this date)" [matTooltipPosition]="'left'" class="flex-two">
-                    <input matInput [matDatepicker]="privacyPicker" placeholder="Privacy Expiration" [formControlName]="'privacyExpirationDate'" [min]="this.today">
-                    <mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>
-                    <mat-datepicker #privacyPicker disabled="false"></mat-datepicker>
-                </mat-form-field>
-            </div>
-            <div class="form-row-children">
-                <div class="flex-container-row form-entry-children">
-                    <custom-combo-box placeholder="Organism" [options]="this.organismList"
-                                        valueField="value" displayField="display"
-                                        [formControlName]="'idOrganism'">
-                    </custom-combo-box>
-                    <button mat-button class="link-button" [hidden]="!isEditMode" [disabled]="!isEditMode || !canUpdate" (click)="this.openEditOrganism()">New/Edit</button>
-                </div>
-                <span></span>
-                <div class="flex-container-row">
-                    <button mat-button class="link-button" [hidden]="!isEditMode" [disabled]="!isEditMode || !canUpdate" (click)="this.openCollaboratorsWindow()">Collaborators</button>
-                </div>
-            </div>
-            <div class="form-row-children">
-                <div class="flex-container-col" style="font-size: 100%;">
-                    <div class="flex-container-row form-entry-children">
-                        <custom-combo-box placeholder="Genome Builds" [formControlName]="'genomeBuildToAdd'"
-                                          displayField="display" [options]="genomeBuildList" style="flex: 5;">
-                        </custom-combo-box>
-                        <button mat-button (click)="this.addGenomeBuild()" [hidden]="!isEditMode" [disabled]="!isEditMode || !canUpdate || !this.form.controls['genomeBuildToAdd'].value">
-                            <img [src]="'./assets/add.png'" class="icon">Add
-                        </button>
-                        <button mat-button (click)="this.removeGenomeBuild()" [hidden]="!isEditMode" [disabled]="!isEditMode || !canUpdate || !this.genomeBuildToRemove">
-                            <img [src]="'./assets/delete.png'" class="icon">Remove
-                        </button>
-                        <button mat-button class="link-button" [hidden]="!isEditMode" [disabled]="!isEditMode || !canUpdate" (click)="this.openEditOrganism()">New/Edit</button>
-                    </div>
-                    <div class="genome-build-grid-container">
-                        <ag-grid-angular class="ag-theme-balham full-height full-width"
-                                         (gridReady)="this.onGenomeBuildGridReady($event)"
-                                         (gridSizeChanged)="this.onGridSizeChanged($event)"
-                                         (rowClicked)="this.onGenomeBuildGridSelection($event)"
-                                         [rowSelection]="'single'"
-                                         [rowData]="this.form.controls['genomeBuildsJSONString'].value">
-                        </ag-grid-angular>
-                    </div>
-                </div>
-                <span></span>
-                <div class="flex-container-col">
-                    <custom-combo-box placeholder="Institution" [formControlName]="'idInstitution'"
-                                      displayField="display" valueField="idInstitution" [options]="institutionList">
-                    </custom-combo-box>
-                    <div>
-                        <ul>Analysis Group(s)
-                            <li *ngFor="let analysisGroup of this.form.controls['analysisGroupsJSONString'].value">{{analysisGroup.name}}</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </form>
-    `,
+    templateUrl: "analysis-info-tab.component.html",
     styles: [`
-        * {
-            font-size: 95%;
+        
+        .column-width {
+            min-width: 12em;
+            width: 35em;
         }
-        .padded {
-            padding: 1em;
+        
+        .horizontal-spacer {
+            width: 2em;
         }
-        .flex-one {
-            flex: 1;
+        
+        .min-grid-height {
+            min-height: 8em;
         }
-        .flex-two {
-            flex: 2;
-        }
-        .flex-container-row-children > * {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-        }
-        .form-row-children > * {
-            flex: 2;
-        }
-        .form-row-children > span {
-            flex: 1;
-        }
-        .form-entry-children > mat-form-field,
-        .form-entry-children > custom-combo-box {
-            flex: 8;
-        }
-        .form-entry-children > button {
-            flex: 1;
-        }
-        div.genome-build-grid-container {
-            width: 100%;
-            height: 150px;
-        }
+        
     `]
 })
 export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
@@ -187,7 +61,6 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
     public today: Date = new Date();
     private protocolListSubscription: Subscription;
     private genomeBuildGridApi: GridApi;
-    private readonly genomeBuildGridColDefs: any[];
     private genomeBuildToRemove: RowNode;
 
     constructor(private route: ActivatedRoute,
@@ -203,6 +76,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
                 public prefService: UserPreferencesService,
                 public propertyService: PropertyService,
                 private constantsService: ConstantsService) {
+
         this.form = this.formBuilder.group({
             labName: [{value: "", disabled: true}],
             name: [{value: "", disabled: true}, Validators.required],
@@ -220,10 +94,6 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
             genomeBuildToAdd: null,
             privacyExpirationDate: [{value: "", disabled: true}],
         });
-
-        this.genomeBuildGridColDefs = [
-            {headerName: "Name", field: "display"}
-        ];
     }
 
     ngOnInit() {
@@ -371,7 +241,9 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
     }
 
     public onGenomeBuildGridReady(event: GridReadyEvent): void {
-        event.api.setColumnDefs(this.genomeBuildGridColDefs);
+        event.api.setColumnDefs([
+            {headerName: "Genome Builds", field: "display"}
+        ]);
         event.api.sizeColumnsToFit();
         this.genomeBuildGridApi = event.api;
     }

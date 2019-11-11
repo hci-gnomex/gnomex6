@@ -1,0 +1,180 @@
+<div class="full-height full-width overflow-auto padded small-font">
+    <form [formGroup]="form" class="flex-container-row full-height full-width">
+        <div class="flex-container-col column-width">
+            <mat-form-field>
+                <input matInput placeholder="Lab Group" [formControlName]="'labName'">
+            </mat-form-field>
+            <mat-form-field>
+                <input matInput placeholder="Name" [formControlName]="'name'">
+            </mat-form-field>
+            <div class="flex-container-row align-center">
+                <custom-combo-box placeholder="Analysis Type"
+                                  class="flex-grow"
+                                  displayField="display"
+                                  valueField="value"
+                                  [formControlName]="'idAnalysisType'"
+                                  [options]="analysisTypes">
+                </custom-combo-box>
+                <div class="padded-left">
+                    <button mat-button
+                            class="minimize link-button"
+                            [disabled]="!isEditMode || !canUpdate"
+                            [hidden]="!isEditMode"
+                            (click)="openEditAnalysisType()">
+                        New/Edit
+                    </button>
+                </div>
+            </div>
+            <div class="flex-container-row align-center">
+                <custom-combo-box placeholder="Analysis Protocol"
+                                  class="flex-grow"
+                                  displayField="label"
+                                  valueField="id"
+                                  [formControlName]="'idAnalysisProtocol'"
+                                  [options]="protocolList">
+                </custom-combo-box>
+                <div class="padded-left">
+                    <button mat-button
+                            class="minimize link-button"
+                            [disabled]="!isEditMode || !canUpdate"
+                            [hidden]="!isEditMode"
+                            (click)="openEditAnalysisProtocol()">
+                        New/Edit
+                    </button>
+                </div>
+            </div>
+            <div class="flex-container-row align-center">
+                <custom-combo-box placeholder="Organism"
+                                  class="flex-grow"
+                                  displayField="display"
+                                  valueField="value"
+                                  [formControlName]="'idOrganism'"
+                                  [options]="organismList">
+                </custom-combo-box>
+                <div class="padded-left">
+                    <button mat-button
+                            class="minimize link-button"
+                            [disabled]="!isEditMode || !canUpdate"
+                            [hidden]="!isEditMode"
+                            (click)="openEditOrganism()">
+                        New/Edit
+                    </button>
+                </div>
+            </div>
+            <div *ngIf="isEditMode" class="flex-container-row align-center">
+                <custom-combo-box placeholder="Genome Builds"
+                                  displayField="display"
+                                  style="flex: 5;"
+                                  [formControlName]="'genomeBuildToAdd'"
+                                  [hidden]="!isEditMode"
+                                  [options]="genomeBuildList">
+                </custom-combo-box>
+                <div class="padded-left">
+                    <button mat-button
+                            class="minimize"
+                            [disabled]="!isEditMode || !canUpdate || !form.controls['genomeBuildToAdd'].value"
+                            [hidden]="!isEditMode"
+                            (click)="addGenomeBuild()">
+                        <img [src]="'./assets/add.png'" alt="" class="icon">
+                        Add
+                    </button>
+                </div>
+                <div class="padded-left">
+                    <button mat-button
+                            class="minimize"
+                            [disabled]="!isEditMode || !canUpdate || !genomeBuildToRemove"
+                            [hidden]="!isEditMode"
+                            (click)="removeGenomeBuild()">
+                        <img [src]="'./assets/delete.png'" alt=""  class="icon">
+                        Remove
+                    </button>
+                </div>
+                <div class="padded-left">
+                    <button mat-button
+                            class="minimize link-button"
+                            [disabled]="!isEditMode || !canUpdate" (click)="openEditOrganism()"
+                            [hidden]="!isEditMode">
+                        New/Edit
+                    </button>
+                </div>
+            </div>
+            <div class="flex-grow">
+                <ag-grid-angular class="ag-theme-balham full-height full-width min-grid-height"
+                                 [rowData]="form.controls['genomeBuildsJSONString'].value"
+                                 [rowSelection]="'single'"
+                                 [suppressMovableColumns]="true"
+                                 (gridReady)="onGenomeBuildGridReady($event)"
+                                 (gridSizeChanged)="onGridSizeChanged($event)"
+                                 (rowClicked)="onGenomeBuildGridSelection($event)">
+                </ag-grid-angular>
+            </div>
+        </div>
+        <div class="horizontal-spacer">
+        </div>
+        <div class="flex-container-col column-width">
+            <custom-combo-box placeholder="Owner"
+                              valueField="idAppUser"
+                              [displayField]="prefService.userDisplayField"
+                              [formControlName]="'idAppUser'"
+                              [options]="labUsers">
+            </custom-combo-box>
+            <mat-form-field>
+                <input matInput placeholder="Submitter" [formControlName]="'submitterName'">
+            </mat-form-field>
+            <mat-form-field>
+                <input matInput placeholder="Submit Date" [formControlName]="'submitDate'">
+            </mat-form-field>
+            <mat-radio-group class="flex-container-col double-padded" [formControlName]="'codeVisibility'">
+                <mat-radio-button *ngFor="let vis of visibilityList"
+                                  [value]="vis.codeVisibility"
+                                  [matTooltip]="vis.tooltip"
+                                  [matTooltipPosition]="'left'">
+                    {{ vis.display }}
+                </mat-radio-button>
+            </mat-radio-group>
+            <div *ngIf="propertyService.isPrivacyExpirationSupported && analysis.codeVisibility !== 'PUBLIC'" class="padded">
+                <mat-form-field matTooltip="Public visibility date (visibility automatically changes to public on this date)"
+                                [matTooltipPosition]="'left'">
+                    <input matInput
+                           placeholder="Privacy Expiration"
+                           [formControlName]="'privacyExpirationDate'"
+                           [matDatepicker]="privacyPicker"
+                           [min]="today">
+                    <mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>
+                    <mat-datepicker #privacyPicker disabled="false"></mat-datepicker>
+                </mat-form-field>
+            </div>
+            <div class="flex-container-row align-center">
+                <div class="padded-left">
+                    <button mat-button
+                            class="link-button"
+                            [disabled]="!isEditMode || !canUpdate"
+                            [hidden]="!isEditMode"
+                            (click)="openCollaboratorsWindow()">
+                        Collaborators
+                    </button>
+                </div>
+            </div>
+            <custom-combo-box placeholder="Institution"
+                              displayField="display"
+                              valueField="idInstitution"
+                              [formControlName]="'idInstitution'"
+                              [options]="institutionList">
+            </custom-combo-box>
+            <div>
+                <div class="italic">
+                    Analysis Group(s) :
+                </div>
+                <div class="padded">
+                    <ul>
+                        <li *ngFor="let analysisGroup of form.controls['analysisGroupsJSONString'].value">
+                            {{ analysisGroup.name }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="flex-grow">
+        </div>
+    </form>
+</div>
