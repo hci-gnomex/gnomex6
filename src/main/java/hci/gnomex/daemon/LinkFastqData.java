@@ -91,7 +91,7 @@ public class LinkFastqData extends TimerTask {
         }
         fileExtensionMap = new HashMap<String, List<String>>();
         fileExtensionMap.put("avatar", Arrays.asList("fastq") );
-        fileExtensionMap.put("foundation", Arrays.asList("deident.xml") );
+        fileExtensionMap.put("foundation", Arrays.asList("bam", "deident.xml") );
         fileExtensionMap.put("tempus", Arrays.asList("deident.json", "fastq"));
 
     }
