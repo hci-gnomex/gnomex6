@@ -13,7 +13,7 @@ import {GnomexService} from "../services/gnomex.service";
 import {ExternalRoute} from "./external-routes.module";
 import * as _ from "lodash";
 import {TopicService} from "../services/topic.service";
-import {MatDialogConfig, MatToolbar} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {AdvancedSearchComponent} from "./advanced_search/advanced-search.component";
 import {AuthenticationService} from "../auth/authentication.service";
 import {PropertyService} from "../services/property.service";
@@ -23,20 +23,11 @@ import {DialogsService} from "../util/popup/dialogs.service";
 @Component({
     selector: "gnomex-header",
     templateUrl: "./header.component.html",
-    styles: [`
-        
-        .minimize {
-            width:  fit-content;
-            height: fit-content;
-        }
+    styles: [`        
         
         .red {
             /*font-weight: bold;*/
             color: red;
-        }
-        
-        .horizontal-spacing-center {
-            text-align: center;
         }
         
         .no-padding-dialog .mat-dialog-container {
@@ -45,13 +36,8 @@ import {DialogsService} from "../util/popup/dialogs.service";
         .no-padding-dialog .mat-dialog-container .mat-dialog-actions{
             background-color: #eeeeeb;
         }
-        .lookup {
-            font-size: small;
-            text-decoration: none;
-        }
+        
         .header-one {
-            color: black;
-            background-color: white;
             position: fixed;
             z-index: 1;
         }
@@ -59,6 +45,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
             background-color: #f5fffa;
             color: black;
         }
+        
         .top-menu-item {
             flex: 1;
         }
@@ -98,7 +85,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
 
 export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
 
-    @ViewChild('headerRef') headerRef: MatToolbar;
+    @ViewChild('headerRef') headerRef: ElementRef;
     @ViewChild('spacerRef') spacerRef: ElementRef;
 
     options: FormGroup;
@@ -191,12 +178,11 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             && this.spacerRef.nativeElement
             && this.spacerRef.nativeElement.style
             && this.headerRef
-            && this.headerRef._elementRef
-            && this.headerRef._elementRef.nativeElement
-            && this.headerRef._elementRef.nativeElement.offsetHeight
-            && this.headerRef._elementRef.nativeElement.offsetHeight > 0) {
+            && this.headerRef.nativeElement
+            && this.headerRef.nativeElement.offsetHeight
+            && this.headerRef.nativeElement.offsetHeight > 0) {
 
-            this.headerHeight = this.headerRef._elementRef.nativeElement.offsetHeight;
+            this.headerHeight = this.headerRef.nativeElement.offsetHeight;
 
             this.spacerRef.nativeElement.style.height = 'initial';
             this.spacerRef.nativeElement.style.height = '' + Math.ceil(this.headerHeight) + 'px';
