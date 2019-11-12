@@ -28,12 +28,22 @@ import {UtilService} from "../../services/util.service";
     selector: 'analysis-files-tab',
     template: `
         <div class="padded flex-container-col full-height">
-            <div class="flex-container-row">
-                <button mat-button (click)="this.handleUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD" class="icon">Upload Files</button>
-                <button mat-button *ngIf="isFDTSupported" (click)="this.handleFDTUploadCommandLine()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Command Line</button>
-                <button mat-button *ngIf="isFDTSupported" (click)="this.handleFDTUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Files</button>
-                <button mat-button (click)="this.handleManageFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon">Manage Files</button>
-                <button mat-button (click)="this.handleDownloadFiles()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download Files</button>
+            <div class="flex-container-row flex-wrap">
+                <button mat-button class="minimize" (click)="this.handleUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD" class="icon">
+                    Upload Files
+                </button>
+                <button mat-button class="minimize" *ngIf="isFDTSupported" (click)="this.handleFDTUploadCommandLine()" [disabled]="!this.canUpdate">
+                    <img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Command Line
+                </button>
+                <button mat-button class="minimize" *ngIf="isFDTSupported" (click)="this.handleFDTUploadFiles()" [disabled]="!this.canUpdate">
+                    <img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Files
+                </button>
+                <button mat-button class="minimize" (click)="this.handleManageFiles()" [disabled]="!this.canUpdate">
+                    <img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon">Manage Files
+                </button>
+                <button mat-button class="minimize" (click)="this.handleDownloadFiles()">
+                    <img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download Files
+                </button>
             </div>
             <div class="flex-grow">
                 <ag-grid-angular class="ag-theme-balham full-height full-width"

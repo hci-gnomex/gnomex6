@@ -1,12 +1,12 @@
 <div class="full-width full-height flex-container-col">
     <div class="flex-container-row align-center padded-left-right-bottom small-font overflow-auto">
-        <div class="flex-container-row align-center label-min-width">
+        <div class="flex-container-row align-center label-min-width minimize">
             <img [src]="analysisTreeNode?.icon" alt="">
             <div class="medium-font padded-left">
                 Analysis {{ analysisTreeNode?.number }}
             </div>
         </div>
-        <div class="flex-container-row child-margins">
+        <div class="flex-container-row flex-wrap child-margins">
             <button mat-raised-button *ngIf="showEdit" class="minimize" (click)="editButtonClicked($event)">
                 <img *ngIf="!isEditMode" class="icon" [src]="constService.ICON_TAG_BLUE_EDIT" alt="">
                 <img *ngIf="isEditMode" class="icon" [src]="constService.PAGE" alt="">
