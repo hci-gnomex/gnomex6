@@ -353,6 +353,10 @@ img.tree-node-icon {
     padding: 0;
 }
 
+.large-font {
+    font-size: large;
+}
+
 .medium-font {
     font-size: medium;
 }
