@@ -18,10 +18,11 @@
                 <div class="padded-left">
                     <button mat-button
                             class="minimize link-button"
+                            matTooltip="Add or edit Analysis Type"
                             [disabled]="!isEditMode || !canUpdate"
                             [hidden]="!isEditMode"
                             (click)="openEditAnalysisType()">
-                        New/Edit
+                        Edit
                     </button>
                 </div>
             </div>
@@ -36,10 +37,11 @@
                 <div class="padded-left">
                     <button mat-button
                             class="minimize link-button"
+                            matTooltip="Add or edit protocol"
                             [disabled]="!isEditMode || !canUpdate"
                             [hidden]="!isEditMode"
                             (click)="openEditAnalysisProtocol()">
-                        New/Edit
+                        Edit
                     </button>
                 </div>
             </div>
@@ -54,10 +56,11 @@
                 <div class="padded-left">
                     <button mat-button
                             class="minimize link-button"
+                            matTooltip="Add or edit organism"
                             [disabled]="!isEditMode || !canUpdate"
                             [hidden]="!isEditMode"
                             (click)="openEditOrganism()">
-                        New/Edit
+                        Edit
                     </button>
                 </div>
             </div>
@@ -70,31 +73,34 @@
                                   [options]="genomeBuildList">
                 </custom-combo-box>
                 <div class="padded-left">
-                    <button mat-button
+                    <button mat-raised-button
                             class="minimize"
+                            matTooltip="Add to list"
                             [disabled]="!isEditMode || !canUpdate || !form.controls['genomeBuildToAdd'].value"
                             [hidden]="!isEditMode"
                             (click)="addGenomeBuild()">
-                        <img [src]="'./assets/add.png'" alt="" class="icon">
-                        Add
+                        <img *ngIf="!isEditMode || !canUpdate || !form.controls['genomeBuildToAdd'].value" [src]="'./assets/add_disable.png'" alt="">
+                        <img *ngIf="isEditMode && canUpdate && form?.controls['genomeBuildToAdd']?.value" [src]="'./assets/add.png'" alt="">
                     </button>
                 </div>
                 <div class="padded-left">
-                    <button mat-button
+                    <button mat-raised-button
                             class="minimize"
+                            matTooltip="Remove from list"
                             [disabled]="!isEditMode || !canUpdate || !genomeBuildToRemove"
                             [hidden]="!isEditMode"
                             (click)="removeGenomeBuild()">
-                        <img [src]="'./assets/delete.png'" alt=""  class="icon">
-                        Remove
+                        <img *ngIf="!isEditMode || !canUpdate || !genomeBuildToRemove" [src]="'./assets/delete_disable.png'" alt="">
+                        <img *ngIf="isEditMode && canUpdate && genomeBuildToRemove" [src]="'./assets/delete.png'" alt="">
                     </button>
                 </div>
                 <div class="padded-left">
-                    <button mat-button
+                    <button mat-raised-button
                             class="minimize link-button"
+                            matTooltip="Add or edit organism"
                             [disabled]="!isEditMode || !canUpdate" (click)="openEditOrganism()"
                             [hidden]="!isEditMode">
-                        New/Edit
+                        Edit
                     </button>
                 </div>
             </div>

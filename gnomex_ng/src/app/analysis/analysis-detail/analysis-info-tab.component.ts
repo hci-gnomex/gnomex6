@@ -26,11 +26,13 @@ import {ManageProtocolsComponent} from "../../configuration/manage-protocols.com
     styles: [`
         
         .column-width {
-            min-width: 12em;
+            min-width: 25em;
             width: 35em;
         }
         
         .horizontal-spacer {
+            min-width: 2em;
+            max-width: 2em;
             width: 2em;
         }
         
