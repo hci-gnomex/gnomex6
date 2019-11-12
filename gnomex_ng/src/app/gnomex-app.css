@@ -353,6 +353,10 @@ img.tree-node-icon {
     padding: 0;
 }
 
+.large-font {
+    font-size: large;
+}
+
 .medium-font {
     font-size: medium;
 }
@@ -478,9 +482,6 @@ button.mat-raised-button.minimize span {
 
 .background {
     background-color: #EEEEEE;
-    padding: 0.3em;
-    border-radius: 0.3em;
-    border: 1px solid darkgrey;
 }
 
 .background-border {

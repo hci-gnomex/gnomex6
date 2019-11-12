@@ -1,63 +1,59 @@
-<mat-toolbar #headerRef class="header-one" *ngIf="this.gnomexService.isLoggedIn">
-    <mat-toolbar-row>
-        <span class="flex-grow">
+<div #headerRef class="full-width header-one small-font align-center" *ngIf="this.gnomexService.isLoggedIn">
+    <div class="flex-container-row align-center">
+        <div class="flex-grow">
             <a [routerLink]="['/home']">
-                <img [src]="'./assets/gnomex_logo_hdr.png'">
+                <img [src]="'./assets/gnomex_logo_hdr.png'" alt="">
             </a>
-        </span>
-        <span class="lookup horizontal-center">
-            <div class="inline-block horizontal-padding">
-                <mat-form-field [hideRequiredMarker]="options.value.hideRequired"
-                                [floatLabel]="options.value.floatPlaceholder">
-                    <input matInput type="text" [(ngModel)]="objNumber" placeholder="Lookup by #">
-                </mat-form-field>
-                <button (click)="searchNumber()">
-                    <img [src]="'./assets/arrow_right.png'">
-                </button>
-            </div>
-            <div class="inline-block horizontal-padding">
-                <mat-form-field floatLabel='auto'>
-                    <input matInput [(ngModel)]="searchText" placeholder="Search">
-                </mat-form-field>
-                <button (click)="searchByText()">
-                    <img [src]="'./assets/magnifier.png'">
-                </button>
-            </div>
-        </span>
-        <span class="flex-grow flex-container-row">
-            <div class="flex-grow horizontal-spacing-center flex-container-row align-center">
+        </div>
+        <div class="flex-container-row padded-left-right align-center">
+            <mat-form-field [hideRequiredMarker]="options.value.hideRequired"
+                            [floatLabel]="options.value.floatPlaceholder">
+                <input matInput type="text" [(ngModel)]="objNumber" placeholder="Lookup by #">
+            </mat-form-field>
+            <button mat-button class="minimize" (click)="searchNumber()">
+                <img [src]="'./assets/arrow_right.png'" alt="">
+            </button>
+            <mat-form-field class="padded-left" floatLabel='auto'>
+                <input matInput class="flex-grow" [(ngModel)]="searchText" placeholder="Search">
+            </mat-form-field>
+            <button mat-button class="minimize" (click)="searchByText()">
+                <img [src]="'./assets/magnifier.png'" alt="">
+            </button>
+        </div>
+        <div class="flex-grow flex-container-row align-center">
+            <div class="flex-container-row flex-grow align-center">
                 <div class="flex-grow">
                 </div>
-                <div class="minimize red">
+                <div class="large-font red">
                     FOR RESEARCH ONLY
                 </div>
                 <div class="flex-grow">
                 </div>
             </div>
-            <span *ngFor="let item of linkNavItems">
+            <div *ngFor="let item of linkNavItems">
                 <!-- Handle branch node buttons here -->
                 <span *ngIf="item.children && item.children.length > 0">
                     <button mat-button
                             [ngClass]="item.class"
                             [matMenuTriggerFor]="menu.childMenu"
                             [disabled]="item.disabled">
-                        <img class="icon" *ngIf="item.iconName" src="{{item.iconName}}">
-                        <span> {{item.displayName}} </span>
+                        <img class="icon" *ngIf="item?.iconName" [src]="item.iconName" alt="">
+                        {{ item.displayName }}
                     </button>
                     <app-menu-item #menu [items]="item.children"></app-menu-item>
                 </span>
                 <!-- Leaf node buttons here -->
                 <span *ngIf="!item.children || item.children.length === 0">
                     <button [ngClass]="item.class" mat-button [routerLink]="item.route">
-                        <img class="icon" *ngIf="item.iconName" src="{{item.iconName}}">
-                        <span>{{item.displayName}}</span>
+                        <img class="icon" *ngIf="item?.iconName" [src]="item.iconName" alt="">
+                        {{ item.displayName }}
                     </button>
                 </span>
-            </span>
-        </span>
+            </div>
+        </div>
         <!--<mat-list></mat-list>-->
-    </mat-toolbar-row>
-    <mat-toolbar-row class="header-two">
+    </div>
+    <div class="flex-container-row header-two">
         <span *ngFor="let item of navItems" class="full-height" [ngClass]="item.class">
             <!-- Handle branch node buttons here -->
             <span *ngIf="item.children && item.children.length > 0" class="full-height">
@@ -66,7 +62,7 @@
                         [hidden]="item.hidden"
                         [matMenuTriggerFor]="menu.childMenu"
                         [disabled]="item.disabled">
-                    <img class="icon" *ngIf="item.iconName" src="{{item.iconName}}">
+                    <img class="icon" *ngIf="item.iconName" [src]="item.iconName" alt="">
                     <span> {{item.displayName}} </span>
                 </button>
                 <app-menu-item #menu [items]="item.children"></app-menu-item>
@@ -75,12 +71,12 @@
             <span *ngIf="!item.children || item.children.length === 0" class="full-height">
                 <button mat-button class="top-menu-item full-height full-width" [hidden]="item.hidden"
                         [routerLink]="item.route"
-                        (click)="setNavModeType()" >
-                    <img class="icon" *ngIf="item.iconName" src="{{item.iconName}}">
+                        (click)="setNavModeType()">
+                    <img class="icon" *ngIf="item.iconName" [src]="item.iconName" alt="">
                     <span>{{item.displayName}}</span>
                 </button>
             </span>
         </span>
-    </mat-toolbar-row>
-</mat-toolbar>
+    </div>
+</div>
 <div #spacerRef></div>
