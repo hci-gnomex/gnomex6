@@ -1,27 +1,39 @@
-<div class="full-width full-height flex-container-col" >
-    <div class="flex-container-row align-baseline padded small-font">
-        <label class="label-title label-title-width">
-            <img class="icon" [src]="analysisTreeNode?.icon">
-            Analysis {{analysisTreeNode?.number}}
-        </label>
-        <button mat-button color="link" *ngIf="showEdit" (click)="editButtonClicked($event)">
-            <img *ngIf="!isEditMode" class="icon" [src]="this.constService.ICON_TAG_BLUE_EDIT">
-            <img *ngIf="isEditMode" class="icon" [src]="this.constService.PAGE">
-            {{isEditMode ? "View" : "Edit"}}
-        </button>
-        <button mat-button *ngIf="this.showAutoDistributeDataTracks" (click)="this.distributeDataTracks()"><img class="icon" [src]="constService.ICON_DATATRACK_NEW"> Distribute Data Tracks</button>
-        <button mat-button *ngIf="this.showManagePEDFile" (click)="this.showManagePEDFileWindow()"><img class="icon" [src]="constService.ICON_CHART_ORGANIZATION">Manage Ped File</button>
-        <button mat-button (click)="this.shareWebLink()"><img class="icon" [src]="constService.GLOBE_LINK">Share URL</button>
-        <button *ngIf="showLinkToExp"
-                mat-button
-                color="link"
-                (click)="makeLinkToExperiment()">
-            <img class="icon" [src]="constService.ICON_LINK">
-            Link to Experiment
-        </button>
+<div class="full-width full-height flex-container-col">
+    <div class="flex-container-row align-center padded-left-right-bottom small-font overflow-auto">
+        <div class="flex-container-row align-center label-min-width">
+            <img [src]="analysisTreeNode?.icon" alt="">
+            <div class="medium-font padded-left">
+                Analysis {{ analysisTreeNode?.number }}
+            </div>
+        </div>
+        <div class="flex-container-row child-margins">
+            <button mat-raised-button *ngIf="showEdit" class="minimize" (click)="editButtonClicked($event)">
+                <img *ngIf="!isEditMode" class="icon" [src]="constService.ICON_TAG_BLUE_EDIT" alt="">
+                <img *ngIf="isEditMode" class="icon" [src]="constService.PAGE" alt="">
+                {{ isEditMode ? "View" : "Edit" }}
+            </button>
+            <button mat-raised-button *ngIf="showAutoDistributeDataTracks" class="minimize" (click)="distributeDataTracks()">
+                <img class="icon" [src]="constService.ICON_DATATRACK_NEW" alt="">
+                Distribute Data Tracks
+            </button>
+            <button mat-raised-button *ngIf="showManagePEDFile" class="minimize" (click)="showManagePEDFileWindow()">
+                <img class="icon" [src]="constService.ICON_CHART_ORGANIZATION" alt="">
+                Manage Ped File
+            </button>
+            <button mat-raised-button class="minimize" (click)="shareWebLink()">
+                <img class="icon" [src]="constService.GLOBE_LINK" alt="">
+                Share URL
+            </button>
+            <button *ngIf="showLinkToExp" mat-raised-button class="minimize" (click)="makeLinkToExperiment()">
+                <img class="icon" [src]="constService.ICON_LINK" alt="">
+                Link to Experiment
+            </button>
+        </div>
+        <div class="flex-grow">
+        </div>
     </div>
-    <div class="flex-grow">
-        <mat-tab-group class="mat-tab-group-border full-height"  (selectedTabChange)="tabChanged($event)">
+    <div class="flex-grow padded-bottom overflow-auto">
+        <mat-tab-group class="bordered full-height"  (selectedTabChange)="tabChanged($event)">
             <mat-tab label="Info">
                 <analysis-info-tab [isEditMode]="isEditMode"></analysis-info-tab>
             </mat-tab>
@@ -43,9 +55,10 @@
         </mat-tab-group>
     </div>
     <div>
-        <save-footer (saveClicked)="save()" [hidden]="this.routeOutlet !== 'analysisPanel'"
-                     [disableSave]="this.analysisService.analysisOverviewForm.invalid || !isEditMode"
-                     [dirty]="this.analysisService.analysisOverviewForm.dirty">
+        <save-footer [hidden]="routeOutlet !== 'analysisPanel'"
+                     [dirty]="analysisService.analysisOverviewForm.dirty"
+                     [disableSave]="analysisService.analysisOverviewForm.invalid || !isEditMode"
+                     (saveClicked)="save()">
         </save-footer>
     </div>
 </div>
