@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, OnInit, ViewChild} from "@angular/core";
+import {Component, ElementRef, ViewChild} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
 import {GnomexService} from "../services/gnomex.service";
 import {GridSizeChangedEvent, GridApi} from "ag-grid-community";
@@ -16,35 +16,47 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
     selector: 'libprepqc-workflow',
     templateUrl: 'libprepqc-workflow.html',
     styles: [`
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
+
+        .request-number-width {
+            min-width: 4em;
+            width: fit-content;
+            max-width: 6em;
         }
-        .formField {
-            width: 20%;
-            margin: 0 0.5%;
+
+        .experiment-type-width {
+            min-width: 15em;
+            width: fit-content;
+            max-width: 15em;
         }
-        .row-one {
-            display: flex;
-            flex-grow: 1;
+
+        .grid-min-height {
+            min-height: 8em;
         }
-        .row-one-right {
-            display: flex;
-            flex-grow: 1;
-            margin-left: 85em;
+
+
+        .no-height {
+            height: 0;
         }
+
+        .single-em {
+            width: 1em;
+        }
+
     `]
 })
 
-export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
+export class LibprepQcWorkflowComponent {
     @ViewChild("requestInput") requestInput: ElementRef;
     @ViewChild("coreFacility") coreFacilityInput: ElementRef;
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+
+    private emToPxConversionRate: number = 13;
+
+    public  requestIds: any[] = [];
 
     private workItemList: any[] = [];
     private workingWorkItemList: any[] = [];
-    private requestIds: any[] = [];
     private changedRowMap: Map<string, any> = new Map<string, any>();
-    private columnDefs;
     private emptyRequest = {requestNumber: ""};
     private dirty: boolean = false;
     private showSpinner: boolean = false;
@@ -54,8 +66,66 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
     private label: string = "Illumina Library Prep QC";
     private codeStepNext: string = "";
     private preCodeStepNext: string = "";
-    private libraryPrepQCProtocols: any[] = [];
-    private coreAdmins: any[] = [];
+
+    private get columnDefs(): any[] {
+
+        let result: any[] = [];
+
+        result.push({
+            headerName: "Sample #",
+            editable: false,
+            field: "sampleNumber",
+            width:    1,
+            minWidth: 4.5 * this.emToPxConversionRate,
+            maxWidth: 9 * this.emToPxConversionRate
+        });
+        result.push({
+            headerName: "Client",
+            editable: false,
+            field: "appUserName",
+            width:    500,
+            minWidth: 9 * this.emToPxConversionRate,
+        });
+        result.push({
+            headerName: "Library QC Protocol",
+            editable:  true,
+            width:    500,
+            minWidth: 12 * this.emToPxConversionRate,
+            field: "idLibPrepQCProtocol",
+            cellRendererFramework: SelectRenderer,
+            cellEditorFramework: SelectEditor,
+            selectOptions: this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.LibraryPrepQCProtocol"),
+            selectOptionsDisplayField: "display",
+            selectOptionsValueField: "idLibPrepQCProtocol",
+            showFillButton: true,
+            fillGroupAttribute: 'idRequest',
+        });
+        result.push({
+            headerName: "Library QC Conc.",
+            editable: true,
+            width:    500,
+            minWidth: 9 * this.emToPxConversionRate,
+            field: "qcLibConcentration",
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+        });
+        result.push({
+            headerName: "Status",
+            editable:  true,
+            width:    1,
+            minWidth: 10 * this.emToPxConversionRate,
+            field: "seqPrepQCStatus",
+            cellRendererFramework: SelectRenderer,
+            cellEditorFramework: SelectEditor,
+            selectOptions: this.workflowService.workflowCompletionStatus,
+            selectOptionsDisplayField: "display",
+            selectOptionsValueField: "value",
+            showFillButton: true,
+            fillGroupAttribute: 'idRequest',
+        });
+
+        return result;
+    }
+
     // left to have nova, hi, mi until we phase them out
     public readonly codeStepArray: any[] = [
         { label: "Illumina Seq ", codeStepNext: this.workflowService.ILLSEQ_PREP_QC  },
@@ -65,20 +135,16 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
     ];
 
 
-
     constructor(public workflowService: WorkflowService,
                 private gnomexService: GnomexService,
                 private dialogsService: DialogsService,
                 private securityAdvisor: CreateSecurityAdvisorService,
-                private dictionaryService: DictionaryService) {
+                private dictionaryService: DictionaryService) { }
 
-    }
-
-    ngOnInit() {
-    }
 
     initialize() {
         this.dialogsService.startDefaultSpinnerDialog();
+
         if(!this.codeStepNext) {
             this.codeStepNext = this.workflowService.ALL_PREP_QC;
         }
@@ -86,64 +152,16 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
         this.preCodeStepNext = this.codeStepNext;
         this.workItem = "";
         
-        let params: HttpParams = new HttpParams()
-            .set("codeStepNext", this.codeStepNext );
+        let params: HttpParams = new HttpParams().set("codeStepNext", this.codeStepNext );
+
         this.workflowService.getWorkItemList(params).subscribe((response: any) => {
             this.workItemList = response ? UtilService.getJsonArray(response, response.WorkItem) : [];
             this.workingWorkItemList = this.workItemList;
             this.workingWorkItemList = this.filterWorkItems();
             this.workingWorkItemList = this.workingWorkItemList.sort(this.workflowService.sortSampleNumber);
-            this.libraryPrepQCProtocols = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.LibraryPrepQCProtocol");
 
-            this.columnDefs = [
-                {
-                    headerName: "Sample #",
-                    editable: false,
-                    field: "sampleNumber",
-                    width: 100
-                },
-                {
-                    headerName: "Client",
-                    editable: false,
-                    field: "appUserName",
-                },
-                {
-                    headerName: "Library QC Protocol",
-                    editable:  true,
-                    width: 400,
-                    field: "idLibPrepQCProtocol",
-                    cellRendererFramework: SelectRenderer,
-                    cellEditorFramework: SelectEditor,
-                    selectOptions: this.libraryPrepQCProtocols,
-                    selectOptionsDisplayField: "display",
-                    selectOptionsValueField: "idLibPrepQCProtocol",
-                    showFillButton: true,
-                    fillGroupAttribute: 'idRequest',
-                },
-                {
-                    headerName: "Library QC Conc.",
-                    editable: true,
-                    width: 150,
-                    field: "qcLibConcentration",
-                    cellRendererFramework: TextAlignLeftMiddleRenderer,
-                },
-                {
-                    headerName: "Status",
-                    editable:  true,
-                    width: 200,
-                    field: "seqPrepQCStatus",
-                    cellRendererFramework: SelectRenderer,
-                    cellEditorFramework: SelectEditor,
-                    selectOptions: this.workflowService.workflowCompletionStatus,
-                    selectOptionsDisplayField: "display",
-                    selectOptionsValueField: "value",
-                    showFillButton: true,
-                    fillGroupAttribute: 'idRequest',
-
-                }
-
-            ];
             this.gridApi.setColumnDefs(this.columnDefs);
+            this.gridApi.setRowData(this.workingWorkItemList);
             this.gridApi.sizeColumnsToFit();
 
             this.requestIds = Array.from(this.workingWorkItemList.reduce((m, t) => m.set(t.requestNumber, t), new Map()).values());
@@ -152,10 +170,6 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
         },(err:IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
         });
-
-    }
-
-    ngAfterViewInit() {
     }
 
     filterWorkItems(): any[] {
@@ -174,6 +188,8 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
 
     selectRequestOption() {
         this.workingWorkItemList = this.filterWorkItems();
+
+        this.gridApi.setRowData(this.workingWorkItemList);
     }
 
     selectCodeOption() {
@@ -200,12 +216,21 @@ export class LibprepQcWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     onGridReady(params) {
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
+
         this.initialize();
     }
 
     onGridSizeChanged(event: GridSizeChangedEvent) {
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
         event.api.sizeColumnsToFit();
     }
 

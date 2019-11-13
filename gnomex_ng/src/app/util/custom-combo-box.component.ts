@@ -30,11 +30,11 @@ import {debounceTime} from "rxjs/operators";
                               (opened)="this.onOpened()" (closed)="this.onClosed()" [displayWith]="this.displayFn">
                 <mat-option [classList]="customOptionClasses" *ngIf="this.allowNone && (this.forceShowNone || !this.innerControl.value)">None</mat-option>
                 <mat-option [classList]="customOptionClasses" *ngFor="let opt of this.loadedOptions" [value]="opt">
-                    {{this.displayField ? opt[this.displayField] : opt}}
+                    {{ displayField ? opt[displayField] : opt}}
                 </mat-option>
                 <mat-option [classList]="customOptionClasses" *ngIf="this.includeLoadingOption">Loading...</mat-option>
             </mat-autocomplete>
-            <mat-error *ngIf="this.innerControl.hasError('required')">{{this.placeholder}} is required</mat-error>
+            <mat-error *ngIf="this.innerControl.hasError('required')">{{ placeholder }} is required</mat-error>
         </mat-form-field>
     `,
     providers: [{

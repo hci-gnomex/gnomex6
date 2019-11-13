@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
 import {GnomexService} from "../services/gnomex.service";
 import {GridApi} from "ag-grid-community";
@@ -20,10 +20,111 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 })
 
 export class PipelineWorkflowComponent implements OnInit {
+
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+
+    private emToPxConversionRate: number = 13;
+
+
+    public get columnDefs(): any[] {
+        let results: any[] = [];
+
+        results.push({
+            headerName: "Flow Cell Lane #",
+            editable: false,
+            field: "flowCellNumber",
+            valueFormatter: this.getFullFlowCellChannelNumber,
+            width: 1,
+            minWidth: 7 * this.emToPxConversionRate
+        });
+        results.push({
+            headerName: "Flow Cell Sample #",
+            editable: false,
+            field: "number",
+            width: 1000,
+            minWidth: 6 * this.emToPxConversionRate
+        });
+        results.push({
+            headerName: "Requested # Cycles",
+            editable: false,
+            field: "idNumberSequencingCycles",
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            valueFormatter: this.getNumberSequencingCycles.bind(this),
+            width: 1,
+            minWidth: 8 * this.emToPxConversionRate,
+            hide: true
+        });
+        results.push({
+            headerName: "Actual # Cycles",
+            editable: false,
+            field: "numberSequencingCyclesActual",
+            width: 1,
+            minWidth: 6 * this.emToPxConversionRate,
+            hide: true
+        });
+        results.push({
+            headerName: "Folder name",
+            editable: false,
+            field: "fileName",
+            width: 300,
+            minWidth: 7 * this.emToPxConversionRate
+        });
+        results.push({
+            headerName: "Reads PF (M)",
+            editable: true,
+            field: "read1ClustersPassedFilterM",
+            width: 1,
+            minWidth: 7 * this.emToPxConversionRate,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            valueSetter: PipelineWorkflowComponent.qualCalcValueSetter,
+            validateService: this.gridColumnValidatorService,
+            maxValue: 9999,
+            minValue: 0,
+            allowNegative: false
+        });
+        results.push({
+            headerName: "Q30 % (eg 88.5)",
+            editable: true,
+            field: "q30PercentForDisplay",
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            width: 1,
+            minWidth: 7 * this.emToPxConversionRate
+        });
+        results.push({
+            headerName: "Pipeline Protocol",
+            editable: false,
+            width: 1,
+            minWidth: 12 * this.emToPxConversionRate,
+            field: "idPipelineProtocol",
+            cellRendererFramework: SelectRenderer,
+            cellEditorFramework: SelectEditor,
+            selectOptions: this.pipelineProtoList,
+            selectOptionsDisplayField: "protocol",
+            selectOptionsValueField: "idPipelineProtocol",
+            fillGroupAttribute: 'idRequest'
+        });
+        results.push({
+            headerName: "Status",
+            editable: true,
+            width: 1,
+            minWidth: 8 * this.emToPxConversionRate,
+            field: "pipelineStatus",
+            cellRendererFramework: SelectRenderer,
+            cellEditorFramework: SelectEditor,
+            selectOptions: this.workflowService.pipelineCompletionStatus,
+            selectOptionsDisplayField: "display",
+            selectOptionsValueField: "value",
+            showFillButton: true,
+            fillGroupAttribute: 'flowCellNumber'
+        });
+
+        return results;
+    }
+
+
     private workItemList: any[] = [];
     public workingWorkItemList: any[] = [];
     private changedRowMap: Map<string, any> = new Map<string, any>();
-    public columnDefs: any;
     private dirty: boolean = false;
     private showSpinner: boolean = false;
     private workItem: any;
@@ -39,117 +140,38 @@ export class PipelineWorkflowComponent implements OnInit {
                 private dialogsService: DialogsService,
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private gridColumnValidatorService: GridColumnValidateService,
-                private dictionaryService: DictionaryService) {
+                private dictionaryService: DictionaryService) { }
 
+    ngOnInit() {
+        this.pipelineProtoList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.PipelineProtocol");
     }
 
-    initialize() {
+
+    private initialize(): void {
         this.dialogsService.startDefaultSpinnerDialog();
-        let params: HttpParams = new HttpParams()
-            .set("codeStepNext", this.workflowService.ALL_DATA_PIPELINE);
+
+        let params: HttpParams = new HttpParams().set("codeStepNext", this.workflowService.ALL_DATA_PIPELINE);
         this.workflowService.getWorkItemList(params).subscribe((response: any) => {
             this.workItemList = response ? UtilService.getJsonArray(response, response.WorkItem) : [];
             this.workingWorkItemList = this.workItemList;
             this.workingWorkItemList = this.filterWorkItems();
             this.workingWorkItemList = this.workingWorkItemList.sort(this.workflowService.sortSampleNumber);
 
-            this.columnDefs = [
-                {
-                    headerName: "Flow Cell Lane #",
-                    editable: false,
-                    field: "flowCellNumber",
-                    valueFormatter: this.getFullFlowCellChannelNumber,
-                    width: 130
-                },
-                {
-                    headerName: "Flow Cell Sample #",
-                    editable: false,
-                    field: "number",
-                    width: 200
-                },
-                {
-                    headerName: "Requested # Cycles",
-                    editable: false,
-                    field: "idNumberSequencingCycles",
-                    valueFormatter: this.getNumberSequencingCycles.bind(this),
-                    width: 130
-                },
-                {
-                    headerName: "Actual # Cycles",
-                    editable: false,
-                    field: "numberSequencingCyclesActual",
-                    width: 130
-                },
-                {
-                    headerName: "Folder name",
-                    editable: false,
-                    field: "fileName",
-                    width: 200
-                },
-                {
-                    headerName: "Reads PF (M)",
-                    editable: true,
-                    field: "read1ClustersPassedFilterM",
-                    width: 130,
-                    cellRendererFramework: TextAlignLeftMiddleRenderer,
-                    valueSetter: PipelineWorkflowComponent.qualCalcValueSetter,
-                    validateService: this.gridColumnValidatorService,
-                    maxValue: 9999,
-                    minValue: 0,
-                    allowNegative: false
-
-                },
-                {
-                    headerName: "Q30 % (eg 88.5)",
-                    editable: true,
-                    field: "q30PercentForDisplay",
-                    width: 130
-                },
-                {
-                    headerName: "Pipeline Protocol",
-                    editable: false,
-                    width: 200,
-                    field: "idPipelineProtocol",
-                    cellRendererFramework: SelectRenderer,
-                    cellEditorFramework: SelectEditor,
-                    selectOptions: this.pipelineProtoList,
-                    selectOptionsDisplayField: "protocol",
-                    selectOptionsValueField: "idPipelineProtocol",
-                    fillGroupAttribute: 'idRequest',
-                },
-                {
-                    headerName: "Status",
-                    editable: true,
-                    width: 140,
-                    field: "pipelineStatus",
-                    cellRendererFramework: SelectRenderer,
-                    cellEditorFramework: SelectEditor,
-                    selectOptions: this.workflowService.pipelineCompletionStatus,
-                    selectOptionsDisplayField: "display",
-                    selectOptionsValueField: "value",
-                    showFillButton: true,
-                    fillGroupAttribute: 'flowCellNumber',
-                }
-
-            ];
             this.gridApi.setColumnDefs(this.columnDefs);
             this.gridApi.sizeColumnsToFit();
 
             this.workflowService.assignBackgroundColor(this.workingWorkItemList, "flowCellNumber");
             this.dialogsService.stopAllSpinnerDialogs();
-        },(err: IGnomexErrorResponse) => {
+        }, (err: IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
         });
-
     }
 
-    public getFullFlowCellChannelNumber(params): string
-    {
+    public getFullFlowCellChannelNumber(params): string {
         return params.data.flowCellNumber + "-" + params.data.channelNumber;
     }
 
-    public getNumberSequencingCycles(params): string
-    {
+    public getNumberSequencingCycles(params): string {
         if (this.dictionaryService) {
             return this.dictionaryService.getEntryDisplay("hci.gnomex.model.NumberSequencingCycles", params.data.idNumberSequencingCycles);
         } else {
@@ -157,11 +179,7 @@ export class PipelineWorkflowComponent implements OnInit {
         }
     }
 
-    ngOnInit() {
-        this.pipelineProtoList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.PipelineProtocol");
-    }
-
-    filterWorkItems(): any[] {
+    private filterWorkItems(): any[] {
         let items: any[] = [];
 
         if (this.workItem) {
@@ -180,34 +198,41 @@ export class PipelineWorkflowComponent implements OnInit {
         return items;
     }
 
-    onNotifyGridRowDataChanged(event) {
+    public onNotifyGridRowDataChanged(event) {
         if (this.gridApi) {
             this.gridApi.hideOverlay();
         }
     }
 
-    onCellValueChanged(event) {
+    public onCellValueChanged(event) {
         this.changedRowMap.set(event.data.key, event.data);
         this.dirty = true;
     }
 
-    onGridReady(params) {
+    public onGridReady(params) {
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
         this.initialize();
     }
 
 
-    save() {
+    public save() {
         this.gridApi.stopEditing();
+
         setTimeout(() => {
             let workItems: any[] = [];
             for(let value of Array.from( this.changedRowMap.values()) ) {
                 workItems.push(value);
             }
 
-            let params: HttpParams = new HttpParams().set("workItemXMLString", JSON.stringify(workItems));
             this.showSpinner = true;
+
+            let params: HttpParams = new HttpParams().set("workItemXMLString", JSON.stringify(workItems));
+
             this.workflowService.SaveWorkItemSolexaPipeline(params).subscribe((response: any) => {
                 if (response && response.result && response.result === 'SUCCESS') {
                     if (response.message) {
@@ -227,6 +252,7 @@ export class PipelineWorkflowComponent implements OnInit {
                     this.workItem = "";
                     this.initialize();
                 }
+
                 this.showSpinner = false;
             });
         })
@@ -236,15 +262,17 @@ export class PipelineWorkflowComponent implements OnInit {
         return params.colDef.validateService.validate(params);
     }
 
-    refreshWorklist(event) {
+    public refreshWorkItemList(event: any) {
         this.initialize();
     }
 
-    sizeColumnsToFit(api: any): void {
-        if (api) {
-            api.sizeColumnsToFit();
+    public onGridSizeChanged(event: any): void {
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
+        if (event && event.api) {
+            event.api.sizeColumnsToFit();
         }
     }
-
-
 }

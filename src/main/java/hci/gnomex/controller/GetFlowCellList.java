@@ -48,35 +48,29 @@ public class GetFlowCellList extends GNomExCommand implements Serializable {
 
     if (this.getSecurityAdvisor().hasPermission(SecurityAdvisor.CAN_MANAGE_WORKFLOW)) {
       try {
-
-
         Session sess = this.getSecAdvisor().getReadOnlyHibernateSession(this.getUsername());
 
         StringBuffer buf =  filter.getQuery(this.getSecAdvisor());
         List flowCells = (List)sess.createQuery(buf.toString()).list();
 
         Document doc = new Document(new Element("FlowCellList"));
-        for(Iterator i = flowCells.iterator(); i.hasNext();) {
-          FlowCell fc = (FlowCell)i.next();
 
-
-          Element fcNode = fc.toXMLDocument(null, DetailObject.DATE_OUTPUT_SQL).getRootElement();
-
+        for(Object obj : flowCells) {
+          Element fcNode = ((FlowCell) obj).toXMLDocument(null, DetailObject.DATE_OUTPUT_SQL).getRootElement();
           doc.getRootElement().addContent(fcNode);
-
         }
 
         XMLOutputter out = new org.jdom.output.XMLOutputter();
         this.xmlResult = out.outputString(doc);
 
         setResponsePage(this.SUCCESS_JSP);
-        }catch (Exception e){
-          this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in GetFlowCellList ", e);
+      } catch (Exception e) {
+        this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in GetFlowCellList ", e);
 
-          throw new RollBackCommandException(e.getMessage());
-        }
-        setResponsePage(this.SUCCESS_JSP);
+        throw new RollBackCommandException(e.getMessage());
+      }
 
+      setResponsePage(this.SUCCESS_JSP);
     } else {
       this.addInvalidField("Insufficient permissions", "Insufficient permission to manage workflow.");
       setResponsePage(this.ERROR_JSP);
@@ -84,5 +78,4 @@ public class GetFlowCellList extends GNomExCommand implements Serializable {
 
     return this;
   }
-
 }

@@ -16,19 +16,7 @@ import {first} from "rxjs/operators";
 @Component({
     selector: 'libprep-workflow',
     templateUrl: 'libprep-workflow.html',
-    styles: [`
-        
-        .request-number-width {
-            min-width: 4em;
-            width: fit-content;
-            max-width: 6em;
-        }
-        
-        .experiment-type-width {
-            min-width: 15em;
-            width: fit-content;
-            max-width: 15em;
-        }
+    styles: [`        
         
         .grid-min-height {
             min-height: 8em;

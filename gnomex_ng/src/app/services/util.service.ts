@@ -210,4 +210,7 @@ export class UtilService {
 
     }
 
-}
+
+    public static shrinkCellText(params): any {
+        return {'font-size': '.70rem'};
+    }}

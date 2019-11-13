@@ -36,6 +36,13 @@ import {DictionaryService} from "../../services/dictionary.service";
         let solexaFlowCellChannels: number = requestCategory.numberOfChannels;
         let rLanes: any[] = [];
 
+        let emptyChoice: any = {
+            display: "",
+            value: ""
+        };
+
+        rLanes.push(emptyChoice);
+
         for (var i = 1; i <= solexaFlowCellChannels; i++) {
             let obj = {display: i.toString(), value: i};
             rLanes.push(obj);

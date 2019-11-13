@@ -1,8 +1,8 @@
-import {AfterViewInit, Component, Inject, OnInit} from "@angular/core";
+import {Component, ElementRef, Inject, OnInit, ViewChild} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
 import {MatDialogConfig} from "@angular/material";
 import {GnomexService} from "../services/gnomex.service";
-import {GridApi, GridOptions, GridSizeChangedEvent} from "ag-grid-community";
+import {GridApi, GridSizeChangedEvent} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
@@ -18,6 +18,8 @@ import {UtilService} from "../services/util.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {ConstantsService} from "../services/constants.service";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {DateRenderer} from "../util/grid-renderers/date.renderer";
+import {DateParserComponent} from "../util/parsers/date-parser.component";
 
 
 @Component({
@@ -25,38 +27,94 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
     templateUrl: 'flowcell-workflow.html',
     styles: [`
         
-        mat-form-field.formField {
-            width: 20%;
-            margin: 0 0.5%;
+        
+        .reserved-space {
+            min-width: 12em;
         }
-        .row-one-right {
-            display: flex;
-            flex-grow: 1;
-            margin-left: 85em;
+        
+        .margin-children > *:not(:last-child) {
+            margin-right: 0.3em;
         }
-        .filter-by-date {
-            width: 20%
-        }
+        
+        
     `]
 })
 
-export class FlowcellWorkflowComponent implements OnInit, AfterViewInit {
+export class FlowcellWorkflowComponent implements OnInit {
+
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+
+    private emToPxConversionRate: number = 13;
+
+
+    public get columnDefs(): any[] {
+        let results: any[] = [];
+
+        results.push({
+            headerName: "Flow Cell",
+            editable: false,
+            width: 1,
+            minWidth: 5 * this.emToPxConversionRate,
+            field: "number",
+            cellRendererFramework: TextAlignLeftMiddleRenderer
+        });
+        results.push({
+            headerName: "Barcode",
+            editable: false,
+            width: 1,
+            minWidth: 7 * this.emToPxConversionRate,
+            field: "barcode",
+            cellRendererFramework: TextAlignLeftMiddleRenderer
+        });
+        results.push({
+            headerName: "Cluster Gen Date",
+            editable: false,
+            width: 1,
+            minWidth: 7 * this.emToPxConversionRate,
+            field: "createDate",
+            cellRendererFramework: DateRenderer,
+            dateParser: new DateParserComponent("YYYY-MM-DD", "YYYY-MM-DD")
+        });
+        results.push({
+            headerName: "Sequencing Protocol",
+            editable: false,
+            width: 300,
+            minWidth: 12 * this.emToPxConversionRate,
+            field: "idNumberSequencingCyclesAllowed",
+            cellRendererFramework: SelectRenderer,
+            cellEditorFramework: SelectEditor,
+            selectOptions: this.sequenceProtocolsList,
+            selectOptionsDisplayField: "name",
+            selectOptionsValueField: "idNumberSequencingCyclesAllowed",
+            showFillButton: true,
+            fillGroupAttribute: 'idRequest'
+        });
+        results.push({
+            headerName: "Content",
+            editable: false,
+            width: 800,
+            minWidth: 8 * this.emToPxConversionRate,
+            field: "notes",
+            cellRendererFramework: TextAlignLeftMiddleRenderer
+        });
+
+        return results;
+    }
+
+    public get isRowSelected(): boolean {
+        return this.selectedFlowCell && this.selectedFlowCell.number;
+    }
+
 
     private workItemList: any[] = [];
-    private workingWorkItemList: any[] = [];
     private sequenceProtocolsList: any[] = [];
-    private gridOptions:GridOptions = {};
     private changedRowMap: Map<string, any> = new Map<string, any>();
     public label:string = "Flow Cells";
     private searchText: string;
     private dirty: boolean = false;
     private gridApi:GridApi;
-    private gridColumnApi;
-    private libraryPrepQCProtocols: any[] =[];
     public filterForm: FormGroup;
     private selectedFlowCell: any;
-    public columnDefs:any[];
-
 
 
     constructor(@Inject(FormBuilder) private fb: FormBuilder,
@@ -68,68 +126,22 @@ export class FlowcellWorkflowComponent implements OnInit, AfterViewInit {
                 private dictionaryService: DictionaryService,
                 public constService:ConstantsService ) {
 
-        this.filterForm = fb.group({
-            date: ['', [
-                Validators.required
-            ]],
-        });
-
+        this.filterForm = fb.group({ date: ['', [ Validators.required ]], });
     }
 
     ngOnInit() {
-        this.sequenceProtocolsList = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.NumberSequencingCyclesAllowed").filter(proto =>
-            (proto.codeRequestCategory ===  "HISEQ" || proto.codeRequestCategory === "MISEQ" ||
-                proto.codeRequestCategory === "NOSEQ" || proto.codeRequestCategory === "ILLSEQ") && proto.isActive === 'Y'
-        );
-        this.columnDefs = [
-            {
-                headerName: "Flow Cell",
-                editable: false,
-                width: 120,
-                field: "number",
-                cellRendererFramework: TextAlignLeftMiddleRenderer,
-            },
-            {
-                headerName: "Barcode",
-                editable: false,
-                width: 120,
-                field: "barcode",
-                cellRendererFramework: TextAlignLeftMiddleRenderer,
-            },
-            {
-                headerName: "Cluster Gen Date",
-                editable: false,
-                width: 150,
-                field: "createDate",
-                cellRendererFramework: TextAlignLeftMiddleRenderer,
-            },
-            {
-                headerName: "Sequencing Protocol",
-                editable: false,
-                width: 450,
-                field: "idNumberSequencingCyclesAllowed",
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor,
-                selectOptions: this.sequenceProtocolsList,
-                selectOptionsDisplayField: "name",
-                selectOptionsValueField: "idNumberSequencingCyclesAllowed",
-                showFillButton: true,
-                fillGroupAttribute: 'idRequest',
-            },
-            {
-                headerName: "Content",
-                editable: false,
-                width: 555,
-                field: "notes",
-                cellRendererFramework: TextAlignLeftMiddleRenderer,
-            },
-
-        ];
-
+        this.sequenceProtocolsList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.NUMBER_SEQUENCING_CYCLES_ALLOWED).filter((proto) => {
+            return proto.isActive === 'Y'
+                && (proto.codeRequestCategory ===  "HISEQ"
+                    || proto.codeRequestCategory === "MISEQ"
+                    || proto.codeRequestCategory === "NOSEQ"
+                    || proto.codeRequestCategory === "ILLSEQ");
+        });
     }
 
     initialize() {
         this.dialogsService.startDefaultSpinnerDialog();
+
         let params: HttpParams = new HttpParams();
         if (this.filterForm.controls['date'].value) {
             let dateRange: DateRange = this.filterForm.controls['date'].value;
@@ -142,107 +154,123 @@ export class FlowcellWorkflowComponent implements OnInit, AfterViewInit {
         this.workflowService.getFlowCellList(params).subscribe((response: any) => {
             if (response && response.result !== "INVALID") {
                 this.workItemList = response ? UtilService.getJsonArray(response, response.FlowCell) : [];
-                this.workingWorkItemList = this.workItemList;
-                this.gridApi.setRowData(this.workingWorkItemList);
+
+                this.gridApi.setRowData(this.workItemList);
+                this.gridApi.sizeColumnsToFit();
+
                 if(this.searchText){
-                    this.gridOptions.api.setQuickFilter(this.searchText);
+                    this.gridApi.setQuickFilter(this.searchText);
                 }
             }
+
             this.dialogsService.stopAllSpinnerDialogs();
-        },(err:IGnomexErrorResponse) =>{
+        }, (err:IGnomexErrorResponse) =>{
             this.dialogsService.stopAllSpinnerDialogs();
         });
     }
 
-    ngAfterViewInit() {
-
-    }
-
-    selectedRow(event) {
-        if(event.node.selected) {
-            this.selectedFlowCell = event.data;
-        }
-    }
 
     public dateRangeChange(event: DateRange): void {
         this.filterForm.controls['date'].setValue(event);
         this.initialize();
     }
 
-    onNotifyGridRowDataChanged(event) {
-        if (this.gridApi) {
-            this.gridApi.hideOverlay();
-        }
-    }
-
-    onCellValueChanged(event) {
-        this.changedRowMap.set(event.data.key, event.data);
-        this.dirty = true;
-    }
-    onFind(event){
+    public onFind(event?: any): void {
         this.initialize();
     }
 
-    onGridReady(params) {
-        this.gridApi = params.api;
-        this.gridColumnApi = params.columnApi;
-        this.gridApi.setColumnDefs(this.columnDefs);
-        params.api.sizeColumnsToFit();
+    public search(): void {
+        this.gridApi.setQuickFilter(this.searchText);
     }
 
-    onGridSizeChanged(event: GridSizeChangedEvent) {
-        event.api.sizeColumnsToFit();
-    }
-
-    search() {
-        this.gridOptions.api.setQuickFilter(this.searchText);
-    }
-
-    refreshWorklist(event) {
-        this.initialize();
-    }
-
-    onClickPrepReport() {
+    public onClickPrepReport(): void {
         let url: string = this.document.location.href;
         url = url.substring(0,url.lastIndexOf('/'));
         url += "/ShowFlowCellPrepForm.gx?idFlowCell=" + this.selectedFlowCell.idFlowCell;
         window.open(url, "_blank");
     }
 
-    onClickRunReport() {
+    public onClickRunReport(): void {
         let url: string = this.document.location.href;
         url = url.substring(0,url.lastIndexOf('/'));
         url += "/ShowFlowCellForm.gx?idFlowCell=" + this.selectedFlowCell.idFlowCell;
         window.open(url, "_blank");
     }
 
-    onClickEditFlowCell() {
-        let params: HttpParams = new HttpParams();
+    public onClickEditFlowCell(): void {
         let editFlowCell: any;
-        params = params.set("id", this.selectedFlowCell.idFlowCell);
+
+        let params: HttpParams = new HttpParams().set("id", this.selectedFlowCell.idFlowCell);
         this.workflowService.getFlowCell(params).subscribe((response: any) => {
             editFlowCell = response;
+
             let config: MatDialogConfig = new MatDialogConfig();
             config.width = "60em";
             config.height = "50em";
-            config.data = {
-                flowCell: editFlowCell.FlowCell
+            config.data = { flowCell: editFlowCell.FlowCell };
+
+            let actionConfig: any = {
+                actions: [
+                    {
+                        type: ActionType.PRIMARY,
+                        icon: this.constService.ICON_SAVE,
+                        name: "Save",
+                        internalAction: "saveFlowCell"
+                    },
+                    {
+                        type: ActionType.SECONDARY,
+                        name: "Cancel",
+                        internalAction: "onClose"
+                    }
+                ]
             };
-            this.dialogsService.genericDialogContainer(EditFlowcellDialogComponent, null, null, config,
-                {actions: [
-                        {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "saveFlowCell"},
-                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
-                    ]}).subscribe((result: any) => {
-                        if(result) {
-                            this.searchText = "";
-                            this.initialize();
-                        }
+
+            this.dialogsService.genericDialogContainer(EditFlowcellDialogComponent, null, null, config, actionConfig).subscribe((result: any) => {
+                if(result) {
+                    this.searchText = "";
+                    this.initialize();
+                }
             });
         });
     }
 
-    launchEditFlowCell(event) {
+    public launchEditFlowCell(event?: any): void {
         this.onClickEditFlowCell();
     }
 
+
+    public onRowSelected(event: any): void {
+        if(event.node.selected) {
+            this.selectedFlowCell = event.data;
+        }
+    }
+
+    public onCellValueChanged(event: any): void {
+        this.changedRowMap.set(event.data.key, event.data);
+        this.dirty = true;
+    }
+
+    public onGridReady(event: any): void {
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
+        if (event && event.api) {
+            this.gridApi = event.api;
+            this.gridApi.setColumnDefs(this.columnDefs);
+            this.gridApi.sizeColumnsToFit();
+
+            this.gridApi.hideOverlay();
+        }
+    }
+
+    public onGridSizeChanged(event: GridSizeChangedEvent): void {
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
+        if (event && event.api) {
+            event.api.sizeColumnsToFit();
+        }
+    }
 }

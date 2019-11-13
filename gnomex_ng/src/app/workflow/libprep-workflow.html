@@ -11,6 +11,7 @@
                               displayField="requestNumber"
                               valueField="requestNumber"
                               [(ngModel)]="selectedRequestNumber"
+                              [customOptionClasses]="'small-font padded inline-block full-width'"
                               [options]="this.requestIds"
                               [allowNone]="false"
                               (optionSelected)="selectRequestOption()">
@@ -21,6 +22,7 @@
                               displayField="label"
                               valueField="codeStepNext"
                               [(ngModel)]="codeStepNext"
+                              [customOptionClasses]="'small-font padded inline-block full-width'"
                               [options]="this.codeStepArray"
                               (optionSelected)="selectExperimentType()">
             </custom-combo-box>
@@ -34,10 +36,11 @@
     <div class="flex-grow padded-bottom">
         <div #oneEmWidth class="no-height single-em"></div>
         <ag-grid-angular class="ag-theme-fresh full-height full-width grid-min-height"
-                         [enableSorting]="true"
-                         [stopEditingWhenGridLosesFocus]="true"
-                         [rowClassRules]="this.workflowService.assmGridRowClassRules"
                          [enableColResize]="true"
+                         [enableSorting]="true"
+                         [rowClassRules]="this.workflowService.assmGridRowClassRules"
+                         [singleClickEdit]="true"
+                         [stopEditingWhenGridLosesFocus]="true"
                          (cellValueChanged)="onCellValueChanged($event)"
                          (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
                          (gridReady)="onGridReady($event)"
