@@ -187,10 +187,18 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
                 this.loadedOptions.push(currentlySelected);
             }
         }
-        if (this.innerControl.value !== newValue) {
+        // prefer to check id if it has one  vs straight against it's object identity
+        if( this.innerControl.value && newValue && this.valueField){
+            if(this.innerControl.value[this.valueField] !== newValue[this.valueField]){
+                this.ignoreInnerControlChanges = true;
+                this.innerControl.setValue(newValue);
+                this.optionSelected.emit(newValue[this.valueField]);
+            }
+        } else if (this.innerControl.value !== newValue) {
             this.ignoreInnerControlChanges = true;
             this.innerControl.setValue(newValue);
-            this.selectOption(newValue);
+            let nv = newValue ? ((this.valueField && !this.forceEmitObject) ? newValue[this.valueField] : newValue) : null;
+            this.optionSelected.emit(nv);
         }
     }
 
