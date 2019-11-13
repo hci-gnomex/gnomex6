@@ -2,7 +2,7 @@
     <div *ngIf="!!icon || !!label" class="full-width align-center padded-bottom">
         <div class="full-height full-width flex-container-row">
             <div *ngIf="!!icon" class="padded-left">
-                <img src="{{ icon }}" height="16" width="16">
+                <img [src]="icon" alt="" height="16" width="16">
             </div>
             <div *ngIf="!!label" class="flex-grow padded" style="min-height: calc(0.6em + 16px);">
                 {{ label }}

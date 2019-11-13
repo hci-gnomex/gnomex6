@@ -244,6 +244,8 @@ export class CustomInputComponent implements AfterViewInit {
     @Input("noTopBorder") noTopBorder: boolean = false;
 
     @Input("label")       label: string = 'label';
+    @Input("id")          id: string = 'theInput';
+    @Input("name")        name: string = 'theInput';
     @Input("tooltip")     tooltip: string = 'tooltip';
 
 

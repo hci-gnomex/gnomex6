@@ -345,7 +345,7 @@ mat-tab-group.flex-style mat-tab-header .mat-tab-label-container .mat-tab-list .
 }
 
 img.icon {
-    margin-right: 0.5em;
+    margin-right: 0.3em;
 }
 
 img.tree-node-icon {
@@ -516,6 +516,28 @@ button.mat-raised-button.minimize span {
     padding: 0.3em;
 }
 
+button.mat-button span.mat-button-wrapper {
+    display: flex;
+    align-items: center;
+    height: fit-content;
+    width: 100%;
+    justify-content: center;
+}
+
+button.mat-raised-button span.mat-button-wrapper {
+    display: flex;
+    align-items: center;
+    height: fit-content;
+    width: 100%;
+    justify-content: center;
+}
+
+
+.mat-checkbox label.mat-checkbox-layout span.mat-checkbox-label {
+    margin-top: 2px;
+}
+
+
 .bordered {
     border: 1px solid silver;
 }
@@ -559,8 +581,8 @@ button.mat-button.link-button {
 
 
 label.mat-radio-label {
-    margin-top: 0.15em !important;
-    margin-bottom: 0.15em !important;
+    margin-top: 1px !important;
+    margin-bottom: 1px !important;
 }
 
 

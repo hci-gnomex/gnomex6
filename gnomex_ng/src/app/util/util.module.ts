@@ -42,6 +42,7 @@ import {CustomComboBoxComponent} from "./custom-combo-box.component";
 import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
 import {CustomMultiComboBoxComponent} from "./custom-multi-combo-box.component";
 import {AngularEditorModule} from "@kolkov/angular-editor";
+import {BrowseFilterBasicComponent} from "./browse-filter-basic.component";
 @NgModule({
     imports: [
         BrowserModule,
@@ -60,6 +61,7 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
     declarations: [
         BillingUsageReportComponent,
         BrowseFilterComponent,
+        BrowseFilterBasicComponent,
         DateParserComponent,
         DatePickerComponent,
         DateRangeFilterComponent,
@@ -111,6 +113,7 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
     ],
     exports: [
         BrowseFilterComponent,
+        BrowseFilterBasicComponent,
         BillingUsageReportComponent,
         DateParserComponent,
         DatePickerComponent,

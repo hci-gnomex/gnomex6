@@ -7,7 +7,14 @@ import {DialogsService} from "./popup/dialogs.service";
 @Component({
     selector: "context-help",
     template: `
-        <button mat-button [matTooltip]="this.tooltip" [matTooltipPosition]="this.tooltipPosition" (click)="this.showPopup()"><img [src]="'./assets/information.png'" class="icon">{{this.label}}</button>
+        <button mat-button 
+                class="minimize"
+                [matTooltip]="tooltip" 
+                [matTooltipPosition]="tooltipPosition" 
+                (click)="showPopup()">
+            <img [src]="'./assets/information.png'" class="{{ !!label ? 'icon' : ''}}" alt="">
+            {{ label }}
+        </button>
     `,
     styles: [`
         * {

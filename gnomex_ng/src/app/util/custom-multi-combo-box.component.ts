@@ -19,22 +19,26 @@ import {MatSelect} from "@angular/material";
     selector: "custom-multi-combo-box",
     template: `
         <div class="full-height full-width flex-container-row align-center">
-            <mat-form-field class="flex-grow" [matTooltip]="this.tooltip">
+            <mat-form-field class="flex-grow" [matTooltip]="tooltip">
                 <input #input matInput name="customMultiComboBoxFilter" class="ellipsis"
-                       (focus)="this.onInputFocus()"
+                       (focus)="onInputFocus()"
                        autocomplete="off"
-                       [placeholder]="this.temporaryPlaceholder ? (this.outerControl.value && this.outerControl.value.length ? '' : this.placeholder) : this.placeholder"
-                       [formControl]="this.innerControl">
+                       [placeholder]="temporaryPlaceholder ? (outerControl.value && outerControl.value.length ? '' : placeholder) : placeholder"
+                       [formControl]="innerControl">
             </mat-form-field>
             <div>
                 <mat-select #select [multiple]="true"
-                            (selectionChange)="this.selectOptions($event.value)"
-                            (openedChange)="this.onOpenedChange($event)">
-                    <mat-option *ngFor="let opt of this.loadedOptions" [value]="opt">
-                        {{this.displayField ? opt[this.displayField] : opt}}
+                            (selectionChange)="selectOptions($event.value)"
+                            (openedChange)="onOpenedChange($event)">
+                    <mat-option [classList]="customOptionClasses" *ngFor="let opt of loadedOptions" [value]="opt">
+                        {{ displayField ? opt[displayField] : opt }}
                     </mat-option>
-                    <mat-option *ngIf="this.includeLoadingOption">Loading...</mat-option>
-                    <mat-option *ngIf="!this.includeLoadingOption && !this.options.length">None</mat-option>
+                    <mat-option [classList]="customOptionClasses" *ngIf="includeLoadingOption">
+                        Loading...
+                    </mat-option>
+                    <mat-option [classList]="customOptionClasses" *ngIf="!includeLoadingOption && !options.length">
+                        None
+                    </mat-option>
                 </mat-select>
             </div>
         </div>
@@ -65,7 +69,16 @@ export class CustomMultiComboBoxComponent implements AfterViewInit, OnChanges, O
     @Input() private forceEmitObject: boolean = false;
     @Input() public displayField: string;
 
-    private outerControl: AbstractControl = new FormControl([]);
+    @Input() public set customOptionClasses(value: string) {
+        this._customOptionClasses = value ? value : "";
+    }
+    public get customOptionClasses(): string {
+        return !!this._customOptionClasses ? this._customOptionClasses : 'mat-option';
+    }
+
+    private _customOptionClasses: string = "";
+
+    public outerControl: AbstractControl = new FormControl([]);
     public innerControl: FormControl = new FormControl("");
     private ignoreInnerControlChanges: boolean = false;
     private innerControlSubscription: Subscription;
@@ -213,6 +226,7 @@ export class CustomMultiComboBoxComponent implements AfterViewInit, OnChanges, O
                 newVal.push((this.valueField && !this.forceEmitObject) ? opt[this.valueField] : opt);
             }
         }
+
         if (this.noNgControl) {
             this.outerControl.setValue(newVal);
         }

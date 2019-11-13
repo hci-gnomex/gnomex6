@@ -18,6 +18,7 @@ import {DialogsModule} from "../util/popup/dialogs.module";
 import {AnalysisOverviewModule} from "./analysis-overview/analysis-overview.module";
 import {AnalysisDetailModule} from "./analysis-detail/analysis-detail.module";
 import {AngularEditorModule} from "@kolkov/angular-editor";
+import {BrowseFilterAnalysisComponent} from "./browse-analysis-filter.component";
 
 /**
  * @author jdewell
@@ -46,12 +47,22 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
     ],
     declarations: [
         BrowseAnalysisComponent,
-        DeleteAnalysisComponent,
+        BrowseFilterAnalysisComponent,
         CreateAnalysisComponent,
-        CreateAnalysisGroupComponent
+        CreateAnalysisGroupComponent,
+        DeleteAnalysisComponent
     ],
-    entryComponents: [DeleteAnalysisComponent, CreateAnalysisComponent, CreateAnalysisGroupComponent],
-    exports: [DeleteAnalysisComponent, CreateAnalysisComponent, CreateAnalysisGroupComponent]
+    entryComponents: [
+        CreateAnalysisComponent,
+        CreateAnalysisGroupComponent,
+        DeleteAnalysisComponent
+    ],
+    exports: [
+        BrowseFilterAnalysisComponent,
+        CreateAnalysisComponent,
+        CreateAnalysisGroupComponent,
+        DeleteAnalysisComponent
+    ]
 })
 export class AnalysisModule {
 }

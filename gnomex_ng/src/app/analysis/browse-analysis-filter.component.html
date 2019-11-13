@@ -1,0 +1,70 @@
+<div class="full-width foreground bordered padded small-font">
+    <div class="flex-container-row align-center overflow-auto">
+        <div class="flex-container-row align-center children-spaced filter-row-top" [hidden]="isCollapsed">
+            <div class="min-width-header padded" *ngIf="showLabelAndIcon">
+                <img [src]="iconSource" [alt]="iconAlt" class="icon">
+                <label>
+                    {{ label }}
+                </label>
+            </div>
+            <button mat-raised-button class="minimize" (click)="search()">
+                <img [src]="'./assets/magnifier.png'" alt="" class="icon">
+                Search
+            </button>
+            <div class="flex-container-row align-center children-spaced" *ngIf="showLabMultiSelectComboBox">
+                <!--<label class="">-->
+                <!--Lab(s) :-->
+                <!--</label>-->
+                <custom-multi-combo-box placeholder="Lab(s) :"
+                                        [options]="labList"
+                                        [displayField]="prefService.labDisplayField"
+                                        [valueField]="'idLab'"
+                                        (selectionChanged)="onMultiLabChange($event)">
+                </custom-multi-combo-box>
+            </div>
+            <div class="flex-container-row align-center" *ngIf="showAllCheckbox">
+                <input [(ngModel)]="allFlag" id="allCheckbox" type="checkbox">
+                <label for="allCheckbox" class="following-label">
+                    All
+                </label>
+            </div>
+            <div class="flex-container-row align-center" *ngIf="showPublicCheckbox && propertyService.isPublicVisbility()">
+                <input [(ngModel)]="publicFlag" id="publicCheckbox" type="checkbox">
+                <label for="publicCheckbox" class="following-label">
+                    Public
+                </label>
+            </div>
+            <date-range-filter *ngIf="showDateRangePicker" (onChange)="onDateRangePickerChange($event)">
+            </date-range-filter>
+            <div class="flex-container-row align-center children-spaced" *ngIf="showOrganismComboBox">
+                <custom-combo-box placeholder="Organism..."
+                                  valueField="idOrganism"
+                                  displayField="display"
+                                  [customOptionClasses]="'small-font padded inline-block full-width'"
+                                  [options]="organismList"
+                                  (optionSelected)="onOrganismSelect($event)">
+                </custom-combo-box>
+                <div class="flex-container-row align-center" *ngIf="showGenomeBuildComboBox && idOrganismString">
+                    <custom-combo-box placeholder="Genome Build..."
+                                      displayField="display"
+                                      valueField="idGenomeBuild"
+                                      [customOptionClasses]="'small-font padded inline-block full-width'"
+                                      [options]="genomeBuildList"
+                                      (optionSelected)="onGenomeBuildSelect($event)">
+                    </custom-combo-box>
+                </div>
+            </div>
+            <mat-form-field *ngIf="showSearchTextInput" class="small-font">
+                <input matInput [(ngModel)]="searchText" placeholder="Search contents for...">
+            </mat-form-field>
+        </div>
+        <div class="flex-grow">
+        </div>
+        <div class="flex-container-row align-center padding-right">
+            <!--<img [hidden]="!isCollapsed" [src]="constantsService.ICON_MATERIAL_FILTER_EDIT" alt="" class="collapse-expand-icon">-->
+            <button class="collapse-expand-button" (click)="toggleCollapseExpand()">
+                <img [src]="isCollapsed ? constantsService.ICON_MATERIAL_ARROW_EXPAND : constantsService.ICON_MATERIAL_ARROW_COLLAPSE" alt="" class="collapse-expand-icon">
+            </button>
+        </div>
+    </div>
+</div>

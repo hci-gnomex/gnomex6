@@ -8,14 +8,13 @@
                     </div>
                     <mat-radio-group *ngIf="requestCategories.length > 0; else noPlatforms"
                                      class="flex-container-col"
-                                     placeholder="Select a service category"
                                      formControlName="selectedCategory"
                                      (change)="onCategoryChange()">
                         <div *ngFor="let category of requestCategories" class="full-width">
                             <mat-radio-button [value]="category">
                                 <div class="full-width flex-container-row">
-                                    <div class="label-width">
-                                        <img src="{{ category.icon }}">
+                                    <div class="label-width flex-container-row align-center">
+                                        <img [src]="category.icon" alt="" class="icon">
                                         {{ category.display }}
                                     </div>
                                     <div>

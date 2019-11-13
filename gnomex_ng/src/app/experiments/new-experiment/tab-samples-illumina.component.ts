@@ -62,6 +62,11 @@ import {NewExperimentService} from "../../services/new-experiment.service";
         .hidden {
             display: none;
         }
+        
+        .child-margin > * {
+            margin-right: 0.3em;
+        }
+        
     `]
 })
 

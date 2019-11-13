@@ -5,51 +5,58 @@
             </div>
         </div>
         <div class="full-width flex-grow flex-container-col">
-            <div class="full-width flex-container-row align-center padded">
+            <div class="full-width flex-container-row align-center child-margin padded">
                 <context-help *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && experiment?.isExternal !== 'Y'"
-                              name="samplesTabHelp" [isEditMode]="this.createSecurityAdvisor.isAdmin"
+                              name="samplesTabHelp"
                               popupTitle="Samples Tab Instructions" label="Instructions"
+                              [codeRequestCategory]="this.requestCategoryType"
                               [idCoreFacility]="this._experiment.idCoreFacility"
-                              [codeRequestCategory]="this.requestCategoryType">
+                              [isEditMode]="this.createSecurityAdvisor.isAdmin">
                 </context-help>
-
-                <div class="flex-container-row" *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && experiment?.isExternal === 'Y'">
-                    <button mat-button class="padded-right" (click)="onAddSample()">
+                <div class="flex-container-row child-margin" *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && experiment?.isExternal === 'Y'">
+                    <button mat-button class="minimize" (click)="onAddSample()">
                         <img class="icon" [src]="this.constService.ICON_ADD" alt="">
                         Add sample
                     </button>
                     <context-help name="addSampleHelp" [isEditMode]="this.createSecurityAdvisor.isAdmin" popupTitle="Add Samples Help">
                     </context-help>
                 </div>
-
                 <context-help *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && experiment?.isExternal !== 'Y'"
-                              name="addSampleHelp" [isEditMode]="this.createSecurityAdvisor.isAdmin"
-                              popupTitle="Add Samples Help" label="Adding samples">
+                              name="addSampleHelp"
+                              popupTitle="Add Samples Help"
+                              label="Adding samples"
+                              [isEditMode]="this.createSecurityAdvisor.isAdmin">
                 </context-help>
                 <button *ngIf="_state === this.STATE_NEW || _state === this.STATE_EDIT" mat-button
-                        class="padded-right"
+                        class="minimize"
                         color="link"
-                        matTooltip="Upload Sample Sheet&#13;tab delimited txt file"
+                        matTooltip="Upload Sample Sheet&#13;(tab delimited txt file)"
                         (click)="upload()">
-                    <img class="icon" [src]="constService.ICON_UPLOAD">
+                    <img class="icon" [src]="constService.ICON_UPLOAD" alt="">
                     Upload Sample Sheet
                 </button>
                 <context-help *ngIf="_state === this.STATE_NEW || _state === this.STATE_EDIT"
-                              name="uploadSampleSheetHelp" [isEditMode]="this.createSecurityAdvisor.isAdmin"
-                              popupTitle="Upload Sample Sheet Instructions">
+                              name="uploadSampleSheetHelp"
+                              popupTitle="Upload Sample Sheet Instructions"
+                              [isEditMode]="this.createSecurityAdvisor.isAdmin">
                 </context-help>
                 <input type="file" #fileInput accept=".txt" class="hidden" (change)="onFileSelected($event)" multiple>
                 <button mat-button
-                        class="padded-right"
+                        class="minimize"
                         color="link"
                         matTooltip=""
                         (click)="download()">
                     <img class="icon" [src]="constService.ICON_DOWNLOAD">
                     Download Sample Sheet
                 </button>
-                <mat-checkbox *ngIf="this.showCcCheckbox" #ccCheckbox class="double-left-padded" (change)="toggleCC($event)">Enter CC Numbers</mat-checkbox>
+                <mat-checkbox #ccCheckbox
+                              *ngIf="this.showCcCheckbox"
+                              class="double-left-padded"
+                              (change)="toggleCC($event)">
+                    Enter CC Numbers
+                </mat-checkbox>
             </div>
-            <div class="full-width flex-grow">
+            <div class="full-width padded-left-right-bottom flex-grow">
                 <div #oneEmWidth class="no-height single-em"></div>
                 <ag-grid-angular class="ag-theme-fresh full-height full-width"
                                  stopEditingWhenGridLosesFocus="true"

@@ -32,28 +32,29 @@ import {GnomexService} from "../services/gnomex.service";
                         <div class="full-width">
                             <form class="login-form" [formGroup]="_loginForm">
                                 <div class="full-width">
-                                    <div>
-                                        <custom-input [form]="_loginForm"
-                                                      [formControlNameToUse]="'username'"
-                                                      [type]="'text'" 
-                                                      [placeholder]="' '" 
-                                                      [roundTop]="true"
-                                                      [roundBottom]="false"
-                                                      [label]="'Username'"
-                                                      [tooltip]="'Username tooltip'">
-                                        </custom-input>
-                                    </div>
-                                    <div>
-                                        <custom-input [form]="_loginForm"
-                                                      [formControlNameToUse]="'password'"
-                                                      [label]="'Password'"
-                                                      [type]="'password'"
-                                                      [placeholder]="' '"
-                                                      [roundTop]="false"
-                                                      [roundBottom]="true"
-                                                      [noTopBorder]="true"
-                                                      [tooltip]="'Username tooltip'"></custom-input>
-                                    </div>
+                                    <custom-input [form]="_loginForm"
+                                                  [formControlNameToUse]="'username'"
+                                                  [id]="'username'"
+                                                  [name]="'username'"
+                                                  [type]="'text'" 
+                                                  [placeholder]="' '" 
+                                                  [roundTop]="true"
+                                                  [roundBottom]="false"
+                                                  [label]="'Username'"
+                                                  [tooltip]="'Username tooltip'">
+                                    </custom-input>
+                                    <custom-input [form]="_loginForm"
+                                                  [formControlNameToUse]="'password'"
+                                                  [id]="'current-password'"
+                                                  [name]="'current-password'"
+                                                  [label]="'Password'"
+                                                  [type]="'password'"
+                                                  [placeholder]="' '"
+                                                  [roundTop]="false"
+                                                  [roundBottom]="true"
+                                                  [noTopBorder]="true"
+                                                  [tooltip]="'Username tooltip'">
+                                    </custom-input>
                                 </div>
                                 <div class="full-width vertical-spacer">
                                 </div>
