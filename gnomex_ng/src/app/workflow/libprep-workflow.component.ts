@@ -55,7 +55,7 @@ export class LibprepWorkflowComponent {
     public  dirty: boolean = false;
 
     public showSpinner: boolean = false;
-    private selectedRequestNumber: any;
+    public selectedRequestNumber: any;
     private gridApi: GridApi;
     private barCodes: any[] = [];
     private coreAdmins: any[] = [];
@@ -282,6 +282,9 @@ export class LibprepWorkflowComponent {
 
     public selectRequestOption() {
         this.workingWorkItemList = this.filterWorkItems();
+
+        this.gridApi.setRowData(this.workingWorkItemList);
+        this.gridApi.sizeColumnsToFit();
     }
 
     public selectExperimentType(): void {
