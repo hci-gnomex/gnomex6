@@ -127,7 +127,7 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
 
     private idCoreFacilityFilter: string;
 
-	private selectedRequestNumbers: string[];
+	private selectedIdRequests: string[];
 	private changeStatusResponsesReceived: number;
 
 	private enableChanges: boolean = false;
@@ -346,13 +346,13 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
 
 		// When we get a response from the backend that the status of an experiment has changed
 		this.statusChangeSubscription = this.experimentsService.getChangeExperimentStatusObservable().subscribe((response) => {
-			for (let i: number = 0; i < this.selectedRequestNumbers.length; i++) {
-				if (this.selectedRequestNumbers[i] === response.idRequest) {
+			for (let i: number = 0; i < this.selectedIdRequests.length; i++) {
+				if (this.selectedIdRequests[i] === response.idRequest) {
 					// count the changes made
 					this.changeStatusResponsesReceived++;
 
 					// when the changes are all made, reload the grid data
-					if (this.changeStatusResponsesReceived === this.selectedRequestNumbers.length) {
+					if (this.changeStatusResponsesReceived === this.selectedIdRequests.length) {
 						this.experimentsService.repeatGetExperiments_fromBackend();
 					}
 
@@ -408,14 +408,13 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
 
 		    setTimeout(() => {
                 this.changeStatusResponsesReceived = 0;
-                this.selectedRequestNumbers = [];
+                this.selectedIdRequests = [];
 
                 for (let selectedRow of this.gridApi.getSelectedRows()) {
-                    let idRequest = ('' + selectedRow.requestNumber).trim();
-                    let cleanedIdRequest: string = idRequest.slice(0, idRequest.indexOf("R") >= 0 ? idRequest.indexOf("R") : idRequest.length);
+                    let idRequest = ('' + selectedRow.idRequest).trim();
 
-                    this.selectedRequestNumbers.push(cleanedIdRequest);
-                    this.experimentsService.changeExperimentStatus(cleanedIdRequest, this.changeStatus);
+                    this.selectedIdRequests.push(idRequest);
+                    this.experimentsService.changeExperimentStatus(idRequest, this.changeStatus);
                 }
             });
         }
