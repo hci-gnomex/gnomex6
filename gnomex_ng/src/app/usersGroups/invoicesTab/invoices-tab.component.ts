@@ -1,6 +1,6 @@
 import {Component, Inject, Input, OnInit, SimpleChanges} from "@angular/core";
 import {FormControl, Validators} from '@angular/forms';
-import {URLSearchParams} from "@angular/http";
+import {HttpParams} from "@angular/common/http";
 
 import * as moment from 'moment';
 import {BehaviorSubject} from "rxjs";
@@ -8,6 +8,7 @@ import {BillingService} from "../../services/billing.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DOCUMENT} from "@angular/common";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'invoices-tab',
@@ -63,10 +64,10 @@ export class InvoicesTabComponent implements OnInit {
         this.complete.subscribe((value) => {
             if (value) {
                 if (this.selectedBillingPeriod && this.coreFacilityFC.value) {
-                    let params: URLSearchParams = new URLSearchParams();
-                    params.set("idBillingPeriod", this.selectedBillingPeriod.value);
-                    params.set("idCoreFacility", this.coreFacilityFC.value);
-                    params.set("idLab", this.memberGroup.idLab);
+                    let params: HttpParams = new HttpParams()
+                        .set("idBillingPeriod", this.selectedBillingPeriod.value)
+                        .set("idCoreFacility", this.coreFacilityFC.value)
+                        .set("idLab", this.memberGroup.idLab);
                     this.billingService.getBillingAccountListForPeriodAndCore(params).subscribe((response: any) => {
                         if (response) {
                             if (!this.secAdvisor.isArray(response)) {
@@ -78,10 +79,11 @@ export class InvoicesTabComponent implements OnInit {
                         }
 
                         this.complete.next(false);
+                    }, (err: IGnomexErrorResponse) => {
                     });
                 }
             }
-        })
+        });
     }
 
     findMinimumYear() {

@@ -1,12 +1,11 @@
 import {Injectable} from "@angular/core";
-import {Http, Response} from "@angular/http";
+import {HttpClient, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
-
 
 import {LabListService} from "./lab-list.service";
 import {DictionaryService} from "./dictionary.service";
-import {ProgressService} from "../home/progress.service";
 import {map} from "rxjs/operators";
+
 
 @Injectable()
 export class CreateSecurityAdvisorService {
@@ -123,7 +122,7 @@ export class CreateSecurityAdvisorService {
         }
     }
 
-    constructor(private http: Http,
+    constructor(private httpClient: HttpClient,
                 private labListService: LabListService, private dictionaryService: DictionaryService) {
     }
 
@@ -163,20 +162,20 @@ export class CreateSecurityAdvisorService {
 
     createSecurityAdvisor(): Observable<any> {
         console.log("createSecurityAdvisor new");
-        return this.http.get("/gnomex/CreateSecurityAdvisor.gx", {withCredentials: true}).pipe(map((response: Response) => {
+        return this.httpClient.get("/gnomex/CreateSecurityAdvisor.gx", {withCredentials: true}).pipe(map((response: any) => {
             console.log("return createSecurityAdvisor");
-            if (response.status === 200) {
-                this.result = response.json();
+            if (response) {
+                this.result = response;
 
                 this.idAppUserValue = Number(this.result.idAppUser);
-                this.isGuestValue = this.result.isGuest == "Y";
+                this.isGuestValue = this.result.isGuest === "Y";
                 this.uIDValue = this.result.uID;
                 this.userNameValue = this.result.userFirstName + " " + this.result.userLastName;
                 this.userEmailValue = this.result.userEmail;
                 this.loginDateTimeValue = this.result.loginDateTime;
-                this.isUniversityOnlyUserValue = this.result.isUniversityOnlyUser == "Y";
-                this.isUserActiveValue = this.result.isUserActive == "Y";
-                this.isExternalUserValue = this.result.isExternalUser == "Y";
+                this.isUniversityOnlyUserValue = this.result.isUniversityOnlyUser === "Y";
+                this.isUserActiveValue = this.result.isUserActive === "Y";
+                this.isExternalUserValue = this.result.isExternalUser === "Y";
                 this.versionValue = this.result.version;
                 this.isSuperAdminValue = this.hasPermission("canAdministerAllCoreFacilities");
                 if (this.result.groupsToManage && this.result.groupsToManage.Lab) {
@@ -211,10 +210,10 @@ export class CreateSecurityAdvisorService {
         }));
     }
 
-    createGuestSecurityAdvisor(params:URLSearchParams):Observable<any> {
-        return this.http.get("/gnomex/CreateSecurityAdvisorForGuest.gx",{search:params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                this.result = response.json();
+    createGuestSecurityAdvisor(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/CreateSecurityAdvisorForGuest.gx", {params: params}).pipe(map((response: any) => {
+            if (response) {
+                this.result = response;
 
                 this.isGuestValue = true;
                 this.idAppUserValue = Number(this.result.idAppUser);
@@ -222,9 +221,9 @@ export class CreateSecurityAdvisorService {
                 this.userNameValue = "guest user";
                 this.userEmailValue = this.result.userEmail;
                 this.loginDateTimeValue = this.result.loginDateTime;
-                this.isUserActiveValue = this.result.isUserActive == "Y";
+                this.isUserActiveValue = this.result.isUserActive === "Y";
                 this.versionValue = this.result.version;
-                this.isUniversityOnlyUserValue = this.result.isUniversityOnlyUser === 'Y';
+                this.isUniversityOnlyUserValue = this.result.isUniversityOnlyUser === "Y";
                 this.isExternalUserValue = false;
                 this.isSuperAdminValue = false;
                 this.isAdminValue = false;
@@ -233,12 +232,11 @@ export class CreateSecurityAdvisorService {
                 this.groupsToManage = [];
                 this.determineUsersCoreFacilities();
 
-                this.result = response.json();
-            }
-            else {
+                return this.result;
+            } else {
                 throw new Error("Error");
             }
-        }))
+        }));
     }
 
     /*

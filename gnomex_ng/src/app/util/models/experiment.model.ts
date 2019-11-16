@@ -9,6 +9,7 @@ import {PropertyService} from "../../services/property.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {BillingTemplate} from "../billing-template-window.component";
 import {BillingService} from "../../services/billing.service";
+import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
 
 export class Experiment {
 
@@ -395,7 +396,7 @@ export class Experiment {
             });
         }
 
-        return this._samples
+        return this._samples;
     }
 
     // Really this will always return a Sample[]...
@@ -407,14 +408,14 @@ export class Experiment {
             return this._hypothetical_samples_plate;
         }
 
-        return this._samples
+        return this._samples;
     }
     public set samples(value :any|any[]) {
         if (!value) {
             this._samples = [];
         }
         if (!Array.isArray(value)) {
-            value = [value.Sample]
+            value = [value.Sample];
         }
 
         let temp = [];
@@ -526,7 +527,7 @@ export class Experiment {
         if (this.gnomexService.submitInternalExperiment() && this.sampleType) {
             idSampleType = this.sampleType.idSampleType;
         } else if (this.idSampleTypeDefault != null) {
-            idSampleType = this.idSampleTypeDefault
+            idSampleType = this.idSampleTypeDefault;
         } else {
             // do nothing, leave idSampleType as default.
         }
@@ -1133,6 +1134,7 @@ export class Experiment {
 
             Experiment.addDescriptionFieldToAnnotations(response);
             this.PropertyEntries = response;
+        }, (err: IGnomexErrorResponse) => {
         });
     }
 

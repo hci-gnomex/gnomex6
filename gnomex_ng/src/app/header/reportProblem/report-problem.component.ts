@@ -5,6 +5,7 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ReportIssueService} from "../../services/report-issue.service";
 import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "report-problem",
@@ -101,7 +102,9 @@ export class ReportProblemComponent extends BaseGenericContainerDialog {
             setTimeout(() => this.dialogRef.close());
             this.reportIssueService.sendReportIssueEmail(this.url, formData).subscribe((response: any) => {
                 this.dialogsService.alert("Issue has been submitted. Thank you.", null, DialogType.SUCCESS);
+            }, (err: IGnomexErrorResponse) => {
             });
+        }, (err: IGnomexErrorResponse) => {
         });
     }
 

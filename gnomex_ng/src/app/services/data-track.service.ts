@@ -15,30 +15,30 @@ export class DataTrackService {
     private _haveLoadedDatatracksList: boolean = false;
     private _previousURLParams: HttpParams = null;
     private _datatrackListTreeNode: any;
-    private _labList: any[] =[];
+    private _labList: any[] = [];
     private _activeNodeToSelect: any = {};
 
     constructor(private http: Http, private cookieUtilService: CookieUtilService,
                 private httpClient: HttpClient,
-                private dialogService:DialogsService) {
+                private dialogService: DialogsService) {
     }
 
-    set labList(data:string[]){
+    set labList(data: string[]) {
         this._labList = data;
     }
-    get labList(){
+    get labList() {
         return this._labList;
     }
-    set datatrackListTreeNode(data:any){
+    set datatrackListTreeNode(data: any) {
         this._datatrackListTreeNode = data;
     }
-    get datatrackListTreeNode():any{
+    get datatrackListTreeNode(): any {
         return this._datatrackListTreeNode;
     }
-    set previousURLParams(data:HttpParams){
+    set previousURLParams(data: HttpParams) {
         this._previousURLParams  = data;
     }
-    get previousURLParams():HttpParams{
+    get previousURLParams(): HttpParams {
         return this._previousURLParams;
     }
 
@@ -59,6 +59,8 @@ export class DataTrackService {
     getDataTrackList(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/GetDataTrackList.gx", {params: params}).pipe(map((response: any) => {
             return response.Organism;
+        }), catchError((err: IGnomexErrorResponse) => {
+            return throwError(err);
         }));
     }
 
@@ -118,10 +120,10 @@ export class DataTrackService {
         return this.httpClient.post("/gnomex/DeleteOrganism.gx", params.toString(), { headers: headers });
     }
 
-    emitDatatracksList(dtList?:any): void {
-        if(dtList){
+    emitDatatracksList(dtList?: any): void {
+        if(dtList) {
             this.datatracksListSubject.next(dtList);
-        }else{
+        } else {
             this.datatracksListSubject.next(this.datatracksList);
         }
     }
@@ -135,12 +137,12 @@ export class DataTrackService {
         this._previousURLParams = params;
 
         this.httpClient.get("/gnomex/GetDataTrackList.gx", {params: params})
-            .pipe(map((resp:any) =>{ return resp.Organism}))
+            .pipe(map((resp: any) => { return resp.Organism; }))
             .subscribe((response: any) => {
                 this.dialogService.removeSpinnerWorkItem();
                 this.datatracksList = response;
                 this.emitDatatracksList();
-            },(err:IGnomexErrorResponse) => {
+            }, (err: IGnomexErrorResponse) => {
                 this.dialogService.stopAllSpinnerDialogs();
             });
 
@@ -149,19 +151,19 @@ export class DataTrackService {
     refreshDatatracksList_fromBackend(): void {
         this.dialogService.addSpinnerWorkItem();
         this.httpClient.get("/gnomex/GetDataTrackList.gx", {params: this._previousURLParams})
-            .pipe(map((resp:any) => { return resp.Organism }))
+            .pipe(map((resp: any) => { return resp.Organism; }))
             .subscribe((response: any) => {
                 this.dialogService.removeSpinnerWorkItem();
                 this.datatracksList = response;
                 this.emitDatatracksList();
-            }, (err:IGnomexErrorResponse) =>{
+            }, (err: IGnomexErrorResponse) => {
                 this.dialogService.stopAllSpinnerDialogs();
             });
     }
 
-    getGenomeBuild(params:HttpParams):Observable<any>{
+    getGenomeBuild(params: HttpParams): Observable<any> {
         return this.httpClient.get("/gnomex/GetGenomeBuild.gx", {params: params})
-            .pipe(catchError((err:IGnomexErrorResponse) =>{
+            .pipe(catchError((err: IGnomexErrorResponse) => {
                 return throwError(err);
             }));
 
@@ -176,23 +178,23 @@ export class DataTrackService {
 
     saveFolder(params: HttpParams):  Observable<any> {
         let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
-        return this.httpClient.post("/gnomex/SaveDataTrackFolder.gx",params.toString(),{headers:headers})
+        return this.httpClient.post("/gnomex/SaveDataTrackFolder.gx", params.toString(), {headers: headers});
     }
 
 
 
-    getImportSegments(params: HttpParams):Observable<any>{
+    getImportSegments(params: HttpParams): Observable<any> {
         let headers: HttpHeaders = new HttpHeaders()
             .set("Content-Type", "application/x-www-form-urlencoded");
-        return this.httpClient.post("/gnomex/ImportSegments.gx",params.toString(), {headers: headers})
+        return this.httpClient.post("/gnomex/ImportSegments.gx", params.toString(), {headers: headers});
 
     }
-    getImportSeqFiles(formData: FormData):Observable<any>{
+    getImportSeqFiles(formData: FormData): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
         let headers: Headers = new Headers();
         //headers.set("Content-Type", "application/x-www-form-urlencoded");
         //, {headers: headers})
-        return this.http.post("/gnomex/UploadSequenceFileServlet.gx",formData)
+        return this.http.post("/gnomex/UploadSequenceFileServlet.gx", formData)
             .pipe(map((response: Response) => {
                 if (response.status === 200) {
                     return response.json();
@@ -203,35 +205,35 @@ export class DataTrackService {
 
     saveOrganism(params: HttpParams):  Observable<any> {
         let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
-        return this.httpClient.post("/gnomex/SaveOrganism.gx",params.toString(),{headers:headers});
+        return this.httpClient.post("/gnomex/SaveOrganism.gx", params.toString(), {headers: headers});
     }
 
-    makeUCSCLinks(params:HttpParams): Observable<any> {
+    makeUCSCLinks(params: HttpParams): Observable<any> {
         let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
-        return this.httpClient.post("/gnomex/MakeDataTrackUCSCLinks.gx", params.toString(),{headers: headers});
+        return this.httpClient.post("/gnomex/MakeDataTrackUCSCLinks.gx", params.toString(), {headers: headers});
     }
 
     makeIGVLink(): Observable<any> {
         return this.httpClient.get("/gnomex/MakeDataTrackIGVLink.gx");
     }
 
-    makeIOBIOLink(params:HttpParams): Observable<any> {
-        let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
-        return this.httpClient.post("/gnomex/MakeDataTrackLinks.gx", params.toString(),{headers: headers});
-    }
-
-    makeURLLink(params:HttpParams): Observable<any> {
+    makeIOBIOLink(params: HttpParams): Observable<any> {
         let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
         return this.httpClient.post("/gnomex/MakeDataTrackLinks.gx", params.toString(), {headers: headers});
     }
 
-    makeGENELink(params:HttpParams): Observable<any> {
+    makeURLLink(params: HttpParams): Observable<any> {
+        let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/MakeDataTrackLinks.gx", params.toString(), {headers: headers});
+    }
+
+    makeGENELink(params: HttpParams): Observable<any> {
         let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
         return this.httpClient.post("/gnomex/MakeGeneURL.gx", params.toString(), {headers: headers});
     }
 
     destroyLinks(): Observable<any> {
-        return this.httpClient.post("/gnomex/DestroyExistingLinks.gx",null);
+        return this.httpClient.post("/gnomex/DestroyExistingLinks.gx", null);
     }
 
     public createAllDataTracks(idAnalysis: string, idsToDistrube: string[] ): Observable<any> {

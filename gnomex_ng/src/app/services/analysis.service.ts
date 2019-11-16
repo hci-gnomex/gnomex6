@@ -1,5 +1,4 @@
 import {Injectable} from "@angular/core";
-import {Http, Response, URLSearchParams} from "@angular/http";
 import {BehaviorSubject, Observable, Subject, throwError} from "rxjs";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
@@ -7,7 +6,6 @@ import {catchError, map} from "rxjs/operators";
 import {AbstractControl, FormGroup} from "@angular/forms";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
-import {IAnalysisFile} from "../util/interfaces/analysis-file.model";
 
 @Injectable()
 export class AnalysisService {
@@ -37,7 +35,7 @@ export class AnalysisService {
     public editMode: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
 
-    constructor(private http: Http, private httpClient: HttpClient,
+    constructor(private httpClient: HttpClient,
                 private cookieUtilService: CookieUtilService,
                 private dialogService: DialogsService) {
         this._analysisOverviewForm = new FormGroup({});

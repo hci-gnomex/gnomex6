@@ -124,7 +124,7 @@ export class ConfigureProductTypesComponent extends BaseGenericContainerDialog i
                 }
                 this.dialogsService.error("An error occurred while retrieving price categories" + message);
             }
-        },(err:IGnomexErrorResponse) => {
+        }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
     }
@@ -192,6 +192,8 @@ export class ConfigureProductTypesComponent extends BaseGenericContainerDialog i
                             this.dialogsService.error("An error occurred while deleting the product type" + message);
                         }
                         this.showSpinner = false;
+                    }, (err: IGnomexErrorResponse) => {
+                        this.showSpinner = false;
                     });
                 }
             });
@@ -222,6 +224,8 @@ export class ConfigureProductTypesComponent extends BaseGenericContainerDialog i
                     this.dialogsService.error("An error occurred while saving the product type" + message);
                 }
                 this.showSpinner = false;
+            }, (err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
         }
     }
@@ -233,6 +237,7 @@ export class ConfigureProductTypesComponent extends BaseGenericContainerDialog i
                 this.dialogsService.alert("Please set name", null, DialogType.VALIDATION);
                 return;
             }
+            this.showSpinner = true;
             this.productsService.saveNewProductPriceCategory(name).subscribe((response: any) => {
                 if (response && response.result && response.result === "SUCCESS" && response.idPriceCategory) {
                     this.loadPriceCategories();
@@ -244,8 +249,11 @@ export class ConfigureProductTypesComponent extends BaseGenericContainerDialog i
                     if (response && response.message) {
                         message = ": " + response.message;
                     }
+                    this.showSpinner = false;
                     this.dialogsService.error("An error occurred while saving the price category" + message);
                 }
+            }, (err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
         }
     }

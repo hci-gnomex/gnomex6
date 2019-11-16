@@ -4,6 +4,7 @@ import {PasswordUtilService} from "../services/password-util.service";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {Router} from "@angular/router";
 import {GnomexService} from "../services/gnomex.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "reset-password",
@@ -87,6 +88,7 @@ export class ResetPasswordComponent implements OnInit {
                 }
                 this.dialogsService.error("An error occurred while resetting your password" + message);
             }
+        }, (err: IGnomexErrorResponse) => {
         });
     }
 

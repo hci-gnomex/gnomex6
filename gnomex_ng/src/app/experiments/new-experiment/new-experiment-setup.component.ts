@@ -539,6 +539,7 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
                             this.QCChipPriceList.next([ result ]);
                         }
                     }
+                }, (err: IGnomexErrorResponse) => {
                 });
             }
 

@@ -287,6 +287,8 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                     });
 
                     this.inputs.experiment = experiment;
+                }, (err: IGnomexErrorResponse) => {
+                    this.dialogService.stopAllSpinnerDialogs();
                 });
             }
         });

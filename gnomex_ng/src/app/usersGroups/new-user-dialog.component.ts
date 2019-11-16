@@ -1,9 +1,10 @@
 import {Component, OnInit} from "@angular/core";
-import {URLSearchParams} from "@angular/http";
+import {HttpParams} from "@angular/common/http";
 import {MatDialogRef} from "@angular/material";
 import {UserService} from "../services/user.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "new-user-dialog",
@@ -35,25 +36,22 @@ export class NewUserDialogComponent extends BaseGenericContainerDialog implement
 
     public save(): void {
         this.showSpinner = true;
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idAppUser", '0');
-        params.set("firstName", this.firstName);
-        params.set("lastName", this.lastName);
-        params.set("codeUserPermissionKind", 'LAB');
-        params.set("isActive", 'N');
-        params.set("isWebForm", 'N');
+        let params: HttpParams = new HttpParams()
+            .set("idAppUser", "0")
+            .set("firstName", this.firstName)
+            .set("lastName", this.lastName)
+            .set("codeUserPermissionKind", "LAB")
+            .set("isActive", "N")
+            .set("isWebForm", "N");
 
         this.userService.saveAppUser(params).subscribe((response: any) => {
             this.showSpinner = false;
-            if (response.status === 200) {
-                let responseJSON: any = response.json();
-                if (responseJSON.idAppUser) {
-                    this.dialogRef.close(responseJSON.idAppUser);
-                }
+            if (response && response.idAppUser) {
+                this.dialogRef.close(response.idAppUser);
                 this.dialogsService.alert("The user has been saved but is inactive. You must fill in login information and activate the user before the user can login.");
-            } else {
-                this.dialogRef.close();
             }
+        }, (err: IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
     }
 

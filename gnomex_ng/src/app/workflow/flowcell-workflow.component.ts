@@ -164,7 +164,7 @@ export class FlowcellWorkflowComponent implements OnInit {
             }
 
             this.dialogsService.stopAllSpinnerDialogs();
-        }, (err:IGnomexErrorResponse) =>{
+        }, (err: IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
         });
     }
@@ -231,6 +231,7 @@ export class FlowcellWorkflowComponent implements OnInit {
                     this.initialize();
                 }
             });
+        }, (err: IGnomexErrorResponse) => {
         });
     }
 

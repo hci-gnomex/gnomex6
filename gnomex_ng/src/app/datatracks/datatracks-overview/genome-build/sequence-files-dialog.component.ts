@@ -7,6 +7,7 @@ import {DialogsService} from "../../../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
 import {BaseGenericContainerDialog} from "../../../util/popup/base-generic-container-dialog";
 import {UtilService} from "../../../services/util.service";
+import {IGnomexErrorResponse} from "../../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     template: `
@@ -181,14 +182,15 @@ export class SequenceFilesDialog extends BaseGenericContainerDialog implements O
                 });
 
         } else if( idx === this.fileInfoList.length){
-            let params:HttpParams = new HttpParams()
+            let params: HttpParams = new HttpParams()
                 .set("idGenomeBuild", this.idGenomeBuild);
-            this.datatrackService.getGenomeBuild(params).pipe(first()).subscribe( resp =>{
+            this.datatrackService.getGenomeBuild(params).pipe(first()).subscribe( resp => {
                 let seqFiles = Array.isArray(resp.SequenceFiles.Dir.File) ? resp.SequenceFiles.Dir.File
                     : [ resp.SequenceFiles.Dir.File];
                 this.setSeqGridFunc(seqFiles);
                 this.progressVal = 0;
                 this.dialogRef.close();
+            }, (err: IGnomexErrorResponse) => {
             });
 
         }

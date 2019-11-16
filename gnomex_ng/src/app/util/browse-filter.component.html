@@ -41,7 +41,7 @@
                 <input [(ngModel)]="allFlag" id="allCheckbox" type="checkbox">
                 <label for="allCheckbox" class="following-label">All</label>
             </div>
-            <div class="inlineDiv children-spaced" *ngIf="showLabComboBox && (mode === 'billingBrowse' ? !(idCoreFacilityString === '') : true)">
+            <div class="inlineDiv children-spaced" *ngIf="showLabComboBox">
                 <label>Group</label>
                 <div>
                     <custom-combo-box [options]="this.labList"
@@ -61,16 +61,6 @@
                                       valueField="idAppUser"
                                       [displayField]="this.prefService.userDisplayField"
                                       (optionSelected)="onAppUserSelect($event)">
-                    </custom-combo-box>
-                </div>
-                <div *ngIf="showBillingAccountComboBox && idLabString" class="flex-container-row align-center children-spaced">
-                    <label>Account</label>
-                    <custom-combo-box [options]="this.billingAccountList"
-                                      placeholder="Select an Account..."
-                                      [temporaryPlaceholder]="true"
-                                      valueField="idBillingAccount"
-                                      displayField="accountNameDisplay"
-                                      (optionSelected)="onBillingAccountSelect($event)">
                     </custom-combo-box>
                 </div>
             </div>
