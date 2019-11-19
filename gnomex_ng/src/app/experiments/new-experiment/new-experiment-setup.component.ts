@@ -713,7 +713,7 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
     }
 
     public onClickNewProject(): void {
-        if(!this.form.get("selectLab").value || !this.form.get("selectName").value) {
+        if (this.showName && (!this.form.get("selectLab").value || !this.form.get("selectName").value)) {
             this.dialogService.alert("Please select the user submitting the request", null, DialogType.ALERT);
             return;
         }
