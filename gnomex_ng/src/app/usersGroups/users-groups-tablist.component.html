@@ -2,12 +2,12 @@
     <div class="full-width full-height foreground">
         <as-split (dragEnd)="onSplitDragEnd($event)">
             <as-split-area size="20">
-                <mat-tab-group class="full-height" [selectedIndex]="selectedTab" (selectedTabChange)="onTabChange($event)">
-                    <mat-tab #userTab label="Users" class="full-height">
+                <mat-tab-group class="full-height flex-style" [selectedIndex]="selectedTab" (selectedTabChange)="onTabChange($event)">
+                    <mat-tab label="Users" class="full-height">
                         <div class="full-height full-width flex-container-col foreground small-font">
                             <div class="full-width small-font padded">
                                 <mat-form-field>
-                                    <input matInput [(ngModel)]="searchText" (input)="search($event)" placeholder="Search by name or email...">
+                                    <input matInput [(ngModel)]="searchText" (input)="search()" placeholder="Search by name or email...">
                                 </mat-form-field>
                             </div>
                             <div class="full-width flex-grow padded-left-right small-font">
@@ -16,12 +16,12 @@
                                                  [gridOptions]="gridOptions"
                                                  [rowData]="rowData"
                                                  [columnDefs]="columnDefs"
-                                                 (rowDataChanged)="this.onNotifyGridRowDataChanged()"
+                                                 (rowDataChanged)="onNotifyGridRowDataChanged()"
                                                  [rowSelection]="rowSelection"
                                                  (gridReady)="onGridReady($event)"
                                                  (selectionChanged)="onSelectionChanged($event)"
                                                  [enableSorting]="true"
-                                                 (onGridSizeChanged)="onGridSizeChanged($event)"
+                                                 (gridSizeChanged)="onGridSizeChanged($event)"
                                                  [enableFilter]="true"
                                                  [enableColResize]="true">
                                 </ag-grid-angular>
@@ -29,10 +29,16 @@
                             <div class="full-width small-font">
                                 <div class="flex-container-row align-center padded">
                                     <div class="padded-right">
-                                        <button mat-button (click)="newUser()"><img [src]="'./assets/user.png'">New User</button>
+                                        <button mat-button (click)="newUser()">
+                                            <img [src]="'./assets/user.png'" alt="">
+                                            New User
+                                        </button>
                                     </div>
                                     <div class="padded-right">
-                                        <button mat-button (click)="deleteUser()"><img [src]="'./assets/delete.png'">Delete User</button>
+                                        <button mat-button (click)="deleteUser()">
+                                            <img [src]="'./assets/delete.png'" alt="">
+                                            Delete User
+                                        </button>
                                     </div>
                                     <div class="full-height flex-grow"></div>
                                     <div>
@@ -42,7 +48,7 @@
                             </div>
                         </div>
                     </mat-tab>
-                    <mat-tab #groupTab label="Groups" class="full-height">
+                    <mat-tab label="Groups" class="full-height">
                         <div class="full-height full-width foreground flex-container-col small-font">
                             <div class="full-width padded">
                                 <mat-form-field>
@@ -76,7 +82,7 @@
                                                  [rowData]="groupsData"
                                                  [columnDefs]="groupsColumnDefs"
                                                  [rowSelection]="rowSelection"
-                                                 (gridReady)="onGroupsGridReady($event)"
+                                                 (gridReady)="onGridReady($event)"
                                                  (gridSizeChanged)="onGridSizeChanged($event)"
                                                  (selectionChanged)="onGroupsSelectionChanged($event)"
                                                  [enableSorting]="true"
@@ -86,25 +92,27 @@
                             <div class="full-width flex-container-row align-center padded">
                                 <div class="padded-right">
                                     <button mat-button (click)="newGroup()">
-                                        <img [src]="'./assets/group_add.png'">
+                                        <img [src]="'./assets/group_add.png'" alt="">
                                         New Group
                                     </button>
                                 </div>
                                 <div class="padded-right">
                                     <button mat-button [disabled]="!selectedGroup" (click)="deleteGroup()">
-                                        <img [src]="'./assets/delete.png'">
+                                        <img [src]="'./assets/delete.png'" alt="">
                                         Delete Group
                                     </button>
                                 </div>
                                 <div class="full-height flex-grow"></div>
                                 <div>
-                                    <mat-label>{{groupLabel}}</mat-label>
+                                    <mat-label>
+                                        {{ groupLabel }}
+                                    </mat-label>
                                 </div>
                             </div>
                             <div *ngIf="secAdvisor.isSuperAdmin" class="full-width small-font">
                                 <div class="padded-left-right-bottom">
                                     <button mat-button (click)="verify('all')">
-                                        <img [src]="'./assets/email_go.png'">
+                                        <img [src]="'./assets/email_go.png'" alt="">
                                         Verify all users
                                     </button>
                                 </div>
@@ -114,11 +122,10 @@
                 </mat-tab-group>
             </as-split-area>
             <as-split-area size="80">
-                <div *ngIf="isUserTab && selectedUser" #userDetail class="full-height full-width flex-container-col background border-padding small-font">
+                <div *ngIf="isUserTab && selectedUser" class="full-height full-width flex-container-col background border-padding small-font">
                     <div class="full-width flex-grow">
                         <as-split direction="vertical">
                             <as-split-area size="75" class="foreground">
-                                <!--user detail-->
                                 <form class="full-height full-width foreground flex-container-col" [formGroup]="userForm">
                                     <div class="reserve-height flex-container-row align-center padded">
                                         <div class="flex-grow min-width padded">
@@ -152,8 +159,8 @@
                                         <div class="flex-grow min-width padded">
                                             <mat-form-field class="full-width">
                                                 <input matInput formControlName="email" placeholder="Email">
-                                                <mat-error *ngIf="this.emailFC.hasError('required')">Required</mat-error>
-                                                <mat-error *ngIf="this.emailFC.hasError('email') && !this.emailFC.hasError('required')">Valid Email Required</mat-error>
+                                                <mat-error *ngIf="emailFC.hasError('required')">Required</mat-error>
+                                                <mat-error *ngIf="emailFC.hasError('email') && !emailFC.hasError('required')">Valid Email Required</mat-error>
                                             </mat-form-field>
                                         </div>
                                         <div class="flex-grow min-width padded">
@@ -199,19 +206,25 @@
                                                                 <div class="full-width">
                                                                     <mat-form-field class="formField">
                                                                         <input matInput formControlName="userName" placeholder="User name">
-                                                                        <mat-error *ngIf="this.usernameFC.hasError('required')">Required</mat-error>
+                                                                        <mat-error *ngIf="usernameFC.hasError('required')">
+                                                                            Required
+                                                                        </mat-error>
                                                                     </mat-form-field>
                                                                 </div>
                                                                 <div class="full-width">
                                                                     <mat-form-field class="formField">
                                                                         <input matInput matTooltip="Passwords must be 8-25 characters long, contain no spaces or slashes, and contain three or more of the following: lowercase letter, uppercase letter, digit, or symbol." type="password" formControlName="password" placeholder="Password">
-                                                                        <mat-error *ngIf="this.passwordFC.hasError('validatePassword')">{{this.passwordUtilService.PASSWORD_COMPLEXITY_ERROR}}</mat-error>
+                                                                        <mat-error *ngIf="passwordFC.hasError('validatePassword')">
+                                                                            {{ passwordUtilService.PASSWORD_COMPLEXITY_ERROR }}
+                                                                        </mat-error>
                                                                     </mat-form-field>
                                                                 </div>
                                                                 <div class="full-width">
                                                                     <mat-form-field class="formField">
                                                                         <input matInput matTooltip="Passwords must be 8-25 characters long, contain no spaces or slashes, and contain three or more of the following: lowercase letter, uppercase letter, digit, or symbol." type="password" formControlName="passwordConfirm" placeholder="Confirm Password">
-                                                                        <mat-error *ngIf="this.passwordConfirmFC.hasError('validatePasswordConfirm')">{{this.passwordUtilService.PASSWORD_MATCH_ERROR}}</mat-error>
+                                                                        <mat-error *ngIf="passwordConfirmFC.hasError('validatePasswordConfirm')">
+                                                                            {{ passwordUtilService.PASSWORD_MATCH_ERROR }}
+                                                                        </mat-error>
                                                                     </mat-form-field>
                                                                 </div>
                                                             </div>
@@ -219,7 +232,9 @@
                                                     </div>
                                                     <div class="small-width large-margin-left">
                                                         <div class="full-height foreground flex-container-col">
-                                                            <label>Permission Level</label>
+                                                            <label>
+                                                                Permission Level
+                                                            </label>
                                                             <div class="full-width flex-grow">
                                                                 <mat-radio-group class="flex-container-col full-width" formControlName="permissionLevel" (change)="onPermissionLevelChange($event)">
                                                                     <mat-radio-button value="LAB">Group</mat-radio-button>
@@ -242,12 +257,12 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div *ngIf="codeUserPermissionKind!=='SUPER' && codeUserPermissionKind!=='ADMIN' && (this.secAdvisor.isSuperAdmin||this.secAdvisor.isBillingAdmin)" class="foreground border-padding margin-left">
+                                            <div *ngIf="codeUserPermissionKind!=='SUPER' && codeUserPermissionKind!=='ADMIN' && (secAdvisor.isSuperAdmin||secAdvisor.isBillingAdmin)" class="foreground border-padding margin-left">
                                                 <div class="full-width full-height large-padding-right">
                                                     <div class="flex-container-row align-center">
                                                         <label class="full-width">Submit experiments in all labs in core</label>
                                                         <context-help name="SubmitterPermissionHelp" tooltipPosition="right"
-                                                                      [isEditMode]="this.secAdvisor.isSuperAdmin" popupTitle="Submitter Help"></context-help>
+                                                                      [isEditMode]="secAdvisor.isSuperAdmin" popupTitle="Submitter Help"></context-help>
                                                     </div>
                                                     <div class="flex-container-col">
                                                         <mat-checkbox *ngFor="let cf of coreFacilitiesICanSubmitTo" [checked]=cf.isSelected [formControlName]=cf.display>
@@ -268,7 +283,7 @@
                                                          [rowData]="labs"
                                                          [columnDefs]="labColumnDefs"
                                                          [rowSelection]="rowSelection"
-                                                         (gridReady)="onLabGridReady($event)"
+                                                         (gridReady)="onGridReady($event)"
                                                          [enableSorting]="true">
                                         </ag-grid-angular>
                                     </div>
@@ -280,7 +295,7 @@
                                                          [rowData]="collaboratingLabs"
                                                          [columnDefs]="collColumnDefs"
                                                          [rowSelection]="rowSelection"
-                                                         (gridReady)="onCollGridReady($event)"
+                                                         (gridReady)="onGridReady($event)"
                                                          [enableSorting]="true">
                                         </ag-grid-angular>
                                     </div>
@@ -292,8 +307,8 @@
                                                          [rowData]="managingLabs"
                                                          [columnDefs]="manColumnDefs"
                                                          [rowSelection]="rowSelection"
-                                                         (gridReady)="onManGridReady($event)"
-                                                         (onGridSizeChanged)="onManGridSizeChanged($event)"
+                                                         (gridReady)="onGridReady($event)"
+                                                         (gridSizeChanged)="onManGridSizeChanged()"
                                                          [enableSorting]="true">
                                         </ag-grid-angular>
                                     </div>
@@ -302,17 +317,16 @@
                         </as-split>
                     </div>
                     <div class="full-width right-align foreground padded-left-right-bottom">
-                        <save-footer [disableSave]="this.userForm.invalid"
-                                     [showSpinner]="this.showSpinner"
-                                     [dirty]="this.userForm.dirty"
-                                     [icon]="this.constantsService.ICON_SAVE"
+                        <save-footer [disableSave]="userForm.invalid"
+                                     [showSpinner]="showSpinner"
+                                     [dirty]="userForm.dirty"
+                                     [icon]="constantsService.ICON_SAVE"
                                      (saveClicked)="saveUser()">
                             Save
                         </save-footer>
                     </div>
                 </div>
                 <div *ngIf="isGroupsTab && selectedGroup" class="full-height full-width flex-container-col">
-                    <!--groups tab group-->
                     <mat-tab-group class="full-width flex-grow" [selectedIndex]="selectedGroupTab">
                         <mat-tab label="Group" class="full-height">
                             <div class="full-height full-width background border-padding">
@@ -351,8 +365,8 @@
                                                 <mat-form-field class="full-width">
                                                     <input matInput formControlName="contactEmail" placeholder="Email">
                                                     <mat-hint>PI gets billing emails + notifications.</mat-hint>
-                                                    <mat-error *ngIf="this.groupEmailFC.hasError('required')">Required</mat-error>
-                                                    <mat-error *ngIf="this.groupEmailFC.hasError('email') && !this.groupEmailFC.hasError('required')">Valid Email Required</mat-error>
+                                                    <mat-error *ngIf="groupEmailFC.hasError('required')">Required</mat-error>
+                                                    <mat-error *ngIf="groupEmailFC.hasError('email') && !groupEmailFC.hasError('required')">Valid Email Required</mat-error>
                                                 </mat-form-field>
                                             </div>
                                             <div class="flex-grow min-width padded">
@@ -365,9 +379,18 @@
                                                     <label>Pricing</label>
                                                     <div class="full-width flex-grow">
                                                         <mat-radio-group class="flex-container-col full-width" formControlName="pricing">
-                                                            <mat-radio-button class="padded-left-right" value="INTERNAL"><img [src]="'./assets/group.png'"> Internal</mat-radio-button>
-                                                            <mat-radio-button class="padded-left-right" value="EXACADEMIC"><img [src]="'./assets/graduation_cap.png'"> External Academic</mat-radio-button>
-                                                            <mat-radio-button class="padded-left-right" value="EXCOMM"><img [src]="'./assets/building.png'"> External Commercial</mat-radio-button>
+                                                            <mat-radio-button class="padded-left-right" value="INTERNAL">
+                                                                <img [src]="'./assets/group.png'" alt="">
+                                                                Internal
+                                                            </mat-radio-button>
+                                                            <mat-radio-button class="padded-left-right" value="EXACADEMIC">
+                                                                <img [src]="'./assets/graduation_cap.png'" alt="">
+                                                                External Academic
+                                                            </mat-radio-button>
+                                                            <mat-radio-button class="padded-left-right" value="EXCOMM">
+                                                                <img [src]="'./assets/building.png'" alt="">
+                                                                External Commercial
+                                                            </mat-radio-button>
                                                         </mat-radio-group>
                                                     </div>
                                                 </div>
@@ -399,12 +422,12 @@
                                                             </custom-combo-box>
                                                             <div>
                                                                 <button mat-raised-button (click)="addInstitution()" [disabled]="!institutionToAddControl.value || !institutionToAddControl.value.idInstitution">
-                                                                    <img [src]="constantsService.ICON_ADD">
+                                                                    <img [src]="constantsService.ICON_ADD" alt="">
                                                                 </button>
                                                             </div>
                                                             <div>
                                                                 <button mat-raised-button (click)="removeInstitution()" [disabled]="!institutionToRemove">
-                                                                    <img [src]="constantsService.ICON_DELETE">
+                                                                    <img [src]="constantsService.ICON_DELETE" alt="">
                                                                 </button>
                                                             </div>
                                                         </div>
@@ -440,33 +463,23 @@
                         </mat-tab>
                         <mat-tab label="Invoices" class="full-height">
                             <div *ngIf="selectedGroup" class="full-height full-width">
-                                <invoices-tab [memberGroup]="selectedGroup" #invoicesTab></invoices-tab>
+                                <invoices-tab [memberGroup]="selectedGroup"></invoices-tab>
                             </div>
                         </mat-tab>
                     </mat-tab-group>
-                    <div *ngIf="isGroupsTab" class="full-width flex-container-row padded">
-                        <div class="full-height flex-grow">
-                            <div class="flex-grow">
-                                <button mat-button (click)="verify('lab')">
-                                    <img [src]="'./assets/email_go.png'">
-                                    Send email to verify users
-                                </button>
-                            </div>
-                        </div>
-                        <div *ngIf="groupFormDirty" class="height-auto" style="background:#feec89; padding: 0 1em;">
-                            <div class="full-height full-width flex-container-row align-center">
-                                <div>
-                                    Your changes have not been saved
-                                </div>
-                            </div>
-                        </div>
-                        <div class="horizontal-spacer">
-                        </div>
-                        <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.groupForm.valid" (click)="saveLab()">
-                            <img [src]="'./assets/save.png'">
-                            Save
+                    <div *ngIf="isGroupsTab" class="full-width flex-container-row align-center">
+                        <button mat-button (click)="verify('lab')">
+                            <img [src]="'./assets/email_go.png'" alt="">
+                            Send email to verify users
                         </button>
-                        <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
+                        <save-footer class="flex-grow"
+                                     [dirty]="groupFormDirty"
+                                     [disableSave]="groupForm.invalid"
+                                     [icon]="constantsService.ICON_SAVE"
+                                     [showSpinner]="showSpinner"
+                                     (saveClicked)="saveLab()">
+                            Save
+                        </save-footer>
                     </div>
                 </div>
             </as-split-area>
