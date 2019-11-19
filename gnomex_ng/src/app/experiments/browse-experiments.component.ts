@@ -364,7 +364,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                             for (var request of project.items) {
                                 if (request) {
                                     if (request.label) {
-                                        request.label = request.requestNumber + "-" + request.name;
+                                        if (request.name) {
+                                            request.label = request.requestNumber + "-" + request.name;
+                                        } else {
+                                            request.label = request.requestNumber;
+                                        }
+
                                         request.id = "r" + request.idRequest;
                                         request.parentid = project.id;
                                     } else {
