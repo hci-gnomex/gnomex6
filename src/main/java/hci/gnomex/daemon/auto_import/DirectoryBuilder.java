@@ -53,7 +53,7 @@ public class DirectoryBuilder {
 			if (args[i].equals("-file")) {
 				this.inFileName = args[++i];
 			} else if (args[i].equals("-root")) {
-				this.root = args[++i] + File.separator;
+				this.root = args[++i];
 			} else if (args[i].equals("-downloadpath")) {
 				this.currentDownloadLocation = args[++i];
 			} else if(args[i].equals("-flaggedfile")){
@@ -275,16 +275,28 @@ public class DirectoryBuilder {
 	}
 
 	StringBuilder getMatchingDirName(String[] chunks, StringBuilder strBuild, Map<String,String> dirMap, Set<String> dupDirSet ){
+		String[] onlyFileExtList = Arrays.copyOfRange(chunks,1,chunks.length);
 
-		for(String chunk:chunks){
-			String corretCaseDirName = dirMap.get( chunk.toLowerCase());
-			//System.out.println("chunk in: " + chunk + " chunk out " + corretCaseDirName );
+		String wholeExt  = String.join(".",onlyFileExtList);
+		String correctDirName= dirMap.get(wholeExt.toLowerCase());
 
-			if(corretCaseDirName != null && dupDirSet.add(chunk.toLowerCase())){
-				strBuild.append(File.separator);
-				strBuild.append(corretCaseDirName);
+		if(correctDirName  != null ){
+			strBuild.append(File.separator);
+			strBuild.append(correctDirName);
+		}else{
+			for(String chunk:chunks){
+
+				correctDirName = dirMap.get( chunk.toLowerCase());
+				//System.out.println("chunk in: " + chunk + " chunk out " + corretCaseDirName );
+				if(correctDirName != null && dupDirSet.add(chunk.toLowerCase())){
+					strBuild.append(File.separator);
+					strBuild.append(correctDirName);
+				}
 			}
+
 		}
+
+
 		return strBuild;
 	}
 
@@ -295,6 +307,8 @@ public class DirectoryBuilder {
 		dirMap.put("xml","Reports");
 		dirMap.put("pdf","Reports");
 		dirMap.put("json","Reports");
+		dirMap.put("deident.xml","Deident_Reports");
+		dirMap.put("deident.json","Deident_Reports");
 		dirMap.put(WHOLE_EXOME, DNA_ALIAS);
 		dirMap.put(RNAseq, RNA_ALIAS);
 
@@ -376,7 +390,9 @@ public class DirectoryBuilder {
 			System.out.println("Full path with PersonID to create " +  strBuild.toString());
 			personIDDir = new File(strBuild.toString());
 			if(!personIDDir.exists()){
-				personIDDir.mkdir();
+				boolean successDir = personIDDir.mkdir();
+				if(!successDir)
+				System.out.println("The directory was NOT CREATED... something went wrong");
 			}
 
 		}catch(Exception e){
@@ -529,7 +545,7 @@ public class DirectoryBuilder {
 		List<String> sampleIDList = new ArrayList<String>();
 		StringBuilder strBuild = new StringBuilder();
 		String from = "DoNotReply@hci.utah.edu";
-		String to = "erik.rasmussen@hci.utah.edu, dalton.wilson@hci.utah.edu, david.nix@hci.utah.edu, qing.li@hci.utah.edu, aaron.atkinson@hci.utah.edu";
+		String to = "erik.rasmussen@hci.utah.edu"; //, dalton.wilson@hci.utah.edu, david.nix@hci.utah.edu, qing.li@hci.utah.edu, aaron.atkinson@hci.utah.edu";
 		String subject = "GNomEx Importer Automated Email - Patient ID Report";
 		Query q =  new Query(path+"gnomex-creds.properties");
 		List<String> reportIDList = new ArrayList<String>();

@@ -20,19 +20,21 @@ public class FilterFile {
 		String credFile ="";
 		String filteredFile = "";
 		String filterRegex = "";
+		String localDataPath = "";
 
 
 		List<String> smallFilesList = new ArrayList<String>();
 		List<String> filterOutList = new ArrayList<String>();
 
 
-		if(args.length == 5) {
+		if(args.length == 6) {
 			inFile = args[0];
 			remoteFileList = args[1]; //output: pdf and xml files
 			credFile=args[2];
 			filteredFile=args[3]; // output: The files that were filtered out
 			System.out.println("credFile: " + credFile);
 			filterRegex=args[4];
+			localDataPath=args[5];
 
 
 		}else {
@@ -98,8 +100,10 @@ public class FilterFile {
 			String[] splitExtension = null;
 			splitExtension = extension.split("\\.");
 
+
 			if(extension.equals("xml")){
-				boolean processed  = hasXMLBeenProcessed(fullFileName,query, currentLine);
+				//todo issue if no path is just filename. tried to have way fix but currentline is pass by value, its a rare case
+				boolean processed  = hasXMLBeenProcessed(fullFileName,query, currentLine,localDataPath);
 				if(!processed){
 					// unprocessed list
 					filterOutList.add(currentLine);
@@ -158,14 +162,20 @@ public class FilterFile {
 
 	}
 
-	private static boolean hasXMLBeenProcessed(String fileName,Query q, String pathWithName) {
+	private static boolean hasXMLBeenProcessed(String fileName,Query q, String pathWithName,String localDataPath) {
 		boolean processed = false;
 
-		File file = new File(pathWithName);
-		System.out.println(pathWithName);
+		File file = new File(pathWithName.toString());
+
 		if(!file.exists()){
-			System.out.println("The file doesn't exist");
-			return processed;
+			pathWithName = localDataPath + File.separator + pathWithName;
+			file = new File(pathWithName.toString());
+			if(!file.exists()){
+				System.out.println(pathWithName);
+				System.out.println("The file doesn't exist");
+				return processed;
+			}
+
 		}
 
 		Date d = new Date(file.lastModified());
@@ -178,6 +188,7 @@ public class FilterFile {
 
 			Timestamp timestamp = ((java.sql.Timestamp)row.get(1));
 			Instant instTimeStamp = timestamp.toInstant();
+			System.out.println(pathWithName);
 			if(instTimeStamp.equals(instDate)){
 				processed = true;
 				System.out.println("This file has been processed :) ");
