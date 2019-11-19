@@ -85,9 +85,63 @@ export class BillingFilterComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.coreFacilityList = this.createSecurityAdvisorService.coreFacilitiesICanManage.sort((a, b) => {
-            return a.sortOrder - b.sortOrder;
+        this.coreFacilityList = this.createSecurityAdvisorService.coreFacilitiesICanManage.filter((value) => {
+            return !value.isActive || value.isActive !== 'N';
+        }).sort((a, b) => {
+            if (!a && !b) {
+                return 0;
+            } else if (!a) {
+                return 1;
+            } else if (!b) {
+                return -1;
+            } else {
+                if (!a.sortOrder && !b.sortOrder) {
+                    if (!a.display && !b.display) {
+                        return 0;
+                    } else if (!a.display) {
+                        return 1;
+                    } else if (!b.display) {
+                        return 1;
+                    } else {
+                        if (a.display.toLowerCase() < a.display.toLowerCase()) {
+                            return -1;
+                        } else if (a.display.toLowerCase() > a.display.toLowerCase()) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    }
+                } else if (!a.sortOrder) {
+                    return 1;
+                } else if (!b.sortOrder) {
+                    return -1;
+                } else {
+                    if (+a.sortOrder < +b.sortOrder) {
+                        return -1;
+                    } else if (+a.sortOrder > +b.sortOrder) {
+                        return 1;
+                    } else {
+                        if (!a.display && !b.display) {
+                            return 0;
+                        } else if (!a.display) {
+                            return 1;
+                        } else if (!b.display) {
+                            return 1;
+                        } else {
+                            if (a.display.toLowerCase() < a.display.toLowerCase()) {
+                                return -1;
+                            } else if (a.display.toLowerCase() > a.display.toLowerCase()) {
+                                return 1;
+                            } else {
+                                return 0;
+                            }
+                        }
+                    }
+                }
+            }
         });
+
+
         if (this.coreFacilityList.length > 0) {
             this.form.controls['idCoreFacility'].setValue(this.coreFacilityList[0].idCoreFacility);
         }
