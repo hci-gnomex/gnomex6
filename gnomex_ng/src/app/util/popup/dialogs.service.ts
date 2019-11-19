@@ -77,7 +77,7 @@ export class DialogsService {
     }
 
     public startDefaultSpinnerDialog(): MatDialogRef<SpinnerDialogComponent> {
-        return this.startSpinnerDialog('Loading...', 3, 30);
+        return this.startSpinnerDialog('Please wait...', 3, 30);
     }
 
     public startSpinnerDialog(message: string, strokeWidth: number, diameter: number): MatDialogRef<SpinnerDialogComponent> {
