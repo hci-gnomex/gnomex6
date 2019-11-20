@@ -1,10 +1,4 @@
-/*
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
- */
 import {Routes, RouterModule} from "@angular/router";
-import {LogoutComponent} from "./logout.component";
-import {CreateReportProblemLauncherComponent} from "./reportProblem/report-problem-launcher.component";
-import {ManageLinksLauncherComponent} from "./manageLinks/manage-links-launcher.component";
 import {LogoutLoaderComponent} from "./logout-loader-component";
 
 /**
@@ -15,11 +9,7 @@ import {LogoutLoaderComponent} from "./logout-loader-component";
  */
 
 const ROUTES: Routes = [
-    { path: "logout", component: LogoutComponent, outlet: 'modal'},
-    {path: "logout-loader", component: LogoutLoaderComponent },
-    { path: "manageLinks", component: ManageLinksLauncherComponent, outlet: 'modal' },
-    { path: "reportProblem", component: CreateReportProblemLauncherComponent, outlet: 'modal' }
-
+    {path: "logout-loader", component: LogoutLoaderComponent }
 ];
 
 export const HEADER_ROUTING = RouterModule.forChild(ROUTES);
