@@ -9,6 +9,7 @@ import {LaunchPropertiesService} from "../../services/launch-properites.service"
 import {MatDialogRef} from "@angular/material";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 import {ConstantsService} from "../../services/constants.service";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     template: `
@@ -114,13 +115,13 @@ export class ManageLinksComponent extends BaseGenericContainerDialog implements 
             this.coreList = this.secAdvisor.myCoreFacilities;
         }
 
-        this.getFAQSubscription = this.launchPropertiesService.getFAQ().subscribe((response: any[]) => {
-            console.log("subscribe createSecurityAdvisor");
-
+        this.getFAQSubscription = this.launchPropertiesService.getFAQ().subscribe((response: any) => {
+            response = Array.isArray(response) ? response : [response.FAQ];
             response.forEach(faq => {
                 this.setCoreFacility(faq);
-            })
+            });
             this.rowData = response;
+        }, (err: IGnomexErrorResponse) => {
         });
 
     }
