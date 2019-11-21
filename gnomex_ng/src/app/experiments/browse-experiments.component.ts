@@ -14,7 +14,7 @@ import {ITreeOptions, ITreeState, TreeComponent, TreeModel, TreeNode} from "angu
 import {BrowseFilterComponent} from "../util/browse-filter.component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
-import {ActivatedRoute, NavigationEnd, NavigationExtras, Router} from "@angular/router";
+import {ActivatedRoute, NavigationEnd, NavigationExtras, ParamMap, Router} from "@angular/router";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {CreateProjectComponent} from "./create-project.component";
 import {MatDialogConfig} from "@angular/material";
@@ -134,6 +134,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private parentProject: any;
     private setActiveNodeId: string;
     private canDeleteProjectSubscription: Subscription;
+    private qParamMap: ParamMap;
+    private paramMap: ParamMap;
 
     constructor(public experimentsService: ExperimentsService,
                 private changeDetectorRef: ChangeDetectorRef,
@@ -161,6 +163,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.labs = [];
 
         this.navService.navMode = this.navService.navMode !== NavigationService.USER ? NavigationService.URL : NavigationService.USER ;
+        this.route.queryParamMap.subscribe((qParam)=>{this.qParamMap = qParam });
+        this.route.paramMap.subscribe((qParam)=>{this.paramMap = qParam });
 
 
         this.experimentsService.startSearchSubject.subscribe((value) => {
@@ -200,9 +204,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             setTimeout(() => {
                 this.toggleButton = "Collapse Projects";
                 this.treeModel.expandAll();
-
-                if(this.gnomexService.orderInitObj) {
-                    let id: string = "r" + this.gnomexService.orderInitObj.idRequest;
+                //todo need replace logic from orderInitObj to use url
+                if(this.navService.navMode === NavigationService.URL) {
+                    let id: string = "r" + this.paramMap.get("idRequest");
                     if(this.treeModel && id) {
                         let node: ITreeNode = this.treeModel.getNodeById(id);
                         if(node) {
@@ -609,45 +613,46 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      * @param event
      */
     treeOnSelect(event: any) {
-        this.selectedItem = event.node;
-        let idLab = this.selectedItem.data.idLab;
-        let idProject = this.selectedItem.data.idProject;
-        let idRequest = this.selectedItem.data.idRequest;
 
-        let projectRequestListNode: Array<any> = _.cloneDeep(this.selectedItem.data);
-        this.experimentsService.emitExperimentOverviewList(projectRequestListNode);
-        let navArray: Array<any> = [];
-        let navExtras: NavigationExtras = {};
+        if(this.navService.navMode === NavigationService.USER){
+            this.selectedItem = event.node;
+            let idLab = this.selectedItem.data.idLab;
+            let idProject = this.selectedItem.data.idProject;
+            let idRequest = this.selectedItem.data.idRequest;
 
-        this.disableDeleteProject = true;
+            let projectRequestListNode: Array<any> = _.cloneDeep(this.selectedItem.data);
+            this.experimentsService.emitExperimentOverviewList(projectRequestListNode);
+            let navArray: Array<any> = [];
+            let navExtras: NavigationExtras = {};
 
-        //Lab
-        if (this.selectedItem.level === 1) {
+            this.disableDeleteProject = true;
 
-            this.disableNewProject = !this.gnomexService.canSubmitRequests(idLab);
-            this.disableDeleteExperiment = true;
+            //Lab
+            if (this.selectedItem.level === 1) {
 
-            navArray = ["/experiments",  "overview"];
+                this.disableNewProject = !this.gnomexService.canSubmitRequests(idLab);
+                this.disableDeleteExperiment = true;
 
-            //Project
-        } else if (this.selectedItem.level === 2) {
-            this.parentProject = event.node.parent;
-            this.disableNewProject = !this.gnomexService.canSubmitRequests(idLab);
-            this.disableDeleteExperiment = true;
+                navArray = ["/experiments",  "overview"];
+                //Project
+            } else if (this.selectedItem.level === 2) {
+                this.parentProject = event.node.parent;
+                this.disableNewProject = !this.gnomexService.canSubmitRequests(idLab);
+                this.disableDeleteExperiment = true;
 
-            navArray = ["/experiments", "overview" ]; //["/experiments" , {outlets: {"browsePanel": ["overview", {"idLab": idLab, "idProject": idProject}]}}];
-            navExtras = {queryParams: { idProject:idProject}};
+                navArray = ["/experiments", "overview" ]; //["/experiments" , {outlets: {"browsePanel": ["overview", {"idLab": idLab, "idProject": idProject}]}}];
+                navExtras = {queryParams: { idProject:idProject}};
 
-            //Experiment
-        } else {
-            navArray = ["/experiments", "detail" , idRequest]; //["/experiments",  {outlets: {"browsePanel": [idRequest]}}];
-            this.parentProject = event.node.parent;
-            this.disableNewProject = true;
+                //Experiment
+            } else {
+                navArray = ["/experiments", "detail" , idRequest]; //["/experiments",  {outlets: {"browsePanel": [idRequest]}}];
+                this.parentProject = event.node.parent;
+                this.disableNewProject = true;
 
+            }
+
+            this.router.navigate(navArray,navExtras);
         }
-
-        this.router.navigate(navArray,navExtras);
-
 
     }
 

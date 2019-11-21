@@ -32,6 +32,7 @@ import {UtilService} from "../services/util.service";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../services/constants.service";
 import {filter, first} from "rxjs/operators";
+import {NavigationService} from "../services/navigation.service";
 
 
 @Component({
@@ -122,6 +123,8 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     private labListSubscription: Subscription;
 
     ngOnInit() {
+        this.navService.navMode = this.navService.navMode !== NavigationService.USER ? NavigationService.URL : NavigationService.USER ;
+
         this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
         this.treeModel = this.treeComponent.treeModel;
         this.options = {
@@ -287,6 +290,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 private gnomexService: GnomexService,
                 private labListService: LabListService,
                 private changeDetectorRef: ChangeDetectorRef,
+                private navService: NavigationService,
                 public createSecurityAdvisorService: CreateSecurityAdvisorService) {
 
 

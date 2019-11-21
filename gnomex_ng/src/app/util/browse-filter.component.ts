@@ -745,7 +745,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         if(this.navigationService.navMode === NavigationService.URL){
             setTimeout(()=>{
                 this.search();
-                this.navigationService.emitResetNavModeSubject("overview");
+                this.navigationService.emitResetNavModeSubject("experiments");
 
             });
 
@@ -1096,20 +1096,31 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         if (this.mode === this.EXPERIMENT_BROWSE) {
             let params: HttpParams = this.getExperimentBrowseParameters();
             let requiredParams = [ {experiments: ""}];
+            this.experimentsService.browsePanelParams = params;
+            this.experimentsService.browsePanelParams["refreshParams"] = true;
             this.experimentsService.getProjectRequestList_fromBackend(params);
             this.setURLFromParams(requiredParams,params );
-
         } else if (this.mode === this.ORDER_BROWSE) {
             this.dialogService.startDefaultSpinnerDialog();
             let params: HttpParams = this.getOrderBrowseParameters();
+            let requiredParams = [ {"experiments-orders": ""}];
             this.experimentsService.getExperiments_fromBackend(params);
+            this.setURLFromParams(requiredParams,params );
         } else if (this.mode === this.ANALYSIS_BROWSE) {
             let params: HttpParams = this.getAnalysisBrowseParameters();
+            let requiredParams = [ {analysis: ""}];
+            this.analysisService.analysisPanelParams = params;
+            this.analysisService.analysisPanelParams["refreshParams"] = true;
             this.analysisService.getAnalysisGroupList_fromBackend(params);
+            this.setURLFromParams(requiredParams,params );
         } else if (this.mode === this.DATA_TRACK_BROWSE) {
             let params: HttpParams = this.getDataTrackBrowseParameters();
+            let requiredParams = [ {datatracks: ""}];
+            this.dataTrackService.previousURLParams = params;
+            this.dataTrackService.previousURLParams["refreshParams"] = true;
             this.dataTrackService.labList = this.labList;
             this.dataTrackService.getDatatracksList_fromBackend(params);
+            this.setURLFromParams(requiredParams,params );
         } else if (this.mode === this.BILLING_BROWSE) {
             let billingRequestListParams: URLSearchParams = this.getBillingRequestListParameters();
             this.billingService.getBillingRequestListDep(billingRequestListParams).subscribe((response: any) => {

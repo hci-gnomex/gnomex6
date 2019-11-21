@@ -3,13 +3,16 @@ import {Resolve, ActivatedRouteSnapshot, ActivatedRoute} from '@angular/router'
 import {ExperimentsService} from '../../experiments/experiments.service'
 import {URLSearchParams} from "@angular/http";
 import {HttpParams} from "@angular/common/http";
+import {map} from "rxjs/operators";
+import {NavigationService} from "../navigation.service";
 
 /* This service will be used in experiment.routes.ts and when injecting ActivateRoute  into browse-overview.component.ts
  we can get the project json off the route */
 
 @Injectable()
 export class ProjectResolverService implements Resolve<any> {
-    constructor(private experimentsService: ExperimentsService) {
+    constructor(private experimentsService: ExperimentsService,
+                private navService:NavigationService) {
     }
 
     resolve(route: ActivatedRouteSnapshot) { // resolve is good with asyncrous data, it waits to load component till data is ready
@@ -21,7 +24,12 @@ export class ProjectResolverService implements Resolve<any> {
             .set('idLab',idLab )
             .set('idProject', idProject );
         if(idLab){
-            return this.experimentsService.getProject(ids);
+            return this.experimentsService.getProject(ids).pipe(map((resp) =>{
+                if(this.navService.navMode === NavigationService.URL){
+                    this.navService.emitResetNavModeSubject("overview");
+                }
+                return resp;
+            }));
         }
 
     }
