@@ -8,7 +8,6 @@ import { SpinnerDialogComponent } from "./spinner-dialog.component";
 import {CustomDialogComponent} from "./custom-dialog.component";
 import {GenericContainerDialogComponent} from "./generic-container-dialog.component";
 import {GDActionConfig} from "../interfaces/generic-dialog-action.model";
-import {FormGroup} from "@angular/forms";
 
 export enum DialogType {
     ERROR = "Error",
@@ -151,13 +150,10 @@ export class DialogsService {
         }
     }
 
-    public genericDialogContainer(dialogContent:any,
-                                  title:string,
-                                  icon?:string,
-                                  config?:MatDialogConfig,
-                                  actionConfig?:GDActionConfig,
-                                  lookForForm?: boolean):Observable<any> {
+    public genericDialogContainer(dialogContent:any,title:string,icon?:string,
+                                  config?:MatDialogConfig, actionConfig?:GDActionConfig):Observable<any> {
         let configuration: MatDialogConfig = null;
+
 
         if (!config) {
             configuration = new MatDialogConfig();
@@ -165,9 +161,6 @@ export class DialogsService {
             configuration = config;
         }
         configuration.data = configuration.data ? configuration.data : {};
-        if (lookForForm && dialogContent && dialogContent.form) {
-            configuration.data.form = dialogContent.form;  // to be used to enable/disable primary button.
-        }
         configuration.data["dialogContent"] = dialogContent;
         configuration.data["title"] = title;
         if(icon){
@@ -179,7 +172,7 @@ export class DialogsService {
         configuration.panelClass = "no-padding";
         configuration.disableClose = true;
         configuration.hasBackdrop = false;
-        let dialogRef = this.dialog.open(GenericContainerDialogComponent, configuration);
+        let dialogRef = this.dialog.open(GenericContainerDialogComponent, configuration );
 
         return dialogRef.afterClosed();
     }
