@@ -1,28 +1,22 @@
 import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
-import {URLSearchParams} from "@angular/http";
+import {HttpParams} from "@angular/common/http";
+import {FormControl, FormGroup, FormGroupDirective, NgForm, Validators} from "@angular/forms";
+import {MatDialogRef, MatDialog, ErrorStateMatcher, MatDialogConfig, MAT_DIALOG_DATA } from "@angular/material";
 import {Router} from "@angular/router";
+import {Subscription} from "rxjs";
 
 import {NewBillingAccountErrorDialogComponent} from "./dialogs/new-billing-account-error-dialog.component";
 import {NewBillingAccountSuccessDialogComponent} from "./dialogs/new-billing-account-success-dialog.component";
-
 import {AccountFieldsConfigurationService} from "../../services/account-fields-configuration.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {LabListService} from "../../services/lab-list.service";
 import {NewBillingAccountService} from "../../services/new-billing-account.service";
 import {PropertyService} from "../../services/property.service";
-
-import {FormControl, FormGroupDirective, NgForm, Validators} from "@angular/forms";
-
-import {
-    MatDialogRef, MatDialog, ErrorStateMatcher, MatDialogConfig,
-    MAT_DIALOG_DATA
-} from "@angular/material";
-import {Subscription} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
-import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {ActionType, GDAction} from "../../util/interfaces/generic-dialog-action.model";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 import {ConstantsService} from "../../services/constants.service";
 
@@ -369,6 +363,20 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 				public prefService: UserPreferencesService,
 				@Inject(MAT_DIALOG_DATA) private data) {
 		super();
+
+		this.primaryDisable = (action) => {
+			if (this.showField) {
+				if (this.showField === this.CHARTFIELD) {
+					return !this.areChartfieldValuesValid();
+				} else if (this.showField === this.PO) {
+					return !this.arePoValuesValid();
+				} else if (this.showField === this.CREDIT_CARD) {
+					return !this.areCreditCardValuesValid();
+				}
+			}
+
+			return true;
+		};
 	}
 
 	ngOnInit(): void {
@@ -659,30 +667,29 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		// );
 
 		if (this.areChartfieldValuesValid()) {
-			let parameters: URLSearchParams = new URLSearchParams();
-
-			parameters.set('idLab', idLab);
-			parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
-			parameters.set('coreFacilitiesJSONString', coreFacilitiesXMLString);
-			parameters.set('accountName', this.accountName_Chartfield);
-			parameters.set('shortAcct', this.shortAccountName_Chartfield);
-			parameters.set('accountNumberBus', this.accountNumberBus_Chartfield);
-			parameters.set('accountNumberOrg', this.accountNumberOrg_Chartfield);
-			parameters.set('accountNumberFund', this.accountNumberFund_Chartfield);
-			parameters.set('accountNumberActivity', this.accountNumberActivity_Chartfield);
-			parameters.set('accountNumberProject', accountNumberProject);
-			parameters.set('accountNumberAccount', accountNumberAccount);
-			parameters.set('accountNumberAu', (this.accountNumberActivity_Chartfield.length > 0 ? this.accountNumberAU_Chartfield : ''));
-			parameters.set('idFundingAgency', idFundingAgency);
-			parameters.set('custom1', custom1);
-			parameters.set('custom2', custom2);
-			parameters.set('custom3', custom3);
-			parameters.set('submitterEmail', this.submitterEmail_chartfield);
-			parameters.set('startDate', this.startDate_chartfield.toLocaleDateString());
-			parameters.set('expirationDate', (this.effectiveUntilDate_chartfield ? this.effectiveUntilDate_chartfield.toLocaleDateString() : ''));
-			parameters.set('totalDollarAmountDisplay', this.totalDollarAmount_Chartfield);
-			parameters.set('activeAccount', activeAccount);
-			parameters.set('isPO', isPO);
+			let parameters: HttpParams = new HttpParams()
+				.set('idLab', idLab)
+				.set('coreFacilitiesXMLString', coreFacilitiesXMLString)
+				.set('coreFacilitiesJSONString', coreFacilitiesXMLString)
+				.set('accountName', this.accountName_Chartfield)
+				.set('shortAcct', this.shortAccountName_Chartfield)
+				.set('accountNumberBus', this.accountNumberBus_Chartfield)
+				.set('accountNumberOrg', this.accountNumberOrg_Chartfield)
+				.set('accountNumberFund', this.accountNumberFund_Chartfield)
+				.set('accountNumberActivity', this.accountNumberActivity_Chartfield)
+				.set('accountNumberProject', accountNumberProject)
+				.set('accountNumberAccount', accountNumberAccount)
+				.set('accountNumberAu', (this.accountNumberActivity_Chartfield.length > 0 ? this.accountNumberAU_Chartfield : ''))
+				.set('idFundingAgency', idFundingAgency)
+				.set('custom1', custom1)
+				.set('custom2', custom2)
+				.set('custom3', custom3)
+				.set('submitterEmail', this.submitterEmail_chartfield)
+				.set('startDate', this.startDate_chartfield.toLocaleDateString())
+				.set('expirationDate', (this.effectiveUntilDate_chartfield ? this.effectiveUntilDate_chartfield.toLocaleDateString() : ''))
+				.set('totalDollarAmountDisplay', this.totalDollarAmount_Chartfield)
+				.set('activeAccount', activeAccount)
+				.set('isPO', isPO);
 
 
 			// in original, called SubmitWorkAuthForm.gx with params :
@@ -713,7 +720,8 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			this.successMessage = 'Billing Account \"' + this.accountName_Chartfield + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
 
 			//this.window.close();
-			this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe(() => {
+			this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe((result) => {
+				console.log('testing');
 				this.openSuccessDialog();
 			},(err:IGnomexErrorResponse) => {
 				this.dialogService.stopAllSpinnerDialogs();
@@ -817,15 +825,15 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 				}
 			}
 		}
+		if (!((this.usesCustomChartfields && !this.includeInCustomField_startDate)
+			|| (this.startDate_chartfield && this.startDate_chartfield.toLocaleDateString() !== ''))) {
 
-		if ((!(this.startDate_chartfield && this.startDate_chartfield.toLocaleDateString() != ''))
-						&& (!this.usesCustomChartfields || this.includeInCustomField_startDate)) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick a start date\n';
 		}
-		if ((!(this.effectiveUntilDate_chartfield && this.effectiveUntilDate_chartfield.toLocaleDateString() != ''))
-				&& ((!this.usesCustomChartfields ||   this.includeInCustomField_startDate)  && this.includeInCustomField_expirationDate)
-				&& ((this.usesCustomChartfields && (!this.includeInCustomField_startDate)) && this.includeInCustomField_expirationDate)) {
+		if (!((this.usesCustomChartfields && !this.includeInCustomField_startDate && !this.includeInCustomField_expirationDate)
+			|| (this.effectiveUntilDate_chartfield && this.effectiveUntilDate_chartfield.toLocaleDateString() !== ''))) {
+
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick an expiration date\n';
 		}
@@ -922,24 +930,23 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		// );
 
 		if (this.arePoValuesValid()) {
-			let parameters: URLSearchParams = new URLSearchParams();
-
-			parameters.set('idLab', idLab);
-			parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
-			parameters.set('coreFacilitiesJSONString', coreFacilitiesXMLString);
-			parameters.set('accountName', this.accountName_po);
-			parameters.set('shortAcct', this.shortAccountName_po);
-			parameters.set('idFundingAgency', idFundingAgency);
-			parameters.set('custom1', custom1);
-			parameters.set('custom2', custom2);
-			parameters.set('custom3', custom3);
-			parameters.set('submitterEmail', this.submitterEmail_po);
-			parameters.set('startDate', startDate);
-			parameters.set('expirationDate', expirationDate);
-			parameters.set('totalDollarAmountDisplay', this.totalDollarAmount_po);
-			parameters.set('activeAccount', activeAccount);
-			parameters.set('isPO', isPO);
-			parameters.set('isCreditCard', isCreditCard);
+			let parameters: HttpParams = new HttpParams()
+				.set('idLab', idLab)
+				.set('coreFacilitiesXMLString', coreFacilitiesXMLString)
+				.set('coreFacilitiesJSONString', coreFacilitiesXMLString)
+				.set('accountName', this.accountName_po)
+				.set('shortAcct', this.shortAccountName_po)
+				.set('idFundingAgency', idFundingAgency)
+				.set('custom1', custom1)
+				.set('custom2', custom2)
+				.set('custom3', custom3)
+				.set('submitterEmail', this.submitterEmail_po)
+				.set('startDate', startDate)
+				.set('expirationDate', expirationDate)
+				.set('totalDollarAmountDisplay', this.totalDollarAmount_po)
+				.set('activeAccount', activeAccount)
+				.set('isPO', isPO)
+				.set('isCreditCard', isCreditCard);
 
 			this.successMessage = 'Billing Account \"' + this.accountName_po + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
 
@@ -1085,26 +1092,25 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		// 		"    isCreditCard             : " + isCreditCard + "\n");
 
 		if (this.areCreditCardValuesValid()) {
-			let parameters: URLSearchParams = new URLSearchParams();
-
-			parameters.set('idLab', idLab);
-			parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
-			parameters.set('coreFacilitiesJSONString', coreFacilitiesXMLString);
-			parameters.set('accountName', this.accountName_creditCard);
-			parameters.set('shortAcct', shortAcct);
-			parameters.set('idFundingAgency', idFundingAgency);
-			parameters.set('custom1', custom1);
-			parameters.set('custom2', custom2);
-			parameters.set('custom3', custom3);
-			parameters.set('submitterEmail', submitterEmail);
-			parameters.set('idCreditCardCompany', idCreditCardCompany);
-			parameters.set('zipCode', this.zipCodeInput_creditCard);
-			parameters.set('startDate', startDate);
-			parameters.set('expirationDate', expirationDate);
-			parameters.set('totalDollarAmountDisplay', totalDollarAmountDisplay);
-			parameters.set('activeAccount', activeAccount);
-			parameters.set('isPO', isPO);
-			parameters.set('isCreditCard', isCreditCard);
+			let parameters: HttpParams = new HttpParams()
+				.set('idLab', idLab)
+				.set('coreFacilitiesXMLString', coreFacilitiesXMLString)
+				.set('coreFacilitiesJSONString', coreFacilitiesXMLString)
+				.set('accountName', this.accountName_creditCard)
+				.set('shortAcct', shortAcct)
+				.set('idFundingAgency', idFundingAgency)
+				.set('custom1', custom1)
+				.set('custom2', custom2)
+				.set('custom3', custom3)
+				.set('submitterEmail', submitterEmail)
+				.set('idCreditCardCompany', idCreditCardCompany)
+				.set('zipCode', this.zipCodeInput_creditCard)
+				.set('startDate', startDate)
+				.set('expirationDate', expirationDate)
+				.set('totalDollarAmountDisplay', totalDollarAmountDisplay)
+				.set('activeAccount', activeAccount)
+				.set('isPO', isPO)
+				.set('isCreditCard', isCreditCard);
 
 			this.successMessage = 'Billing Account \"' + this.accountName_creditCard + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
 
@@ -1286,5 +1292,4 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			this.isActivity = true;
 		}
 	}
-
 }
