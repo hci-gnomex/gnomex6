@@ -1,12 +1,11 @@
 import {Component, Input, OnDestroy, OnInit} from "@angular/core";
 import {DictionaryService} from "../../services/dictionary.service";
-import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {BillingService} from "../../services/billing.service";
 import {Subscription} from "rxjs/index";
 import {Experiment} from "../../util/models/experiment.model";
 import {NewExperimentService} from "../../services/new-experiment.service";
-import {ALL} from "tslint/lib/rules/completedDocsRule";
 
 @Component({
     selector: "tabSeqProtoView",
@@ -111,7 +110,6 @@ export class TabSeqProtoViewComponent implements OnInit, OnDestroy {
             if (this.idLab_subscription) {
                 this.idLab_subscription.unsubscribe();
             }
-
 
             this.idLab_subscription = this._experiment.onChange_idLab.subscribe(() => {
                 this.changePrices();
@@ -317,7 +315,7 @@ export class TabSeqProtoViewComponent implements OnInit, OnDestroy {
                     }
 
                     this.alternateDisplayFilters = [
-                        { value: this.ALL,   display: "All" },
+                        { value: this.ALL,   display: "All Available Options" },
                         { value: this.NOSEQ, display: "Illumina NovaSeq Sequencing Options" },
                         { value: this.HISEQ, display: "Illumina HiSeq Sequencing Options" },
                         { value: this.MISEQ, display: "Illumina MiSeq Sequencing Options" }
