@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 public class FastDataTransferDownloadExpServlet extends HttpServlet {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 1L;
 
@@ -46,7 +46,7 @@ public class FastDataTransferDownloadExpServlet extends HttpServlet {
     if (req.getParameter("emailAddress") != null && !req.getParameter("emailAddress").equals("")) {
       emailAddress = req.getParameter("emailAddress");
     }
-    
+
     String showCommandLineInstructions = "N";
     if (req.getParameter("showCommandLineInstructions") != null && !req.getParameter("showCommandLineInstructions").equals("")) {
       showCommandLineInstructions = req.getParameter("showCommandLineInstructions");
@@ -123,10 +123,10 @@ public class FastDataTransferDownloadExpServlet extends HttpServlet {
             LOG.error("Clinical Research experiment " + requestNumber + " is are not allowed to download using FDT");
             continue;
           }
-          
-          // Check permissions - bypass this request if the user 
+
+          // Check permissions - bypass this request if the user
           // does not have  permission to read it.
-          if (!secAdvisor.canRead(request)) {  
+          if (!secAdvisor.canRead(request)) {
             LOG.error("Insufficient permissions to read request " + requestNumber + ".  Bypassing fdt download for user " + (req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest") + ".");
             continue;
           }
@@ -158,7 +158,7 @@ public class FastDataTransferDownloadExpServlet extends HttpServlet {
               // If this is a flow cell, make sure that that a sequence lane on this request has this flow cell
               for(Iterator i2 = request.getSequenceLanes().iterator(); i2.hasNext();) {
                 SequenceLane lane = (SequenceLane)i2.next();
-                if (lane.getFlowCellChannel() != null && 
+                if (lane.getFlowCellChannel() != null &&
                     lane.getFlowCellChannel().getFlowCell().getNumber().equals(fd.getMainFolderName(sess, serverName, request.getIdCoreFacility()))) {
                   isAuthorizedDirectory = true;
                   break;
@@ -167,14 +167,14 @@ public class FastDataTransferDownloadExpServlet extends HttpServlet {
               }
               if (!isAuthorizedDirectory) {
                 LOG.error("Request number " + requestNumber + " does not correspond to the directory " + fd.getMainFolderName(sess, serverName, request.getIdCoreFacility()) + " for attempted download on " + fd.getFileName() +  ".  Bypassing download." );
-                continue;              
+                continue;
               }
             }
 
 
 
             // Make softlinks dir
-            if(softlinks_dir.length() == 0) {							
+            if(softlinks_dir.length() == 0) {
               softlinks_dir = PropertyDictionaryHelper.getInstance(sess).getFDTDirectoryForGNomEx(req.getServerName())+uuid.toString();
               File dir = new File(softlinks_dir);
               boolean success = dir.mkdir();
@@ -182,11 +182,11 @@ public class FastDataTransferDownloadExpServlet extends HttpServlet {
                 response.setStatus(999);
                 System.out.println("Error. Unable to create softlinks directory.");
                 return;
-              } 
+              }
 
               String theFileTransferLogFile = "fdtDownloadTransferLog_" + uuid.toString();
               UploadDownloadHelper.writeDownloadInfoFile(softlinks_dir, emailAddress, secAdvisor,req, theidRequest,theidLab,"",theFileTransferLogFile);
-              
+
               // change ownership to HCI_fdt user
               String fdtUser = PropertyDictionaryHelper.getInstance(sess).getProperty(PropertyDictionary.FDT_USER);
               if (fdtUser == null || fdtUser.equals("")) {
@@ -196,14 +196,14 @@ public class FastDataTransferDownloadExpServlet extends HttpServlet {
               if (fdtGroup == null || fdtGroup.equals("")) {
                 fdtGroup = "fdt_security";
               }
-              Process process = Runtime.getRuntime().exec( new String[] { "chown", "-R", fdtUser + ":" + fdtGroup, softlinks_dir } );          
+              Process process = Runtime.getRuntime().exec( new String[] { "chown", "-R", fdtUser + ":" + fdtGroup, softlinks_dir } );
               process.waitFor();
-              process.destroy(); 
-              
+              process.destroy();
+
               // only fdt user and group have permissions on this directory
-              process = Runtime.getRuntime().exec( new String[] { "chmod", "770", softlinks_dir } );                   
+              process = Runtime.getRuntime().exec( new String[] { "chmod", "770", softlinks_dir } );
               process.waitFor();
-              process.destroy();        
+              process.destroy();
             }
 
 
@@ -221,20 +221,20 @@ public class FastDataTransferDownloadExpServlet extends HttpServlet {
 
             // Get fileName to use for the name of the softlink
             String fileName = softlinks_dir+Constants.FILE_SEPARATOR+zipEntryName.substring((indxDirPath > 0 ? indxDirPath-1 : 0));
-            
+
             // Make intermediate directories if necessary
             String dirsName = softlinks_dir+Constants.FILE_SEPARATOR+zipEntryName.substring((indxDirPath > 0 ? indxDirPath-1 : 0), indxFileName);
             File dir = new File(dirsName);
             if(!dir.exists()) {
-              boolean isDirCreated = dir.mkdirs();  
+              boolean isDirCreated = dir.mkdirs();
               if (!isDirCreated) {
                 response.setStatus(999);
                 System.out.println("Error. Unable to create " + dirsName);
                 return;
-              }						    				    					    	
+              }
             }
 
-            Process process = Runtime.getRuntime().exec( new String[] { "ln", "-s", fd.getFileName(), fileName } );					
+            Process process = Runtime.getRuntime().exec( new String[] { "ln", "-s", fd.getFileName(), fileName } );
             process.waitFor();
             process.destroy();
 
@@ -268,7 +268,7 @@ public class FastDataTransferDownloadExpServlet extends HttpServlet {
         String uuidStr = uuid.toString();
         createTransferLogFile (softlinks_dir, uuidStr, filesToDownload );
         secAdvisor.closeReadOnlyHibernateSession();
-        
+
         // clear out session variable
         req.getSession().setAttribute(CacheFileDownloadList.SESSION_KEY_FILE_DESCRIPTOR_PARSER, null);
         String fdtJarLoc = PropertyDictionaryHelper.getInstance(sess).getFDTJarLocation(req.getServerName());
@@ -278,9 +278,9 @@ public class FastDataTransferDownloadExpServlet extends HttpServlet {
             System.out.println ("[FDTDES] WARNING no fdtJarLoc, server: " + req.getServerName());
           fdtJarLoc = "http://hci-bio-app.hci.utah.edu/fdt/";
         }
-        
+
         if(showCommandLineInstructions != null && showCommandLineInstructions.equals("Y")) {
-          response.setContentType("text/html");
+          response.setContentType("text/html; charset=UTF-8");
           response.getOutputStream().println("***** Please read, the directions have changed (AGAIN) *****");
           response.getOutputStream().println("Complete the following steps to run FDT from the command line:");
           response.getOutputStream().println("1) Download the fdtCommandLine.jar app from " + fdtJarLoc);
@@ -291,9 +291,9 @@ public class FastDataTransferDownloadExpServlet extends HttpServlet {
           response.getOutputStream().flush();
           return;
         }
-        
+
         response.setHeader("Content-Disposition","attachment;filename=\"gnomex.jnlp\"");
-        response.setContentType("application/jnlp");
+        response.setContentType("application/jnlp; charset=UTF-8");
         response.setHeader("Cache-Control", "max-age=0, must-revalidate");
         try {
           ServletOutputStream out = response.getOutputStream();
@@ -314,7 +314,7 @@ public class FastDataTransferDownloadExpServlet extends HttpServlet {
           out.println("");
           out.println("java -jar path2YourLocalCopyOfFDT/fdtCommandLine.jar -noupdates -pull -r -c " + fdtServerName + " -d path2SaveDataOnYourLocalComputer " + softLinksPath);
           out.println("");
-          out.println("-->");	
+          out.println("-->");
           out.println("<information>");
 		      out.println("<title>GNomEx FDT Download Experiment Files</title>");
 		      out.println("<vendor>Sun Microsystems, Inc.</vendor>");
@@ -338,7 +338,7 @@ public class FastDataTransferDownloadExpServlet extends HttpServlet {
 
 		    } catch (IOException e) {
 		      LOG.error( "Unable to get response output stream.", e );
-		    }	          
+		    }
 
 		  } else {
 		    response.setStatus(999);
@@ -349,9 +349,9 @@ public class FastDataTransferDownloadExpServlet extends HttpServlet {
 
 		  LOG.error( "FastDataTransferDownloadExpServlet: An exception occurred ", e);
 
-		} 					
+		}
 
-	}    
+	}
 
 
   public void createTransferLogFile (String taskFileDir, String uuidStr, StringBuilder filesToTransfer ) {
@@ -400,7 +400,7 @@ public class FastDataTransferDownloadExpServlet extends HttpServlet {
 	  if (requests.size() == 1) {
 	    request = (Request)requests.get(0);
 	  }
-	  return request;    
+	  return request;
 	}
 
 }

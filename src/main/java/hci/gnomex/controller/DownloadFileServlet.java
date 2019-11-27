@@ -79,7 +79,7 @@ public class DownloadFileServlet extends HttpServlet {
       secAdvisor = (SecurityAdvisor) req.getSession().getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY);
 
       if (secAdvisor != null) {
-        response.setContentType("application/x-download");
+        response.setContentType("application/x-download; charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment;filename=gnomex.zip");
         response.setHeader("Cache-Control", "max-age=0, must-revalidate");
 
@@ -116,7 +116,7 @@ public class DownloadFileServlet extends HttpServlet {
             continue;
           }
 
-          // Check permissions - bypass this request if the user 
+          // Check permissions - bypass this request if the user
           // does not have  permission to read it.
           if (!secAdvisor.canRead(request)) {
             LOG.error("Insufficient permissions to read request " + requestNumber + ".  Bypassing download for user " + (req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest") + ".");
@@ -174,14 +174,14 @@ public class DownloadFileServlet extends HttpServlet {
 
             // If we are using tar, compress the file first using
             // zip.  If we are zipping the file, just open
-            // it to read.            
+            // it to read.
             InputStream in = archiveHelper.getInputStreamToArchive(fd.getFileName(), fd.getZipEntryName());
 
 
-            // Add an entry to the archive 
+            // Add an entry to the archive
             // (The file name starts after the year subdirectory)
             if (archiveHelper.isZipMode()) {
-              // Add ZIP entry 
+              // Add ZIP entry
               zipOut.putNextEntry(new ZipEntry(archiveHelper.getArchiveEntryName()));
             } else {
               // Add a TAR archive entry

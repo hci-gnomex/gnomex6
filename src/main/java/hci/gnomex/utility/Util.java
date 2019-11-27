@@ -922,7 +922,7 @@ public class Util {
                 .add("url", URL)
                 .add("fileExtensions", fileExtensionsBuilder.toString())
                 .build();
-        response.setContentType("application/json");
+        response.setContentType("application/json; charset=UTF-8");
         try (JsonWriter jsonWriter = Json.createWriter(response.getOutputStream())) {
             jsonWriter.writeObject(value);
         }
