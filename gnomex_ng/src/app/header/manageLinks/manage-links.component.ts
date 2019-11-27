@@ -115,9 +115,8 @@ export class ManageLinksComponent extends BaseGenericContainerDialog implements 
             this.coreList = this.secAdvisor.myCoreFacilities;
         }
 
-        this.getFAQSubscription = this.launchPropertiesService.getFAQ().subscribe((response: any[]) => {
-            console.log("subscribe createSecurityAdvisor");
-
+        this.getFAQSubscription = this.launchPropertiesService.getFAQ().subscribe((response: any) => {
+            response = Array.isArray(response) ? response : [response.FAQ];
             response.forEach(faq => {
                 this.setCoreFacility(faq);
             });

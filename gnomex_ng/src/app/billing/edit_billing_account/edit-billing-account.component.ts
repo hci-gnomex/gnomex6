@@ -1285,7 +1285,7 @@ export class EditBillingAccountComponent extends BaseGenericContainerDialog impl
 		this.startDate = (this._rowData.startDate && this._rowData.startDate !== '') ? this._rowData.startDate : this._rowData.startDateOther;
         this.effectiveUntilDate = (this._rowData.expirationDate && this._rowData.expirationDate !== '') ? this._rowData.expirationDate : this._rowData.expirationDateOther;
 
-        this.approvedUsersValue = this._rowData.approvedUsers;
+        this.approvedUsersValue = this._rowData.acctUsers;
 
         this.submitterEmail = this._rowData.submitterEmail;
         this.submitterEmailFormControl.reset();
@@ -1312,7 +1312,7 @@ export class EditBillingAccountComponent extends BaseGenericContainerDialog impl
         this.totalDollarAmount = this._rowData.totalDollarAmountDisplay;
         this.activeCheckBox = (this._rowData.activeAccount && this._rowData.activeAccount.toLowerCase() === 'y');
 
-        this.approvedUsersValue = this._rowData.approvedUsers;
+        this.approvedUsersValue = this._rowData.acctUsers;
 
         this.submitterEmail = this._rowData.submitterEmail;
         this.submitterEmailFormControl.reset();
