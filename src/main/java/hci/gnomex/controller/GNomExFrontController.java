@@ -311,7 +311,7 @@ protected static void initLog4j() {
 	String thexml = (String) request.getAttribute("xmlResult");
 	String theJSON = (String) request.getAttribute("jsonResult");
 	if (theJSON != null) {
-		response.setContentType("application/json");
+		response.setContentType("application/json; charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		out.print(theJSON);
 		out.flush();
@@ -346,7 +346,7 @@ protected static void initLog4j() {
 			thejson = thejson.replace("\"notype\":","\"type\":");
 		}
 
-		response.setContentType("application/json");
+		response.setContentType("application/json; charset=UTF-8");
 		// Get the printwriter object from response to write the required json object to the output stream
 		PrintWriter out = response.getWriter();
 		// Assuming your json object is **jsonObject**, perform the following, it will return your json object

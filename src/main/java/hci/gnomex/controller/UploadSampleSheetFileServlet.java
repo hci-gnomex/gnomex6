@@ -188,7 +188,7 @@ public class UploadSampleSheetFileServlet extends HttpServlet {
             res.setHeader("Cache-Control", "cache, must-revalidate, proxy-revalidate, s-maxage=0, max-age=0");
             res.setHeader("Pragma", "public");
             res.setDateHeader("Expires", 0);
-            res.setContentType("application/json");
+            res.setContentType("application/json; charset=UTF-8");
 
             XMLOutputter xmlOut = new XMLOutputter();
             String xmlResult = xmlOut.outputString(doc);
@@ -205,7 +205,7 @@ public class UploadSampleSheetFileServlet extends HttpServlet {
             res.setHeader("Cache-Control", "cache, must-revalidate, proxy-revalidate, s-maxage=0, max-age=0");
             res.setHeader("Pragma", "public");
             res.setDateHeader("Expires", 0);
-            res.setContentType("application/xml");
+            res.setContentType("application/xml; charset=UTF-8");
             responseOut.println("<ERROR message=\"Illegal data\"/>");
         } catch (Exception e) {
             LOG.error("An error has occured in UploadSampleSheetFileServlet - " + e.toString(), e);

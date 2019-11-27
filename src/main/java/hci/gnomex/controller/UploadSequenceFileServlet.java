@@ -146,7 +146,7 @@ public class UploadSequenceFileServlet extends HttpServlet {
                     .build();
             JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
 
-            res.setContentType("application/json");
+            res.setContentType("application/json; charset=UTF-8");
             jsonWriter.writeObject(value);
             jsonWriter.close();
 
@@ -162,7 +162,7 @@ public class UploadSequenceFileServlet extends HttpServlet {
                     .build();
             JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
 
-            res.setContentType("application/json");
+            res.setContentType("application/json; charset=UTF-8");
             jsonWriter.writeObject(value);
             jsonWriter.close();
 
