@@ -1,23 +1,23 @@
 import {AfterViewInit, Component, OnDestroy, OnInit} from "@angular/core";
 import {TopicService} from "../services/topic.service";
 import {ActivatedRoute} from "@angular/router";
-import {Observable, Subscription} from "rxjs";
+import {Observable, Subscription, throwError} from "rxjs";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ConstantsService} from "../services/constants.service";
 import {GnomexService} from "../services/gnomex.service";
-import {MatDialog, MatDialogConfig, MatSnackBar} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {GetLabService} from "../services/get-lab.service";
-import {URLSearchParams} from "@angular/http";
 import {PropertyService} from "../services/property.service";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {BasicEmailDialogComponent} from "../util/basic-email-dialog.component";
 import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
-import {map} from "rxjs/operators";
+import {catchError, map} from "rxjs/operators";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {AngularEditorConfig} from "@kolkov/angular-editor";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 import {UtilService} from "../services/util.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     templateUrl: "./topics-detail.component.html",
@@ -71,8 +71,6 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                 public getLabService: GetLabService,
                 private propertyService: PropertyService,
                 private dialogService: DialogsService,
-                private dialog: MatDialog,
-                private snackBar: MatSnackBar,
                 public prefService: UserPreferencesService) {
     }
 
@@ -103,10 +101,10 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
             if (!this.topicForm.get("idLab").value) {
                 return;
             }
-            let params: URLSearchParams = new URLSearchParams();
-            params.set("idLab", this.topicForm.get("idLab").value);
-            params.set("includeBillingAccounts", "N");
-            params.set("includeProductCounts", "N");
+            let params: HttpParams = new HttpParams()
+                .set("idLab", this.topicForm.get("idLab").value)
+                .set("includeBillingAccounts", "N")
+                .set("includeProductCounts", "N");
 
             this.getLabService.getLabMembers_fromBackend(params);
             if (!this.inInitialization) {
@@ -191,6 +189,8 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                 }
                 this.dialogService.error("An error occurred while saving the topic" + message);
             }
+        }, (err: IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
     }
 
@@ -236,7 +236,7 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
             return this.topicService.emailTopicOwner(params).pipe(map((result) => {
                 return result && result.result === "SUCCESS";
-            }));
+            }), (catchError((err: IGnomexErrorResponse) => {return throwError(err); })));
         };
 
         let configuration: MatDialogConfig = new MatDialogConfig();

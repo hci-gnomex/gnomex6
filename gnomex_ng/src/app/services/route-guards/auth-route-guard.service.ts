@@ -1,18 +1,14 @@
 import {
+    ActivatedRoute,
+    ActivatedRouteSnapshot,
     CanActivate,
     Router,
-    ActivatedRouteSnapshot,
     RouterStateSnapshot,
-    NavigationExtras,
-    ActivatedRoute
 } from "@angular/router";
-import {Observable, of} from "rxjs";
-import {ExperimentsService} from "../../experiments/experiments.service";
+import {BehaviorSubject, Observable, of} from "rxjs";
 import {Injectable} from "@angular/core";
 import {GnomexService} from "../gnomex.service";
-import {URLSearchParams} from "@angular/http";
 import {HttpParams} from "@angular/common/http";
-import {BehaviorSubject} from "rxjs";
 import {AuthenticationService} from "../../auth/authentication.service";
 import {catchError, flatMap, map} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
@@ -71,7 +67,7 @@ export class AuthRouteGuardService implements CanActivate {
     }
 
 
-    private redirectByURL(params: HttpParams, initOrderSubject: BehaviorSubject<any>, isNoPublicVis:boolean,  isAuthed: boolean, numberObj: any): Observable<boolean> {
+    private redirectByURL(params: HttpParams, initOrderSubject: BehaviorSubject<any>, isNoPublicVis: boolean,  isAuthed: boolean, numberObj: any): Observable<boolean> {
         return this.gnomexService.getOrderFromNumber(params).pipe(map((res) => {
             this.setIDsFromResponse(res, numberObj); // no navigation
             this.gnomexService.orderInitObj = numberObj;
@@ -85,9 +81,9 @@ export class AuthRouteGuardService implements CanActivate {
                 this._authenticationService.redirectUrl = "/" + numberObj.urlSegList[0];
                 this._router.navigate(["authenticate"]);
                 return false;
-            }else{ // order is public
+            } else { // order is public
                 numberObj["isGuest"] = !isAuthed;
-                if(isNoPublicVis){
+                if(isNoPublicVis) {
                     // do not let them route since backend will let them see public data if not
                     this._authenticationService.redirectUrl = "/home";
                     this.gnomexService.redirectURL = null;
@@ -96,13 +92,13 @@ export class AuthRouteGuardService implements CanActivate {
                     initOrderSubject.next(null);
 
                     return false;
-                }else{
+                } else {
                     return true;
                 }
 
             }
 
-        }), catchError( (err:IGnomexErrorResponse) =>{
+        }), catchError( (err: IGnomexErrorResponse) => {
             this._router.navigate(["authenticate"]);
             return of(false);
         }));
@@ -110,8 +106,8 @@ export class AuthRouteGuardService implements CanActivate {
     }
 
     private determineIfPublic(queryParam: any, isAuthed: boolean, url: string): Observable<boolean> {
-        return this.gnomexService.getLoginPropertiesObservable().pipe(flatMap((loginPropResp:any)=>{
-            let noPublicVis:boolean = loginPropResp[PropertyService.PROPERTY_NO_PUBLIC_VISIBILITY];
+        return this.gnomexService.getLoginPropertiesObservable().pipe(flatMap((loginPropResp: any) => {
+            let noPublicVis: boolean = loginPropResp[PropertyService.PROPERTY_NO_PUBLIC_VISIBILITY];
 
             let numberObj: any = {};
             if (queryParam["requestNumber"]) {
@@ -121,7 +117,7 @@ export class AuthRouteGuardService implements CanActivate {
                 numberObj["urlSegList"] = ["experiments"];
                 let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
                 let sub = this.gnomexService.navInitBrowseExperimentSubject;
-                return this.redirectByURL(params, sub,noPublicVis, isAuthed, numberObj);
+                return this.redirectByURL(params, sub, noPublicVis, isAuthed, numberObj);
 
 
             } else if (queryParam["analysisNumber"]) {
@@ -131,7 +127,7 @@ export class AuthRouteGuardService implements CanActivate {
                 numberObj["urlSegList"] = ["analysis"];
                 let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
                 let sub = this.gnomexService.navInitBrowseAnalysisSubject;
-                return this.redirectByURL(params, sub,noPublicVis, isAuthed, numberObj);
+                return this.redirectByURL(params, sub, noPublicVis, isAuthed, numberObj);
 
             } else if (queryParam["dataTrackNumber"]) {
                 numberObj["type"] = "dataTrackNumber";
@@ -140,7 +136,7 @@ export class AuthRouteGuardService implements CanActivate {
                 numberObj["urlSegList"] = ["datatracks"];
                 let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
                 let sub = this.gnomexService.navInitBrowseDatatrackSubject;
-                return this.redirectByURL(params, sub,noPublicVis, isAuthed, numberObj);
+                return this.redirectByURL(params, sub, noPublicVis, isAuthed, numberObj);
 
             } else if (queryParam["topicNumber"]) {
                 numberObj["type"] = "topicNumber";
@@ -148,24 +144,23 @@ export class AuthRouteGuardService implements CanActivate {
                 numberObj["urlSegList"] = ["topics"];
                 let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
                 let sub = this.gnomexService.navInitBrowseTopicSubject;
-                return this.redirectByURL(params, sub,noPublicVis, isAuthed, numberObj);
+                return this.redirectByURL(params, sub, noPublicVis, isAuthed, numberObj);
 
 
             } else {
                 return of(false);
             }
 
+        }), catchError((err: IGnomexErrorResponse) => {
+            return of(false);
         }));
-
-
-
 
     }
 
     private setIDsFromResponse(resp: any, orderInfo: any) {
         let idList: Array<any> = Object.keys(resp);
         for (let idKey  of idList) {
-            if (idKey === 'result' || idKey === 'codeVisbility') {
+            if (idKey === "result" || idKey === "codeVisbility") {
                 continue;
             } else {
                 orderInfo[idKey] = resp[idKey];

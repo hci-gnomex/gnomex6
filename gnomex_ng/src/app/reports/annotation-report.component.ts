@@ -6,6 +6,7 @@ import {DictionaryService} from "../services/dictionary.service";
 import {AnnotationService} from "../services/annotation.service";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {DateRange} from "../util/date-range-filter.component";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'annotation-report',
@@ -63,6 +64,7 @@ export class AnnotationReportComponent {
         this.annotationService.getPropertyList().subscribe((response: any[]) => {
             this.allProperties = response;
             this.refreshAnnotationList();
+        }, (err: IGnomexErrorResponse) => {
         });
 
         this.customColumnsColumnDefs = [

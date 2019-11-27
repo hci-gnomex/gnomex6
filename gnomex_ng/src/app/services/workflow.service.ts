@@ -1,14 +1,10 @@
-
 import {Injectable} from "@angular/core";
-import {Http, Response, Headers, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {DictionaryService} from "./dictionary.service";
 import {CookieUtilService} from "./cookie-util.service";
-import {map} from "rxjs/operators";
 
-export enum qcModes
-{
+export enum qcModes {
     All = "All",
     Illumina = "Illumina",
     Microarray = "Microarray",
@@ -67,8 +63,7 @@ export class WorkflowService {
         {display: 'Terminate', value: 'Terminated'},
     ];
 
-    constructor(private http: Http,
-                private cookieUtilService: CookieUtilService,
+    constructor(private cookieUtilService: CookieUtilService,
                 private dictionaryService: DictionaryService,
                 private httpClient: HttpClient) {
 
@@ -135,7 +130,7 @@ export class WorkflowService {
 
         let comp: number = WorkflowService.stringCompare(firstChar1, firstChar2);
 
-        if (comp == 0) {
+        if (comp === 0) {
             let number1: number = Number(num1);
             let number2: number = Number(num2);
             if (number1 > number2) {
@@ -145,20 +140,21 @@ export class WorkflowService {
             }
         }
 
-        if (comp == 0) {
+        // TODO: check if this is correct for comp's value of 0
+        if (comp === 0) {
             let remNum1: number = Number(rem1);
             let remNum2: number = Number(rem2);
             if (remNum1 > remNum2) {
-                comp = 1
+                comp = 1;
             } else if (remNum2 > remNum1) {
                 comp = -1;
             }
         }
 
         return comp;
-    };
+    }
 
-    private static stringCompare(s1: string, s2:string): number {
+    private static stringCompare(s1: string, s2: string): number {
         if (s1 > s2) {
             return 1;
         } else if (s2 > s1) {
@@ -178,7 +174,7 @@ export class WorkflowService {
 
     public lookupOligoBarcode(item: any): string {
         if (item != null && item.sampleIdOligoBarcode) {
-            if (item.sampleIdOligoBarcode != '') {
+            if (item.sampleIdOligoBarcode !== '') {
                 return this.dictionaryService.getEntryDisplay("hci.gnomex.model.OligoBarcode", item.sampleIdOligoBarcode);
             } else {
                 return item.barcodeSequence;
@@ -191,7 +187,7 @@ export class WorkflowService {
 
     public lookupOligoBarcodeB(item: any): string {
         if (item != null && item.sampleIdOligoBarcodeB) {
-            if (item.sampleIdOligoBarcodeB != '') {
+            if (item.sampleIdOligoBarcodeB !== '') {
                 return this.dictionaryService.getEntryDisplay("hci.gnomex.model.OligoBarcode", item.sampleIdOligoBarcodeB);
             } else {
                 return item.barcodeSequenceB;
@@ -223,11 +219,9 @@ export class WorkflowService {
         return this.httpClient.get("/gnomex/GetFlowCell.gx", {params: params});
     }
 
-    public getFlowCellChannel(params: HttpParams){
-        return this.httpClient.get("/gnomex/GetFlowCellChannel.gx", {params:params});
+    public getFlowCellChannel(params: HttpParams) {
+        return this.httpClient.get("/gnomex/GetFlowCellChannel.gx", {params: params});
     }
-
-
 
     getWorkItemList(params: HttpParams):  Observable<any> {
         return this.httpClient.get("/gnomex/GetWorkItemList.gx", {params: params});
@@ -235,7 +229,7 @@ export class WorkflowService {
 
     saveCombinedWorkItemQualityControl(params: HttpParams):  Observable<any> {
         let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
-        return this.httpClient.post("/gnomex/SaveCombinedWorkItemQualityControl.gx",params.toString(), {headers: headers});
+        return this.httpClient.post("/gnomex/SaveCombinedWorkItemQualityControl.gx", params.toString(), {headers: headers});
 
     }
 
@@ -252,7 +246,7 @@ export class WorkflowService {
 
     deleteWorkItem(params: HttpParams):  Observable<any> {
         let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
-        return this.httpClient.post("/gnomex/DeleteWorkItem.gx",params.toString(), {headers: headers});
+        return this.httpClient.post("/gnomex/DeleteWorkItem.gx", params.toString(), {headers: headers});
 
     }
 

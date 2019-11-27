@@ -217,10 +217,10 @@ export class ProductOrdersComponent implements OnInit {
                 if (lab) {
                     this.selectTreeNode(lab, idProductOrder);
                 }
-            } ,(err: IGnomexErrorResponse) => {
+            } , (err: IGnomexErrorResponse) => {
                 this.showSpinner = false;
             });
-        } ,(err: IGnomexErrorResponse) => {
+        } , (err: IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
     }
@@ -251,6 +251,7 @@ export class ProductOrdersComponent implements OnInit {
     }
 
     private save(): void {
+        this.showSpinner = true;
         let lab: string;
         let idProductOrder: string;
         let params: HttpParams = new HttpParams()
@@ -264,6 +265,7 @@ export class ProductOrdersComponent implements OnInit {
             lab = this.selectedTreeNode.data.display;
         }
         this.productsService.changeProductOrderStatus(params).subscribe((response: any) => {
+            this.showSpinner = false;
             if (response && response.result && response.result === 'SUCCESS') {
                 if (response.message) {
                     this.dialogsService.alert(response.message, null, DialogType.SUCCESS);
@@ -279,6 +281,8 @@ export class ProductOrdersComponent implements OnInit {
                 }
                 this.dialogsService.error("An error occurred while saving product order line item(s)" + message);
             }
+        }, (err: IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
     }
 
@@ -336,6 +340,7 @@ export class ProductOrdersComponent implements OnInit {
                 }
                 this.dialogsService.error("An error occurred while deleting product order line item(s)" + message);
             }
+        }, (err: IGnomexErrorResponse) => {
         });
     }
 
@@ -343,7 +348,7 @@ export class ProductOrdersComponent implements OnInit {
         this.productsService.getProductOrder(idProductOrder).subscribe((response: any) => {
             this.currentProductOrder = response;
 
-        },(err:IGnomexErrorResponse) => {
+        }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
     }

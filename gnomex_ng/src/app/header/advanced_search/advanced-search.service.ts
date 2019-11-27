@@ -5,7 +5,6 @@ import {BehaviorSubject} from "rxjs";
 import {Observable} from "rxjs";
 import {Subject} from "rxjs";
 import {Subscription} from "rxjs";
-import {AdvancedSearchComponent} from "./advanced-search.component";
 import {CookieUtilService} from "../../services/cookie-util.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../../util/popup/dialogs.service";
@@ -345,18 +344,9 @@ export class AdvancedSearchService implements OnDestroy {
                     }
                     this._searchResultSubject.next(data);
                 }
+            }, (err: IGnomexErrorResponse) => {
             });
 
-            // this.httpClient.post('/gnomex/SearchIndex.gx', finalParams).subscribe((response: any|any[]) => {
-            //     if (response) {
-            //         let data = response;
-            //
-            //         if (!Array.isArray(response)) {
-            //             data = [response];
-            //         }
-            //         this._searchResultSubject.next(data);
-            //     }
-            // });
         }
     }
 }

@@ -31,6 +31,7 @@ import {GridApi} from "ag-grid-community";
 import {SampleUploadService} from "../../upload/sample-upload.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "tab-samples-illumina",
@@ -1690,6 +1691,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
             this.propertyList = result;
             this.rebuildColumnDefinitions();
 
+            this.dialogService.stopAllSpinnerDialogs();
+        }, (err: IGnomexErrorResponse) => {
             this.dialogService.stopAllSpinnerDialogs();
         });
 

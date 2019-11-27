@@ -4,6 +4,7 @@ import {PasswordUtilService} from "../services/password-util.service";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {ActivatedRoute, ParamMap, Router} from "@angular/router";
 import {GnomexService} from "../services/gnomex.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "change-password",
@@ -78,8 +79,8 @@ import {GnomexService} from "../services/gnomex.service";
 })
 export class ChangePasswordComponent implements OnInit {
 
-    private guid: string;
     public formGroup: FormGroup;
+    private guid: string;
 
     constructor(public passwordUtilService: PasswordUtilService,
                 private dialogsService: DialogsService,
@@ -91,24 +92,24 @@ export class ChangePasswordComponent implements OnInit {
 
     ngOnInit(): void {
         this.formGroup = this.fb.group({
-            username: ['', Validators.required],
-            password: ['', [Validators.required, PasswordUtilService.validatePassword]],
-            passwordConfirm: ['', [Validators.required, PasswordUtilService.validatePasswordConfirm()]],
+            username: ["", Validators.required],
+            password: ["", [Validators.required, PasswordUtilService.validatePassword]],
+            passwordConfirm: ["", [Validators.required, PasswordUtilService.validatePasswordConfirm()]],
         });
 
         this.gnomexService.getLoginProperties();
 
         this.route.paramMap.subscribe((params: ParamMap) => {
             this.guid = params.get("guid");
-        })
+        });
     }
 
     public submit(): void {
-        let username: string = this.formGroup.controls['username'].value;
-        let password: string = this.formGroup.controls['password'].value;
-        let passwordConfirm: string = this.formGroup.controls['passwordConfirm'].value;
+        let username: string = this.formGroup.controls["username"].value;
+        let password: string = this.formGroup.controls["password"].value;
+        let passwordConfirm: string = this.formGroup.controls["passwordConfirm"].value;
         this.passwordUtilService.changePassword(username, password, passwordConfirm, this.guid).subscribe((result: any) => {
-            if (result && result.result && result.result === 'SUCCESS') {
+            if (result && result.result && result.result === "SUCCESS") {
                 this.dialogsService.alert("Your password has been changed", "", DialogType.SUCCESS);
                 this.router.navigateByUrl("/authenticate");
             } else {
@@ -118,6 +119,7 @@ export class ChangePasswordComponent implements OnInit {
                 }
                 this.dialogsService.error("An error occurred while changing your password" + message);
             }
+        }, (err: IGnomexErrorResponse) => {
         });
     }
 

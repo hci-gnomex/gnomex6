@@ -185,14 +185,14 @@ export class PipelineWorkflowComponent implements OnInit {
         if (this.workItem) {
             items = this.workItemList.filter(request =>
                 request.requestNumber === this.workItem
-            )
+            );
         } else {
             items = this.workItemList;
         }
         if (this.core) {
             items = items.filter(request =>
                 request.idCoreFacility === this.core.idCoreFacility
-            )
+            );
         }
         this.workflowService.assignBackgroundColor(items, "idRequest");
         return items;
@@ -244,9 +244,9 @@ export class PipelineWorkflowComponent implements OnInit {
                 this.dirty = false;
                 this.workItem = "";
                 this.initialize();
-            },(err:IGnomexErrorResponse) => {
+            }, (err: IGnomexErrorResponse) => {
                 // just warning that it couldn't send an email still saved
-                if(err.gError.result === "SUCCESS"){
+                if(err.gError.result === "SUCCESS") {
                     this.changedRowMap = new Map<string, any>();
                     this.dirty = false;
                     this.workItem = "";
@@ -255,7 +255,7 @@ export class PipelineWorkflowComponent implements OnInit {
 
                 this.showSpinner = false;
             });
-        })
+        });
     }
 
     static qualCalcValueSetter(params: any) {

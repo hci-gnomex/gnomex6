@@ -116,7 +116,7 @@ export class ProductLedgerComponent implements OnInit {
         this.showDirtyNote = false;
         this.isAdminState = this.createSecurityAdvisorService.isAdmin || this.createSecurityAdvisorService.isSuperAdmin;
         this.treeOptions = {
-            displayField: 'display',
+            displayField: "display",
         };
         this.treeModel = this.treeComponent.treeModel;
 
@@ -128,7 +128,7 @@ export class ProductLedgerComponent implements OnInit {
         this.labListService.getSubmitRequestLabList().subscribe((response: any[]) => {
             this.labList = response;
             if (this.labList.length === 1) {
-                this.filterForm.controls['lab'].setValue(this.labList[0].idLab);
+                this.filterForm.controls["lab"].setValue(this.labList[0].idLab);
             }
         });
         this.productsService.getProductList().subscribe((response: any) => {
@@ -146,7 +146,7 @@ export class ProductLedgerComponent implements OnInit {
                     return false;
                 });
             }
-        },(err: IGnomexErrorResponse) => {
+        }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
         this.loadLedger();
@@ -174,7 +174,7 @@ export class ProductLedgerComponent implements OnInit {
             if (selectedProduct) {
                 this.selectNode(selectedProduct.idLab, selectedProduct.idProduct);
             }
-        },(err: IGnomexErrorResponse) => {
+        }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
     }
@@ -213,7 +213,7 @@ export class ProductLedgerComponent implements OnInit {
                     }
                 }
                 this.sizeColumnsToFit();
-            },(err: IGnomexErrorResponse) => {
+            }, (err: IGnomexErrorResponse) => {
                 this.showSpinner = false;
             });
         }
@@ -345,6 +345,8 @@ export class ProductLedgerComponent implements OnInit {
                     }
                     this.dialogsService.error("An error occurred while saving" + message);
                 }
+                this.showSpinner = false;
+            }, (err: IGnomexErrorResponse) => {
                 this.showSpinner = false;
             });
         }

@@ -1,10 +1,10 @@
 import {Component} from "@angular/core";
-import {Response} from "@angular/http";
 import {MatDialogRef, MatSnackBar} from "@angular/material";
 import {LabListService} from "../services/lab-list.service";
 import {LabMembershipRequestService} from "../services/lab-membership-request.service";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {GDAction} from "../util/interfaces/generic-dialog-action.model";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'lab-membership-request',
@@ -62,17 +62,16 @@ export class LabMembershipRequestComponent extends BaseGenericContainerDialog {
                 idLabs += selectedLabs[i].idLab + ",";
             }
             idLabs = idLabs.substring(0, idLabs.lastIndexOf(","));
-            this.labMembershipRequestService.requestLabMembership(idLabs).subscribe((response: Response) => {
+            this.labMembershipRequestService.requestLabMembership(idLabs).subscribe((response: any) => {
                 this.showSpinner = false;
-                if (response.status === 200) {
-                    let responseJSON: any = response.json();
-                    if (responseJSON.result && responseJSON.result === "SUCCESS") {
-                        this.snackBar.open("Request(s) Sent", "Lab Membership", {
-                            duration: 5000,
-                        });
-                        this.dialogRef.close();
-                    }
+                if (response && response.result && response.result === "SUCCESS") {
+                    this.snackBar.open("Request(s) Sent", "Lab Membership", {
+                        duration: 5000,
+                    });
+                    this.dialogRef.close();
                 }
+            }, (err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
         }
     }

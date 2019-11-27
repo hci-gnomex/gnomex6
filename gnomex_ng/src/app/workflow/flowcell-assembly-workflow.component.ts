@@ -3,7 +3,7 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {MatDialogConfig} from "@angular/material";
 import {HttpParams} from "@angular/common/http";
 
-import {GridApi, GridOptions, GridSizeChangedEvent} from "ag-grid-community";
+import {GridApi, GridSizeChangedEvent} from "ag-grid-community";
 
 import {WorkflowService} from "../services/workflow.service";
 import {GnomexService} from "../services/gnomex.service";
@@ -318,8 +318,8 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
     public selectedLab:            FormControl;
     public protocolFilterFc:       FormControl;
 
-    private allRequestGridApi:GridApi;
-    private assmGridApi:GridApi;
+    private allRequestGridApi: GridApi;
+    private assmGridApi: GridApi;
 
 
     constructor(public prefService: UserPreferencesService,
@@ -331,7 +331,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
                 private securityAdvisor: CreateSecurityAdvisorService) {
 
         this.barcodeFC    = new FormControl("");
-        this.runFC        = new FormControl("",Validators.pattern("^[0-9]*$"));
+        this.runFC        = new FormControl("", Validators.pattern("^[0-9]*$"));
         this.createDateFC = new FormControl("");
         this.instrumentFC = new FormControl("");
         this.protocolFC   = new FormControl("", Validators.required);
@@ -410,7 +410,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             }
 
             this.dialogsService.stopAllSpinnerDialogs();
-        },(err:IGnomexErrorResponse) => {
+        }, (err: IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
         });
     }
@@ -466,7 +466,9 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             } else {
                 event.data.selected = false;
                 this.selectedSeqlanes.forEach( (item, index) => {
-                    if(item === event.data) this.selectedSeqlanes.splice(index,1);
+                    if(item === event.data) {
+                        this.selectedSeqlanes.splice(index, 1);
+                    }
                 });
             }
         }
@@ -501,7 +503,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             if (this.assmItemList
                 && this.assmItemList.length
                 && this.assmItemList.length > 0
-                && event.data.codeRequestCategory != this.assmItemList[0].codeRequestCategory) {
+                && event.data.codeRequestCategory !== this.assmItemList[0].codeRequestCategory) {
 
                 this.multiExperimentTypeWarningIsOpen = true;
                 let alertMessage = "Only one type of experiment can be assembled on a flow cell";
@@ -591,7 +593,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
 
 
     private lanesHasFlowcellChannel(channelNumber: number): boolean {
-        if (this.lanes.filter((lane) => { return lane === channelNumber }).length === 0) {
+        if (this.lanes.filter((lane) => { return lane === channelNumber; }).length === 0) {
             return false;
         } else {
             return true;
@@ -606,7 +608,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             if (item.flowCellChannelNumber && this.lanesHasFlowcellChannel(item.flowCellChannelNumber)) {
                 tmp.forEach((lane, index) => {
                     if (lane === item.flowCellChannelNumber) {
-                        tmp.splice(index,1);
+                        tmp.splice(index, 1);
                     }
                 });
             }
@@ -631,7 +633,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             if (wi.idNumberSequencingCyclesAllowed === '' || wi.idNumberSequencingCyclesAllowed == null) {
                 errorMessage = "One or more samples have no sequencing protocol.  Please correct sequence lanes before continuing.";
             }
-            if(wi.idNumberSequencingCyclesAllowed != this.protocolFC.value.idNumberSequencingCyclesAllowed) {
+            if(wi.idNumberSequencingCyclesAllowed !== this.protocolFC.value.idNumberSequencingCyclesAllowed) {
                 warningMessage += "One or more samples have different protocols from the flow cell.\n\n";
                 break;
             }
@@ -671,7 +673,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
                     if (answer) {
                         this.saveWorkItems();
                     }
-                })
+                });
             } else {
                 this.saveWorkItems();
             }
@@ -706,7 +708,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
                 this.initialize();
             }
             this.showSpinner = false;
-        },(err:IGnomexErrorResponse) => {
+        }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
     }
@@ -786,7 +788,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
         for (let wi of this.assmItemList) {
             if (wi.flowCellChannelNumber === flowCellChannelNumber) {
                 let tag = wi.barcodeSequence + wi.barcodeSequenceB;
-                if(tag !== null && tag !== ""){
+                if(tag !== null && tag !== "") {
                     barcodes.push(tag);
                 }
             }
@@ -794,7 +796,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
 
         for( var i: number = 0; i < barcodes.length; i++) {
             let sequenceOne: any[] = barcodes[i].split("");
-            for (var j: number = i+1; j < barcodes.length; j++) {
+            for (var j: number = i + 1; j < barcodes.length; j++) {
                 let sequenceTwo: any[] = barcodes[j].split("");
                 if(!FlowcellAssemblyWorkflowComponent.atLeastThreeUnique(sequenceOne, sequenceTwo)){
                     return false;
@@ -808,8 +810,8 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
     private static atLeastThreeUnique(sequenceOne: any[], sequenceTwo: any[]): boolean {
         let uniqueBaseCount: number = 0;
 
-        for(var i: number = 0; i < sequenceOne.length; i++){
-            if(sequenceOne[i] != sequenceTwo[i]){
+        for(var i: number = 0; i < sequenceOne.length; i++) {
+            if(sequenceOne[i] !== sequenceTwo[i]) {
                 uniqueBaseCount++;
             }
         }

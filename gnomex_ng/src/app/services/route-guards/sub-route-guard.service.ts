@@ -1,12 +1,11 @@
-// src/app/auth/auth-guard.service.ts
-import {Injectable} from '@angular/core';
+import {Injectable} from "@angular/core";
 import {
     ActivatedRoute,
     ActivatedRouteSnapshot,
     CanActivate,
     Router,
     RouterStateSnapshot,
-} from '@angular/router';
+} from "@angular/router";
 import {GnomexService} from "../gnomex.service";
 import {CreateSecurityAdvisorService} from "../create-security-advisor.service";
 import {PropertyService} from "../property.service";
@@ -28,22 +27,22 @@ export class SubRouteGuardService implements CanActivate {
 
 
 
-        if (!this.gnomexService.isLoggedIn){
+        if (!this.gnomexService.isLoggedIn) {
             this.gnomexService.redirectURL = state.url;
-            this.router.navigate(['home']);
+            this.router.navigate(["home"]);
             return false;
         }
-        if(this.gnomexService.redirectURL === "/configure-experiment-platform"){
-            if(this.secAdvisory.isAdmin){
+        if(this.gnomexService.redirectURL === "/configure-experiment-platform") {
+            if(this.secAdvisory.isAdmin) {
                 return true;
-            }else{
+            } else {
                 return false;
             }
 
         }
 
-        if(!this.propertyService.isPublicVisbility()){
-            if(this.gnomexService.orderInitObj &&  this.gnomexService.orderInitObj.codeVisbility === "PUBLIC"){
+        if(!this.propertyService.isPublicVisbility()) {
+            if(this.gnomexService.orderInitObj &&  this.gnomexService.orderInitObj.codeVisbility === "PUBLIC") {
                 this.dialogsService.alert("You do not have permission to view this item.", "", DialogType.FAILED);
                 return false;
             }

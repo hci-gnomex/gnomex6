@@ -1,9 +1,10 @@
 import {Component, Inject, OnInit} from "@angular/core";
-import {URLSearchParams} from "@angular/http";
+import {HttpParams} from "@angular/common/http";
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {UserService} from "../services/user.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "delete-user-dialog",
@@ -33,12 +34,14 @@ export class DeleteUserDialogComponent extends BaseGenericContainerDialog implem
 
     public delete(): void {
         this.showSpinner = true;
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idAppUser", this.idAppUser);
+        let params: HttpParams = new HttpParams()
+            .set("idAppUser", this.idAppUser);
 
-        this.userService.deleteAppUser(params).subscribe((response: Response) => {
+        this.userService.deleteAppUser(params).subscribe((response: any) => {
             this.showSpinner = false;
             this.dialogRef.close(true);
+        }, (err: IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
     }
 

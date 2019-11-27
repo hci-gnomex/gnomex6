@@ -1,26 +1,26 @@
-import {Inject, Injectable} from "@angular/core";
-import {Http, Response, URLSearchParams} from "@angular/http";
-import {Subject} from "rxjs";
-import {Observable} from "rxjs";
+import {Injectable} from "@angular/core";
+import {HttpClient, HttpParams} from "@angular/common/http";
+import {Observable, Subject} from "rxjs";
 import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
 import {DialogsService} from "../popup/dialogs.service";
+
 
 @Injectable()
 export class EmailRelatedUsersService {
 
-	private emailSentSuccess:boolean;
-	private emailSentSubject:Subject<boolean> = new Subject();
+	private emailSentSuccess: boolean;
+	private emailSentSubject: Subject<boolean> = new Subject();
 
-	constructor(private _http:Http,
-				private dialogService:DialogsService) {	}
+	constructor(private httpClient: HttpClient,
+				private dialogService: DialogsService) {	}
 
 	getEmailSentSubscription(): Observable<boolean> {
 		return this.emailSentSubject.asObservable();
 	}
 
-	sendEmailToRequestRelatedUsers(idRequests:number[], subject:string, body:string) {
-		let parameters:URLSearchParams = new URLSearchParams();
-		let xmlString:string = "";
+	sendEmailToRequestRelatedUsers(idRequests: number[], subject: string, body: string) {
+		let params: HttpParams = new HttpParams();
+		let xmlString: string = "";
 
 		xmlString += "<Requests>";
 
@@ -30,23 +30,20 @@ export class EmailRelatedUsersService {
 
 		xmlString += "</Requests>";
 
-		parameters.set("requestsXMLString", xmlString);
-		parameters.set("subject", subject);
-		parameters.set("body", body);
+		params = params.set("requestsXMLString", xmlString);
+		params = params.set("subject", subject);
+		params = params.set("body", body);
 
 		// send the request to the backend.
 
-		this._http.get("/gnomex/EmailServlet.gx", {
+		this.httpClient.get("/gnomex/EmailServlet.gx", {
 			withCredentials: true,
-			search: parameters
-		}).subscribe((response: Response) => {
-			console.log("EmailServlet called");
+			params: params,
+		}).subscribe((response: any) => {
+			this.emailSentSuccess = true;
+			this.emitEmailToRequestRelatedUsersResults();
 
-			if (response.status === 200) {
-				this.emailSentSuccess = true;
-				this.emitEmailToRequestRelatedUsersResults();
-			}
-		}, (err:IGnomexErrorResponse) => {
+		}, (err: IGnomexErrorResponse) => {
 			this.emailSentSuccess = false;
 			this.emitEmailToRequestRelatedUsersResults();
 		});

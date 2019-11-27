@@ -5,6 +5,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'add-product-window',
@@ -64,6 +65,7 @@ export class AddProductWindowComponent extends BaseGenericContainerDialog implem
                 }
                 this.dialogsService.error("An error occurred while retrieving the lab list" + message);
             }
+        }, (err: IGnomexErrorResponse) => {
         });
     }
 
