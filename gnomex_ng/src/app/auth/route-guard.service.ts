@@ -1,10 +1,11 @@
 import {Injectable, Inject} from "@angular/core";
 import {CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot} from "@angular/router";
 
-import {Observable} from "rxjs";
+import {Observable, throwError} from "rxjs";
 
 import {AuthenticationService, AUTHENTICATION_ROUTE} from "./authentication.service";
-import {map} from "rxjs/operators";
+import {catchError, map} from "rxjs/operators";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 /**
  * A {@code CanActivate} implementation which makes its calculation based on the current authentication state.
@@ -39,7 +40,9 @@ export class RouteGuardService implements CanActivate {
       return authenticated;
     }, (error: any) => {
       return false;
+    }), catchError((err: IGnomexErrorResponse) => {
+      return throwError(err);
     }));
-  };
+  }
 }
 

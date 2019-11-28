@@ -43,7 +43,7 @@ public class UploadPurchaseOrder extends HttpServlet {
         try {
             Session sess = HibernateSession.currentSession((req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
 
-            res.setContentType("text/html");
+            res.setContentType("text/html; charset=UTF-8");
             MultipartParser mp = new MultipartParser(req, Integer.MAX_VALUE);
             FileInputStream fileStream;
             byte[] blob = new byte[1024];

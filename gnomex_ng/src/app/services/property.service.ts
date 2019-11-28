@@ -1,10 +1,10 @@
 import {Injectable} from "@angular/core";
-import {Http, Response, URLSearchParams} from "@angular/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {DictionaryService} from "./dictionary.service";
 import {Observable} from "rxjs";
 import {CookieUtilService} from "./cookie-util.service";
 import {map} from "rxjs/operators";
-import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
+
 
 export enum annotType
 {
@@ -72,7 +72,6 @@ export class PropertyService {
     public static readonly PROPERTY_CAN_ACCESS_BSTX: string = "can_access_bstx";
 
     constructor(private dictionaryService: DictionaryService,
-                private http: Http,
                 private httpClient: HttpClient,
                 private cookieUtilService: CookieUtilService) {}
 
@@ -133,40 +132,26 @@ export class PropertyService {
 
     }
 
-    public getPropertyListCall(propertyOnly: boolean): Observable<Response> {
+    public getPropertyListCall(propertyOnly: boolean): Observable<any> {
         if (propertyOnly) {
-            let params: URLSearchParams = new URLSearchParams();
-            params.set("propertyOnly", "Y");
-            return this.http.get("/gnomex/GetPropertyList.gx", {search: params});
+            let params: HttpParams = new HttpParams()
+                .set("propertyOnly", "Y");
+            return this.httpClient.get("/gnomex/GetPropertyList.gx", {params: params});
         } else {
-            return this.http.get("/gnomex/GetPropertyList.gx");
+            return this.httpClient.get("/gnomex/GetPropertyList.gx");
         }
     }
 
     public getPropertyList(propertyOnly: boolean): Observable<any[]> {
-        return this.getPropertyListCall(propertyOnly).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                return [];
-            }
+        return this.getPropertyListCall(propertyOnly).pipe(map((response: any) => {
+            return response ? Array.isArray(response) ? response : [response] : [];
         }));
-    }
-
-    public getPropertyAnnotationCall(idProperty: string): Observable<Response> {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idProperty", idProperty);
-        return this.http.get("/gnomex/GetProperty.gx", {search: params});
     }
 
     public getPropertyAnnotation(idProperty: string): Observable<any> {
-        return this.getPropertyAnnotationCall(idProperty).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                return null;
-            }
-        }));
+        let params: HttpParams = new HttpParams()
+            .set("idProperty", idProperty);
+        return this.httpClient.get("/gnomex/GetProperty.gx", {params: params});
     }
 
     public savePropertyAnnotation(params: HttpParams):  Observable<any> {

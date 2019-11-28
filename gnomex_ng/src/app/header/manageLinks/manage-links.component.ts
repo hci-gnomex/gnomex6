@@ -4,7 +4,7 @@ import {Subscription} from "rxjs";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {GridOptions} from "ag-grid-community/main";
-import {URLSearchParams} from "@angular/http";
+import {HttpParams} from "@angular/common/http";
 import {LaunchPropertiesService} from "../../services/launch-properites.service";
 import {MatDialogRef} from "@angular/material";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
@@ -150,13 +150,14 @@ export class ManageLinksComponent extends BaseGenericContainerDialog implements 
                 return;
             }
         }
-        let params: URLSearchParams = new URLSearchParams();
+        let params: HttpParams = new HttpParams();
         let stringifiedFaqCollection = JSON.stringify(this.rowData);
 
 
-        params.set("faqXMLString", stringifiedFaqCollection);
-        this.saveFAQSubscription = this.launchPropertiesService.saveFAQ(params).subscribe((response: Response) => {
+        params = params.set("faqXMLString", stringifiedFaqCollection);
+        this.saveFAQSubscription = this.launchPropertiesService.saveFAQ(params).subscribe((response: any) => {
             setTimeout(() => this.dialogRef.close(this.dirty));
+        }, (err: IGnomexErrorResponse) => {
         });
     }
 

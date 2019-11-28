@@ -25,18 +25,18 @@ public class CheckSessionStatus extends HttpServlet {
 
   /**
    * Initialize global variables
-   * 
+   *
    * @exception ServletException
    *              Description of the Exception
    */
   public void init() throws ServletException {
-    
+
   }
 
 
   /**
    * Process the HTTP Get request
-   * 
+   *
    * @param request
    *          Description of the Parameter
    * @param response
@@ -52,7 +52,7 @@ public class CheckSessionStatus extends HttpServlet {
 
   /**
    * Process the HTTP Post request
-   * 
+   *
    * @param request
    *          Description of the Parameter
    * @param response
@@ -91,7 +91,7 @@ public class CheckSessionStatus extends HttpServlet {
     }
 
     String jsonResult = Util.xmlToJson(xmlResult);
-    response.setContentType("text/html");
+    response.setContentType("text/html; charset=UTF-8");
     PrintWriter out = response.getWriter();
     out.println(jsonResult);
     out.close();

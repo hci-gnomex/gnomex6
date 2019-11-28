@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {Http, Response, URLSearchParams, Headers} from "@angular/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
 
 import {CookieUtilService} from "./cookie-util.service";
@@ -7,18 +7,18 @@ import {CookieUtilService} from "./cookie-util.service";
 @Injectable()
 export class LabMembershipRequestService {
 
-    constructor(private http: Http,
+    constructor(private httpClient: HttpClient,
                 private cookieUtilService: CookieUtilService) {
     }
 
-    public requestLabMembership(idLabs: string):  Observable<Response> {
+    public requestLabMembership(idLabs: string):  Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
 
-        let headers: Headers = new Headers();
-        headers.set("Content-Type", "application/x-www-form-urlencoded");
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idLabs", idLabs);
-        return this.http.post("/gnomex/RequestLabMembership.gx", params.toString(), {headers: headers});
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        let params: HttpParams = new HttpParams()
+            .set("idLabs", idLabs);
+        return this.httpClient.post("/gnomex/RequestLabMembership.gx", params.toString(), {headers: headers});
     }
 
 }

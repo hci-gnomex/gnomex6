@@ -121,7 +121,7 @@ public class GetNewAccountServlet extends HttpServlet {
 
             if(value != null){
                 JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
-                res.setContentType("application/json");
+                res.setContentType("application/json; charset=UTF-8");
                 jsonWriter.writeObject(value.build());
                 jsonWriter.close();
             }else{
@@ -139,7 +139,7 @@ public class GetNewAccountServlet extends HttpServlet {
                     .build();
             JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
 
-            res.setContentType("application/json");
+            res.setContentType("application/json; charset=UTF-8");
             jsonWriter.writeObject(value);
             jsonWriter.close();
 

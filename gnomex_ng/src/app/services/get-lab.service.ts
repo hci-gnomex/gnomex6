@@ -1,9 +1,9 @@
 import {Injectable} from "@angular/core";
-import {Http, Response, URLSearchParams} from "@angular/http";
-import {BehaviorSubject, Observable} from "rxjs";
+import {BehaviorSubject, Observable, throwError} from "rxjs";
 import {HttpClient, HttpParams} from "@angular/common/http";
-import {first, map} from "rxjs/operators";
+import {catchError, first, map} from "rxjs/operators";
 import {UtilService} from "./util.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Injectable()
 export class GetLabService {
@@ -17,8 +17,7 @@ export class GetLabService {
     public labMembersSubject: BehaviorSubject<any[]> = new BehaviorSubject([]);
 
 
-    constructor(private http: Http,
-                private httpClient: HttpClient) {
+    constructor(private httpClient: HttpClient) {
 
     }
 
@@ -30,7 +29,7 @@ export class GetLabService {
     }
 
 
-    public  sortLabMembersFn = (obj1, obj2) =>{
+    public  sortLabMembersFn = (obj1, obj2) => {
         if (!obj1 && !obj2) {
             return 0;
         } else if (!obj1) {
@@ -38,8 +37,8 @@ export class GetLabService {
         } else if (!obj2) {
             return -1;
         } else {
-            var display1:String = obj1.displayName;
-            var display2:String = obj2.displayName;
+            var display1: String = obj1.displayName;
+            var display2: String = obj2.displayName;
 
             if (display1.toLowerCase() < display2.toLowerCase()) {
                 return -1;
@@ -110,6 +109,7 @@ export class GetLabService {
 
                     this._labSubmitters_subject.next(possibleSubmittersForLabDictionary);
                 }
+            }, (err: IGnomexErrorResponse) => {
             });
         });
 
@@ -117,24 +117,26 @@ export class GetLabService {
     }
 
 
-    getLabMembers_fromBackend(params: URLSearchParams): void {
+    getLabMembers_fromBackend(params: HttpParams): void {
 
-        this.http.get("/gnomex/GetLab.gx", { search: params}).subscribe((response: Response) => {
-            if (response.status === 200) {
-                let lab: any = response.json().Lab;
+        this.httpClient.get("/gnomex/GetLab.gx", { params: params}).subscribe((response: any) => {
+            if (response && response.Lab) {
+                let lab: any = response.Lab;
                 if (lab) {
                     let members: Array<any> = Array.isArray(lab.members) ? lab.members : [lab.members.AppUser];
-                    let activeMembers:Array<any> = members.filter(appUser => appUser.isActive === 'Y');
+                    let activeMembers: Array<any> = members.filter(appUser => appUser.isActive === "Y");
                     let sortedActiveMembers = activeMembers.sort(this.sortLabMembersFn);
                     this.labMembersSubject.next(sortedActiveMembers);
                 }
-            } else {
-                throw new Error("Error");
             }
+        }, (err: IGnomexErrorResponse) => {
         });
     }
     getLab(params: HttpParams): Observable<any> {
-        return this.httpClient.get("/gnomex/GetLab.gx", {params: params});
+        return this.httpClient.get("/gnomex/GetLab.gx", {params: params})
+            .pipe(catchError((err: IGnomexErrorResponse) => {
+                return throwError(err);
+            }));
     }
 
     public getLabNew(params: HttpParams): Observable<any> {
@@ -161,14 +163,8 @@ export class GetLabService {
         }));
     }
 
-    deleteLab(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/DeleteLab.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }));
+    deleteLab(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/DeleteLab.gx", {params: params});
     }
 
     getLabById(idLab: string): Observable<any> {
@@ -186,7 +182,7 @@ export class GetLabService {
         return this.getLab(params);
     }
 
-    public getLabBasic(idLab: string): Observable<Response> {
+    public getLabBasic(idLab: string): Observable<any> {
         let params: HttpParams = this.makeParams(idLab, false, false, false, false, false, false, false, false);
         return this.getLabCall(params);
     }
@@ -198,7 +194,7 @@ export class GetLabService {
     public getLabMembers(idLab: string): Observable<any[]> {
         return this.getLabBasic(idLab).pipe(map((response: any) => {
             if (response && response.Lab) {
-                let lab = response
+                let lab = response;
                 return UtilService.getJsonArray(lab.Lab.members, lab.Lab.members.AppUser);
             } else {
                 return [];

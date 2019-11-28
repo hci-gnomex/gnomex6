@@ -136,7 +136,7 @@ export class UploadViewRemoveRenderer implements ICellRendererAngularComp {
 
             let formData: FormData = new FormData();
             formData.append("Filename", this.file.name);
-            formData.append("format", this.file.type == "text/html" ? "html" : "text");
+            formData.append("format", this.file.type === "text/html" ? "html" : "text");
             formData.append("idBillingAccount", this.params.data.idBillingAccount);
             formData.append("Filedata", this.file, this.file.name);
 
@@ -159,10 +159,6 @@ export class UploadViewRemoveRenderer implements ICellRendererAngularComp {
     }
 
     public onClickRemove():void {
-        // if (dirty.isDirty()) {
-        //     Alert.show("Please save existing changes before attempting to upload/remove a purchase order form.");
-        //     return;
-        // }
         if (this.poFormService && this.params && this.params.data) {
             this.poFormService.deletePoFormFromBillingAccount(this.params.data.idBillingAccount).subscribe((deleteWasSuccessful) => {
                 this.hasPoForm = !deleteWasSuccessful;

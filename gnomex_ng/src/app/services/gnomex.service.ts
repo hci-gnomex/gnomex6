@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core'
+import {Injectable} from "@angular/core";
 import {DictionaryService} from "./dictionary.service";
 import {CreateSecurityAdvisorService} from "./create-security-advisor.service";
 import {PropertyService} from "./property.service";
@@ -108,12 +108,11 @@ export class GnomexService {
         private labListService: LabListService,
         private projectService: ProjectService,
         private createSecurityAdvisorService: CreateSecurityAdvisorService,
-        private authenticationService:AuthenticationService,
+        private authenticationService: AuthenticationService,
         private launchPropertiesService: LaunchPropertiesService,
         private appUserListService: AppUserListService,
-        //private http:Http
-        private http:HttpClient,
-        private router:Router,
+        private http: HttpClient,
+        private router: Router,
         private dialogService: DialogsService,
         private userPreferencesService: UserPreferencesService) {
     }
@@ -224,6 +223,7 @@ export class GnomexService {
         this.buildSeqLibProtocolListWithAppFilters();
         this.propertyService.getPropertyList(false).subscribe((response: any[]) => {
             this.propertyList = response;
+        }, (err: IGnomexErrorResponse) => {
         });
 
         this.labListService.getLabList().subscribe((response: any) => {
@@ -231,6 +231,7 @@ export class GnomexService {
         });
         this.labListService.getOrganismList().subscribe((response: any) => {
             this.onGetOrganismList(response);
+        }, (err: IGnomexErrorResponse) => {
         });
         return new Promise((resolve) => {
             resolve()
@@ -240,6 +241,7 @@ export class GnomexService {
     rebuildPropertyList() {
         this.propertyService.getPropertyList(false).subscribe((response: any[]) => {
             this.propertyList = response;
+        }, (err: IGnomexErrorResponse) => {
         });
     }
     /**
@@ -272,12 +274,12 @@ export class GnomexService {
         let coreGenomicsConfigured: boolean = false;
         let coreDNASeqConfigured: boolean = false;
         for (let cf of coreFacilities) {
-            if (cf.isActive != 'Y') {
+            if (cf.isActive !== "Y") {
                 continue;
             }
             if (cf.facilityName === CORE_FACILITY_GENOMICS) {
                 coreGenomicsConfigured = true;
-                this.idCoreFacilityHTG = cf.idCoreFacility
+                this.idCoreFacilityHTG = cf.idCoreFacility;
             } else if (cf.facilityName === CORE_FACILITY_DNA_SEQ) {
                 coreDNASeqConfigured = true;
                 this.idCoreFacilityDNASeq = cf.idCoreFacility;
@@ -297,11 +299,11 @@ export class GnomexService {
             for (let core of this.createSecurityAdvisorService.myCoreFacilities) {
 
                 for (let dcf of coreFacilities) {
-                    if (dcf.idCoreFacility == core.idCoreFacility) {
-                        let found:Boolean = false;
+                    if (dcf.idCoreFacility === core.idCoreFacility) {
+                        let found: Boolean = false;
                         for (let i: number = 0; i < this.myCoreFacilities.length; i++) {
                             let core2 = this.myCoreFacilities[i];
-                            if (core.idCoreFacility === '') {
+                            if (core.idCoreFacility === "") {
                                 found = true;
                                 break;
                             } else if (core.idCoreFacility === core2.idCoreFacility) {
@@ -320,7 +322,7 @@ export class GnomexService {
         this.coreFacilitiesICanManage = [];
         for (let core of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.CoreFacility")) {
             for (let mCore of this.createSecurityAdvisorService.coreFacilitiesICanManage) {
-                if (core.value == mCore.value) {
+                if (core.value === mCore.value) {
                     this.coreFacilitiesICanManage.push(core);
                     break;
                 }
@@ -340,8 +342,9 @@ export class GnomexService {
 
 
         // Sort core facilities by sort order
-        if (this.myCoreFacilities)
+        if (this.myCoreFacilities) {
             this.myCoreFacilities = this.myCoreFacilities.sort((n1, n2) => n1.sortOrder - n2.sortOrder);
+        }
 
     }
 
@@ -425,11 +428,11 @@ export class GnomexService {
         if (!this.createSecurityAdvisorService.isGuest) {
             for (let cf of this.createSecurityAdvisorService.coreFacilitiesICanManage) {
                 for (let requestCategory of this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY)) {
-                    if (requestCategory.idCoreFacility == cf.idCoreFacility &&
-                        requestCategory.isActive == 'Y' &&
-                        (requestCategory.type == TYPE_CAP_SEQ ||
-                            requestCategory.type == TYPE_MIT_SEQ ||
-                            requestCategory.type == TYPE_FRAG_ANAL)) {
+                    if (requestCategory.idCoreFacility === cf.idCoreFacility &&
+                        requestCategory.isActive === "Y" &&
+                        (requestCategory.type === TYPE_CAP_SEQ ||
+                            requestCategory.type === TYPE_MIT_SEQ ||
+                            requestCategory.type === TYPE_FRAG_ANAL)) {
                         return true;
                     }
                 }
@@ -443,12 +446,12 @@ export class GnomexService {
      */
     setDefaultSubmissionState(): void {
         if (this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) != null &&
-            this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) == 'INTERNAL') {
+            this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) === "INTERNAL") {
             // Default is "submit request" (internal), but if this is an external data sharing
             // hub, make default "register external" experiment.
             this.isInternalExperimentSubmission = !this.isExternalDataSharingSite;
         } else if (this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) != null &&
-            this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) == 'EXTERNAL') {
+            this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) === "EXTERNAL") {
             this.isInternalExperimentSubmission = false;
         } else {
             this.isInternalExperimentSubmission = true;
@@ -466,9 +469,9 @@ export class GnomexService {
         if (this.hasPermission(CAN_ADMINISTER_ALL_CORE_FACILITIES)) {
             let found: boolean = false;
             for (let rc of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
-                if (rc.isActive === 'Y') {
+                if (rc.isActive === "Y") {
                     let rct = this.requestCategoryTypeMap.get(rc.type);
-                    if (rct && rct.isIllumina == 'Y') {
+                    if (rct && rct.isIllumina === "Y") {
                         found = true;
                         break;
                     }
@@ -581,16 +584,16 @@ export class GnomexService {
         let orgList:any[] = Array.isArray(orgs) ? orgs : [orgs.Organism];
 
         for (let organism of orgList) {
-            if (organism.das2Name != '' && organism.bionomialName != '' && organism.isActive == 'Y') {
+            if (organism.das2Name !== "" && organism.bionomialName !== "" && organism.isActive === "Y") {
                 this.das2OrganismList.push(organism);
             }
-            if (organism.isActive == 'Y') {
+            if (organism.isActive === "Y") {
                 this.activeOrganismList.push(organism);
             }
         }
         this.activeOrganismList = this.activeOrganismList.sort((obj1, obj2) => {
-            let so1: Number = (obj1.sortOrder == '' || obj1.sortOrder == null) ? Number(999999) : new Number(obj1.sortOrder);
-            let so2: Number = (obj2.sortOrder == '' || obj2.sortOrder == null) ? Number(999999) : new Number(obj2.sortOrder);
+            let so1: Number = (obj1.sortOrder === "" || obj1.sortOrder == null) ? Number(999999) : new Number(obj1.sortOrder);
+            let so2: Number = (obj2.sortOrder === "" || obj2.sortOrder == null) ? Number(999999) : new Number(obj2.sortOrder);
 
             if (so1 < so2) {
                 return -1;
@@ -638,7 +641,7 @@ export class GnomexService {
     public getQCRequestCategoryForCore(idCoreFacility: string): any {
         let retObj = null;
         for (var rc of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
-            if (rc.idCoreFacility === idCoreFacility && rc.type == 'QC') {
+            if (rc.idCoreFacility === idCoreFacility && rc.type === 'QC') {
                 retObj = rc;
                 break;
             }
@@ -691,18 +694,18 @@ export class GnomexService {
         return code;
     }
 
-    initApp(): void{
+    initApp(): void {
         this.authSubscription = this.authenticationService.isAuthenticated().pipe(first()).subscribe(authenticated => {
-            //this._isLoggedIn = authenticated && this.progressService.hideLoader.asObservable()
             if (authenticated) {
                 this.createSecurityAdvisorService.createSecurityAdvisor().pipe(first()).subscribe(response => {
                     this.progressService.displayLoader(15);
                     this.projectService.getProjectList().subscribe((response: any) => {
                         this.projectList = response;
+                    }, (err: IGnomexErrorResponse) => {
                     });
                     this.dictionaryService.load(() => {
                         this.progressService.displayLoader(30);
-                        forkJoin(this.appUserListService.getFullAppUserList(),this.labListService.getLabList())
+                        forkJoin(this.appUserListService.getFullAppUserList(), this.labListService.getLabList())
                             .pipe(first()).subscribe((response: any[]) => {
                             this.progressService.displayLoader(45);
                             this.appUserList = UtilService.getJsonArray(response[0], response[0] ? response[0].AppUser : null);
@@ -730,21 +733,15 @@ export class GnomexService {
                                             this.progressService.displayLoader(100);
                                             this.emitIsAppInitCompelete(true);
                                             this.isLoggedIn = true;
+                                        }, (err: IGnomexErrorResponse) => {
                                         });
                                     });
+                                }, (err: IGnomexErrorResponse) => {
                                 });
-
-
-
-                                //TODO implemented, delete this V
-                                // TODO will need this in future
-                                // this.launchPropertiesService.getSampleSheetUploadURL().subscribe((response: any) => {
-                                //      this.progressService.displayLoader(100);
-                                //     this.gnomexService.uploadSampleSheetURL = response.url;
-                                // });
                             });
                         });
                     });
+                }, (err: IGnomexErrorResponse) => {
                 });
             }
         });
@@ -752,13 +749,13 @@ export class GnomexService {
     }
     initGuestApp() {
 
-        let params:URLSearchParams = new URLSearchParams();
-        params.set("idCoreFacility",null);
+        let params: HttpParams = new HttpParams()
+            .set("idCoreFacility", null);
         this.createSecurityAdvisorService.createGuestSecurityAdvisor(params).pipe(first()).subscribe(response => {
             this.progressService.displayLoader(15);
             this.dictionaryService.load(() => {
                 this.progressService.displayLoader(30);
-                forkJoin(this.appUserListService.getFullAppUserList(),this.labListService.getLabList())
+                forkJoin(this.appUserListService.getFullAppUserList(), this.labListService.getLabList())
                     .pipe(first()).subscribe((response: any[]) => {
                     this.progressService.displayLoader(45);
                     this.appUserList = [];
@@ -776,27 +773,24 @@ export class GnomexService {
                                 this.progressService.displayLoader(100);
                                 this.emitIsAppInitCompelete(true);
                                 this.isLoggedIn = true;
+                            }, (err: IGnomexErrorResponse) => {
                             });
                         });
 
-                        // TODO will need this in future
-                        // this.launchPropertiesService.getSampleSheetUploadURL().subscribe((response: any) => {
-                        //      this.progressService.displayLoader(100);
-                        //     this.gnomexService.uploadSampleSheetURL = response.url;
-                        // });
                     });
                 });
             });
+        }, (err: IGnomexErrorResponse) => {
         });
 
     }
 
 
-    public getOrderFromNumber(p:HttpParams) : Observable<any> {
-        return this.http.get("/gnomex/GetGNomExOrderFromNumberServlet.gx",{params:p})
-            .pipe(catchError((err:IGnomexErrorResponse) => {
+    public getOrderFromNumber(params: HttpParams) : Observable<any> {
+        return this.http.get("/gnomex/GetGNomExOrderFromNumberServlet.gx", {params: params})
+            .pipe(catchError((err: IGnomexErrorResponse) => {
                 this.router.navigateByUrl("/home");
-                return throwError(err)
+                return throwError(err);
             }));
     }
 
@@ -1007,6 +1001,7 @@ export class GnomexService {
                 this.disableUserSignup = response[PropertyService.PROPERTY_DISABLE_USER_SIGNUP];
                 this.noGuestAccess = response[PropertyService.PROPERTY_NO_GUEST_ACCESS];
             }
+        }, (err: IGnomexErrorResponse) => {
         });
     }
     public getLoginPropertiesObservable(): Observable<any> {
