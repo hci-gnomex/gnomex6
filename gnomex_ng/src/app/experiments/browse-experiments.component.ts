@@ -7,8 +7,6 @@ import {
     ViewChild,
 } from "@angular/core";
 
-import {URLSearchParams} from "@angular/http";
-
 import {ExperimentsService} from "./experiments.service";
 import {ITreeOptions, ITreeState, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
 import {BrowseFilterComponent} from "../util/browse-filter.component";
@@ -468,10 +466,10 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         } else {
             this.showBillingCombo = true;
         }
-        var params: URLSearchParams = new URLSearchParams();
-        params.set("idLab", event.to.parent.idLab);
+        let params: HttpParams = new HttpParams()
+            .set("idLab", event.to.parent.idLab);
 
-        var lPromise = this.experimentsService.getLab(params).toPromise();
+        let lPromise = this.experimentsService.getLab(params).toPromise();
         lPromise.then(response => {
             this.buildLabMembers(response, event);
         });

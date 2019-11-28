@@ -130,7 +130,7 @@ export class ConfigureProductsComponent implements OnInit {
                 }
                 this.dialogsService.error("An error occurred while retrieving the product list" + message);
             }
-        }, (err:IGnomexErrorResponse) =>{
+        }, (err: IGnomexErrorResponse) => {
         });
     }
 
@@ -222,6 +222,7 @@ export class ConfigureProductsComponent implements OnInit {
                         this.dialogsService.error("An error occurred while deleting the product" + message);
                     }
                     this.loadProducts();
+                }, (err: IGnomexErrorResponse) => {
                 });
             } else {
                 this.selectProduct(null);
@@ -276,6 +277,8 @@ export class ConfigureProductsComponent implements OnInit {
                 }
                 this.showSpinner = false;
                 this.loadProducts();
+            }, (err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
         }
     }

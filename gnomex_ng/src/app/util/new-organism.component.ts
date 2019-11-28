@@ -100,7 +100,7 @@ export class NewOrganismComponent extends BaseGenericContainerDialog implements 
             .set("binomialName", this.organismForm.get("binomialName").value)
             .set("das2Name", this.organismForm.get("das2Name").value)
             .set("isActive", this.organismForm.get("das2Name").value ? "Y" : "N")
-            .set("idAppUser", ""+this.secAdvisor.idAppUser);
+            .set("idAppUser", "" + this.secAdvisor.idAppUser);
         this.organismService.saveOrganismNew(params).subscribe((response: any) => {
             if (response && response.result && response.result === "SUCCESS" && response.idOrganism) {
                 this.dictionaryService.reloadAndRefresh(() => {

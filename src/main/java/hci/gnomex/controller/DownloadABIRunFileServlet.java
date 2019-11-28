@@ -57,7 +57,7 @@ protected void doGet(HttpServletRequest req, HttpServletResponse response) throw
 	if (idInstrumentRun == null) {
 		LOG.error("idInstrumentRun required");
 
-		response.setContentType("text/html");
+		response.setContentType("text/html; charset=UTF-8");
 		response.getOutputStream().println("<html><head><title>Error</title></head>");
 		response.getOutputStream().println("<body><b>");
 		response.getOutputStream().println("Missing parameter:  idInstrumentRun required" + "<br>");
@@ -105,7 +105,7 @@ protected void doGet(HttpServletRequest req, HttpServletResponse response) throw
 				return;
 			}
 
-			response.setContentType("application/x-download");
+			response.setContentType("application/x-download; charset=UTF-8");
 			response.setHeader("Content-Disposition", "attachment;filename=" + runFileName);
 			response.setHeader("Cache-Control", "max-age=0, must-revalidate");
 
@@ -260,7 +260,7 @@ protected void doGet(HttpServletRequest req, HttpServletResponse response) throw
 			out.flush();
 
 		} else {
-			response.setContentType("text/html");
+			response.setContentType("text/html; charset=UTF-8");
 			response.getOutputStream().println("<html><head><title>Error</title></head>");
 			response.getOutputStream().println("<body><b>");
 			response.getOutputStream()
@@ -280,7 +280,7 @@ protected void doGet(HttpServletRequest req, HttpServletResponse response) throw
 		Util.sendErrorReport(HibernateSession.currentSession(),"GNomEx.Support@hci.utah.edu", "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
 
 		HibernateSession.rollback();
-		response.setContentType("text/html");
+		response.setContentType("text/html; charset=UTF-8");
 		response.getOutputStream().println("<html><head><title>Error</title></head>");
 		response.getOutputStream().println("<body><b>");
 		response.getOutputStream().println("DownloadABIRunFileServlet: An exception occurred " + e.toString() + "<br>");

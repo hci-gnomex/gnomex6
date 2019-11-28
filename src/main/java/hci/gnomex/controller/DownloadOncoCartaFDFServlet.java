@@ -141,7 +141,7 @@ private String populateTemplate(Session sess, Request request, String template) 
 
 private void writeResponse(HttpServletResponse response, String outString) throws IOException {
 	response.setHeader("Cache-Control", "max-age=0, must-revalidate");
-	response.setContentType("fdf");
+	response.setContentType("fdf; charset=UTF-8");
 	OutputStream out = response.getOutputStream();
 	byte b[] = outString.getBytes();
 	out.write(b, 0, outString.length());

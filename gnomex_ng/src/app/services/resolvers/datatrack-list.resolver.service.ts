@@ -1,13 +1,9 @@
-import {Injectable} from '@angular/core'
-import {Resolve, ActivatedRouteSnapshot, ActivatedRoute} from '@angular/router'
-import {URLSearchParams} from "@angular/http";
-import {AnalysisService} from "../analysis.service";
+import {Injectable} from "@angular/core";
+import {Resolve, ActivatedRouteSnapshot} from "@angular/router";
 import {GnomexService} from "../gnomex.service";
 import {DataTrackService} from "../data-track.service";
 import {HttpParams} from "@angular/common/http";
 
-/* This service will be used in experiment.routes.ts and when injecting ActivateRoute  into browse-overview.component.ts
- we can get the project json off the route */
 
 @Injectable()
 export class DatatrackListResolverService implements Resolve<any> {
@@ -19,11 +15,11 @@ export class DatatrackListResolverService implements Resolve<any> {
         // then it calls subscribe
 
 
-        let idGenomeBuild= route.params["idGenomeBuild"];
+        let idGenomeBuild = route.params["idGenomeBuild"];
         let ids: HttpParams = new HttpParams().set("idGenomeBuild", idGenomeBuild);
 
 
-        if(this.gnomexService.orderInitObj){
+        if(this.gnomexService.orderInitObj) {
             ids.set("number", this.gnomexService.orderInitObj.dataTrackNumber);
             ids.set("idOrganism", this.gnomexService.orderInitObj.idOrganism);
             ids.set("idLab", this.gnomexService.orderInitObj.idLab);
@@ -31,7 +27,7 @@ export class DatatrackListResolverService implements Resolve<any> {
 
         this.datatrackService.previousURLParams = ids;
 
-        if(idGenomeBuild){
+        if(idGenomeBuild) {
             return this.datatrackService.getDataTrackList(ids);
         }
 

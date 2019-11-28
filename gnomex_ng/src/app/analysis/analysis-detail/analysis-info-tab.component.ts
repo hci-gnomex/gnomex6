@@ -19,6 +19,7 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../../services/constants.service";
 import {ManageProtocolsComponent} from "../../configuration/manage-protocols.component";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "analysis-info-tab",
@@ -215,6 +216,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
                         }
                         this.dialogsService.error("An error occurred while retrieving lab" + message);
                     }
+                }, (err: IGnomexErrorResponse) => {
                 });
             }
         });
@@ -380,6 +382,7 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
                     }
                     this.dialogsService.error("An error occurred while retrieving lab" + message);
                 }
+            }, (err: IGnomexErrorResponse) => {
             });
             return;
         }

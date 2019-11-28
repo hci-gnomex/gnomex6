@@ -49,7 +49,7 @@ public class GetLoginProperties extends HttpServlet {
                     .build()
                     .toString();
 
-            response.setContentType("application/json");
+            response.setContentType("application/json; charset=UTF-8");
             try (PrintWriter out = response.getWriter()) {
                 out.print(jsonResult);
                 out.flush();

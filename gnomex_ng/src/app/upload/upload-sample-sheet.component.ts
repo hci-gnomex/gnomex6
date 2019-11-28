@@ -547,7 +547,7 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 
             let formData: FormData = new FormData();
             formData.append("filename", this.file.name);
-            formData.append("filetype", this.file.type == "text/html" ? "html" : "text");
+            formData.append("filetype", this.file.type === "text/html" ? "html" : "text");
             formData.append("value", this.file, this.file.name);
 
             if (!this.uploadSubscription) {
