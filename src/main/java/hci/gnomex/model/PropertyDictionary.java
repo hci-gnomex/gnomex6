@@ -143,7 +143,7 @@ public class PropertyDictionary extends DictionaryEntry implements Serializable 
 	public static final String ALLOW_CORE_GLOBAL_SUBMISSION = "allow_core_global_submission";
 	public static final String REQUEST_COMPLETE_CONFIRMATION_EMAIL_MESSAGE = "request_complete_confirmation_email_message";
 	public static final String REQUEST_COMPLETE_CONFIRMATION_EMAIL_MESSAGE_BMP = "request_complete_confirmation_email_message_bmp";
-	public static final String REQUEST_COMPLETE_EMAIL_BMP = "request_comlete_email_bmp";
+	public static final String REQUEST_COMPLETE_EMAIL_BMP = "request_complete_email_bmp";
 
 	public static final String ANNOTATION_OPTION_EQUIVALENTS = "annotation_option_equivalents";
 	public static final String ANNOTATION_OPTION_INVALID = "annotation_option_invalid";
