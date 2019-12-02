@@ -162,16 +162,28 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.billingAccounts = [];
         this.labs = [];
 
-        this.navService.navMode = this.navService.navMode !== NavigationService.USER ? NavigationService.URL : NavigationService.USER ;
-        this.route.queryParamMap.subscribe((qParam)=>{this.qParamMap = qParam });
-        this.route.paramMap.subscribe((qParam)=>{this.paramMap = qParam });
+        this.navService.navMode = this.navService.navMode !== NavigationService.USER ? NavigationService.URL : NavigationService.USER;
 
+        let activateRoute :ActivatedRoute = this.route;
+
+        while(true){
+            if(activateRoute.children.length > 0){
+                activateRoute = this.route.children[0];
+            }else{
+                break;
+            }
+        }
+        if(activateRoute){
+            activateRoute.queryParamMap.subscribe((qParam)=>{this.qParamMap = qParam });
+            activateRoute.paramMap.subscribe((param)=>{ this.paramMap = param });
+        }
 
         this.experimentsService.startSearchSubject.subscribe((value) => {
             if (value) {
                 this.dialogsService.startDefaultSpinnerDialog();
             }
         });
+
 
         this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
             this.lookupLab = "";
@@ -212,13 +224,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                         if(node) {
                             this.treeModel.getNodeById(id).setIsActive(true);
                             this.treeModel.getNodeById(id).scrollIntoView();
-                        } else {
-                            let navArray = ["/experiments",  {outlets: {"browsePanel": [this.gnomexService.orderInitObj.idRequest]}}];
-                            this.disableNewProject = true;
-                            this.router.navigate(navArray);
                         }
-                        this.lookupLab = this.gnomexService.orderInitObj.idLab ? this.gnomexService.orderInitObj.idLab.toString() : "";
-                        this.gnomexService.orderInitObj = null;
 
                     }
                 } else if(this.setActiveNodeId) {
@@ -614,18 +620,19 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      */
     treeOnSelect(event: any) {
 
+
+        this.selectedItem = event.node;
+        let idLab = this.selectedItem.data.idLab;
+        let idProject = this.selectedItem.data.idProject;
+        let idRequest = this.selectedItem.data.idRequest;
+
+        let projectRequestListNode: Array<any> = _.cloneDeep(this.selectedItem.data);
+        this.experimentsService.emitExperimentOverviewList(projectRequestListNode);
+        let navArray: Array<any> = [];
+        let navExtras: NavigationExtras = {};
+        this.disableDeleteProject = true;
+
         if(this.navService.navMode === NavigationService.USER){
-            this.selectedItem = event.node;
-            let idLab = this.selectedItem.data.idLab;
-            let idProject = this.selectedItem.data.idProject;
-            let idRequest = this.selectedItem.data.idRequest;
-
-            let projectRequestListNode: Array<any> = _.cloneDeep(this.selectedItem.data);
-            this.experimentsService.emitExperimentOverviewList(projectRequestListNode);
-            let navArray: Array<any> = [];
-            let navExtras: NavigationExtras = {};
-
-            this.disableDeleteProject = true;
 
             //Lab
             if (this.selectedItem.level === 1) {
@@ -651,8 +658,15 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
             }
 
+            navExtras.relativeTo = this.route;
+            navExtras.queryParamsHandling = 'merge';
             this.router.navigate(navArray,navExtras);
+
+        }else{
+            this.navService.emitResetNavModeSubject("detail");
+            this.navService.emitResetNavModeSubject("overview");
         }
+
 
     }
 

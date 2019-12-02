@@ -10,6 +10,8 @@ import {MatTabChangeEvent, MatTabGroup} from "@angular/material";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {HttpParams} from "@angular/common/http";
+import {map} from "rxjs/operators";
+import {NavigationService} from "../../services/navigation.service";
 
 
 @Component({
@@ -48,9 +50,9 @@ import {HttpParams} from "@angular/common/http";
                          [disableSave]="this.experimentsService.invalid || this.noSave || this.createSecurityAdvisorService.isGuest">
             </save-footer>
         </div>
-`,
+    `,
     styles: [`
-        
+
         /deep/ .mat-tab-body-wrapper {
             flex: 1 !important;
         }
@@ -79,7 +81,8 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
                 public experimentsService: ExperimentsService,
                 public dictionary: DictionaryService,
                 public createSecurityAdvisorService: CreateSecurityAdvisorService,
-                public prefService: UserPreferencesService) {
+                public prefService: UserPreferencesService,
+                public navService:NavigationService) {
     }
 
 
@@ -90,6 +93,12 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
             this.project = data["project"] && data["project"].Project ? data["project"].Project : null; // this data is carried on route look at browse-experiments.component.ts
             this.experimentsService.updateCanDeleteProject(this.project && this.project.canDelete === 'Y');
         });
+
+        if(this.navService.navMode === NavigationService.URL){
+            this.navService.emitResetNavModeSubject("overview");
+        }
+
+
 
         this.refreshOverviewData();
 

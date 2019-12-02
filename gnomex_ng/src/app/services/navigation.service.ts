@@ -2,8 +2,10 @@ import {Injectable} from "@angular/core";
 
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {forkJoin, Observable, Subject, Subscription} from "rxjs";
-import {ParamMap, Router, UrlSegment, UrlSegmentGroup, UrlTree} from "@angular/router";
+import {NavigationStart, ParamMap, Router, UrlSegment, UrlSegmentGroup,  Event as NavigationEvent} from "@angular/router";
 import {IRequiredParam} from "../util/interfaces/navigation-definition.model";
+import {filter} from "rxjs/operators";
+import {NavigationItem} from "typedoc";
 
 @Injectable()
 export class NavigationService {
@@ -33,8 +35,15 @@ export class NavigationService {
             this._resetNavModeSubscription = this.resetNavModeSubject.subscribe((currentSeg:string)=>{
                 let lastSegs: UrlSegment[]  =  this.getLastRouteSegments();
                 let lastSegInRoute = '';
+                let lastSegIndex: number = null;
                 if(lastSegs && lastSegs.length > 0){
-                    lastSegInRoute =  (lastSegs[ lastSegs.length - 1]).path;
+                    for(let i = lastSegs.length - 1; i >= 0; i-- ){
+                        if (isNaN(parseInt(lastSegs[i].path))){ // we don't care about ids only path names
+                            lastSegIndex = i;
+                            break;
+                        }
+                    }
+                    lastSegInRoute = lastSegs[lastSegIndex].path;
                 }
                 if(lastSegInRoute === currentSeg){
                     this.navMode = NavigationService.USER;
@@ -111,6 +120,29 @@ export class NavigationService {
             }
         }
         return segGroup;
+
+    }
+
+    trackNavState(){
+        this.router.events
+            .pipe(
+                filter(( event: NavigationEvent ) => {
+                    return( event instanceof NavigationStart );
+                })
+            ).subscribe(( event: NavigationStart ) => {
+
+                    console.debug( "trigger:", event.navigationTrigger );
+
+                    if ( event.restoredState && event.navigationTrigger === 'popstate' ) {
+                        console.debug("restoring navigation id:", event.restoredState.navigationId);
+                        console.debug("Back or forward button pressed on browser");
+                        this.navMode = NavigationService.URL;
+
+                    }
+
+
+                }
+            );
 
     }
 

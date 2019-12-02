@@ -24,12 +24,7 @@ export class ProjectResolverService implements Resolve<any> {
             .set('idLab',idLab )
             .set('idProject', idProject );
         if(idLab){
-            return this.experimentsService.getProject(ids).pipe(map((resp) =>{
-                if(this.navService.navMode === NavigationService.URL){
-                    this.navService.emitResetNavModeSubject("overview");
-                }
-                return resp;
-            }));
+            return this.experimentsService.getProject(ids);
         }
 
     }

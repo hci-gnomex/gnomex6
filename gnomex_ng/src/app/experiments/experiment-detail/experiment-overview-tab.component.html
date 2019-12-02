@@ -19,7 +19,8 @@
                         <div [matTooltip]="_experiment?.labName">
                             <custom-combo-box class="full-width" (optionSelected)="onChange_lab($event)" valueField="idLab"
                                               [options]="filteredLabDictionary" [displayField]="this.prefService.labDisplayField"
-                                              [(ngModel)]="_experiment.idLab" [formControlName]="'idLab'">
+                                              [ngModel]="_experiment?.idLab" (ngModelChange)="_experiment.idLab=$event"
+                                              [formControlName]="'idLab'">
                             </custom-combo-box>
                         </div>
                     </div>
@@ -32,7 +33,8 @@
                         <div [matTooltip]="_experiment?.project?.Project?.name">
                             <custom-combo-box class="full-width" (optionSelected)="onChange_project($event)"
                                               [options]="projectsDictionary" displayField="name" valueField="idProject"
-                                              [(ngModel)]="_experiment.idProject" [formControlName]="'idProject'">
+                                              [ngModel]="_experiment?.idProject" (ngModelChange)="_experiment.idProject=$event"
+                                              [formControlName]="'idProject'">
                             </custom-combo-box>
                         </div>
                     </div>
@@ -64,7 +66,8 @@
                             <div [matTooltip]="_experiment?.application?.Application?.display">
                                 <custom-combo-box class="full-width" (optionSelected)="onChange_application($event)" displayField="display"
                                                   [options]="filteredApplicationDictionary" valueField="value"
-                                                  [(ngModel)]="_experiment.codeApplication" [formControlName]="'codeApplication'">
+                                                  [ngModel]="_experiment?.codeApplication" (ngModelChange)="_experiment.codeApplication=$event"
+                                                  [formControlName]="'codeApplication'">
                                 </custom-combo-box>
                             </div>
                         </div>
@@ -114,7 +117,8 @@
                         <div [matTooltip]="_experiment?.ownerName">
                             <custom-combo-box class="full-width" (optionSelected)="onChange_owner($event)" valueField="idAppUser"
                                               [options]="possibleOwnersForLabDictionary" [displayField]="this.prefService.userDisplayField"
-                                              [(ngModel)]="_experiment.idAppUser" [formControlName]="'idAppUser'">
+                                              [ngModel]="_experiment?.idAppUser" (ngModelChange)="_experiment.idAppUser=$event"
+                                              [formControlName]="'idAppUser'">
                             </custom-combo-box>
                         </div>
                     </div>
@@ -127,7 +131,8 @@
                         <div [matTooltip]="_experiment?.submitterName">
                             <custom-combo-box class="full-width" (optionSelected)="onChange_submitter($event)" valueField="idAppUser"
                                               [options]="possibleSubmittersForLabDictionary" [displayField]="this.prefService.userDisplayField"
-                                              [(ngModel)]="_experiment.idSubmitter" [formControlName]="'idSubmitter'">
+                                              [ngModel]="_experiment?.idSubmitter" (ngModelChange)="_experiment.idSubmitter=$event"
+                                              [formControlName]="'idSubmitter'">
                             </custom-combo-box>
                         </div>
                     </div>

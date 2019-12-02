@@ -430,6 +430,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
     }
 
     ngOnInit() {
+
         setTimeout(() => {
             this.dialogService.startDefaultSpinnerDialog();
         });
@@ -517,15 +518,19 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
         }
 
         this.isPrivacyExpSupported= this.propertyService.isPrivacyExpirationSupported;
+        if(this._experiment){
+            let dateParsed = this.parsePrivacyDate(this._experiment.privacyExpirationDate);
+            if (dateParsed.length > 0 ) {
+                this.privacyExp = new Date(dateParsed[0],dateParsed[1],dateParsed[2]);
+            } else {
+                this.privacyExp = null;
+            }
 
-        let dateParsed = this.parsePrivacyDate(this._experiment.privacyExpirationDate);
-        if (dateParsed.length > 0 ) {
-            this.privacyExp = new Date(dateParsed[0],dateParsed[1],dateParsed[2]);
-        } else {
-            this.privacyExp = null;
+            this.updateForm();
+
         }
 
-        this.updateForm();
+
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -688,42 +693,47 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
         }
 
         this.isReady_filteredApplicationDictionary = false;
+        if(this._experiment){
+            this.filteredApplicationDictionary = this.applicationDictionary.filter((a) => {
+                if (!a.value) {
+                    return false;
+                } else if (a.value === this._experiment.codeApplication) {
+                    return true;
+                } else if (a.isActive === 'N') {
+                    return false;
+                }
 
-        this.filteredApplicationDictionary = this.applicationDictionary.filter((a) => {
-            if (!a.value) {
-                return false;
-            } else if (a.value === this._experiment.codeApplication) {
-                return true;
-            } else if (a.isActive === 'N') {
-                return false;
-            }
+                let applicationMatchesRequestCategory: boolean = false;
 
-            let applicationMatchesRequestCategory: boolean = false;
+                let filteredRequestCategoryApplicationsDictionary = this.requestCategoryApplicationsDictionary.filter((entry) => {
+                    return entry && entry.value && entry.codeApplication === a.value;
+                });
 
-            let filteredRequestCategoryApplicationsDictionary = this.requestCategoryApplicationsDictionary.filter((entry) => {
-                return entry && entry.value && entry.codeApplication === a.value;
+                for (let entry of filteredRequestCategoryApplicationsDictionary) {
+                    if (entry.codeRequestCategory === this._experiment.codeRequestCategory) {
+                        applicationMatchesRequestCategory = true;
+                        break;
+                    }
+                }
+
+                if (!applicationMatchesRequestCategory) {
+                    return false;
+                }
+
+
+                let applicationMatchesSeqPrepByCore: boolean = true;
+
+                if (a.onlyForLabPrepped !== 'N' && this._experiment.seqPrepByCore === 'Y') {
+                    applicationMatchesSeqPrepByCore = false;
+                }
+
+                return applicationMatchesSeqPrepByCore;
             });
 
-            for (let entry of filteredRequestCategoryApplicationsDictionary) {
-                if (entry.codeRequestCategory === this._experiment.codeRequestCategory) {
-                    applicationMatchesRequestCategory = true;
-                    break;
-                }
-            }
+        }else{
+            this.filteredApplicationDictionary = [];
+        }
 
-            if (!applicationMatchesRequestCategory) {
-                return false;
-            }
-
-
-            let applicationMatchesSeqPrepByCore: boolean = true;
-
-            if (a.onlyForLabPrepped !== 'N' && this._experiment.seqPrepByCore === 'Y') {
-                applicationMatchesSeqPrepByCore = false;
-            }
-
-            return applicationMatchesSeqPrepByCore;
-        });
 
         this.isReady_filteredApplicationDictionary = true;
     }

@@ -33,6 +33,7 @@ import {ExperimentBioinformaticsTabComponent} from "./experiment-bioinformatics-
 import {ExperimentBillingTabComponent} from "./experiment-billing-tab.component";
 import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {NavigationService} from "../../services/navigation.service";
 
 export const TOOLTIPS = Object.freeze({
     PRINT_EXPERIMENT_ORDER: "Create PDF form for this experiment order",
@@ -111,12 +112,12 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
     @ViewChild(ExperimentSequenceLanesTab) private sequenceLanesTab: ExperimentSequenceLanesTab;
 
     @ViewChild("tabSamplesIlluminaComponent") private tabSamplesIlluminaComponent: TabSamplesIlluminaComponent;
-    
+
     @ViewChild(AnnotationTabComponent) private annotationTab: AnnotationTabComponent;
     @ViewChild(VisibilityDetailTabComponent) private visibilityDetailTab: VisibilityDetailTabComponent;
     @ViewChild(ExperimentBioinformaticsTabComponent) private bioinformaticsTab : ExperimentBioinformaticsTabComponent;
     @ViewChild(ExperimentBillingTabComponent) private billingTab: ExperimentBillingTabComponent;
-    
+
     constructor(private securityAdvisor: CreateSecurityAdvisorService,
                 private dictionaryService: DictionaryService,
                 public experimentService: ExperimentsService,
@@ -129,6 +130,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                 private fileService: FileService,
                 private snackBar: MatSnackBar,
                 private billingService: BillingService,
+                private navService: NavigationService,
                 private orderValidateService: BrowseOrderValidateService) {
     }
 
@@ -141,73 +143,77 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
         });
 
         this.route.data.forEach((data: any) => {
-            this.experiment = null;
-            this.showSequenceLanesTab = false;
-            this.showBillingTab = false;
-            this.showCreateAnalysisButton = false;
-            this.routeOutlet = this.route.outlet;
+            if(data && data.experiment) {
 
-            this.experimentService.experimentOverviewForm.reset();
+                this.experiment = null;
+                this.showSequenceLanesTab = false;
+                this.showBillingTab = false;
+                this.showCreateAnalysisButton = false;
+                this.routeOutlet = this.route.outlet;
 
-            if (data && data.experiment && data.experiment.Request) {
-                this.experiment  = data.experiment.Request;
-                this._experiment = Experiment.createExperimentObjectFromAny(
-                    this.dictionaryService,
-                    this.gnomexService,
-                    this.propertyService,
-                    this.securityAdvisor,
-                    this.experiment
-                );
-            }
+                this.experimentService.experimentOverviewForm.reset();
 
-            if (this.experiment) {
-                if (!this.requestCategory || this.requestCategory.codeRequestCategory !== this.experiment.codeRequestCategory) {
-                    this.requestCategory = this.dictionaryService.getEntry("hci.gnomex.model.RequestCategory", this.experiment.codeRequestCategory);
-
-                    this.showBioinformaticsTab = this.requestCategory
-                        && this.requestCategory.type !== this.gnomexService.TYPE_MICROARRAY
-                        && (this.requestCategory.type === this.gnomexService.TYPE_NANOSTRING
-                            || (this.requestCategory.isIlluminaType === "Y" && this.gnomexService.submitInternalExperiment())
-                            || (this.requestCategory.isIlluminaType === "Y" && this.experiment && this.experiment.isExternal !== "Y"))
-                        && this.experiment.isExternal !== 'Y';
+                if (data.experiment.Request) {
+                    this.experiment = data.experiment.Request;
+                    this._experiment = Experiment.createExperimentObjectFromAny(
+                        this.dictionaryService,
+                        this.gnomexService,
+                        this.propertyService,
+                        this.securityAdvisor,
+                        this.experiment
+                    );
                 }
 
-                this.showCreateAnalysisButton = !this.secAdvisor.isGuest && this.routeOutlet === "browsePanel" && this.requestCategory.codeRequestCategory === this.experiment.codeRequestCategory && this.requestCategory.associatedWithAnalysis === "Y";
-                this.showSequenceLanesTab = this.requestCategory.isIlluminaType === "Y" && this.experiment.isExternal !== "Y";
-                this.showBillingTab = this.experiment.canRead === "Y" && this.experiment.isExternal !== "Y";
+                if (this.experiment) {
+                    if (!this.requestCategory || this.requestCategory.codeRequestCategory !== this.experiment.codeRequestCategory) {
+                        this.requestCategory = this.dictionaryService.getEntry("hci.gnomex.model.RequestCategory", this.experiment.codeRequestCategory);
 
-                let protocols: any[] = [];
-                if (this.experiment.protocols) {
-                    if (Array.isArray(this.experiment.protocols)) {
-                        protocols = this.experiment.protocols;
-                    } else {
-                        protocols = [this.experiment.protocols.Protocol];
+                        this.showBioinformaticsTab = this.requestCategory
+                            && this.requestCategory.type !== this.gnomexService.TYPE_MICROARRAY
+                            && (this.requestCategory.type === this.gnomexService.TYPE_NANOSTRING
+                                || (this.requestCategory.isIlluminaType === "Y" && this.gnomexService.submitInternalExperiment())
+                                || (this.requestCategory.isIlluminaType === "Y" && this.experiment && this.experiment.isExternal !== "Y"))
+                            && this.experiment.isExternal !== 'Y';
                     }
-                }
-                this.showMaterialsMethodsTab = ((this.experiment.captureLibDesignId && this.experiment.captureLibDesignId !== "")
-                    || (this.experiment.codeIsolationPrepType && this.experiment.codeIsolationPrepType !== "")
-                    || protocols.length > 0);
 
-                let annots = this.experiment.RequestProperties;
-                this.showRelatedDataTab = this.initRelatedData(this.experiment);
+                    this.showCreateAnalysisButton = !this.secAdvisor.isGuest && this.routeOutlet === "browsePanel" && this.requestCategory.codeRequestCategory === this.experiment.codeRequestCategory && this.requestCategory.associatedWithAnalysis === "Y";
+                    this.showSequenceLanesTab = this.requestCategory.isIlluminaType === "Y" && this.experiment.isExternal !== "Y";
+                    this.showBillingTab = this.experiment.canRead === "Y" && this.experiment.isExternal !== "Y";
 
-                if (annots) {
-                    this.annotations = Array.isArray(annots) ? <IAnnotation[]>annots : <IAnnotation[]>[annots];
-                    for (let i = 0; i < this.annotations.length; i++) {
-                        let propertyOptions = this.annotations[i].PropertyOption;
-                        if (propertyOptions) {
-                            this.annotations[i].PropertyOption = Array.isArray(propertyOptions) ? propertyOptions : <IAnnotationOption[]>[propertyOptions];
+                    let protocols: any[] = [];
+                    if (this.experiment.protocols) {
+                        if (Array.isArray(this.experiment.protocols)) {
+                            protocols = this.experiment.protocols;
+                        } else {
+                            protocols = [this.experiment.protocols.Protocol];
                         }
                     }
-                } else {
-                    this.annotations = [];
-                }
+                    this.showMaterialsMethodsTab = ((this.experiment.captureLibDesignId && this.experiment.captureLibDesignId !== "")
+                        || (this.experiment.codeIsolationPrepType && this.experiment.codeIsolationPrepType !== "")
+                        || protocols.length > 0);
 
-                this.showEdit = this.experiment && !this.secAdvisor.isGuest && this.experiment.canUpdate === "Y" && this.routeOutlet === "browsePanel";
-                this.isEditMode = this.experimentService.getEditMode();
-                this.setNodeTitle();
+                    let annots = this.experiment.RequestProperties;
+                    this.showRelatedDataTab = this.initRelatedData(this.experiment);
+
+                    if (annots) {
+                        this.annotations = Array.isArray(annots) ? <IAnnotation[]>annots : <IAnnotation[]>[annots];
+                        for (let i = 0; i < this.annotations.length; i++) {
+                            let propertyOptions = this.annotations[i].PropertyOption;
+                            if (propertyOptions) {
+                                this.annotations[i].PropertyOption = Array.isArray(propertyOptions) ? propertyOptions : <IAnnotationOption[]>[propertyOptions];
+                            }
+                        }
+                    } else {
+                        this.annotations = [];
+                    }
+
+                    this.showEdit = this.experiment && !this.secAdvisor.isGuest && this.experiment.canUpdate === "Y" && this.routeOutlet === "browsePanel";
+                    this.isEditMode = this.experimentService.getEditMode();
+                    this.setNodeTitle();
+                }
             }
         });
+
 
     }
 
@@ -438,7 +444,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
         this.dialogsService.genericDialogContainer(ShareLinkDialogComponent,
             "Web Link for Experiment " + (this.experiment ? this.experiment.number : ""), null, configuration,
             {actions: [
-                {type: ActionType.PRIMARY, name: "Copy To Clipboard", internalAction: "copyToClipboard"}
+                    {type: ActionType.PRIMARY, name: "Copy To Clipboard", internalAction: "copyToClipboard"}
                 ]});
     }
 
