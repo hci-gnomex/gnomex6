@@ -48,6 +48,9 @@ import {UtilService} from "../services/util.service";
         .run-width {
             width: 5em;
         }
+        .children-margin-right > *:not(:last-child) {
+            margin-right: 1em;
+        }
         
         .min-lab-width {
             min-width: 3em;
@@ -311,6 +314,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
 
     public barcodeFC:              FormControl;
     public createDateFC:           FormControl;
+    public sideFC:                 FormControl;
     public instrumentFC:           FormControl;
     public protocolFC:             FormControl;
     public runFC:                  FormControl;
@@ -335,15 +339,18 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
         this.createDateFC = new FormControl("");
         this.instrumentFC = new FormControl("");
         this.protocolFC   = new FormControl("", Validators.required);
+        this.sideFC = new FormControl("");
 
         this.createDateFC.disable();
+
 
         this.allFG = new FormGroup({
             barCode: this.barcodeFC,
             run: this.runFC,
             createDate: this.createDateFC,
             instrument: this.instrumentFC,
-            protocol: this.protocolFC
+            protocol: this.protocolFC,
+            side: this.sideFC
         });
 
         this.protocolFilterFc       = new FormControl('');
@@ -375,6 +382,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
     }
 
     private initialize(): void {
+        this.sideFC.disable();
         if (this.allRequestGridApi) {
             this.allRequestGridApi.setRowData([]);
         }
@@ -408,7 +416,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
                 this.assmGridApi.setColumnDefs(this.assemblyColumnDefs);
                 this.assmGridApi.sizeColumnsToFit();
             }
-
+            this.showSpinner = false;
             this.dialogsService.stopAllSpinnerDialogs();
         }, (err: IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
@@ -526,7 +534,29 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
                     this.buildLanes();
                 }
 
+                if(this.assmItemList.length > 0 ){
+                    let reqCat = this.assmItemList[0].codeRequestCategory;
+                    if(reqCat === 'MISEQ'){
+                        this.sideFC.disable();
+                        this.sideFC.setValue(null);
+                        this.sideFC.clearValidators();
+                    }else{
+                        this.sideFC.setValidators(Validators.required);
+                        this.sideFC.updateValueAndValidity();
+                        this.sideFC.enable();
+
+                    }
+
+                }else{
+                    this.sideFC.disable();
+                    this.sideFC.setValue(null);
+                    this.sideFC.clearValidators();
+                    this.sideFC.updateValueAndValidity();
+                }
+
                 this.allFG.markAsDirty();
+
+
             }
         }
 
@@ -548,6 +578,12 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
         this.assmItemList = this.workItemList
             .filter((a) => { return !!a.flowCellChannelNumber; })
             .sort(this.workflowService.sortSampleNumber);
+        if(this.assmItemList.length === 0){
+            this.sideFC.setValue(null);
+            this.sideFC.clearValidators();
+            this.sideFC.updateValueAndValidity();
+            this.sideFC.disable();
+        }
 
         if (this.allRequestGridApi) {
             this.allRequestGridApi.redrawRows();
@@ -691,6 +727,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             .set("idSeqRunType", this.protocolFC.value.idSeqRunType)
             .set("numberSequencingCyclesActual", this.protocolFC.value ? this.protocolFC.value.numberSequencingCyclesDisplay : "" )
             .set("runNumber", this.runFC.value)
+            .set("side", this.sideFC.value ? this.sideFC.value : '')
             .set("flowCellBarcode", this.barcodeFC.value)
             .set("workItemXMLString", JSON.stringify(this.assmItemList));
 
@@ -707,7 +744,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
                 this.assmItemList = [];
                 this.initialize();
             }
-            this.showSpinner = false;
+
         }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
