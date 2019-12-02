@@ -45,8 +45,8 @@ import org.hibernate.query.Query;
 
 /**
  * Edited 1/15/2013 Mosbruger
- * 
- * 
+ *
+ *
  * /**Used for making html url links formatted for IGV and softlinked to GNomEx files.
  */
 public class MakeDataTrackIGVLink extends HttpServlet {
@@ -325,7 +325,7 @@ public void execute(HttpServletResponse res, String serverName, SecurityAdvisor 
 						.build();
 				JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
 
-				res.setContentType("application/json");
+				res.setContentType("application/json; charset=UTF-8");
 				jsonWriter.writeObject(value);
 				jsonWriter.close();
 
@@ -347,7 +347,7 @@ public void execute(HttpServletResponse res, String serverName, SecurityAdvisor 
 
 		JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
 
-		res.setContentType("application/json");
+		res.setContentType("application/json; charset=UTF-8");
 		jsonWriter.writeObject(value);
 		jsonWriter.close();
 

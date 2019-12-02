@@ -148,10 +148,10 @@ export class LibprepQcWorkflowComponent {
         if(!this.codeStepNext) {
             this.codeStepNext = this.workflowService.ALL_PREP_QC;
         }
-        
+
         this.preCodeStepNext = this.codeStepNext;
         this.workItem = "";
-        
+
         let params: HttpParams = new HttpParams().set("codeStepNext", this.codeStepNext );
 
         this.workflowService.getWorkItemList(params).subscribe((response: any) => {
@@ -167,7 +167,7 @@ export class LibprepQcWorkflowComponent {
             this.requestIds = Array.from(this.workingWorkItemList.reduce((m, t) => m.set(t.requestNumber, t), new Map()).values());
             this.requestIds.unshift(this.emptyRequest);
             this.dialogsService.stopAllSpinnerDialogs();
-        },(err:IGnomexErrorResponse) => {
+        }, (err: IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
         });
     }
@@ -178,7 +178,7 @@ export class LibprepQcWorkflowComponent {
         if (this.workItem) {
             items = this.workItemList.filter(request =>
                 request.requestNumber === this.workItem
-            )
+            );
         } else {
             items = this.workItemList;
         }
@@ -199,7 +199,7 @@ export class LibprepQcWorkflowComponent {
         if(this.codeStepNext === this.preCodeStepNext) {
             return;
         }
-        
+
         this.initialize();
     }
 
@@ -250,8 +250,10 @@ export class LibprepQcWorkflowComponent {
                 this.dirty = false;
                 this.workItem = "";
                 this.initialize();
+            }, (err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
-        })
+        });
     }
 
     refreshWorklist(event) {

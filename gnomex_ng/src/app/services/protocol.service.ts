@@ -1,8 +1,7 @@
-import { Injectable } from '@angular/core';
-import {HttpClient, HttpErrorResponse, HttpParams} from "@angular/common/http";
-import { CookieUtilService } from "./cookie-util.service";
-import {Observable, Subject, throwError} from "rxjs";
-import { catchError } from "rxjs/operators";
+import {Injectable} from '@angular/core';
+import {HttpClient, HttpParams} from "@angular/common/http";
+import {CookieUtilService} from "./cookie-util.service";
+import {Observable, Subject} from "rxjs";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../util/popup/dialogs.service";
 
@@ -47,19 +46,15 @@ export class ProtocolService {
             .set('protocolClassName', protocolClassName);
 
         this.httpClient.get('gnomex/GetProtocol.gx', {params: params})
-            .pipe(catchError(this.handleError))
             .subscribe((result) => {
-            this.protocolSubject.next(result);
-        }, (err: IGnomexErrorResponse) => {
+                this.protocolSubject.next(result);
+            }, (err: IGnomexErrorResponse) => {
                 this.dialogService.stopAllSpinnerDialogs();
             });
     }
 
-
-
-
-    public getProtocolList(params?:HttpParams): void {
-        let protocolCallBackFn =  (result:any) => {
+    public getProtocolList(params?: HttpParams): void {
+        let protocolCallBackFn =  (result: any) => {
             if (result) {
                 if (Array.isArray(result)) {
                     this.protocolListSubject.next(result);
@@ -72,12 +67,14 @@ export class ProtocolService {
             }
         };
 
-        if(params){
-            this.httpClient.get('gnomex/GetProtocolList.gx',{params: params}).subscribe(protocolCallBackFn, (err:IGnomexErrorResponse) =>{
+        if(params) {
+            this.httpClient.get("gnomex/GetProtocolList.gx", {params: params})
+                .subscribe(protocolCallBackFn, (err: IGnomexErrorResponse) => {
                 this.dialogService.stopAllSpinnerDialogs();
-            })
-        }else{
-            this.httpClient.get('gnomex/GetProtocolList.gx').subscribe(protocolCallBackFn, (err:IGnomexErrorResponse) =>{
+            });
+        } else {
+            this.httpClient.get("gnomex/GetProtocolList.gx")
+                .subscribe(protocolCallBackFn, (err: IGnomexErrorResponse) => {
                 this.dialogService.stopAllSpinnerDialogs();
             });
         }
@@ -85,20 +82,10 @@ export class ProtocolService {
 
     }
 
-    public saveProtocol(params:HttpParams): Observable<any>{ // used for experiment platform
+    public saveProtocol(params: HttpParams): Observable<any> { // used for experiment platform
         this.cookieUtilService.formatXSRFCookie();
-        return this.httpClient.post('/gnomex/SaveProtocol.gx',null,{params:params})
-            .pipe(catchError(this.handleError));
+        return this.httpClient.post("/gnomex/SaveProtocol.gx", null, {params: params});
     }
-    private handleError(errorResponse: HttpErrorResponse){
-        if(errorResponse.error instanceof ErrorEvent){
-            console.error("Client side Error: ", errorResponse.error.message);
-        }else{
-            console.log("Server Side Error: ", errorResponse);
-        }
-        return throwError("An error occured please contact GNomEx Support.");
-    }
-
 
     public saveNewProtocol(protocolName: string, codeRequestCategory: string, protocolClassName: string, idAnalysisType: string): void {
         this.cookieUtilService.formatXSRFCookie();
@@ -120,6 +107,8 @@ export class ProtocolService {
 
         this.httpClient.post('/gnomex/SaveProtocol.gx', null, {params: params}).subscribe((result) => {
             this.saveNewProtocolSubject.next(result);
+        }, (err: IGnomexErrorResponse) => {
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
 
@@ -147,6 +136,8 @@ export class ProtocolService {
 
         this.httpClient.post('/gnomex/SaveProtocol.gx', null, {params: params}).subscribe((result) => {
             this.saveExistingProtocolSubject.next(result);
+        }, (err: IGnomexErrorResponse) => {
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
 
@@ -159,6 +150,8 @@ export class ProtocolService {
 
         this.httpClient.post('/gnomex/DeleteProtocol.gx', null, {params: params}).subscribe((result) => {
             this.deleteProtocolSubject.next(result);
+        }, (err: IGnomexErrorResponse) => {
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
 

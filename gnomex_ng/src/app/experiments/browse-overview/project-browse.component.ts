@@ -146,17 +146,17 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy {
             .set("noJSONToXMLConversionNeeded", "Y")
             .set("parseEntries", "Y");
 
-        this.experimentsService.saveProject(saveParams).pipe(first()).subscribe(response =>{
+        this.experimentsService.saveProject(saveParams).pipe(first()).subscribe(response => {
             this.experimentsService.refreshProjectRequestList_fromBackend();
             this.saveSuccess.emit(true);
             this.formInit = false;
 
-            this.experimentsService.getProject(getParams).pipe(first()).subscribe(response =>{
+            this.experimentsService.getProject(getParams).pipe(first()).subscribe(response => {
                 this.projectBrowseForm.get("projectName").setValue( response["Project"].name);
                 this.projectBrowseForm.get("description").setValue( response["Project"].description);
-            }, (err:IGnomexErrorResponse) => {
+            }, (err: IGnomexErrorResponse) => {
             });
-        },(err:IGnomexErrorResponse) => {
+        }, (err: IGnomexErrorResponse) => {
             this.saveSuccess.emit(false);
         });
 

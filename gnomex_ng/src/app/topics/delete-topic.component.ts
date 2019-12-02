@@ -1,10 +1,11 @@
 import {Component, Inject} from "@angular/core";
-import {Response, URLSearchParams} from "@angular/http";
+import {HttpParams} from "@angular/common/http";
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {TopicService} from "../services/topic.service";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "delete-topic",
@@ -55,21 +56,25 @@ export class DeleteTopicComponent extends BaseGenericContainerDialog {
 
     public delete(): void {
         this.showSpinner = true;
-        let params: URLSearchParams = new URLSearchParams();
+        let params: HttpParams = new HttpParams();
         if (this.unLink) {
-            params.set("idTopic", this.selectedItem.data.idTopic);
-            params.set(this.type, this.deleteId);
-            this.topicService.unlinkItemFromTopic(params).subscribe((response: Response) => {
+            params = params.set("idTopic", this.selectedItem.data.idTopic);
+            params = params.set(this.type, this.deleteId);
+            this.topicService.unlinkItemFromTopic(params).subscribe((response: any) => {
                 this.showSpinner = false;
                 this.dialogRef.close(true);
                 this.topicService.refreshTopicsList_fromBackend();
+            }, (err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
         } else {
-            params.set("idTopic", this.selectedItem.data.idTopic);
-            this.topicService.deleteTopic(params).subscribe((response: Response) => {
+            params = params.set("idTopic", this.selectedItem.data.idTopic);
+            this.topicService.deleteTopic(params).subscribe((response: any) => {
                 this.showSpinner = false;
                 this.dialogRef.close(true);
                 this.topicService.refreshTopicsList_fromBackend();
+            }, (err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
         }
     }

@@ -193,9 +193,9 @@ export class OrderProductsComponent implements OnInit {
                             }
                         }
                     }
-                },(err:IGnomexErrorResponse) => {
+                }, (err: IGnomexErrorResponse) => {
                 });
-            }, (err:IGnomexErrorResponse) => {
+            }, (err: IGnomexErrorResponse) => {
             });
         }
     }
@@ -271,6 +271,7 @@ export class OrderProductsComponent implements OnInit {
                     this.dialogsService.error("An error occurred while submitting the product order" + message);
                     this.enableSubmit = true;
                 }
+            }, (err: IGnomexErrorResponse) => {
             });
         }
     }

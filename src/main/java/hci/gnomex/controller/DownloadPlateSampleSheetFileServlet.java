@@ -20,15 +20,15 @@ import javax.servlet.http.HttpServletResponse;
 import org.hibernate.Session;
 import org.jdom.Element;
 import org.apache.log4j.Logger;
-public class DownloadPlateSampleSheetFileServlet extends HttpServlet { 
+public class DownloadPlateSampleSheetFileServlet extends HttpServlet {
 
   private static Logger LOG = Logger.getLogger(DownloadPlateSampleSheetFileServlet.class);
-  
+
 
   public void init() {
-  
+
   }
-    
+
   protected void doGet(HttpServletRequest req, HttpServletResponse response)
       throws ServletException, IOException {
 
@@ -45,21 +45,21 @@ public class DownloadPlateSampleSheetFileServlet extends HttpServlet {
     if (req.getParameter("idPlate") != null && !req.getParameter("idPlate").equals("")) {
       idPlate = Integer.valueOf(req.getParameter("idPlate"));
     }
-    
+
     if (idPlate == null) {
       ServletUtil.reportServletError(response, "Missing parameter:  idPlate required", LOG);
     }
 
     InputStream in = null;
     SecurityAdvisor secAdvisor = null;
-    
+
     try {
-      
+
 
       // Get security advisor
      secAdvisor = (SecurityAdvisor) req.getSession().getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY);
 
-     
+
      if (secAdvisor != null) {
 
         Session sess = secAdvisor.getHibernateSession(req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest");
@@ -69,9 +69,9 @@ public class DownloadPlateSampleSheetFileServlet extends HttpServlet {
         plateName = plateName.replaceAll("\\s", "_");
         String plateFileName = plateName + ".txt";
 
-        // Check permissions 
+        // Check permissions
         if (!secAdvisor.hasPermission(SecurityAdvisor.CAN_MANAGE_DNA_SEQ_CORE)) {
-          response.setContentType("text/html");
+          response.setContentType("text/html; charset=UTF-8");
           response.getOutputStream().println(
               "<html><head><title>Error</title></head>");
           response.getOutputStream().println("<body><b>");
@@ -83,21 +83,21 @@ public class DownloadPlateSampleSheetFileServlet extends HttpServlet {
           System.out.println( "DownloadPlateSampleSheetFileServlet: Insufficient  permission to export sample names for plate.");
           return;
         }
-        
-        
-        response.setContentType("application/x-download");
-        response.setHeader("Content-Disposition", "attachment;filename=" + plateFileName);          
+
+
+        response.setContentType("application/x-download; charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment;filename=" + plateFileName);
         response.setHeader("Cache-Control", "max-age=0, must-revalidate");
 
-        
+
         OutputStream out = response.getOutputStream();
 
-        
+
         // Header
         response.getOutputStream().print( "Sample Name\t\n" );
-        
-        
-        
+
+
+
         Element runNode = getPlateWells( sess, plate );
 
         if( runNode != null ) {
@@ -122,7 +122,7 @@ public class DownloadPlateSampleSheetFileServlet extends HttpServlet {
 
 
       } else {
-        response.setContentType("text/html");
+        response.setContentType("text/html; charset=UTF-8");
         response.getOutputStream().println(
             "<html><head><title>Error</title></head>");
         response.getOutputStream().println("<body><b>");
@@ -136,7 +136,7 @@ public class DownloadPlateSampleSheetFileServlet extends HttpServlet {
     } catch (Exception e) {
         LOG.error("DownloadPlateSampleSheetFileServlet: An exception occurred ", e);
       HibernateSession.rollback();
-      response.setContentType("text/html");
+      response.setContentType("text/html; charset=UTF-8");
       response.getOutputStream().println(
           "<html><head><title>Error</title></head>");
       response.getOutputStream().println("<body><b>");
@@ -148,31 +148,31 @@ public class DownloadPlateSampleSheetFileServlet extends HttpServlet {
 
     } finally {
       try {
-        secAdvisor.closeHibernateSession();        
+        secAdvisor.closeHibernateSession();
       } catch (Exception e) {
           LOG.error("DownloadPlateSampleSheetFileServlet: An exception occurred ", e);
       }
-     
+
     }
 
-  }    
-  
-  
+  }
+
+
   private Element getPlateWells(Session sess, Plate plate) {
 
-    try { 
+    try {
       Element plateNode = plate.toXMLDocument(null, DetailObject.DATE_OUTPUT_SQL).getRootElement();
 
       for ( int col = 1; col <= 12; col++ ) {
         for( char row = 'A'; row <= 'H'; row ++ ){
-          
+
             Element wellNode = getWellNode( sess, row, col, plate );
             plateNode.addContent(wellNode);
-          
+
         }
-        
+
       }
-      
+
       return plateNode;
 
     } catch( Exception e ) {
@@ -181,10 +181,10 @@ public class DownloadPlateSampleSheetFileServlet extends HttpServlet {
       return null;
     }
   }
-  
+
   private Element getWellNode( Session sess, char row, int col, Plate plate) {
     try {
-      
+
       Element wellNode = new Element("PlateWell");
 
         String wellQuery = "SELECT pw from PlateWell as pw where pw.idPlate=" + plate.getIdPlate() + "        AND pw.row='" + row + "'       AND pw.col=" + col;
@@ -211,6 +211,6 @@ public class DownloadPlateSampleSheetFileServlet extends HttpServlet {
     }
   }
 
-  
- 
+
+
 }

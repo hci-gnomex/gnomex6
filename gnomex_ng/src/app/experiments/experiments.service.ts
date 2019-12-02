@@ -1,15 +1,12 @@
-import {Inject, Injectable, InjectionToken, Injector} from "@angular/core";
-import {Http, Response, URLSearchParams} from "@angular/http";
-import {Subject, throwError} from "rxjs";
-import {Observable} from "rxjs";
-import {BehaviorSubject} from "rxjs";
+import {Inject, Injectable, InjectionToken} from "@angular/core";
+import {BehaviorSubject, Observable, Subject, throwError} from "rxjs";
 import {
     HttpClient,
     HttpEvent,
     HttpEventType,
     HttpHeaders,
     HttpParams,
-    HttpRequest
+    HttpRequest,
 } from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {catchError, map} from "rxjs/operators";
@@ -28,7 +25,7 @@ export class ExperimentsService {
 
     private experimentOrders: any[];
     public projectRequestList: any;
-    public selectedTreeNode:any;
+    public selectedTreeNode: any;
     public startSearchSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
 
@@ -36,26 +33,26 @@ export class ExperimentsService {
     private experimentOrdersMessageSubject: Subject<string> = new Subject();
     private experimentSubject: Subject<any> = new Subject();
     private projectRequestListSubject: Subject<any> = new Subject<any>();
-    private projectSubject:Subject<any> = new Subject();
+    private projectSubject: Subject<any> = new Subject();
     public canDeleteProjectSubject: Subject<boolean> = new Subject<boolean>();
 
     private haveLoadedExperimentOrders: boolean = false;
     private previousURLParams: HttpParams = null;
     private changeStatusSubject: Subject<any> = new Subject();
-    private requestProgressList: Subject<any>= new Subject();
+    private requestProgressList: Subject<any> = new Subject();
     private requestProgressDNASeqList: Subject<any> = new Subject();
-    private requestProgressSolexaList:Subject<any> = new Subject();
+    private requestProgressSolexaList: Subject<any> = new Subject();
 
-    private experimentOverviewListSubject:BehaviorSubject<any> = new BehaviorSubject([]);
-    private filteredExperimentOverviewListSubject:Subject<any> = new Subject();
-    private saveManagerSubject:Subject<any> = new Subject();
+    private experimentOverviewListSubject: BehaviorSubject<any> = new BehaviorSubject([]);
+    private filteredExperimentOverviewListSubject: Subject<any> = new Subject();
+    private saveManagerSubject: Subject<any> = new Subject();
 
     // conditional params
-    browsePanelParams:HttpParams;
-    experimentList:Array<any> =[];
+    browsePanelParams: HttpParams;
+    experimentList: Array<any> = [];
 
-    public invalid:boolean = false;
-    public dirty:boolean = false;
+    public invalid: boolean = false;
+    public dirty: boolean = false;
     public modeChangedExperiment: any;
     public filteredLabs: any;
     public labList: any[] = [];
@@ -66,7 +63,6 @@ export class ExperimentsService {
 
 
     constructor(private cookieUtilService: CookieUtilService,
-                private _http: Http,
                 private httpClient: HttpClient,
                 private dialogService: DialogsService,
                 @Inject(BROWSE_EXPERIMENTS_ENDPOINT) private _browseExperimentsUrl: string) {
@@ -94,7 +90,7 @@ export class ExperimentsService {
             .subscribe((response: any) => {
                 this.projectRequestList = response;
                 this.emitProjectRequestList();
-            }, (err:IGnomexErrorResponse) => {
+            }, (err: IGnomexErrorResponse) => {
                 this.dialogService.stopAllSpinnerDialogs();
             });
     }
@@ -104,14 +100,14 @@ export class ExperimentsService {
         this.haveLoadedExperimentOrders = true;
         this.previousURLParams = parameters;
 
-        this.httpClient.get("/gnomex/GetRequestList.gx", {params:parameters})
-            .pipe(map((resp:any) => { return resp.Request}))
+        this.httpClient.get("/gnomex/GetRequestList.gx", {params: parameters})
+            .pipe(map((resp: any) => { return resp.Request}))
             .subscribe((response: any) => {
                 this.experimentOrders = response;
                 this.emitExperimentOrders();
                 this.experimentOrdersMessageSubject.next(response.message);
 
-            },(err:IGnomexErrorResponse) => {
+            }, (err: IGnomexErrorResponse) => {
                 this.dialogService.stopAllSpinnerDialogs();
             });
     }
@@ -122,7 +118,7 @@ export class ExperimentsService {
     }
 
     getPreviousURLParamsCoreFacilityFilter(): string {
-        return this.previousURLParams.get('idCoreFacility');
+        return this.previousURLParams.get("idCoreFacility");
     }
 
     getChangeExperimentStatusObservable(): Observable<any> {
@@ -135,20 +131,18 @@ export class ExperimentsService {
 
     changeExperimentStatus(idRequest: string, codeRequestStatus: string): void {
 
-        let parameters: URLSearchParams = new URLSearchParams;
-        parameters.set("idRequest", idRequest);
-        parameters.set("codeRequestStatus", codeRequestStatus);
+        let params: HttpParams = new HttpParams()
+            .set("idRequest", idRequest)
+            .set("codeRequestStatus", codeRequestStatus);
 
-        // console.log("Changing Experiment numbers: " + parameters.get("idRequest") + " status to " + parameters.get("codeRequestStatus"));
-
-        this._http.get("/gnomex/ChangeRequestStatus.gx", {withCredentials: true, search: parameters}).subscribe((response: Response) => {
-            if (response.status === 200) {
-                this.changeStatusSubject.next(response.json());
-                //return response.json().Request;
-            } else {
-                throw new Error("Error");
+        this.httpClient.get("/gnomex/ChangeRequestStatus.gx", {withCredentials: true, params: params})
+            .subscribe((response: any) => {
+            if (response) {
+                this.changeStatusSubject.next(response);
             }
-        });
+        }, (err: IGnomexErrorResponse) => {
+                this.dialogService.stopAllSpinnerDialogs();
+            });
     }
 
 
@@ -165,7 +159,7 @@ export class ExperimentsService {
         this.projectRequestListSubject.next(this.projectRequestList);
     }
 
-    getProjectRequestList_fromBackend(params: HttpParams,allowRefresh?:boolean): void {
+    getProjectRequestList_fromBackend(params: HttpParams, allowRefresh? : boolean): void {
         this.startSearchSubject.next(true);
 
         this.haveLoadedExperimentOrders = true;
@@ -175,36 +169,36 @@ export class ExperimentsService {
             .subscribe((response: any) => {
                 this.projectRequestList = response;
                 this.emitProjectRequestList();
-            }, (err:IGnomexErrorResponse) =>{
+            }, (err: IGnomexErrorResponse) => {
                 this.dialogService.stopAllSpinnerDialogs();
             });
     }
 
-    emitExperiment(exp:any):void{
+    emitExperiment(exp: any): void {
         this.experimentSubject.next(exp);
     }
 
-    getExperimentObservable():Observable<any>{
+    getExperimentObservable(): Observable<any> {
         return this.experimentSubject.asObservable();
     }
 
     getExperiment(id: string): Observable<any> {
-        let params:HttpParams = new HttpParams().set('idRequest',id);
+        let params: HttpParams = new HttpParams().set("idRequest", id);
         return this.httpClient.get("/gnomex/GetRequest.gx", {params: params})
-            .pipe(catchError((err:IGnomexErrorResponse) =>{
+            .pipe(catchError((err: IGnomexErrorResponse) => {
                 return throwError(err);
             }));
     }
 
     public getNewRequest(): Observable<any> {
-        let params: HttpParams = new HttpParams().set("idRequest", '0');
+        let params: HttpParams = new HttpParams().set("idRequest", "0");
         return this.httpClient.get("/gnomex/GetRequest.gx", {params: params});
     }
 
     public getMultiplexLaneList(experiment: Experiment): Observable<any> {
 
         let params: HttpParams = new HttpParams()
-            .set('requestJSONString', JSON.stringify(experiment.getJSONObjectRepresentation()))
+            .set("requestJSONString", JSON.stringify(experiment.getJSONObjectRepresentation()))
             .set("noJSONToXMLConversionNeeded", "Y");
 
         this.cookieUtilService.formatXSRFCookie();
@@ -215,13 +209,15 @@ export class ExperimentsService {
         return this.httpClient.post("/gnomex/GetMultiplexLaneList.gx", params.toString(), { headers: headers });
     }
 
-    getLab(params: URLSearchParams): Observable<any> {
-        return this._http.get("/gnomex/GetLab.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json().Lab;
+    getLab(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetLab.gx", {params: params}).pipe(map((response: any) => {
+            if (response && response.Lab) {
+                return response.Lab;
             } else {
-                throw new Error("Error");
+                throw new Error("Error"); // TODO: need to confirm what's inside of response
             }
+        }), catchError((err: IGnomexErrorResponse) => {
+            return throwError(err);
         }));
 
     }
@@ -244,11 +240,10 @@ export class ExperimentsService {
         }
 
         let params: HttpParams = new HttpParams()
-            .set('requestJSONString', JSON.stringify(experiment.getJSONObjectRepresentation()))
-            .set('description', experiment.description)
-            .set('idProject', experiment.idProject)
-            .set('propertiesXML', propertiesXML);
-        // .set('invoicePrice', '');
+            .set("requestJSONString", JSON.stringify(experiment.getJSONObjectRepresentation()))
+            .set("description", experiment.description)
+            .set("idProject", experiment.idProject)
+            .set("propertiesXML", propertiesXML);
 
         let headers: HttpHeaders = new HttpHeaders()
             .set("Content-Type", "application/x-www-form-urlencoded");
@@ -263,8 +258,8 @@ export class ExperimentsService {
         }
 
         let params: HttpParams = new HttpParams()
-            .set('codeRequestCategory', codeRequestCategory)
-            .set('idLab', idLab);
+            .set("codeRequestCategory", codeRequestCategory)
+            .set("idLab", idLab);
 
         let headers: HttpHeaders = new HttpHeaders()
             .set("Content-Type", "application/x-www-form-urlencoded");
@@ -275,10 +270,10 @@ export class ExperimentsService {
     saveVisibility(body: any, idProject?: string): Observable<any> {
 
         let parameters: HttpParams = new HttpParams();
-        let strBody:string = JSON.stringify(body);
+        let strBody: string = JSON.stringify(body);
 
-        if(idProject){
-            parameters = parameters.set("idProject",idProject);
+        if(idProject) {
+            parameters = parameters.set("idProject", idProject);
         }
         parameters = parameters.set("visibilityXMLString", strBody);
         return this.httpClient.get("/gnomex/SaveVisibility.gx", {params: parameters});
@@ -286,23 +281,22 @@ export class ExperimentsService {
 
 
 
-    getProjectObsevable():Observable<any>{
+    getProjectObsevable(): Observable<any> {
         return this.projectSubject.asObservable();
     }
-    emitProject(project:any):void{
+    emitProject(project: any): void {
         this.projectSubject.next(project);
     }
-    getProject_fromBackend(params: URLSearchParams): void {
-        this._http.get("/gnomex/GetProject.gx",{search: params})
-            .subscribe((response: Response) => {
-                console.log("getProject called");
-                if (response.status === 200) {
-                    let project = response.json();
-                    this.emitProject(project);
-                    //return response.json().Request;
+    getProject_fromBackend(params: HttpParams): void {
+        this.httpClient.get("/gnomex/GetProject.gx", {params: params})
+            .subscribe((response: any) => {
+                if (response) {
+                    this.emitProject(response);
                 } else {
-                    throw new Error("Error getting Project");
+                    throw new Error("Error getting Project"); // Fixme: required?
                 }
+            }, (err: IGnomexErrorResponse) => {
+                this.dialogService.stopAllSpinnerDialogs(); // Fixme: required?
             });
     }
 
@@ -310,7 +304,7 @@ export class ExperimentsService {
 
     getProject(params: HttpParams):  Observable<any> {
         return this.httpClient.get("/gnomex/GetProject.gx", {params: params})
-            .pipe(catchError((err:IGnomexErrorResponse) =>{
+            .pipe(catchError((err: IGnomexErrorResponse) => {
                 return throwError(err);
             }));
     }
@@ -329,8 +323,8 @@ export class ExperimentsService {
     }
 
     getProjectRequestList(params: HttpParams) {
-        return this.httpClient.get("/gnomex/GetProjectRequestList.gx", {params:params})
-            .pipe(catchError((err:IGnomexErrorResponse) =>{
+        return this.httpClient.get("/gnomex/GetProjectRequestList.gx", {params: params})
+            .pipe(catchError((err: IGnomexErrorResponse) => {
                 return throwError(err);
             }));
     }
@@ -339,56 +333,61 @@ export class ExperimentsService {
         return this.httpClient.get("/gnomex/GetProjectRequestList.gx", {params: params});
     }
 
-    getRequestProgressListObservable():Observable<any>{
+    getRequestProgressListObservable(): Observable<any> {
         return this.requestProgressList;
     }
-    getRequestProgressList_FromBackend(params:HttpParams):void{
-        this.httpClient.get("/gnomex/GetRequestProgressList.gx",{params:params})
-            .subscribe((response: any)=> {this.requestProgressList.next(response);}
-                ,(err:IGnomexErrorResponse) => {
-                });
+    getRequestProgressList_FromBackend(params: HttpParams): void {
+        this.httpClient.get("/gnomex/GetRequestProgressList.gx", {params: params})
+            .subscribe((response: any) => {
+                this.requestProgressList.next(response);
+            }, (err: IGnomexErrorResponse) => {
+                this.dialogService.stopAllSpinnerDialogs(); // Fixme: required?
+            });
     }
 
-    getRequestProgressSolexaListObservable():Observable<any>{
+    getRequestProgressSolexaListObservable(): Observable<any> {
         return this.requestProgressSolexaList.asObservable();
     }
-    getRequestProgressSolexaList_FromBackend(params: HttpParams):void{
-        this.httpClient.get("/gnomex/GetRequestProgressSolexaList.gx",{params:params})
-            .subscribe((response: any)=> {
+    getRequestProgressSolexaList_FromBackend(params: HttpParams): void {
+        this.httpClient.get("/gnomex/GetRequestProgressSolexaList.gx", {params: params})
+            .subscribe((response: any) => {
                 this.requestProgressSolexaList.next(response);
-            }, (err:IGnomexErrorResponse) => {
+            }, (err: IGnomexErrorResponse) => {
+                this.dialogService.stopAllSpinnerDialogs(); // Fixme: required?
             });
 
     }
 
-    getRequestProgressDNASeqListObservable(){
+    getRequestProgressDNASeqListObservable() {
         return this.requestProgressDNASeqList.asObservable();
     }
-    getRequestProgressDNASeqList_FromBackend(params: HttpParams):void{
-        this.httpClient.get("/gnomex/GetRequestProgressDNASeqList.gx",{params:params})
-            .subscribe((response: any)=> {this.requestProgressDNASeqList.next(response);}
-                ,(err: IGnomexErrorResponse) => {
-                });
+    getRequestProgressDNASeqList_FromBackend(params: HttpParams): void {
+        this.httpClient.get("/gnomex/GetRequestProgressDNASeqList.gx", {params: params})
+            .subscribe((response: any) => {
+                this.requestProgressDNASeqList.next(response);
+            }, (err: IGnomexErrorResponse) => {
+                this.dialogService.stopAllSpinnerDialogs(); // Fixme: required?
+            });
     }
-    emitExperimentOverviewList(data:any):void{
+    emitExperimentOverviewList(data: any): void {
         this.experimentOverviewListSubject.next(data);
     }
-    resetExperimentOverviewListSubject(){
+    resetExperimentOverviewListSubject() {
         this.experimentOverviewListSubject = new BehaviorSubject([]);
     }
-    getExperimentOverviewListSubject():BehaviorSubject<any>{
+    getExperimentOverviewListSubject(): BehaviorSubject<any> {
         return this.experimentOverviewListSubject;
     }
-    emitFilteredOverviewList(data:any):void{
+    emitFilteredOverviewList(data: any): void {
         this.filteredExperimentOverviewListSubject.next(data);
     }
-    getFilteredOverviewListObservable():Observable<any>{
+    getFilteredOverviewListObservable(): Observable<any> {
         return this.filteredExperimentOverviewListSubject.asObservable();
     }
-    emitSaveManger(type:string):void{
+    emitSaveManger(type: string): void {
         this.saveManagerSubject.next(type);
     }
-    getSaveMangerObservable():Observable<any>{
+    getSaveMangerObservable(): Observable<any> {
         return this.saveManagerSubject.asObservable();
     }
 
@@ -400,15 +399,24 @@ export class ExperimentsService {
 
 
     getExperimentWithParams(params: HttpParams) {
-        return this.httpClient.get("/gnomex/GetRequest.gx",{params:params})
+        return this.httpClient.get("/gnomex/GetRequest.gx", {params: params})
+            .pipe(catchError((err: IGnomexErrorResponse) => {
+                return throwError(err);
+            }));
     }
 
     getRequestDownloadListWithParams(params: HttpParams) {
-        return this.httpClient.get("/gnomex/GetRequestDownloadList.gx", {params: params});
+        return this.httpClient.get("/gnomex/GetRequestDownloadList.gx", {params: params})
+            .pipe(catchError((err: IGnomexErrorResponse) => {
+                return throwError(err);
+            }));
     }
 
-    getLinkedSampleFiles(params: HttpParams):Observable<any>{
-        return this.httpClient.get("/gnomex/GetLinkedSampleFiles.gx", {params:params});
+    getLinkedSampleFiles(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetLinkedSampleFiles.gx", {params: params})
+            .pipe(catchError((err: IGnomexErrorResponse) => {
+            return throwError(err);
+        }));
     }
 
     public setEditMode(editMode: boolean): void {
@@ -447,7 +455,7 @@ export class ExperimentsService {
 
         let params: HttpParams = new HttpParams()
             .set("requestJSONString", JSON.stringify(experiment.getJSONObjectRepresentation()))
-            .set("noJSONToXMLConversionNeeded", 'Y');
+            .set("noJSONToXMLConversionNeeded", "Y");
 
         let headers: HttpHeaders = new HttpHeaders()
             .set("Content-Type", "application/x-www-form-urlencoded");
@@ -461,6 +469,8 @@ export class ExperimentsService {
             if (event.type === HttpEventType.Response) {
                 saveAs(event.body, "testing_ShowRequestForm.pdf");
             }
+        }, (err: IGnomexErrorResponse) => {
+            this.dialogService.stopAllSpinnerDialogs(); // Fixme: required?
         });
     }
 }

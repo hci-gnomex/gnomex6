@@ -143,22 +143,21 @@ export class LibraryPrepProtocolDialogComponent extends BaseGenericContainerDial
             .set('protocolClassName',DictionaryService.SEQ_LIB_PROTOCOL)
             .set('adapterSequenceThreePrime',this.formGroup.get('adapterSequenceThreePrime').value)
             .set('adapterSequenceFivePrime',this.formGroup.get('adapterSequenceFivePrime').value)
-        this.protocolService.saveProtocol(params).subscribe(resp =>{
-                if(resp && resp.result && resp.result === "SUCCESS"){
+        this.protocolService.saveProtocol(params).subscribe((resp: any) => {
+                if(resp && resp.result && resp.result === "SUCCESS") {
                     this.showSpinner = false;
-                    if(resp.message){
+                    if(resp.message) {
                         this.dialogService.alert(resp.message, "", DialogType.SUCCESS);
                         return;
                     }
                     this.saveProtocolFn(resp);
                     this.dialogRef.close();
-                }else{
+                } else {
                     this.showSpinner = false;
                     this.dialogService.error("An error occurred please contact GNomEx Support");
                 }
-            }, error => {
+            }, (err: IGnomexErrorResponse) => {
                 this.showSpinner = false;
-                this.dialogService.error(error);
         });
     }
 

@@ -1,14 +1,11 @@
 import {Injectable} from "@angular/core";
-import {Http, Response, URLSearchParams} from "@angular/http";
 import {Observable} from "rxjs";
 import {HttpClient, HttpParams} from "@angular/common/http";
-import {map} from "rxjs/operators";
 
 @Injectable()
 export class ProjectService {
 
-    constructor(private http: Http,
-                private httpClient: HttpClient) {
+    constructor(private httpClient: HttpClient) {
     }
 
     deleteProject(params: HttpParams):  Observable<any> {

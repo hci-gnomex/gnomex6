@@ -4,6 +4,7 @@ import {LabListService} from "../services/lab-list.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "new-group-dialog",
@@ -121,6 +122,8 @@ export class NewGroupDialogComponent extends BaseGenericContainerDialog implemen
             } else {
                 this.dialogRef.close();
             }
+        }, (err: IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
     }
 }

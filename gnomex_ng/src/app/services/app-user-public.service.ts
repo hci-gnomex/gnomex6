@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {Http, Response, URLSearchParams, Headers} from "@angular/http";
+import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {CookieUtilService} from "./cookie-util.service";
 import {map} from "rxjs/operators";
@@ -7,32 +7,30 @@ import {map} from "rxjs/operators";
 @Injectable()
 export class AppUserPublicService {
 
-    constructor(private http: Http,
+    constructor(private httpClient: HttpClient,
                 private cookieUtilService: CookieUtilService) {
     }
 
-    public getAppUserPublicCall(idAppUser: string): Observable<Response> {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idAppUser", idAppUser);
-        return this.http.get("/gnomex/GetAppUserPublic.gx", {search: params});
+    public getAppUserPublicCall(idAppUser: string): Observable<any> {
+        let params: HttpParams = new HttpParams()
+            .set("idAppUser", idAppUser);
+        return this.httpClient.get("/gnomex/GetAppUserPublic.gx", {params: params});
     }
 
     public getAppUserPublic(idAppUser: string): Observable<any> {
-        return this.getAppUserPublicCall(idAppUser).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                return null;
-            }
+        // TODO: Need to check the back-end for why not throwing errors
+        // return this.getAppUserPublicCall(idAppUser);
+        return this.getAppUserPublicCall(idAppUser).pipe(map((response: any) => {
+            return response;
         }));
     }
 
-    public saveAppUserPublic(params: URLSearchParams):  Observable<Response> {
+    public saveAppUserPublic(params: HttpParams): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
 
-        let headers: Headers = new Headers();
-        headers.set("Content-Type", "application/x-www-form-urlencoded");
-        return this.http.post("/gnomex/SaveAppUserPublic.gx", params.toString(), {headers: headers});
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/SaveAppUserPublic.gx", params.toString(), {headers: headers});
     }
 
 }

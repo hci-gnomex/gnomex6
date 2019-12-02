@@ -21,8 +21,8 @@ import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
-    selector: 'qc-workflow',
-    templateUrl: 'qc-workflow.html',
+    selector: "qc-workflow",
+    templateUrl: "qc-workflow.html",
     styles: [`
 
 
@@ -50,7 +50,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 export class QcWorkflowComponent implements OnInit, OnChanges {
     @ViewChild("requestInput") requestInput: ElementRef;
     @ViewChild("coreFacility") coreFacilityInput: ElementRef;
-    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    @ViewChild("oneEmWidth") oneEmWidth: ElementRef;
 
     @Input() mode: string;
 
@@ -70,7 +70,7 @@ export class QcWorkflowComponent implements OnInit, OnChanges {
     public core: any;
     private preSelectedCore: any;
     private hide260230: boolean = true;
-    private gridApi:GridApi;
+    private gridApi: GridApi;
     private label: string = "Combined Sample Quality";
     private codeStepNext: string = "ALL";
 
@@ -124,11 +124,11 @@ export class QcWorkflowComponent implements OnInit, OnChanges {
                     return true;
                 }
 
-                if (option.value == "") {
+                if (option.value === "") {
                     return true;
                 }
 
-                if (option.isActive === 'Y' && rowData) {
+                if (option.isActive === "Y" && rowData) {
                     let appCodes: any[] = context.coreFacilityAppMap.get(rowData.idCoreFacility);
 
                     if (appCodes && appCodes.length > 0) {
@@ -144,7 +144,7 @@ export class QcWorkflowComponent implements OnInit, OnChanges {
             },
             context: this,
             showFillButton: true,
-            fillGroupAttribute: 'idRequest',
+            fillGroupAttribute: "idRequest",
         });
         result.push({
             headerName: "Conc. ng/uL",
@@ -193,7 +193,7 @@ export class QcWorkflowComponent implements OnInit, OnChanges {
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "value",
             showFillButton: true,
-            fillGroupAttribute: 'idRequest',
+            fillGroupAttribute: "idRequest",
         });
 
         return result;
@@ -261,7 +261,7 @@ export class QcWorkflowComponent implements OnInit, OnChanges {
 
             this.preSelectedCore = this.core;
 
-            if (this.codeStepNext == this.workflowService.ALL) {
+            if (this.codeStepNext === this.workflowService.ALL) {
                 this.workingWorkItemList = this.filterWorkItems();
             } else if (this.codeStepNext === this.workflowService.ILLUMINA_SEQQC){
                 this.workingWorkItemList = this.filterByCodeStepNext(this.workflowService.ILLUMINA_SEQQC);
@@ -285,7 +285,7 @@ export class QcWorkflowComponent implements OnInit, OnChanges {
             this.dialogsService.stopAllSpinnerDialogs();
             // TODO Need to get hide260230 and hide that column appropriately
             // var hide260230:String = parentApplication.getCoreFacilityProperty(selectedIdCoreFacility, parentApplication.PROPERTY_HIDE_260_230_QC_WORKFLOW);
-        },(err:IGnomexErrorResponse) => {
+        }, (err: IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
         });
     }
@@ -294,7 +294,7 @@ export class QcWorkflowComponent implements OnInit, OnChanges {
         let items: any[] = [];
 
         if (this.workItem) {
-            items = this.workItemList.filter((request) => { return request.requestNumber === this.workItem; })
+            items = this.workItemList.filter((request) => { return request.requestNumber === this.workItem; });
         } else {
             items = this.workItemList;
         }
@@ -378,7 +378,7 @@ export class QcWorkflowComponent implements OnInit, OnChanges {
     
         this.workItem = "";
     
-        if (this.codeStepNext == this.workflowService.ALL) {
+        if (this.codeStepNext === this.workflowService.ALL) {
             this.workingWorkItemList = this.filterWorkItems();
         } else if (this.codeStepNext === this.workflowService.ILLUMINA_SEQQC){
             this.workingWorkItemList = this.filterByCodeStepNext(this.workflowService.ILLUMINA_SEQQC);
@@ -441,7 +441,7 @@ export class QcWorkflowComponent implements OnInit, OnChanges {
                 this.dirty = false;
                 this.workItem = "";
                 this.initialize(true);
-            }, (err:IGnomexErrorResponse) => {
+            }, (err: IGnomexErrorResponse) => {
                 this.showSpinner = false;
             });
         });
@@ -455,7 +455,7 @@ export class QcWorkflowComponent implements OnInit, OnChanges {
         let warningMessage: string = "";
         if (item.qualCodeBioanalyzerChipType) {
             item.qualCodeApplication = this.gnomexService.getCodeApplicationForBioanalyzerChipType(item.qualCodeBioanalyzerChipType);
-        } else if (item.qualStatus == 'Completed' || item.qualStatus == 'Terminated') {
+        } else if (item.qualStatus === "Completed" || item.qualStatus === "Terminated") {
             warningMessage = item.sampleNumber + " is completed or terminated and does not have a QC Protocol specified.";
             this.dialogsService.confirm(warningMessage, null);
         }
@@ -476,7 +476,7 @@ export class QcWorkflowComponent implements OnInit, OnChanges {
         this.label = "Illumina Sample Quality";
         this.codeStepNext = this.workflowService.ILLUMINA_SEQQC;
         this.workingWorkItemList = this.filterByCodeStepNext(this.workflowService.ILLUMINA_SEQQC);
-        this.buildRequestIds(this.workingWorkItemList, '');
+        this.buildRequestIds(this.workingWorkItemList, "");
 
         this.gridApi.setRowData(this.workingWorkItemList);
     }

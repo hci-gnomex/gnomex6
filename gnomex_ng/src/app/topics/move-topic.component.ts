@@ -1,10 +1,11 @@
 import {Component, Inject} from '@angular/core';
-import {Response, URLSearchParams} from "@angular/http";
+import {HttpParams} from "@angular/common/http";
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {TopicService} from "../services/topic.service";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'move-topic',
@@ -44,38 +45,42 @@ export class MoveTopicComponent extends BaseGenericContainerDialog {
 
     public doMoveCopy(mode: any): void {
         this.showSpinner = true;
-        let params: URLSearchParams = new URLSearchParams();
-        if (mode ==="M")
-            params.set("isMove", "Y");
-        else {
-            params.set("isMove", "N");
+        let params: HttpParams = new HttpParams();
+        if (mode === "M") {
+            params = params.set("isMove", "Y");
+        } else {
+            params = params.set("isMove", "N");
         }
         if (this.currentItem.idParentTopic) {
-            params.set("idParentTopicNew", this.targetItem.idTopic);
-            params.set("idTopic", this.currentItem.idTopic);
-            params.set("name", "Topic");
-            this.topicService.moveOrCopyTopic(params).subscribe((response: Response) => {
+            params = params.set("idParentTopicNew", this.targetItem.idTopic);
+            params = params.set("idTopic", this.currentItem.idTopic);
+            params = params.set("name", "Topic");
+            this.topicService.moveOrCopyTopic(params).subscribe((response: any) => {
                 this.showSpinner = false;
                 this.dialogRef.close(true);
                 this.topicService.refreshTopicsList_fromBackend();
+            }, (err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
         } else {
-            params.set("idTopic", this.targetItem.idTopic);
-            params.set("idTopicOld", this.currentItem.idTopic);
+            params = params.set("idTopic", this.targetItem.idTopic);
+            params = params.set("idTopicOld", this.currentItem.idTopic);
             if (this.currentItem.idAnalysis) {
-                params.set("name", "Analysis");
-                params.set("idAnalysis0", this.currentItem.idAnalysis);
+                params = params.set("name", "Analysis");
+                params = params.set("idAnalysis0", this.currentItem.idAnalysis);
             } else if (this.currentItem.idRequest) {
-                params.set("name", "Request");
-                params.set("idRequest0", this.currentItem.idRequest);
+                params = params.set("name", "Request");
+                params = params.set("idRequest0", this.currentItem.idRequest);
             } else if (this.currentItem.idDataTrack) {
-                params.set("name", "DataTrack");
-                params.set("idDataTrack0", this.currentItem.idDataTrack);
+                params = params.set("name", "DataTrack");
+                params = params.set("idDataTrack0", this.currentItem.idDataTrack);
             }
-            this.topicService.addItemToTopic(params).subscribe((response: Response) => {
+            this.topicService.addItemToTopic(params).subscribe((response: any) => {
                 this.showSpinner = false;
                 this.dialogRef.close(true);
                 this.topicService.refreshTopicsList_fromBackend();
+            }, (err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
         }
 
