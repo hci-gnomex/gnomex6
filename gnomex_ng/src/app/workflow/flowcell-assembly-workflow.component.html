@@ -1,0 +1,166 @@
+<div class="flex-container-col full-height full-width small-font overflow-auto">
+    <div class="flex-container-row align-center">
+        <div class="flex-container-row align-center medium-font">
+            <img [src]="'./assets/DNA_diag.png'" alt="" height="16" width="16">
+            <mat-label class="padded">
+                {{ label }}
+            </mat-label>
+        </div>
+        <div class="flex-grow">
+        </div>
+        <button mat-button
+                matTooltip="Refresh worklist"
+                (click)="refreshWorklist($event)">
+            <img [src]="'./assets/action_refresh.gif'" alt="" class="icon" >
+            Refresh
+        </button>
+    </div>
+    <as-split class="white-split-gutter" unit="percent">
+        <as-split-area size="50" minSize="20">
+            <div class="flex-container-col full-width full-height padded">
+                <div class="large-max-width overflow-auto">
+                    <div class="flex-container-row align-baseline">
+                        <mat-label>Pending Sequence Lanes</mat-label>
+                        <div class="flex-grow">
+                        </div>
+                        <mat-label>{{ filteredNumberOfSequenceLanes }} experiments</mat-label>
+                    </div>
+                    <div class="full-width padded-bottom overflow-auto">
+                        <div class="flex-container-row">
+                            <custom-combo-box placeholder="Protocol"
+                                              displayField="name"
+                                              class="full-width"
+                                              [customOptionClasses]="'small-font padded inline-block full-width'"
+                                              [formControl]="protocolFilterFc"
+                                              [options]="sequenceProtocolsList"
+                                              (optionSelected)="refreshRequestsGrid()">
+                            </custom-combo-box>
+                        </div>
+                        <div class="flex-container-row align-baseline spaced-children-margin">
+                            <mat-form-field class="request-number-width">
+                                <input matInput
+                                       placeholder="Exp #"
+                                       [(ngModel)]="searchText"
+                                       (input)="refreshRequestsGrid()">
+                            </mat-form-field>
+                            <custom-combo-box class="flex-grow"
+                                              placeholder="Lab"
+                                              valueField="idLab"
+                                              [customOptionClasses]="'small-font padded inline-block full-width'"
+                                              [displayField]="prefService.labDisplayField"
+                                              [formControl]="selectedLab"
+                                              [options]="labList"
+                                              (optionSelected)="refreshRequestsGrid()">
+                            </custom-combo-box>
+                            <custom-combo-box class="flex-grow"
+                                              placeholder="Experiment Type"
+                                              displayField="display"
+                                              valueField="value"
+                                              [customOptionClasses]="'small-font padded inline-block full-width'"
+                                              [formControl]="selectedExperimentType"
+                                              [options]="experimentTypesInList"
+                                              (optionSelected)="refreshRequestsGrid()">
+                            </custom-combo-box>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-grow">
+                    <div #oneEmWidth1 class="no-height single-em"></div>
+                    <ag-grid-angular class="ag-theme-fresh full-height full-width min-grid-size"
+                                     [enableColResize]="true"
+                                     [enableSorting]="true"
+                                     [rowClassRules]="workflowService.assmGridRowClassRules"
+                                     [rowSelection]="'multiple'"
+                                     [singleClickEdit]="true"
+                                     [stopEditingWhenGridLosesFocus]="true"
+                                     (cellValueChanged) = "onCellValueChanged_allRequestsGrid($event)"
+                                     (gridReady)="onAllRequestsGridReady($event)"
+                                     (gridSizeChanged)="onGridSizeChanged($event)"
+                                     (rowDataChanged)="onNotifyGridRowDataChanged($event)"
+                                     (rowSelected)="onRowSelected($event)">
+                    </ag-grid-angular>
+                </div>
+            </div>
+        </as-split-area>
+        <as-split-area size="*" minSize="20">
+            <form [formGroup]="allFG" class="flex-container-col full-height full-width padded">
+                <div class="flex-container-row italic assembly-message">
+                    <mat-label>Flow Cell to Assemble</mat-label>
+                </div>
+                <div class="full-width padded-bottom overflow-auto">
+                    <div class="flex-container-row align-baseline spaced-children-margin">
+                        <mat-form-field>
+                            <input matInput placeholder="Barcode" [formControl]="barcodeFC">
+                        </mat-form-field>
+                        <mat-form-field class="run-width">
+                            <input matInput placeholder="Run #" [formControl]="runFC">
+                            <mat-error *ngIf="runFC.hasError('pattern')"> field only accepts numbers </mat-error>
+                        </mat-form-field>
+                        <mat-form-field class="date-width">
+                            <input matInput
+                                   placeholder="Create Date"
+                                   [formControl]="createDateFC"
+                                   [matDatepicker]="createDatePicker">
+                            <mat-datepicker-toggle matSuffix [for]="createDatePicker"></mat-datepicker-toggle>
+                            <mat-datepicker #createDatePicker disabled="false"></mat-datepicker>
+                        </mat-form-field>
+                        <mat-radio-group [formControl]="sideFC" class="flex-container-row children-margin-right" >
+                            <mat-radio-button value="A">Side A</mat-radio-button>
+                            <mat-radio-button value="B">Side B</mat-radio-button>
+                        </mat-radio-group>
+
+                    </div>
+                    <div class="flex-container-row spaced-children-margin">
+                        <div>
+                            <custom-combo-box placeholder="Instrument"
+                                              displayField="instrument"
+                                              [customOptionClasses]="'small-font padded inline-block full-width'"
+                                              [formControl]="instrumentFC"
+                                              [options]="instrumentList">
+                            </custom-combo-box>
+                        </div>
+                        <div class="protocol-width">
+                            <custom-combo-box placeholder="Protocol"
+                                              displayField="name"
+                                              [customOptionClasses]="'small-font padded inline-block full-width'"
+                                              [formControl]="protocolFC"
+                                              [options]="filteredProtocolsList">
+                            </custom-combo-box>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-grow">
+                    <div #oneEmWidth2 class="no-height single-em"></div>
+                    <ag-grid-angular class="ag-theme-fresh full-height full-width min-grid-size"
+                                     [enableColResize]="true"
+                                     [enableSorting]="true"
+                                     [rowClassRules]="workflowService.assmGridRowClassRules"
+                                     [singleClickEdit]="true"
+                                     [stopEditingWhenGridLosesFocus]="true"
+                                     (gridReady)="onAssemblyGridReady($event)"
+                                     (gridSizeChanged)="onGridSizeChanged($event)"
+                                     (rowDataChanged)="onNotifyGridRowDataChanged($event)"
+                                     (cellValueChanged) = "onCellValueChanged_assemblyGrid($event)">
+                    </ag-grid-angular>
+                </div>
+            </form>
+        </as-split-area>
+    </as-split>
+    <div class="flex-container-row align-center">
+        <button mat-button
+                matTooltip="Delete selected sequence lanes"
+                [disabled]="selectedSeqlanes.length===0"
+                (click)="deleteWorkItem($event)">
+            <img class="icon" [src]="'./assets/delete.png'" alt="">
+            Delete
+        </button>
+        <div class="flex-grow">
+            <save-footer [dirty]="allFG.dirty"
+                         [disableSave]="!allFG.valid||assmItemList.length===0"
+                         [showSpinner]="showSpinner"
+                         (saveClicked)="save()">
+            </save-footer>
+        </div>
+    </div>
+</div>
+

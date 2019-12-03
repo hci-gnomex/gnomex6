@@ -11,8 +11,7 @@ import {of} from "rxjs";
 @Injectable()
 export class ExperimentResolverService implements Resolve<any> {
     constructor(private experimentsService:ExperimentsService,
-                private router:Router,
-                private navService:NavigationService) {}
+                private router:Router) {}
 
     resolve(route:ActivatedRouteSnapshot) { // resolve is good with asyncrous data, it waits to load before display component
         let segGroup  = (<UrlTree>this.router.parseUrl(this.router.url)).root.children['modal'];

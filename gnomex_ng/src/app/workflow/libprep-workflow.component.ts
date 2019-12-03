@@ -16,19 +16,7 @@ import {first} from "rxjs/operators";
 @Component({
     selector: 'libprep-workflow',
     templateUrl: 'libprep-workflow.html',
-    styles: [`
-        
-        .request-number-width {
-            min-width: 4em;
-            width: fit-content;
-            max-width: 6em;
-        }
-        
-        .experiment-type-width {
-            min-width: 15em;
-            width: fit-content;
-            max-width: 15em;
-        }
+    styles: [`        
         
         .grid-min-height {
             min-height: 8em;
@@ -67,7 +55,7 @@ export class LibprepWorkflowComponent {
     public  dirty: boolean = false;
 
     public showSpinner: boolean = false;
-    private selectedRequestNumber: any;
+    public selectedRequestNumber: any;
     private gridApi: GridApi;
     private barCodes: any[] = [];
     private coreAdmins: any[] = [];
@@ -268,10 +256,10 @@ export class LibprepWorkflowComponent {
                 this.requestIds.unshift(this.emptyRequest);
 
                 this.dialogsService.stopAllSpinnerDialogs();
-            }, (err:IGnomexErrorResponse) => {
+            }, (err: IGnomexErrorResponse) => {
                 this.dialogsService.stopAllSpinnerDialogs();
             });
-        }, (err:IGnomexErrorResponse) => {
+        }, (err: IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
         });
     }
@@ -294,6 +282,9 @@ export class LibprepWorkflowComponent {
 
     public selectRequestOption() {
         this.workingWorkItemList = this.filterWorkItems();
+
+        this.gridApi.setRowData(this.workingWorkItemList);
+        this.gridApi.sizeColumnsToFit();
     }
 
     public selectExperimentType(): void {
@@ -327,7 +318,7 @@ export class LibprepWorkflowComponent {
         }
         sortedDirtyItems = dirtyItems.sort((item1, item2) => {
             let n1: string = item1.sampleNumber;
-            let n2:String = item2.sampleNumber;
+            let n2: String = item2.sampleNumber;
 
             let parts: any[] = n1.split("X");
             let num1: string = parts[0];
@@ -351,7 +342,7 @@ export class LibprepWorkflowComponent {
 
             let comp: number = LibprepWorkflowComponent.stringCompare(firstChar1, firstChar2);
 
-            if (comp == 0) {
+            if (comp === 0) {
                 let number1: number = Number(num1);
                 let number2: number = Number(num2);
                 if (number1 > number2) {
@@ -361,11 +352,11 @@ export class LibprepWorkflowComponent {
                 }
             }
 
-            if (comp == 0) {
+            if (comp === 0) {
                 let remNum1: number = Number(rem1);
                 let remNum2: number = Number(rem2);
                 if (remNum1 > remNum2) {
-                    comp = 1
+                    comp = 1;
                 } else if (remNum2 > remNum1) {
                     comp = -1;
                 }
@@ -400,7 +391,7 @@ export class LibprepWorkflowComponent {
                         areUnique = false;
                         break;
                     }
-                    if (idRequest == workItem.idRequest && multiplexGroupNumber != workItem.multiplexGroupNumber) {
+                    if (idRequest === workItem.idRequest && multiplexGroupNumber !== workItem.multiplexGroupNumber) {
                         barcodes = [];
                         multiplexGroupNumber = workItem.multiplexGroupNumber;
                         this.addBarcodes(workItem, barcodes);
@@ -412,7 +403,7 @@ export class LibprepWorkflowComponent {
         if (!this.checkBasePairs(barcodes)) {
             areUnique = false;
         }
-        if (areUnique == false) {
+        if (!areUnique) {
             this.dialogsService.confirm("Request " + requestNumber +
                 " has samples in the same multiplex group whose barcodes do not differ by at least 3 base pairs."
                 + "<br> Continue?").subscribe(answer => {
@@ -441,7 +432,7 @@ export class LibprepWorkflowComponent {
     private static atLeastThreeUnique(sequenceOne: any[], sequenceTwo: any[]): boolean {
         let uniqueBaseCount: number = 0;
         for (var i: number = 0; i < sequenceOne.length; i++) {
-            if (sequenceOne[i] != sequenceTwo[i]) {
+            if (sequenceOne[i] !== sequenceTwo[i]) {
                 uniqueBaseCount++;
             }
         }
@@ -449,7 +440,7 @@ export class LibprepWorkflowComponent {
         return (uniqueBaseCount >= 3);
     }
 
-    private static stringCompare(s1: string, s2:string): number {
+    private static stringCompare(s1: string, s2: string): number {
         if (s1 > s2) {
             return 1;
         } else if (s2 > s1) {
@@ -476,7 +467,7 @@ export class LibprepWorkflowComponent {
 
             let workItems: any[] = [];
             for(let value of Array.from( this.changedRowMap.values()) ) {
-                if(value.idLibPrepPerformedBy === '' && value.seqPrepStatus != '' && value.seqPrepStatus != "Terminated") {
+                if(value.idLibPrepPerformedBy === '' && value.seqPrepStatus !== '' && value.seqPrepStatus !== "Terminated") {
 
                     this.dialogsService.alert("Make sure all samples have a name selected in the 'Performed By' column before changing the status.\"", null, DialogType.VALIDATION);
                     return;
@@ -495,7 +486,7 @@ export class LibprepWorkflowComponent {
                 this.dirty = false;
                 this.selectedRequestNumber = "";
                 this.initialize();
-            },(err:IGnomexErrorResponse) => {
+            }, (err: IGnomexErrorResponse) => {
                 this.showSpinner = false;
             });
         });

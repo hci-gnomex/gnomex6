@@ -71,6 +71,7 @@ export class NewTopicComponent extends BaseGenericContainerDialog {
                         return user.idAppUser === this.createSecurityAdvisorService.idAppUser;
                     });
                 }
+            }, (err: IGnomexErrorResponse) => {
             });
         }
     }

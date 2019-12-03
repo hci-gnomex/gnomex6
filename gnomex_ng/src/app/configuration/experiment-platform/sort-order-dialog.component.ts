@@ -9,6 +9,7 @@ import {first} from "rxjs/operators";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../../services/constants.service";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     template: `
@@ -128,17 +129,18 @@ export class SortOrderDialogComponent extends BaseGenericContainerDialog impleme
 
     }
 
-    ngOnInit(){
-        this.expPlatformService.getExperimentPlatformSortOrderList(new HttpParams().set('idCoreFacility',this.idCoreFacility))
+    ngOnInit() {
+        this.expPlatformService.getExperimentPlatformSortOrderList(new HttpParams().set("idCoreFacility", this.idCoreFacility))
             .subscribe(resp => {
-                if(resp && !resp.message ){
-                    this.sortOrderList = Array.isArray(resp)? resp : [resp];
+                if(resp && !resp.message ) {
+                    this.sortOrderList = Array.isArray(resp) ? resp : [resp];
                     this.rowData = this.sortOrderList;
                     this.rowData.sort(this.sortFn);
 
-                }else if(resp && resp.message) {
+                } else if(resp && resp.message) {
                     this.dialogService.error(resp.message);
                 }
+            }, (err: IGnomexErrorResponse) => {
             });
 
         this.dirty = () => {return this.isDirty; };
@@ -161,23 +163,24 @@ export class SortOrderDialogComponent extends BaseGenericContainerDialog impleme
         this.isDirty = true;
     }
 
-    refresh(){
+    refresh() {
         this.dialogService.confirm("Refreshing will discard your changes.  Do want to discard your changes?", "Discard Changes Confirm")
-            .subscribe((answer:any) =>{
-                if(answer){
-                    this.expPlatformService.getExperimentPlatformSortOrderList(new HttpParams().set('idCoreFacility',this.idCoreFacility)).
-                        pipe(first()).subscribe(resp => {
-                            if(resp && !resp.message ){
-                                this.sortOrderList = Array.isArray(resp)? resp : [resp];
+            .subscribe((answer: any) => {
+                if(answer) {
+                    this.expPlatformService.getExperimentPlatformSortOrderList(new HttpParams().set("idCoreFacility", this.idCoreFacility))
+                        .pipe(first()).subscribe(resp => {
+                            if(resp && !resp.message ) {
+                                this.sortOrderList = Array.isArray(resp) ? resp : [resp];
                                 this.rowData = this.sortOrderList;
                                 this.rowData.sort(this.sortFn);
                                 this.gridApi.setRowData(this.rowData);
                                 this.isDirty = false;
 
-                            }else if(resp && resp.message) {
+                            } else if(resp && resp.message) {
                                 this.dialogService.error(resp.message);
                             }
-                        });
+                        }, (err: IGnomexErrorResponse) => {
+                    });
                 }
             });
     }
@@ -186,20 +189,22 @@ export class SortOrderDialogComponent extends BaseGenericContainerDialog impleme
 
     save() {
         this.showSpinner = true;
-        let reqCategoriesJSONStr:string = JSON.stringify( this.rowData);
+        let reqCategoriesJSONStr: string = JSON.stringify( this.rowData);
 
-        let params:HttpParams = new HttpParams()
-            .set('requestCategoriesJSONString', reqCategoriesJSONStr)
-            .set('noJSONToXMLConversionNeeded',"Y");
+        let params: HttpParams = new HttpParams()
+            .set("requestCategoriesJSONString", reqCategoriesJSONStr)
+            .set("noJSONToXMLConversionNeeded", "Y");
         this.expPlatformService.saveExperimentPlatformSortOrderList(params)
-            .subscribe(resp =>{
-                if(resp && resp.result && resp.result === "SUCCESS"){
-                    this.showSpinner = false;
+            .subscribe((resp: any) => {
+                this.showSpinner = false;
+                if(resp && resp.result && resp.result === "SUCCESS") {
                     this.isDirty = false;
                     this.expPlatformService.getExperimentPlatformList_fromBackend();
-                }else if(resp && resp.message){
+                } else if(resp && resp.message) {
                     this.dialogService.error(resp.message);
                 }
+            }, (err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
     }
 

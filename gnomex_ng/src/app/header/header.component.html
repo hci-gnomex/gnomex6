@@ -44,7 +44,11 @@
                 </span>
                 <!-- Leaf node buttons here -->
                 <span *ngIf="!item.children || item.children.length === 0">
-                    <button [ngClass]="item.class" mat-button [routerLink]="item.route">
+                    <button *ngIf="item.callback" [ngClass]="item.class" mat-button (click)="item.callback(item?.params)">
+                        <img class="icon" *ngIf="item?.iconName" [src]="item.iconName" alt="">
+                        {{ item.displayName }}
+                    </button>
+                    <button *ngIf="!item.callback" [ngClass]="item.class" mat-button [routerLink]="item.route">
                         <img class="icon" *ngIf="item?.iconName" [src]="item.iconName" alt="">
                         {{ item.displayName }}
                     </button>

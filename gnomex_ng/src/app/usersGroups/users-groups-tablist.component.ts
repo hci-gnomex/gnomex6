@@ -210,18 +210,6 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     private selectedUser: any = "";
     private selectedGroup: any = "";
     private isActive: boolean;
-    public passwordFC: FormControl;
-    public passwordConfirmFC: FormControl;
-    public unidFC: FormControl;
-    public usernameFC: FormControl;
-    public usertypeFC: FormControl;
-    public emailFC: FormControl;
-    public groupEmailFC: FormControl;
-    public permissionLevelFC: FormControl;
-    public pricingFC: FormControl;
-    public phoneFC: FormControl;
-    public groupPhoneFC: FormControl;
-    public isActiveFC: FormControl;
     public codeUserPermissionKind: string;
     public coreFacilitiesICanSubmitTo: any[];
     public coreFacilitiesIManage: any[];
@@ -237,6 +225,20 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     public groupFormValid: boolean = false;
     private userLabel: string;
     private groupLabel: string;
+
+    public passwordFC: FormControl;
+    public passwordConfirmFC: FormControl;
+    public unidFC: FormControl;
+    public usernameFC: FormControl;
+    public usertypeFC: FormControl;
+    public emailFC: FormControl;
+    public groupEmailFC: FormControl;
+    public permissionLevelFC: FormControl;
+    public pricingFC: FormControl;
+    public phoneFC: FormControl;
+    public groupPhoneFC: FormControl;
+    public isActiveFC: FormControl;
+
 
     constructor(public secAdvisor: CreateSecurityAdvisorService,
                 public passwordUtilService: PasswordUtilService,
@@ -264,6 +266,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 headerName: "",
                 editable: false,
                 field: "email",
+                hide: true
             }
         ];
         this.groupsColumnDefs = [
@@ -368,12 +371,14 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         this.selectedUser = null;
         this.rowData = [];
         if (this.secAdvisor.isAdmin || this.secAdvisor.isSuperAdmin || this.secAdvisor.isBillingAdmin) {
-            this.getAppUserListSubscription = this.appUserListService.getFullAppUserList().subscribe((response: any[]) => {
-                this.userLabel = response.length + " users";
+            this.getAppUserListSubscription = this.appUserListService.getFullAppUserList().subscribe((response: any) => {
+                let res: any[] = [];
+                res = UtilService.getJsonArray(response, response.AppUser);
+                this.userLabel = res.length + " users";
                 this.createUserForm();
                 this.userForm.markAsPristine();
                 this.touchUserFields();
-                this.rowData = response;
+                this.rowData = res;
 
                 if (idAppUserToSelect) {
                     setTimeout(() => {
@@ -385,20 +390,20 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                         });
                     });
                 }
-            });
+            }, (err: IGnomexErrorResponse) => {});
         }
     }
 
-    public buildGroups(params: URLSearchParams) {
+    public buildGroups(params: HttpParams) {
         this.labListService.getLabListWithParams(params).subscribe((response: any) => {
             this.groupsData = response ? UtilService.getJsonArray(response, response.Lab) : [];
             this.groupLabel = this.groupsData.length + " groups";
             this.setPricing();
+        }, (err: IGnomexErrorResponse) => {
         });
-
     }
 
-    touchGroupFields() {
+    private touchGroupFields() {
         for (let field in this.groupForm.controls) {
             const control = this.groupForm.get(field);
             if (control) {
@@ -409,7 +414,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         }
     }
 
-    touchUserFields() {
+    private touchUserFields(): void {
         for (let field in this.userForm.controls) {
             const control = this.userForm.get(field);
             if (control) {
@@ -420,24 +425,22 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         }
     }
 
-    public buildLabList(idLabToSelect?: string) {
-        this.selectedGroup = null;
+    private buildLabList(idLabToSelect?: string): void {
 
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idCoreFacility", this.idCoreFacility);
-        params.set("idInstitution", "");
-        params.set("isExternal", "");
-        params.set("listKind", "UnboundedLabList");
+        let params: HttpParams = new HttpParams()
+            .set("idCoreFacility", this.idCoreFacility ? this.idCoreFacility : "")
+            .set("idInstitution", "")
+            .set("isExternal", "")
+            .set("listKind", "UnboundedLabList");
 
         this.getGroupListSubscription = this.labListService.getLabListWithParams(params).subscribe((response: any[]) => {
             this.buildManagedLabList(response);
+
             if (this.secAdvisor.isSuperAdmin || this.secAdvisor.isAdmin || this.secAdvisor.isBillingAdmin) {
                 this.groupsData = this.myManagingLabs;
             } else {
                 this.groupsData = this.secAdvisor.groupsToManage;
             }
-            this.isGroupsTab = false;
-            this.isUserTab = true;
 
             this.groupLabel = this.groupsData.length + " lab groups";
             this.createGroupForm();
@@ -453,11 +456,11 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                     });
                 });
             }
+        }, (err: IGnomexErrorResponse) => {
         });
-
     }
 
-    buildManagedLabList(labs: any[]) {
+    private buildManagedLabList(labs: any[]): void {
         this.myCoreFacilitiesIManage = this.secAdvisor.coreFacilitiesICanManage;
         if (this.myCoreFacilitiesIManage.length > 0) {
             if (!this.secAdvisor.isSuperAdmin) {
@@ -482,10 +485,9 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         });
     }
 
-    public onSplitDragEnd(event) {
+    public onSplitDragEnd(event: any): void {
         this.gridOptions.api.sizeColumnsToFit();
         this.groupsGridOptions.api.sizeColumnsToFit();
-
     }
 
     public onGridSizeChanged(event: any): void {
@@ -511,52 +513,50 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 return null;
             }
         }
+
         return {'validatePasswordConfirm': {value: c.value}};
     }
 
-    setUserValues() {
+    private setUserValues(): void {
         for (let core of this.coreFacilitiesICanSubmitTo) {
             this.userForm.controls[core.display].patchValue(core.isSelected, {onlySelf: true, emitEvent: true});
-
         }
         for (let core of this.coreFacilitiesIManage) {
             this.userForm.controls[core.display + 'm'].patchValue(core.isSelected, {onlySelf: true, emitEvent: true});
-
         }
-        this.userForm
-            .patchValue({
-                firstName: this.selectedUser.firstName,
-                lastName: this.selectedUser.lastName,
-                phone: this.selectedUser.phone,
-                email: this.selectedUser.email,
-                isActive: this.isActive,
-                ucscUrl: this.selectedUser.ucscUrl,
-                department: this.selectedUser.department,
-                institute: this.selectedUser.institute,
-                uNid: this.selectedUser.uNID,
-                permissionLevel: this.codeUserPermissionKind,
-                userName: this.selectedUser.DUMMY_USERNAME,
-                password: this.DUMMY_PASSWORD,
-                confirm: this.DUMMY_PASSWORD
-            });
+
+        this.userForm.patchValue({
+            firstName: this.selectedUser.firstName,
+            lastName: this.selectedUser.lastName,
+            phone: this.selectedUser.phone,
+            email: this.selectedUser.email,
+            isActive: this.isActive,
+            ucscUrl: this.selectedUser.ucscUrl,
+            department: this.selectedUser.department,
+            institute: this.selectedUser.institute,
+            uNid: this.selectedUser.uNID,
+            permissionLevel: this.codeUserPermissionKind,
+            userName: this.selectedUser.DUMMY_USERNAME,
+            password: this.DUMMY_PASSWORD,
+            confirm: this.DUMMY_PASSWORD
+        });
     }
 
-    setGroupValues() {
+    private setGroupValues(): void {
         for (let core of this.myCoreFacilities) {
             this.groupForm.controls[core.display].patchValue(core.isSelected, {onlySelf: true, emitEvent: true});
-
         }
-        this.groupForm
-            .patchValue({
-                firstName: this.selectedGroup.firstName,
-                lastName: this.selectedGroup.lastName,
-                pricing: this.selectedGroup.pricing,
-                contactPhone: this.selectedGroup.contactPhone,
-                contactEmail: this.selectedGroup.contactEmail
-            });
+
+        this.groupForm.patchValue({
+            firstName: this.selectedGroup.firstName,
+            lastName: this.selectedGroup.lastName,
+            pricing: this.selectedGroup.pricing,
+            contactPhone: this.selectedGroup.contactPhone,
+            contactEmail: this.selectedGroup.contactEmail
+        });
     }
 
-    createUserForm() {
+    private createUserForm(): void {
         this.passwordFC = new FormControl("", UsersGroupsTablistComponent.validatePassword);
         this.passwordConfirmFC = new FormControl("", UsersGroupsTablistComponent.validatePasswordConfirm);
         this.unidFC = new FormControl("", [Validators.required, Validators.pattern("^u[0-9]{7}$")]);
@@ -568,12 +568,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         this.phoneFC = new FormControl("");
 
         this.userForm = this.formBuilder.group({
-            lastName: ['', [
-                Validators.required
-            ]],
-            firstName: ['', [
-                Validators.required
-            ]],
+            lastName:  ['', [ Validators.required ]],
+            firstName: ['', [ Validators.required ]],
             email: this.emailFC,
             phone: this.phoneFC,
             isActive: this.isActiveFC,
@@ -591,7 +587,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         this.passwordConfirmFC.setParent(this.userForm);
     }
 
-    createGroupForm() {
+    private createGroupForm(): void {
         this.groupEmailFC = new FormControl("", [Validators.required, Validators.pattern("^((\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*)\\s*[,]{0,1}\\s*)+$")]);
         this.pricingFC = new FormControl("", Validators.required);
         this.groupPhoneFC = new FormControl("");
@@ -602,12 +598,12 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             contactEmail: this.groupEmailFC,
             contactPhone: this.groupPhoneFC,
             pricing: this.pricingFC
-        }, { validator: this.atLeastOneNameRequired});
+        }, { validator: UsersGroupsTablistComponent.atLeastOneNameRequired});
     }
 
-    atLeastOneNameRequired(group : FormGroup) {
+    public static atLeastOneNameRequired(group : FormGroup): void {
         if (group) {
-            if(group.controls['lastName'].value || group.controls['firstName'].value) {
+            if (group.controls['lastName'].value || group.controls['firstName'].value) {
 
                 group.controls['lastName'].setErrors(null);
                 group.controls['firstName'].setErrors(null);
@@ -618,26 +614,21 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         }
     }
 
-    search() {
-
+    public search(): void {
         this.gridOptions.api.setQuickFilter(this.searchText);
     }
 
-    searchGroups(event) {
-
+    public searchGroups(event) {
         this.groupsGridOptions.api.setQuickFilter(this.searchText);
     }
 
-    /**
-     *
-     */
-    onSelectionChanged(event?: any) {
+    public onSelectionChanged(event?: any) {
         this.dialogsService.startDefaultSpinnerDialog();
 
-        let params: URLSearchParams = new URLSearchParams();
         let selectedRows = this.gridOptions.api.getSelectedRows();
         this.idAppUser = selectedRows[0].idAppUser;
-        params.set("idAppUser", this.idAppUser);
+        let params: HttpParams = new HttpParams()
+            .set("idAppUser", this.idAppUser);
         this.getAppUserListSubscription = this.appUserListService.getAppUser(params).subscribe((response: any) => {
             this.selectedUser = response.AppUser;
             if (this.selectedUser.isActive === 'N') {
@@ -649,6 +640,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             this.appUser = response;
             this.selectSubmissionCheckbox(response);
             this.setUserValues();
+
             if (response.AppUser.isExternalUser === 'N') {
                 this.resetUserType(false);
                 this.usertypeFC.setValue(this.USER_TYPE_UNIVERSITY);
@@ -660,6 +652,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 this.passwordFC.setValue(this.DUMMY_PASSWORD);
                 this.passwordConfirmFC.setValue(this.DUMMY_PASSWORD);
             }
+
             if (!this.secAdvisor.isArray(response.AppUser.labs)) {
                 this.labs = [response.AppUser.labs.Lab];
             } else {
@@ -677,18 +670,21 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             } else {
                 this.managingLabs = response.AppUser.managingLabs;
             }
+
             this.userForm.markAsPristine();
             this.touchUserFields();
+
             if (this.secAdvisor.isAdmin && !this.secAdvisor.isSuperAdmin && this.selectedUser.codeUserPermissionKind === 'SUPER') {
                 this.userForm.disable();
             }
 
             this.dialogsService.stopAllSpinnerDialogs();
+        }, (err: IGnomexErrorResponse) => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
-
     }
 
-    onGroupsSelectionChanged(event?: any) {
+    public onGroupsSelectionChanged(event?: any) {
         this.dialogsService.startDefaultSpinnerDialog();
 
         let params: HttpParams = new HttpParams();
@@ -719,13 +715,9 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         this.touchGroupFields();
     }
 
-
-    /**
-     *
-     * @param permissionKind
-     */
-    selectPermissionLevel(permissionKind: any) {
+    private selectPermissionLevel(permissionKind: any) {
         this.codeUserPermissionKind = this.selectedUser.codeUserPermissionKind;
+
         if (this.selectedUser.isActive === 'Y') {
             this.isActive = true;
         } else {
@@ -783,11 +775,11 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         }
     }
 
-    public onIsActiveChange(event) {
+    public onIsActiveChange(event: any): void {
         this.isActiveChanged = true;
     }
 
-    onTabChange(event) {
+    public onTabChange(event: any): void {
         if (event.tab.textLabel === "Groups") {
             this.isUserTab = false;
             this.isGroupsTab = true;
@@ -809,10 +801,11 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         }
     }
 
-    selectSubmissionCheckbox(getAppUser: any) {
+    private selectSubmissionCheckbox(getAppUser: any) {
         // Have to build checkboxes on the fly
         this.coreFacilitiesICanSubmitTo = [];
         this.coreFacilitiesIManage = [];
+
         if (this.codeUserPermissionKind === 'LAB' || this.codeUserPermissionKind === 'BILLING' || this.codeUserPermissionKind == 'ADMIN') {
             if (!this.secAdvisor.isArray(getAppUser.coreFacilitiesICanSubmitTo)) {
                 getAppUser.coreFacilitiesICanSubmitTo = [getAppUser.coreFacilitiesICanSubmitTo.coreFacility];
@@ -821,6 +814,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 return core.allowed === 'Y';
             })
         }
+
         if (this.secAdvisor.isSuperAdmin) {
             this.coreFacilitiesIManage = Array.isArray(getAppUser.managingCoreFacilities) ? getAppUser.managingCoreFacilities : [getAppUser.managingCoreFacilities.coreFacility];
             for (let core of this.coreFacilitiesIManage) {
@@ -834,30 +828,33 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 control = new FormControl({value: core.display + 'm', disabled: false});
                 this.userForm.addControl(core.display + 'm', control);
             }
-
         } else if (this.codeUserPermissionKind === 'BILLING' || this.codeUserPermissionKind === 'ADMIN') {
             this.coreFacilitiesIManage = Array.isArray(getAppUser.managingCoreFacilities) ? getAppUser.managingCoreFacilities : [getAppUser.managingCoreFacilities.coreFacility];
+
             for (let core of this.coreFacilitiesIManage) {
                 if (core.selected ==='Y') {
                     core.isSelected = true;
                 } else {
                     core.isSelected = false;
                 }
+
                 let control: FormControl;
                 core.mDisplay = core.display + 'm';
+
                 if (core.value === this.secAdvisor.coreFacilitiesICanManage[0].value) {
                     control = new FormControl({value: core.display + 'm', disabled: false});
                 } else {
                     control = new FormControl({value: core.display + 'm', disabled: true});
                 }
+
                 this.userForm.addControl(core.display + 'm', control);
             }
-
         }
 
         for (let core of this.coreFacilitiesICanSubmitTo) {
             let control: FormControl = new FormControl(core.display);
             this.userForm.addControl(core.display, control);
+
             if (core.selected ==='Y') {
                 core.isSelected = true;
             } else {
@@ -866,7 +863,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         }
     }
 
-    buildGroupCoreControls(): any[] {
+    private buildGroupCoreControls(): any[] {
         let myCoreFacilities: any[] = [];
 
         if (!this.secAdvisor.isArray(this.selectedGroup.coreFacilities)) {
@@ -875,15 +872,14 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
 
         let myCores = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.CoreFacility");
 
-        myCores = myCores.filter((value) => {
-            return !value.isActive || value.isActive !== 'N';
-        });
+        myCores = myCores.filter((value) => { return !value.isActive || value.isActive !== 'N'; });
 
         myCores = myCores.sort(TabSeqSetupViewComponent.sortBySortOrderThenDisplay);
 
         for (let myCore of myCores) {
             let control: FormControl = new FormControl(myCore.display);
             this.groupForm.addControl(myCore.display, control);
+
             if (this.secAdvisor.isSuperAdmin) {
                 control.enable();
             } else {
@@ -893,6 +889,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                     control.disable();
                 }
             }
+
             myCore.isSelected = false;
             myCoreFacilities.push(myCore);
         }
@@ -905,25 +902,28 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 }
             }
         }
+
         return myCoreFacilities;
     }
 
-    newUser() {
+    public newUser(): void {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.height = '20em';
         configuration.width  = '40em';
 
-        this.dialogsService.genericDialogContainer(NewUserDialogComponent, "Add User", this.constantsService.ICON_USER, configuration,
-            {actions: [
-                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
-                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
-                ]}).subscribe((result: any) => {
+        let actions: any = {
+            actions: [
+                {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+            ]
+        };
+
+        this.dialogsService.genericDialogContainer(NewUserDialogComponent, "Add User", this.constantsService.ICON_USER, configuration, actions).subscribe((result: any) => {
             this.buildUsers(result);
         });
-
     }
 
-    deleteUser() {
+    public deleteUser(): void {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.height = '11em';
         configuration.width  = '24em';
@@ -933,44 +933,29 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             userName: this.selectedUser[this.prefService.userDisplayField]
         };
 
-        this.dialogsService.genericDialogContainer(DeleteUserDialogComponent, "Delete User", this.constantsService.ICON_USER, configuration,
-            {actions: [
-                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "delete"},
-                    {type: ActionType.SECONDARY, name: "No", internalAction: "onClose"}
-                ]}).subscribe((result: any) => {
+        let actions: any = {
+            actions: [
+                {type: ActionType.PRIMARY, name: "Yes", internalAction: "delete"},
+                {type: ActionType.SECONDARY, name: "No", internalAction: "onClose"}
+            ]
+        };
+
+        this.dialogsService.genericDialogContainer(DeleteUserDialogComponent, "Delete User", this.constantsService.ICON_USER, configuration, actions).subscribe((result: any) => {
             if(result) {
                 this.buildUsers();
             }
         });
-
     }
 
-    onGridReady(params) {
-        this.gridOptions.columnApi.setColumnVisible('email', false);
-        let api = params.api;
-        let filter = api.getFilterInstance(this.prefService.userDisplayField);
-        this.gridOptions.api.sizeColumnsToFit();
-
+    public onGridReady(event: any) {
+        if (event && event.api) {
+            event.api.sizeColumnsToFit();
+        }
     }
 
-    onLabGridReady(params) {
-        this.labGridOptions.api.sizeColumnsToFit();
-
-    }
-    onCollGridReady(params) {
-        this.collGridOptions.api.sizeColumnsToFit();
-
-    }
-    onManGridReady(params) {
-        this.manGridOptions.api.sizeColumnsToFit();
-
-    }
-    onGroupsGridReady(params) {
-        this.groupsGridOptions.api.sizeColumnsToFit();
-    }
-
-    setCoreFacilities(): number {
+    private setCoreFacilities(): number {
         let coresIManage: number = 0;
+
         for (let field in this.userForm.controls) { // 'field' is a string
             let control = this.userForm.get(field);
             for (let core of this.coreFacilitiesICanSubmitTo) {
@@ -994,10 +979,11 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 }
             }
         }
+
         return coresIManage;
     }
 
-    buildLabsMessage (): string {
+    private buildLabsMessage (): string {
         let message: string = "";
         for (let lab of this.labs) {
             message = message.concat(lab[this.prefService.labDisplayField] + " as a member");
@@ -1015,7 +1001,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         return message;
     }
 
-    save() {
+    private save(): void {
         let stringifiedSF: string = "";
         let stringifiedMF: string = "";
         this.showSpinner = true;
@@ -1066,13 +1052,13 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             this.buildUsers(response.idAppUser);
 
             this.showSpinner = false;
-        }, (error:IGnomexErrorResponse) =>{
-            this.userForm.markAsPristine()
+        }, (error: IGnomexErrorResponse) =>{
+            this.userForm.markAsPristine();
             this.showSpinner = false;
         });
     }
 
-    saveUser() {
+    public saveUser(): void {
         let coresIManage = this.setCoreFacilities();
 
         if (this.codeUserPermissionKind === 'ADMIN' && coresIManage === 0) {
@@ -1103,7 +1089,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         }
     }
 
-    saveLab(): void {
+    public saveLab(): void {
 
         let warningMessages: string[] = [];
 
@@ -1139,7 +1125,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             }
         }
         for (let account of poAccounts) {
-            if (!this.areChartfieldFieldsBlank(account)) {
+            if (!UsersGroupsTablistComponent.areChartfieldFieldsBlank(account)) {
                 warningMessages.push('Will clear chartfield account fields from new PO account "' + account.accountName + '"');
             } if (!this.areCreditCardFieldsBlank(account)) {
                 warningMessages.push('Will clear credit card account fields from new PO account "' + account.accountName + '"');
@@ -1148,7 +1134,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         for (let account of creditCardAccounts) {
             if (!this.arePoFieldsBlank(account)) {
                 warningMessages.push('Will clear PO account fields from new credit card account "' + account.accountName + '"');
-            } if (!this.areChartfieldFieldsBlank(account)) {
+            } if (!UsersGroupsTablistComponent.areChartfieldFieldsBlank(account)) {
                 warningMessages.push('Will clear chartfield account fields from new credit card account "' + account.accountName + '"');
             }
         }
@@ -1169,11 +1155,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         }
     }
 
-    testFunction(): void {
-        console.log('Save this lab!');
-    }
-
-    areChartfieldFieldsBlank(billingAccount: any): boolean {
+    private static areChartfieldFieldsBlank(billingAccount: any): boolean {
         return !!billingAccount
             && !billingAccount.accountNumberBus
             && !billingAccount.accountNumberOrg
@@ -1391,6 +1373,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             this.showSpinner = false;
         }, (err: IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
+            this.showSpinner = false;
         });
     }
 
@@ -1398,42 +1381,37 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         let appUsers: any[] = [];
 
         for (let user of users) {
-            let appUser: any;
-
-            appUser = {"AppUser": user};
-            appUsers.push(appUser);
+            appUsers.push({"AppUser": user});
         }
+
         return appUsers;
     }
 
     searchCoreFacility(event) {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idCoreFacility", event ? event : "");
-        params.set("idInstitution", "");
-        params.set("isExternal", "");
-        params.set("listKind", "UnboundedLabList");
-
+        let params: HttpParams = new HttpParams()
+            .set("idCoreFacility", event ? event : "")
+            .set("idInstitution", "")
+            .set("isExternal", "")
+            .set("listKind", "UnboundedLabList");
 
         this.buildGroups(params);
     }
 
     onExternalGroupChange(event) {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idCoreFacility", "");
-        params.set("idInstitution", "");
+        let params: HttpParams = new HttpParams()
+            .set("idCoreFacility", "")
+            .set("idInstitution", "");
         if (event.checked) {
-            params.set("isExternal", 'Y');
+            params = params.set("isExternal", "Y");
         } else {
-            params.set("isExternal", 'N');
+            params = params.set("isExternal", "N");
         }
-        params.set("listKind", "UnboundedLabList");
-
+        params = params.set("listKind", "UnboundedLabList");
 
         this.buildGroups(params);
-
     }
 
-    buildInstitutions() {
+    private buildInstitutions() {
         this.institutions = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.INSTITUTION).sort(this.prefService.createDisplaySortFunction("display"));
     }
 
@@ -1455,6 +1433,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 this.institutionToRemove = null;
                 this.institutionsChanged = true;
             }
+
             this.institutionToAddControl.setValue("");
         }
     }
@@ -1489,31 +1468,33 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     }
 
     searchInstitution(event) {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idCoreFacility", "");
-        params.set("idInstitution", event ? event : "");
-        params.set("isExternal", "");
-        params.set("listKind", "UnboundedLabList");
-
+        let params: HttpParams = new HttpParams()
+            .set("idCoreFacility", "")
+            .set("idInstitution", event ? event : "")
+            .set("isExternal", "")
+            .set("listKind", "UnboundedLabList");
 
         this.buildGroups(params);
     }
 
-    newGroup() {
+    public newGroup(): void {
         let configuration: MatDialogConfig = new MatDialogConfig();
         configuration.height = '35em';
         configuration.width  = '40em';
 
-        this.dialogsService.genericDialogContainer(NewGroupDialogComponent, "Add Group", this.constantsService.ICON_USER, configuration,
-            {actions: [
-                    {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
-                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
-                ]}).subscribe((result: any) => {
+        let actions: any = {
+            actions: [
+                {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
+                {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+            ]
+        };
+
+        this.dialogsService.genericDialogContainer(NewGroupDialogComponent, "Add Group", this.constantsService.ICON_USER, configuration, actions).subscribe((result: any) => {
             if(result) {
+                this.selectedGroup = null;
                 this.buildLabList(result);
             }
         });
-
     }
 
     deleteGroup() {
@@ -1532,6 +1513,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                     {type: ActionType.SECONDARY, name: "No", internalAction: "onClose"}
                 ]}).subscribe((result: any) => {
             if(result) {
+                this.selectedGroup = null;
                 this.buildLabList();
             }
         });
@@ -1592,6 +1574,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     }
 
     private isBillingAccountsTabDirty: boolean = false;
+
     onManualDirty() {
         this.isBillingAccountsTabDirty = true;
     }

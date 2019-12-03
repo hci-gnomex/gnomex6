@@ -12,7 +12,13 @@
     <!-- Handle leaf node menu items -->
     <span *ngIf="!child.children || child.children.length === 0">
       <span *ngIf="child.divider===undefined;else divider">
-        <button mat-menu-item
+        <button *ngIf="child.callback" mat-menu-item
+                class="child.class" [hidden]="child.hidden"
+                (click)="child.callback(child?.params)">
+          <img class="icon" *ngIf="child.iconName" src="{{child.iconName}}">
+          <span>{{child.displayName}}</span>
+        </button>
+        <button *ngIf="!child.callback" mat-menu-item
                 class="child.class" [hidden]="child.hidden"
                 (click)="setNavModeType()"
                 [routerLink]="child.route" [queryParams]="{id:child.idCoreFacility}">

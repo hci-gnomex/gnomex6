@@ -1,22 +1,22 @@
 import {Injectable} from "@angular/core";
-import {Http, Response} from "@angular/http";
+import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {map} from "rxjs/operators";
 
 @Injectable()
 export class AnnotationService {
 
-    constructor(private http: Http) {
+    constructor(private httpClient: HttpClient) {
     }
 
-    public getPropertyListCall(): Observable<Response> {
-        return this.http.get("/gnomex/GetPropertyList.gx");
+    public getPropertyListCall(): Observable<any> {
+        return this.httpClient.get("/gnomex/GetPropertyList.gx");
     }
 
     public getPropertyList(): Observable<any[]> {
-        return this.getPropertyListCall().pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
+        return this.getPropertyListCall().pipe(map((response: any) => {
+            if (response) {
+                return response;
             } else {
                 return [];
             }

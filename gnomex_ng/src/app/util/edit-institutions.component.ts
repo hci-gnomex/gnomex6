@@ -6,6 +6,7 @@ import {GridApi, GridReadyEvent, RowSelectedEvent} from "ag-grid-community";
 import {CheckboxRenderer} from "./grid-renderers/checkbox.renderer";
 import {DialogsService, DialogType} from "./popup/dialogs.service";
 import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
+import {IGnomexErrorResponse} from "./interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "edit-institutions",
@@ -136,7 +137,7 @@ export class EditInstitutionsComponent extends BaseGenericContainerDialog implem
             }, () => {
                 this.showSpinner = false;
             }, DictionaryService.INSTITUTION);
-        }, () => {
+        }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
     }

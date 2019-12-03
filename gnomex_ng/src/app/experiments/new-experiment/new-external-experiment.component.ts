@@ -19,6 +19,7 @@ import {DynamicComponent} from "ng-dynamic-component";
 import {TabConfirmIlluminaComponent} from "./tab-confirm-illumina.component";
 import {ConstantsService} from "../../services/constants.service";
 import {TopicService} from "../../services/topic.service";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'new-external-experiment',
@@ -117,6 +118,7 @@ export class NewExternalExperimentComponent implements OnInit, OnDestroy {
                     }
                 });
             });
+        }, (err: IGnomexErrorResponse) => {
         });
     }
 

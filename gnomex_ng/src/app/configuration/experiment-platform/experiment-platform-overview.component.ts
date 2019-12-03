@@ -189,7 +189,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
                         this.selectRowIndex = event.rowIndex;
                         this.changeExperimentPlaform(this.selectedExpPlatform);
                     }
-                })
+                });
             }else{
                 this.selectRowIndex = event.rowIndex;
                 this.changeExperimentPlaform(this.selectedExpPlatform);
@@ -220,22 +220,25 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
     }
 
-    removePlatform(){
+    removePlatform() {
         let expPlatform = this.selectedPlatformList.length > 0 ? this.selectedPlatformList[0] : null;
-        if(expPlatform){
+        if(expPlatform) {
             this.dialogService.confirm("Are you sure you want to remove experiment platform " + expPlatform.display + "?", "Remove Platform")
-                .pipe(first()).subscribe((result:boolean) => {
-                if(result){
+                .pipe(first()).subscribe((result: boolean) => {
+                if(result) {
                     this.dialogService.startDefaultSpinnerDialog();
 
-                    let params:HttpParams = new HttpParams().set("codeRequestCategory", expPlatform.codeRequestCategory);
+                    let params: HttpParams = new HttpParams().set("codeRequestCategory", expPlatform.codeRequestCategory);
                     this.expPlatformService.deleteExperimentPlatform(params).pipe(first())
-                        .subscribe(resp => {
-                            if(resp && resp.result === "SUCCESS"){
+                        .subscribe((resp: any) => {
+                            this.dialogService.stopAllSpinnerDialogs();
+                            if(resp && resp.result === "SUCCESS") {
                                 this.expPlatformService.getExperimentPlatformList_fromBackend();
-                            }else if(resp && resp.message){
+                            } else if(resp && resp.message) {
                                 this.dialogService.error(resp.message);
                             }
+                        }, (err: IGnomexErrorResponse) => {
+                            this.dialogService.stopAllSpinnerDialogs();
                         });
                     this.experimentPlatformTabs = [];
                 }
@@ -355,7 +358,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         let experimentPlatformTabForm:FormGroup = <FormGroup>expPlatformForm.get('ExperimentPlatformTabComponent');
         Object.keys(experimentPlatformTabForm.controls).forEach( key => {
             let control = experimentPlatformTabForm.get(key).value;
-            if(typeof control == "boolean"){
+            if(typeof control === "boolean"){
                 let decisionStr = control ? 'Y' : 'N';
                 params = params.set(key,decisionStr);
             }else if(control){
@@ -406,15 +409,15 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         }
         params = params.set("noJSONToXMLConversionNeeded", "Y");
 
-        this.expPlatformService.saveExperimentPlatform(params).pipe(first()).subscribe( resp => {
-            if(resp && resp.result && resp.result === "SUCCESS" ){
+        this.expPlatformService.saveExperimentPlatform(params).pipe(first()).subscribe( (resp: any) => {
+            if(resp && resp.result && resp.result === "SUCCESS" ) {
                 this.expPlatformService.getExperimentPlatformList_fromBackend();
                 this.dictionaryService.reloadAndRefresh();
-            }else if(resp && resp.message){
+            } else if(resp && resp.message) {
                 this.dialogService.error(resp.message);
 
                 this.dialogService.stopAllSpinnerDialogs();
-            }else{
+            } else {
                 this.dialogService.error("Unknown Error occurred please contact GNomEx Support.");
                 this.dialogService.stopAllSpinnerDialogs();
             }

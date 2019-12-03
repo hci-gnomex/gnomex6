@@ -5,6 +5,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'add-ledger-entry',
@@ -74,6 +75,8 @@ export class AddLedgerEntryComponent extends BaseGenericContainerDialog implemen
                     }
                     this.dialogsService.error("An error occurred while saving the ledger entry" + message);
                 }
+            }, (err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
         }
     }

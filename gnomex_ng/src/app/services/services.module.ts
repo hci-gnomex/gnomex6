@@ -19,7 +19,6 @@ import {ConstantsService} from "./constants.service";
 import {ProjectService} from "./project.service";
 import {OrganismService} from "./organism.service";
 import {GetLabService} from "./get-lab.service";
-import {HttpService} from "./http.service";
 import {LabListService} from "./lab-list.service";
 import {PropertyService} from "./property.service";
 import {AnnotationService} from "./annotation.service";
@@ -71,7 +70,6 @@ import {NavigationService} from "./navigation.service";
         DictionaryService,
         ExperimentViewService,
         GetLabService,
-        HttpService,
         LabListService,
         PropertyService,
         ExperimentResolverService,

@@ -44,8 +44,12 @@ public class EmailHelper {
     String subject = dictionaryHelper.getRequestCategory(request.getCodeRequestCategory()) + " Order " + request.getNumber() + " completed";
     
     String emailRecipients = null;
-    if (bioRepEmail != null && !bioRepEmail.equals("")) {
-        emailRecipients = bioRepEmail;
+    if (request != null
+        && request.getIncludeQubitConcentration().equals("Y")
+        &&  bioRepEmail != null
+        && !bioRepEmail.equals("")) {
+
+      emailRecipients = bioRepEmail;
     }
     else {
         emailRecipients = request.getAppUser().getEmail();

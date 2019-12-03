@@ -1,25 +1,25 @@
 import {Injectable} from "@angular/core";
-import {Http, Response, URLSearchParams} from "@angular/http";
 import {BehaviorSubject, Observable, of, Subject, throwError} from "rxjs";
 import {catchError, first, flatMap, map} from "rxjs/operators";
 import {HttpClient, HttpErrorResponse, HttpHeaders, HttpParams} from "@angular/common/http";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Injectable()
 export class LabListService {
-    private labListSubject:BehaviorSubject<any> = new BehaviorSubject([]);
+    private labListSubject: BehaviorSubject<any> = new BehaviorSubject([]);
 
 
-    constructor(private http: Http, private httpClient:HttpClient) {
+    constructor(private httpClient: HttpClient) {
     }
 
-    public getLabListCall(): Observable<Response> {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("listKind", "UnboundedLabList");
-        return this.http.get("/gnomex/GetLabList.gx", {search: params});
+    public getLabListCall(): Observable<any> {
+        let params: HttpParams = new HttpParams()
+            .set("listKind", "UnboundedLabList");
+        return this.httpClient.get("/gnomex/GetLabList.gx", {params: params});
     }
 
 
-    getLabListSubject():Observable<any>{
+    getLabListSubject(): Observable<any> {
         return this.labListSubject.asObservable();
     }
     private handleError(errorResponse: HttpErrorResponse){
@@ -31,40 +31,28 @@ export class LabListService {
         return throwError({message: "An error occured please contact GNomEx Support."});
     }
 
-    getLabList_FromBackEnd():void{
+    getLabList_FromBackEnd(): void {
         let params: HttpParams = new HttpParams().set("listKind", "UnboundedLabList");
-        this.httpClient.get("/gnomex/GetLabList.gx",{params:params}).pipe(first())
-            .subscribe( resp => {
-                this.labListSubject.next(resp)
+        this.httpClient.get("/gnomex/GetLabList.gx", {params: params}).pipe(first())
+            .subscribe( (resp: any) => {
+                this.labListSubject.next(resp);
 
-            },(err) =>{
-                this.labListSubject.next(err)
+            }, (err: IGnomexErrorResponse) => {
+                this.labListSubject.next(err);
             });
 
     }
 
-
-
-
-
     public getLabList(): Observable<any[]> {
-        return this.getLabListCall().pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                return [];
-            }
-        }));
+        return this.getLabListCall().pipe(map((response: any) => {
+            return response;
+        }), (catchError((err: IGnomexErrorResponse) => {
+            return throwError(err);
+        })));
     }
 
-    getLabListWithParams(params: URLSearchParams): Observable<any> {
-        return this.http.get("/gnomex/GetLabList.gx", {search: params}).pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }));
+    getLabListWithParams(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GetLabList.gx", {params: params});
     }
 
     saveLab(params: HttpParams): Observable<any> {
@@ -74,61 +62,30 @@ export class LabListService {
     }
 
     getOrganismList(): Observable<any> {
-        return this.http.get("/gnomex/GetOrganismList.gx").pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw new Error("Error");
-            }
-        }));
+        return this.httpClient.get("/gnomex/GetOrganismList.gx");
     }
 
-    generateUserAccountEmail(params: URLSearchParams): Observable<any> {
-        if (params.paramsMap.size === 0) {
-            return this.http.get("/gnomex/GenerateUserAccountEmail.gx").pipe(map((response: Response) => {
-                if (response.status === 200) {
-                    return response.json();
-                } else {
-                    throw new Error("Error");
-                }
-            }));
-
-        } else {
-            return this.http.get("/gnomex/GenerateUserAccountEmail.gx", {search: params}).pipe(map((response: Response) => {
-                if (response.status === 200) {
-                    return response.json();
-                } else {
-                    throw new Error("Error");
-                }
-            }));
-        }
+    generateUserAccountEmail(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/GenerateUserAccountEmail.gx", {params: params});
     }
 
     public getSubmitRequestLabList(): Observable<any[]> {
-        return this.getLabListCall().pipe(map((response: Response) => {
-            if (response.status === 200) {
-                let allLabs: any[] = response.json();
-                return allLabs.filter((lab: any) => {
-                    return lab.canGuestSubmit === "Y" || lab.canSubmitRequests === "Y";
-                });
-            } else {
-                return [];
-            }
-        }));
-    }
-
-    public getAllLabsCall(): Observable<Response> {
-        return this.http.get("/gnomex/GetAllLabs.gx");
+        return this.getLabListCall().pipe(map((response: any) => {
+            let allLabs = response ? Array.isArray(response) ? response : [response] : [];
+            return allLabs.filter((lab: any) => {
+                return lab.canGuestSubmit === "Y" || lab.canSubmitRequests === "Y";
+            });
+        }), (catchError((err: IGnomexErrorResponse) => {
+            return throwError(err);
+        })));
     }
 
     public getAllLabs(): Observable<any[]> {
-        return this.getAllLabsCall().pipe(map((response: Response) => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                return [];
-            }
-        }));
+        return this.httpClient.get("/gnomex/GetAllLabs.gx").pipe(map((response: any) => {
+            return response;
+        }), (catchError((err: IGnomexErrorResponse) => {
+            return throwError(err);
+        })));
     }
 
 }

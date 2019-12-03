@@ -66,7 +66,7 @@ public class DownloadFastaFileServlet extends HttpServlet {
                 String fastaFileName = chromatName.replace( "ab1", "fasta" );
 
 
-                response.setContentType("application/x-download");
+                response.setContentType("application/x-download; charset=UTF-8");
                 response.setHeader("Content-Disposition", "attachment;filename=" + fastaFileName);
                 response.setHeader("Cache-Control", "max-age=0, must-revalidate");
 
@@ -92,7 +92,7 @@ public class DownloadFastaFileServlet extends HttpServlet {
 
 
             } else {
-                response.setContentType("text/html");
+                response.setContentType("text/html; charset=UTF-8");
                 response.getOutputStream().println(
                         "<html><head><title>Error</title></head>");
                 response.getOutputStream().println("<body><b>");
@@ -111,7 +111,7 @@ public class DownloadFastaFileServlet extends HttpServlet {
             Util.sendErrorReport(HibernateSession.currentSession(),"GNomEx.Support@hci.utah.edu", "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
 
             HibernateSession.rollback();
-            response.setContentType("text/html");
+            response.setContentType("text/html; charset=UTF-8");
             response.getOutputStream().println(
                     "<html><head><title>Error</title></head>");
             response.getOutputStream().println("<body><b>");

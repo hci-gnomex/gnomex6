@@ -1,10 +1,9 @@
 import {Injectable} from "@angular/core";
-import {Http, Response, URLSearchParams} from "@angular/http";
 
 @Injectable()
 export class GnomexStringUtilService {
 
-    constructor(private http: Http) {
+    constructor() {
     }
     public static stripHTMLText(htmlText:string):string {
         var pattern:RegExp = /<P.*?>/g;
@@ -47,10 +46,5 @@ export class GnomexStringUtilService {
 
         return str;
     }
-
-
-
-
-
 
 }

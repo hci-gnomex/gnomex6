@@ -41,7 +41,7 @@
                 <input [(ngModel)]="allFlag" id="allCheckbox" type="checkbox">
                 <label for="allCheckbox" class="following-label">All</label>
             </div>
-            <div class="inlineDiv children-spaced" *ngIf="showLabComboBox && (mode === 'billingBrowse' ? !(selectedCoreFacility === '') : true)">
+            <div class="inlineDiv children-spaced" *ngIf="showLabComboBox">
                 <label>Group</label>
                 <div>
                     <custom-combo-box [options]="this.labList"

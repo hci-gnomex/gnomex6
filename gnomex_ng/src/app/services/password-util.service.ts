@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {Observable} from "rxjs";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
-import {AbstractControl, FormGroup, ValidatorFn} from "@angular/forms";
+import {AbstractControl, FormGroup} from "@angular/forms";
 
 
 @Injectable()
@@ -52,21 +52,21 @@ export class PasswordUtilService {
     }
 
     public static validatePassword(c: AbstractControl): {[key: string]: any} | null {
-        return PasswordUtilService.passwordMeetsRequirements(c.value) ? null : {'validatePassword': {value: c.value}};
+        return PasswordUtilService.passwordMeetsRequirements(c.value) ? null : {"validatePassword": {value: c.value}};
     }
 
-    public static validatePasswordConfirm(passwordKey?:string){
+    public static validatePasswordConfirm(passwordKey?: string) {
         return (c: AbstractControl): {[key: string]: any} | null => {
             if (c.parent) {
                 let parent: FormGroup = c.parent as FormGroup;
-                let passwordName = passwordKey ? passwordKey : 'password';
-                if (c.value != '' && c.value === parent.controls[passwordName].value) {
+                let passwordName = passwordKey ? passwordKey : "password";
+                if (c.value !== "" && c.value === parent.controls[passwordName].value) {
                     return null;
                 }
             }
-            return {'validatePasswordConfirm': {value: c.value}};
+            return {"validatePasswordConfirm": {value: c.value}};
 
-        }
+        };
 
     }
 
@@ -90,5 +90,4 @@ export class PasswordUtilService {
             .set("Content-Type", "application/x-www-form-urlencoded");
         return this.httpClient.post("/gnomex/ChangePassword.gx", params.toString(), {headers: headers});
     }
-    
 }

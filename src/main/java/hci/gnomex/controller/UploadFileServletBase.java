@@ -111,7 +111,7 @@ public abstract class UploadFileServletBase extends HttpServlet {
 				throw new ServletException("Unable to upload file due to a server error.  Please contact GNomEx support.");
 			}
 
-			data.res.setContentType("text/html");
+			data.res.setContentType("text/html; charset=UTF-8");
 			PrintWriter out = data.res.getWriter();
 			data.res.setHeader("Cache-Control", "max-age=0, must-revalidate");
 
@@ -129,7 +129,7 @@ public abstract class UploadFileServletBase extends HttpServlet {
 					baseURL = fullPath.substring(0, pos);
 				}
 
-				data.res.setContentType("text/html");
+				data.res.setContentType("text/html; charset=UTF-8");
 				data.res.setHeader("Cache-Control", "max-age=0, must-revalidate");
 
 				format = org.dom4j.io.OutputFormat.createPrettyPrint();
@@ -226,7 +226,7 @@ public abstract class UploadFileServletBase extends HttpServlet {
 
 				writer.close();
 			}else{
-				data.res.setContentType("application/json");
+				data.res.setContentType("application/json; charset=UTF-8");
 				JsonObject value = Json.createObjectBuilder()
 						.add("result", "SUCCESS")
 						.build();

@@ -268,7 +268,7 @@ public class UploadDataTrackFileServlet extends HttpServlet {
             root.addAttribute("idGenomeBuild", idGenomeBuild.toString());
 
             PrintWriter responseOut = res.getWriter();
-            res.setContentType("application/json");
+            res.setContentType("application/json; charset=UTF-8");
             XMLOutputter xmlOut = new XMLOutputter();
             String xmlResult = xmlOut.outputString(doc.toString());
             String jsonResult = Util.xmlToJson(xmlResult);
@@ -284,7 +284,7 @@ public class UploadDataTrackFileServlet extends HttpServlet {
             Element root = doc.addElement("ERROR");
             root.addAttribute("message", e.getMessage());
             PrintWriter responseOut = res.getWriter();
-            res.setContentType("application/json");
+            res.setContentType("application/json; charset=UTF-8");
             XMLOutputter xmlOut = new XMLOutputter();
             String xmlResult = xmlOut.outputString(doc.toString());
             String jsonResult = Util.xmlToJson(xmlResult);

@@ -77,7 +77,7 @@ export class UserPreferencesService {
             } else {
                 return 0;
             }
-        }
+        };
     }
 
     public createUserDisplaySortFunction(): (a: any, b: any) => number {
@@ -91,7 +91,7 @@ export class UserPreferencesService {
     private createDisplayWithFunction(displayField: string): (value: any) => string {
         return (value: any) => {
             return value ? value[displayField] : "";
-        }
+        };
     }
 
     public createLabDisplayWithFunction(): (value: any) => string {

@@ -36,7 +36,7 @@ export class ExperimentsBrowseTab extends PrimaryTab implements OnInit,OnDestroy
     private selectedTreeNodeSubscript: Subscription;
     private filteredExperimentOverviewListSubscript: Subscription;
     public readonly rowSelection: string = "single";
-    private gridOpt:GridOptions = {};
+    public gridOpt:GridOptions = {};
 
     name:string = "Experiments";
 

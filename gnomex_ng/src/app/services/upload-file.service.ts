@@ -1,29 +1,21 @@
-import { Injectable } from '@angular/core';
-import {
-    HttpClient,
-    HttpRequest,
-    HttpEventType,
-    HttpResponse,
-    HttpHeaders,
-    HttpErrorResponse, HttpParams
-} from '@angular/common/http';
-import {BehaviorSubject, concat, Observable, ObservableInput, of, throwError,} from 'rxjs';
-import {Http,URLSearchParams,Response} from "@angular/http";
-import {catchError, concatMap, first, flatMap, map} from "rxjs/operators";
+import {Injectable} from "@angular/core";
+import {HttpClient, HttpParams} from "@angular/common/http";
+import {concat, Observable, ObservableInput, of, throwError} from "rxjs";
+import {Http, Response} from "@angular/http";
+import {catchError, flatMap, map} from "rxjs/operators";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
-//const url = 'http://localhost:3000/upload';
 
 @Injectable()
 export class UploadFileService {
-    constructor(private http: Http, private httpClient:HttpClient,
-                private dialogService:DialogsService) {}
+    constructor(private http: Http, private httpClient: HttpClient,
+                private dialogService: DialogsService) {}
 
 
-
-    public uploadFromBrowse(files: any[], url:string, ids:any): Observable<any> {
-        let idKeys:string[] = Object.keys(ids);
-        let idKey:string = idKeys[0];
+    public uploadFromBrowse(files: any[], url: string, ids: any): Observable<any> {
+        let idKeys: string[] = Object.keys(ids);
+        let idKey: string = idKeys[0];
         console.log(files);
         let fileUploadObservableList: ObservableInput<any>[] = [];
 
@@ -37,43 +29,40 @@ export class UploadFileService {
             formData.append("Filedata", file.file, file.name);
             formData.append("Upload", "Submit Query");
 
-            fileUploadObservableList.push(this.http.post(url,formData,{withCredentials:true})
-                .pipe(map((resp: Response) =>{
+            fileUploadObservableList.push(this.http.post(url, formData, {withCredentials: true})
+                .pipe(map((resp: Response) => {
                     return resp.json();
-                }))
+                })),
             );
         });
-        return concat<any>(...fileUploadObservableList).pipe(catchError(this.handleError));
-    }
-
-
-
-    private handleError(errorResponse: HttpErrorResponse){
-        if(errorResponse.error instanceof ErrorEvent){
-            console.error("Client side Error: ", errorResponse.error.message);
-        }else{
-            console.log("Server Side Error: ", errorResponse);
-        }
-        return throwError("An error occured please contact GNomEx Support.");
-    }
-    public startFDTUpload(idObj:any): Observable<any> {
-        let key:string = (Object.keys(idObj))[0];
-        let params:HttpParams = new HttpParams().set(key, idObj[key]);
-        return this.httpClient.get("/gnomex/FastDataTransferUploadStart.gx",{params:params})
-            .pipe(flatMap((resp:any) =>{
-                if(resp && resp.uuid ){
-                    let uuid = resp.uuid;
-                    return this.getFDTJnlpServlet(new HttpParams().set('uuid', uuid))
-                }else if(resp.message){
-                    this.dialogService.error(resp.message);
-                }
-                return of(false);
+        return concat<any>(...fileUploadObservableList)
+            .pipe(catchError((err: IGnomexErrorResponse) => {
+                return throwError(err);
             }));
     }
 
-    private getFDTJnlpServlet(params:HttpParams): Observable<any>{
-        return this.httpClient.get("/gnomex/FastDataTransferUploadGetJnlpServlet.gx", {responseType: 'blob', params: params});
+    public startFDTUpload(idObj: any): Observable<any> {
+        let key: string = (Object.keys(idObj))[0];
+        let params: HttpParams = new HttpParams().set(key, idObj[key]);
+        return this.httpClient.get("/gnomex/FastDataTransferUploadStart.gx", {params: params})
+            .pipe(flatMap((resp: any) => {
+                if (resp && resp.uuid) {
+                    let uuid = resp.uuid;
+                    return this.getFDTJnlpServlet(new HttpParams().set("uuid", uuid));
+                } else if (resp.message) {
+                    this.dialogService.error(resp.message);
+                }
+                return of(false);
+            }), catchError((err: IGnomexErrorResponse) => {
+                return throwError(err);
+            }));
     }
 
+    private getFDTJnlpServlet(params: HttpParams): Observable<any> {
+        return this.httpClient.get("/gnomex/FastDataTransferUploadGetJnlpServlet.gx", {responseType: "blob", params: params})
+            .pipe(catchError((err: IGnomexErrorResponse) => {
+                return throwError(err);
+            }));
+    }
 
 }

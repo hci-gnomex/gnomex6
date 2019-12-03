@@ -97,7 +97,7 @@ import {HttpParams} from "@angular/common/http";
                                     </mat-error>
                                 </mat-form-field>
                             </div>
-                            
+
                         </div>
                         <ng-template #selectLab >
 
@@ -128,9 +128,9 @@ import {HttpParams} from "@angular/common/http";
                                 <mat-error *ngIf="this.formGroup?.get('uNID')?.hasError('pattern')">
                                     Format should be a "u" followed by 7 digits (u0000000)
                                 </mat-error>
-                                
+
                             </mat-form-field>
-                            
+
                         </div>
                         <ng-template #externalU >
                             <div formGroupName="externalToUniversityGroup" class="flex-container-col align-center">
@@ -168,14 +168,14 @@ import {HttpParams} from "@angular/common/http";
                                 <div class="text-body">
                                     {{ this.passwordUtilService.PASSWORD_COMPLEXITY_REQUIREMENTS }}
                                 </div>
-                                
+
                             </div>
                         </ng-template>
                     </div>
                     <div class="flex-row-container justify-flex-end">
                         <button type="submit" mat-raised-button [color]="color" [disabled]="this.formGroup.invalid" >Submit</button>
                     </div>
-                    
+
                 </form>
             </div>
         </div>
@@ -187,7 +187,7 @@ import {HttpParams} from "@angular/common/http";
 
     `
     ,
-    styles:[`
+    styles: [`
 
         .spaced-children > *:not(:last-child) {
             margin-right: 1em;
@@ -216,51 +216,51 @@ export class RegisterUserComponent  implements OnInit, OnDestroy{
     private registerUser: IRegisterUser;
     private labs: ISimpleLab[];
     private isUniversityAuthd: string;
-    private publicNotice:string;
-    public siteLogo:string;
+    private publicNotice: string;
+    public siteLogo: string;
     private formGroup: FormGroup;
-    private newLabGroupTemplate:any;
-    private emailRegex:RegExp  = /^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/;
+    private newLabGroupTemplate: any;
+    private emailRegex: RegExp  = /^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/;
     private externalToGroupTemplate: any;
-    public color:string="primary";
-    private idCoreFacility:string;
+    public color: string = "primary";
+    private idCoreFacility: string;
 
-    constructor(private route:ActivatedRoute, private dialogService: DialogsService,
-                private fb:FormBuilder, public passwordUtilService: PasswordUtilService,
+    constructor(private route: ActivatedRoute, private dialogService: DialogsService,
+                private fb: FormBuilder, public passwordUtilService: PasswordUtilService,
                 private userService: UserService) {
     }
 
-    ngOnInit():void{
+    ngOnInit(): void {
 
         this.externalToGroupTemplate = {
-            institute:'',
-            userNameExternal:['', Validators.required],
-            passwordExternal: ['', [Validators.required, PasswordUtilService.validatePassword ] ],
-            passwordExternalConfirm: ['',[Validators.required, PasswordUtilService.validatePasswordConfirm('passwordExternal')]]
+            institute: '',
+            userNameExternal: ['', Validators.required],
+            passwordExternal: ['', [Validators.required, PasswordUtilService.validatePassword]],
+            passwordExternalConfirm: ['', [Validators.required, PasswordUtilService.validatePasswordConfirm('passwordExternal')]],
         };
-        this.newLabGroupTemplate =  {
-            newLabFirstName:['',Validators.required],
-            newLabLastName: ['',Validators.required],
+        this.newLabGroupTemplate = {
+            newLabFirstName: ['', Validators.required],
+            newLabLastName: ['', Validators.required],
             department: [''],
-            contactEmail:['',[Validators.required, Validators.pattern(this.emailRegex) ]],
-            contactPhone:['',Validators.required]
+            contactEmail: ['', [Validators.required, Validators.pattern(this.emailRegex)]],
+            contactPhone: ['', Validators.required],
         };
         this.formGroup = this.fb.group({
-            firstName:['',Validators.required ],
+            firstName: ['', Validators.required],
             lastName: ['', Validators.required],
-            email: ['', [Validators.required, Validators.pattern(this.emailRegex) ]],
-            phone: ['',Validators.required ],
+            email: ['', [Validators.required, Validators.pattern(this.emailRegex)]],
+            phone: ['', Validators.required],
             labToggler: false,
-            labDropdown:['', Validators.required],
+            labDropdown: ['', Validators.required],
             uofuAffiliate: true,
-            uNID: ['', [Validators.required, Validators.pattern(/u\d{7}/)]]
+            uNID: ['', [Validators.required, Validators.pattern(/u\d{7}/)]],
         });
 
 
-        this.route.data.forEach(resp =>{
-            if(resp ){
+        this.route.data.forEach(resp => {
+            if(resp ) {
                 let regUserResp: any = resp.registerUserInfo;
-                if(regUserResp && regUserResp.result === "SUCCESS"){
+                if(regUserResp && regUserResp.result === "SUCCESS") {
                     this.registerUser = <IRegisterUser>regUserResp;
                     this.labs = this.registerUser.Labs && this.registerUser.Labs.length > 0 ? this.registerUser.Labs : [];
                     this.isUniversityAuthd = this.registerUser.isUniversityUserAuthentication;
@@ -268,79 +268,74 @@ export class RegisterUserComponent  implements OnInit, OnDestroy{
                     this.siteLogo = this.registerUser.siteLogo ? this.registerUser.siteLogo : "";
 
 
-                    if(!this.isUniversityAuthd){
+                    if(!this.isUniversityAuthd) {
                         this.formGroup.get('uofuAffiliate').setValue(false);
                     }
 
-                }else if(regUserResp && regUserResp.message){
+                } else if(regUserResp && regUserResp.message) {
                     this.dialogService.alert(regUserResp.message, "", DialogType.FAILED);
                 }
             }
         });
         this.route.paramMap.subscribe( param => {
             this.idCoreFacility = param.get('idCoreFacility');
-        })
+        });
 
     }
 
-    toggledLabState(event:MatSlideToggleChange){
-        if(event.checked){
+    toggledLabState(event: MatSlideToggleChange) {
+        if(event.checked) {
             console.log("is a new Lab");
             this.formGroup.removeControl("labDropdown");
-            if(!this.formGroup.get("newLabGroup")){
+            if(!this.formGroup.get("newLabGroup")) {
                 this.formGroup.addControl("newLabGroup", this.fb.group(this.newLabGroupTemplate));
             }
-
-
-        }else{
+        } else {
             console.log("is existing lab");
             this.formGroup.removeControl("newLabGroup");
-            if(!this.formGroup.get("labDropdown")){
-                this.formGroup.addControl('labDropdown',new FormControl('',Validators.required));
+            if(!this.formGroup.get("labDropdown")) {
+                this.formGroup.addControl('labDropdown', new FormControl('', Validators.required));
             }
         }
     }
-    toggledUniversityState(event:MatSlideToggleChange){
-        if(event.checked){
+    toggledUniversityState(event: MatSlideToggleChange) {
+        if(event.checked) {
             console.log("is existing university employee");
             this.formGroup.removeControl("externalToUniversityGroup");
-            if(!this.formGroup.get("uNID")){
-                this.formGroup.addControl("uNID", new FormControl('',[Validators.required,Validators.pattern(/u\d{7}/) ]));
+            if(!this.formGroup.get("uNID")) {
+                this.formGroup.addControl("uNID", new FormControl('', [Validators.required, Validators.pattern(/u\d{7}/) ]));
             }
-
-
-        }else{
+        } else {
             console.log("is external university");
             this.formGroup.removeControl("uNID");
-            if(!this.formGroup.get("externalToUniversityGroup")){
-                this.formGroup.addControl('externalToUniversityGroup',this.fb.group(this.externalToGroupTemplate));
+            if(!this.formGroup.get("externalToUniversityGroup")) {
+                this.formGroup.addControl('externalToUniversityGroup', this.fb.group(this.externalToGroupTemplate));
             }
         }
 
     }
 
-    submit(formGroup:FormGroup){
-        console.log("I am submitting the form");
+    submit(formGroup: FormGroup) {
         let params = new HttpParams();
-        Object.keys(formGroup.controls).forEach( key => {
+        Object.keys(formGroup.controls).forEach(key => {
             let control: any = formGroup.get(key).value;
-            let keyList: any[] =  Object.keys(control);
-            if(keyList.length > 0 && typeof control === 'object'  ){
-                for(let k of keyList){
+            let keyList: any[] = Object.keys(control);
+            if (keyList.length > 0 && typeof control === 'object') {
+                for (let k of keyList) {
                     let c = control[k];
-                    if(typeof control == "boolean"){
+                    if (typeof control === "boolean") {
                         let decisionStr = control ? 'Y' : 'N';
-                        params = params.set(k,decisionStr);
-                    }else if(c){
-                        params = params.set(k,c);
+                        params = params.set(k, decisionStr);
+                    } else if (c) {
+                        params = params.set(k, c);
                     }
                 }
-            }else{
-                if(typeof control == "boolean"){
+            } else {
+                if (typeof control === "boolean") {
                     let decisionStr = control ? 'Y' : 'N';
-                    params = params.set(key,decisionStr);
-                }else if(control){
-                    params = params.set(key,<string>control);
+                    params = params.set(key, decisionStr);
+                } else if (control) {
+                    params = params.set(key, <string>control);
                 }
 
             }
@@ -350,17 +345,14 @@ export class RegisterUserComponent  implements OnInit, OnDestroy{
 
 
         this.userService.saveSelfRegisteredAppUser(params).subscribe(resp => {
-                if(resp){
-                    console.log(resp);
-                }
-            })
+            if (resp) {
+                console.log(resp);
+            }
+        });
     }
 
-
-
-    ngOnDestroy(){
+    ngOnDestroy() {
     }
-
 
 }
 

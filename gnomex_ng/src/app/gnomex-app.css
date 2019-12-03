@@ -83,6 +83,11 @@ input.mat-input-element:disabled {
     color: rgba(88,88,88,1);
 }
 
+.mat-form-field {
+    line-height: inherit;
+    font: inherit;
+}
+
 mat-form-field.dialogFormField {
     width: 100%;
     margin: 0.4rem 0rem;
@@ -216,6 +221,33 @@ div.mainnav {
 
 .mat-tab-body-wrapper {
     height: 100%;
+}
+
+mat-tab-group.flex-style mat-tab-header .mat-tab-label-container .mat-tab-list .mat-tab-labels .mat-tab-label {
+    min-width: 48px;
+    flex: 1;
+}
+
+/* Needed to style split-gutter white */
+.white-split-gutter .as-split-gutter.ng-star-inserted {
+    background-color: white !important;
+}
+
+.no-height {
+    height: 0;
+    min-height: 0;
+    max-height: 0;
+}
+
+.single-em {
+    width: 1em;
+    min-width: 1em;
+    max-width: 1em;
+}
+
+.min-grid-size {
+    min-height: 8em;
+    min-width: 25em;
 }
 
 .tree-node-font {
@@ -433,6 +465,18 @@ img.tree-node-icon {
 
 .double-padded-right {
     padding-right: 0.6em;
+}
+
+.request-number-width {
+    min-width: 4em;
+    width: fit-content;
+    max-width: 6em;
+}
+
+.experiment-type-width {
+    min-width: 15em;
+    width: fit-content;
+    max-width: 15em;
 }
 
 .warningLabelMinor {

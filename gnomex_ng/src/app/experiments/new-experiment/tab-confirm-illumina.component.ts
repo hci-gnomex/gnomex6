@@ -26,6 +26,7 @@ import {GridApi} from "ag-grid-community";
 import {ConstantsService} from "../../services/constants.service";
 import {PropertyService} from "../../services/property.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "tabConfirmIllumina",
@@ -264,6 +265,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
         this.annotationService.getPropertyList().subscribe((result) => {
             this.propertyList = result;
             this.buildColumnDefinitions();
+        }, (err: IGnomexErrorResponse) => {
         });
 
         this.organisms = this.dictionaryService.getEntries("hci.gnomex.model.OrganismLite");
@@ -899,6 +901,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
                 this.sequenceLanes = sequenceLanes;
                 this.gridApi.setRowData(this.sequenceLanes);
+            }, (err: IGnomexErrorResponse) => {
+                this.dialogsService.stopAllSpinnerDialogs();
             });
         } else {
             let sampleNumber: number = 0;

@@ -1,10 +1,8 @@
-import {Injectable} from '@angular/core'
-import {Resolve, ActivatedRouteSnapshot} from '@angular/router'
+import {Injectable} from "@angular/core";
+import {Resolve, ActivatedRouteSnapshot} from "@angular/router";
 import {AnalysisService} from "../analysis.service";
 import {HttpParams} from "@angular/common/http";
 
-/* This service will be used in analysis.routes.ts and when injecting ActivateRoute  into analysis-overview.component.ts
- we can get the project json off the route */
 
 @Injectable()
 export class AnalysisGroupResolverService implements Resolve<any> {
