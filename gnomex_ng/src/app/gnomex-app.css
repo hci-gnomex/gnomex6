@@ -479,6 +479,12 @@ img.tree-node-icon {
     max-width: 15em;
 }
 
+.protocol-width {
+    min-width: 25em;
+    width: fit-content;
+    max-width: 35em;
+}
+
 .warningLabelMinor {
     color: #17871C;
     fontWeight: normal;

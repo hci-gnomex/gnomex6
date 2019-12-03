@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, forwardRef} from "@angular/core";
+import {Component, Input, OnInit, forwardRef, Output, EventEmitter} from "@angular/core";
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
 
 import {DateParserComponent} from "./parsers/date-parser.component";
@@ -67,8 +67,8 @@ const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
 
     writeValue(value: string) { this.value = value; }
 
-    registerOnChange(fn: any)  { this.onChangeCallback = fn; }
-    registerOnTouched(fn: any) { this.onTouchedCallback = fn; }
+    public registerOnChange(fn: any)  { this.onChangeCallback = fn; }
+    public registerOnTouched(fn: any) { this.onTouchedCallback = fn; }
 
     // end ngModel stuff!
 
@@ -76,6 +76,8 @@ const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     @Input() set defaultToToday(value: boolean) {
         this._defaultToToday = value;
     }
+
+    @Output("change") change: EventEmitter<string> = new EventEmitter<string>();
 
     @Input('placeholder') placeholder: string = 'Choose a Date';
     @Input('required') required: boolean = false;
@@ -127,9 +129,12 @@ const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
         });
     }
 
-    onDatePickerChange(){
-        this._dateString = this.value;
-        this.onChangeCallback(this._dateString);
+    onChange() {
+        // This setTimeout is needed because the event fired from the datepicker itself takes place before _date's value changes.
+        setTimeout(() => {
+            this._dateString = this.value;
+            this.change.emit(this._dateString);
+            this.onChangeCallback(this._dateString);
+        });
     }
-
 }
