@@ -1,42 +1,46 @@
-<div class="flex-container-col full-height full-width padded">
-    <div class="flex-container-row">
-        <mat-form-field class="formField">
+<div class="flex-container-col full-height full-width small-font padded">
+    <div class="flex-container-row spaced-children-margin">
+        <mat-form-field>
             <input matInput placeholder="Barcode" [formControl]="this.barcodeFC">
             <mat-error *ngIf="this.barcodeFC.hasError('required')">Required</mat-error>
         </mat-form-field>
-        <mat-form-field class="formField">
+        <mat-form-field>
             <input matInput placeholder="Run #" [formControl]="this.runFC">
             <mat-error *ngIf="this.runFC.hasError('required')">Required</mat-error>
         </mat-form-field>
-        <mat-form-field style="margin: 0 0.5%">
-            <input matInput [matDatepicker]="createDatePicker" placeholder="Cluster Gen Date" [formControl]="this.createDateFC">
-            <mat-datepicker-toggle matSuffix [for]="createDatePicker"></mat-datepicker-toggle>
-            <mat-datepicker #createDatePicker disabled="false"></mat-datepicker>
-        </mat-form-field>
-        <mat-form-field style="margin: 0 0.5%">
-            <input matInput [matDatepicker]="seqRunDatePicker" placeholder="Seq Run Complete Date" [formControl]="this.seqRunCompleteDateFC">
-            <mat-datepicker-toggle matSuffix [for]="seqRunDatePicker"></mat-datepicker-toggle>
-            <mat-datepicker #seqRunDatePicker disabled="false"></mat-datepicker>
-        </mat-form-field>
-    </div>
-    <div class="flex-container-row">
-        <div class="formField">
-            <custom-combo-box placeholder="Instrument" [options]="this.instrumentList"
-                              displayField="instrument" [formControl]="this.instrumentFC">
-            </custom-combo-box>
+        <div class="flex-grow">
         </div>
-        <div class="formField">
-            <custom-combo-box placeholder="Protocol" [options]="this.sequenceProtocolsList"
-                              displayField="name" [formControl]="this.protocolFC">
-            </custom-combo-box>
-        </div>
+        <date-picker [(ngModel)]="this.flowCell.createDate" placeholder="Cluster Gen Date" (change)="onChangeCreateDate()">
+        </date-picker>
+        <date-picker [(ngModel)]="this.flowCell.lastCycleDate" placeholder="Seq Run Complete Date" (change)="onChangeLastCycleDate()">
+        </date-picker>
     </div>
-    <div class="flex-container-row">
+    <div class="flex-container-row spaced-children-margin">
+        <custom-combo-box placeholder="Instrument"
+                          displayField="instrument"
+                          customOptionClasses="small-font padded inline-block full-width"
+                          [formControl]="this.instrumentFC"
+                          [options]="this.instrumentList">
+        </custom-combo-box>
+        <custom-combo-box placeholder="Protocol"
+                          displayField="name"
+                          class="protocol-width"
+                          customOptionClasses="small-font padded inline-block full-width"
+                          [formControl]="this.protocolFC"
+                          [options]="this.sequenceProtocolsList">
+        </custom-combo-box>
+    </div>
+    <div class="flex-container-row align-baseline padded">
         <div>
             Flow Cell Lane
         </div>
+        <div class="flex-grow">
+        </div>
         <div>
-            <button mat-button (click)="removeChannel($event)" [disabled]="!channel"><mat-icon>remove</mat-icon>Remove Lane</button>
+            <button mat-raised-button class="minimize" (click)="removeChannel($event)" [disabled]="!channel">
+                <mat-icon>remove</mat-icon>
+                Remove Lane
+            </button>
         </div>
     </div>
     <div class="flex-grow">
