@@ -42,6 +42,9 @@ import {DateParserComponent} from "../util/parsers/date-parser.component";
         .min-lab-width {
             min-width: 3em;
         }
+        .children-margin-right > *:not(:last-child) {
+            margin-right: 1em;
+        }
         
 
     `]
@@ -243,6 +246,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     public createDateFC: FormControl;
     public instrumentFC: FormControl;
     public protocolFC:   FormControl;
+    public sideFC: FormControl;
 
 
     constructor(public workflowService: WorkflowService,
@@ -257,6 +261,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         this.createDateFC = new FormControl("");
         this.instrumentFC = new FormControl("", Validators.required);
         this.protocolFC   = new FormControl("", Validators.required);
+        this.sideFC       = new FormControl();
 
         this.allFG = new FormGroup({
             barCode:    this.barcodeFC,
@@ -264,7 +269,9 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             createDate: this.createDateFC,
             instrument: this.instrumentFC,
             protocol:   this.protocolFC,
+            side:       this.sideFC
         });
+
     }
 
     ngOnInit() {
@@ -296,6 +303,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
 
     private initialize(): void {
         this.dialogsService.startDefaultSpinnerDialog();
+        this.sideFC.disable();
 
         let temp: string = this.workflowService.ILLSEQ_FINALIZE_FC + ','
             + this.workflowService.NOSEQ_FINALIZE_FC + ','
@@ -385,6 +393,25 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         for (let flow of this.assmItemList) {
             flow.seqADisplay = this.workflowService.lookupOligoBarcode(flow);
             flow.seqBDisplay = this.workflowService.lookupOligoBarcodeB(flow);
+        }
+
+        if(this.assmItemList.length > 0 ){
+            let reqCat:string = this.assmItemList[0].codeRequestCategory;
+            if(reqCat === 'MISEQ'){
+                this.sideFC.setValue(null);
+                this.sideFC.disable();
+                this.sideFC.clearValidators();
+                this.sideFC.updateValueAndValidity();
+            }else{
+                this.sideFC.enable();
+                this.sideFC.setValidators(Validators.required);
+                this.sideFC.updateValueAndValidity();
+            }
+        }else{
+            this.sideFC.setValue(null);
+            this.sideFC.disable();
+            this.sideFC.clearValidators();
+            this.sideFC.updateValueAndValidity();
         }
 
         // let showConc = this.gnomexService.getCoreFacilityProperty(this.flowCell.idCoreFacility, this.gnomexService.PROPERTY_SHOW_SAMPLE_CONC_PM);
@@ -595,7 +622,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             .set("numberSequencingCyclesActual", this.protocolFC.value.numberSequencingCyclesDisplay)
             .set("runFolder", this.flowCellRunFolder)
             .set("runNumber", this.runFC.value)
-            .set("side", "A")
+            .set("side", this.sideFC.value ? this.sideFC.value : '')
             .set("noJSONToXMLConversionNeeded", "Y");
         for (let seqLane of this.assmItemList) {
             this.buildChannel(seqLane);
@@ -742,7 +769,8 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             runFolder += year + month + date + "_" + this.instrumentFC.value.instrument + "_";
 
             let runNumberPlus: number = Number(this.runFC.value) + 10000;
-            runFolder += runNumberPlus.toString().substring(1, 5) + "_A" + this.barcodeFC.value;
+            let side = this.sideFC.value ? this.sideFC.value : '';
+            runFolder += runNumberPlus.toString().substring(1, 5) + "_" + side + this.barcodeFC.value;
         }
         if (this.originalProtocol
             && this.protocolFC.value.idNumberSequencingCyclesAllowed !== this.originalProtocol.value) {
