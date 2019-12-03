@@ -7,5 +7,5 @@
            (dateChange)="onChange()"
            [disabled]="textInputDisabled">
     <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
-    <mat-datepicker #datePicker (closed)="onChange()" [disabled]="datePickerDisabled"></mat-datepicker>
+    <mat-datepicker #datePicker [disabled]="datePickerDisabled"></mat-datepicker>
 </mat-form-field>
