@@ -505,6 +505,7 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
             this.propertyService.getPropertyAnnotation(event.data.idProperty).pipe(first()).subscribe((prop: any) => {
                 this.setProperty(prop.Property);
                 this.formGroup.markAsPristine();
+            }, (err: IGnomexErrorResponse) => {
             });
         }
     }
@@ -762,6 +763,8 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
                 this.updateDisplayedProperties();
             }
 
+        }, (err: IGnomexErrorResponse) => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
     }
 

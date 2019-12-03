@@ -371,12 +371,14 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         this.selectedUser = null;
         this.rowData = [];
         if (this.secAdvisor.isAdmin || this.secAdvisor.isSuperAdmin || this.secAdvisor.isBillingAdmin) {
-            this.getAppUserListSubscription = this.appUserListService.getFullAppUserList().subscribe((response: any[]) => {
-                this.userLabel = response.length + " users";
+            this.getAppUserListSubscription = this.appUserListService.getFullAppUserList().subscribe((response: any) => {
+                let res: any[] = [];
+                res = UtilService.getJsonArray(response, response.AppUser);
+                this.userLabel = res.length + " users";
                 this.createUserForm();
                 this.userForm.markAsPristine();
                 this.touchUserFields();
-                this.rowData = response;
+                this.rowData = res;
 
                 if (idAppUserToSelect) {
                     setTimeout(() => {
@@ -388,15 +390,16 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                         });
                     });
                 }
-            });
+            }, (err: IGnomexErrorResponse) => {});
         }
     }
 
-    public buildGroups(params: URLSearchParams) {
+    public buildGroups(params: HttpParams) {
         this.labListService.getLabListWithParams(params).subscribe((response: any) => {
             this.groupsData = response ? UtilService.getJsonArray(response, response.Lab) : [];
             this.groupLabel = this.groupsData.length + " groups";
             this.setPricing();
+        }, (err: IGnomexErrorResponse) => {
         });
     }
 
@@ -424,11 +427,11 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
 
     private buildLabList(idLabToSelect?: string): void {
 
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idCoreFacility", this.idCoreFacility);
-        params.set("idInstitution", "");
-        params.set("isExternal", "");
-        params.set("listKind", "UnboundedLabList");
+        let params: HttpParams = new HttpParams()
+            .set("idCoreFacility", this.idCoreFacility ? this.idCoreFacility : "")
+            .set("idInstitution", "")
+            .set("isExternal", "")
+            .set("listKind", "UnboundedLabList");
 
         this.getGroupListSubscription = this.labListService.getLabListWithParams(params).subscribe((response: any[]) => {
             this.buildManagedLabList(response);
@@ -453,6 +456,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                     });
                 });
             }
+        }, (err: IGnomexErrorResponse) => {
         });
     }
 
@@ -621,10 +625,10 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     public onSelectionChanged(event?: any) {
         this.dialogsService.startDefaultSpinnerDialog();
 
-        let params: URLSearchParams = new URLSearchParams();
         let selectedRows = this.gridOptions.api.getSelectedRows();
         this.idAppUser = selectedRows[0].idAppUser;
-        params.set("idAppUser", this.idAppUser);
+        let params: HttpParams = new HttpParams()
+            .set("idAppUser", this.idAppUser);
         this.getAppUserListSubscription = this.appUserListService.getAppUser(params).subscribe((response: any) => {
             this.selectedUser = response.AppUser;
             if (this.selectedUser.isActive === 'N') {
@@ -674,6 +678,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 this.userForm.disable();
             }
 
+            this.dialogsService.stopAllSpinnerDialogs();
+        }, (err: IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
         });
     }
@@ -1367,6 +1373,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             this.showSpinner = false;
         }, (err: IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
+            this.showSpinner = false;
         });
     }
 
@@ -1381,25 +1388,25 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     }
 
     searchCoreFacility(event) {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idCoreFacility", event ? event : "");
-        params.set("idInstitution", "");
-        params.set("isExternal", "");
-        params.set("listKind", "UnboundedLabList");
+        let params: HttpParams = new HttpParams()
+            .set("idCoreFacility", event ? event : "")
+            .set("idInstitution", "")
+            .set("isExternal", "")
+            .set("listKind", "UnboundedLabList");
 
         this.buildGroups(params);
     }
 
     onExternalGroupChange(event) {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idCoreFacility", "");
-        params.set("idInstitution", "");
+        let params: HttpParams = new HttpParams()
+            .set("idCoreFacility", "")
+            .set("idInstitution", "");
         if (event.checked) {
-            params.set("isExternal", 'Y');
+            params = params.set("isExternal", "Y");
         } else {
-            params.set("isExternal", 'N');
+            params = params.set("isExternal", "N");
         }
-        params.set("listKind", "UnboundedLabList");
+        params = params.set("listKind", "UnboundedLabList");
 
         this.buildGroups(params);
     }
@@ -1461,11 +1468,11 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     }
 
     searchInstitution(event) {
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idCoreFacility", "");
-        params.set("idInstitution", event ? event : "");
-        params.set("isExternal", "");
-        params.set("listKind", "UnboundedLabList");
+        let params: HttpParams = new HttpParams()
+            .set("idCoreFacility", "")
+            .set("idInstitution", event ? event : "")
+            .set("isExternal", "")
+            .set("listKind", "UnboundedLabList");
 
         this.buildGroups(params);
     }

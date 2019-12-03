@@ -6,7 +6,7 @@ import {HttpClient, HttpParams} from "@angular/common/http";
 
 	constructor(private httpClient: HttpClient) { }
 
-	public submitWorkAuthForm_chartfield(parameters: HttpParams): Observable<any> {
-		return this.httpClient.get("/gnomex/SubmitWorkAuthForm.gx", { params: parameters });
+	public submitWorkAuthForm_chartfield(params: HttpParams): Observable<any> {
+		return this.httpClient.get("/gnomex/SubmitWorkAuthForm.gx", { withCredentials: true, params: params });
 	}
 }

@@ -85,7 +85,7 @@ public class FastDataTransferUploadGetJnlpServlet extends HttpServlet {
                 }
 
                 if(showCommandLineInstructions != null && showCommandLineInstructions.equals("Y")) {
-                    response.setContentType("text/html");
+                    response.setContentType("text/html; charset=UTF-8");
 
                     response.getOutputStream().println("<p>");
                     response.getOutputStream().println("***** Please read THESE ARE NEW directions *****");
@@ -108,7 +108,7 @@ public class FastDataTransferUploadGetJnlpServlet extends HttpServlet {
                 }
 
                 response.setHeader("Content-Disposition","attachment;filename=\"gnomex.jnlp\"");
-                response.setContentType("application/jnlp");
+                response.setContentType("application/jnlp; charset=UTF-8");
                 response.setHeader("Cache-Control", "max-age=0, must-revalidate");
                 try {
                     ServletOutputStream out = response.getOutputStream();

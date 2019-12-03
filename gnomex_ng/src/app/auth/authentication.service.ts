@@ -9,6 +9,7 @@ import {JwtHelperService} from "@auth0/angular-jwt";
 
 import {AuthenticationProvider} from "./authentication.provider";
 import {catchError, first, map} from "rxjs/operators";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 /**
  * The token used for injection of the server side endpoint for the currently authenticated subject.
@@ -187,7 +188,7 @@ export class AuthenticationService {
                     }
                     this.subscribeToTokenActivity();
                 },
-                (error) => {
+                (err: IGnomexErrorResponse) => {
                     //Token refresh failed.
                     this.logout(true);
                 }
@@ -255,7 +256,9 @@ export class AuthenticationService {
             } else {
                 throw new Error("Authentication failed. " + resp.status + ": " + resp.statusText);
             }
-        }), catchError(this.handleError));
+        }), catchError((err: IGnomexErrorResponse) => {
+            return throwError(err);
+        }));
     }
 
     guestLogin(): void {
@@ -297,7 +300,7 @@ export class AuthenticationService {
                 (response) => {
                     //window.location.replace(this._redirectUrl);
                 },
-                (error) => {
+                (err: IGnomexErrorResponse) => {
                     window.location.replace(this._redirectUrl);
                 }
             );

@@ -6,14 +6,15 @@ import {UtilService} from "../services/util.service";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {ConstantsService} from "../services/constants.service";
 import {Subscription} from "rxjs";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "track-usage-detail",
     template: `
         <div class="full-height full-width flex-container-row">
             <div *ngIf="this.showGrid1" class="grid-container">
-                <ag-grid-angular class="full-height full-width ag-theme-balham font-small" 
-                                 [columnDefs]="this.gridColDefs1" 
+                <ag-grid-angular class="full-height full-width ag-theme-balham font-small"
+                                 [columnDefs]="this.gridColDefs1"
                                  [enableColResize]="true"
                                  [rowData]="this.gridData1"
                                  [getNodeChildDetails]="this.getNodeChildDetails"
@@ -22,7 +23,7 @@ import {Subscription} from "rxjs";
                 </ag-grid-angular>
             </div>
             <div *ngIf="this.showGrid2" class="grid-container margin-left">
-                <ag-grid-angular class="full-height full-width ag-theme-balham font-small" 
+                <ag-grid-angular class="full-height full-width ag-theme-balham font-small"
                                  [columnDefs]="this.gridColDefs2"
                                  [enableColResize]="true"
                                  [rowData]="this.gridData2"
@@ -131,11 +132,11 @@ export class TrackUsageDetailComponent implements OnInit, OnDestroy {
 
             let dataForGrid: any[] = [];
             for (let key of Object.keys(labMap)) {
-                dataForGrid.push(labMap[key])
+                dataForGrid.push(labMap[key]);
             }
             dataForGrid.sort(this.userPrefService.createDisplaySortFunction("labName"));
             this["gridData" + gridNumber] = dataForGrid;
-        }, () => {
+        }, (err: IGnomexErrorResponse) => {
             this.dialogRef.close();
         }));
     }

@@ -43,23 +43,23 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 		fileType = ba.getOrderFormFileType();
 
 		if (fileType.equals(".pdf")) {
-			res.setHeader("Content-Type", "application/pdf");
+			res.setHeader("Content-Type", "application/pdf; charset=UTF-8");
 			res.setHeader("Content-Disposition", "inline; filename=BillingAccount" + idBillingAccount + fileType);
 		} else if (fileType.equals(".doc")) {
-			res.setHeader("Content-Type", "application/msword");
+			res.setHeader("Content-Type", "application/msword; charset=UTF-8");
 			res.setHeader("Content-Disposition", "inline; filename=BillingAccount" + idBillingAccount + fileType);
 		} else if (fileType.equals(".docx")) {
-			res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+			res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document; charset=UTF-8");
 			res.setHeader("Content-Disposition", "inline; filename=BillingAccount" + idBillingAccount + fileType);
 		} else if (fileType.equals(".txt")) {
-			res.setHeader("Content-Type", "text/plain");
+			res.setHeader("Content-Type", "text/plain; charset=UTF-8");
 		} else if (fileType.equals(".html")) {
-			res.setHeader("Content-Type", "text/html");
+			res.setHeader("Content-Type", "text/html; charset=UTF-8");
 		} else if (fileType.equals(".zip")) {
-			res.setHeader("Content-Type", "application/zip");
+			res.setHeader("Content-Type", "application/zip; charset=UTF-8");
 			res.setHeader("Content-Disposition", "inline; filename=BillingAccount" + idBillingAccount + fileType);
 		} else if (fileType.equals(".xls")) {
-			res.setHeader("Content-Type", "application/msexcel");
+			res.setHeader("Content-Type", "application/msexcel; charset=UTF-8");
 			res.setHeader("Content-Disposition", "inline; filename=BillingAccount" + idBillingAccount + fileType);
 		}
 

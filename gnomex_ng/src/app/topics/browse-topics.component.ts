@@ -31,11 +31,12 @@ import {UserPreferencesService} from "../services/user-preferences.service";
 import {HttpParams} from "@angular/common/http";
 import {UtilService} from "../services/util.service";
 import {ConstantsService} from "../services/constants.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "analysis",
     templateUrl: "./browse-topics.component.html",
-    styles: [`        
+    styles: [`
         .formField {
             margin: 0 2.0%;
             width: 20%
@@ -279,10 +280,10 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
                     attributeValue = this.currentItem.idDataTrack;
                 }
                 this.resetDataTree();
-                this.topicService.addItemToTopicNew(this.targetItem.idTopic, attribute, attributeValue).subscribe(() => {
+                this.topicService.addItemToTopicNew(this.targetItem.idTopic, attribute, attributeValue).subscribe((response: any) => {
                     this.dialogService.removeSpinnerWorkItem();
                     this.topicService.refreshTopicsList_fromBackend();
-                }, () => {
+                }, (err: IGnomexErrorResponse) => {
                     this.dialogService.stopAllSpinnerDialogs();
                 });
             } else {
@@ -728,8 +729,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
                     this.expandChildNodes(this.dataTreeModel);
                     this.dialogService.removeSpinnerWorkItem();
                 });
-            }, () =>{
-                this.dialogService.stopAllSpinnerDialogs();
+            }, (err: IGnomexErrorResponse) => {
+                this.dialogService.removeSpinnerWorkItem();
             });
         }
     }

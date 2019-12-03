@@ -8,7 +8,7 @@ export class ProductsService {
     public static readonly PRODUCT_TYPE_CLASS: string = "hci.gnomex.model.ProductType";
 
     constructor(private httpClient: HttpClient,
-                private cookieUtilService: CookieUtilService,) {
+                private cookieUtilService: CookieUtilService) {
     }
 
     public getProductList(): Observable<any> {
@@ -28,7 +28,7 @@ export class ProductsService {
 
     public getPriceCategories(requireIsActive: boolean, priceSheetName: string): Observable<any> {
         let params: HttpParams = new HttpParams()
-            .set("requireIsActive", requireIsActive ? 'Y' : 'N')
+            .set("requireIsActive", requireIsActive ? "Y" : "N")
             .set("priceSheetName", priceSheetName);
         return this.httpClient.get("/gnomex/GetPriceCategories.gx", {params: params});
     }

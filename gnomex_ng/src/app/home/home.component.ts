@@ -1,5 +1,5 @@
-import {Component, OnInit, ViewChild, ViewEncapsulation, AfterViewInit, OnDestroy} from "@angular/core";
-import {URLSearchParams} from "@angular/http";
+import {Component, OnInit, AfterViewInit, OnDestroy} from "@angular/core";
+import {HttpParams} from "@angular/common/http";
 import {Router} from "@angular/router";
 import {BehaviorSubject} from "rxjs";
 import {Subscription} from "rxjs";
@@ -11,6 +11,7 @@ import {AuthenticationService} from "../auth/authentication.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {PropertyService} from "../services/property.service";
 import {UtilService} from "../services/util.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "gnomex-home",
@@ -162,7 +163,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                 private progressService: ProgressService,
                 private gnomexService: GnomexService,
                 private createSecurityAdvisor: CreateSecurityAdvisorService,
-                private router:Router,
+                private router: Router,
                 private authService: AuthenticationService,
                 private propertyService: PropertyService
     ) {
@@ -181,14 +182,14 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     ngOnInit() {
 
-        if(!this.progressService.hideLoader){
+        if(!this.progressService.hideLoader) {
             this.progressService.hideLoader = new BehaviorSubject<boolean>(false);
             this.hideLoader = this.progressService.hideLoader;
-        }else{
+        } else {
             this.hideLoader = this.progressService.hideLoader;
         }
 
-        let params: URLSearchParams = new URLSearchParams();
+        let params: HttpParams = new HttpParams();
 
         this.launchPropertiesService.getLaunchProperties(params).pipe(first()).subscribe((response: any) => {
             this.launchProperties = response;
@@ -205,6 +206,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
             this.gnomexService.coreFacilityList = response.CoreFacilities;
             this.progressService.displayLoader(10);
 
+        }, (err: IGnomexErrorResponse) => {
         });
 
         if(!this.gnomexService.isLoggedIn){

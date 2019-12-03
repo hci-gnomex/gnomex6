@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild } from "@angular/core";
+import {AfterViewInit, Component, ElementRef, ViewChild} from "@angular/core";
 
 import { ICellEditorAngularComp } from "ag-grid-angular";
 import { MatDatepicker } from "@angular/material";
@@ -12,17 +12,17 @@ import { DateParserComponent } from "../parsers/date-parser.component";
             <div class="full-width full-height flex-stretch">
                 <div class="t full-width full-height" (click)="onClick()">
                     <div class="tr">
-                        <div class="td vertical-center">
+                        <div  class="td vertical-center">
                             <div class="invisible">
                                 <mat-form-field>
-                                    <input matInput [matDatepicker]="picker" [(ngModel)]="date">
+                                    <input matInput [matDatepicker]="picker" (dateChange)="stopEditing()"  [(ngModel)]="date">
                                     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                                 </mat-form-field>
                             </div>
                             <div class="full-width right-align">
                                 {{ display }}
                             </div>
-                            <mat-datepicker #picker></mat-datepicker>
+                            <mat-datepicker  #picker></mat-datepicker>
                         </div>
                     </div>
                 </div>
@@ -117,6 +117,7 @@ export class DateEditor implements AfterViewInit, ICellEditorAngularComp {
         if (this.showFillButton && (!this.fillGroupAttribute || this.fillGroupAttribute === '')) {
             throw new Error('Invalid state, cannot use fill button without specifying the fillGroupAttribute.');
         }
+
 	}
 
 	ngAfterViewInit(): void {
@@ -131,6 +132,12 @@ export class DateEditor implements AfterViewInit, ICellEditorAngularComp {
 
 	onClick(): void {
 		this.picker.open();
+	}
+
+	stopEditing():void{
+		if(this.params && this.params.column && this.params.column.gridApi){
+			this.params.column.gridApi.stopEditing();
+		}
 	}
 
 	private static getDisplayStringFromDate(date: Date): string {

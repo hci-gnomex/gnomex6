@@ -76,6 +76,8 @@ export class DeleteDataTrackComponent extends BaseGenericContainerDialog {
                                 this.dataTrackService.refreshDatatracksList_fromBackend();
                             }
                         );
+                }, (err: IGnomexErrorResponse) => {
+                    this.showSpinner = false;
                 });
             }, (err: IGnomexErrorResponse) => {
                 this.showSpinner = false;

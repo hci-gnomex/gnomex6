@@ -50,14 +50,14 @@ export class SampleUploadService {
 
 
     private getSampleUpload_URL(): void {
-        this.http.get(SampleUploadService.getUploadSampleSheetURL_URL, {}).subscribe((response: any) => {
-            if (response) {
-                this.sampleUpload_URL = '' + response.json().url;
+        this.httpClient.get(SampleUploadService.getUploadSampleSheetURL_URL).subscribe((response: any) => {
+            if (response && response.url) {
+                this.sampleUpload_URL = response.url;
 
                 this.hasSampleUploadURLSubject.next(this.sampleUpload_URL);
                 this.hasSampleUploadURLSubject.unsubscribe();
             }
-        },(err:IGnomexErrorResponse) => {
+        }, (err: IGnomexErrorResponse) => {
             this.dialogService.stopAllSpinnerDialogs();
         });
     }
@@ -82,6 +82,8 @@ export class SampleUploadService {
                 } else {
                     this.uploadSampleSheetSubject.next(null);
                 }
+            }, (err: IGnomexErrorResponse) => {
+                this.dialogService.stopAllSpinnerDialogs();
             });
         }
 
@@ -95,20 +97,20 @@ export class SampleUploadService {
     public uploadBulkSampleSheet(params: any): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
 
-        this.http.get(SampleUploadService.getUploadSampleSheetURL_URL, {}).subscribe((response: any) => {
+        this.httpClient.get(SampleUploadService.getUploadSampleSheetURL_URL).subscribe((response: any) => {
             if (response && response.url) {
-                this.sampleUpload_URL = '' + response.url;
+                this.sampleUpload_URL = response.url;
 
                 this.cookieUtilService.formatXSRFCookie();
 
                 this.http.post('/gnomex/UploadMultiRequestSampleSheetFileServlet.gx', params).subscribe((response: any) => {
                     this.bulkUploadSubject.next(response.json());
 
-                    },(err:IGnomexErrorResponse) => {
+                    }, (err: IGnomexErrorResponse) => {
                     this.dialogService.stopAllSpinnerDialogs();
                 });
             }
-        },(err:IGnomexErrorResponse) => {
+        }, (err: IGnomexErrorResponse) => {
             this.dialogService.stopAllSpinnerDialogs();
         });
 
@@ -142,22 +144,23 @@ export class SampleUploadService {
             });
         }
 
-        let params: URLSearchParams = new URLSearchParams();
+        let params: HttpParams = new HttpParams()
+            .set('sampleSheetHeaderXMLString', JSON.stringify(processedHeaders))
+            .set('sampleSheetRowXMLString',    JSON.stringify(rows));
 
-        params.set('sampleSheetHeaderXMLString', JSON.stringify(processedHeaders));
-        params.set('sampleSheetRowXMLString',    JSON.stringify(rows));
-
-        let headers: Headers = new Headers();
-        headers.set("Content-Type", "application/x-www-form-urlencoded");
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
 
         this.cookieUtilService.formatXSRFCookie();
 
-        this.http.post('/gnomex/SaveMultiRequestSampleSheet.gx', params.toString(), {headers: headers}).subscribe((response: any) => {
-            if (response && response.status === 200) {
-                this.bulkUploadImportedSubject.next(response.json());
+        this.httpClient.post('/gnomex/SaveMultiRequestSampleSheet.gx', params.toString(), {headers: headers}).subscribe((response: any) => {
+            if (response) {
+                this.bulkUploadImportedSubject.next(response);
             } else {
                 this.bulkUploadImportedSubject.next(null);
             }
+        }, (err: IGnomexErrorResponse) => {
+            this.dialogService.stopAllSpinnerDialogs();
         });
 
         return this.bulkUploadImportedSubject;
@@ -240,6 +243,8 @@ export class SampleUploadService {
             if (event.type === HttpEventType.Response) {
                 saveAs(event.body, filename);
             }
+        }, (err: IGnomexErrorResponse) => {
+            this.dialogService.stopAllSpinnerDialogs();
         });
     }
 }

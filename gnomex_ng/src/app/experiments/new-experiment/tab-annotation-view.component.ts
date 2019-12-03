@@ -268,6 +268,8 @@ export class TabAnnotationViewComponent implements OnDestroy {
                     this.gnomexService.propertyList = response;
                     this._experiment.refreshSampleAnnotationList();
                     this.dialogsService.stopAllSpinnerDialogs();
+                }, (err: IGnomexErrorResponse) => {
+                    this.dialogsService.stopAllSpinnerDialogs();
                 });
             } else {
                 let message: string = response && response.message ? " " + response.message : "";

@@ -209,7 +209,7 @@ public class ReportIssueFeedbackServlet extends HttpServlet {
 
             org.dom4j.io.OutputFormat format1 = org.dom4j.io.OutputFormat.createPrettyPrint();
             org.dom4j.io.HTMLWriter writer;
-            res.setContentType("text/html");
+            res.setContentType("text/html; charset=UTF-8");
 
             Document doc = DocumentHelper.createDocument();
             Element root = doc.addElement("HTML");

@@ -80,7 +80,7 @@ public class DownloadProductOrderSingleFileServlet extends HttpServlet {
         if (idProductOrder == null || fileName == null) {
             LOG.error("idProductOrder and fileName required");
 
-            response.setContentType("text/html");
+            response.setContentType("text/html; charset=UTF-8");
             response.getOutputStream().println(
                     "<html><head><title>Error</title></head>");
             response.getOutputStream().println("<body><b>");
@@ -107,10 +107,13 @@ public class DownloadProductOrderSingleFileServlet extends HttpServlet {
                 String mimeType = req.getSession().getServletContext().getMimeType(fileName);
                 if (view.equals("Y") && mimeType != null) {
                     response.setContentType(mimeType);
+                    if(response.getCharacterEncoding() == null || (!response.getCharacterEncoding().equals("UTF-8") && !response.getCharacterEncoding().equals("utf-8"))) {
+                        response.setCharacterEncoding("UTF-8");
+                    }
                     response.setHeader("Content-Disposition", "filename=" + "\"" + fileName + "\"");
                     response.setHeader("Cache-Control", "max-age=0, must-revalidate");
                 } else {
-                    response.setContentType("application/x-download");
+                    response.setContentType("application/x-download; charset=UTF-8");
                     response.setHeader("Content-Disposition", "attachment;filename=" + "\"" + fileName + "\"");
                     response.setHeader("Cache-Control", "max-age=0, must-revalidate");
                 }
@@ -248,7 +251,7 @@ public class DownloadProductOrderSingleFileServlet extends HttpServlet {
 
 
             } else {
-                response.setContentType("text/html");
+                response.setContentType("text/html; charset=UTF-8");
                 response.getOutputStream().println(
                         "<html><head><title>Error</title></head>");
                 response.getOutputStream().println("<body><b>");
@@ -267,7 +270,7 @@ public class DownloadProductOrderSingleFileServlet extends HttpServlet {
             Util.sendErrorReport(HibernateSession.currentSession(),"GNomEx.Support@hci.utah.edu", "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
 
             HibernateSession.rollback();
-            response.setContentType("text/html");
+            response.setContentType("text/html; charset=UTF-8");
             response.getOutputStream().println(
                     "<html><head><title>Error</title></head>");
             response.getOutputStream().println("<body><b>");

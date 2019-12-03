@@ -19,45 +19,7 @@ import {ConstantsService} from "../services/constants.service";
 @Component({
     selector: "edit-flowcell-dialog",
     templateUrl: "./edit-flowcell-dialog.html",
-    styles: [`
-
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
-        }
-        .flex-row-container-itailic {
-            display: flex;
-            flex-direction: row;
-            font-style: italic;
-            color: #1601db;
-        }
-        .flex-row-container-margin {
-            display: flex;
-            flex-direction: row;
-            margin-bottom: .5em;
-            font-style: italic;
-            color: #1601db;
-        }
-        .normal-text {
-            font-style: normal;
-            color: black;
-        }
-        .flex-row-container-end {
-            display: flex;
-            flex-direction: row;
-            justify-content: flex-end;
-            margin-top: 1.2em;
-        }
-        .fill-flex-row {
-            height: 10em;
-            display: flex;
-            flex-direction: row;
-        }
-        .formField {
-            width: 50%;
-            margin: 0 0.5%;
-        }
-    `]
+    styles: [``]
 })
 
 export class EditFlowcellDialogComponent extends BaseGenericContainerDialog implements OnInit{
@@ -72,6 +34,7 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
     public barcodeFC: FormControl;
     public runFC: FormControl;
     public createDateFC: FormControl;
+    public lastCycleDateFC: FormControl;
     public seqRunCompleteDateFC: FormControl;
     public instrumentFC: FormControl;
     public protocolFC: FormControl;
@@ -93,6 +56,7 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
         this.barcodeFC = new FormControl("", Validators.required);
         this.runFC = new FormControl("", Validators.required);
         this.createDateFC = new FormControl("");
+        this.lastCycleDateFC = new FormControl("");
         this.seqRunCompleteDateFC = new FormControl("");
         this.instrumentFC = new FormControl("", Validators.required);
         this.protocolFC = new FormControl("", Validators.required);
@@ -100,6 +64,7 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
             barCode: this.barcodeFC,
             run: this.runFC,
             createDate: this.createDateFC,
+            lastCycleDate: this.lastCycleDateFC,
             seqRunCompletDate: this.seqRunCompleteDateFC,
             instrument: this.instrumentFC,
             protocol: this.protocolFC,
@@ -198,6 +163,7 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
         this.barcodeFC.setValue(this.flowCell.barcode);
         this.runFC.setValue(this.flowCell.runNumber);
         this.createDateFC.setValue(this.flowCell.createDate);
+        this.lastCycleDateFC.setValue(this.flowCell.lastCycleDate);
         this.instrumentFC.setValue(this.flowCell.idInstrument);
         for (let instrument of this.instrumentList) {
             if (instrument.idInstrument === this.flowCell.idInstrument) {
@@ -216,6 +182,10 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
                 this.flowCellChannels = [this.flowCell.flowCellChannels.FlowCellChannel];
             } else {
                 this.flowCellChannels = this.flowCell.flowCellChannels;
+            }
+
+            if (this.flowCellChannels && Array.isArray(this.flowCellChannels) && this.flowCellChannels.length > 0) {
+                this.flowCell.lastCycleDate = this.flowCellChannels[0].lastCycleDate;
             }
         }
         for(let fcChannel of this.flowCellChannels){
@@ -286,7 +256,8 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
     public save(): void {
         let params: HttpParams = new HttpParams().set("barcode" ,this.barcodeFC.value)
             .set("codeSequencingPlatform", this.codeSequencingPlatform)
-            .set("createDate", WorkflowService.convertDate(this.createDateFC.value))
+            .set("createDate", this.flowCell.createDate)
+            .set("lastCycleDate", this.flowCell.lastCycleDate)
             .set("idCoreFacility", this.flowCell.idCoreFacility)
             .set("idFlowCell", this.flowCell.idFlowCell)
             .set("idInstrument", this.instrumentFC.value.idInstrument)
@@ -343,5 +314,13 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
         );
         this.allFG.markAsDirty();
         this.setEditForm();
+    }
+
+    public onChangeCreateDate() {
+        this.createDateFC.markAsDirty();
+    }
+
+    public onChangeLastCycleDate() {
+        this.createDateFC.markAsDirty();
     }
 }

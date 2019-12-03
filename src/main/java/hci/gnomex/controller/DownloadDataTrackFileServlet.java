@@ -88,7 +88,7 @@ protected void doGet(HttpServletRequest req, HttpServletResponse response) throw
 		// Get security advisor
 		SecurityAdvisor secAdvisor = (SecurityAdvisor) req.getSession().getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY);
 
-		response.setContentType("application/x-download");
+		response.setContentType("application/x-download; charset=UTF-8");
 		response.setHeader("Content-Disposition", "attachment;filename=genopub_dataTracks.zip");
 		response.setHeader("Cache-Control", "max-age=0, must-revalidate");
 

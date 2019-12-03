@@ -1,5 +1,5 @@
 import {Component} from "@angular/core";
-import {Response, URLSearchParams} from "@angular/http";
+import {HttpParams} from "@angular/common/http";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {PasswordUtilService} from "../services/password-util.service";
@@ -8,6 +8,7 @@ import {MatSnackBar} from "@angular/material";
 import {LabMembershipRequestComponent} from "./lab-membership-request.component";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'my-account',
@@ -88,7 +89,7 @@ export class MyAccountComponent {
         this.notifyLabsChanged = [];
 
         this.appUserPublicService.getAppUserPublic(this.createSecurityAdvisorService.idAppUser.toString()).subscribe((response: any) => {
-            if (response) {
+            if (response && response.idAppUser) {
                 this.firstNameFC.setValue(response.firstName);
                 this.lastNameFC.setValue(response.lastName);
                 this.emailFC.setValue(response.email);
@@ -96,13 +97,13 @@ export class MyAccountComponent {
                 this.institutionFC.setValue(response.institute);
                 this.departmentFC.setValue(response.department);
                 this.urlFC.setValue(response.ucscUrl);
-                if (response.userNameExternal && response.userNameExternal != "") {
+                if (response.userNameExternal && response.userNameExternal !== "") {
                     this.resetUserType(true);
                     this.userType = this.USER_TYPE_EXTERNAL;
                     this.usernameFC.setValue(response.userNameExternal);
                     this.passwordFC.setValue(this.DUMMY_PASSWORD);
                     this.passwordConfirmFC.setValue(this.DUMMY_PASSWORD);
-                } else if (response.uNID && response.uNID != "") {
+                } else if (response.uNID && response.uNID !== "") {
                     this.resetUserType(false);
                     this.userType = this.USER_TYPE_UNIVERSITY;
                     this.unidFC.setValue(response.uNID);
@@ -117,7 +118,13 @@ export class MyAccountComponent {
                         this.notifyGridRowData = response.notificationLabs;
                     }
                 }
+            } else {
+                // TODO: remove this later once error caught by the interceptor
+                let message: string = response && response.message ? response.message : "";
+                this.dialogsService.error("An error occurred while getting appUserPublic. " + message);
             }
+        }, (err: IGnomexErrorResponse) => {
+            // TODO: Need to check on back-end to see why it can't catch errors
         });
     }
 
@@ -184,37 +191,36 @@ export class MyAccountComponent {
 
     public save(): void {
         this.showSpinner = true;
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idAppUser", this.createSecurityAdvisorService.idAppUser.toString());
-        params.set("firstName", this.firstNameFC.value);
-        params.set("lastName", this.lastNameFC.value);
-        params.set("institute", this.institutionFC.value);
-        params.set("department", this.departmentFC.value);
-        params.set("email", this.emailFC.value);
-        params.set("phone", this.phoneFC.value);
-        params.set("ucscUrl", this.urlFC.value);
-        params.set("isActive", "Y");
+        let params: HttpParams = new HttpParams()
+            .set("idAppUser", this.createSecurityAdvisorService.idAppUser.toString())
+            .set("firstName", this.firstNameFC.value)
+            .set("lastName", this.lastNameFC.value)
+            .set("institute", this.institutionFC.value)
+            .set("department", this.departmentFC.value)
+            .set("email", this.emailFC.value)
+            .set("phone", this.phoneFC.value)
+            .set("ucscUrl", this.urlFC.value)
+            .set("isActive", "Y");
         if (this.userType === this.USER_TYPE_UNIVERSITY) {
-            params.set("uNID", this.unidFC.value);
+            params = params.set("uNID", this.unidFC.value);
         } else if (this.userType === this.USER_TYPE_EXTERNAL) {
-            params.set("userNameExternal", this.usernameFC.value);
-            params.set("passwordExternal", this.passwordFC.value === this.DUMMY_PASSWORD ? this.PASSWORD_MASKED : this.passwordFC.value);
+            params = params.set("userNameExternal", this.usernameFC.value);
+            params = params.set("passwordExternal", this.passwordFC.value === this.DUMMY_PASSWORD ? this.PASSWORD_MASKED : this.passwordFC.value);
         }
         if (this.notifyLabsChanged.length > 0) {
-            params.set("userNotificationLabsJSONString", JSON.stringify(this.notifyLabsChanged));
-            params.set("noJSONToXMLConversionNeeded", "Y");
+            params = params.set("userNotificationLabsJSONString", JSON.stringify(this.notifyLabsChanged));
+            params = params.set("noJSONToXMLConversionNeeded", "Y");
         }
 
-        this.appUserPublicService.saveAppUserPublic(params).subscribe((response: Response) => {
-            if (response.status === 200) {
-                let responseJSON: any = response.json();
-                if (responseJSON.result && responseJSON.result === "SUCCESS") {
-                    this.allFG.markAsPristine();
-                    this.snackBar.open("Changes Saved", "My Account", {
-                        duration: 2000,
-                    });
-                }
+        this.appUserPublicService.saveAppUserPublic(params).subscribe((response: any) => {
+            if(response && response.result && response.result === "SUCCESS") {
+                this.allFG.markAsPristine();
+                this.snackBar.open("Changes Saved", "My Account", {
+                    duration: 2000,
+                });
             }
+            this.showSpinner = false;
+        }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
     }

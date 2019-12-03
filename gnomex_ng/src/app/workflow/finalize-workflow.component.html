@@ -55,7 +55,7 @@
                             &nbsp;{{flowCellNumber}}
                         </div>
                     </div>
-                    <div class="flex-container-row spaced-children-margin">
+                    <div class="flex-container-row align-baseline spaced-children-margin">
                         <mat-form-field>
                             <input matInput
                                    placeholder="Barcode"
@@ -81,6 +81,10 @@
                             <mat-datepicker-toggle matSuffix [for]="createDatePicker"></mat-datepicker-toggle>
                             <mat-datepicker #createDatePicker disabled="false"></mat-datepicker>
                         </mat-form-field>
+                        <mat-radio-group [formControl]="sideFC" class="flex-container-row children-margin-right" (change)="createFlowCellFileName()">
+                            <mat-radio-button value="A">Side A</mat-radio-button>
+                            <mat-radio-button value="B">Side B</mat-radio-button>
+                        </mat-radio-group>
                     </div>
                     <div class="flex-container-row spaced-children-margin">
                         <div>

@@ -39,9 +39,11 @@ export class DeleteExperimentComponent extends BaseGenericContainerDialog {
             .set("idRequest", this.selectedExperiment.idRequest);
         this.experimentsService.deleteExperiment(params).pipe(first())
             .subscribe(response => {
+                this.showSpinner = false;
                 this.dialogRef.close(true);
                 this.experimentsService.refreshProjectRequestList_fromBackend();
             }, (err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
     }
 

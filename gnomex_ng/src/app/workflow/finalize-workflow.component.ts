@@ -42,6 +42,9 @@ import {DateParserComponent} from "../util/parsers/date-parser.component";
         .min-lab-width {
             min-width: 3em;
         }
+        .children-margin-right > *:not(:last-child) {
+            margin-right: 1em;
+        }
         
 
     `]
@@ -233,7 +236,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     private flowCellRunFolder: string;
     private idFlowCell: string;
 
-    private selectionGridApi:GridApi;
+    private selectionGridApi: GridApi;
     private detailGridApi: GridApi;
 
     public allFG: FormGroup;
@@ -243,6 +246,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     public createDateFC: FormControl;
     public instrumentFC: FormControl;
     public protocolFC:   FormControl;
+    public sideFC: FormControl;
 
 
     constructor(public workflowService: WorkflowService,
@@ -257,6 +261,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         this.createDateFC = new FormControl("");
         this.instrumentFC = new FormControl("", Validators.required);
         this.protocolFC   = new FormControl("", Validators.required);
+        this.sideFC       = new FormControl();
 
         this.allFG = new FormGroup({
             barCode:    this.barcodeFC,
@@ -264,7 +269,9 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             createDate: this.createDateFC,
             instrument: this.instrumentFC,
             protocol:   this.protocolFC,
+            side:       this.sideFC
         });
+
     }
 
     ngOnInit() {
@@ -296,6 +303,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
 
     private initialize(): void {
         this.dialogsService.startDefaultSpinnerDialog();
+        this.sideFC.disable();
 
         let temp: string = this.workflowService.ILLSEQ_FINALIZE_FC + ','
             + this.workflowService.NOSEQ_FINALIZE_FC + ','
@@ -317,7 +325,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             }
 
             this.dialogsService.stopAllSpinnerDialogs();
-        }, (err:IGnomexErrorResponse) => {
+        }, (err: IGnomexErrorResponse) => {
             this.dialogsService.stopAllSpinnerDialogs();
         });
     }
@@ -385,6 +393,25 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         for (let flow of this.assmItemList) {
             flow.seqADisplay = this.workflowService.lookupOligoBarcode(flow);
             flow.seqBDisplay = this.workflowService.lookupOligoBarcodeB(flow);
+        }
+
+        if(this.assmItemList.length > 0 ){
+            let reqCat:string = this.assmItemList[0].codeRequestCategory;
+            if(reqCat === 'MISEQ'){
+                this.sideFC.setValue(null);
+                this.sideFC.disable();
+                this.sideFC.clearValidators();
+                this.sideFC.updateValueAndValidity();
+            }else{
+                this.sideFC.enable();
+                this.sideFC.setValidators(Validators.required);
+                this.sideFC.updateValueAndValidity();
+            }
+        }else{
+            this.sideFC.setValue(null);
+            this.sideFC.disable();
+            this.sideFC.clearValidators();
+            this.sideFC.updateValueAndValidity();
         }
 
         // let showConc = this.gnomexService.getCoreFacilityProperty(this.flowCell.idCoreFacility, this.gnomexService.PROPERTY_SHOW_SAMPLE_CONC_PM);
@@ -485,7 +512,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             if (item.flowCellChannelNumber && this.lanesHasFlowcellChannel(item.flowCellChannelNumber)) {
                 tmp.forEach((lane, index) => {
                     if(lane === item.flowCellChannelNumber) {
-                        tmp.splice(index,1);
+                        tmp.splice(index, 1);
                     }
                 });
             }
@@ -513,7 +540,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             if (wi.idNumberSequencingCyclesAllowed === '' || wi.idNumberSequencingCyclesAllowed == null) {
                 errorMessage = "One or more samples have no sequencing protocol.  Please correct sequence lanes before continuing.";
             }
-            if(wi.idNumberSequencingCyclesAllowed != this.protocolFC.value.idNumberSequencingCyclesAllowed) {
+            if(wi.idNumberSequencingCyclesAllowed !== this.protocolFC.value.idNumberSequencingCyclesAllowed) {
                 warningMessage += "One or more samples have different protocols from the flow cell.\n\n";
                 break;
             }
@@ -595,7 +622,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             .set("numberSequencingCyclesActual", this.protocolFC.value.numberSequencingCyclesDisplay)
             .set("runFolder", this.flowCellRunFolder)
             .set("runNumber", this.runFC.value)
-            .set("side","A")
+            .set("side", this.sideFC.value ? this.sideFC.value : '')
             .set("noJSONToXMLConversionNeeded", "Y");
         for (let seqLane of this.assmItemList) {
             this.buildChannel(seqLane);
@@ -614,7 +641,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             this.initialize();
 
             this.showSpinner = false;
-        }, (err: IGnomexErrorResponse) =>{
+        }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;
         });
     }
@@ -656,6 +683,8 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
                 this.dialogsService.error("An error occurred while deleting" + message);
             }
             this.showSpinner = false;
+        }, (err: IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
     }
 
@@ -684,17 +713,17 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         for (let wi of this.assmItemList) {
             if (wi.flowCellChannelNumber === flowCellChannelNumber) {
                 let tag = wi.barcodeSequence + wi.barcodeSequenceB;
-                if(tag !== null && tag !== ""){
+                if(tag !== null && tag !== "") {
                     barcodes.push(tag);
                 }
             }
         }
 
-        for(var i: number = 0; i < barcodes.length; i++){
+        for(var i: number = 0; i < barcodes.length; i++) {
             let sequenceOne: any[] = barcodes[i].split("");
-            for(let j: number = i+1; j < barcodes.length; j++){
+            for(let j: number = i + 1; j < barcodes.length; j++) {
                 let sequenceTwo: any[] = barcodes[j].split("");
-                if(!this.atLeastThreeUnique(sequenceOne, sequenceTwo)){
+                if(!this.atLeastThreeUnique(sequenceOne, sequenceTwo)) {
                     return false;
                 }
             }
@@ -706,8 +735,8 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     private atLeastThreeUnique(sequenceOne: any[], sequenceTwo: any[]): boolean{
         let uniqueBaseCount: number = 0;
 
-        for(var i: number = 0; i < sequenceOne.length; i++){
-            if(sequenceOne[i] != sequenceTwo[i]){
+        for(var i: number = 0; i < sequenceOne.length; i++) {
+            if(sequenceOne[i] !== sequenceTwo[i]) {
                 uniqueBaseCount++;
             }
         }
@@ -715,7 +744,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         return (uniqueBaseCount >= 3);
     }
 
-    private createFlowCellFileName():void {
+    private createFlowCellFileName(): void {
         let runFolder: string = '';
         if(this.barcodeFC.value.length > 0
             && this.runFC.value.length > 0
@@ -725,7 +754,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
 
             let cDate = new Date(this.createDateFC.value);
 
-            let year: string = (cDate.getFullYear().toString()).substr(2,3);
+            let year: string = (cDate.getFullYear().toString()).substr(2, 3);
 
             let month: string = (cDate.getMonth() + 1).toString();
             if (month.length === 1) {
@@ -733,14 +762,15 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             }
 
             let date: string =  cDate.getDate().toString();
-            if(date.length == 1) {
+            if(date.length === 1) {
                 date = "0" + date;
             }
 
             runFolder += year + month + date + "_" + this.instrumentFC.value.instrument + "_";
 
             let runNumberPlus: number = Number(this.runFC.value) + 10000;
-            runFolder += runNumberPlus.toString().substring(1,5) + "_A" + this.barcodeFC.value;
+            let side = this.sideFC.value ? this.sideFC.value : '';
+            runFolder += runNumberPlus.toString().substring(1, 5) + "_" + side + this.barcodeFC.value;
         }
         if (this.originalProtocol
             && this.protocolFC.value.idNumberSequencingCyclesAllowed !== this.originalProtocol.value) {
