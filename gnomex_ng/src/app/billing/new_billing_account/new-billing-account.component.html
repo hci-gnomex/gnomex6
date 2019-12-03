@@ -68,7 +68,7 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_shortAccount" class="tr full-width">
+				<div *ngIf="!usesCustomChartfields || includeInCustomField_shortAccount" class="tr full-width">
 					<div class="td cell-label">
 						Short Account Name
 					</div>
@@ -84,7 +84,7 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<div *ngIf="usesCustomChartfields !== 'Y'" class="tr full-width">
+				<div *ngIf="!usesCustomChartfields" class="tr full-width">
 					<div class="td cell-label">
 						Chartfield to be charged
 					</div>
@@ -231,7 +231,7 @@
 						</div>
 					</div>
 				</div>
-				<div *ngIf="usesCustomChartfields === 'Y'"  class="tr full-width">
+				<div *ngIf="usesCustomChartfields"  class="tr full-width">
 					<div class="td cell-label">
 						Chartfield to be charged
 					</div>
@@ -397,7 +397,7 @@
 						</div>
 					</div>
 				</div>
-				<div *ngIf="showFundingAgencies && (usesCustomChartfields !== 'Y' || includeInCustomField_fundingAgency)" class="tr full-width">
+				<div *ngIf="showFundingAgencies && (!usesCustomChartfields || includeInCustomField_fundingAgency)" class="tr full-width">
 					<div class="td cell-label">
 						Funding Agency
 					</div>
@@ -410,7 +410,7 @@
 				</div>
 				<div class="tr full-width row-spacer">
 				</div>
-				<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_startDate" class="tr full-width">
+				<div *ngIf="!usesCustomChartfields || includeInCustomField_startDate" class="tr full-width">
 					<div class="td cell-label">
 						Start Date
 					</div>
@@ -430,10 +430,10 @@
 						</div>
 						<div class="inline-block" style="width:7em;">
 						</div>
-						<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_expirationDate" class="inline-block cell-label" style="height: 100%;">
+						<div *ngIf="!usesCustomChartfields || includeInCustomField_expirationDate" class="inline-block cell-label" style="height: 100%;">
 							Effective Until
 						</div>
-						<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_expirationDate" style="display:inline-block; overflow:visible; font-size:small;">
+						<div *ngIf="!usesCustomChartfields || includeInCustomField_expirationDate" style="display:inline-block; overflow:visible; font-size:small;">
 							<mat-form-field>
 								<input
 										matInput
@@ -448,7 +448,7 @@
 						</div>
 					</div>
 				</div>
-				<div *ngIf="(usesCustomChartfields == 'Y' && (!includeInCustomField_startDate)) && includeInCustomField_expirationDate" class="tr full-width">
+				<div *ngIf="(usesCustomChartfields && (!includeInCustomField_startDate)) && includeInCustomField_expirationDate" class="tr full-width">
 					<div class="td cell-label">
 						Effective Until
 					</div>
@@ -468,7 +468,7 @@
 						</div>
 					</div>
 				</div>
-				<div *ngIf="usesCustomChartfields !== 'Y' || includeInCustomField_totalDollarAmount" class="tr full-width">
+				<div *ngIf="!usesCustomChartfields || includeInCustomField_totalDollarAmount" class="tr full-width">
 					<div class="td cell-label">
 						Total Dollar Amount
 					</div>
