@@ -77,7 +77,7 @@
                                    [disabled]="true"
                                    [formControl]="this.createDateFC"
                                    [matDatepicker]="createDatePicker"
-                                   (change)="createFlowCellFileName()">
+                                   (dateChange)="createFlowCellFileName()">
                             <mat-datepicker-toggle matSuffix [for]="createDatePicker"></mat-datepicker-toggle>
                             <mat-datepicker #createDatePicker disabled="false"></mat-datepicker>
                         </mat-form-field>
@@ -90,6 +90,7 @@
                         <div>
                             <custom-combo-box placeholder="Instrument"
                                               displayField="instrument"
+                                              valueField="idInstrument"
                                               [customOptionClasses]="'small-font padded inline-block full-width'"
                                               [formControl]="this.instrumentFC"
                                               [options]="this.instrumentList"
@@ -99,6 +100,7 @@
                         <div class="protocol-width">
                             <custom-combo-box placeholder="Protocol"
                                               displayField="name"
+                                              valueField="idNumberSequencingCyclesAllowed"
                                               [customOptionClasses]="'small-font padded inline-block full-width'"
                                               [formControl]="this.protocolFC"
                                               [options]="this.filteredProtocolsList"

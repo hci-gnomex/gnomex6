@@ -342,7 +342,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         if(event
             && event.node
             && event.node.selected) {
-
+            this.originalProtocol = "";
             this.filteredProtocolsList = this.sequenceProtocolsList.filter((proto) => {
                 return proto.codeRequestCategory === event.data.codeSequencingPlatform && proto.isActive === 'Y';
             });
@@ -350,10 +350,12 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             this.selectedFlowCells = [];
             this.selectedFlowCells.push(event.data);
             this.setFinalizedForm(event);
+            this.originalProtocol = event.data.idNumberSequencingCyclesAllowed;
         }
     }
 
     private setFinalizedForm(event): void {
+
         this.codeSequencingPlatform = event.data.codeSequencingPlatform;
         this.flowCell = event.data;
         this.assmItemList = [];
@@ -363,26 +365,15 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         this.barcodeFC.setValue(event.data.barcode);
         this.runFC.setValue(event.data.runNumber);
         this.createDateFC.setValue(event.data.createDate);
+        this.sideFC.setValue(event.data.side);
         this.instrumentFC.setValue(event.data.idInstrument);
+        this.protocolFC.setValue(event.data.idNumberSequencingCyclesAllowed);
+
+
 
         this.detailGridApi.setRowData([]);
 
         UtilService.markChildrenAsTouched(this.allFG);
-
-        for (let instrument of this.instrumentList) {
-            if (instrument.idInstrument === event.data.idInstrument) {
-                this.instrumentFC.setValue(instrument);
-                break;
-            }
-        }
-
-        for (let proto of this.filteredProtocolsList) {
-            if (proto.idNumberSequencingCyclesAllowed === event.data.idNumberSequencingCyclesAllowed) {
-                this.protocolFC.setValue(proto);
-                this.originalProtocol = proto;
-                break;
-            }
-        }
 
         this.flowCellChannels = UtilService.getJsonArray(event.data.flowCellChannels, event.data.flowCellChannels.FlowCellChannel);
 
@@ -396,8 +387,14 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         }
 
         if(this.assmItemList.length > 0 ){
-            let reqCat:string = this.assmItemList[0].codeRequestCategory;
-            if(reqCat === 'MISEQ'){
+            let firstFC : any  = this.assmItemList[0];
+            let reqCat:string = firstFC.codeRequestCategory;
+            let seqProtocolId = firstFC.idNumberSequencingCyclesAllowed;
+
+            let foundProtocol = this.filteredProtocolsList.find(p => (p.idNumberSequencingCyclesAllowed === seqProtocolId  ));
+            let foundProtocolName:string = foundProtocol && foundProtocol.name ?  (<string>foundProtocol.name).toUpperCase() : '';
+
+            if(reqCat === 'MISEQ' || foundProtocolName.indexOf("MISEQ") != -1 ){
                 this.sideFC.setValue(null);
                 this.sideFC.disable();
                 this.sideFC.clearValidators();
@@ -424,7 +421,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         this.detailGridApi.sizeColumnsToFit();
 
         this.refreshPipeline(this.assmItemList);
-        this.createFlowCellFileName();
+        //this.createFlowCellFileName();
         this.touchFields();
 
         this.workflowService.assignBackgroundColor(this.assmItemList, "flowCellChannelNumber");
@@ -613,10 +610,8 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             .set("createDate", WorkflowService.convertDate(this.createDateFC.value))
             .set("idCoreFacility", this.flowCell.idCoreFacility)
             .set("idFlowCell", this.flowCell.idFlowCell)
-            .set("idInstrument", this.instrumentFC.value.idInstrument)
-            .set("idNumberSequencingCycles", this.protocolFC.value.idNumberSequencingCycles)
-            .set("idNumberSequencingCyclesAllowed", this.protocolFC.value.idNumberSequencingCyclesAllowed)
-            .set("idSeqRunType", this.protocolFC.value.idSeqRunType)
+            .set("idInstrument", this.instrumentFC.value ? this.instrumentFC.value : "")
+            .set("idNumberSequencingCyclesAllowed", this.protocolFC.value ? this.protocolFC.value : "")
             .set("notes", this.flowCell.notes)
             .set("number", this.flowCell.number)
             .set("numberSequencingCyclesActual", this.protocolFC.value.numberSequencingCyclesDisplay)
@@ -628,6 +623,13 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             this.buildChannel(seqLane);
         }
 
+
+        let protocolObj =  this.filteredProtocolsList.find(p => (p.idNumberSequencingCyclesAllowed === this.protocolFC.value));
+        params = params.set("numberSequencingCyclesActual", protocolObj ? protocolObj.numberSequencingCyclesDisplay : "" );
+        params = params.set("idSeqRunType", protocolObj ?  protocolObj.idSeqRunType : "");
+        params = params.set("idNumberSequencingCycles", protocolObj ?  protocolObj.idNumberSequencingCycles : "");
+
+
         params = params.set("channelsJSONString", JSON.stringify(this.flowCellChannels));
 
         this.showSpinner = true;
@@ -638,6 +640,8 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             }
             this.dialogsService.alert("Flowcell " + response.flowCellNumber + " created", null, DialogType.SUCCESS);
             this.assmItemList = [];
+            this.allFG.reset();
+            this.flowCellRunFolder = "";
             this.initialize();
 
             this.showSpinner = false;
@@ -765,15 +769,21 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             if(date.length === 1) {
                 date = "0" + date;
             }
+            let instrumentCode:string = "";
+            if(this.instrumentFC.value){
+               let instrumentObj = this.instrumentList.find(i => (i.idInstrument === this.instrumentFC.value ));
+               instrumentCode = instrumentObj &&  instrumentObj.instrument ? instrumentObj.instrument : "";
+            }
 
-            runFolder += year + month + date + "_" + this.instrumentFC.value.instrument + "_";
+
+            runFolder += year + month + date + "_" + instrumentCode + "_";
 
             let runNumberPlus: number = Number(this.runFC.value) + 10000;
             let side = this.sideFC.value ? this.sideFC.value : '';
             runFolder += runNumberPlus.toString().substring(1, 5) + "_" + side + this.barcodeFC.value;
         }
         if (this.originalProtocol
-            && this.protocolFC.value.idNumberSequencingCyclesAllowed !== this.originalProtocol.value) {
+            && this.protocolFC.value !== this.originalProtocol) {
 
             let message: string = "Changing the protocol for the flow cell will change the protocol for all the samples it contains.";
             this.dialogsService.alert(message, null, DialogType.WARNING);
