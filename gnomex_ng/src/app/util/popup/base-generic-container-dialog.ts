@@ -9,10 +9,11 @@ export abstract class BaseGenericContainerDialog {
 
     public  primaryDisable: (action?: GDAction) => boolean = (action) => {
         return false;
-    }
+    };
+
     public  secondaryDisable: (action?: GDAction) => boolean = (action) => {
         return false;
-    }
+    };
 
     public dirty: () => boolean = () => { return false; };
 
