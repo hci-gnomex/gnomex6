@@ -3,6 +3,7 @@ import {Observable} from "rxjs";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {DictionaryService} from "./dictionary.service";
 import {CookieUtilService} from "./cookie-util.service";
+import {DateParserComponent} from "../util/parsers/date-parser.component";
 
 export enum qcModes {
     All = "All",
@@ -168,8 +169,8 @@ export class WorkflowService {
         if (value === "") {
             return value;
         }
-        let date = new Date(value);
-        return date.getMonth() + 1 + '/' + date.getDate() + '/' +  date.getFullYear()
+        let date = new DateParserComponent('YYYY-MM-DD', 'MM/DD/YYYY');
+        return  date.parseDateString(value);
     }
 
     public lookupOligoBarcode(item: any): string {

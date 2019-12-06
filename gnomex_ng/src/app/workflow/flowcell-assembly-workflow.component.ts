@@ -535,8 +535,14 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
                 }
 
                 if(this.assmItemList.length > 0 ){
-                    let reqCat = this.assmItemList[0].codeRequestCategory;
-                    if(reqCat === 'MISEQ'){
+                    let firstFC : any  = this.assmItemList[0];
+                    let reqCat:string = firstFC.codeRequestCategory;
+                    let seqProtocolId = firstFC.idNumberSequencingCyclesAllowed;
+
+                    let foundProtocol = this.filteredProtocolsList.find(p => (p.idNumberSequencingCyclesAllowed === seqProtocolId  ));
+                    let foundProtocolName:string = foundProtocol && foundProtocol.name ?  (<string>foundProtocol.name).toUpperCase() : '';
+
+                    if(reqCat === 'MISEQ' || foundProtocolName.indexOf("MISEQ") != -1 ){
                         this.sideFC.disable();
                         this.sideFC.setValue(null);
                         this.sideFC.clearValidators();
@@ -734,6 +740,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
         this.workflowService.saveWorkItemSolexaAssemble(params).subscribe((response: any) => {
             let responseJSON: any = response;
             if (responseJSON && responseJSON.result && responseJSON.result === "SUCCESS") {
+                this.allFG.reset();
                 this.allFG.markAsPristine();
 
                 if (!responseJSON.flowCellNumber) {
