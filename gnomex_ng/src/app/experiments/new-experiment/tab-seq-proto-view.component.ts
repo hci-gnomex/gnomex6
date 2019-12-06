@@ -5,6 +5,7 @@ import {HttpParams} from "@angular/common/http";
 import {BillingService} from "../../services/billing.service";
 import {Subscription} from "rxjs/index";
 import {Experiment} from "../../util/models/experiment.model";
+import {NewExperimentService} from "../../services/new-experiment.service";
 
 @Component({
     selector: "tabSeqProtoView",
@@ -17,9 +18,15 @@ import {Experiment} from "../../util/models/experiment.model";
             padding-right: 2em;
             margin-bottom: 2em;
         }
+        
+        .filter {
+            width: 80%;
+            min-width: 20em;
+            max-width: 30em;
+        }
 
-        .odd  { background-color: #edede9; }
-        .even { background-color: white; }
+        .odd  { background-color: white; }
+        .even { background-color: #edede9; }
         
         ol.three-depth-numbering {
             padding: 0;
@@ -78,7 +85,7 @@ import {Experiment} from "../../util/models/experiment.model";
         
         .right-align { text-align: right; }
         
-        
+        .left-spacer { margin-left: 4em; }
         
         .inline-block {
             width: 20em;
@@ -90,6 +97,12 @@ import {Experiment} from "../../util/models/experiment.model";
 
 export class TabSeqProtoViewComponent implements OnInit, OnDestroy {
 
+    private readonly ALL:   string = "ALL";
+    private readonly NOSEQ: string = "NOSEQ";
+    private readonly HISEQ: string = "HISEQ";
+    private readonly MISEQ: string = "MISEQ";
+    private readonly OTHER: string = "OTHER";
+
     @Input("experiment") set experiment(value: Experiment) {
         this._experiment = value;
 
@@ -97,7 +110,6 @@ export class TabSeqProtoViewComponent implements OnInit, OnDestroy {
             if (this.idLab_subscription) {
                 this.idLab_subscription.unsubscribe();
             }
-
 
             this.idLab_subscription = this._experiment.onChange_idLab.subscribe(() => {
                 this.changePrices();
@@ -108,8 +120,14 @@ export class TabSeqProtoViewComponent implements OnInit, OnDestroy {
                 this.codeRequestCategory_subscription.unsubscribe();
             }
 
-            this.codeRequestCategory_subscription = this._experiment.onChange_codeRequestCategory.subscribe(() => {
+            this.codeRequestCategory_subscription = this._experiment.onChange_codeRequestCategory.subscribe((codeRequestCategory) => {
                 this.changePrices();
+
+                if (codeRequestCategory && codeRequestCategory === NewExperimentService.TYPE_ILLSEQ) {
+                    this.useAlternateDisplay = true;
+                } else {
+                    this.useAlternateDisplay = false;
+                }
             })
         }
 
@@ -125,8 +143,69 @@ export class TabSeqProtoViewComponent implements OnInit, OnDestroy {
     private codeRequestCategory_subscription: Subscription;
 
     public form: FormGroup;
+
+    public useAlternateDisplay: boolean = false;
+
     private filteredNumberSequencingCyclesAllowedList: any[] = [];
     private priceMap: Map<string, string> = new Map<string, string>();
+
+    private filterValue: string = this.ALL;
+
+    // Instead of being static, these should probably be replaced by machines associated with the ILLSEQ RequestCategory
+    // See [GNOM6-1245]
+    public alternateDisplayFilters: any[] = [
+        { value: this.ALL,   display: "All Available Options" },
+        { value: this.NOSEQ, display: "Illumina NovaSeq Sequencing Options" },
+        { value: this.HISEQ, display: "Illumina HiSeq Sequencing Options" },
+        { value: this.MISEQ, display: "Illumina MiSeq Sequencing Options" }
+    ];
+
+    // TODO Replace this "alternate display node" per GNOM6-1204, replacing this front-end specific sorting
+    // TODO   with a generic property on the backend.
+
+    public get alternateDisplaySequencingOptions_Novaseq(): any[] {
+        return this.filteredNumberSequencingCyclesAllowedList.filter((a: any) => {
+            return a.display && a.display.toLowerCase().substr(0, 8) === 'novaseq ';
+        });
+    }
+
+    public get alternateDisplaySequencingOptions_Hiseq(): any[] {
+        return this.filteredNumberSequencingCyclesAllowedList.filter((a: any) => {
+            return a.display && a.display.toLowerCase().substr(0, 6) === 'hiseq ';
+        });
+    }
+
+    public get alternateDisplaySequencingOptions_Miseq(): any[] {
+        return this.filteredNumberSequencingCyclesAllowedList.filter((a: any) => {
+            return a.display && a.display.toLowerCase().substr(0, 6) === 'miseq ';
+        });
+    }
+
+    public get alternateDisplaySequencingOptions_Other(): any[] {
+        return this.filteredNumberSequencingCyclesAllowedList.filter((a: any) => {
+            return (a.display && !(a.display.toLowerCase().substr(0, 8) === 'novaseq '))
+                && (a.display && !(a.display.toLowerCase().substr(0, 6) === 'hiseq '))
+                && (a.display && !(a.display.toLowerCase().substr(0, 6) === 'miseq '));
+        });
+    }
+
+
+    public get showNovaSeqOptions(): boolean {
+        return this.useAlternateDisplay && (this.filterValue === this.ALL || this.filterValue === this.NOSEQ);
+    }
+    public get showHiSeqOptions(): boolean {
+        return this.useAlternateDisplay && (this.filterValue === this.ALL || this.filterValue === this.HISEQ);
+    }
+    public get showMiSeqOptions(): boolean {
+        return this.useAlternateDisplay && (this.filterValue === this.ALL || this.filterValue === this.MISEQ);
+    }
+    public get showOtherOptions(): boolean {
+        return this.useAlternateDisplay
+            && (this.filterValue === this.ALL || this.filterValue === this.OTHER)
+            && this.alternateDisplaySequencingOptions_Other
+            && this.alternateDisplaySequencingOptions_Other.length > 0;
+    }
+
 
     constructor(private billingService: BillingService,
                 private dictionaryService: DictionaryService,
@@ -234,8 +313,23 @@ export class TabSeqProtoViewComponent implements OnInit, OnDestroy {
                     for (let proto of this.filteredNumberSequencingCyclesAllowedList) {
                         proto.price = this.priceMap.get(proto.idNumberSequencingCyclesAllowed);
                     }
+
+                    this.alternateDisplayFilters = [
+                        { value: this.ALL,   display: "All Available Options" },
+                        { value: this.NOSEQ, display: "Illumina NovaSeq Sequencing Options" },
+                        { value: this.HISEQ, display: "Illumina HiSeq Sequencing Options" },
+                        { value: this.MISEQ, display: "Illumina MiSeq Sequencing Options" }
+                    ];
+
+                    if (this.alternateDisplaySequencingOptions_Other && this.alternateDisplaySequencingOptions_Other.length > 0) {
+                        this.alternateDisplayFilters.push({ value: this.OTHER, display: "Other Sequencing Options" });
+                    }
                 }
             });
         }
+    }
+
+    public onChangeFilter(event: any): void {
+        this.filterValue = event ? event : this.ALL;
     }
 }

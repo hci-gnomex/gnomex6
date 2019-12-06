@@ -1,8 +1,9 @@
 import {Component, Inject, OnInit} from '@angular/core';
-import {URLSearchParams} from "@angular/http";
+import {HttpParams} from "@angular/common/http";
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {GetLabService} from "../services/get-lab.service";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'new-group-dialog',
@@ -30,12 +31,14 @@ export class DeleteGroupDialogComponent extends BaseGenericContainerDialog imple
 
     public delete(): void {
         this.showSpinner = true;
-        let params: URLSearchParams = new URLSearchParams();
-        params.set("idLab", this.idLab);
+        let params: HttpParams = new HttpParams()
+            .set("idLab", this.idLab);
 
         this.getLabService.deleteLab(params).subscribe((response: any) => {
             this.showSpinner = false;
             this.dialogRef.close(true);
+        }, (err: IGnomexErrorResponse) => {
+            this.showSpinner = false;
         });
     }
 

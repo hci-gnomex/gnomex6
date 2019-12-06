@@ -216,7 +216,7 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
             }
 
             try(JsonWriter jsonWriter = Json.createWriter(res.getOutputStream())){
-                res.setContentType("application/json");
+                res.setContentType("application/json; charset=UTF-8");
                 jsonWriter.writeObject(value);
             }
 
@@ -230,7 +230,7 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
                     .build();
             JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
 
-            res.setContentType("application/json");
+            res.setContentType("application/json; charset=UTF-8");
             jsonWriter.writeObject(value);
             jsonWriter.close();
 

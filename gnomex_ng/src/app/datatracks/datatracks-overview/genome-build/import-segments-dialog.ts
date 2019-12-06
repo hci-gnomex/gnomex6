@@ -82,6 +82,8 @@ export class ImportSegmentsDialog extends BaseGenericContainerDialog implements 
                 this.parseImport(segs);
                 this.showSpinner = false;
                 this.dialogRef.close();
+            }, (err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
         }, (err: IGnomexErrorResponse) => {
             this.showSpinner = false;

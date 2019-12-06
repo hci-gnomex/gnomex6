@@ -69,7 +69,6 @@
 						[singleClickEdit]="true"
 						[enableSorting]="true"
 						[enableColResize]="true"
-						(cellClicked)="markAsDirty()"
 						(cellEditingStopped)="markAsDirty()"
 						(cellValueChanged)="translateChangesOntoAccountRecords($event)"
 						(gridSizeChanged)="onGridSizeChanged($event)"
@@ -85,7 +84,6 @@
 						[singleClickEdit]="true"
 						[enableSorting]="true"
 						[enableColResize]="true"
-						(cellClicked)="markAsDirty()"
 						(cellEditingStopped)="markAsDirty()"
 						(gridSizeChanged)="onGridSizeChanged($event)"
 						(gridReady)="onPoGridReady($event)">
@@ -100,7 +98,6 @@
 						[singleClickEdit]="true"
 						[enableSorting]="true"
 						[enableColResize]="true"
-						(cellClicked)="markAsDirty()"
 						(cellEditingStopped)="markAsDirty()"
 						(gridSizeChanged)="onGridSizeChanged($event)"
 						(gridReady)="onCreditCardGridReady($event)">

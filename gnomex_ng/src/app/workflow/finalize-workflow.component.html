@@ -1,0 +1,153 @@
+<div class="flex-container-col full-height full-width small-font">
+    <div class="flex-container-row align-center">
+        <img [src]="'./assets/DNA_diag.png'" alt="" height="16" width="16">
+        <mat-label class="padded medium-font">
+            {{ label }}
+        </mat-label>
+        <div class="flex-grow">
+        </div>
+        <button mat-button matTooltip="Refresh worklist" (click)="refreshWorkItemList()">
+            <img [src]="'./assets/action_refresh.gif'" alt="">
+            Refresh
+        </button>
+    </div>
+    <as-split class="white-split-gutter" unit="percent">
+        <as-split-area size="50" minSize="20">
+            <div class="flex-container-col full-height full-width padded">
+                <div #growToMatch class="flex-container-col full-width overflow-auto">
+                    <div class="flex-grow">
+                    </div>
+                    <div class="flex-container-row full-width padded-bottom align-baseline">
+                        <div class="italic title-color">
+                            Assembled Flow Cells :
+                        </div>
+                        <div>
+                            &nbsp;{{ assmFlowCellNumber }}
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-grow">
+                    <div #oneEmWidth1 class="no-height single-em"></div>
+                    <ag-grid-angular class="ag-theme-fresh full-height full-width min-grid-size"
+                                     [enableColResize]="true"
+                                     [enableSorting]="true"
+                                     [rowClassRules]="this.workflowService.assmGridRowClassRules"
+                                     [rowData]="workingWorkItemList"
+                                     [rowSelection]="'single'"
+                                     [singleClickEdit]="true"
+                                     [stopEditingWhenGridLosesFocus]="true"
+                                     (gridReady)="onSelectionGridReady($event)"
+                                     (gridSizeChanged)="onGridSizeChanged($event)"
+                                     (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
+                                     (rowSelected)="onRowSelected($event)">
+                    </ag-grid-angular>
+                </div>
+            </div>
+        </as-split-area>
+        <as-split-area size="*" minSize="20">
+            <form [formGroup]="this.allFG" class="flex-container-col full-height full-width padded">
+                <div #heightToMatch class="full-width overflow-auto">
+                    <div class="flex-container-row">
+                        <div class="italic title-color">
+                            Flow Cell to Finalize :
+                        </div>
+                        <div>
+                            &nbsp;{{flowCellNumber}}
+                        </div>
+                    </div>
+                    <div class="flex-container-row align-baseline spaced-children-margin">
+                        <mat-form-field>
+                            <input matInput
+                                   placeholder="Barcode"
+                                   [formControl]="this.barcodeFC"
+                                   (change)="createFlowCellFileName()">
+                            <mat-error *ngIf="this.barcodeFC.hasError('required')">field is required</mat-error>
+                        </mat-form-field>
+                        <mat-form-field class="run-width">
+                            <input matInput
+                                   placeholder="Run #"
+                                   [formControl]="this.runFC"
+                                   (change)="createFlowCellFileName()">
+                            <mat-error *ngIf="this.runFC.hasError('required')">field is required </mat-error>
+                            <mat-error *ngIf="this.runFC.hasError('pattern')"> field only accepts numbers </mat-error>
+                        </mat-form-field>
+                        <mat-form-field class="date-width">
+                            <input matInput
+                                   placeholder="Create Date"
+                                   [disabled]="true"
+                                   [formControl]="this.createDateFC"
+                                   [matDatepicker]="createDatePicker"
+                                   (change)="createFlowCellFileName()">
+                            <mat-datepicker-toggle matSuffix [for]="createDatePicker"></mat-datepicker-toggle>
+                            <mat-datepicker #createDatePicker disabled="false"></mat-datepicker>
+                        </mat-form-field>
+                        <mat-radio-group [formControl]="sideFC" class="flex-container-row children-margin-right" (change)="createFlowCellFileName()">
+                            <mat-radio-button value="A">Side A</mat-radio-button>
+                            <mat-radio-button value="B">Side B</mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                    <div class="flex-container-row spaced-children-margin">
+                        <div>
+                            <custom-combo-box placeholder="Instrument"
+                                              displayField="instrument"
+                                              [customOptionClasses]="'small-font padded inline-block full-width'"
+                                              [formControl]="this.instrumentFC"
+                                              [options]="this.instrumentList"
+                                              (optionSelected)="createFlowCellFileName()">
+                            </custom-combo-box>
+                        </div>
+                        <div class="protocol-width">
+                            <custom-combo-box placeholder="Protocol"
+                                              displayField="name"
+                                              [customOptionClasses]="'small-font padded inline-block full-width'"
+                                              [formControl]="this.protocolFC"
+                                              [options]="this.filteredProtocolsList"
+                                              (optionSelected)="createFlowCellFileName()">
+                            </custom-combo-box>
+                        </div>
+                    </div>
+                    <div class="flex-container-row padded-bottom">
+                        <div class="italic title-color">
+                            Filename :
+                        </div>
+                        <div>
+                            &nbsp;{{flowCellRunFolder}}
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-grow">
+                    <div #oneEmWidth2 class="no-height single-em"></div>
+                    <ag-grid-angular class="ag-theme-fresh full-height full-width min-grid-size"
+                                     [enableColResize]="true"
+                                     [enableSorting]="true"
+                                     [rowData]="assmItemList"
+                                     [rowSelection]="'single'"
+                                     [rowClassRules]="this.workflowService.assmGridRowClassRules"
+                                     [singleClickEdit]="true"
+                                     [stopEditingWhenGridLosesFocus]="true"
+                                     (cellValueChanged) = "onCellValueChanged($event)"
+                                     (gridReady)="onDetailGridReady($event)"
+                                     (rowDataChanged)="this.onNotifyGridRowDataChanged($event)">
+                    </ag-grid-angular>
+                </div>
+            </form>
+        </as-split-area>
+    </as-split>
+    <div class="flex-container-row align-center">
+        <div class="flex-grow">
+        </div>
+        <button mat-raised-button
+                matTooltip="Delete selected Flow Cell"
+                [disabled]="this.selectedFlowCells.length===0"
+                (click)="onClickDeleteFlowCell($event)">
+            <img [src]="'./assets/delete.png'" alt="">
+            Delete
+        </button>
+        <save-footer (saveClicked)="save()"
+                     [disableSave]="!this.allFG.valid||this.assmItemList.length===0"
+                     [dirty]="this.allFG.dirty"
+                     [showSpinner]="this.showSpinner">
+        </save-footer>
+    </div>
+</div>
+

@@ -9,6 +9,7 @@ import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {first} from "rxjs/operators";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 
 
@@ -98,23 +99,20 @@ export class AddExperimentPlatformDialogComponent extends BaseGenericContainerDi
             .set('icon',this.formGroup.get("type").value.defaultIcon);
 
 
-        this.expPlatformService.saveExperimentPlatform(params).pipe(first()).subscribe(resp =>{
-            console.log(resp);
-            if(resp){ // response is the code request category if successful
-                if(resp.message){ // had a known error
+        this.expPlatformService.saveExperimentPlatform(params).pipe(first()).subscribe((resp: any) => {
+            if(resp) { // response is the code request category if successful
+                if(resp.message) { // had a known error
                     this.dialogService.error(resp.message);
-                }else{
+                } else {
                     this.expPlatformService.getExperimentPlatformList_fromBackend();
                     this.addFn();
                     this.dialogRef.close();
                 }
-
-
-            }else{
+            } else {
                 this.dialogService.error("An error occured please contact GNomEx Support");
             }
+        }, (err: IGnomexErrorResponse) => {
         });
-
     }
 
 

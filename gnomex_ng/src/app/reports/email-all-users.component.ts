@@ -6,6 +6,7 @@ import {Response, URLSearchParams} from "@angular/http";
 import {MatDialogRef} from "@angular/material";
 import {AngularEditorConfig} from "@kolkov/angular-editor";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'email-all-users',
@@ -86,10 +87,10 @@ export class EmailAllUsersComponent extends BaseGenericContainerDialog implement
         this.coreFacilities = this.createSecurityAdvisorService.coreFacilitiesICanManage;
 
         this.broadcastEmailService.getUploadURL().subscribe((result: any) => {
-            if (result && result.name == "UploadAndBroadcastEmailURLServlet") {
+            if (result && result.name && result.name === "UploadAndBroadcastEmailURLServlet") {
                 this.uploadURL = result.url;
             }
-        });
+        }, (err: IGnomexErrorResponse) => {});
     }
 
     ngOnInit(): void {
@@ -133,7 +134,7 @@ export class EmailAllUsersComponent extends BaseGenericContainerDialog implement
         if (this.uploadFile) {
             let formData: FormData = new FormData();
             formData.append("Filename", this.uploadFile.name);
-            formData.append("format", this.uploadFile.type == "text/html" ? "html" : "text");
+            formData.append("format", this.uploadFile.type === "text/html" ? "html" : "text");
             formData.append("subject", this.subjectFormControl.value);
             formData.append("coreFacilityIds", this.coresFormControl.value);
             formData.append("Filedata", this.uploadFile, this.uploadFile.name);

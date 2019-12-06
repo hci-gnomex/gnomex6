@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit} from "@angular/core";
-import {GridApi, GridReadyEvent, RowSelectedEvent, RowNode} from "ag-grid-community";
+import {GridApi, GridReadyEvent, RowNode, RowSelectedEvent} from "ag-grid-community";
 import {OrganismService} from "../services/organism.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {DictionaryService} from "../services/dictionary.service";
@@ -190,14 +190,16 @@ export class ConfigureOrganismsComponent extends BaseGenericContainerDialog impl
                             }
                             this.dialogsService.error("An error occurred while deleting the organism" + message);
                         }
+                    }, (err: IGnomexErrorResponse) => {
+                        this.showSpinner = false;
                     });
                 }
             });
-        }else if(this.selectedOrganism && !this.selectedOrganism.idOrganism){
-            let idOwner:string = this.formGroup.get("owner").value;
+        } else if (this.selectedOrganism && !this.selectedOrganism.idOrganism) {
+            let idOwner: string = this.formGroup.get("owner").value;
             this.formGroup.reset();
             this.genomeBuildList = [];
-            if(idOwner){
+            if(idOwner) {
                 this.formGroup.get("owner").setValue(idOwner);
             }
             this.selectedOrganism = null;

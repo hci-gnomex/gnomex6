@@ -7,8 +7,6 @@ import {
     ViewChild,
 } from "@angular/core";
 
-import {URLSearchParams} from "@angular/http";
-
 import {ExperimentsService} from "./experiments.service";
 import {ITreeOptions, ITreeState, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
 import {BrowseFilterComponent} from "../util/browse-filter.component";
@@ -86,7 +84,7 @@ const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
         .background-lightyellow {
             background-color: lightyellow;
         }
-        
+
     `]
 })
 
@@ -158,6 +156,10 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.labMembers = [];
         this.billingAccounts = [];
         this.labs = [];
+
+
+
+
 
         this.experimentsService.startSearchSubject.subscribe((value) => {
             if (value) {
@@ -324,6 +326,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.labs = [];
         this.experimentsService.filteredLabs = [];
 
+
         if (response) {
             if (!this.isArray(response)) {
                 this.items = [response];
@@ -359,7 +362,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                             for (var request of project.items) {
                                 if (request) {
                                     if (request.label) {
-                                        request.label = request.requestNumber + "-" + request.name;
+                                        if (request.name) {
+                                            request.label = request.requestNumber + "-" + request.name;
+                                        } else {
+                                            request.label = request.requestNumber;
+                                        }
+
                                         request.id = "r" + request.idRequest;
                                         request.parentid = project.id;
                                     } else {
@@ -458,10 +466,10 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         } else {
             this.showBillingCombo = true;
         }
-        var params: URLSearchParams = new URLSearchParams();
-        params.set("idLab", event.to.parent.idLab);
+        let params: HttpParams = new HttpParams()
+            .set("idLab", event.to.parent.idLab);
 
-        var lPromise = this.experimentsService.getLab(params).toPromise();
+        let lPromise = this.experimentsService.getLab(params).toPromise();
         lPromise.then(response => {
             this.buildLabMembers(response, event);
         });

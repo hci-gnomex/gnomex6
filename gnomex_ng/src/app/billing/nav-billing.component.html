@@ -1,4 +1,4 @@
-<div class="full-height full-width background small-font">
+<div class="full-height full-width background background-border padded small-font">
     <div class="full-height full-width flex-container-col">
         <billing-filter [selectedItem]="billingItemsTreeSelectedNode"
                         [totalPrice]="totalPrice"
@@ -9,7 +9,7 @@
         </billing-filter>
         <div class="full-width vertical-spacer">
         </div>
-        <div class="flex-container-row flex-grow foreground padding-left-right-bottom overflow-auto min-grid-height">
+        <div class="flex-container-row flex-grow foreground padding-left-right-bottom overflow-auto min-grid-size">
             <as-split>
                 <as-split-area [size]="19">
                     <div class="full-height bordered overflow-auto">
@@ -183,7 +183,7 @@
                                     <!--</custom-combo-box>-->
                                 </div>
                             </div>
-                            <div class="flex-grow min-grid-height">
+                            <div class="flex-grow min-grid-size">
                                 <div #oneEmWidth class="no-height single-em">
                                 </div>
                                 <ag-grid-angular class="ag-theme-fresh full-height full-width small-font"

@@ -166,8 +166,26 @@ export class SelectEditor implements ICellEditorAngularComp, OnDestroy {
 
             this.params.column.gridApi.forEachNode((rowNode) => {
                 if (rowNode && rowNode.data && thisRowNode && thisRowNode.data && (this.fillAll || rowNode.data[this.fillGroupAttribute] === thisRowNode.data[this.fillGroupAttribute])) {
+                    let spoofedEvent: any = {
+                        api: this.params.column.gridApi,
+                        colDef: this.params.column.colDef,
+                        column: this.params.column,
+                        columnApi: this.params.column.columnApi,
+                        context: undefined,
+                        data: rowNode.data,
+                        event: null,
+                        newValue: this.value,
+                        node: rowNode,
+                        oldValue: rowNode.data[this.gridValueField],
+                        rowIndex: rowNode.rowIndex,
+                        rowPinned: undefined,
+                        type: 'cellValueChanged',
+                        value: this.value
+                    };
+
                     rowNode.data[this.gridValueField] = this.value;
                     rowNode.setDataValue(this.gridValueField, this.value);
+                    this.params.column.gridApi.dispatchEvent(spoofedEvent);
                 }
             });
 

@@ -16,6 +16,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {Experiment} from "../../util/models/experiment.model";
 import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'tab-external-setup',
@@ -112,7 +113,7 @@ export class TabExternalSetupComponent implements OnInit, OnChanges, OnDestroy {
                 private dialog: MatDialog,
                 private appUserService: AppUserListService,
                 private formBuilder: FormBuilder,
-                private dialogsService: DialogsService,) {
+                private dialogsService: DialogsService) {
 
         this.form = this.formBuilder.group({
             lab: ["", [Validators.required]],
@@ -142,6 +143,7 @@ export class TabExternalSetupComponent implements OnInit, OnChanges, OnDestroy {
             this.organismList = UtilService.getJsonArray(result, result.Organism)
                 .filter((o: any) => o.isActive === 'Y' && o.canRead === 'Y')
                 .sort(this.prefService.createDisplaySortFunction("display"));
+        }, (err: IGnomexErrorResponse) => {
         });
         this.requestCategoryList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.REQUEST_CATEGORY)
             .filter((cat: any) => cat.isActive === 'Y' && cat.isExternal === 'Y')
@@ -216,6 +218,7 @@ export class TabExternalSetupComponent implements OnInit, OnChanges, OnDestroy {
                 } else {
                     this.preselectProject("idAppUser", this.form.get("appUser").value.idAppUser);
                 }
+            }, (err: IGnomexErrorResponse) => {
             });
         } else {
             this.projectList = [];
@@ -287,6 +290,7 @@ export class TabExternalSetupComponent implements OnInit, OnChanges, OnDestroy {
         if (this.showLinkToTopic && this.topicList.length === 0) {
             this.topicService.getTopics().subscribe((result: any[]) => {
                 this.topicList = result.sort(this.prefService.createDisplaySortFunction("name"));
+            }, (err: IGnomexErrorResponse) => {
             });
         }
         if (!this.showLinkToTopic) {

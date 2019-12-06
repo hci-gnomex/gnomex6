@@ -85,7 +85,7 @@ public class DownloadChromatogramFileServlet extends HttpServlet {
                     }
                 }
                 if (!hasPermission) {
-                    response.setContentType("text/html");
+                    response.setContentType("text/html; charset=UTF-8");
                     response.getOutputStream().println(
                             "<html><head><title>Error</title></head>");
                     response.getOutputStream().println("<body><b>");
@@ -99,7 +99,7 @@ public class DownloadChromatogramFileServlet extends HttpServlet {
                 }
 
 
-                response.setContentType("application/x-download");
+                response.setContentType("application/x-download; charset=UTF-8");
                 response.setHeader("Content-Disposition", "attachment;filename=" + chromatogram.getFileName());
                 response.setHeader("Cache-Control", "max-age=0, must-revalidate");
 
@@ -125,7 +125,7 @@ public class DownloadChromatogramFileServlet extends HttpServlet {
 
 
             } else {
-                response.setContentType("text/html");
+                response.setContentType("text/html; charset=UTF-8");
                 response.getOutputStream().println(
                         "<html><head><title>Error</title></head>");
                 response.getOutputStream().println("<body><b>");
@@ -144,7 +144,7 @@ public class DownloadChromatogramFileServlet extends HttpServlet {
             Util.sendErrorReport(HibernateSession.currentSession(),"GNomEx.Support@hci.utah.edu", "DoNotReply@hci.utah.edu", userName, errorMessage, requestDump);
 
             HibernateSession.rollback();
-            response.setContentType("text/html");
+            response.setContentType("text/html; charset=UTF-8");
             response.getOutputStream().println(
                     "<html><head><title>Error</title></head>");
             response.getOutputStream().println("<body><b>");

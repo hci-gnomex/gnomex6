@@ -41,6 +41,7 @@ export class DeleteProjectComponent extends BaseGenericContainerDialog {
             .set("idProject", this.selectedItem.data.idProject);
 
         this.projectService.deleteProject(params).subscribe( response => {
+            this.showSpinner = false;
             this.dialogRef.close(true);
             this.experimentsService.refreshProjectRequestList_fromBackend();
         }, (err: IGnomexErrorResponse) => {

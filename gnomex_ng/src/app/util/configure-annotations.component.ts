@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from "@angular/core";
+import {Component, Inject, OnInit, ViewEncapsulation} from "@angular/core";
 import {DictionaryService} from "../services/dictionary.service";
 import {PropertyService} from "../services/property.service";
 import {ActivatedRoute, Params} from "@angular/router";
@@ -16,6 +16,7 @@ import {IGnomexErrorResponse} from "./interfaces/gnomex-error.response.model";
 @Component({
     selector: 'configure-annotations',
     templateUrl: "./configure-annotations.component.html",
+    encapsulation: ViewEncapsulation.None,
 })
 
 export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog implements OnInit {
@@ -23,6 +24,7 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
     public readonly SHOW_FOR_ANALYSIS: string = "a";
     public readonly SHOW_FOR_DATA_TRACKS: string = "dt";
     public readonly SHOW_FOR_EXPERIMENTS: string = "e";
+    public readonly SHOW_FOR_ALL: string = "";
     public readonly TYPE_TEXT: string = "TEXT";
     public readonly TYPE_URL: string = "URL";
     public readonly TYPE_CHECKBOX: string = "CHECK";
@@ -101,6 +103,7 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
     public mageOntologyCodeFC: FormControl;
     public mageOntologyDefFC: FormControl;
     public canAccessAnyObject: boolean = false;
+    public gridSplitSize: number = 28;
 
 
     constructor(private dictionaryService: DictionaryService,
@@ -132,7 +135,7 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
         };
 
         this.optionGridColumnDefs = [
-            {headerName: "Option", field: "option", width: 10, editable: this.determineEditable},
+            {headerName: "Option", field: "option", width: 30, editable: this.determineEditable},
             {headerName: "Order", field: "sortOrder", width: 10, editable: this.determineEditable},
             {headerName: "Active", field: "isActive", width: 10, editable: this.determineEditable, valueParser: this.activeValueParser},
         ];
@@ -502,6 +505,7 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
             this.propertyService.getPropertyAnnotation(event.data.idProperty).pipe(first()).subscribe((prop: any) => {
                 this.setProperty(prop.Property);
                 this.formGroup.markAsPristine();
+            }, (err: IGnomexErrorResponse) => {
             });
         }
     }
@@ -759,6 +763,8 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
                 this.updateDisplayedProperties();
             }
 
+        }, (err: IGnomexErrorResponse) => {
+            this.dialogsService.stopAllSpinnerDialogs();
         });
     }
 
@@ -768,6 +774,7 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
 
     externallyResizeGrid(){
         if(this.annotGridApi){
+            this.gridSplitSize = 25;
             this.annotGridApi.sizeColumnsToFit();
         }
     }

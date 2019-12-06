@@ -1,36 +1,24 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import { BrowserModule } from "@angular/platform-browser";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 
 import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
-import {
-    MatButtonModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatGridListModule,
-    MatInputModule,
-    MatListModule,
-    MatMenuModule,
-    MatToolbarModule,
-    ShowOnDirtyErrorStateMatcher
-} from '@angular/material';
+import {MatDialogModule} from "@angular/material";
 import {HEADER_ROUTING} from "./header.routes";
-import {AgGridModule} from 'ag-grid-angular/main';
+import {AgGridModule} from "ag-grid-angular/main";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {NewBillingAccountModule} from "../billing/new_billing_account/new-billing-account.module";
 
 import {AdvancedSearchComponent} from "./advanced_search/advanced-search.component";
-import {CreateReportProblemLauncherComponent} from "./reportProblem/report-problem-launcher.component";
-import {ExternalLinkComponent} from './external-routes.module';
-import {ExternalLinkResolver} from './external-routes.module';
+import {ExternalLinkComponent} from "./external-routes.module";
+import {ExternalLinkResolver} from "./external-routes.module";
 import {HeaderComponent} from "./header.component";
 import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-renderer.component";
 import {LogoutComponent} from "./logout.component";
 import {ManageLinksComponent} from "./manageLinks/manage-links.component";
-import {ManageLinksLauncherComponent} from "./manageLinks/manage-links-launcher.component";
-import {MenuItemComponent} from './menu-item/menu-item.component';
+import {MenuItemComponent} from "./menu-item/menu-item.component";
 import {ReportProblemComponent} from "./reportProblem/report-problem.component";
 
 import {DateRenderer} from "../util/grid-renderers/date.renderer";
@@ -52,8 +40,6 @@ import {UtilModule} from "../util/util.module";
         HEADER_ROUTING,
         CommonModule,
         BrowserModule,
-        FormsModule,
-        CommonModule,
         FormsModule,
         ReactiveFormsModule,
         AngularMaterialModule,
@@ -81,17 +67,15 @@ import {UtilModule} from "../util/util.module";
 
     declarations: [
         AdvancedSearchComponent,
-        CreateReportProblemLauncherComponent,
         ExternalLinkComponent,
         HeaderComponent,
         LogoutComponent,
         ManageLinksComponent,
-        ManageLinksLauncherComponent,
         MenuItemComponent,
         ReportProblemComponent,
         LogoutLoaderComponent
     ],
-    entryComponents:[
+    entryComponents: [
         AdvancedSearchComponent,
         ExternalLinkComponent,
         ManageLinksComponent,

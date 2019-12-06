@@ -213,8 +213,8 @@ export class TabAnnotationViewComponent implements OnDestroy {
 
     public editAnnotations(event?: any): void {
         let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.width = "80em";
-        configuration.height = "56em";
+        configuration.width = "82em";
+        configuration.height = "60em";
         configuration.autoFocus = false;
         configuration.data = {
             isDialog: true,
@@ -267,6 +267,8 @@ export class TabAnnotationViewComponent implements OnDestroy {
                 this.propertyService.getPropertyList(false).pipe(first()).subscribe((response: any[]) => {
                     this.gnomexService.propertyList = response;
                     this._experiment.refreshSampleAnnotationList();
+                    this.dialogsService.stopAllSpinnerDialogs();
+                }, (err: IGnomexErrorResponse) => {
                     this.dialogsService.stopAllSpinnerDialogs();
                 });
             } else {

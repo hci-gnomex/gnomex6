@@ -1,24 +1,18 @@
 import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
-import {URLSearchParams} from "@angular/http";
+import {HttpParams} from "@angular/common/http";
+import {FormControl, FormGroupDirective, NgForm, Validators} from "@angular/forms";
+import {MatDialogRef, MatDialog, ErrorStateMatcher, MatDialogConfig, MAT_DIALOG_DATA } from "@angular/material";
 import {Router} from "@angular/router";
+import {Subscription} from "rxjs";
 
 import {NewBillingAccountErrorDialogComponent} from "./dialogs/new-billing-account-error-dialog.component";
 import {NewBillingAccountSuccessDialogComponent} from "./dialogs/new-billing-account-success-dialog.component";
-
 import {AccountFieldsConfigurationService} from "../../services/account-fields-configuration.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {LabListService} from "../../services/lab-list.service";
 import {NewBillingAccountService} from "../../services/new-billing-account.service";
 import {PropertyService} from "../../services/property.service";
-
-import {FormControl, FormGroupDirective, NgForm, Validators} from "@angular/forms";
-
-import {
-    MatDialogRef, MatDialog, ErrorStateMatcher, MatDialogConfig,
-    MAT_DIALOG_DATA
-} from "@angular/material";
-import {Subscription} from "rxjs";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
@@ -36,16 +30,16 @@ export class NewBillingAccountLauncher {
 	constructor(private dialogsService: DialogsService, private router: Router,
 				public createSecurityAdvisorService: CreateSecurityAdvisorService,
 				private constService: ConstantsService) {
-        let config: MatDialogConfig = new MatDialogConfig();
-        config.width = "60em";
-        config.autoFocus = false;
+		let config: MatDialogConfig = new MatDialogConfig();
+		config.width = "60em";
+		config.autoFocus = false;
 
 		this.dialogsService.genericDialogContainer(NewBillingAccountComponent, "Submit Campus Billing Account", this.constService.ICON_WORK_AUTH_FORM, config,
 			{actions: [
 					{type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "onSaveButtonClicked"},
 					{type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
 				]}).subscribe((result: any) => {
-            		this.router.navigate([{ outlets: {modal: null}}]);
+			this.router.navigate([{ outlets: {modal: null}}]);
 		});
 	}
 }
@@ -359,7 +353,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 
 	constructor(private accountFieldsConfigurationService: AccountFieldsConfigurationService,
 				private createSecurityAdvisorService: CreateSecurityAdvisorService,
-                private dialogService: DialogsService,
+				private dialogService: DialogsService,
 				private dialog: MatDialog,
 				private dialogRef: MatDialogRef<NewBillingAccountComponent>,
 				private dictionaryService: DictionaryService,
@@ -369,14 +363,28 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 				public prefService: UserPreferencesService,
 				@Inject(MAT_DIALOG_DATA) private data) {
 		super();
+
+		this.primaryDisable = (action) => {
+			if (this.showField) {
+				if (this.showField === this.CHARTFIELD) {
+					return !this.areChartfieldValuesValid();
+				} else if (this.showField === this.PO) {
+					return !this.arePoValuesValid();
+				} else if (this.showField === this.CREDIT_CARD) {
+					return !this.areCreditCardValuesValid();
+				}
+			}
+
+			return true;
+		};
 	}
 
 	ngOnInit(): void {
-        if (this.data && this.data.idLab) {
-        	setTimeout(() => {
-        		this.dialogService.startDefaultSpinnerDialog();
-            });
-        }
+		if (this.data && this.data.idLab) {
+			setTimeout(() => {
+				this.dialogService.startDefaultSpinnerDialog();
+			});
+		}
 
 		this.selectedLab = null;
 		this.selectedCoreFacilities = [];
@@ -385,14 +393,14 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			this.labList = response;
 
 			if (this.data && this.data.idLab) {
-                let temp: any[] = this.labList.filter((a) => {
-                	return a.idLab === this.data.idLab;
+				let temp: any[] = this.labList.filter((a) => {
+					return a.idLab === this.data.idLab;
 				});
 
-                if (temp.length === 1) {
-                	this.selectedLab = temp[0];
+				if (temp.length === 1) {
+					this.selectedLab = temp[0];
 
-                	this.onLabListSelection( temp[0] );
+					this.onLabListSelection( temp[0] );
 				}
 
 				this.dialogService.stopAllSpinnerDialogs();
@@ -410,7 +418,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		let originalFundingAgencies = this.dictionaryService.getEntries('hci.gnomex.model.FundingAgency');
 		this.fundingAgencies = [];
 
-		if (originalFundingAgencies.length != undefined && originalFundingAgencies.length != null) {
+		if (originalFundingAgencies.length !== undefined && originalFundingAgencies.length != null) {
 			for (let i = 0; i < originalFundingAgencies.length; i++) {
 				if (originalFundingAgencies[i].fundingAgency != null && originalFundingAgencies[i].value != null) {
 					this.fundingAgencies.push(originalFundingAgencies[i]);
@@ -422,9 +430,9 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		originalCreditCardCompanies.sort((a, b) => { return a.sortOrder - b.sortOrder; });
 		this.creditCardCompanies = [];
 
-		if (originalCreditCardCompanies.length != undefined && originalCreditCardCompanies.length != null) {
+		if (originalCreditCardCompanies.length !== undefined && originalCreditCardCompanies.length != null) {
 			for (let i = 0; i < originalCreditCardCompanies.length; i++) {
-				if (originalCreditCardCompanies[i].display != null && originalCreditCardCompanies[i].display != '') {
+				if (originalCreditCardCompanies[i].display != null && originalCreditCardCompanies[i].display !== '') {
 					this.creditCardCompanies.push(originalCreditCardCompanies[i]);
 				}
 			}
@@ -439,18 +447,18 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			}
 
 			this.internalAccountFieldsConfigurationSubscription =
-					this.accountFieldsConfigurationService.getInternalAccountFieldsConfigurationObservable().subscribe((response) => {
-						this.processInternalAccountFieldsConfigurations(response);
-					});
+				this.accountFieldsConfigurationService.getInternalAccountFieldsConfigurationObservable().subscribe((response) => {
+					this.processInternalAccountFieldsConfigurations(response);
+				});
 
 			this.otherAccountFieldsConfigurationSubscription =
-					this.accountFieldsConfigurationService.getOtherAccountFieldsConfigurationObservable().subscribe((response) => {
-						this.processOtherAccountFieldsConfigurations(response);
-					});
+				this.accountFieldsConfigurationService.getOtherAccountFieldsConfigurationObservable().subscribe((response) => {
+					this.processOtherAccountFieldsConfigurations(response);
+				});
 
 			this.accountFieldsConfigurationService.publishAccountFieldConfigurations();
 		} else {
-            this.accountNumberAccount_Chartfield = this.propertyService.getPropertyValue(PropertyService.PROPERTY_ACCOUNT_NUMBER_ACCOUNT_DEFAULT);
+			this.accountNumberAccount_Chartfield = this.propertyService.getPropertyValue(PropertyService.PROPERTY_ACCOUNT_NUMBER_ACCOUNT_DEFAULT);
 		}
 	}
 
@@ -477,8 +485,8 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		}
 
 		this.internalAccountFieldsConfiguration = internalAccountFieldsConfiguration
-				.filter((a) => { return a.include === 'Y'; })
-				.sort((a, b) => { return a.sortOrder - b.sortOrder; });
+			.filter((a) => { return a.include === 'Y'; })
+			.sort((a, b) => { return a.sortOrder - b.sortOrder; });
 
 		for (let i = 0; i < this.internalAccountFieldsConfiguration.length; i++) {
 			let validators = [];
@@ -552,11 +560,11 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 	private onSaveButtonClicked(): void {
 		this.errorMessage = '';
 
-		if (this.showField == this.CHARTFIELD) {
+		if (this.showField === this.CHARTFIELD) {
 			this.saveChartfield();
-		} else if (this.showField == this.PO) {
+		} else if (this.showField === this.PO) {
 			this.savePo();
-		} else if (this.showField == this.CREDIT_CARD) {
+		} else if (this.showField === this.CREDIT_CARD) {
 			this.saveCreditCard();
 		}
 	}
@@ -613,7 +621,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 
 				if (i > 0 && i + 1 < this.selectedCoreFacilities.length) {
 					this.selectedCoreFacilitiesString += ', ';
-				} else if (i + 1 === this.selectedCoreFacilities.length && this.selectedCoreFacilities.length != 1) {
+				} else if (i + 1 === this.selectedCoreFacilities.length && this.selectedCoreFacilities.length !== 1) {
 					this.selectedCoreFacilitiesString += ' and ';
 				}
 				this.selectedCoreFacilitiesString += this.selectedCoreFacilities[i].display;
@@ -659,30 +667,29 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		// );
 
 		if (this.areChartfieldValuesValid()) {
-			let parameters: URLSearchParams = new URLSearchParams();
-
-			parameters.set('idLab', idLab);
-			parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
-			parameters.set('coreFacilitiesJSONString', coreFacilitiesXMLString);
-			parameters.set('accountName', this.accountName_Chartfield);
-			parameters.set('shortAcct', this.shortAccountName_Chartfield);
-			parameters.set('accountNumberBus', this.accountNumberBus_Chartfield);
-			parameters.set('accountNumberOrg', this.accountNumberOrg_Chartfield);
-			parameters.set('accountNumberFund', this.accountNumberFund_Chartfield);
-			parameters.set('accountNumberActivity', this.accountNumberActivity_Chartfield);
-			parameters.set('accountNumberProject', accountNumberProject);
-			parameters.set('accountNumberAccount', accountNumberAccount);
-			parameters.set('accountNumberAu', (this.accountNumberActivity_Chartfield.length > 0 ? this.accountNumberAU_Chartfield : ''));
-			parameters.set('idFundingAgency', idFundingAgency);
-			parameters.set('custom1', custom1);
-			parameters.set('custom2', custom2);
-			parameters.set('custom3', custom3);
-			parameters.set('submitterEmail', this.submitterEmail_chartfield);
-			parameters.set('startDate', this.startDate_chartfield.toLocaleDateString());
-			parameters.set('expirationDate', (this.effectiveUntilDate_chartfield ? this.effectiveUntilDate_chartfield.toLocaleDateString() : ''));
-			parameters.set('totalDollarAmountDisplay', this.totalDollarAmount_Chartfield);
-			parameters.set('activeAccount', activeAccount);
-			parameters.set('isPO', isPO);
+			let parameters: HttpParams = new HttpParams()
+				.set('idLab', idLab)
+				.set('coreFacilitiesXMLString', coreFacilitiesXMLString)
+				.set('coreFacilitiesJSONString', coreFacilitiesXMLString)
+				.set('accountName', this.accountName_Chartfield)
+				.set('shortAcct', this.shortAccountName_Chartfield)
+				.set('accountNumberBus', this.accountNumberBus_Chartfield)
+				.set('accountNumberOrg', this.accountNumberOrg_Chartfield)
+				.set('accountNumberFund', this.accountNumberFund_Chartfield)
+				.set('accountNumberActivity', this.accountNumberActivity_Chartfield)
+				.set('accountNumberProject', accountNumberProject)
+				.set('accountNumberAccount', accountNumberAccount)
+				.set('accountNumberAu', (this.accountNumberActivity_Chartfield.length > 0 ? this.accountNumberAU_Chartfield : ''))
+				.set('idFundingAgency', idFundingAgency)
+				.set('custom1', custom1)
+				.set('custom2', custom2)
+				.set('custom3', custom3)
+				.set('submitterEmail', this.submitterEmail_chartfield)
+				.set('startDate', this.startDate_chartfield.toLocaleDateString())
+				.set('expirationDate', (this.effectiveUntilDate_chartfield ? this.effectiveUntilDate_chartfield.toLocaleDateString() : ''))
+				.set('totalDollarAmountDisplay', this.totalDollarAmount_Chartfield)
+				.set('activeAccount', activeAccount)
+				.set('isPO', isPO);
 
 
 			// in original, called SubmitWorkAuthForm.gx with params :
@@ -713,7 +720,8 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			this.successMessage = 'Billing Account \"' + this.accountName_Chartfield + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
 
 			//this.window.close();
-			this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe(() => {
+			this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe((result) => {
+				console.log('testing');
 				this.openSuccessDialog();
 			},(err:IGnomexErrorResponse) => {
 				this.dialogService.stopAllSpinnerDialogs();
@@ -758,7 +766,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		//
 		// console.log("agreementCheckbox                             invalid : " + !this.agreementCheckbox.valueOf());
 
-		if (!(this.selectedLab != undefined && this.selectedLab != null && this.selectedLab !== '')) {
+		if (!(this.selectedLab !== undefined && this.selectedLab != null && this.selectedLab !== '')) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please select a Lab\n';
 		}
@@ -789,7 +797,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 				errorFound = errorFound || true;
 				this.errorMessage += '- "Fund" must be 4 digits\n';
 			}
-			if (this.accountNumberActivity_Chartfield.length == 0 && this.accountNumberProject_Chartfield.length == 0) {
+			if (this.accountNumberActivity_Chartfield.length === 0 && this.accountNumberProject_Chartfield.length === 0) {
 				errorFound = errorFound || true;
 				this.errorMessage += '- Please enter either an "Activity" or "Project" number\n';
 			} else if (this.accountNumberActivity_Chartfield.length > 0 && this.accountNumberProject_Chartfield.length > 0) {
@@ -817,15 +825,15 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 				}
 			}
 		}
+		if (!((this.usesCustomChartfields && !this.includeInCustomField_startDate)
+			|| (this.startDate_chartfield && this.startDate_chartfield.toLocaleDateString() !== ''))) {
 
-		if ((!(this.startDate_chartfield && this.startDate_chartfield.toLocaleDateString() != ''))
-						&& (!this.usesCustomChartfields || this.includeInCustomField_startDate)) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick a start date\n';
 		}
-		if ((!(this.effectiveUntilDate_chartfield && this.effectiveUntilDate_chartfield.toLocaleDateString() != ''))
-				&& ((!this.usesCustomChartfields ||   this.includeInCustomField_startDate)  && this.includeInCustomField_expirationDate)
-				&& ((this.usesCustomChartfields && (!this.includeInCustomField_startDate)) && this.includeInCustomField_expirationDate)) {
+		if (!((this.usesCustomChartfields && !this.includeInCustomField_startDate && !this.includeInCustomField_expirationDate)
+			|| (this.effectiveUntilDate_chartfield && this.effectiveUntilDate_chartfield.toLocaleDateString() !== ''))) {
+
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick an expiration date\n';
 		}
@@ -882,7 +890,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 
 				if (i > 0 && i + 1 < this.selectedCoreFacilities.length) {
 					this.selectedCoreFacilitiesString += ', ';
-				} else if (i + 1 === this.selectedCoreFacilities.length && this.selectedCoreFacilities.length != 1) {
+				} else if (i + 1 === this.selectedCoreFacilities.length && this.selectedCoreFacilities.length !== 1) {
 					this.selectedCoreFacilitiesString += ' and ';
 				}
 				this.selectedCoreFacilitiesString += this.selectedCoreFacilities[i].display;
@@ -922,24 +930,23 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		// );
 
 		if (this.arePoValuesValid()) {
-			let parameters: URLSearchParams = new URLSearchParams();
-
-			parameters.set('idLab', idLab);
-			parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
-			parameters.set('coreFacilitiesJSONString', coreFacilitiesXMLString);
-			parameters.set('accountName', this.accountName_po);
-			parameters.set('shortAcct', this.shortAccountName_po);
-			parameters.set('idFundingAgency', idFundingAgency);
-			parameters.set('custom1', custom1);
-			parameters.set('custom2', custom2);
-			parameters.set('custom3', custom3);
-			parameters.set('submitterEmail', this.submitterEmail_po);
-			parameters.set('startDate', startDate);
-			parameters.set('expirationDate', expirationDate);
-			parameters.set('totalDollarAmountDisplay', this.totalDollarAmount_po);
-			parameters.set('activeAccount', activeAccount);
-			parameters.set('isPO', isPO);
-			parameters.set('isCreditCard', isCreditCard);
+			let parameters: HttpParams = new HttpParams()
+				.set('idLab', idLab)
+				.set('coreFacilitiesXMLString', coreFacilitiesXMLString)
+				.set('coreFacilitiesJSONString', coreFacilitiesXMLString)
+				.set('accountName', this.accountName_po)
+				.set('shortAcct', this.shortAccountName_po)
+				.set('idFundingAgency', idFundingAgency)
+				.set('custom1', custom1)
+				.set('custom2', custom2)
+				.set('custom3', custom3)
+				.set('submitterEmail', this.submitterEmail_po)
+				.set('startDate', startDate)
+				.set('expirationDate', expirationDate)
+				.set('totalDollarAmountDisplay', this.totalDollarAmount_po)
+				.set('activeAccount', activeAccount)
+				.set('isPO', isPO)
+				.set('isCreditCard', isCreditCard);
 
 			this.successMessage = 'Billing Account \"' + this.accountName_po + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
 
@@ -958,7 +965,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		this.errorMessage = '';
 		let errorFound: boolean = false;
 
-		if (!(this.selectedLab != undefined && this.selectedLab != null && this.selectedLab !== '')) {
+		if (!(this.selectedLab !== undefined && this.selectedLab != null && this.selectedLab !== '')) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please select a Lab\n';
 		}
@@ -976,11 +983,11 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			this.errorMessage += '- Error with short account name\n';
 		}
 
-		if (!(this.startDate_po && this.startDate_po.toLocaleDateString() != '')) {
+		if (!(this.startDate_po && this.startDate_po.toLocaleDateString() !== '')) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick a start date\n';
 		}
-		if (!(this.expirationDate_po && this.expirationDate_po.toLocaleDateString() != '')) {
+		if (!(this.expirationDate_po && this.expirationDate_po.toLocaleDateString() !== '')) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick an expiration date\n';
 		}
@@ -1044,7 +1051,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 
 				if (i > 0 && i + 1 < this.selectedCoreFacilities.length) {
 					this.selectedCoreFacilitiesString += ', ';
-				} else if (i + 1 === this.selectedCoreFacilities.length && this.selectedCoreFacilities.length != 1) {
+				} else if (i + 1 === this.selectedCoreFacilities.length && this.selectedCoreFacilities.length !== 1) {
 					this.selectedCoreFacilitiesString += ' and ';
 				}
 				this.selectedCoreFacilitiesString += this.selectedCoreFacilities[i].display;
@@ -1085,26 +1092,25 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		// 		"    isCreditCard             : " + isCreditCard + "\n");
 
 		if (this.areCreditCardValuesValid()) {
-			let parameters: URLSearchParams = new URLSearchParams();
-
-			parameters.set('idLab', idLab);
-			parameters.set('coreFacilitiesXMLString', coreFacilitiesXMLString);
-			parameters.set('coreFacilitiesJSONString', coreFacilitiesXMLString);
-			parameters.set('accountName', this.accountName_creditCard);
-			parameters.set('shortAcct', shortAcct);
-			parameters.set('idFundingAgency', idFundingAgency);
-			parameters.set('custom1', custom1);
-			parameters.set('custom2', custom2);
-			parameters.set('custom3', custom3);
-			parameters.set('submitterEmail', submitterEmail);
-			parameters.set('idCreditCardCompany', idCreditCardCompany);
-			parameters.set('zipCode', this.zipCodeInput_creditCard);
-			parameters.set('startDate', startDate);
-			parameters.set('expirationDate', expirationDate);
-			parameters.set('totalDollarAmountDisplay', totalDollarAmountDisplay);
-			parameters.set('activeAccount', activeAccount);
-			parameters.set('isPO', isPO);
-			parameters.set('isCreditCard', isCreditCard);
+			let parameters: HttpParams = new HttpParams()
+				.set('idLab', idLab)
+				.set('coreFacilitiesXMLString', coreFacilitiesXMLString)
+				.set('coreFacilitiesJSONString', coreFacilitiesXMLString)
+				.set('accountName', this.accountName_creditCard)
+				.set('shortAcct', shortAcct)
+				.set('idFundingAgency', idFundingAgency)
+				.set('custom1', custom1)
+				.set('custom2', custom2)
+				.set('custom3', custom3)
+				.set('submitterEmail', submitterEmail)
+				.set('idCreditCardCompany', idCreditCardCompany)
+				.set('zipCode', this.zipCodeInput_creditCard)
+				.set('startDate', startDate)
+				.set('expirationDate', expirationDate)
+				.set('totalDollarAmountDisplay', totalDollarAmountDisplay)
+				.set('activeAccount', activeAccount)
+				.set('isPO', isPO)
+				.set('isCreditCard', isCreditCard);
 
 			this.successMessage = 'Billing Account \"' + this.accountName_creditCard + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
 
@@ -1123,7 +1129,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		this.errorMessage = '';
 		let errorFound: boolean = false;
 
-		if (!(this.selectedLab != undefined && this.selectedLab != null && this.selectedLab !== '')) {
+		if (!(this.selectedLab !== undefined && this.selectedLab != null && this.selectedLab !== '')) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please select a Lab\n';
 		}
@@ -1137,11 +1143,11 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			this.errorMessage += '- Please provide a name for your account\n';
 		}
 
-		if (!(this.startDate_creditcard && this.startDate_creditcard.toLocaleDateString() != '')) {
+		if (!(this.startDate_creditcard && this.startDate_creditcard.toLocaleDateString() !== '')) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick a start date\n';
 		}
-		if (!(this.expirationDate_creditcard && this.expirationDate_creditcard.toLocaleDateString() != '')) {
+		if (!(this.expirationDate_creditcard && this.expirationDate_creditcard.toLocaleDateString() !== '')) {
 			errorFound = errorFound || true;
 			this.errorMessage += '- Please pick an expiration date\n';
 		}
@@ -1180,20 +1186,20 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		if (event && event.coreFacilities) {
 			let coreFacilities = event.coreFacilities;
 
-			if (coreFacilities != undefined && coreFacilities != null) {
-				if (coreFacilities[0] != undefined && coreFacilities[0] != null) {
+			if (coreFacilities !== undefined && coreFacilities != null) {
+				if (coreFacilities[0] !== undefined && coreFacilities[0] != null) {
 					for (let i: number = 0; i < coreFacilities.length; i++) {
 						if (coreFacilities[i].acceptOnlineWorkAuth != null
-								&& coreFacilities[i].acceptOnlineWorkAuth != undefined
-								&& coreFacilities[i].acceptOnlineWorkAuth === 'Y') {
+							&& coreFacilities[i].acceptOnlineWorkAuth !== undefined
+							&& coreFacilities[i].acceptOnlineWorkAuth === 'Y') {
 							coreFacilityApplicable.push(coreFacilities[i]);
 						}
 					}
 				} else {
-					if (coreFacilities.CoreFacility != undefined && coreFacilities.CoreFacility != null) {
+					if (coreFacilities.CoreFacility !== undefined && coreFacilities.CoreFacility != null) {
 						if (coreFacilities.CoreFacility.acceptOnlineWorkAuth != null
-								&& coreFacilities.CoreFacility.acceptOnlineWorkAuth != undefined
-								&& coreFacilities.CoreFacility.acceptOnlineWorkAuth === 'Y') {
+							&& coreFacilities.CoreFacility.acceptOnlineWorkAuth !== undefined
+							&& coreFacilities.CoreFacility.acceptOnlineWorkAuth === 'Y') {
 							coreFacilityApplicable.push(coreFacilities.CoreFacility);
 						}
 					}
@@ -1208,7 +1214,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 				difference = a.sortOrder - b.sortOrder;
 			}
 
-			if (difference == 0 && a.displayName && b.displayName) {
+			if (difference === 0 && a.displayName && b.displayName) {
 				difference = a.displayName.localeCompare(b.displayName);
 			}
 
@@ -1220,7 +1226,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		if (coreFacilityApplicable.length > 0) {
 			this.disableCoreFacilitiesSelector = false;
 
-			if (this.coreFacilityReducedList.length == 1) {
+			if (this.coreFacilityReducedList.length === 1) {
 				this.selectedCoreFacilities = this.coreFacilityReducedList;
 			}
 		} else {
@@ -1229,62 +1235,61 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 	}
 
 	private onCoreFacilitiesSelected(): void {
-        this.showFundingAgencies = false;
+		this.showFundingAgencies = false;
 		if (this.selectedCoreFacilities.length) {
-            // Look through for core facilities which use funding agencies, if there are any, show that dropdown
-            for (let cf of this.selectedCoreFacilities) {
-                let showFundingAgency: boolean = this.propertyService.getPropertyAsBoolean(this.propertyService.SHOW_FUNDING_AGENCY, cf.idCoreFacility);
-                if (showFundingAgency) {
-                    this.showFundingAgencies = true;
-                    break;
-                }
-            }
+			// Look through for core facilities which use funding agencies, if there are any, show that dropdown
+			for (let cf of this.selectedCoreFacilities) {
+				let showFundingAgency: boolean = this.propertyService.getPropertyAsBoolean(this.propertyService.SHOW_FUNDING_AGENCY, cf.idCoreFacility);
+				if (showFundingAgency) {
+					this.showFundingAgencies = true;
+					break;
+				}
+			}
 		}
 	}
 
 
 	private openSuccessDialog(): void {
-        let config: MatDialogConfig = new MatDialogConfig();
+		let config: MatDialogConfig = new MatDialogConfig();
 		config.width = "40em";
 		config.autoFocus = false;
 		config.data = {
-            successMessage: this.successMessage
+			successMessage: this.successMessage
 		};
 
 		this.dialogService.genericDialogContainer(NewBillingAccountSuccessDialogComponent, "Succeed", null, config,
-            {actions: [
-                    {type: ActionType.SECONDARY, name: "OK", internalAction: "onClose"}
-                ]}).subscribe(() => {
-                	this.dialogRef.close();
+			{actions: [
+					{type: ActionType.SECONDARY, name: "OK", internalAction: "onClose"}
+				]}).subscribe(() => {
+			this.dialogRef.close();
 		});
 	}
 
 	private openErrorDialog(): void {
 		let config: MatDialogConfig = new MatDialogConfig();
-        config.width = "40em";
-        config.autoFocus = false;
-        config.data = {
-            errorMessage: this.errorMessage
-        };
+		config.width = "40em";
+		config.autoFocus = false;
+		config.data = {
+			errorMessage: this.errorMessage
+		};
 
-        this.dialogService.genericDialogContainer(NewBillingAccountErrorDialogComponent, "Validation Error", null, config,
+		this.dialogService.genericDialogContainer(NewBillingAccountErrorDialogComponent, "Validation Error", null, config,
 			{actions: [
 					{type: ActionType.SECONDARY, name: "OK", internalAction: "onClose"}
 				]});
 	}
 
 	private clearAccountNumberActivity(): void {
-		if (this.showField === this.CHARTFIELD && this.accountNumberProject_Chartfield != '') {
+		if (this.showField === this.CHARTFIELD && this.accountNumberProject_Chartfield !== '') {
 			this.accountNumberActivity_Chartfield = '';
 			this.isActivity = false;
 		}
 	}
 
 	private clearAccountNumberProject(): void {
-		if (this.showField === this.CHARTFIELD && this.accountNumberActivity_Chartfield != '')  {
+		if (this.showField === this.CHARTFIELD && this.accountNumberActivity_Chartfield !== '')  {
 			this.accountNumberProject_Chartfield = '';
 			this.isActivity = true;
 		}
 	}
-
 }

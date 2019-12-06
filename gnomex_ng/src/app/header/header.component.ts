@@ -13,30 +13,29 @@ import {GnomexService} from "../services/gnomex.service";
 import {ExternalRoute} from "./external-routes.module";
 import * as _ from "lodash";
 import {TopicService} from "../services/topic.service";
-import {MatDialogConfig, MatToolbar} from "@angular/material";
+import {MatDialogConfig} from "@angular/material";
 import {AdvancedSearchComponent} from "./advanced_search/advanced-search.component";
 import {AuthenticationService} from "../auth/authentication.service";
 import {PropertyService} from "../services/property.service";
-import {Subscription} from "rxjs/index";
+import {BehaviorSubject, Subscription} from "rxjs/index";
 import {DialogsService} from "../util/popup/dialogs.service";
+import * as html2canvas from "html2canvas";
+import {ReportProblemComponent} from "./reportProblem/report-problem.component";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {ConstantsService} from "../services/constants.service";
+import {AboutComponent} from "../about/about.component";
+import {ContactUsComponent} from "../about/contact-us.component";
+import {ManageLinksComponent} from "./manageLinks/manage-links.component";
+import {first} from "rxjs/operators";
 
 @Component({
     selector: "gnomex-header",
     templateUrl: "./header.component.html",
     styles: [`
         
-        .minimize {
-            width:  fit-content;
-            height: fit-content;
-        }
-        
         .red {
             /*font-weight: bold;*/
             color: red;
-        }
-        
-        .horizontal-spacing-center {
-            text-align: center;
         }
         
         .no-padding-dialog .mat-dialog-container {
@@ -45,13 +44,8 @@ import {DialogsService} from "../util/popup/dialogs.service";
         .no-padding-dialog .mat-dialog-container .mat-dialog-actions{
             background-color: #eeeeeb;
         }
-        .lookup {
-            font-size: small;
-            text-decoration: none;
-        }
+        
         .header-one {
-            color: black;
-            background-color: white;
             position: fixed;
             z-index: 1;
         }
@@ -59,6 +53,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
             background-color: #f5fffa;
             color: black;
         }
+        
         .top-menu-item {
             flex: 1;
         }
@@ -98,10 +93,11 @@ import {DialogsService} from "../util/popup/dialogs.service";
 
 export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
 
-    @ViewChild('headerRef') headerRef: MatToolbar;
+    @ViewChild('headerRef') headerRef: ElementRef;
     @ViewChild('spacerRef') spacerRef: ElementRef;
 
     options: FormGroup;
+    private readonly serviceParams: any;
 
     constructor(private authenticationService: AuthenticationService,
                 private progressService: ProgressService,
@@ -113,12 +109,23 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                 private labListService: LabListService,
                 private gnomexService: GnomexService,
                 private formBuilder: FormBuilder,
-                private dialogsService: DialogsService) {
+                private dialogsService: DialogsService,
+                private constService: ConstantsService) {
 
         this.options = this.formBuilder.group({
             hideRequired: false,
             floatPlaceholder: 'auto',
         });
+
+        this.serviceParams = {
+            authenticationService: this.authenticationService,
+            progressService: this.progressService,
+            router: this.router,
+            gnomexService: this.gnomexService,
+            dialogsService: this.dialogsService,
+            constService: this.constService,
+        };
+
     }
 
     public objNumber: string;
@@ -162,10 +169,10 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     ngOnDestroy(): void {
         if (this.isAppInitCompleteSubscription) {
-            this.isAppInitCompleteSubscription.unsubscribe()
+            this.isAppInitCompleteSubscription.unsubscribe();
         }
         if (this.isLoggedInSubscription) {
-            this.isLoggedInSubscription.unsubscribe()
+            this.isLoggedInSubscription.unsubscribe();
         }
     }
 
@@ -191,16 +198,117 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             && this.spacerRef.nativeElement
             && this.spacerRef.nativeElement.style
             && this.headerRef
-            && this.headerRef._elementRef
-            && this.headerRef._elementRef.nativeElement
-            && this.headerRef._elementRef.nativeElement.offsetHeight
-            && this.headerRef._elementRef.nativeElement.offsetHeight > 0) {
+            && this.headerRef.nativeElement
+            && this.headerRef.nativeElement.offsetHeight
+            && this.headerRef.nativeElement.offsetHeight > 0) {
 
-            this.headerHeight = this.headerRef._elementRef.nativeElement.offsetHeight;
+            this.headerHeight = this.headerRef.nativeElement.offsetHeight;
 
             this.spacerRef.nativeElement.style.height = 'initial';
             this.spacerRef.nativeElement.style.height = '' + Math.ceil(this.headerHeight) + 'px';
         }
+    }
+
+    public launcherReportProblem(params: any): void {
+        if(!params.gnomexService || !params.dialogsService || !params.constService) {
+            return;
+        }
+        params.dialogsService.addSpinnerWorkItem();
+        html2canvas(document.body).then( canvas => {
+            let littleCanvas = document.createElement("canvas");
+            let bigCanvas = document.createElement("canvas");
+
+            littleCanvas.width = 500;
+            littleCanvas.height = 300;
+            bigCanvas.width = 2400;
+            bigCanvas.height = 1500;
+            bigCanvas.style.width = "1200px";
+            bigCanvas.style.height = "750px";
+            let context = littleCanvas.getContext("2d");
+            let context2 = bigCanvas.getContext("2d");
+            context.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, 500, 300);
+            context2.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, 2400, 1500);
+            context2.scale(2, 2);
+            let smallImgData = littleCanvas.toDataURL("image/png");
+            let bigImgData = bigCanvas.toDataURL("image/png");
+            let submitRequestLabList: any[] = [];
+            submitRequestLabList = params.gnomexService ? params.gnomexService.submitRequestLabList : [];
+            params.dialogsService.removeSpinnerWorkItem();
+
+            setTimeout(() => {
+                let config: MatDialogConfig = new MatDialogConfig();
+                config.width = "45em";
+                config.data = {
+                    labList: submitRequestLabList,
+                    items: [],
+                    selectedLabItem: "",
+                    smallImgData: smallImgData,
+                    bigImgData: bigImgData,
+                };
+                params.dialogsService.genericDialogContainer(ReportProblemComponent, "Send Email to GNomEx Team", params.constService.EMAIL_GO_LINK, config,
+                    {actions: [
+                            {type: ActionType.PRIMARY, icon: params.constService.EMAIL_GO_LINK, name: "Send Email", internalAction: "send"},
+                            {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                        ]});
+            });
+        });
+    }
+
+    public launcherAbout(params: any): void {
+        if(!params.dialogsService) {
+            return;
+        }
+        params.dialogsService.genericDialogContainer(AboutComponent, " About", null, null,
+            {actions: [{type: ActionType.SECONDARY, name: "Close", internalAction: "onClose"}]});
+    }
+
+    public launchContactUs(params: any): void {
+        if(!params.dialogsService) {
+            return;
+        }
+        params.dialogsService.genericDialogContainer(ContactUsComponent, "Contact Us", null, null,
+            {actions: [{type: ActionType.SECONDARY, name: "Close", internalAction: "onClose"}]});
+    }
+
+    public launcherManageLink(params: any): void {
+        if(!params.gnomexService || !params.dialogsService || !params.constService) {
+            return;
+        }
+
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.autoFocus = false;
+        config.width = "60em";
+        config.height = "35em";
+        params.dialogsService.genericDialogContainer(ManageLinksComponent, "Manage Quick Links", params.constService.ICON_FLAG_YELLOW, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: params.constService.ICON_SAVE, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: any) => {
+            if(result) {
+                params.gnomexService.emitFaqUpdateObservable();
+            }
+        });
+    }
+
+    public logout(params: any): void {
+        setTimeout(() => {
+            let mes: string = "Are you sure you want to sign out?";
+            params.dialogsService.confirm(mes, "Sign Out")
+                .pipe(first()).subscribe((result: boolean) => {
+                if(result) {
+                    params.authenticationService.logout();
+                    params.gnomexService.isLoggedIn = false;
+                    params.gnomexService.orderInitObj = null;
+                    params.gnomexService.redirectURL = null;
+                    params.progressService.hideLoaderStatus(false);
+                    params.progressService.loaderStatus = new BehaviorSubject<number> (0);
+                    params.router.navigate([{ outlets: { modal: null }}], {skipLocationChange: true})
+                        .then( () => {
+                            params.router.navigate(["/logout-loader"]);
+                        });
+                }
+            });
+        });
     }
 
     public buildNavItems() {
@@ -211,7 +319,8 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             {
                 displayName: 'Report Problem',
                 class: 'problem',
-                route: [{outlets: {modal: ['reportProblem']}}]
+                callback: this.launcherReportProblem,
+                params: this.serviceParams
             },
             {
                 displayName: 'Links',
@@ -229,12 +338,14 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'About',
                         class: 'mat-menu-item',
-                        route: [{outlets: {'modal': 'about-window-modal'}}]
+                        callback: this.launcherAbout,
+                        params: this.serviceParams
                     },
                     {
                         displayName: 'Contact Us',
                         class: 'mat-menu-item',
-                        route: [{outlets: {'modal': 'contact-us-window-modal'}}]
+                        callback: this.launchContactUs,
+                        params: this.serviceParams
                     }
                 ]
             },
@@ -250,7 +361,8 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Sign out',
                         iconName: './assets/flask.png',
-                        route: [{outlets: {'modal': 'logout'}}]
+                        callback: this.logout,
+                        params: this.serviceParams
                     }
                 ]
             }
@@ -1864,12 +1976,13 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         };
     }
 
-    private createModalMenuItem(displayName: string, context: string, icon: string, route: any, idCoreFacility: string, children: any[]): any {
+    private createModalMenuItem(displayName: string, context: string, icon: string, fn: any, params: any, children: any[]): any {
         return {
             displayName: displayName,
             context: context,
             iconName: icon,
-            route: route,
+            callback: fn,
+            params: params,
             children: children
         };
     }
@@ -1884,7 +1997,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     lniCtr++;
                 }
                 if (this.isAdminState) {
-                    lni.children[lniCtr] = this.createModalMenuItem("Manage...", "", "", [{outlets: {modal: ['manageLinks']}}], "", []);
+                    lni.children[lniCtr] = this.createModalMenuItem("Manage...", "", "", this.launcherManageLink, this.serviceParams, []);
                     lniCtr++;
                 }
                 break;

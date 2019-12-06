@@ -41,7 +41,7 @@ public class DownloadSingleFileServlet extends HttpServlet {
 
   private static String                          serverName = null;
 
-  
+
   public void init() { }
 
   protected void doGet(HttpServletRequest req, HttpServletResponse response)
@@ -74,7 +74,7 @@ public class DownloadSingleFileServlet extends HttpServlet {
     } else if (req.getParameter("requestNumber") != null && !req.getParameter("requestNumber").equals("")) {
       requestNumber = req.getParameter("requestNumber");
     }
-    
+
     // Get the fileName parameter
     if (req.getParameter("fileName") != null && !req.getParameter("fileName").equals("")) {
       fileName = req.getParameter("fileName");
@@ -92,7 +92,7 @@ public class DownloadSingleFileServlet extends HttpServlet {
     if ((idRequest == null && requestNumber == null) || fileName == null) {
       LOG.error("idRequest/requestNumber and fileName required");
 
-      response.setContentType("text/html");
+      response.setContentType("text/html; charset=UTF-8");
       response.getOutputStream().println("<html><head><title>Error</title></head>");
       response.getOutputStream().println("<body><b>");
       response.getOutputStream().println("Missing parameters:  idRequest and fileName required<br>");
@@ -117,10 +117,13 @@ public class DownloadSingleFileServlet extends HttpServlet {
 
         if (view.equals("Y") && mimeType != null) {
           response.setContentType(mimeType);
+          if(response.getCharacterEncoding() == null || (!response.getCharacterEncoding().equals("UTF-8") && !response.getCharacterEncoding().equals("utf-8"))) {
+          	response.setCharacterEncoding("UTF-8");
+					}
           response.setHeader("Content-Disposition", "filename=" + "\"" + fileName + "\"");
           response.setHeader("Cache-Control", "max-age=0, must-revalidate");
         } else {
-          response.setContentType("application/x-download");
+          response.setContentType("application/x-download; charset=UTF-8");
           response.setHeader("Content-Disposition", "attachment;filename=" + "\"" + fileName + "\"");
           response.setHeader("Cache-Control", "max-age=0, must-revalidate");
         }
@@ -279,7 +282,7 @@ public class DownloadSingleFileServlet extends HttpServlet {
 
           in = new FileInputStream(experimentFd.getFileName());
           OutputStream out = response.getOutputStream();
-                    
+
           byte b[] = new byte[102400];
           int numRead = 0;
           int size = 0;
@@ -298,12 +301,12 @@ public class DownloadSingleFileServlet extends HttpServlet {
               size += numRead;
             }
           }
-          
-          // Save transfer log 
+
+          // Save transfer log
           xferLog.setFileSize(new BigDecimal(size));
           xferLog.setEndDateTime(new java.util.Date(System.currentTimeMillis()));
           sess.save(xferLog);
-          
+
           in.close();
 
           if (needToPreprocess) {
@@ -314,13 +317,13 @@ public class DownloadSingleFileServlet extends HttpServlet {
           out.close();
 
           in = null;
-          out = null;           
+          out = null;
         }
 
         sess.flush();
-        
+
       } else {
-        response.setContentType("text/html");
+        response.setContentType("text/html; charset=UTF-8");
         response.getOutputStream().println("<html><head><title>Error</title></head>");
         response.getOutputStream().println("<body><b>");
         response.getOutputStream().println(
@@ -346,7 +349,7 @@ public class DownloadSingleFileServlet extends HttpServlet {
 
       HibernateSession.rollback();
 
-      response.setContentType("text/html");
+      response.setContentType("text/html; charset=UTF-8");
       response.getOutputStream().println("<html><head><title>Error</title></head>");
       response.getOutputStream().println("<body><b>");
       response.getOutputStream().println("DownloadSingleFileServlet: An exception occurred " + e.toString() + "<br>");
@@ -450,7 +453,7 @@ private void outString (StringBuilder theText, int startpos, int endpos, OutputS
 
 	try {
 		asBytes = theBytes.getBytes("UTF-8");
-		out.write(asBytes);		
+		out.write(asBytes);
 	} catch (UnsupportedEncodingException e) {
 		// TODO Auto-generated catch block
 	} catch (IOException e) {
@@ -460,14 +463,14 @@ private void outString (StringBuilder theText, int startpos, int endpos, OutputS
 
 private boolean processIMG (String imgline, OutputStream out, String dir, String experimentDir) {
 	boolean processed = false;
-	
+
 	// if already an inline base64 image, just return
 	int jpos = imgline.indexOf("src=\"data:image/");
 	if (jpos != -1) {
 		return processed;
 	}
-	
-	
+
+
 	// there are two types of syntax, image tags containing DownloadSingleFileServlet
 	// and those with src="local image name" without a &dir specified
 	int syntaxType = 1;								// assume DownloadSingleFileServlet
@@ -482,7 +485,7 @@ private boolean processIMG (String imgline, OutputStream out, String dir, String
 	int startA = 0;							// <
 	int endA = 0;							// everything upto src=
 	int startC = 0;							// everything after close " on src filename
-	
+
 	if (syntaxType == 1) {
 		// get the image filename, here's an example of what the html looks like
 		// <img src="https://b2b.hci.utah.edu/gnomex/DownloadSingleFileServlet.gx?requestNumber=103R&fileName=per_base_quality.png&view=Y&dir=Images">
@@ -498,14 +501,14 @@ private boolean processIMG (String imgline, OutputStream out, String dir, String
 		}
 
 		fileName = imgline.substring(ipos+9,epos);
-	
+
 		// figure out what type of image it is
 		imageType = "png";
 		ipos = fileName.lastIndexOf('.');
 		if (ipos != -1 && (ipos+1 < fileName.length()) ) {
 			imageType = fileName.substring(ipos+1);
 		}
-	
+
 		// get the directory
 		ipos = imgline.indexOf("&dir=");
 		if (ipos == -1) {
@@ -526,7 +529,7 @@ private boolean processIMG (String imgline, OutputStream out, String dir, String
 			// not a format we can deal with
 			return processed;
 		}
-		
+
 		endA = ipos;			// end of everything upto src=
 		ipos = imgline.indexOf('"',ipos+4);
 		if (ipos == -1) {
@@ -544,28 +547,28 @@ private boolean processIMG (String imgline, OutputStream out, String dir, String
 			// we only deal with local filenames
 			return processed;
 		}
-		
+
 		// figure out what type of image it is
 		imageType = "png";
 		ipos = fileName.lastIndexOf('.');
 		if (ipos != -1 && (ipos+1 < fileName.length()) ) {
 			imageType = fileName.substring(ipos+1);
 		}
-		
-		
+
+
 		localdir = dir + Constants.FILE_SEPARATOR;
 		if (experimentDir.endsWith(localdir))
 		{
 			localdir = "";
 		}
 	}
-	
+
 	// get the file
-	String pathname = experimentDir + localdir + fileName;		
+	String pathname = experimentDir + localdir + fileName;
 	File imageFd = new File(pathname);
 
 	// read it in
-	long filesize = imageFd.length();		
+	long filesize = imageFd.length();
 	byte thefile[] = new byte[(int)filesize];
 
     FileInputStream inf;
@@ -587,7 +590,7 @@ private boolean processIMG (String imgline, OutputStream out, String dir, String
 	if (!readImageOK) {
 		return processed;
 	}
-	
+
 	// convert it to base64
 	byte[] encodedBytes = Base64.encodeBase64(thefile);
 
@@ -597,8 +600,8 @@ private boolean processIMG (String imgline, OutputStream out, String dir, String
 	if (syntaxType == 1) {
 		imgtag.append("<img src=\"data:image/");
 		imgtag.append(imageType);
-		imgtag.append(";base64,"); 
-			
+		imgtag.append(";base64,");
+
 		imgtag.append(new String(encodedBytes));
 		imgtag.append("\" />");
 	}
@@ -608,15 +611,15 @@ private boolean processIMG (String imgline, OutputStream out, String dir, String
 
 		imgtag.append("src=\"data:image/");
 		imgtag.append(imageType);
-		imgtag.append(";base64,"); 
-			
+		imgtag.append(";base64,");
+
 		imgtag.append(new String(encodedBytes));
 		imgtag.append("\"");
-		
+
 		String partC = imgline.substring(startC);
 		imgtag.append(partC);
 	}
-	
+
 	// write it out
 	outString (imgtag,0,imgtag.length(),out);
 	processed = true;

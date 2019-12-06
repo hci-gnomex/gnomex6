@@ -1,4 +1,4 @@
-<button mat-button [matMenuTriggerFor]="topMenu">{{this.label}}</button>
+<button mat-raised-button [matMenuTriggerFor]="topMenu">{{this.label}}</button>
 <mat-menu #topMenu="matMenu">
     <button mat-menu-item (click)="this.setRangeWithinLast(7)">Last week</button>
     <button mat-menu-item (click)="this.setRangeWithinLast(30)">Last 30 days</button>

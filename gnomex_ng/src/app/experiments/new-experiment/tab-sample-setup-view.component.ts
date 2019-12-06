@@ -291,6 +291,18 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
         return this.newExperimentService.currentState !== 'QCState';
     }
 
+    public get showNotifyBMP(): boolean {
+        if (this._experiment && this._experiment.idCoreFacility) {
+            for (let option of this.gnomexService.coreFacilitiesICanManage) {
+                if (option.idCoreFacility === this._experiment.idCoreFacility) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public get showNumberPlatesPrompt(): boolean {
         // return true;
         return this._experiment
