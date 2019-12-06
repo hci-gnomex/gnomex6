@@ -6,17 +6,20 @@
             </a>
         </div>
         <div class="flex-container-row padded-left-right align-center">
-            <mat-form-field [hideRequiredMarker]="options.value.hideRequired"
+            <mat-form-field class="padded-left-right"
+                            [hideRequiredMarker]="options.value.hideRequired"
                             [floatLabel]="options.value.floatPlaceholder">
-                <input matInput type="text" [(ngModel)]="objNumber" placeholder="Lookup by #">
+                <input matInput type="text" [(ngModel)]="objNumber" placeholder="Lookup by #" (keyup)="ifPressEnterSearchByNumber($event)">
             </mat-form-field>
-            <button mat-button class="minimize" (click)="searchNumber()">
+            <button mat-raised-button class="minimize" (click)="searchNumber()">
                 <img [src]="'./assets/arrow_right.png'" alt="">
             </button>
-            <mat-form-field class="padded-left" floatLabel='auto'>
-                <input matInput class="flex-grow" [(ngModel)]="searchText" placeholder="Search">
+            <div class="horizontal-spacer">
+            </div>
+            <mat-form-field class="padded-left-right" floatLabel='auto'>
+                <input matInput class="flex-grow" [(ngModel)]="searchText" placeholder="Search" (keyup)="ifPressEnterSearchByText($event)">
             </mat-form-field>
-            <button mat-button class="minimize" (click)="searchByText()">
+            <button mat-raised-button class="minimize" (click)="searchByText()">
                 <img [src]="'./assets/magnifier.png'" alt="">
             </button>
         </div>
