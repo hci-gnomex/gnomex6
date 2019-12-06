@@ -640,8 +640,12 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             }
             this.dialogsService.alert("Flowcell " + response.flowCellNumber + " created", null, DialogType.SUCCESS);
             this.assmItemList = [];
+            this.originalProtocol = "";
             this.allFG.reset();
             this.flowCellRunFolder = "";
+            this.createDateFC.setValue(null);
+            this.createDateFC.updateValueAndValidity();
+
             this.initialize();
 
             this.showSpinner = false;
@@ -750,33 +754,22 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
 
     private createFlowCellFileName(): void {
         let runFolder: string = '';
-        if(this.barcodeFC.value.length > 0
-            && this.runFC.value.length > 0
+        if(this.barcodeFC.value
+            && this.runFC.value
             && this.createDateFC.value
             && this.instrumentFC.value
             && this.protocolFC.value) {
 
-            let cDate = new Date(this.createDateFC.value);
+            let date = (<string>this.createDateFC.value).replace(/-/g,'');
+            date = date.slice(2,date.length);
 
-            let year: string = (cDate.getFullYear().toString()).substr(2, 3);
-
-            let month: string = (cDate.getMonth() + 1).toString();
-            if (month.length === 1) {
-                month = "0" + month;
-            }
-
-            let date: string =  cDate.getDate().toString();
-            if(date.length === 1) {
-                date = "0" + date;
-            }
             let instrumentCode:string = "";
             if(this.instrumentFC.value){
                let instrumentObj = this.instrumentList.find(i => (i.idInstrument === this.instrumentFC.value ));
                instrumentCode = instrumentObj &&  instrumentObj.instrument ? instrumentObj.instrument : "";
             }
 
-
-            runFolder += year + month + date + "_" + instrumentCode + "_";
+            runFolder += date + "_" + instrumentCode + "_";
 
             let runNumberPlus: number = Number(this.runFC.value) + 10000;
             let side = this.sideFC.value ? this.sideFC.value : '';
