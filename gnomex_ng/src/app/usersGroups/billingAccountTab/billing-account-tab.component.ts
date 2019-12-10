@@ -41,6 +41,7 @@ import {UniqueIdGeneratorService} from "../../services/unique-id-generator.servi
 import {ConstantsService} from "../../services/constants.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 
 export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
     isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -183,12 +184,14 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
     private hasReceivedOtherAccountFieldsConfiguration: boolean = false;
 
 
-    constructor(private dictionaryService: DictionaryService,
-                private dialogsService: DialogsService,
-                private propertyService: PropertyService,
-                private accountFieldsConfigurationService: AccountFieldsConfigurationService,
+    constructor(private accountFieldsConfigurationService: AccountFieldsConfigurationService,
                 private constService: ConstantsService,
-                private idGenerator: UniqueIdGeneratorService) {
+                private createSecurityAdvisorService: CreateSecurityAdvisorService,
+                private dictionaryService: DictionaryService,
+                private dialogsService: DialogsService,
+                private idGenerator: UniqueIdGeneratorService,
+                private propertyService: PropertyService) {
+
 		this.context = { componentParent: this };
 	}
 
@@ -260,7 +263,12 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 	// All the data on this component needs to be updated when the selected lab is changed (auto-detected
 	// when the input "labInfo" changes).
 	private onLabChanged() {
-		this.selectedCoreFacility = this.getDefaultCoreFacility();
+        if (this.amIALabManagerForThisLab()) {
+            this.selectedCoreFacility = this.getDefaultCoreFacility();
+        } else {
+            this.selectedCoreFacility = this.getDefaultCoreFacilityAsAdmin();
+        }
+
 		this.labActiveSubmitters = this.getActiveSubmitters();
 
 		if (this.chartfieldGridApi) {
@@ -289,6 +297,26 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
         this.markAsPristine();
 	}
 
+	private amIALabManagerForThisLab(): boolean {
+
+        let temp: any[] = [];
+
+        if (this._labInfo && this._labInfo.managers) {
+            if (Array.isArray(this._labInfo.managers)) {
+                temp = this._labInfo.managers;
+            } else {
+                temp = [this._labInfo.managers.AppUser];
+            }
+        }
+
+        for (let user of temp) {
+            if (user && user.idAppUser === "" + this.createSecurityAdvisorService.idAppUser) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 	private getDefaultCoreFacility(): any {
 		if (!!this._labInfo.coreFacilities && this._labInfo.coreFacilities.length > 0) {
@@ -322,6 +350,50 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 		}
 
 	}
+
+    private getDefaultCoreFacilityAsAdmin(): any {
+        if (!!this._labInfo.coreFacilities && this._labInfo.coreFacilities.length > 0) {
+            this.coreFacilities = _.cloneDeep(this._labInfo.coreFacilities).filter((value: any) => {
+                let manageList: any[] = this.createSecurityAdvisorService.coreFacilitiesICanManage.filter((value) => {
+                    return !value.isActive || value.isActive !== 'N';
+                });
+
+                for (let coreFacility of manageList) {
+                    if (coreFacility.idCoreFacility === value.idCoreFacility) {
+                        return true;
+                    }
+                }
+
+                return false;
+            });
+
+            this.coreFacilities = this.coreFacilities.sort((a, b) => {
+                if (a.sortOrder && a.sortOrder != "") {
+                    if (b.sortOrder && b.sortOrder != "") {
+                        return parseInt(a.sortOrder) - parseInt(b.sortOrder);
+                    } else {
+                        return -1;
+                    }
+                } else {
+                    if (b.sortOrder && b.sortOrder != "") {
+                        return 1;
+                    } else {
+                        if (a.display && b.display && a.display.toLowerCase() > b.display.toLowerCase()){
+                            return 1;
+                        } else if (a.display && b.display && a.display.toLowerCase() === b.display.toLowerCase()) {
+                            return 0
+                        } else {
+                            return -1;
+                        }
+                    }
+                }
+            });
+
+            return this.coreFacilities[0];
+        } else {
+            return null;
+        }
+    }
 
 	getActiveSubmitters(): any[] {
 		let results = new Map();
