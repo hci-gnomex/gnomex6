@@ -130,11 +130,8 @@ const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     }
 
     onChange() {
-        // This setTimeout is needed because the event fired from the datepicker itself takes place before _date's value changes.
-        setTimeout(() => {
-            this._dateString = this.value;
-            this.change.emit(this._dateString);
-            this.onChangeCallback(this._dateString);
-        });
+        this._dateString = this.value;
+        this.onChangeCallback(this._dateString);
+        this.change.emit(this._dateString);
     }
 }
