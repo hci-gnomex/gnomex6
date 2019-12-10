@@ -240,17 +240,17 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         });
 
         //{headerName: "Type", headerTooltip:"Type", field: "codeBillingChargeKind", tooltipField: "codeBillingChargeKind", width: 100},
-        columnDefs.push({
-            headerName: "Price Category",
-            headerTooltip:"Price Category",
-            field: "category",
-            tooltipField: "category",
-            editable: false,
-            cellRendererFramework: TextAlignLeftMiddleRenderer,
-            cellEditorFramework: TextAlignLeftMiddleEditor,
-            width:    5 * this.emToPxConversionRate,
-            minWidth: 10 * this.emToPxConversionRate
-        });
+        // columnDefs.push({
+        //     headerName: "Price Category",
+        //     headerTooltip:"Price Category",
+        //     field: "category",
+        //     tooltipField: "category",
+        //     editable: false,
+        //     cellRendererFramework: TextAlignLeftMiddleRenderer,
+        //     cellEditorFramework: TextAlignLeftMiddleEditor,
+        //     width:    5 * this.emToPxConversionRate,
+        //     minWidth: 10 * this.emToPxConversionRate
+        // });
 
         columnDefs.push({
             headerName: "Description",
