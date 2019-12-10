@@ -96,14 +96,8 @@
                             <input matInput placeholder="Run #" [formControl]="runFC">
                             <mat-error *ngIf="runFC.hasError('pattern')"> field only accepts numbers </mat-error>
                         </mat-form-field>
-                        <mat-form-field class="date-width">
-                            <input matInput
-                                   placeholder="Create Date"
-                                   [formControl]="createDateFC"
-                                   [matDatepicker]="createDatePicker">
-                            <mat-datepicker-toggle matSuffix [for]="createDatePicker"></mat-datepicker-toggle>
-                            <mat-datepicker #createDatePicker disabled="false"></mat-datepicker>
-                        </mat-form-field>
+                        <date-picker  [formControl]="this.createDateFC"  placeholder="Create Date">
+                        </date-picker>
                         <mat-radio-group [formControl]="sideFC" class="flex-container-row children-margin-right" >
                             <mat-radio-button value="A">Side A</mat-radio-button>
                             <mat-radio-button value="B">Side B</mat-radio-button>
