@@ -24,8 +24,8 @@
             <angular-editor #descEditorRef formControlName="description" [config]="this.editorConfig">
             </angular-editor>
         </div>
-        <div> Created By: {{this.dtService.datatrackListTreeNode.createdBy}}
-            {{this.dtService.datatrackListTreeNode.createDate}}
+        <div> Created By: {{this.dtService?.datatrackListTreeNode?.createdBy}}
+            {{this.dtService?.datatrackListTreeNode?.createDate}}
         </div>
     </div>
     <div>

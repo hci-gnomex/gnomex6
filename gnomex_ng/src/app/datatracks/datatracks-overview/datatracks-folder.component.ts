@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ViewChild} from "@angular/core";
+import {Component, Input, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {DataTrackService} from "../../services/data-track.service";
 import {ActivatedRoute} from "@angular/router";
@@ -8,6 +8,7 @@ import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
 import {GnomexService} from "../../services/gnomex.service";
+import {Subscription} from "rxjs";
 
 
 @Component({
@@ -21,7 +22,7 @@ import {GnomexService} from "../../services/gnomex.service";
         }
     `]
 })
-export class DatatracksFolderComponent implements OnInit {
+export class DatatracksFolderComponent implements OnInit, OnDestroy {
     //Override
 
     public canWrite: boolean = false;
@@ -29,6 +30,7 @@ export class DatatracksFolderComponent implements OnInit {
     public editorConfig: AngularEditorConfig;
     private folderFormGroup: FormGroup;
     private labList: Array<string> = [];
+    private datatracksTreeNodeSubscription : Subscription;
     @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
     // todo need a toggle for editable for datatracks overview detail
     @Input() editable;
@@ -62,15 +64,16 @@ export class DatatracksFolderComponent implements OnInit {
             description:[{value:"", disabled: this.secAdvisor.isGuest}]
         });
 
-        this.route.paramMap.forEach(params => {
-            let folderName = this.dtService.datatrackListTreeNode.name;
-            this.canWrite = this.dtService.datatrackListTreeNode.canWrite === "Y";
-            this.folderFormGroup.get("folderName").setValue(folderName);
-            this.folderFormGroup.get("description").setValue(this.dtService.datatrackListTreeNode.description);
-            this.folderFormGroup.get("lab").setValue(this.dtService.datatrackListTreeNode.idLab);
-            this.folderFormGroup.markAsPristine();
+        this.datatracksTreeNodeSubscription =  this.dtService.datatrackListTreeNodeSubject.subscribe((data)=>{
+            if(data){
+                let folderName = data.name;
+                this.canWrite = data.canWrite === "Y";
+                this.folderFormGroup.get("folderName").setValue(folderName);
+                this.folderFormGroup.get("description").setValue(data.description);
+                this.folderFormGroup.get("lab").setValue(data.idLab);
+                this.folderFormGroup.markAsPristine();
+            }
         });
-
     }
 
 
@@ -98,6 +101,10 @@ export class DatatracksFolderComponent implements OnInit {
         },(err:IGnomexErrorResponse) =>{
             this.showSpinner = false;
         });
+    }
+
+    ngOnDestroy(): void {
+        this.datatracksTreeNodeSubscription.unsubscribe();
     }
 
 }

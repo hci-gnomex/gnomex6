@@ -304,10 +304,8 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     params.gnomexService.redirectURL = null;
                     params.progressService.hideLoaderStatus(false);
                     params.progressService.loaderStatus = new BehaviorSubject<number> (0);
-                    params.router.navigate([{ outlets: { modal: null }}], {skipLocationChange: true})
-                        .then( () => {
-                            params.router.navigate(["/logout-loader"]);
-                        });
+                    params.router.navigate(["/logout-loader"]);
+
                 }
             });
         });

@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {DataTrackService} from "../../services/data-track.service";
 import {ActivatedRoute} from "@angular/router";
@@ -8,6 +8,7 @@ import {specialChars} from "../../util/validators/special-characters.validator";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../../util/popup/dialogs.service";
+import {Subscription} from "rxjs";
 
 
 @Component({
@@ -89,13 +90,14 @@ import {DialogsService} from "../../util/popup/dialogs.service";
         }
     `]
 })
-export class DatatracksOrganismComponent implements OnInit {
+export class DatatracksOrganismComponent implements OnInit, OnDestroy {
     //Override
 
     public showSpinner: boolean = false;
     public dirty = false;
     public orgFormGroup: FormGroup;
     public canWrite: boolean = false;
+    private datatracksTreeNodeSubscription: Subscription;
 
 
     constructor(private fb: FormBuilder, private dtService: DataTrackService,
@@ -115,22 +117,22 @@ export class DatatracksOrganismComponent implements OnInit {
            isActive: [{value: false  , disabled: this.secAdvisor.isGuest}]
 
        });
-        this.route.paramMap.forEach(params => {
-            let commonName = this.dtService.datatrackListTreeNode.commonName;
-            let binomialName = this.dtService.datatrackListTreeNode.binomialName;
-            let name = this.dtService.datatrackListTreeNode.name;
-            let NCBITaxID = this.dtService.datatrackListTreeNode.NCBITaxID;
-            let isActive : boolean = this.dtService.datatrackListTreeNode.isActive  === "Y";
-            this.orgFormGroup.get("commonName").setValue(commonName);
-            this.orgFormGroup.get("binomialName").setValue(binomialName);
-            this.orgFormGroup.get("name").setValue(name);
-            this.orgFormGroup.get("NCBITaxID").setValue(NCBITaxID);
-            this.orgFormGroup.get("isActive").setValue(isActive);
-            this.orgFormGroup.markAsPristine();
-
-            this.canWrite = this.dtService.datatrackListTreeNode.canWrite === "Y";
-        });
-
+      this.datatracksTreeNodeSubscription =  this.dtService.datatrackListTreeNodeSubject.subscribe((data)=>{
+           if(data){
+               let commonName = data.commonName;
+               let binomialName = data.binomialName;
+               let name = data.name;
+               let NCBITaxID = data.NCBITaxID;
+               let isActive : boolean = data.isActive  === "Y";
+               this.orgFormGroup.get("commonName").setValue(commonName);
+               this.orgFormGroup.get("binomialName").setValue(binomialName);
+               this.orgFormGroup.get("name").setValue(name);
+               this.orgFormGroup.get("NCBITaxID").setValue(NCBITaxID);
+               this.orgFormGroup.get("isActive").setValue(isActive);
+               this.orgFormGroup.markAsPristine();
+               this.canWrite = data.canWrite === "Y";
+           }
+       });
 
     }
 
@@ -162,6 +164,10 @@ export class DatatracksOrganismComponent implements OnInit {
         });
 
 
+    }
+
+    ngOnDestroy(): void {
+        this.datatracksTreeNodeSubscription.unsubscribe();
     }
 }
 

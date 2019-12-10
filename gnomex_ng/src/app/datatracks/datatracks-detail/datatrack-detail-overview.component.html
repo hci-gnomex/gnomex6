@@ -1,8 +1,8 @@
 <div style="display:flex; flex-direction:column; height:100%; width:100%;">
     <div style="display:flex; font-size:small; " >
         <label>
-            <img class="icon" [src]="dataTrackService?.datatrackListTreeNode.icon">
-            Data Track {{this.dataTrackService?.datatrackListTreeNode.number}}
+            <img class="icon" [src]="dataTrackService?.datatrackListTreeNode?.icon">
+            Data Track {{this.dataTrackService?.datatrackListTreeNode?.number}}
         </label>
 
         <button [disabled]="!showUCSC"

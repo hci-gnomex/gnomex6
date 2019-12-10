@@ -1,10 +1,10 @@
 import {Injectable} from "@angular/core";
 import {Http, Headers, Response} from "@angular/http";
-import {Observable, of, throwError} from "rxjs";
+import {BehaviorSubject, Observable, of, throwError} from "rxjs";
 import {Subject} from "rxjs";
 import {CookieUtilService} from "./cookie-util.service";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
-import {catchError, map} from "rxjs/operators";
+import {catchError, map, takeUntil} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../util/popup/dialogs.service";
 
@@ -14,9 +14,15 @@ export class DataTrackService {
     private datatracksListSubject: Subject<any[]> = new Subject();
     private _haveLoadedDatatracksList: boolean = false;
     private _previousURLParams: HttpParams = null;
-    private _datatrackListTreeNode: any;
+    private _datatrackListTreeNode: BehaviorSubject<any> = new BehaviorSubject<any>(null);
     private _labList: any[] = [];
     private _activeNodeToSelect: any = {};
+    private _endSubscriptDTTreeNode: boolean = false;
+    private destroy: Subject<boolean> = new Subject<boolean>();
+    public static readonly ORGANISM: string = 'organism';
+    public static readonly GENOME_BUILD:string = 'genomebuild';
+    public static readonly FOLDER:string = 'folder';
+    public static readonly DATA_TRACK:string= 'detail';
 
     constructor(private http: Http, private cookieUtilService: CookieUtilService,
                 private httpClient: HttpClient,
@@ -29,12 +35,20 @@ export class DataTrackService {
     get labList() {
         return this._labList;
     }
+    //synchronous
     set datatrackListTreeNode(data: any) {
-        this._datatrackListTreeNode = data;
+        this._datatrackListTreeNode.next(data);
     }
     get datatrackListTreeNode(): any {
+        return this._datatrackListTreeNode.getValue();
+    }
+
+    //async
+    get datatrackListTreeNodeSubject(): BehaviorSubject<any>{
         return this._datatrackListTreeNode;
     }
+
+
     set previousURLParams(data: HttpParams) {
         this._previousURLParams  = data;
     }

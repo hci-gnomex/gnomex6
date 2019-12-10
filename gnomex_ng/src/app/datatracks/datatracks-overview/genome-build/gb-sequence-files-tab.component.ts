@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder} from "@angular/forms"
 import {PrimaryTab} from "../../../util/tabs/primary-tab.component"
 import {ActivatedRoute} from "@angular/router";
@@ -58,7 +58,7 @@ import {ActionType} from "../../../util/interfaces/generic-dialog-action.model";
     `]
 
 })
-export class GBSequenceFilesTabComponent extends PrimaryTab implements OnInit{
+export class GBSequenceFilesTabComponent extends PrimaryTab implements OnInit, OnDestroy{
     //Override
     name = "Sequence Files";
     public rowData:Array<any> = [];
@@ -69,6 +69,7 @@ export class GBSequenceFilesTabComponent extends PrimaryTab implements OnInit{
     private enableRemove:boolean = false;
     private validSubscription:Subscription;
     private idGenomeBuild:string;
+    private datatracksTreeNodeSubscription: Subscription;
 
     private editable = ():boolean =>{
         return !this.secAdvisor.isGuest;
@@ -111,9 +112,15 @@ export class GBSequenceFilesTabComponent extends PrimaryTab implements OnInit{
     ngOnInit():void{
         this.newPage = this.constService.PAGE_NEW;
         this.removePage = this.constService.PAGE_REMOVE_DISABLE;
+        this.datatracksTreeNodeSubscription = this.datatracksService.datatrackListTreeNodeSubject.subscribe((data) =>{
+            if(data){
+                let canWrite:boolean = data.canWrite === 'Y';
+                this.enableUpload = canWrite;
+            }
 
-        let canWrite:boolean = this.datatracksService.datatrackListTreeNode.canWrite === 'Y';
-        this.enableUpload = canWrite;
+        });
+
+
 
 
         this.route.data.forEach(data =>{
@@ -183,6 +190,10 @@ export class GBSequenceFilesTabComponent extends PrimaryTab implements OnInit{
 
         this.gbValidateService.dirtyNote = true;
         this.rowData = tmpRowData;
+    }
+
+    ngOnDestroy() {
+       this.datatracksTreeNodeSubscription.unsubscribe();
     }
 
 }

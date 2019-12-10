@@ -2,7 +2,15 @@ import {Injectable} from "@angular/core";
 
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {forkJoin, Observable, Subject, Subscription} from "rxjs";
-import {NavigationStart, ParamMap, Router, UrlSegment, UrlSegmentGroup,  Event as NavigationEvent} from "@angular/router";
+import {
+    NavigationStart,
+    ParamMap,
+    Router,
+    UrlSegment,
+    UrlSegmentGroup,
+    Event as NavigationEvent,
+    ActivatedRoute
+} from "@angular/router";
 import {IRequiredParam} from "../util/interfaces/navigation-definition.model";
 import {filter} from "rxjs/operators";
 import {NavigationItem} from "typedoc";
@@ -144,6 +152,19 @@ export class NavigationService {
                 }
             );
 
+    }
+
+
+    getChildActivateRoute(route:ActivatedRoute):ActivatedRoute{
+        let activateRoute = route;
+        while(true){
+            if(activateRoute.children.length > 0){
+                activateRoute = activateRoute.children[0];
+            }else{
+                break;
+            }
+        }
+        return activateRoute;
     }
 
 

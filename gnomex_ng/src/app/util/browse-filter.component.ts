@@ -670,6 +670,10 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
             setTimeout(()=>{
                 this.search();
                 this.navigationService.emitResetNavModeSubject("experiments");
+                this.navigationService.emitResetNavModeSubject("analysis");
+                this.navigationService.emitResetNavModeSubject("datatracks");
+                this.navigationService.emitResetNavModeSubject("topics");
+                this.navigationService.emitResetNavModeSubject("experiments-orders")
 
             });
         }
@@ -969,6 +973,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
             this.dataTrackService.previousURLParams["refreshParams"] = true;
             this.dataTrackService.labList = this.labList;
             this.dataTrackService.getDatatracksList_fromBackend(params);
+            this.setURLFromParams(requiredParams,params );
         }
     }
 

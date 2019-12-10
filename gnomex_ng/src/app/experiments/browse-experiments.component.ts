@@ -161,20 +161,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.labs = [];
 
         this.navService.navMode = this.navService.navMode !== NavigationService.USER ? NavigationService.URL : NavigationService.USER;
-
-        let activateRoute :ActivatedRoute = this.route;
-
-        while(true){
-            if(activateRoute.children.length > 0){
-                activateRoute = this.route.children[0];
-            }else{
-                break;
-            }
+        let activatedRoute = this.navService.getChildActivateRoute(this.route);
+        if(activatedRoute){
+            activatedRoute.queryParamMap.subscribe((qParam)=>{this.qParamMap = qParam });
+            activatedRoute.paramMap.subscribe((param)=>{ this.paramMap = param });
         }
-        if(activateRoute){
-            activateRoute.queryParamMap.subscribe((qParam)=>{this.qParamMap = qParam });
-            activateRoute.paramMap.subscribe((param)=>{ this.paramMap = param });
-        }
+
 
         this.experimentsService.startSearchSubject.subscribe((value) => {
             if (value) {
@@ -216,14 +208,14 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 this.treeModel.expandAll();
                 //todo need replace logic from orderInitObj to use url
                 if(this.navService.navMode === NavigationService.URL) {
-                    let id: string = "r" + this.paramMap.get("idRequest");
+                    let id: string = this.paramMap.get("idRequest") ? 'r'+ this.paramMap.get("idRequest")
+                        : this.qParamMap.get("idProject") ? 'p' + this.qParamMap.get("idProject") : null;
                     if(this.treeModel && id) {
                         let node: ITreeNode = this.treeModel.getNodeById(id);
                         if(node) {
                             this.treeModel.getNodeById(id).setIsActive(true);
                             this.treeModel.getNodeById(id).scrollIntoView();
                         }
-
                     }
                 } else if(this.setActiveNodeId) {
                     let node: TreeNode;
