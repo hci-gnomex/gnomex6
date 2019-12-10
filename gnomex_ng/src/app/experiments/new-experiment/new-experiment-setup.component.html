@@ -65,10 +65,35 @@
                             <div class="heading">
                                 Select a payment method :
                             </div>
-                            <custom-combo-box class="moderate-width" placeholder="Account" (optionSelected)="onBillingAccountSelection($event)"
-                                              displayField="accountNameDisplay" [options]="authorizedBillingAccounts"
-                                              [formControlName]="'selectAccount'">
-                            </custom-combo-box>
+                            <mat-form-field class="full-width full-height">
+                                <input matInput class="full-width full-height"
+                                       autocomplete="off"
+                                       placeholder="Account"
+                                       [autocomplete]="autoBillingAccount"
+                                       [formControl]="form.controls['selectAccount']">
+                                <mat-autocomplete autoActiveFirstOption
+                                                  #autoBillingAccount="matAutocomplete"
+                                                  (optionSelected)="onBillingAccountSelection($event.option.value)">
+                                    <mat-option class="">
+                                        None
+                                    </mat-option>
+                                    <mat-option class="" *ngFor="let opt of authorizedBillingAccounts" [value]="opt">
+                                        {{ opt.display }}
+                                    </mat-option>
+                                </mat-autocomplete>
+                                <mat-error *ngIf="form.controls['selectAccount'].hasError('required')">Account is required</mat-error>
+
+                            </mat-form-field>
+
+
+
+                            <!--<custom-combo-box class="moderate-width"-->
+                                              <!--placeholder="Account"-->
+                                              <!--displayField="accountNameDisplay"-->
+                                              <!--[formControlName]="'selectAccount'"-->
+                                              <!--[options]="authorizedBillingAccounts"-->
+                                              <!--(optionSelected)="onBillingAccountSelection($event)">-->
+                            <!--</custom-combo-box>-->
                         </div>
                         <div class="flex-container-col" *ngIf="this.form.get('selectBillingTemplate').value">
                             <span *ngFor="let item of this.form.get('selectBillingTemplate').value.items" class="margin-left">{{item.accountNameDisplay}}</span>
