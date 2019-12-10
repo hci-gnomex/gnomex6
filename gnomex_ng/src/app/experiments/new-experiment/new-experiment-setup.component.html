@@ -52,10 +52,20 @@
                     <div class="heading">
                         Verify your name :
                     </div>
-                    <custom-combo-box class="moderate-width" placeholder="Your name"
-                                      [displayField]="this.prefService.userDisplayField" [options]="possibleSubmitters"
-                                      [(ngModel)]="submitter" [formControlName]="'selectName'">
-                    </custom-combo-box>
+                    <mat-form-field class="moderate-width full-height">
+                        <mat-select class="full-width full-height"
+                                    placeholder="Your name"
+                                    [(ngModel)]="submitter"
+                                    [formControl]="form.controls['selectName']">
+                            <mat-option class="" [value]="">
+                                None
+                            </mat-option>
+                            <mat-option class="" *ngFor="let opt of possibleSubmitters" [value]="opt">
+                                {{ opt[prefService.userDisplayField] }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="form.controls['selectName'].hasError('required')">Your name is required</mat-error>
+                    </mat-form-field>
                 </div>
             </li>
             <li *ngIf="showBilling" class="full-width align-baseline">
@@ -65,35 +75,20 @@
                             <div class="heading">
                                 Select a payment method :
                             </div>
-                            <mat-form-field class="full-width full-height">
-                                <input matInput class="full-width full-height"
-                                       autocomplete="off"
-                                       placeholder="Account"
-                                       [autocomplete]="autoBillingAccount"
-                                       [formControl]="form.controls['selectAccount']">
-                                <mat-autocomplete autoActiveFirstOption
-                                                  #autoBillingAccount="matAutocomplete"
-                                                  (optionSelected)="onBillingAccountSelection($event.option.value)">
-                                    <mat-option class="">
+                            <mat-form-field class="moderate-width full-height">
+                                <mat-select class="full-width full-height"
+                                            placeholder="Account"
+                                            [formControl]="form.controls['selectAccount']"
+                                            (selectionChange)="onBillingAccountSelection($event.value)">
+                                    <mat-option class="" [value]="">
                                         None
                                     </mat-option>
                                     <mat-option class="" *ngFor="let opt of authorizedBillingAccounts" [value]="opt">
-                                        {{ opt.display }}
+                                        {{ opt.accountNameDisplay }}
                                     </mat-option>
-                                </mat-autocomplete>
+                                </mat-select>
                                 <mat-error *ngIf="form.controls['selectAccount'].hasError('required')">Account is required</mat-error>
-
                             </mat-form-field>
-
-
-
-                            <!--<custom-combo-box class="moderate-width"-->
-                                              <!--placeholder="Account"-->
-                                              <!--displayField="accountNameDisplay"-->
-                                              <!--[formControlName]="'selectAccount'"-->
-                                              <!--[options]="authorizedBillingAccounts"-->
-                                              <!--(optionSelected)="onBillingAccountSelection($event)">-->
-                            <!--</custom-combo-box>-->
                         </div>
                         <div class="flex-container-col" *ngIf="this.form.get('selectBillingTemplate').value">
                             <span *ngFor="let item of this.form.get('selectBillingTemplate').value.items" class="margin-left">{{item.accountNameDisplay}}</span>
@@ -125,10 +120,20 @@
                     <div class="heading word-wrap">
                         {{ "Select a folder : \n (for organizing experiments)" }}
                     </div>
-                    <custom-combo-box class="moderate-width" placeholder="Project" (optionSelected)="onProjectSelection($event)"
-                                      displayField="name" [options]="filteredProjectList"
-                                      [formControlName]="'selectProject'">
-                    </custom-combo-box>
+                    <mat-form-field class="moderate-width full-height">
+                        <mat-select class="full-width full-height"
+                                    placeholder="Project"
+                                    [formControl]="form.controls['selectProject']"
+                                    (selectionChange)="onProjectSelection($event.value)">
+                            <mat-option class="" [value]="">
+                                None
+                            </mat-option>
+                            <mat-option class="" *ngFor="let opt of filteredProjectList" [value]="opt">
+                                {{ opt.name }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="form.controls['selectProject'].hasError('required')">Project is required</mat-error>
+                    </mat-form-field>
                     <div class="flex-container-row major-padding-left">
                         <div class="padded-right">
                             <button mat-button class="link-button minimize" [disabled]="!this.form.get('selectProject').value" (click)="onClickEditProject()">Edit</button>
