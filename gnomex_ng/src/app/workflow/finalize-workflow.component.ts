@@ -338,6 +338,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         this.detailGridApi.redrawRows();
     }
 
+
     public onRowSelected(event): void {
         if(event
             && event.node
@@ -529,15 +530,34 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         };
     }
 
+
+
     private validateProtocolAndLanes(): any {
         let warningMessage: string = "";
         let errorMessage: string = "";
+        let assmItemProtocolSet: Set<string> = new Set<string>();
+
+        let fcProtocol = this.sequenceProtocolsList.find(seqProto => {
+            return seqProto.idNumberSequencingCyclesAllowed === this.protocolFC.value;
+        });
+
+        if(!fcProtocol.name){
+            return {
+                errorMessage: "Please select a protocol for the flow cell",
+                warningMessage: ""
+            }
+        }
+        assmItemProtocolSet.add(fcProtocol.name);
 
         for (let wi of this.assmItemList) {
             if (wi.idNumberSequencingCyclesAllowed === '' || wi.idNumberSequencingCyclesAllowed == null) {
                 errorMessage = "One or more samples have no sequencing protocol.  Please correct sequence lanes before continuing.";
+                break;
             }
-            if(wi.idNumberSequencingCyclesAllowed !== this.protocolFC.value.idNumberSequencingCyclesAllowed) {
+            let filteredSeqProtocol = this.sequenceProtocolsList.find(seqProto => {
+                return seqProto.idNumberSequencingCyclesAllowed === wi.idNumberSequencingCyclesAllowed;
+            });
+            if(!assmItemProtocolSet.has(filteredSeqProtocol.name)) {
                 warningMessage += "One or more samples have different protocols from the flow cell.\n\n";
                 break;
             }
