@@ -206,7 +206,7 @@ export class Experiment {
     public idProject:                          string = ''; // "62962"
     public project:                            any;
     public slideProduct:                       string = "";
-    public isExternal:                         string = ''; // "N",
+    public isExternal:                         string = 'N'; // "N",
     public amendState:                         string = ''; // "SolexaLaneAmendState";
     public requestStatus:                      string = "";
     public reagent:                            string = ''; // "asdf"
