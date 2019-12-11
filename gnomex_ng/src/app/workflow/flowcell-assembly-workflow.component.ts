@@ -27,39 +27,39 @@ import {UtilService} from "../services/util.service";
     templateUrl: 'flowcell-assembly-workflow.component.html',
     styles: [`
 
-        
+
         .large-max-width {
             max-width : 40em;
         }
-        
+
         .assembly-message {
             color: #1601db;
         }
-        
-        
+
+
         .date-width {
             width: 10em;
         }
-        
+
         .protocol-width {
             width: 30em;
         }
-        
+
         .run-width {
             width: 5em;
         }
         .children-margin-right > *:not(:last-child) {
             margin-right: 1em;
         }
-        
+
         .min-lab-width {
             min-width: 3em;
         }
-        
+
         .min-request-category-width {
             min-width: 3em;
         }
-        
+
 
     `]
 })
@@ -506,13 +506,33 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
         this.lanes = rLanes;
     }
 
+    //todo this is fix not a PERMANENT SOLUTION!!
+    isSeqProtocolSame(event:any):boolean{
+        let firstFC : any  = this.assmItemList[0];
+        let seqProtocol = this.sequenceProtocolsList.find(seqProto => {
+            return seqProto.idNumberSequencingCyclesAllowed === event.data.idNumberSequencingCyclesAllowed
+        });
+        let filteredSeqProtocol = this.sequenceProtocolsList.find(seqProto => {
+            return seqProto.idNumberSequencingCyclesAllowed === firstFC.idNumberSequencingCyclesAllowed;
+        });
+
+        if(seqProtocol && filteredSeqProtocol){
+            let filteredName = (<string>filteredSeqProtocol.name).split(' ')[0];
+            let name = (<string>seqProtocol.name).split(' ')[0];
+            // logic is unless we explicitly know we don't stop user from be able to add to assembleList
+            if(name && filteredName && name.toUpperCase() != filteredName.toUpperCase()){
+                return false;
+            }
+        }
+        return true;
+    }
+
     public onCellValueChanged_allRequestsGrid(event): void {
         if (!this.multiExperimentTypeWarningIsOpen) {
             if (this.assmItemList
                 && this.assmItemList.length
                 && this.assmItemList.length > 0
-                && event.data.codeRequestCategory !== this.assmItemList[0].codeRequestCategory) {
-
+                && !this.isSeqProtocolSame(event)) {
                 this.multiExperimentTypeWarningIsOpen = true;
                 let alertMessage = "Only one type of experiment can be assembled on a flow cell";
                 this.dialogsService.alert(alertMessage, null, DialogType.WARNING).subscribe(() => {
