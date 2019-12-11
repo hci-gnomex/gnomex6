@@ -1860,6 +1860,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     private rebuildColumnDefinitions(): void {
+        if (this._state !== this.STATE_NEW) {
+            return;
+        }
+
         this.getColumnProperties();
 
         let temp: any[]  = this.defaultSampleColumnDefinitions;
