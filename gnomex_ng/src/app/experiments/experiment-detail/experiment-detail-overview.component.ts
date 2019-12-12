@@ -102,7 +102,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
     public showBillingTab: boolean = false;
     public isDirty: boolean = false;
     public showCreateAnalysisButton: boolean = false;
-    public routeOutlet: string = "";
+    public fromTopic: boolean = false;
 
     public types = OrderType;
 
@@ -149,7 +149,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                 this.showSequenceLanesTab = false;
                 this.showBillingTab = false;
                 this.showCreateAnalysisButton = false;
-                this.routeOutlet = this.route.outlet;
+                this.fromTopic = !!data.fromTopic;
 
                 this.experimentService.experimentOverviewForm.reset();
 
@@ -176,7 +176,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                             && this.experiment.isExternal !== 'Y';
                     }
 
-                    this.showCreateAnalysisButton = !this.secAdvisor.isGuest && this.routeOutlet === "browsePanel" && this.requestCategory.codeRequestCategory === this.experiment.codeRequestCategory && this.requestCategory.associatedWithAnalysis === "Y";
+                    this.showCreateAnalysisButton = !this.secAdvisor.isGuest && !this.fromTopic && this.requestCategory.codeRequestCategory === this.experiment.codeRequestCategory && this.requestCategory.associatedWithAnalysis === "Y";
                     this.showSequenceLanesTab = this.requestCategory.isIlluminaType === "Y" && this.experiment.isExternal !== "Y";
                     this.showBillingTab = this.experiment.canRead === "Y" && this.experiment.isExternal !== "Y";
 
@@ -207,7 +207,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                         this.annotations = [];
                     }
 
-                    this.showEdit = this.experiment && !this.secAdvisor.isGuest && this.experiment.canUpdate === "Y" && this.routeOutlet === "browsePanel";
+                    this.showEdit = this.experiment && !this.secAdvisor.isGuest && this.experiment.canUpdate === "Y" && !this.fromTopic;
                     this.isEditMode = this.experimentService.getEditMode();
                     this.setNodeTitle();
                 }

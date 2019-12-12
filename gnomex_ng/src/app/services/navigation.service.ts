@@ -14,6 +14,7 @@ import {
 import {IRequiredParam} from "../util/interfaces/navigation-definition.model";
 import {filter} from "rxjs/operators";
 import {NavigationItem} from "typedoc";
+import {ITreeNode} from "angular-tree-component/dist/defs/api";
 
 @Injectable()
 export class NavigationService {
@@ -41,18 +42,7 @@ export class NavigationService {
     public resetNavModeFN():void {
         if(!this._resetNavModeSubscription){ // ensuring one subscriber for the whole app
             this._resetNavModeSubscription = this.resetNavModeSubject.subscribe((currentSeg:string)=>{
-                let lastSegs: UrlSegment[]  =  this.getLastRouteSegments();
-                let lastSegInRoute = '';
-                let lastSegIndex: number = null;
-                if(lastSegs && lastSegs.length > 0){
-                    for(let i = lastSegs.length - 1; i >= 0; i-- ){
-                        if (isNaN(parseInt(lastSegs[i].path))){ // we don't care about ids only path names
-                            lastSegIndex = i;
-                            break;
-                        }
-                    }
-                    lastSegInRoute = lastSegs[lastSegIndex].path;
-                }
+                let lastSegInRoute =  this.getLastRouteSegment();
                 if(lastSegInRoute === currentSeg){
                     this.navMode = NavigationService.USER;
                 }
@@ -77,8 +67,8 @@ export class NavigationService {
             }
 
         }
-        let keys: string[] =  params.keys();
-        for(let k of keys){
+        let paramKeys: string[] =  params.keys();
+        for(let k of paramKeys){
             let skipKey = false;
             for(let rp of requiredParams){
                 let rpkey = Object.keys(rp)[0];
@@ -110,10 +100,25 @@ export class NavigationService {
     }
 
 
-    getLastRouteSegments() : UrlSegment[]{
+    getLastRouteSegment() : string {
         let url:string = this.router.url;
         let root =  this.router.parseUrl(url).root;
-        return this.recurseGetLastRouteSegments(root);
+
+
+        let lastSegs: UrlSegment[] = this.recurseGetLastRouteSegments(root);
+        let lastSegIndex: number = null;
+        let lastSegInRoute = null;
+
+        if(lastSegs && lastSegs.length > 0){
+            for(let i = lastSegs.length - 1; i >= 0; i-- ){
+                if (isNaN(parseInt(lastSegs[i].path))){ // we don't care about ids only path names
+                    lastSegIndex = i;
+                    break;
+                }
+            }
+            lastSegInRoute = lastSegs[lastSegIndex].path;
+        }
+        return lastSegInRoute;
     }
 
     recurseGetLastRouteSegments(urlSegGroup:UrlSegmentGroup) : UrlSegment[] {
@@ -139,18 +144,18 @@ export class NavigationService {
                 })
             ).subscribe(( event: NavigationStart ) => {
 
-                    console.debug( "trigger:", event.navigationTrigger );
+                console.debug( "trigger:", event.navigationTrigger );
 
-                    if ( event.restoredState && event.navigationTrigger === 'popstate' ) {
-                        console.debug("restoring navigation id:", event.restoredState.navigationId);
-                        console.debug("Back or forward button pressed on browser");
-                        this.navMode = NavigationService.URL;
-
-                    }
-
+                if ( event.restoredState && event.navigationTrigger === 'popstate' ) {
+                    console.debug("restoring navigation id:", event.restoredState.navigationId);
+                    console.debug("Back or forward button pressed on browser");
+                    this.navMode = NavigationService.URL;
 
                 }
-            );
+
+
+            }
+        );
 
     }
 
@@ -165,6 +170,24 @@ export class NavigationService {
             }
         }
         return activateRoute;
+    }
+    setValueGoingUpTree(idObjList:any[],node:ITreeNode){
+        return this.recurseSetValueGoingUpTree(node, idObjList, idObjList.length - 1);
+    }
+    private recurseSetValueGoingUpTree(node:ITreeNode, idObjList:any[],index:number){
+        if(index < 0 || !node){
+            return idObjList;
+        }
+        let idName = Object.keys(idObjList[index])[0];
+
+
+        idObjList[index][idName] = node.data[idName];
+
+        // if idName is still found on parent node stay current index
+        let decCount = node.parent.data[idName] ? 0 : 1 ;
+        let targetNode = idObjList[index][idName] ? node.parent : node;
+        return this.recurseSetValueGoingUpTree(targetNode,idObjList,index - decCount);
+
     }
 
 

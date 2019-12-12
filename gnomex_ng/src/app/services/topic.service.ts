@@ -15,6 +15,10 @@ export class TopicService {
     private _previousURLParams: HttpParams = null;
     private topicsListSubject: Subject<any[]> = new Subject();
     private topicTreeNodeSubject: BehaviorSubject<any> = new BehaviorSubject({});
+    public static readonly DATATRACK : string = 'datatrack';
+    public static readonly ANALYSIS : string = 'analysis';
+    public static readonly EXPERIMENT: string = 'experiment';
+    public static readonly TOPIC: string = 'detail';
 
     public topicsList: any[];
 

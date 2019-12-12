@@ -13,7 +13,7 @@ import {TopicService} from "../services/topic.service";
     selector: 'topics-panel',
     template: `        
         <div style="height:100%;">
-            <router-outlet name="topicsPanel"></router-outlet>
+            <router-outlet ></router-outlet>
         </div>
 `
 })

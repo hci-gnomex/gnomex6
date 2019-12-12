@@ -1,6 +1,6 @@
 <form (ngSubmit)="save()" [formGroup]="folderFormGroup" class="flex-container-col full-width full-height">
     <div style="margin-bottom: 1em;">
-        <img [src]="dtService.datatrackListTreeNode.icon"> Folder {{dtService.datatrackListTreeNode.name}}
+        <img [src]="dtService?.datatrackListTreeNode?.icon"> Folder {{dtService?.datatrackListTreeNode?.name}}
     </div>
     <div class="full-width full-height">
         <div class="flex-container-row full-width">

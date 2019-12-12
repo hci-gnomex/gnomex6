@@ -331,7 +331,9 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
                     this.labList = response
                         .sort(this.prefService.createLabDisplaySortFunction());
-                    this.preselectOnBrowseFilter();
+                    if(this.labList.length > 0){
+                        this.preselectOnBrowseFilter();
+                    }
                 });
             } else if (isGuestState) {
                 this.showDateRangePicker = true;
@@ -353,8 +355,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                         .sort(this.prefService.createLabDisplaySortFunction());
                     if (this.labList.length > 1) {
                         this.showLabComboBox = true;
+                        this.preselectOnBrowseFilter();
                     }
-                    this.preselectOnBrowseFilter();
                 });
 
                 this.showMore = true;
@@ -372,7 +374,9 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
                     this.labList = response
                         .sort(this.prefService.createLabDisplaySortFunction());
-                    this.preselectOnBrowseFilter();
+                    if(this.labList.length > 0){
+                        this.preselectOnBrowseFilter();
+                    }
                 });
             } else if (isGuestState) {
                 this.showOrganismComboBox = true;
@@ -389,8 +393,9 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                         .sort(this.prefService.createLabDisplaySortFunction());
                     if (this.labList.length > 1) {
                         this.showLabComboBox = true;
+                        this.preselectOnBrowseFilter();
                     }
-                    this.preselectOnBrowseFilter();
+
                 });
             }
 
@@ -971,7 +976,6 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
             let requiredParams = [ {datatracks: ""}];
             this.dataTrackService.previousURLParams = params;
             this.dataTrackService.previousURLParams["refreshParams"] = true;
-            this.dataTrackService.labList = this.labList;
             this.dataTrackService.getDatatracksList_fromBackend(params);
             this.setURLFromParams(requiredParams,params );
         }

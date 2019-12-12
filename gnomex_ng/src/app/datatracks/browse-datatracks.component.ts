@@ -132,8 +132,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 if(this.navService.navMode === NavigationService.URL) { // this is if component is being navigated to by url
                     let idVal: string = null;
                     let idName: string = null;
-                    let segs:UrlSegment[] = this.navService.getLastRouteSegments();
-                    let lastSeg: string = segs[segs.length -1 ].path;
+                    let lastSeg: string  = this.navService.getLastRouteSegment();
 
                     if(lastSeg === DataTrackService.ORGANISM){
                         idName = "idOrganism";
@@ -208,6 +207,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         };
         this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
         this.treeModel = this.treeComponent.treeModel;
+
         this.labListService.getLabList_FromBackEnd();
         this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
             this.labList = response;
@@ -453,58 +453,51 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
         let navArray:Array<any> = [];
         let navExtras: NavigationExtras = {};
+        let idObjList =[{'idOrganism':null},{'idGenomeBuild':null}, {'idDataTrackFolder': null}, {'idDataTrack': null}];
+
+        idObjList =  this.navService.setValueGoingUpTree(idObjList, event.node);
+        let idOrganism = idObjList[0]['idOrganism'];
+        let idGenomeBuild = idObjList[1]['idGenomeBuild'];
+        let idDataTrackFolder = idObjList[2]['idDataTrackFolder'];
+        let idDataTrack = idObjList[3]['idDataTrack'];
+        navExtras = {
+            queryParams: {
+                'idGenomeBuild': idGenomeBuild,
+                'idOrganism' : idOrganism,
+                'idDataTrackFolder': idDataTrackFolder,
+                'idDataTrack': idDataTrack
+            }};
+
 
         if(this.navService.navMode === NavigationService.USER){
             if(datatrackListNode.isGenomeBuild){
                 datatrackListNode["treeNodeType"] = "GenomeBuild";
                 this.disableDelete = false;
-                let idGenomeBuild:string = datatrackListNode.idGenomeBuild;
                 navArray = ['/datatracks', 'genomebuild'];
-                navExtras = {
-                    queryParams: {
-                        'idOrganism':null,
-                        'idDataTrackFolder':null,
-                        'idGenomeBuild': idGenomeBuild
-                    }};
-
                 //['/datatracks', {outlets:{'datatracksPanel':['genomeBuild',{'idGenomeBuild':idGenomeBuild}]}}];
 
             }else if (datatrackListNode.isDataTrackFolder){
                 datatrackListNode["treeNodeType"] = "Folder";
-                let idDataTrackFolder:string = datatrackListNode.idDataTrackFolder;
                 navArray = ['/datatracks', 'folder'];
-                navExtras = {
-                    queryParams: {
-                        'idOrganism':null,
-                        'idDataTrackFolder':idDataTrackFolder,
-                        'idGenomeBuild': null
-                    }};
                 //['/datatracks', {outlets:{'datatracksPanel':['folder',{'idDataTrackFolder': idDataTrackFolder}]}}];
                 this.disableDelete = false;
             }else if (this.selectedItem.isRoot){
                 datatrackListNode["treeNodeType"] = "Organism";
                 this.disableDelete = true;
-                let idOrganism:string = datatrackListNode.idOrganism;
                 navArray =['/datatracks', 'organism'];
-                navExtras = {
-                    queryParams: {
-                        'idOrganism':idOrganism,
-                        'idDataTrackFolder':null,
-                        'idGenomeBuild': null
-                }};
                 //['/datatracks', {outlets:{'datatracksPanel':['organism',{'idOrganism':idOrganism}]}}];
             }
             else { // isLeaf
                 //idDataTrack
                 datatrackListNode["treeNodeType"] = "Datatrack";
-                let idDataTrack: string = datatrackListNode.idDataTrack;
+
                 this.disableDelete = false;
                 navArray = ['/datatracks','detail', idDataTrack];
                 navExtras = {
                     queryParams: {
-                        'idOrganism': null,
-                        'idDataTrackFolder':null,
-                        'idGenomeBuild': null
+                        "idOrganism":idOrganism,
+                        "idGenomeBuild":idGenomeBuild,
+                        "idDataTrackFolder": idDataTrackFolder
                     }};
             }
 
