@@ -58,7 +58,7 @@
                  <visibility-detail-tab [disabled]="!isEditMode"></visibility-detail-tab>
             </mat-tab>
             <mat-tab *ngIf="showSequenceLanesTab" label="Sequence Lanes">
-                <experiment-sequence-lanes-tab [editMode]="isEditMode"></experiment-sequence-lanes-tab>
+                <experiment-sequence-lanes-tab [editMode]="isEditMode" [experiment]="_experiment"></experiment-sequence-lanes-tab>
             </mat-tab>
             <mat-tab *ngIf="showBioinformaticsTab" label="Bioinformatics">
                 <experiment-bioinformatics-tab [experiment]="experiment" [editMode]="isEditMode"></experiment-bioinformatics-tab>
