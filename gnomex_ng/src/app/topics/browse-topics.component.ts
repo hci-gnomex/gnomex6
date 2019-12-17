@@ -3,7 +3,7 @@ import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild,} from "@angu
 import {ITreeOptions, TreeComponent, TreeModel, TreeNode,} from "angular-tree-component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
-import {ActivatedRoute, ParamMap, Router} from "@angular/router";
+import {ActivatedRoute, NavigationExtras, ParamMap, Router} from "@angular/router";
 import {MatDialogConfig} from "@angular/material";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
@@ -237,8 +237,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
                         idName = "idRequest";
                         idVal = this.paramMap.get(idName);
                     }else if(lastSeg === TopicService.TOPIC){
-                        idName = "idLab";
-                        idVal = this.paramMap.get(idName);
+                        idName = "idTopic";
+                        idVal = this.qParamMap.get(idName);
                     }else{
                         return;
                     }
@@ -249,7 +249,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
                         if (tNode) {
                             tNode.setIsActive(true);
                             tNode.scrollIntoView();
-                        } else {
+                        } else if(idName === 'idTopic') {
                             this.dialogService.alert("You do not have permission to view Topic " + capID , "INVALID", DialogType.FAILED);
                         }
                     }
@@ -455,6 +455,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
         this.linkDataView = false;
         let name = this.selectedItem.displayField;
         let topicListNode = _.cloneDeep(this.selectedItem.data);
+        let navExtras:NavigationExtras = {};
 
         if(this.navService.navMode === NavigationService.USER){
             if (this.selectedItem.isRoot) {
@@ -479,10 +480,11 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
                     this.datatrackService.datatrackListTreeNode = topicListNode;
                 } else if (this.selectedItem.data.idTopic) {
                     pathPair = ["detail", this.selectedItem.data.idLab];
+                    navExtras.queryParams = {"idTopic": this.selectedItem.data.idTopic};
                     this.topicService.emitSelectedTreeNode(topicListNode);
                 }
                 if (pathPair) {
-                    this.router.navigate(['/topics',pathPair[0],pathPair[1]])
+                    this.router.navigate(['/topics',pathPair[0],pathPair[1]], navExtras);
                 }
             }
         }else{

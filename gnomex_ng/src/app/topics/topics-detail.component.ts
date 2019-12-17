@@ -113,21 +113,12 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         });
 
         this.topicListNodeSubscription = this.topicService.getSelectedTreeNodeObservable().subscribe(data => {
-                this.topicNode = data;
-        });
-
-        this.route.data.forEach(data => {
             this.inInitialization = true;
-            this.topicLab = data.topicLab.Lab;
-
-            if(this.topicNode) {
+            this.topicNode = data;
+            if(this.topicNode){
                 this.labList = this.gnomexService.labList
                     .filter(lab => lab.canGuestSubmit === "Y" || lab.canSubmitRequests === "Y" || lab.idLab === this.topicNode.idLab)
                     .sort(this.prefService.createLabDisplaySortFunction());
-
-                let memList: Array<any> = (this.topicLab && this.topicLab.members) ? (Array.isArray(this.topicLab.members) ? this.topicLab.members : [this.topicLab.members.AppUser]) : [];
-                let activeMemList: Array<any> = memList.filter(appUser => appUser.isActive === "Y");
-                this.getLabService.labMembersSubject.next(activeMemList);
 
                 this.topicForm.get("idLab").setValue(this.topicNode.idLab ? this.topicNode.idLab : "");
                 this.topicForm.get("name").setValue(this.topicNode.name);
@@ -136,6 +127,7 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                 this.topicForm.get("idTopic").setValue(this.topicNode.idTopic);
                 this.topicForm.get("description").setValue(this.topicNode.description);
                 this.topicForm.get("idParentTopic").setValue(this.topicNode.idParentTopic);
+
 
                 let canEdit: boolean = this.topicNode.canWrite === "Y";
                 if (canEdit) {
@@ -147,9 +139,22 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                 this.editorConfig.enableToolbar = canEdit;
                 this.editorConfig.showToolbar = canEdit;
                 this.topicForm.markAsPristine();
-            }
 
+            }
             this.inInitialization = false;
+
+        });
+
+        this.route.data.forEach(data => {
+
+            this.topicLab = data.topicLab.Lab;
+
+            if(this.topicNode) {
+
+                let memList: Array<any> = (this.topicLab && this.topicLab.members) ? (Array.isArray(this.topicLab.members) ? this.topicLab.members : [this.topicLab.members.AppUser]) : [];
+                let activeMemList: Array<any> = memList.filter(appUser => appUser.isActive === "Y");
+                this.getLabService.labMembersSubject.next(activeMemList);
+            }
         });
     }
 

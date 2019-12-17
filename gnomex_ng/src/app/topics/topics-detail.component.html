@@ -1,8 +1,8 @@
 <div class="flexbox-column">
     <div class="flex-container-row">
-        <div style="margin:1em" >
+        <div *ngIf="this.topicNode" style="margin:1em" >
             <img [src]="this.constService.ICON_TOPIC" class="icon">
-            Topic {{'T' + this.topicNode?.idTopic + ' -'}} {{(this.topicNode?.name?.length > 60) ? (this.topicNode?.name | slice:0:60) + '...' : this.topicNode?.name}}
+            Topic {{'T' + this.topicNode.idTopic + ' -'}} {{(this.topicNode.name.length > 60) ? (this.topicNode.name | slice:0:60) + '...' : this.topicNode.name}}
         </div>
         <button mat-button color="primary" (click)="onShareLinkClick()" style="margin:1em">
             <img [src]="this.constService.GLOBE_LINK" class="icon">Share URL
