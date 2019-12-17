@@ -78,7 +78,7 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
         this._customOptionClasses = value ? value : "";
     }
     public get customOptionClasses(): string {
-        return !!this._customOptionClasses ? this._customOptionClasses : 'mat-option';
+        return !!this._customOptionClasses ? this._customOptionClasses : 'small-font padded inline-block full-width ellipsis';
     }
 
     private _customOptionClasses: string = "";
