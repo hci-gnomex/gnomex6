@@ -233,6 +233,9 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
 
             this._experiment.experimentOwner = this.form.get('selectName').value;
             this._experiment.idOwner = this.form.get('selectName').value.idAppUser;
+        } else {
+            this._experiment.experimentOwner = null;
+            this._experiment.idOwner = "";
         }
 
         this.selectDefaultUserProject();
@@ -309,7 +312,7 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
             selectLab:              ['', Validators.required],
             selectName:             ['', Validators.required],
             selectProject:          ['', Validators.required],
-            selectAccount:          [null],
+            selectAccount:          ['', Validators.required],
             selectBillingTemplate:  [null],
             billingSelected:        [false, Validators.requiredTrue],
             experimentName:         [''],
@@ -318,14 +321,16 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
     }
 
     private updateBilling(selectedAccount: any, selectedTemplate: BillingTemplate): void {
-        this.form.get("selectAccount").setValue(selectedAccount);
-        this.form.get("selectBillingTemplate").setValue(selectedTemplate);
-        this.form.get("billingSelected").setValue(!!(selectedAccount || selectedTemplate));
+        setTimeout(() => {
+            this.form.get("selectAccount").setValue(selectedAccount);
+            this.form.get("selectBillingTemplate").setValue(selectedTemplate);
+            this.form.get("billingSelected").setValue(!!(selectedAccount || selectedTemplate));
 
-        if (this._experiment) {
-            this._experiment.billingAccount = selectedAccount;
-            this._experiment.billingTemplate = selectedTemplate;
-        }
+            if (this._experiment) {
+                this._experiment.billingAccount = selectedAccount;
+                this._experiment.billingTemplate = selectedTemplate;
+            }
+        });
     }
 
     ngOnDestroy() {
@@ -443,7 +448,9 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
     }
 
     public selectDefaultUserProject(): void {
-        this.form.controls['selectName'].setErrors(null);
+        if (!this.showName) {
+            this.form.controls['selectName'].setErrors(null);
+        }
 
         if (this._experiment.idAppUser != null) {
             for (let project of this.filteredProjectList) {
@@ -600,6 +607,15 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
                     );
 
                     this.refreshBillingAccounts();
+
+                    if (this.adminState !== "AdminState"
+                        && this.authorizedBillingAccounts
+                        && Array.isArray(this.authorizedBillingAccounts)
+                        && this.authorizedBillingAccounts.length === 1) {
+
+                        this.form.get("selectAccount").setValue(this.authorizedBillingAccounts[0]);
+                        this.onBillingAccountSelection(this.authorizedBillingAccounts[0]);
+                    }
                 });
             }
 

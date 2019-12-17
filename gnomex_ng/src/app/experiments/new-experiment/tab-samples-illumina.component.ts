@@ -1860,6 +1860,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     private rebuildColumnDefinitions(): void {
+        if (this._state !== this.STATE_NEW) {
+            return;
+        }
+
         this.getColumnProperties();
 
         let temp: any[]  = this.defaultSampleColumnDefinitions;
@@ -1908,8 +1912,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
 
         if (this.samplesGridApi) {
-            this.samplesGridColumnDefs = temp;
-
             this.createColumnsBasedOnState(this._state);
             this.assignRowDataBasedOnState(this._state);
             // this.samplesGridApi.setRowData(this._experiment.samples);
@@ -2099,6 +2101,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
             this.samplesGridApi.setColumnDefs(temp);
             this.samplesGridApi.redrawRows();
+
+            this.samplesGridColumnDefs = temp;
         }
         if (this.ccCheckbox) {
             this.toggleCC(this.ccCheckbox);
