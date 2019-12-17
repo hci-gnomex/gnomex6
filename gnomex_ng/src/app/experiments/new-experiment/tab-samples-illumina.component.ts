@@ -2344,38 +2344,32 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public download(): void {
-        // if (this.samplesGridApi) {
-        //     this.samplesGridApi.sizeColumnsToFit();
-        // }
 
-        this.rebuildColumnDefinitions();
+        let state: string = "";
 
-        //
-        // let state: string = "";
-        //
-        // if (this._state === TabSamplesIlluminaComponent.STATE_NEW) {
-        //     state = "new";
-        // }
-        //
-        // if (this._experiment) {
-        //     if (this._lab) {
-        //         this.sampleUploadService.downloadSampleSheet(this._lab.name, state, this.samplesGridColumnDefs, this._experiment);
-        //     } else if (this._experiment.lab) {
-        //         this.sampleUploadService.downloadSampleSheet(this._experiment.lab.name, state, this.samplesGridColumnDefs, this._experiment);
-        //     } else if (this._experiment.idLab && this.gnomexService.labList && Array.isArray(this.gnomexService.labList)) {
-        //         let selectionSet = this.gnomexService.labList.filter((lab) => {
-        //             return lab.idLab && lab.idLab === this._experiment.idLab;
-        //         });
-        //
-        //         if (selectionSet && Array.isArray(selectionSet) && selectionSet.length > 0) {
-        //             this.sampleUploadService.downloadSampleSheet(selectionSet[0].name, state, this.samplesGridColumnDefs, this._experiment);
-        //         } else {
-        //             this.sampleUploadService.downloadSampleSheet("Unknown Lab", state, this.samplesGridColumnDefs, this._experiment);
-        //         }
-        //     } else {
-        //         this.sampleUploadService.downloadSampleSheet("Unknown Lab", state, this.samplesGridColumnDefs, this._experiment);
-        //     }
-        // }
+        if (this._state === TabSamplesIlluminaComponent.STATE_NEW) {
+            state = "new";
+        }
+
+        if (this._experiment) {
+            if (this._lab) {
+                this.sampleUploadService.downloadSampleSheet(this._lab.name, state, this.samplesGridColumnDefs, this._experiment);
+            } else if (this._experiment.lab) {
+                this.sampleUploadService.downloadSampleSheet(this._experiment.lab.name, state, this.samplesGridColumnDefs, this._experiment);
+            } else if (this._experiment.idLab && this.gnomexService.labList && Array.isArray(this.gnomexService.labList)) {
+                let selectionSet = this.gnomexService.labList.filter((lab) => {
+                    return lab.idLab && lab.idLab === this._experiment.idLab;
+                });
+
+                if (selectionSet && Array.isArray(selectionSet) && selectionSet.length > 0) {
+                    this.sampleUploadService.downloadSampleSheet(selectionSet[0].name, state, this.samplesGridColumnDefs, this._experiment);
+                } else {
+                    this.sampleUploadService.downloadSampleSheet("Unknown Lab", state, this.samplesGridColumnDefs, this._experiment);
+                }
+            } else {
+                this.sampleUploadService.downloadSampleSheet("Unknown Lab", state, this.samplesGridColumnDefs, this._experiment);
+            }
+        }
     }
 
     public onAddSample(): void {
