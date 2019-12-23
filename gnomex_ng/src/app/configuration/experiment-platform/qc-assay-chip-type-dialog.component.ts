@@ -16,20 +16,25 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
     template: `
         <div class="full-height full-width flex-container-col small-font double-padded-left-right">
             <div class="flex-grow">
-                <form class="full-height full-width padded-inner flex-container-col"  [formGroup]="formGroup">
+                <form class="full-height full-width padded-inner flex-container-col"
+                      [formGroup]="formGroup">
                     <div class="flex-container-row spaced-children-margin">
                         <mat-form-field class="medium-form-input">
-                            <input matInput placeholder="Assay Name" formControlName="bioanalyzerChipType">
-                            <mat-error  *ngIf="this.formGroup?.controls['bioanalyzerChipType']?.hasError('required')">
+                            <input matInput placeholder="Assay Name"
+                                   formControlName="bioanalyzerChipType">
+                            <mat-error
+                                    *ngIf="this.formGroup?.controls['bioanalyzerChipType']?.hasError('required')">
                                 Field is required
                             </mat-error>
                         </mat-form-field>
                         <mat-form-field class="short-input">
-                            <input matInput placeholder="Concentration" formControlName="concentrationRange">
+                            <input matInput placeholder="Concentration"
+                                   formControlName="concentrationRange">
                         </mat-form-field>
                         <mat-form-field class="short-input">
                             <input matInput placeholder="Sort Order" formControlName="sortOrder">
-                            <mat-error  *ngIf="this.formGroup?.controls['sortOrder']?.hasError('numberRange')">
+                            <mat-error
+                                    *ngIf="this.formGroup?.controls['sortOrder']?.hasError('numberRange')">
                                 {{this.formGroup.get('sortOrder').errors.numberRange }}
                             </mat-error>
                         </mat-form-field>
@@ -37,11 +42,14 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
 
                     <div class="flex-container-row spaced-children-margin">
                         <mat-form-field *ngIf="!hideBufferStrength" class="medium-form-input">
-                            <input matInput placeholder="Max Sample Buffer Strength" formControlName="maxSampleBufferStrength">
+                            <input matInput placeholder="Max Sample Buffer Strength"
+                                   formControlName="maxSampleBufferStrength">
                         </mat-form-field>
                         <mat-form-field *ngIf="!hideWellPerChip" class="medium-form-input">
-                            <input matInput placeholder="Sample Wells Per Chip" formControlName="sampleWellsPerChip">
-                            <mat-error  *ngIf="this.formGroup?.controls['sampleWellsPerChip']?.hasError('numberRange')">
+                            <input matInput placeholder="Sample Wells Per Chip"
+                                   formControlName="sampleWellsPerChip">
+                            <mat-error
+                                    *ngIf="this.formGroup?.controls['sampleWellsPerChip']?.hasError('numberRange')">
                                 {{this.formGroup.get('sampleWellsPerChip').errors.numberRange }}
                             </mat-error>
                         </mat-form-field>
@@ -49,34 +57,45 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
 
                     <!-- billing  -->
                     <div *ngIf="!this.canEnterPrice || this.createSecurityAdvisorService.isSuperAdmin">
-                        <context-help name="ExperimentPlatformQCPricingHelp" [isEditMode]="this.createSecurityAdvisorService.isSuperAdmin" label="Why can't I edit prices?" popupTitle="Pricing Help" tooltipPosition="right"></context-help>
+                        <context-help name="ExperimentPlatformQCPricingHelp"
+                                      [hasEditPermission]="this.createSecurityAdvisorService.isSuperAdmin"
+                                      label="Why can't I edit prices?" popupTitle="Pricing Help"
+                                      tooltipPosition="right"></context-help>
                     </div>
-                    <div class="flex-container-row spaced-children-margin" >
+                    <div class="flex-container-row spaced-children-margin">
                         <mat-form-field class="flex-grow">
                             <span matPrefix>$ &nbsp;</span>
-                            <input matInput placeholder="Internal Pricing" formControlName="unitPriceInternal">
-                            <mat-error  *ngIf="this.formGroup?.controls['unitPriceInternal']?.hasError('pattern')">
+                            <input matInput placeholder="Internal Pricing"
+                                   formControlName="unitPriceInternal">
+                            <mat-error
+                                    *ngIf="this.formGroup?.controls['unitPriceInternal']?.hasError('pattern')">
                                 Invalid dollar amount
                             </mat-error>
                         </mat-form-field>
 
-                        <mat-form-field  class="flex-grow">
+                        <mat-form-field class="flex-grow">
                             <span matPrefix>$ &nbsp;</span>
-                            <input matInput placeholder="External Academic Pricing" formControlName="unitPriceExternalAcademic">
-                            <mat-error  *ngIf="this.formGroup?.controls['unitPriceExternalAcademic']?.hasError('pattern')">
+                            <input matInput placeholder="External Academic Pricing"
+                                   formControlName="unitPriceExternalAcademic">
+                            <mat-error
+                                    *ngIf="this.formGroup?.controls['unitPriceExternalAcademic']?.hasError('pattern')">
                                 Invalid dollar amount
                             </mat-error>
                         </mat-form-field>
-                        <mat-form-field  class="flex-grow">
+                        <mat-form-field class="flex-grow">
                             <span matPrefix>$ &nbsp;</span>
-                            <input matInput placeholder="External Commercial Pricing" formControlName="unitPriceExternalCommercial">
-                            <mat-error  *ngIf="this.formGroup?.controls['unitPriceExternalCommercial']?.hasError('pattern')">
+                            <input matInput placeholder="External Commercial Pricing"
+                                   formControlName="unitPriceExternalCommercial">
+                            <mat-error
+                                    *ngIf="this.formGroup?.controls['unitPriceExternalCommercial']?.hasError('pattern')">
                                 Invalid dollar amount
                             </mat-error>
                         </mat-form-field>
                     </div>
                     <mat-form-field>
-                        <textarea matInput placeholder="Protocol Description" formControlName="protocolDescription" matTextareaAutosize matAutosizeMinRows="15" matAutosizeMaxRows="15">
+                        <textarea matInput placeholder="Protocol Description"
+                                  formControlName="protocolDescription" matTextareaAutosize
+                                  matAutosizeMinRows="15" matAutosizeMaxRows="15">
                         </textarea>
                     </mat-form-field>
 

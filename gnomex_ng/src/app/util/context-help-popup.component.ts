@@ -15,19 +15,41 @@ import {DictionaryService} from "../services/dictionary.service";
     template: `
         <div class="flex-container-col full-width full-height double-padded">
             <div class="editor-grid">
-                <angular-editor #descEditorRef id="descEditor" [formControl]="descriptionControl" [config]="this.editorConfig">
+                <angular-editor #descEditorRef id="descEditor" [formControl]="descriptionControl"
+                                [config]="editorConfig">
                 </angular-editor>
             </div>
-            <div *ngIf="this.isEditMode">
-                <mat-form-field class="full-width">
-                    <textarea matInput placeholder="Tooltip" [formControl]="this.tooltipControl"
-                              matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
+            <div class="flex-container-row align-center">
+                <mat-form-field class="flex-grow">
+                    <textarea matInput 
+                              placeholder="Tooltip" 
+                              [formControl]="this.tooltipControl"
+                              matTextareaAutosize 
+                              matAutosizeMinRows="3"
+                              matAutosizeMaxRows="3">
+                    </textarea>
                 </mat-form-field>
+                <div *ngIf="hasEditPermission" class="padded">
+                    <button mat-raised-button 
+                            class="minimize" 
+                            [disabled]="!hasEditPermission"
+                            (click)="onClickEdit()">
+                        {{ editorConfig.editable ? 'View' : 'Edit' }}
+                    </button>
+                </div>
             </div>
         </div>
         <div class="flex-container-row justify-flex-end generic-dialog-footer-colors">
-            <save-footer *ngIf="this.isEditMode" [icon]="this.constService.ICON_SAVE" (saveClicked)="this.save()" name="Save" [showSpinner]="this.showSpinner"></save-footer>
-            <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="this.onClose()" name="Close"></save-footer>
+            <save-footer *ngIf="hasEditPermission"
+                         name="Save"
+                         [icon]="constService.ICON_SAVE"
+                         [showSpinner]="showSpinner"
+                         (saveClicked)="save()">
+            </save-footer>
+            <save-footer name="Close"
+                         [actionType]="actionType.SECONDARY"
+                         (saveClicked)="onClose()">
+            </save-footer>
         </div>
     `,
     styles: [`
@@ -45,7 +67,7 @@ export class ContextHelpPopupComponent extends BaseGenericContainerDialog implem
 
     public tooltipControl: FormControl;
     public actionType: any = ActionType;
-    public isEditMode: boolean = false;
+    public hasEditPermission: boolean = false;
     public editorConfig: AngularEditorConfig;
     public descriptionControl: FormControl;
     public popupTitle: string = "";
@@ -64,36 +86,35 @@ export class ContextHelpPopupComponent extends BaseGenericContainerDialog implem
         if(this.data) {
             this.innerTitle = this.data.popupTitle;
             this.dictionary = this.data.dictionary;
-            this.isEditMode = this.data.isEditMode;
+            this.hasEditPermission = this.data.hasEditPermission;
         }
     }
 
     ngOnInit() {
-
         this.editorConfig = {
             spellcheck: true,
             height: "15em",
             enableToolbar: true,
+            defaultFontSize: '2'
         };
 
         this.descriptionControl = new FormControl(this.dictionary && this.dictionary.helpText ? this.dictionary.helpText : this.NO_HELP_TEXT);
         this.tooltipControl = new FormControl(this.dictionary && this.dictionary.toolTipText ? this.dictionary.toolTipText : "");
 
-        if (this.isEditMode) {
+        if (this.hasEditPermission) {
             this.descriptionControl.enable();
 
         } else {
             this.descriptionControl.disable();
             this.tooltipControl.disable();
         }
-        this.descEditor.editorToolbar.showToolbar = this.isEditMode;
-        this.editorConfig.editable = this.isEditMode;
 
+        this.descEditor.editorToolbar.showToolbar = this.hasEditPermission;
+        this.editorConfig.editable = false;
     }
 
 
     public save(): void {
-
         if (this.dictionary) {
             this.showSpinner = true;
             this.cookieUtilService.formatXSRFCookie();
@@ -125,8 +146,11 @@ export class ContextHelpPopupComponent extends BaseGenericContainerDialog implem
         }
     }
 
-    onClose(): void {
+    public onClose(): void {
         this.dialogRef.close();
     }
 
+    public onClickEdit(): void {
+        this.editorConfig.editable = !this.editorConfig.editable;
+    }
 }

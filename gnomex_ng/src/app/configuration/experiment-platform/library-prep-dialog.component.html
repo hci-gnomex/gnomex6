@@ -78,7 +78,8 @@
                         </mat-form-field>
                     </div>
                     <context-help *ngIf="!this.canEnterPrices || this.secAdvisor.isSuperAdmin"
-                                  name="ExperimentPlatformPricingHelp" [isEditMode]="this.secAdvisor.isSuperAdmin"
+                                  name="ExperimentPlatformPricingHelp"
+                                  [hasEditPermission]="this.secAdvisor.isSuperAdmin"
                                   label="Why can't I edit prices?" popupTitle="Pricing Help"
                                   tooltipPosition="right"></context-help>
                 </div>

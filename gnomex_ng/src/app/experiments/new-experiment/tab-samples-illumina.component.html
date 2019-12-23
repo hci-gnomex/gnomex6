@@ -7,7 +7,8 @@
         <div class="full-width flex-grow flex-container-col">
             <div class="full-width flex-container-row align-center padded">
                 <context-help *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && experiment?.isExternal !== 'Y'"
-                              name="samplesTabHelp" [isEditMode]="this.createSecurityAdvisor.isAdmin"
+                              name="samplesTabHelp"
+                              [hasEditPermission]="this.createSecurityAdvisor.isAdmin"
                               popupTitle="Samples Tab Instructions" label="Instructions"
                               [idCoreFacility]="this._experiment.idCoreFacility"
                               [codeRequestCategory]="this.requestCategoryType">
@@ -18,12 +19,15 @@
                         <img class="icon" [src]="this.constService.ICON_ADD" alt="">
                         Add sample
                     </button>
-                    <context-help name="addSampleHelp" [isEditMode]="this.createSecurityAdvisor.isAdmin" popupTitle="Add Samples Help">
+                    <context-help name="addSampleHelp"
+                                  [hasEditPermission]="this.createSecurityAdvisor.isAdmin"
+                                  popupTitle="Add Samples Help">
                     </context-help>
                 </div>
 
                 <context-help *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && experiment?.isExternal !== 'Y'"
-                              name="addSampleHelp" [isEditMode]="this.createSecurityAdvisor.isAdmin"
+                              name="addSampleHelp"
+                              [hasEditPermission]="this.createSecurityAdvisor.isAdmin"
                               popupTitle="Add Samples Help" label="Adding samples">
                 </context-help>
                 <button *ngIf="_state === this.STATE_NEW || _state === this.STATE_EDIT" mat-button
@@ -35,7 +39,8 @@
                     Upload Sample Sheet
                 </button>
                 <context-help *ngIf="_state === this.STATE_NEW || _state === this.STATE_EDIT"
-                              name="uploadSampleSheetHelp" [isEditMode]="this.createSecurityAdvisor.isAdmin"
+                              name="uploadSampleSheetHelp"
+                              [hasEditPermission]="this.createSecurityAdvisor.isAdmin"
                               popupTitle="Upload Sample Sheet Instructions">
                 </context-help>
                 <input type="file" #fileInput accept=".txt" class="hidden" (change)="onFileSelected($event)" multiple>
