@@ -41,6 +41,7 @@ import {DictionaryService} from "../../services/dictionary.service";
         this.idSeqLibProtocol = params.node.data.idSeqLibProtocol;
 
         this.options = BarcodeSelectEditor.getPermittedBarcodes(this.indexTagLetter, this.idSeqLibProtocol, this.dictionaryService);
+        this.options.unshift("");
     }
 
     public static getPermittedBarcodes(indexTagLetter: string, idSeqLibProtocol: string, dictionaryService: DictionaryService): any[] {
