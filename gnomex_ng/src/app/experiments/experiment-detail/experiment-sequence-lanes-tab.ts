@@ -229,7 +229,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
     }
     
     ngOnChanges(changes: SimpleChanges): void {
-        if(!changes["editMode"].isFirstChange()) {
+        if(changes["editMode"] && !changes["editMode"].isFirstChange()) {
             this.setEditMode();
         }
     }
