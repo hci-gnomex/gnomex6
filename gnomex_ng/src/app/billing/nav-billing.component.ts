@@ -1046,58 +1046,61 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     }
 
     public validateAndSave(): void {
-        this.billingItemGridApi.stopEditing();
+        this.billingItemGridApi.stopEditing(false);
+        setTimeout(()=>{
+            let isExternalApproved: boolean = false;
+            let isEmptyPriceOrQty: boolean = false;
 
-        let isExternalApproved: boolean = false;
-        let isEmptyPriceOrQty: boolean = false;
-
-        for (let r of this.billingItemList) {
-            if (r.isDirty === 'Y') {
-                if (r.isExternalPricing === 'Y' || r.isExternalCommercialPricing === 'Y') {
-                    for (let bi of r.BillingItem) {
-                        if (bi.codeBillingStatus === this.STATUS_APPROVED) {
-                            isExternalApproved = true;
-                            break;
+            for (let r of this.billingItemList) {
+                if (r.isDirty === 'Y') {
+                    if (r.isExternalPricing === 'Y' || r.isExternalCommercialPricing === 'Y') {
+                        for (let bi of r.BillingItem) {
+                            if (bi.codeBillingStatus === this.STATUS_APPROVED) {
+                                isExternalApproved = true;
+                                break;
+                            }
                         }
                     }
-                }
 
-                for (let bi of r.BillingItem) {
-                    if (bi.qty === '' || bi.unitPrice === '' || bi.unitPrice === '0' || bi.invoicePrice === '' || bi.invoicePrice === '0') {
-                        isEmptyPriceOrQty = true;
-                    } else if (bi.qty && bi.unitPrice) {
-                        let qtyParsed: number = Number.parseInt(bi.qty);
-                        let unitPriceParsed: number = Number.parseFloat(bi.unitPrice.replace("$", ''));
-                        if (qtyParsed < 0 && unitPriceParsed < 0) {
-                            this.dialogsService.alert("Either unit price or qty can be negative but not both", "Invalid");
+                    for (let bi of r.BillingItem) {
+                        if (bi.qty === '' || bi.unitPrice === '' || bi.unitPrice === '0' || bi.invoicePrice === '' || bi.invoicePrice === '0') {
+                            isEmptyPriceOrQty = true;
+                        } else if (bi.qty && bi.unitPrice) {
+                            let qtyParsed: number = Number.parseInt(bi.qty);
+                            let unitPriceParsed: number = Number.parseFloat(bi.unitPrice.replace("$", ''));
+                            if (qtyParsed < 0 && unitPriceParsed < 0) {
+                                this.dialogsService.alert("Either unit price or qty can be negative but not both", "Invalid");
+                                return;
+                            }
+                        }
+                        if (bi.idBillingPeriod === '') {
+                            this.dialogsService.alert("Each price must have an associated billing period", "Invalid");
                             return;
                         }
                     }
-                    if (bi.idBillingPeriod === '') {
-                        this.dialogsService.alert("Each price must have an associated billing period", "Invalid");
-                        return;
-                    }
                 }
             }
-        }
 
-        let msg: string = '';
-        if (isExternalApproved) {
-            msg += "External account to be approved. has pricing been verified?";
-        }
-        if (isEmptyPriceOrQty) {
-            msg += " Price or qty is blank. Proceed anyway?";
-        }
+            let msg: string = '';
+            if (isExternalApproved) {
+                msg += "External account to be approved. has pricing been verified?";
+            }
+            if (isEmptyPriceOrQty) {
+                msg += " Price or qty is blank. Proceed anyway?";
+            }
 
-        if (msg != '') {
-            this.dialogsService.confirm(msg).subscribe((result: boolean) => {
-                if (result) {
-                    this.saveBillingItems();
-                }
-            });
-        } else {
-            this.saveBillingItems();
-        }
+            if (msg != '') {
+                this.dialogsService.confirm(msg).subscribe((result: boolean) => {
+                    if (result) {
+                        this.saveBillingItems();
+                    }
+                });
+            } else {
+                this.saveBillingItems();
+            }
+
+        });
+
     }
 
     private saveBillingItems(): void {
@@ -1108,7 +1111,8 @@ export class NavBillingComponent implements OnInit, OnDestroy {
             if (r.isDirty === 'Y') {
                 for (let bi of r.BillingItem) {
                     if (bi.isDirty === 'Y') {
-                        bi.completeDate = bi.completeDateOther;
+                        // this line overrides the value set by the grid for completion date
+                        //bi.completeDate = bi.completeDateOther;
                         saveListArray.push(bi);
                     }
                 }
