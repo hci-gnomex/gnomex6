@@ -1780,7 +1780,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     } else if (!a.display) {
                         return 1;
                     } else if (!b.display) {
-                        return -1
+                        return -1;
                     } else {
                         return 0;
                     }
@@ -1860,6 +1860,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     private rebuildColumnDefinitions(): void {
+        if (this._state !== this.STATE_NEW) {
+            return;
+        }
+
         this.getColumnProperties();
 
         let temp: any[]  = this.defaultSampleColumnDefinitions;
@@ -1908,8 +1912,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
 
         if (this.samplesGridApi) {
-            this.samplesGridColumnDefs = temp;
-
             this.createColumnsBasedOnState(this._state);
             this.assignRowDataBasedOnState(this._state);
             // this.samplesGridApi.setRowData(this._experiment.samples);
@@ -2099,6 +2101,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
             this.samplesGridApi.setColumnDefs(temp);
             this.samplesGridApi.redrawRows();
+
+            this.samplesGridColumnDefs = temp;
         }
         if (this.ccCheckbox) {
             this.toggleCC(this.ccCheckbox);
@@ -2265,30 +2269,51 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public onCellValueChanged(event) {
-        if (event.colDef.headerName === "Index Tag A") {
-            let barcode = this._barCodes.filter(barcode => barcode.idOligoBarcode === event.data.idOligoBarcode);
-            if (Array.isArray(barcode) && barcode.length > 0) {
+        if (event.colDef.headerName === "Seq Lib Protocol") {
+            if(event.newValue !== event.oldValue) {
                 if (this.samplesGridApi
                     && this.samplesGridApi.getRowNode(event.rowIndex)
                     && this.samplesGridApi.getRowNode(event.rowIndex).data) {
-                    this.samplesGridApi.getRowNode(event.rowIndex).data.barcodeSequence = barcode[0].barcodeSequence;
+                    this.samplesGridApi.getRowNode(event.rowIndex).data.idOligoBarcode = "";
+                    this.samplesGridApi.getRowNode(event.rowIndex).data.idOligoBarcodeB = "";
+                    this.samplesGridApi.getRowNode(event.rowIndex).data.barcodeSequence = "";
+                    this.samplesGridApi.getRowNode(event.rowIndex).data.barcodeSequenceB = "";
                 }
 
                 this.samplesGridApi.redrawRows();
             }
+
+        } else if (event.colDef.headerName === "Index Tag A") {
+            let barcode = this._barCodes.filter(barcode => barcode.idOligoBarcode === event.data.idOligoBarcode);
+            if (this.samplesGridApi
+                && this.samplesGridApi.getRowNode(event.rowIndex)
+                && this.samplesGridApi.getRowNode(event.rowIndex).data) {
+
+                if (Array.isArray(barcode) && barcode.length > 0) {
+                    this.samplesGridApi.getRowNode(event.rowIndex).data.barcodeSequence = barcode[0].barcodeSequence;
+                } else {
+                    this.samplesGridApi.getRowNode(event.rowIndex).data.barcodeSequence = "";
+                }
+
+                this.samplesGridApi.redrawRows();
+            }
+
         } else if (event.colDef.headerName === "Index Tag B") {
             let barcode = this._barCodes.filter(barcode => barcode.idOligoBarcodeB === event.data.idOligoBarcodeB);
-            if (Array.isArray(barcode) && barcode.length > 0) {
-                if (this.samplesGridApi
-                    && this.samplesGridApi.getRowNode(event.rowIndex)
-                    && this.samplesGridApi.getRowNode(event.rowIndex).data) {
+            if (this.samplesGridApi
+                && this.samplesGridApi.getRowNode(event.rowIndex)
+                && this.samplesGridApi.getRowNode(event.rowIndex).data) {
 
+                if (Array.isArray(barcode) && barcode.length > 0) {
                     this.samplesGridApi.getRowNode(event.rowIndex).data.barcodeSequenceB = barcode[0].barcodeSequence;
+                } else {
+                    this.samplesGridApi.getRowNode(event.rowIndex).data.barcodeSequenceB = "";
                 }
 
                 this.samplesGridApi.redrawRows();
             }
         }
+
     }
 
     public upload(): void {

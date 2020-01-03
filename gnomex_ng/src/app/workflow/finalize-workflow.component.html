@@ -71,16 +71,8 @@
                             <mat-error *ngIf="this.runFC.hasError('required')">field is required </mat-error>
                             <mat-error *ngIf="this.runFC.hasError('pattern')"> field only accepts numbers </mat-error>
                         </mat-form-field>
-                        <mat-form-field class="date-width">
-                            <input matInput
-                                   placeholder="Create Date"
-                                   [disabled]="true"
-                                   [formControl]="this.createDateFC"
-                                   [matDatepicker]="createDatePicker"
-                                   (change)="createFlowCellFileName()">
-                            <mat-datepicker-toggle matSuffix [for]="createDatePicker"></mat-datepicker-toggle>
-                            <mat-datepicker #createDatePicker disabled="false"></mat-datepicker>
-                        </mat-form-field>
+                        <date-picker  [formControl]="this.createDateFC"  placeholder="Create Date" (change)="createFlowCellFileName()">
+                        </date-picker>
                         <mat-radio-group [formControl]="sideFC" class="flex-container-row children-margin-right" (change)="createFlowCellFileName()">
                             <mat-radio-button value="A">Side A</mat-radio-button>
                             <mat-radio-button value="B">Side B</mat-radio-button>
@@ -90,6 +82,7 @@
                         <div>
                             <custom-combo-box placeholder="Instrument"
                                               displayField="instrument"
+                                              valueField="idInstrument"
                                               [customOptionClasses]="'small-font padded inline-block full-width'"
                                               [formControl]="this.instrumentFC"
                                               [options]="this.instrumentList"
@@ -99,6 +92,7 @@
                         <div class="protocol-width">
                             <custom-combo-box placeholder="Protocol"
                                               displayField="name"
+                                              valueField="idNumberSequencingCyclesAllowed"
                                               [customOptionClasses]="'small-font padded inline-block full-width'"
                                               [formControl]="this.protocolFC"
                                               [options]="this.filteredProtocolsList"

@@ -15,6 +15,8 @@ import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {AgGridNg2} from "ag-grid-angular";
+import {FormBuilder, FormGroup} from "@angular/forms";
+import {Experiment} from "../../util/models/experiment.model";
 
 @Component({
     selector: 'experiment-sequence-lanes-tab',
@@ -71,6 +73,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
     @ViewChild("lanesGrid") lanesGrid: AgGridNg2;
     
     @Input() editMode: boolean;
+    @Input() experiment: Experiment;
 
     public sampleGridSplitSize: number = 0;
     public label: string = 'Sequence Lanes';
@@ -81,6 +84,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
     public samplesGridColDefs: any[] = [];
     public samplesGridData: any[] = [];
     private selectedSample: any = null;
+    public seqLaneFormGroup :FormGroup;
 
     private lanesGridApi: GridApi;
     public lanesGridColDefs: any[] = [];
@@ -106,6 +110,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
     
     constructor(public constantsService: ConstantsService,
                 private route: ActivatedRoute,
+                private fb: FormBuilder,
                 private dialogsService: DialogsService,
                 private experimentsService: ExperimentsService,
                 private dictionaryService: DictionaryService,
@@ -113,6 +118,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
     }
 
     ngOnInit(): void {
+
         const workflowStatusList: any[] = [
             {value: "", display: ""},
             {value: this.constantsService.STATUS_IN_PROGRESS, display: "In Progress"},
@@ -175,6 +181,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
 
                 this.samplesGridData = samples;
                 this.lanesGridData = lanes;
+                this.experiment.sequenceLanes = this.lanesGridData;
 
                 setTimeout(() => {
                     if (this.lanesGridApi) {
@@ -222,7 +229,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
     }
     
     ngOnChanges(changes: SimpleChanges): void {
-        if(!changes["editMode"].isFirstChange()) {
+        if(changes["editMode"] && !changes["editMode"].isFirstChange()) {
             this.setEditMode();
         }
     }
@@ -357,6 +364,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
         };
         this.lanesGridData.push(newLane);
         this.lanesGridApi.setRowData(this.lanesGridData);
+        this.experiment.sequenceLanes = this.lanesGridData;
         this.selectedLanes = [];
     }
 
@@ -375,6 +383,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
             this.lanesGridData.push(newLane);
         }
         this.lanesGridApi.setRowData(this.lanesGridData);
+        this.experiment.sequenceLanes = this.lanesGridData;
         this.selectedLanes = [];
     }
 
@@ -401,6 +410,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
         this.lanesToRemove.push(lane);
         this.lanesGridData.splice(this.lanesGridData.indexOf(lane), 1);
         this.lanesGridApi.setRowData(this.lanesGridData);
+        this.experiment.sequenceLanes = this.lanesGridData
     }
 
 }

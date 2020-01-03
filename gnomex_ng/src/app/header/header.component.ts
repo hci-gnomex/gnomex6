@@ -87,6 +87,10 @@ import {first} from "rxjs/operators";
         .inline-block { display: inline-block; }
         .horizontal-padding { padding: 0 0.4em; }
         .horizontal-center { text-align: center; }
+        
+        .horizontal-spacer {
+            width: 2em;
+        }
     `],
     encapsulation: ViewEncapsulation.None
 })
@@ -2331,4 +2335,15 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         }
     }
 
+    public ifPressEnterSearchByNumber(event: any) {
+        if (event && event.key && event.key === "Enter") {
+            this.searchNumber();
+        }
+    }
+
+    public ifPressEnterSearchByText(event: any) {
+        if (event && event.key && event.key === "Enter") {
+            this.searchByText();
+        }
+    }
 }

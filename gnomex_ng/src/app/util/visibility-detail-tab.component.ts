@@ -40,7 +40,7 @@ import {HttpParams} from "@angular/common/http";
                     <div style="width:30%">
                         <custom-combo-box placeholder="Collaborators" (optionSelected)="collaborDropdownChange($event)"
                                           [options]="collabDropdown" [displayField]="this.prefService.userDisplayField"
-                                          [formControlName]="'collaborator'">
+                                          [formControlName]="'selectedCollaborator'">
                         </custom-combo-box>
                     </div>
                     <button mat-button [disabled]="!enableAdd || _disabled" type="button" (click)="addCollaborator()">
@@ -198,7 +198,8 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
         this.visibilityForm = this.fb.group({
             codeVisibility:['',Validators.required],
             privacyExp: null,
-            collaborator: ''
+            collaborators: [],
+            selectedCollaborator: ''
         });
 
         this.route.data.forEach(data => { // new datatrack
@@ -259,6 +260,7 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
 
                     }
                     this.collabGridRowData = this.addNameToCollabs(currentCollaborators);
+                    this.visibilityForm.get("collaborators").setValue(this.collabGridRowData);
 
                     if(this.currentLab){
                         this.updateCollaborators();
@@ -384,7 +386,7 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
 
     addCollaborator() {
         this.visibilityForm.markAsDirty();
-        let collabVal = this.visibilityForm.get("collaborator").value;
+        let collabVal = this.visibilityForm.get("selectedCollaborator").value;
         if(collabVal){
             let collabGridItem = {
                     idAppUser: collabVal.idAppUser,
@@ -396,6 +398,7 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
             // add to grid
             this.collabGridRowData.push(collabGridItem);
             this.gridApi.setRowData(this.collabGridRowData);
+            this.visibilityForm.get("collaborators").setValue(this.collabGridRowData);
 
             // remove out of dropdown
             let i:number = this.memCollaborators.findIndex(c =>  c.idAppUser === collabVal.idAppUser );
@@ -442,6 +445,7 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
     removeCollaborator(){
         let removedCollab = this.collabGridRowData.splice(this.selectedCollabGridIndex,1);
         this.gridApi.setRowData(this.collabGridRowData);
+        this.visibilityForm.get("collaborators").setValue(this.collabGridRowData);
 
         let formatMemCollab = this.formatCollabList(this.currentLab.membersCollaborators);
         let mem = formatMemCollab.find(collab => collab.idAppUser === removedCollab[0].idAppUser);
