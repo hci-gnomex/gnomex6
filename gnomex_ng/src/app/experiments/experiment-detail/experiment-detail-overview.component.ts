@@ -287,12 +287,14 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
             } else {
                 let experimentTabForm: FormGroup = <FormGroup>experimentOverviewForm.get(key);
                 Object.keys(experimentTabForm.controls).forEach(k => {
-                    let val = experimentTabForm.get(k).value;
-                    if(val) {
-                        if(k.includes("JSONString")) {
-                            this._experiment[k] = JSON.stringify(experimentTabForm.get(k).value);
-                        } else {
-                            this._experiment[k] = experimentTabForm.get(k).value;
+                    if (k !== 'codeApplication') {
+                        let val = experimentTabForm.get(k).value;
+                        if(val) {
+                            if(k.includes("JSONString")) {
+                                this._experiment[k] = JSON.stringify(experimentTabForm.get(k).value);
+                            } else {
+                                this._experiment[k] = experimentTabForm.get(k).value;
+                            }
                         }
                     }
                 });
