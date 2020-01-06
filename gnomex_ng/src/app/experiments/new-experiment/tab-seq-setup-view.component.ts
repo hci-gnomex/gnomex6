@@ -82,6 +82,9 @@ import {NewExperimentService} from "../../services/new-experiment.service";
         }
 
         .significant-left-padding { padding-left: 3em; }
+        .majority-width{
+            width: 60%;
+        }
         
         .special-width { width: 6rem; }
         

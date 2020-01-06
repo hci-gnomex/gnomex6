@@ -264,6 +264,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
             } else if (isGuestState) {
                 this.showMoreSwitch = true;
                 this.showMore = true;
+                this.showDateRangePicker = true;
                 this.preselectOnBrowseFilter();
             } else {
                 this.showExperimentsRadioGroup = true;
@@ -588,7 +589,6 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         } else {
             this.idAppUserString = "";
         }
-
     }
 
 
