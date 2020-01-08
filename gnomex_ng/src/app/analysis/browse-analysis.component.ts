@@ -551,6 +551,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         }else{
             this.navService.emitResetNavModeSubject("detail");
             this.navService.emitResetNavModeSubject("overview");
+            this.dialogsService.removeSpinnerWorkItem();
         }
 
     }
@@ -559,7 +560,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         this.utilService.removeChangeDetectorRef(this.changeDetectorRef);
         this.analysisGroupListSubscription.unsubscribe();
         this.navEndSubscription.unsubscribe();
-        this.gnomexService.navInitBrowseAnalysisSubject.next(null);
         this.labListSubscription.unsubscribe();
     }
 

@@ -497,6 +497,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
             this.navService.emitResetNavModeSubject(TopicService.DATATRACK);
             this.navService.emitResetNavModeSubject(TopicService.EXPERIMENT);
             this.navService.emitResetNavModeSubject(TopicService.TOPIC);
+            this.dialogService.removeSpinnerWorkItem();
         }
 
 
@@ -982,7 +983,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
         this.utilService.removeChangeDetectorRef(this.changeDetector);
         UtilService.safelyUnsubscribe(this.topicListSubscription);
         UtilService.safelyUnsubscribe(this.navInitSubscription);
-        this.gnomexService.navInitBrowseTopicSubject.next(null);
     }
 
 }

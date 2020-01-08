@@ -13,6 +13,7 @@ import {AuthenticationService} from "../../auth/authentication.service";
 import {catchError, flatMap, map} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {PropertyService} from "../property.service";
+import {NavigationService} from "../navigation.service";
 
 /**
  * A {@code CanActivate} implementation which makes its calculation based on the current authentication state.
@@ -27,6 +28,7 @@ export class AuthRouteGuardService implements CanActivate {
     constructor(private _authenticationService: AuthenticationService,
                 private _router: Router,
                 private route: ActivatedRoute,
+                private navService: NavigationService,
                 private gnomexService: GnomexService
     ) {
 
@@ -67,11 +69,10 @@ export class AuthRouteGuardService implements CanActivate {
     }
 
 
-    private redirectByURL(params: HttpParams, initOrderSubject: BehaviorSubject<any>, isNoPublicVis: boolean,  isAuthed: boolean, numberObj: any): Observable<boolean> {
+    private redirectByURL(params: HttpParams, isNoPublicVis: boolean,  isAuthed: boolean, numberObj: any): Observable<boolean> {
         return this.gnomexService.getOrderFromNumber(params).pipe(map((res) => {
             this.setIDsFromResponse(res, numberObj); // no navigation
             this.gnomexService.orderInitObj = numberObj;
-            initOrderSubject.next(this.gnomexService.orderInitObj);
 
 
             if (isAuthed && !(res.codeVisbility === "PUBLIC")) { //allow them to route, but backend will not show order if not permitted access(flex approach)
@@ -89,7 +90,6 @@ export class AuthRouteGuardService implements CanActivate {
                     this.gnomexService.redirectURL = null;
                     this._router.navigate(["authenticate"]);
                     this.gnomexService.orderInitObj = null;
-                    initOrderSubject.next(null);
 
                     return false;
                 } else {
@@ -113,38 +113,31 @@ export class AuthRouteGuardService implements CanActivate {
             if (queryParam["requestNumber"]) {
                 numberObj["type"] = "requestNumber";
                 numberObj["value"] = queryParam["requestNumber"];
-                //numberObj["urlSegList"] =  ["experiments","idProject","browsePanel","idRequest"];
                 numberObj["urlSegList"] = ["experiments"];
                 let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
-                let sub = this.gnomexService.navInitBrowseExperimentSubject;
-                return this.redirectByURL(params, sub, noPublicVis, isAuthed, numberObj);
+                return this.redirectByURL(params, noPublicVis, isAuthed, numberObj);
 
 
             } else if (queryParam["analysisNumber"]) {
                 numberObj["type"] = "analysisNumber";
                 numberObj["value"] = queryParam["analysisNumber"];
-                //numberObj["urlSegList"] =  ["analysis","idLab","analysisPanel","idAnalysis"];
                 numberObj["urlSegList"] = ["analysis"];
                 let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
-                let sub = this.gnomexService.navInitBrowseAnalysisSubject;
-                return this.redirectByURL(params, sub, noPublicVis, isAuthed, numberObj);
+                return this.redirectByURL(params, noPublicVis, isAuthed, numberObj);
 
             } else if (queryParam["dataTrackNumber"]) {
                 numberObj["type"] = "dataTrackNumber";
                 numberObj["value"] = queryParam["dataTrackNumber"];
-                //numberObj["urlSegList"] =  ["datatracks","idGenomeBuild","datatracksPanel","idDataTrack"];
                 numberObj["urlSegList"] = ["datatracks"];
                 let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
-                let sub = this.gnomexService.navInitBrowseDatatrackSubject;
-                return this.redirectByURL(params, sub, noPublicVis, isAuthed, numberObj);
+                return this.redirectByURL(params, noPublicVis, isAuthed, numberObj);
 
             } else if (queryParam["topicNumber"]) {
                 numberObj["type"] = "topicNumber";
                 numberObj["value"] = queryParam["topicNumber"];
                 numberObj["urlSegList"] = ["topics"];
                 let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
-                let sub = this.gnomexService.navInitBrowseTopicSubject;
-                return this.redirectByURL(params, sub, noPublicVis, isAuthed, numberObj);
+                return this.redirectByURL(params, noPublicVis, isAuthed, numberObj);
 
 
             } else {
@@ -168,7 +161,7 @@ export class AuthRouteGuardService implements CanActivate {
         }
 
         if (orderInfo) {
-            this.gnomexService.redirectURL = this.gnomexService.makeURL(orderInfo);
+            this.gnomexService.redirectURL = this.navService.makeURL(orderInfo);
         }
 
     }

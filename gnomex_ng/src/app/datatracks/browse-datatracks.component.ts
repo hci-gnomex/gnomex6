@@ -509,6 +509,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
             this.navService.emitResetNavModeSubject("genomebuild");
             this.navService.emitResetNavModeSubject("folder");
             this.navService.emitResetNavModeSubject("detail");
+            this.dialogsService.removeSpinnerWorkItem();
 
         }
 
@@ -554,7 +555,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         this.utilService.removeChangeDetectorRef(this.changeDetectorRef);
         this.dataTracksListSubscription.unsubscribe();
         this.labListSubscription.unsubscribe();
-        this.gnomexService.navInitBrowseDatatrackSubject.next(null);
         this.navDatatrackList = null;
     }
 }

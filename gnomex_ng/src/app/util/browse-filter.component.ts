@@ -127,6 +127,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
 
     // need these to set model programmatically
     public selectedLab: string = "";
+    public selectedLabs :string[] = [];
     public selectedOwner: any;
     public selectedCoreFacility: any;
     public selectedRequestCategory: any;
@@ -421,6 +422,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
             codeRequestCategory : ["selectedRequestCategory"],
             ccNumber: ["ccNumberString"],
             allExperiments: ["allFlag"],
+            labKeys:["selectedLabs"],
             idLab : ["selectedLab"],
             idAppUser : [{"selectedOwner": this.showOwnerComboBox} , {"selectedLabMember": this.showExperimentsRadioGroup} ],
             expRadio:["experimentsRadioString"],
@@ -436,7 +438,6 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
             searchText : ["searchText"],
             idOrganism: ["selectedOrganism"],
             idGenomeBuild: ["selectedGenomeBuild"],
-            showLabMultiSelectComboBox: [null],
             isVisibilityPublic: ["visibilityPublicFlag"],
             isVisibilityOwner: ["visibilityOwnerFlag"],
             isVisibilityMembers: ["visibilityAllLabMembersFlag"],

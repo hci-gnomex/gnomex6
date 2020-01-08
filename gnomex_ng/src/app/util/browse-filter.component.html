@@ -164,6 +164,7 @@
             <custom-multi-combo-box [options]="labList"
                                     [displayField]="this.prefService.labDisplayField"
                                     [valueField]="'idLab'"
+                                    [(ngModel)]="selectedLabs"
                                     (selectionChanged)="onMultiLabChange($event)">
             </custom-multi-combo-box>
         </div>

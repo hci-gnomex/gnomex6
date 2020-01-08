@@ -16,6 +16,7 @@ import {UserPreferencesService} from "./user-preferences.service";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {UtilService} from "./util.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {NavigationService} from "./navigation.service";
 
 const CAN_ADMINISTER_ALL_CORE_FACILITIES: string = "canAdministerAllCoreFacilities";
 const CAN_ADMINISTER_USERS: string = "canAdministerUsers";
@@ -85,10 +86,6 @@ export class GnomexService {
     public redirectURL:string;
     /*used  app navigating to specific order item  */
     public orderInitObj:any;
-    public navInitBrowseExperimentSubject:BehaviorSubject<any>= new BehaviorSubject(null);
-    public navInitBrowseAnalysisSubject:BehaviorSubject<any>= new BehaviorSubject(null);
-    public navInitBrowseDatatrackSubject:BehaviorSubject<any>= new BehaviorSubject(null);
-    public navInitBrowseTopicSubject:BehaviorSubject<any>= new BehaviorSubject(null);
 
     public organismList: any[] = [];
     public das2OrganismList: any[] = [];
@@ -114,7 +111,8 @@ export class GnomexService {
         private http: HttpClient,
         private router: Router,
         private dialogService: DialogsService,
-        private userPreferencesService: UserPreferencesService) {
+        private userPreferencesService: UserPreferencesService,
+        private navService: NavigationService) {
     }
 
     /* The header only uses this for displaying itself.
@@ -794,20 +792,6 @@ export class GnomexService {
             }));
     }
 
-    public makeURL(orderInfo:any ):string{
-        let segList:Array<string> = orderInfo.urlSegList;
-        let url:string = '';
-
-        if(segList.length === 2){
-            url ="/"+segList[0]+ "/"+segList[1];
-        }else{
-            url ="/"+segList[0];
-        }
-
-
-        return url;
-    }
-
     private buildSeqLibProtocolListWithAppFilters():void {
         for (let seq of this.dictionaryService.getEntries('hci.gnomex.model.SeqLibProtocol')) {
             if (seq != null) {
@@ -891,42 +875,40 @@ export class GnomexService {
 
                     //path = ["experiments","idProject","browsePanel","idRequest"];
                     path = ["experiments"];
-                    let sub = this.navInitBrowseExperimentSubject;
                     if(!idInstead){
                         params = params.set("requestNumber", number);
-                        this.getOrderID(params,path,sub);
+                        this.getOrderID(params,path);
                     }else{
                         params = params.set("requestNumber", match[2])
                             .set("hasID","Y");
-                        this.getOrderID(params,path,sub);
+                        this.getOrderID(params,path);
                     }
 
                 }else if(match[1].toUpperCase() === 'A'){
 
                     //path =  ["analysis","idLab","analysisPanel","idAnalysis"];
                     path = ["analysis"];
-                    let sub = this.navInitBrowseAnalysisSubject;
                     if(!idInstead){
                         params = params.set("analysisNumber", number);
-                        this.getOrderID(params,path,sub);
+                        this.getOrderID(params,path);
                     }else{
                         params = params.set("analysisNumber",match[2])
                             .set("hasID", "Y");
-                        this.getOrderID(params,path,sub);
+                        this.getOrderID(params,path);
                     }
 
                 }else if(match[1].toUpperCase()=== 'DT' ){
 
                     //path = ["datatracks","idGenomeBuild","datatracksPanel","idDataTrack"];
                     path = ["datatracks"];
-                    let sub = this.navInitBrowseDatatrackSubject;
+
                     if(!idInstead){
                         params = params.set("dataTrackNumber",number);
-                        this.getOrderID(params,path,sub);
+                        this.getOrderID(params,path);
                     }else{
                         params = params.set("dataTrackNumber",match[2])
                             .set("hasID","Y");
-                        this.getOrderID(params,path,sub);
+                        this.getOrderID(params,path);
                     }
 
                 }else if(match[1].toUpperCase() === 'T'){ // topic doesn't have number only ID
@@ -935,8 +917,7 @@ export class GnomexService {
                     }
                     //path = [ "topics","topicsPanel", "idLab" ] ;
                     path = [ "topics"] ;
-                    let sub = this.navInitBrowseTopicSubject;
-                    this.getOrderID(params,path,sub);
+                    this.getOrderID(params,path);
                 }
 
             }
@@ -950,13 +931,12 @@ export class GnomexService {
     }
 
 
-    private getOrderID(params:HttpParams,path:string[],initOrderSubject:BehaviorSubject<any> ){
+    private getOrderID(params:HttpParams,path:string[]){
         this.getOrderFromNumber(params).pipe(first()).subscribe(data =>{
             this.orderInitObj = data;
             this.orderInitObj.urlSegList = path;
-            let url = this.makeURL(this.orderInitObj);
+            let url = this.navService.makeURL(this.orderInitObj);
             this.router.navigateByUrl(url);
-            initOrderSubject.next(this.orderInitObj);
         },(err:IGnomexErrorResponse) =>{
             console.debug(err);
         });

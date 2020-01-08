@@ -13,6 +13,7 @@ import {PropertyService} from "../services/property.service";
 import {UtilService} from "../services/util.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {NavigationService} from "../services/navigation.service";
+import {DialogsService} from "../util/popup/dialogs.service";
 
 
 @Component({
@@ -168,7 +169,8 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                 private createSecurityAdvisor: CreateSecurityAdvisorService,
                 private router: Router,
                 private authService: AuthenticationService,
-                private propertyService: PropertyService
+                private propertyService: PropertyService,
+                private dialogsService: DialogsService,
     ) {
         // Do instance configuration here
     }
@@ -215,13 +217,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
         if(!this.gnomexService.isLoggedIn){
 
-            if(this.gnomexService.orderInitObj){
-                if(this.gnomexService.orderInitObj.isGuest){
-                    this.gnomexService.initGuestApp();
-                }else{
-                    this.gnomexService.initApp();
-                }
-            } else if (this.authService.isGuestMode()) {
+            if (this.authService.isGuestMode()) {
                 this.gnomexService.initGuestApp();
             } else {
                 this.gnomexService.initApp();
@@ -230,6 +226,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.gnomexService.isAppInitCompleteObservable().pipe(first()).subscribe(() =>{
             if (this.gnomexService.redirectURL) {
+                this.dialogsService.addSpinnerWorkItem();
                 this.router.navigateByUrl("/" + this.gnomexService.redirectURL);
             }
         });

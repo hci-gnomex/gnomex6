@@ -181,7 +181,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.experimentCountMessage = response.message ? "(" + response.message + ")" : "";
 
             if(this.experimentCount === "0" && !response.Lab) {
-                this.gnomexService.orderInitObj = null;
                 this.dialogsService.stopAllSpinnerDialogs();
                 this.dialogsService.error("Insufficient permission to access this request or this lab.", "INVALID");
                 return;
@@ -206,7 +205,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             setTimeout(() => {
                 this.toggleButton = "Collapse Projects";
                 this.treeModel.expandAll();
-                //todo need replace logic from orderInitObj to use url
                 if(this.navService.navMode === NavigationService.URL) {
                     let id: string = this.paramMap.get("idRequest") ? 'r'+ this.paramMap.get("idRequest")
                         : this.qParamMap.get("idProject") ? 'p' + this.qParamMap.get("idProject") : null;
@@ -660,6 +658,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         }else{
             this.navService.emitResetNavModeSubject("detail");
             this.navService.emitResetNavModeSubject("overview");
+            this.dialogsService.removeSpinnerWorkItem();
         }
 
 
@@ -690,7 +689,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         UtilService.safelyUnsubscribe(this.labListSubscription);
         UtilService.safelyUnsubscribe(this.canDeleteProjectSubscription);
         this.utilService.removeChangeDetectorRef(this.changeDetectorRef);
-        this.gnomexService.navInitBrowseExperimentSubject.next(null);
         this.experimentsService.filteredLabs = undefined;
         this.experimentsService.labList = [];
 

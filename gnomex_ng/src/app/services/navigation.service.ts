@@ -18,11 +18,18 @@ import {ITreeNode} from "angular-tree-component/dist/defs/api";
 
 @Injectable()
 export class NavigationService {
+
     private _resetNavModeSubscription:Subscription;
     private resetNavModeSubject: Subject<any> = new Subject<any>();
     navMode: string;
     public static readonly URL = 'url';
     public static readonly USER = 'usr';
+    public static readonly NUMBER_TO_ID_MAP : Map<string,string> = new Map<string, string>([
+        ["requestNumber", "idRequest"],
+        ["analysisNumber", "idAnalysis"],
+        ["dataTrackNumber", "idDataTrack"],
+        ["topicNumber", "idTopic"]
+    ]);
 
 
 
@@ -188,6 +195,39 @@ export class NavigationService {
         let targetNode = idObjList[index][idName] ? node.parent : node;
         return this.recurseSetValueGoingUpTree(targetNode,idObjList,index - decCount);
 
+    }
+    makeURL(orderInfo: any): string {
+        let segList:Array<string> = orderInfo.urlSegList;
+        let url:string = '';
+        let orderDetailPath = "detail";
+        let idOrder = NavigationService.NUMBER_TO_ID_MAP.get(orderInfo.type);
+        if(!idOrder || !orderInfo[idOrder]){
+            throw new Error("There is no ID that matches this number please check the NUMBER_TO_ID_MAP");
+        }
+        let orderInfoKeys = Object.keys(orderInfo);
+        let qParamStr:string = "";
+
+        for(let i = 0; i < orderInfoKeys.length; i++) {
+            let infoKey = orderInfoKeys[i];
+            if (infoKey.startsWith("id") && infoKey !== idOrder) {
+                if ( i < orderInfoKeys.length - 1) {
+                    qParamStr +=  infoKey + "=" + orderInfo[infoKey] + "&"
+                } else {
+                    qParamStr += infoKey + "=" + orderInfo[infoKey];
+                }
+            }
+        }
+
+
+        if(idOrder === 'idTopic'){
+            url = "/" + segList[0] + "/" + orderDetailPath + "/" + orderInfo["idLab"] + "?" + idOrder + "=" +  orderInfo[idOrder];
+        }else {
+            url ="/"+segList[0] +"/" + orderDetailPath + "/" + orderInfo[idOrder] + "?" + qParamStr;
+        }
+
+
+
+        return url;
     }
 
 
