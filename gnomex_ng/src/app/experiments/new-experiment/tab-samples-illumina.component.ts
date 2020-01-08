@@ -213,6 +213,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
         this.rebuildColumnDefinitions();
         this.loadSampleTypes();
         this.loadSeqLibProtocol();
+
+        if (this.samplesGridApi) {
+            this.samplesGridApi.sizeColumnsToFit();
+        }
     }
     public get experiment() {
         return this._experiment;
@@ -1701,6 +1705,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
         this.showHideColumns();
 
         this.loadBarcodes();
+
+        if (this.samplesGridApi) {
+            this.samplesGridApi.sizeColumnsToFit();
+        }
     }
 
     ngOnDestroy() {
@@ -1861,6 +1869,12 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     private rebuildColumnDefinitions(): void {
         if (this._state !== this.STATE_NEW) {
+            if (this.samplesGridApi) {
+                this.createColumnsBasedOnState(this._state);
+                this.assignRowDataBasedOnState(this._state);
+                this.samplesGridApi.sizeColumnsToFit();
+            }
+
             return;
         }
 
@@ -1914,7 +1928,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
         if (this.samplesGridApi) {
             this.createColumnsBasedOnState(this._state);
             this.assignRowDataBasedOnState(this._state);
-            // this.samplesGridApi.setRowData(this._experiment.samples);
             this.samplesGridApi.sizeColumnsToFit();
         }
     }
@@ -2103,6 +2116,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
             this.samplesGridApi.redrawRows();
 
             this.samplesGridColumnDefs = temp;
+
+            if (this.samplesGridApi) {
+                this.samplesGridApi.sizeColumnsToFit();
+            }
         }
         if (this.ccCheckbox) {
             this.toggleCC(this.ccCheckbox);
@@ -2348,6 +2365,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public download(): void {
+
         let state: string = "";
 
         if (this._state === TabSamplesIlluminaComponent.STATE_NEW) {
