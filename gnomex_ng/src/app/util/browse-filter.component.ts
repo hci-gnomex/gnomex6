@@ -254,8 +254,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy, OnChanges {
                     }
                 });
             } else if (isGuestState) {
-                this.showMoreSwitch = true;
-                this.showMore = true;
+                this.showDateRangePicker = true;
             } else {
                 this.showExperimentsRadioGroup = true;
                 this.showDateRangePicker = true;
