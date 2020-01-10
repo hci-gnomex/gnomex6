@@ -1773,7 +1773,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
     private seqLibProtocols: any[];
 
     private loadSeqLibProtocol(): void {
-        this.seqLibProtocols = this.dictionaryService.getEntries(DictionaryService.SEQ_LIB_PROTOCOL).sort((a, b) => {
+        this.seqLibProtocols = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.SEQ_LIB_PROTOCOL).sort((a, b) => {
             if (!a && !b) {
                 return 0;
             } else if (!a) {
