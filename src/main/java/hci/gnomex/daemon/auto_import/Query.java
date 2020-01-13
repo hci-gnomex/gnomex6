@@ -270,7 +270,8 @@ public class Query {
             String sampleName = "";
 
             if (idAnalysisGroup == 11) { //avatar project
-                sampleName = "(s.name LIKE \'SL%\')";
+                sampleName = "(s.name LIKE \'SL%\' OR s.name REGEXP \'^[0-9]{2}-[A-Za-z0-9\\.]+.*$\')";
+
             } else if (idAnalysisGroup == 14) {// foundation project{
                 sampleName = "(s.name LIKE \'%RF%\' OR s.name LIKE \'ORD%\' );";
             }else if(idAnalysisGroup == 22){ //tempus project

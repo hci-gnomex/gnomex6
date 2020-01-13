@@ -300,7 +300,7 @@ public class CollaboratorPermission {
 
 
         if (dataVendor.equals("avatar")) {
-            strBuild.append(" s.name LIKE \'SL%\' ");
+            strBuild.append(" s.name LIKE \'SL%\' OR s.name REGEXP \'^[0-9]{2}-[A-Za-z0-9\\.]+.*$\' ");
         } else if (dataVendor.equals("foundation")) {
             strBuild.append(" ( s.name  REGEXP \'^T?C?Q?RF[0-9]+\' ");
             strBuild.append(" OR s.name LIKE \'ORD%\' ) ");

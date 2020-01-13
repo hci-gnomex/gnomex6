@@ -12,25 +12,62 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.*;
 import java.sql.Timestamp;
-
+import java.util.regex.Pattern;
 
 
 public class Downloader {
-	
-	
+
+
+	private String mode;
 	private Map<String,String>fileNameList;
 	private String dependentDataPath;
+	private String fileOfPaths;
+
 	private String downloadPath;
 	private final String rootAvatar = "HCI_Molecular_Data:/";
 	private List<String> flaggedFileList;
+	private boolean allowClearFile = false;
 	
-	Downloader(String dependentDataPath , String downloadPath ){
-		this.dependentDataPath = dependentDataPath;
-		this.downloadPath = downloadPath;
+	Downloader(String[] args ){
+		this.mode = "avatar";
+		for (int i = 0; i < args.length; i++) {
+			args[i] =  args[i].toLowerCase();
+			if (args[i].equals("-filelist")) {
+				this.fileOfPaths = args[++i];
+				String pattern = Pattern.quote(System.getProperty("file.separator"));
+				String[] fileChunks = this.fileOfPaths.split(pattern);
+				fileChunks = Arrays.copyOfRange(fileChunks,0,fileChunks.length -1 );
+				this.dependentDataPath = String.join(File.separator,fileChunks) + File.separator;
+
+			} else if (args[i].equals("-downloadpath")) {
+				this.downloadPath = args[++i];
+			} else if (args[i].equals("-mode")) {
+				this.mode = args[++i];
+				if(!(this.mode.equals("tempus") || this.mode.equals("avatar")) ){
+					System.out.println("If you specify mode it has to be either tempus or avatar");
+					System.exit(1);
+				}
+
+			}else if(args[i].equals("-allowclearfile")){
+				this.allowClearFile = true;
+			} else if (args[i].equals("-help")) {
+				//printUsage();
+				System.exit(0);
+			}
+		}
+		if(dependentDataPath == null || downloadPath == null){
+			System.out.println("Please specify both the log path and the download path");
+			System.exit(1);
+		}
+
 		this.fileNameList = new TreeMap<String,String>();
 		this.flaggedFileList = new ArrayList<String>();
-		
 	}
+
+	public String getMode(){
+		return this.mode;
+	}
+
 
 
 	private boolean hasSubProccessErrors(File errorFile) {
@@ -158,7 +195,7 @@ public class Downloader {
 		// determine if download successful && make log
 		if(!true) {
 			System.out.println("One or more downloads failed, and will be requeued for downloading.");
-			writeToFile(this.dependentDataPath + "uniqueFilesToDownload.txt",reDownloadList); ///home/u0566434/parser_data/uniqueFilesToDownload.txt
+			writeToFile(this.fileOfPaths,reDownloadList); ///home/u0566434/parser_data/uniqueFilesToDownload.txt
 			// need to limit  fileNameList
 		}else {
 			
@@ -169,12 +206,35 @@ public class Downloader {
 			
 			downloadedList.add("Dowloaded successfully, " + timestamp );
 			downloadedList.add(this.createFormattedPath("~/", true, true).replace("\"", ""));
-			
+
 			writeToFile(this.dependentDataPath + "download.log", downloadedList);
 			
 			
 		}
 			
+	}
+
+	public void executeTempusDownload() {
+		List<String> commands = new ArrayList<String>();
+
+		List<String> status = Arrays.asList("Downloading in progress...");
+		writeToFile(this.dependentDataPath + "download.log",status); // /home/u0566434/parser_data/download.log
+		writeToFile(this.fileOfPaths, this.fileNameList);
+
+		String downloadCommand = "cat " + this.fileOfPaths + " | xargs -P10 -I {} aws --profile tempus s3 cp {} " + this.downloadPath;
+		System.out.println(downloadCommand);
+		commands.add(downloadCommand);
+		commands.add("mv -t " + this.downloadPath + " " + this.downloadPath + File.separator +  "Flagged" +File.separator +  "*" );
+		executeCommands(commands);
+
+		ArrayList<String> downloadedList = new ArrayList<String>();
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+		downloadedList.add("Dowloaded successfully, " + timestamp );
+		downloadedList.add(this.createFormattedPath("", true, true).replace("\"", ""));
+
+		writeToFile(this.dependentDataPath + "download.log", downloadedList);
+
 	}
 	
 	private boolean downloadSuccesful(List<String> requeueList ) {
@@ -220,7 +280,7 @@ public class Downloader {
 		
 		FileReader reader = null;
 		try {
-			reader = new FileReader(new File(this.dependentDataPath + "uniqueFilesToDownload.out"));
+			reader = new FileReader(new File(this.fileOfPaths));
 			BufferedReader buffReader = new BufferedReader(reader);
 			
 			String line = "";
@@ -236,6 +296,7 @@ public class Downloader {
 			if(fileNameList.size() < 1) {
 				throw new Exception("Appears to be no new files to download");
 			}
+			System.out.println("Total files to download: " + fileNameList.size());
 
 			File flaggedFolder = new File(this.downloadPath + "/Flagged/");
 			for(File file: flaggedFolder.listFiles()){
@@ -250,11 +311,12 @@ public class Downloader {
 
 				}
 			}
+			System.out.println("Files to download after excluding already downloaded Flagged Files: " + fileNameList.size() );
 
+			if(this.allowClearFile){
+				writeToFile(this.fileOfPaths, new ArrayList<String>());
+			}
 
-			writeToFile(this.dependentDataPath + "uniqueFilesToDownload.out", new ArrayList<String>());
-		
-		
 		}
 		catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -336,13 +398,13 @@ public class Downloader {
 
 		for (Map.Entry<String, String> entry : fileNameList.entrySet()) {
 			String pathWithFileName = entry.getValue();
-			strBuild.append("\"");
-			strBuild.append(root);
+				strBuild.append("\"");
+				strBuild.append(root);
 			String safeFileName = pathWithFileName.replaceAll(" ", "\\\\ ");
 			strBuild.append(safeFileName);
-			strBuild.append("\"");
+				strBuild.append("\"");
 			if(hasNewLine) {
-				if(count < fileNameList.size() - 1) {
+				if(count < fileNameList.size()) {
 					strBuild.append("\n");
 				}
 			}
@@ -360,11 +422,9 @@ public class Downloader {
 		if(afterDownload){
 			for( int i = 0; i <  this.flaggedFileList.size(); i++){
 				String flaggedFileName =  this.flaggedFileList.get(i);
-				strBuild.append("\"");
 				String safeFileName = flaggedFileName.replaceAll(" ", "\\\\ ");
 
 				strBuild.append(safeFileName);
-				strBuild.append("\"");
 				if(hasNewLine) {
 					if(i < flaggedFileList.size() - 1) {
 						strBuild.append("\n");
@@ -405,6 +465,22 @@ public class Downloader {
 		}
 		return dataFromFileList;
 	}
+	public void writeToFile(String fileName, Map<String,String> dataToWrite) {
+		PrintWriter writer = null;
+		try {
+			writer = new PrintWriter(fileName);
+			for (Map.Entry<String,String> entry : dataToWrite.entrySet()) {
+				writer.println(entry.getValue());
+			}
+
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}finally {
+			writer.close();
+		}
+
+	}
 	
 	public void writeToFile(String fileName, List<String> dataToWrite) {
 		PrintWriter writer = null;
@@ -422,8 +498,7 @@ public class Downloader {
 		}
 		
 	}
-	
-	
-	
-	
+
+
+
 }
