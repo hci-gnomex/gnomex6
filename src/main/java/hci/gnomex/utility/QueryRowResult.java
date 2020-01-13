@@ -36,8 +36,7 @@ public class QueryRowResult {
 
     public String getFieldValueString(String fieldName, String defaultString) {
         try {
-            String value = (String) getFieldValue(fieldName);
-            return value != null ? value : defaultString;
+            return getFieldValue(fieldName) != null ? getFieldValue(fieldName).toString() : defaultString;
         } catch (ClassCastException e) {
             return defaultString;
         }

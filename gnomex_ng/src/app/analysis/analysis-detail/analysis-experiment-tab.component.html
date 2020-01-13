@@ -42,8 +42,8 @@
                     <div class="flex-grow">
                     </div>
                     <mat-radio-group [(ngModel)]="gridRaidoOpt" class="flex-container-row padded" (change)="onGridTypeChange()">
-                        <mat-radio-button [value]="HYBS" class="padded-left-right" > Microarray Hybridizations{{"(" + this.hybsList.length + ")"}}</mat-radio-button>
                         <mat-radio-button [value]="SEQ_LANES" class="padded-left-right" > Illumina Sequencing{{"(" + this.lanesList.length + ")"}} </mat-radio-button>
+                        <mat-radio-button [value]="HYBS" class="padded-left-right" > Microarray Hybridizations{{"(" + this.hybsList.length + ")"}}</mat-radio-button>
                         <mat-radio-button [value]="SAMPLE" class="padded-left-right"> Other{{"(" + this.sampleList.length + ")"}} </mat-radio-button>
                     </mat-radio-group>
                 </div>
