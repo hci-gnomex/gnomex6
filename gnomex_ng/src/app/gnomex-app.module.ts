@@ -51,7 +51,6 @@ import {RegisterUserModule} from "./account/register-user/register-user.module";
 import {HTTP_INTERCEPTORS} from "@angular/common/http";
 import {ErrorHandlerInterceptor} from "./services/interceptors/error-handler.interceptor";
 import {WINDOW_PROVIDERS} from "./services/window.service";
-import {AddHttpHeaderInterceptor} from "./services/interceptors/add-http-header.interceptor";
 
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
@@ -108,7 +107,6 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         {provide: AUTHENTICATION_MAX_INACTIVITY_MINUTES, useValue: 240},
         {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy},
         {provide: HTTP_INTERCEPTORS, useClass: ErrorHandlerInterceptor, multi: true },
-        {provide: HTTP_INTERCEPTORS, useClass: AddHttpHeaderInterceptor, multi: true },
         {provide: Window, useValue: window},
         ...WINDOW_PROVIDERS,
 

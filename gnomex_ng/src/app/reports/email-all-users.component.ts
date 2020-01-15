@@ -2,7 +2,7 @@ import {Component, OnInit} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {BroadcastEmailService} from "../services/broadcast-email.service";
-import {Response, URLSearchParams} from "@angular/http";
+import {HttpParams} from "@angular/common/http";
 import {MatDialogRef} from "@angular/material";
 import {AngularEditorConfig} from "@kolkov/angular-editor";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
@@ -118,11 +118,11 @@ export class EmailAllUsersComponent extends BaseGenericContainerDialog implement
         this.resetFileUpload();
     }
 
-    private handleResponse(response: Response): void {
-        if (response && response.status == 200) {
+    private handleResponse(response: any): void {
+        if (response) {
             let resultWindow = window.open('', '_blank', "height=200, width=500");
             resultWindow.document.open();
-            resultWindow.document.write(response.text());
+            resultWindow.document.write(response);
             resultWindow.document.close();
         }
         this.showSpinner = false;
@@ -140,18 +140,22 @@ export class EmailAllUsersComponent extends BaseGenericContainerDialog implement
             formData.append("Filedata", this.uploadFile, this.uploadFile.name);
             formData.append("Upload", "Submit Query");
             formData.append("fromAddress", this.fromFormControl.value);
-            this.broadcastEmailService.sendBroadcastEmailWithFile(formData).subscribe((response: Response) => {
+            this.broadcastEmailService.sendBroadcastEmailWithFile(formData).subscribe((response: any) => {
                 this.handleResponse(response);
+            }, (err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
         } else {
-            let params: URLSearchParams = new URLSearchParams();
-            params.set("subject", this.subjectFormControl.value);
-            params.set("format", "html");
-            params.set("fromAddress", this.fromFormControl.value);
-            params.set("body", this.bodyFormControl.value);
-            params.set("coreFacilityIds", this.coresFormControl.value);
-            this.broadcastEmailService.sendBroadcastEmail(params).subscribe((response: Response) => {
+            let params: HttpParams = new HttpParams()
+                .set("subject", this.subjectFormControl.value)
+                .set("format", "html")
+                .set("fromAddress", this.fromFormControl.value)
+                .set("body", this.bodyFormControl.value)
+                .set("coreFacilityIds", this.coresFormControl.value);
+            this.broadcastEmailService.sendBroadcastEmail(params).subscribe((response: any) => {
                 this.handleResponse(response);
+            }, (err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
         }
     }

@@ -1,19 +1,17 @@
 import {Injectable} from "@angular/core";
-import {Http, Response} from "@angular/http";
 import {HttpClient} from "@angular/common/http";
 import {Observable} from "rxjs";
 import {CookieUtilService} from "./cookie-util.service";
 
 @Injectable()
 export class ReportIssueService {
-    constructor(private http: Http, private httpClient: HttpClient,
+    constructor(private httpClient: HttpClient,
                 private cookieUtilService: CookieUtilService) {
     }
 
-    public sendReportIssueEmail(url: any, formData: FormData):  Observable<Response> {
+    public sendReportIssueEmail(url: any, formData: FormData):  Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
-        //TODO: Convert multipart http calls to httpClient
-        return this.http.post(url, formData);
+        return this.httpClient.post(url, formData, {responseType: "text"});
     }
 
     reportIssueServletGetURL(): Observable<any> {
