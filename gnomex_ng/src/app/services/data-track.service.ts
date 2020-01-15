@@ -1,5 +1,4 @@
 import {Injectable} from "@angular/core";
-import {Http, Headers, Response} from "@angular/http";
 import {Observable, of, throwError} from "rxjs";
 import {Subject} from "rxjs";
 import {CookieUtilService} from "./cookie-util.service";
@@ -18,7 +17,7 @@ export class DataTrackService {
     private _labList: any[] = [];
     private _activeNodeToSelect: any = {};
 
-    constructor(private http: Http, private cookieUtilService: CookieUtilService,
+    constructor(private cookieUtilService: CookieUtilService,
                 private httpClient: HttpClient,
                 private dialogService: DialogsService) {
     }
@@ -191,16 +190,7 @@ export class DataTrackService {
     }
     getImportSeqFiles(formData: FormData): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
-        let headers: Headers = new Headers();
-        //headers.set("Content-Type", "application/x-www-form-urlencoded");
-        //, {headers: headers})
-        return this.http.post("/gnomex/UploadSequenceFileServlet.gx", formData)
-            .pipe(map((response: Response) => {
-                if (response.status === 200) {
-                    return response.json();
-                }
-            }));
-
+        return this.httpClient.post("/gnomex/UploadSequenceFileServlet.gx", formData);
     }
 
     saveOrganism(params: HttpParams):  Observable<any> {
