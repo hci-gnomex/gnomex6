@@ -17,12 +17,15 @@ const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
 }) export class DatePickerComponent implements OnInit, ControlValueAccessor {
 
     // ngModel stuff!
-    private _date: Date;
+    private _date: Date = null;
     private _dateString: string = '';
     private valueHasBeenSet: boolean = false;
 
     set value(value: string) {
-        this._dateString = value;
+        this._dateString = (value === null ? "" : value);
+        if(this._dateString === this.value) {
+            return;
+        }
         this.valueHasBeenSet = true;
 
         // This setTimeout is needed because on initialization, inputs are run before ngOnInit, and
@@ -65,7 +68,12 @@ const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     private onTouchedCallback: () => void = () => {};
     private onChangeCallback: (_: any) => void = () => {};
 
-    writeValue(value: string) { this.value = value; }
+    writeValue(value: string) {
+        if(!value) {
+            this._date = null;
+        }
+        this.value = value;
+    }
 
     public registerOnChange(fn: any)  { this.onChangeCallback = fn; }
     public registerOnTouched(fn: any) { this.onTouchedCallback = fn; }
@@ -130,8 +138,11 @@ const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     }
 
     onChange() {
-        this._dateString = this.value;
-        this.onChangeCallback(this._dateString);
-        this.change.emit(this._dateString);
+        if(this._dateString !== this.value) {
+            this._dateString = this.value;
+            this.onChangeCallback(this._dateString);
+            this.change.emit(this._dateString);
+        }
     }
+
 }
