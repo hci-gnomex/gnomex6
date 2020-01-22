@@ -262,7 +262,8 @@
                                                     <div class="flex-container-row align-center">
                                                         <label class="full-width">Submit experiments in all labs in core</label>
                                                         <context-help name="SubmitterPermissionHelp" tooltipPosition="right"
-                                                                      [isEditMode]="secAdvisor.isSuperAdmin" popupTitle="Submitter Help"></context-help>
+                                                                      [hasEditPermission]="secAdvisor.isSuperAdmin"
+                                                                      popupTitle="Submitter Help"></context-help>
                                                     </div>
                                                     <div class="flex-container-col">
                                                         <mat-checkbox *ngFor="let cf of coreFacilitiesICanSubmitTo" [checked]=cf.isSelected [formControlName]=cf.display>

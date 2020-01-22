@@ -65,7 +65,8 @@
             <li *ngIf="showConsolidatedGenome && consolidatedGenomeInformation?.length > 0" class="full-width flex-container-row">
                 <div class="flex-grow padded">
                     <context-help name="bioSequenceAligned" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
-                                  [isEditMode]="this.createSecurityAdvisorService.isAdmin" popupTitle="Sequence Alignment Help"
+                                  [hasEditPermission]="this.createSecurityAdvisorService.isAdmin"
+                                  popupTitle="Sequence Alignment Help"
                                   label="Do you want the sequence data to be aligned? {{ alignmentNote }}"></context-help>
                     <div *ngFor="let item of consolidatedGenomeInformation" class="flex-container-row align-center">
                         <div class="label-width">
@@ -86,7 +87,8 @@
             <li class="full-width flex-container-row">
                 <div class="flex-grow padded">
                     <context-help name="bioAnalysisAssistance" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
-                                  [isEditMode]="this.createSecurityAdvisorService.isAdmin" popupTitle="Analysis Assistance Help"
+                                  [hasEditPermission]="this.createSecurityAdvisorService.isAdmin"
+                                  popupTitle="Analysis Assistance Help"
                                   label="Would you like the {{ groupName }} to assist you with analysis?"></context-help>
                     <div class="flex-container-row align-center">
                         <div class="label-width margin-top">
@@ -101,7 +103,7 @@
         </ol>
         <div class="full-width flex-container-col padded">
             <context-help name="bioNote" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
-                          [isEditMode]="this.createSecurityAdvisorService.isAdmin" popupTitle="Analysis Note Help"
+                          [hasEditPermission]="this.createSecurityAdvisorService.isAdmin" popupTitle="Analysis Note Help"
                           label="Enter a note regarding analysis. (optional)"></context-help>
             <div class="full-width padded {{bioinformaticsAssist ? 'enable-bordered' : 'disable-bordered'}}">
                 <textarea matInput
