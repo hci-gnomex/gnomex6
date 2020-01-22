@@ -16,7 +16,7 @@ import {first} from "rxjs/operators";
 @Component({
     selector: 'libprep-workflow',
     templateUrl: 'libprep-workflow.html',
-    styles: [`        
+    styles: [`
         
         .grid-min-height {
             min-height: 8em;
@@ -305,6 +305,14 @@ export class LibprepWorkflowComponent {
     }
 
     public onCellValueChanged(event): void {
+        if (event.colDef.headerName === "Library Protocol") {
+            if(event.newValue !== event.oldValue) {
+                event.data.idOligoBarcode = "";
+                event.data.barcodeSequence = "";
+                event.data.idOligoBarcodeB = "";
+                event.data.barcodeSequenceB = "";
+            }
+        }
         this.changedRowMap.set(event.data.key, event.data);
         this.dirty = true;
     }
