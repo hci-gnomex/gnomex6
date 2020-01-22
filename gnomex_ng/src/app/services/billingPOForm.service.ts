@@ -1,11 +1,11 @@
 import {Injectable} from "@angular/core";
-import {Http} from "@angular/http";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import { Observable } from "rxjs";
 import { Subject } from "rxjs";
 
 import {CookieUtilService} from "./cookie-util.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {UtilService} from "./util.service";
 
 @Injectable()
 export class BillingPOFormService {
@@ -17,33 +17,31 @@ export class BillingPOFormService {
     private uploadSucceededSubject: Subject<boolean>;
     private deleteSucceededSubject: Subject<boolean>;
 
-    constructor(private http: Http, private httpClient: HttpClient, private cookieUtilService: CookieUtilService) { }
+    constructor(private httpClient: HttpClient, private cookieUtilService: CookieUtilService) { }
 
     public uploadNewForm(params: any): Observable<boolean> {
 
         this.cookieUtilService.formatXSRFCookie();
 
         if (this.poUpload_URL != null) {
-            // TODO: Convert multipart http calls to httpClient
-            this.http.post(this.poUpload_URL, params).subscribe((response) => {
-                if (response && response.status === 200) {
+            this.httpClient.post(this.poUpload_URL, params).subscribe((response: any) => {
+                if (response && response.result && response.result === "SUCCESS") {
                     this.uploadSucceededSubject.next(true);
                 } else {
                     this.uploadSucceededSubject.next(false);
                 }
-            });
+            }, (err: IGnomexErrorResponse) => {});
         } else {
             this.httpClient.get(BillingPOFormService.getPOUploadURL_URL).subscribe((response: any) => {
                 if(response && response.url) {
-                    this.poUpload_URL = response.url;
-                    // TODO: Convert multipart http calls to httpClient
-                    this.http.post(this.poUpload_URL, params).subscribe((response) => {
-                        if (response && response.status === 200) {
+                    this.poUpload_URL = UtilService.getUrlString(response.url);
+                    this.httpClient.post(this.poUpload_URL, params).subscribe((response: any) => {
+                        if (response && response.result && response.result === "SUCCESS") {
                             this.uploadSucceededSubject.next(true);
                         } else {
                             this.uploadSucceededSubject.next(false);
                         }
-                    });
+                    }, (err: IGnomexErrorResponse) => {});
                 } else {
                     this.uploadSucceededSubject.next(false);
                 }

@@ -383,6 +383,11 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
 
     private initialize(): void {
         this.sideFC.disable();
+        this.assmItemList = [];
+        this.selectedSeqlanes = [];
+        this.allFG.reset();
+        this.allFG.markAsPristine();
+
         if (this.allRequestGridApi) {
             this.allRequestGridApi.setRowData([]);
         }
@@ -760,15 +765,11 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
         this.workflowService.saveWorkItemSolexaAssemble(params).subscribe((response: any) => {
             let responseJSON: any = response;
             if (responseJSON && responseJSON.result && responseJSON.result === "SUCCESS") {
-                this.allFG.reset();
-                this.allFG.markAsPristine();
-
                 if (!responseJSON.flowCellNumber) {
                     responseJSON.flowCellNumber = "";
                 }
 
                 this.dialogsService.alert("Flowcell " + responseJSON.flowCellNumber + " created", null, DialogType.SUCCESS);
-                this.assmItemList = [];
                 this.initialize();
             }
 

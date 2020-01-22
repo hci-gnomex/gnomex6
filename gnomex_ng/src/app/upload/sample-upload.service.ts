@@ -22,6 +22,7 @@ import {
     HttpRequest
 } from "@angular/common/http";
 import {saveAs} from "file-saver";
+import {UtilService} from "../services/util.service";
 
 
 @Injectable()
@@ -52,7 +53,7 @@ export class SampleUploadService {
     private getSampleUpload_URL(): void {
         this.httpClient.get(SampleUploadService.getUploadSampleSheetURL_URL).subscribe((response: any) => {
             if (response && response.url) {
-                this.sampleUpload_URL = response.url;
+                this.sampleUpload_URL = UtilService.getUrlString(response.url);
 
                 this.hasSampleUploadURLSubject.next(this.sampleUpload_URL);
                 this.hasSampleUploadURLSubject.unsubscribe();
@@ -75,10 +76,9 @@ export class SampleUploadService {
         } else {
             this.cookieUtilService.formatXSRFCookie();
 
-            this.http.post("/gnomex/UploadSampleSheetFileServlet.gx", formData).subscribe((response: any) => {
-                if (response && response.status === 200) {
-                    let result = response.json();
-                    this.uploadSampleSheetSubject.next(result);
+            this.httpClient.post(this.sampleUpload_URL, formData).subscribe((response: any) => {
+                if (response) {
+                    this.uploadSampleSheetSubject.next(response);
                 } else {
                     this.uploadSampleSheetSubject.next(null);
                 }
@@ -97,19 +97,9 @@ export class SampleUploadService {
     public uploadBulkSampleSheet(params: any): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
 
-        this.httpClient.get(SampleUploadService.getUploadSampleSheetURL_URL).subscribe((response: any) => {
-            if (response && response.url) {
-                this.sampleUpload_URL = response.url;
+        this.httpClient.post("/gnomex/UploadMultiRequestSampleSheetFileServlet.gx", params).subscribe((response: any) => {
+            this.bulkUploadSubject.next(response);
 
-                this.cookieUtilService.formatXSRFCookie();
-
-                this.http.post('/gnomex/UploadMultiRequestSampleSheetFileServlet.gx', params).subscribe((response: any) => {
-                    this.bulkUploadSubject.next(response.json());
-
-                    }, (err: IGnomexErrorResponse) => {
-                    this.dialogService.stopAllSpinnerDialogs();
-                });
-            }
         }, (err: IGnomexErrorResponse) => {
             this.dialogService.stopAllSpinnerDialogs();
         });

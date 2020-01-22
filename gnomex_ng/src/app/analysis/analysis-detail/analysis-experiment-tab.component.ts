@@ -83,7 +83,7 @@ export class AnalysisExperimentTabComponent implements OnInit, OnDestroy {
     public readonly HYBS: string = "Hybridization";
     public readonly SAMPLE: string = "Sample";
     public readonly SEQ_LANES: string = "SequenceLane";
-    public gridRaidoOpt: string = "Hybridization";
+    public gridRaidoOpt: string;
     private _tabVisible: boolean = false;
     private formGroup: FormGroup;
 
@@ -275,6 +275,7 @@ export class AnalysisExperimentTabComponent implements OnInit, OnDestroy {
     ngOnInit() {
 
         // rowdata  changes based off of grid selected. default is illumnia or longest array size?
+        this.gridRaidoOpt = this.SEQ_LANES;
         this.formGroup = this.fb.group({
             hybsJSONString: this.hybsList,
             lanesJSONString: this.lanesList,
