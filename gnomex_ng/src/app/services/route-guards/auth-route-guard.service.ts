@@ -79,7 +79,6 @@ export class AuthRouteGuardService implements CanActivate {
                 numberObj["isGuest"] = false;
                 return true;
             } else if(!isAuthed && !(res.codeVisbility === "PUBLIC") ) { //the order isn't public and they haven't signed in. Make them sign in
-                this._authenticationService.redirectUrl = "/" + numberObj.urlSegList[0];
                 this._router.navigate(["authenticate"]);
                 return false;
             } else { // order is public

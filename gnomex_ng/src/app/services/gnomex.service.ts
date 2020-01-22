@@ -876,10 +876,12 @@ export class GnomexService {
                     //path = ["experiments","idProject","browsePanel","idRequest"];
                     path = ["experiments"];
                     if(!idInstead){
-                        params = params.set("requestNumber", number);
+                        params = params.set("requestNumber", number)
+                            .set("type", "requestNumber");
                         this.getOrderID(params,path);
                     }else{
                         params = params.set("requestNumber", match[2])
+                            .set("type", "requestNumber")
                             .set("hasID","Y");
                         this.getOrderID(params,path);
                     }
@@ -889,10 +891,12 @@ export class GnomexService {
                     //path =  ["analysis","idLab","analysisPanel","idAnalysis"];
                     path = ["analysis"];
                     if(!idInstead){
-                        params = params.set("analysisNumber", number);
+                        params = params.set("analysisNumber", number)
+                            .set("type", "analysisNumber")
                         this.getOrderID(params,path);
                     }else{
                         params = params.set("analysisNumber",match[2])
+                            .set("type", "analysisNumber")
                             .set("hasID", "Y");
                         this.getOrderID(params,path);
                     }
@@ -903,17 +907,20 @@ export class GnomexService {
                     path = ["datatracks"];
 
                     if(!idInstead){
-                        params = params.set("dataTrackNumber",number);
+                        params = params.set("dataTrackNumber",number)
+                            .set("type", "dataTrackNumber");
                         this.getOrderID(params,path);
                     }else{
                         params = params.set("dataTrackNumber",match[2])
+                            .set("type", "dataTrackNumber")
                             .set("hasID","Y");
                         this.getOrderID(params,path);
                     }
 
                 }else if(match[1].toUpperCase() === 'T'){ // topic doesn't have number only ID
                     if(match[2]){
-                        params = params.set("topicNumber", match[2]);
+                        params = params.set("topicNumber", match[2])
+                            .set("type", "topicNumber");
                     }
                     //path = [ "topics","topicsPanel", "idLab" ] ;
                     path = [ "topics"] ;
@@ -933,10 +940,14 @@ export class GnomexService {
 
     private getOrderID(params:HttpParams,path:string[]){
         this.getOrderFromNumber(params).pipe(first()).subscribe(data =>{
+            this.navService.navMode = NavigationService.URL;
             this.orderInitObj = data;
             this.orderInitObj.urlSegList = path;
+            this.orderInitObj.type = params.get("type");
             let url = this.navService.makeURL(this.orderInitObj);
-            this.router.navigateByUrl(url);
+            this.router.navigateByUrl(url).then((resp) =>{
+                this.navService.emitBrowseTreeSetupSubject();
+            });
         },(err:IGnomexErrorResponse) =>{
             console.debug(err);
         });

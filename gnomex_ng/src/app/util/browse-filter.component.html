@@ -64,16 +64,6 @@
                                       (optionSelected)="onAppUserSelect($event)">
                     </custom-combo-box>
                 </div>
-                <div *ngIf="showBillingAccountComboBox && selectedLab" class="flex-container-row align-center children-spaced">
-                    <label>Account</label>
-                    <custom-combo-box [options]="this.billingAccountList"
-                                      placeholder="Select an Account..."
-                                      [temporaryPlaceholder]="true"
-                                      valueField="idBillingAccount"
-                                      displayField="accountNameDisplay"
-                                      (optionSelected)="onBillingAccountSelect($event)">
-                    </custom-combo-box>
-                </div>
             </div>
             <date-range-filter *ngIf="this.showDateRangePicker" (onChange)="this.onDateRangePickerChange($event)"></date-range-filter>
             <div class="divider" *ngIf="showDateRangePicker && showOrderNumberInput"></div>

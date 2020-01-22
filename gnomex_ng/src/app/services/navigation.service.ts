@@ -21,6 +21,7 @@ export class NavigationService {
 
     private _resetNavModeSubscription:Subscription;
     private resetNavModeSubject: Subject<any> = new Subject<any>();
+    private setupBrowseTree: Subject<any> = new Subject<any>();
     navMode: string;
     public static readonly URL = 'url';
     public static readonly USER = 'usr';
@@ -210,10 +211,12 @@ export class NavigationService {
         for(let i = 0; i < orderInfoKeys.length; i++) {
             let infoKey = orderInfoKeys[i];
             if (infoKey.startsWith("id") && infoKey !== idOrder) {
-                if ( i < orderInfoKeys.length - 1) {
-                    qParamStr +=  infoKey + "=" + orderInfo[infoKey] + "&"
-                } else {
-                    qParamStr += infoKey + "=" + orderInfo[infoKey];
+                if(orderInfo[infoKey]){
+                    if ( i < orderInfoKeys.length - 1) {
+                        qParamStr +=  infoKey + "=" + orderInfo[infoKey] + "&"
+                    } else {
+                        qParamStr += infoKey + "=" + orderInfo[infoKey];
+                    }
                 }
             }
         }
@@ -228,6 +231,17 @@ export class NavigationService {
 
 
         return url;
+    }
+
+    emitBrowseTreeSetupSubject(data?:any):void{
+        if(data){
+            this.setupBrowseTree.next(data);
+        }else{
+            this.setupBrowseTree.next();
+        }
+    }
+    getBrowseTreeSetupSubject():Observable<any>{
+        return this.setupBrowseTree.asObservable();
     }
 
 

@@ -122,8 +122,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
             if(this.datatracksService.previousURLParams && this.datatracksService.previousURLParams["refreshParams"] ){ // this code occurs when searching
                 this.datatracksService.previousURLParams["refreshParams"] = false;
-                this.datatracksService.datatrackListTreeNode = response;
-
             }
 
 

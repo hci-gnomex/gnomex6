@@ -219,6 +219,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     private paramMap:ParamMap;
     private qParamMap:ParamMap;
     private  navToViewMap:any;
+    private browseTreeSubscription: Subscription;
+    private navByLookUp: boolean = false;
 
 
     constructor(private labListService: LabListService, private getLabService: GetLabService,
@@ -267,7 +269,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 this.showMore = true;
                 this.showDateRangePicker = true;
                 this.preselectOnBrowseFilter();
-            } else {
+            } else { // experiment group user view
                 this.showExperimentsRadioGroup = true;
                 this.showDateRangePicker = true;
                 this.showMoreSwitch = true;
@@ -414,6 +416,12 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
             });
         }
 
+
+
+        this.browseTreeSubscription =  this.navigationService.getBrowseTreeSetupSubject()
+            .subscribe(()=>{
+                this.setupFilter(isAdminState,isGuestState);
+            });
     }
 
     setNavParams():void{
@@ -485,6 +493,12 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
             console.debug(e);
         }
 
+    }
+
+    setupFilter(isAdminState:boolean, isGuestState:boolean){
+        this.navByLookUp = true;
+        this.setNavParams();
+        this.preselectOnBrowseFilter();
     }
 
 
@@ -567,9 +581,11 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                     } else {
                         this.ownerList = [];
                     }
-                    setTimeout(()=>{
-                        this.preselectOnBrowseFilter();
-                    })
+                    if(!this.navByLookUp && this.navigationService.navMode === NavigationService.URL){
+                        setTimeout(()=>{
+                            this.preselectOnBrowseFilter();
+                        });
+                    }
                 });
             }
         } else {
@@ -989,6 +1005,10 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     ngOnDestroy(){
         if(this.labListSubscription){
             this.labListSubscription.unsubscribe();
+            this.labListService.resetLabListSubject();
+        }
+        if(this.browseTreeSubscription){
+            this.browseTreeSubscription.unsubscribe();
         }
     }
 

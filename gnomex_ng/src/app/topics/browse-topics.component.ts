@@ -201,7 +201,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
         this.experimentsService.currentTabIndex = 0;
         this.utilService.registerChangeDetectorRef(this.changeDetector);
 
-        this.navService.navMode = !this.navService.navMode ?  NavigationService.URL : NavigationService.USER;
+        this.navService.navMode = this.navService.navMode ?  this.navService.navMode :  NavigationService.URL;
         let activatedRoute = this.navService.getChildActivateRoute(this.route);
         if(activatedRoute){
             activatedRoute.queryParamMap.subscribe((qParam)=>{this.qParamMap = qParam });
