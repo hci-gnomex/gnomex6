@@ -6,7 +6,7 @@
                     <div>Check sample characteristics</div>
                     <context-help name="annotationTabHelp"
                                   [idCoreFacility]="this._experiment.idCoreFacility"
-                                  [isEditMode]="this.secAdvisor.isAdmin"
+                                  [hasEditPermission]="this.secAdvisor.isAdmin"
                                   popupTitle="Annotation Help">
                     </context-help>
                 </div>
@@ -51,7 +51,7 @@
             </div>
             <context-help name="annotationTabAddHelp"
                           [idCoreFacility]="this._experiment.idCoreFacility"
-                          [isEditMode]="this.secAdvisor.isAdmin"
+                          [hasEditPermission]="this.secAdvisor.isAdmin"
                           popupTitle="Add Annotation Help">
             </context-help>
             <div class="padded-right">

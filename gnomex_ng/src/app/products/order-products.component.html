@@ -9,7 +9,7 @@
                               [(ngModel)]="this.idLab">
             </custom-combo-box>
         </div>
-        <context-help name="experimentLab" [isEditMode]="this.isAdminState" popupTitle="Lab Help" tooltipPosition="right"></context-help>
+        <context-help name="experimentLab" [hasEditPermission]="this.isAdminState" popupTitle="Lab Help" tooltipPosition="right"></context-help>
     </div>
     <div *ngIf="this.isAdminState" [hidden]="!this.idLab" class="full-width flex-container-row align-center">
         <div class="half-width">
@@ -18,7 +18,7 @@
                               [(ngModel)]="this.idAppUser">
             </custom-combo-box>
         </div>
-        <context-help name="experimentOwnerName" [isEditMode]="this.isAdminState" popupTitle="Name" tooltipPosition="right"></context-help>
+        <context-help name="experimentOwnerName" [hasEditPermission]="this.isAdminState" popupTitle="Name" tooltipPosition="right"></context-help>
     </div>
     <div [hidden]="!this.idLab" class="full-width padding-bottom flex-container-row align-center">
         <div class="half-width">
@@ -27,7 +27,8 @@
                               [(ngModel)]="this.idBillingAccount">
             </custom-combo-box>
         </div>
-        <context-help name="experimentBillingAccount" [isEditMode]="this.isAdminState" popupTitle="Billing Account Help"></context-help>
+        <context-help name="experimentBillingAccount" [hasEditPermission]="this.isAdminState"
+                      popupTitle="Billing Account Help"></context-help>
         <button mat-button matTooltip="New accounts must be approved before they can be used." (click)="this.showSubmitWorkAuthorization()">Submit Work Authorization</button>
         <button mat-button *ngIf="this.showSplitBillingButton" (click)="this.showSplitBilling()">Split Billing</button>
     </div>
