@@ -39,6 +39,7 @@ export class AuthenticationService {
     public static GENERIC_ERR_MSG: string = "Server error";
 
     private static CONTENT_TYPE: string = "Content-Type";
+    private static CHARSET: string = "charset";
     private static SEC_GOV_CLASS_HEADER: string = "SecurityGovernorClass";
     private static SEC_GOV_ID_HEADER: string = "SecurityGovernorId";
     private static DEIDENT_HEADER: string = "DeidentifiedContext";
@@ -48,6 +49,7 @@ export class AuthenticationService {
     public idpInactivityMinutes: number = 5;
 
     public contentType: string = "application/json";
+    public charsetUTF_8: string = "charset=UTF-8";
     public securityGovernorClass: string = null;
     public securityGovernorId: number = null;
     public limitedContext: boolean = false;
@@ -126,7 +128,23 @@ export class AuthenticationService {
 
         //Don't set content type if already set
         if (req.headers.get(AuthenticationService.CONTENT_TYPE) === null) {
-            headers = headers.set(AuthenticationService.CONTENT_TYPE, this.contentType.toString());
+            //Set content-type as application/json and charset as UTF-8 except when the body of request is FormData;
+            //httpClient POST/PUT calls let the browser handle contentTyep for multipart/form-data contentType.
+            if(!(req.serializeBody() instanceof FormData)) {
+                let contentType = this.contentType;
+                if(!(req.responseType.toLocaleLowerCase() === "blob")) {
+                    contentType = contentType + "; " + this.charsetUTF_8;
+                }
+                headers = headers.set(AuthenticationService.CONTENT_TYPE, contentType.toString());
+            }
+        } else {
+            if(!(req.responseType.toLocaleLowerCase() === "blob")) {
+                let contentType = req.headers.get(AuthenticationService.CONTENT_TYPE);
+                if(!contentType.includes(AuthenticationService.CHARSET)) {
+                    contentType = contentType + "; " + this.charsetUTF_8;
+                    headers = headers.set(AuthenticationService.CONTENT_TYPE, contentType.toString());
+                }
+            }
         }
 
         if (this.securityGovernorClass !== null) {

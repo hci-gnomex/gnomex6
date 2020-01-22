@@ -12,6 +12,7 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
 import {saveAs} from 'file-saver';
 import {PropertyService} from "../../services/property.service";
 import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
+import {UtilService} from "../../services/util.service";
 
 @Component({
     selector: 'upload-file',
@@ -125,7 +126,7 @@ export class UploadFileComponent implements OnInit {
 
         this.uploadURLSubscription =  this.fileService.getUploadOrderUrl(this.manageData.uploadURL).subscribe(resp =>{
             if(resp && resp.url){
-                this.url = resp.url;
+                this.url = UtilService.getUrlString(resp.url);
             }
         },(err:IGnomexErrorResponse) =>{
             this.dialogService.stopAllSpinnerDialogs();
@@ -201,7 +202,7 @@ export class UploadFileComponent implements OnInit {
             this.progressVal = 0;
             this.pCount = 0;
 
-            this.uploadSubscription =  this.uploadSubscription = this.uploadService.uploadFromBrowse(this.rowData,this.url,this.manageData.id)
+            this.uploadSubscription = this.uploadService.uploadFromBrowse(this.rowData, this.url, this.manageData.id)
                 .pipe(take(this.rowData.length)).subscribe( resp =>{
                 this.pCount++;
                 this.progressVal = ((this.pCount) / this.rowData.length) * 100;
@@ -215,7 +216,7 @@ export class UploadFileComponent implements OnInit {
                            this.fileService.emitGetLinkedSampleFiles({idRequest: this.manageData.id['idRequest']})
                         }
                     }else{
-                        this.fileService.emitGetAnalysisOrganizeFiles(this.orgAnalysisFileParams)
+                        this.fileService.emitGetAnalysisOrganizeFiles(this.orgAnalysisFileParams);
                     }
 
                     this.primaryButtonText = "Upload";
