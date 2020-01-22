@@ -18,7 +18,8 @@
 							Core Facility
 						</div>
 						<context-help name="coreFacilityHelp" label="Help me choose" popupTitle="Core Facility Information"
-									  [isEditMode]="this.createSecurityAdvisorService.isSuperAdmin" tooltipPosition="left"></context-help>
+                                      [hasEditPermission]="this.createSecurityAdvisorService.isSuperAdmin"
+                                      tooltipPosition="left"></context-help>
 					</div>
 					<div class="td">
 						<div class="full-width font-small">

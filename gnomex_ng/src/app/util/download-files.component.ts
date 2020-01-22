@@ -19,11 +19,13 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
         <div class="full-height full-width flex-container-col">
             <div class="full-height full-width flex-container-col padded">
                 <div class="flex-container-row align-center justify-space-between">
-                    <label>Drag files or folders that you want to download. Hold CTRL or SHIFT key to select multiple.</label>
+                    <label>
+                        Drag files or folders that you want to download. Hold CTRL or SHIFT key to select multiple.
+                    </label>
                     <context-help name="downloadhelp" 
                                   label="Download Help"
                                   popupTitle="Download Help"
-                                  [isEditMode]="securityAdvisor.isAdmin">
+                                  [hasEditPermission]="this.securityAdvisor.isAdmin">
                     </context-help>
                 </div>
                 <div class="trees-container">
@@ -80,7 +82,8 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
                     </label>
                 </div>
             </div>
-            <mat-dialog-actions class="justify-flex-end no-margin no-padding generic-dialog-footer-colors">
+            <mat-dialog-actions
+                    class="justify-flex-end no-margin no-padding generic-dialog-footer-colors">
                 <div class="double-padded-right">
                     <button mat-raised-button 
                             color="primary" 

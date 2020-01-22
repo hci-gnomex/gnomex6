@@ -224,7 +224,7 @@
                         <div class="heading">
                             Which organism is the source for these samples?
                             <context-help name="SampleDetailsOrganism"
-                                          [isEditMode]="this.securityAdvisor.isAdmin"
+                                          [hasEditPermission]="this.securityAdvisor.isAdmin"
                                           [idCoreFacility]="this.idCoreFacility"
                                           popupTitle="Sample Organism Help">
                             </context-help>
