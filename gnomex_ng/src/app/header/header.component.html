@@ -1,9 +1,23 @@
-<div #headerRef class="full-width header-one small-font align-center overflow-auto" *ngIf="this.gnomexService.isLoggedIn">
-    <div class="flex-container-row align-center">
-        <div class="flex-grow">
+<div #headerRef
+     *ngIf="this.gnomexService.isLoggedIn"
+     class="full-width header-one small-font align-center overflow-auto animation"
+     (mouseenter)="onMouseIn($event)"
+     (mouseleave)="onMouseOut($event)">
+    <div class="flex-container-row align-center foreground">
+        <div class="flex-grow flex-container-row">
             <a [routerLink]="['/home']">
                 <img [src]="'./assets/gnomex_logo_hdr.png'" alt="">
             </a>
+            <div class="flex-container-row flex-grow align-center">
+                <div class="flex-grow">
+                </div>
+                <button mat-raised-button class="minimize" (click)="togglePinned()">
+                    <img *ngIf="headerIsPinned"  [src]="'./assets/Collapse.png'" alt="">
+                    <img *ngIf="!headerIsPinned" [src]="'./assets/pushpin.png'" alt="">
+                </button>
+                <div class="flex-grow">
+                </div>
+            </div>
         </div>
         <div class="flex-container-row padded-left-right align-center">
             <mat-form-field class="padded-left-right"
@@ -84,5 +98,8 @@
             </span>
         </span>
     </div>
+    <div #bottomNonCollapsing class="flex-container-row minor-height">
+    </div>
 </div>
-<div #spacerRef></div>
+<div #spacerRef class="animation collapse-bar">
+</div>
