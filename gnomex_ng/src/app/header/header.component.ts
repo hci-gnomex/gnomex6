@@ -92,6 +92,23 @@ import {first} from "rxjs/operators";
         .horizontal-spacer {
             width: 2em;
         }
+
+        .minor-height {
+            height: 1em;
+        }
+        
+        .collapse-bar {
+            background-color: #eeeeee;
+            border-bottom: 1px solid silver;
+        }
+        
+        .animation {
+            -webkit-transition: .5s ease-in-out;
+            -moz-transition: .5s ease-in-out;
+            -o-transition: .5s ease-in-out;
+            transition: .5s ease-in-out;
+        }
+        
     `],
     encapsulation: ViewEncapsulation.None
 })
@@ -100,6 +117,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     @ViewChild('headerRef') headerRef: ElementRef;
     @ViewChild('spacerRef') spacerRef: ElementRef;
+    @ViewChild('bottomNonCollapsing') bottomNonCollapsing: ElementRef;
 
     options: FormGroup;
     private readonly serviceParams: any;
@@ -149,6 +167,9 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
     private userNonSubmitterNavItems: any[];
     private userESNavItems: any[];
     private guestNavItems: any[];
+
+    private headerIsExpanded: boolean = true;
+    public headerIsPinned: boolean = true;
 
     private currentState: string;
     private isAdminState: boolean = false;
@@ -210,8 +231,17 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
 
             this.headerHeight = this.headerRef.nativeElement.offsetHeight;
 
-            this.spacerRef.nativeElement.style.height = 'initial';
-            this.spacerRef.nativeElement.style.height = '' + Math.ceil(this.headerHeight) + 'px';
+            // this.spacerRef.nativeElement.style.height = 'initial';
+
+            if (!this.headerIsPinned) {
+                if (this.headerIsExpanded) {
+                    this.spacerRef.nativeElement.style.height = "" + Math.ceil(this.headerHeight - 1) + "px";
+                } else {
+                    this.spacerRef.nativeElement.style.height = "" + Math.ceil(this.headerHeight - 1 - this.bottomNonCollapsing.nativeElement.offsetTop) + "px";
+                }
+            } else {
+                this.spacerRef.nativeElement.style.height = "" + Math.ceil(this.headerHeight - 1) + "px";
+            }
         }
     }
 
@@ -2347,6 +2377,34 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
     public ifPressEnterSearchByText(event: any) {
         if (event && event.key && event.key === "Enter") {
             this.searchByText();
+        }
+    }
+
+    public onMouseIn(event: any): void {
+        this.headerRef.nativeElement.style.top = "0px";
+        this.spacerRef.nativeElement.style.height = "" + Math.ceil(this.headerHeight - 1) + "px";
+        this.headerIsExpanded = true;
+    }
+
+    public onMouseOut(event: any): void {
+        if (!this.headerIsPinned) {
+            this.headerRef.nativeElement.style.top = "" + (-1 * this.bottomNonCollapsing.nativeElement.offsetTop) + "px";
+            this.spacerRef.nativeElement.style.height = "" + Math.ceil(this.headerHeight - 1 - this.bottomNonCollapsing.nativeElement.offsetTop) + "px";
+            this.headerIsExpanded = false;
+        }
+    }
+
+    public togglePinned() {
+        this.headerIsPinned = !this.headerIsPinned;
+
+        if (this.headerIsPinned) {
+            if (this.headerIsExpanded) {
+                this.spacerRef.nativeElement.style.height = "" + Math.ceil(this.headerHeight - 1) + "px";
+            } else {
+                this.spacerRef.nativeElement.style.height = "" + Math.ceil(this.headerHeight - 1 - this.bottomNonCollapsing.nativeElement.offsetTop) + "px";
+            }
+        } else {
+            this.spacerRef.nativeElement.style.height = "" + Math.ceil(this.headerHeight - 1) + "px";
         }
     }
 }

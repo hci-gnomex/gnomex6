@@ -139,18 +139,23 @@ export class Sample implements OnDestroy {
     }
     public set application_object(value: any) {
         this._application = value;
+        // if new experiment 'number' should be null or '' if browse experiment it should have a value
+        // for new experiment we want this cascading effect to occur and be ignored for browse experiment
+        if(!this._experiment || !this._experiment.number){
+            if (value && value.codeApplication) {
+                let lookup = this.dictionaryService.getProtocolFromApplication(value.codeApplication);
 
-        if (value && value.codeApplication) {
-            let lookup = this.dictionaryService.getProtocolFromApplication(value.codeApplication);
-
-            if (lookup && lookup.idSeqLibProtocol) {
-                this.idSeqLibProtocol = lookup.idSeqLibProtocol;
+                if (lookup && lookup.idSeqLibProtocol) {
+                    this.idSeqLibProtocol = lookup.idSeqLibProtocol;
+                } else {
+                    this.idSeqLibProtocol = '';
+                }
             } else {
                 this.idSeqLibProtocol = '';
             }
-        } else {
-            this.idSeqLibProtocol = '';
         }
+
+
     }
 
     public get experiment(): Experiment {

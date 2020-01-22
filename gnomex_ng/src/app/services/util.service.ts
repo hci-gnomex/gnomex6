@@ -103,6 +103,16 @@ export class UtilService {
     public static getSubStr(strItem: string, length: number, fromIndex?: number): string {
          return strItem.length > length ? strItem.substr(fromIndex ? fromIndex : 0, length) + "..." : strItem;
     }
+
+    public static getUrlString(url: string): string {
+        let urlString: string = url.substring(0, url.indexOf(";"));
+        if(urlString) {
+            return urlString.substring(urlString.indexOf("gnomex") - 1, urlString.length);
+        } else {
+            return url.substring(url.indexOf("gnomex") - 1, url.length);
+        }
+    }
+
     public static getFileNodesToDrag(tree: TreeModel): Set<TreeNode> {
         let nodes: Set<TreeNode> = new Set<TreeNode>();
 

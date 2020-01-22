@@ -14,7 +14,8 @@
                           [formControlName]="'isCustom'">
         </custom-combo-box>
         <context-help *ngIf="!this.canEnterPrice || this.secAdvisor.isSuperAdmin"
-                      name="ExperimentPlatformPricingHelp" [isEditMode]="this.secAdvisor.isSuperAdmin"
+                      name="ExperimentPlatformPricingHelp"
+                      [hasEditPermission]="this.secAdvisor.isSuperAdmin"
                       label="Why can't I edit prices?" popupTitle="Pricing Help"
                       tooltipPosition="right"></context-help>
         <div style="align-items: center" class="flex-container-row">

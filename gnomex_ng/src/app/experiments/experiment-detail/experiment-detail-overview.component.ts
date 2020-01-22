@@ -284,7 +284,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
 
         let experimentOverviewForm: FormGroup = this.experimentService.experimentOverviewForm;
 
-        Object.keys(experimentOverviewForm.controls).forEach(key => {
+        for(let key in experimentOverviewForm.controls) {
             if(key === "AnnotationTabComponent") {
                 this.orderValidateService.emitOrderValidateSubject();
                 this._experiment.RequestProperties = this.orderValidateService.annotationsToSave;
@@ -292,18 +292,24 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                 // Saved already. Skip BillingTemplateWindowComponent;
             } else {
                 let experimentTabForm: FormGroup = <FormGroup>experimentOverviewForm.get(key);
-                Object.keys(experimentTabForm.controls).forEach(k => {
+                // first phase, will need to disconnect setting the model from the experiment overview form.
+                // just want model to be saved independently
+                if(key === "ExperimentOverviewTabComponent"){
+                    continue;
+                }
+                for (let k in experimentTabForm.controls) {
                     let val = experimentTabForm.get(k).value;
-                    if(val) {
-                        if(k.includes("JSONString")) {
+                    if (val) {
+                        if (k.includes("JSONString")) {
                             this._experiment[k] = JSON.stringify(experimentTabForm.get(k).value);
                         } else {
                             this._experiment[k] = experimentTabForm.get(k).value;
                         }
                     }
-                });
+                }
+
             }
-        });
+        }
 
         this.replaceArrayItems();
 

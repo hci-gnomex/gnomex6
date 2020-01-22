@@ -10,6 +10,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -111,6 +114,14 @@ public class UploadPurchaseOrder extends HttpServlet {
             sess.flush();
             // Delete the file now that we are finished
             file.delete();
+
+            JsonObject value = Json.createObjectBuilder()
+                                   .add("result", "SUCCESS")
+                                   .build();
+            res.setContentType("application/json; charset=UTF-8");
+            JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
+            jsonWriter.writeObject(value);
+            jsonWriter.close();
 
         } catch (Exception e) {
             HibernateSession.rollback();

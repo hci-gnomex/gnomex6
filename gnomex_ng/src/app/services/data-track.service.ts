@@ -1,10 +1,9 @@
 import {Injectable} from "@angular/core";
-import {Http, Headers, Response} from "@angular/http";
 import {BehaviorSubject, Observable, of, throwError} from "rxjs";
 import {Subject} from "rxjs";
 import {CookieUtilService} from "./cookie-util.service";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
-import {catchError, map, takeUntil} from "rxjs/operators";
+import {catchError, map} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../util/popup/dialogs.service";
 
@@ -17,14 +16,13 @@ export class DataTrackService {
     private _datatrackListTreeNode: BehaviorSubject<any> = new BehaviorSubject<any>(null);
     private _labList: any[] = [];
     private _activeNodeToSelect: any = {};
-    private _endSubscriptDTTreeNode: boolean = false;
-    private destroy: Subject<boolean> = new Subject<boolean>();
+
     public static readonly ORGANISM: string = 'organism';
     public static readonly GENOME_BUILD:string = 'genomebuild';
     public static readonly FOLDER:string = 'folder';
     public static readonly DATA_TRACK:string= 'detail';
 
-    constructor(private http: Http, private cookieUtilService: CookieUtilService,
+    constructor(private cookieUtilService: CookieUtilService,
                 private httpClient: HttpClient,
                 private dialogService: DialogsService) {
     }
@@ -205,16 +203,7 @@ export class DataTrackService {
     }
     getImportSeqFiles(formData: FormData): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
-        let headers: Headers = new Headers();
-        //headers.set("Content-Type", "application/x-www-form-urlencoded");
-        //, {headers: headers})
-        return this.http.post("/gnomex/UploadSequenceFileServlet.gx", formData)
-            .pipe(map((response: Response) => {
-                if (response.status === 200) {
-                    return response.json();
-                }
-            }));
-
+        return this.httpClient.post("/gnomex/UploadSequenceFileServlet.gx", formData);
     }
 
     saveOrganism(params: HttpParams):  Observable<any> {

@@ -179,7 +179,8 @@ export class SequenceFilesDialog extends BaseGenericContainerDialog implements O
                         this.progressVal = ((idx + 1) / this.fileInfoList.length) * 100;
                         this.save(this.fileInfoList,idx + 1);
 
-                });
+                }, (err: IGnomexErrorResponse) => {
+            });
 
         } else if( idx === this.fileInfoList.length){
             let params: HttpParams = new HttpParams()

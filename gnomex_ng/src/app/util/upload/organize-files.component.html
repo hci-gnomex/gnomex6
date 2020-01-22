@@ -17,7 +17,7 @@
                 <img [src]="constService.SEGMENT_IMPORT" >
                 Rename file </button>
             <context-help name="organizeFilesHelp" popupTitle="Organize Files Help"
-                          label="Help" [isEditMode]="this.secAdvisor.isAdmin"></context-help>
+                          label="Help" [hasEditPermission]="this.secAdvisor.isAdmin"></context-help>
         </div>
         <button mat-button color="primary" (click)="refresh()" >
             <img [src]="constService.ICON_REFRESH" >
