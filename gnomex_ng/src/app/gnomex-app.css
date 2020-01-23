@@ -233,6 +233,13 @@ mat-tab-group.flex-style mat-tab-header .mat-tab-label-container .mat-tab-list .
     background-color: white !important;
 }
 
+.silver-bordered-gutter .as-split-gutter.ng-star-inserted {
+    border-style: solid !important;
+    border-color: silver !important;
+    border-width: 0 1px 0 1px !important;
+}
+
+
 .no-height {
     height: 0;
     min-height: 0;
