@@ -16,6 +16,8 @@
 
 <Manager pathname="" />
 
+<!-- <Valve className="org.apache.catalina.valves.rewrite.RewriteValve" /> -->
+
   <!-- GNomEx Realm for authenticating user (LDAP) -->    
       
        <Realm className="hci.gnomex.security.tomcat.GNomExLDAPRealm"

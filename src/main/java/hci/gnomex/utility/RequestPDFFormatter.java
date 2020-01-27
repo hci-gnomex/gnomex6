@@ -33,6 +33,7 @@ import hci.gnomex.model.Sample;
 import hci.gnomex.model.SequenceLane;
 import hci.gnomex.security.SecurityAdvisor;
 
+
 public class RequestPDFFormatter extends RequestPDFFormatterBase {
 	
 	private String amendState;

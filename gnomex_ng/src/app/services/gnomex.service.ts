@@ -57,6 +57,8 @@ export class GnomexService {
     public showBioinformaticsLinks: boolean = true;
     public showCoreGenomicsLinks: boolean = true;
     public isUniversityUserAuthentication: boolean = false;
+    public maintenanceMode: boolean = false;
+    public logoOrMaint: string = 'assets/gnomex_logo_hdr.png';
     public idCoreFacilityHTG: any;
     public idCoreFacilityDNASeq: any;
     public idCoreFacilityMolecular: any;
@@ -99,6 +101,7 @@ export class GnomexService {
 
     public disableUserSignup: boolean = false;
     public noGuestAccess: boolean = true;
+    public maintenanceSplash: string;
 
 
     constructor(
@@ -883,10 +886,10 @@ export class GnomexService {
         //idInstead equals true means using you'll be using the id in place of the number
         // it still should have a letter in it for example for a request '12425R'
 
-        if(number){
+        if (number) {
             let match = number.match(/([A-Za-z]*)([0-9]+)([A-Za-z]?)/);
             let path:Array<string> = [];
-            if(match){
+            if(match) {
                 if( match[3].toUpperCase() === 'R'){
 
                     //path = ["experiments","idProject","browsePanel","idRequest"];
@@ -906,30 +909,30 @@ export class GnomexService {
                     //path =  ["analysis","idLab","analysisPanel","idAnalysis"];
                     path = ["analysis"];
                     let sub = this.navInitBrowseAnalysisSubject;
-                    if(!idInstead){
+                    if(!idInstead) {
                         params = params.set("analysisNumber", number);
                         this.getOrderID(params,path,sub);
-                    }else{
+                    } else {
                         params = params.set("analysisNumber",match[2])
                             .set("hasID", "Y");
                         this.getOrderID(params,path,sub);
                     }
 
-                }else if(match[1].toUpperCase()=== 'DT' ){
+                } else if(match[1].toUpperCase()=== 'DT' ) {
 
                     //path = ["datatracks","idGenomeBuild","datatracksPanel","idDataTrack"];
                     path = ["datatracks"];
                     let sub = this.navInitBrowseDatatrackSubject;
-                    if(!idInstead){
+                    if(!idInstead) {
                         params = params.set("dataTrackNumber",number);
                         this.getOrderID(params,path,sub);
-                    }else{
+                    } else {
                         params = params.set("dataTrackNumber",match[2])
                             .set("hasID","Y");
                         this.getOrderID(params,path,sub);
                     }
 
-                }else if(match[1].toUpperCase() === 'T'){ // topic doesn't have number only ID
+                } else if(match[1].toUpperCase() === 'T') { // topic doesn't have number only ID
                     if(match[2]){
                         params = params.set("topicNumber", match[2]);
                     }
@@ -940,7 +943,7 @@ export class GnomexService {
                 }
 
             }
-        }else{
+                } else {
             this.dialogService.alert("Lookup ID is Invalid", null, DialogType.VALIDATION);
         }
     }
@@ -1000,6 +1003,11 @@ export class GnomexService {
             if (response && response.result === "SUCCESS") {
                 this.disableUserSignup = response[PropertyService.PROPERTY_DISABLE_USER_SIGNUP];
                 this.noGuestAccess = response[PropertyService.PROPERTY_NO_GUEST_ACCESS];
+                this.maintenanceMode = response[PropertyService.PROPERTY_MAINTENANCEMODE];
+                this.maintenanceSplash = response[PropertyService.PROPERTY_MAINTENANCE_SPLASH];
+                if (this.maintenanceMode) {
+                    this.logoOrMaint = this.maintenanceSplash;
+                }
             }
         }, (err: IGnomexErrorResponse) => {
         });

@@ -9,6 +9,7 @@ import hci.gnomex.constants.Constants;
 import hci.gnomex.model.TransferLog;
 import hci.gnomex.security.InvalidSecurityAdvisorException;
 import hci.gnomex.security.SecurityAdvisor;
+import hci.gnomex.utility.FileUtil;
 import hci.gnomex.utility.GnomexFile;
 import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.ServletUtil;
@@ -157,6 +158,7 @@ public abstract class UploadFileServletBase extends HttpServlet {
 						System.out.println(this.getClass().getSimpleName() + ": Unable to create directory " + data.uploadDirectory);
 						throw new ServletException("Unable to upload file due to a server error.  Please contact GNomEx support.");
 					}
+					FileUtil.chmod ("770",data.uploadDirectory);
 				}
 
 				boolean uploadedAnyFiles = false;

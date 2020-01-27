@@ -100,7 +100,7 @@ export class CreateSecurityAdvisorService {
 
     public get myCoreFacilities(): any[] {
         if (this.allowAllCoreFacilities) {
-            return this.dictionaryService.getEntriesExcludeBlank(DictionaryService.CORE_FACILITY);
+            return this.dictionaryService.getEntriesExcludeBlankCF(DictionaryService.CORE_FACILITY);
         } else {
             return this.dictionaryService.getEntryArray(DictionaryService.CORE_FACILITY, this.myCoreFacilitiesIds);
         }
@@ -108,7 +108,7 @@ export class CreateSecurityAdvisorService {
 
     public get coreFacilitiesICanManage(): any[] {
         if (this.allowAllCoreFacilities) {
-            return this.dictionaryService.getEntriesExcludeBlank(DictionaryService.CORE_FACILITY);
+            return this.dictionaryService.getEntriesExcludeBlankCF(DictionaryService.CORE_FACILITY);
         } else {
             return this.dictionaryService.getEntryArray(DictionaryService.CORE_FACILITY, this.coreFacilitiesICanManageIds);
         }
@@ -116,7 +116,7 @@ export class CreateSecurityAdvisorService {
 
     public get coreFacilitiesICanSubmitTo(): any[] {
         if (this.allowAllCoreFacilities) {
-            return this.dictionaryService.getEntriesExcludeBlank(DictionaryService.CORE_FACILITY);
+            return this.dictionaryService.getEntriesExcludeBlankCF(DictionaryService.CORE_FACILITY);
         } else {
             return this.dictionaryService.getEntryArray(DictionaryService.CORE_FACILITY, this.coreFacilitiesICanSubmitToIds);
         }

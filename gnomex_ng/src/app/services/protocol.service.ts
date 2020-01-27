@@ -1,6 +1,6 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpParams} from "@angular/common/http";
-import {CookieUtilService} from "./cookie-util.service";
+import { Injectable } from '@angular/core';
+import {HttpClient, HttpErrorResponse, HttpParams} from "@angular/common/http";
+import { CookieUtilService } from "./cookie-util.service";
 import {Observable, Subject} from "rxjs";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../util/popup/dialogs.service";
@@ -47,14 +47,17 @@ export class ProtocolService {
 
         this.httpClient.get('gnomex/GetProtocol.gx', {params: params})
             .subscribe((result) => {
-                this.protocolSubject.next(result);
-            }, (err: IGnomexErrorResponse) => {
+            this.protocolSubject.next(result);
+        }, (err: IGnomexErrorResponse) => {
                 this.dialogService.stopAllSpinnerDialogs();
             });
     }
 
-    public getProtocolList(params?: HttpParams): void {
-        let protocolCallBackFn =  (result: any) => {
+
+
+
+    public getProtocolList(params?:HttpParams): void {
+        let protocolCallBackFn =  (result:any) => {
             if (result) {
                 if (Array.isArray(result)) {
                     this.protocolListSubject.next(result);
@@ -67,14 +70,12 @@ export class ProtocolService {
             }
         };
 
-        if(params) {
-            this.httpClient.get("gnomex/GetProtocolList.gx", {params: params})
-                .subscribe(protocolCallBackFn, (err: IGnomexErrorResponse) => {
+        if(params){
+            this.httpClient.get('/gnomex/GetProtocolList.gx',{params: params}).subscribe(protocolCallBackFn, (err:IGnomexErrorResponse) =>{
                 this.dialogService.stopAllSpinnerDialogs();
-            });
-        } else {
-            this.httpClient.get("gnomex/GetProtocolList.gx")
-                .subscribe(protocolCallBackFn, (err: IGnomexErrorResponse) => {
+            })
+        }else{
+            this.httpClient.get('/gnomex/GetProtocolList.gx').subscribe(protocolCallBackFn, (err:IGnomexErrorResponse) =>{
                 this.dialogService.stopAllSpinnerDialogs();
             });
         }
@@ -82,10 +83,10 @@ export class ProtocolService {
 
     }
 
-    public saveProtocol(params: HttpParams): Observable<any> { // used for experiment platform
+    public saveProtocol(params:HttpParams): Observable<any>{ // used for experiment platform
         this.cookieUtilService.formatXSRFCookie();
         return this.httpClient.post("/gnomex/SaveProtocol.gx", null, {params: params});
-    }
+        }
 
     public saveNewProtocol(protocolName: string, codeRequestCategory: string, protocolClassName: string, idAnalysisType: string): void {
         this.cookieUtilService.formatXSRFCookie();

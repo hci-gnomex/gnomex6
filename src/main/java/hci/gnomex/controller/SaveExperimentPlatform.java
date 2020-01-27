@@ -74,6 +74,9 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     if (request.getParameter("type") == null || request.getParameter("type").equals("")) {
       setResponsePage(this.ERROR_JSP);
       this.addInvalidField("Null Platform Type", "The Experiment Platform type cannot be null");
+      this.errorDetails = Util.GNLOG(LOG, "The Experiment Platform type cannot be null",null);
+
+
     }
 
     if (request.getParameter("customWarningMessage") != null && !request.getParameter("customWarningMessage").equals("")) {
@@ -1212,10 +1215,12 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
           id = cat.getIdPriceCategory();
         } else {
           LOG.error("SaveExperimentPlatform: Invalid default illumina lib prep price category name -- " + catName);
+          this.errorDetails = Util.GNLOG(LOG,"SaveExperimentPlatform: Invalid default illumina lib prep price category name -- " + catName, null);
           return null;
         }
       } catch (HibernateException e) {
         LOG.error("SaveExperimentPlatform: Invalid default illumina lib prep price category name -- " + catName, e);
+        this.errorDetails = Util.GNLOG(LOG,"SaveExperimentPlatform: Invalid default illumina lib prep price category name -- " + catName, e);
         return null;
       }
     }
@@ -1239,10 +1244,12 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
           id = cat.getIdPriceCategory();
         } else {
           LOG.error("SaveExperimentPlatform: Invalid default sequenom price category name -- " + catName);
+          this.errorDetails = Util.GNLOG(LOG,"SaveExperimentPlatform: Invalid default sequenom price category name -- " + catName, null);
           return null;
         }
       } catch (HibernateException e) {
         LOG.error("SaveExperimentPlatform: Invalid default sequenom price category name -- " + catName, e);
+        this.errorDetails = Util.GNLOG(LOG,"SaveExperimentPlatform: Invalid default sequenom price category name -- " + catName, e);
         return null;
       }
     }
@@ -1263,6 +1270,7 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
       if (defaultCategoryId == null) {
         // no default price category -- can't store new price.
         LOG.error("SaveExperimentPlatform: Unable to store new lib prep price due to no default category for " + rc.getCodeRequestCategory());
+        this.errorDetails = Util.GNLOG(LOG,"SaveExperimentPlatform: Unable to store new lib prep price due to no default category for " + rc.getCodeRequestCategory(), null);
         return;
       }
       price = new Price();
@@ -1311,6 +1319,8 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
       if (defaultCategoryId == null) {
         // no default price category -- can't store new price.
         LOG.error("SaveExperimentPlatform: Unable to store new sequenom price due to no default category for " + rc.getCodeRequestCategory());
+        this.errorDetails = Util.GNLOG(LOG,"SaveExperimentPlatform: Unable to store new lib prep price due to no default category for " + rc.getCodeRequestCategory(), null);
+
         return;
       }
       price = new Price();
@@ -1367,6 +1377,7 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
       modified = PriceUtil.setPrice(attributeValue, existingPrice, price, whichPrice);
     } catch (NumberFormatException e) {
       LOG.error("Unable to parse price: " + attributeValue, e);
+      this.errorDetails = Util.GNLOG(LOG,"SaveExperimentPlatform -- Unable to parse price: " + attributeValue, e);
     }
 
     return modified;
@@ -1388,10 +1399,12 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
         id = cat.getIdPriceCategory();
       } else {
         LOG.error("SaveExperimentPlatform: Unable to determine price category for request category " + rc.getCodeRequestCategory());
+        this.errorDetails = Util.GNLOG(LOG,"SaveExperimentPlatform: Unable to determine price category for request category " + rc.getCodeRequestCategory(), null);
         return null;
       }
     } catch (HibernateException e) {
       LOG.error("SaveExperimentPlatform: Unable to determine price category for request category " + rc.getCodeRequestCategory(), e);
+      this.errorDetails = Util.GNLOG(LOG,"SaveExperimentPlatform: Unable to determine price category for request category " + rc.getCodeRequestCategory(), e);
       return null;
     }
 
@@ -1606,6 +1619,7 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
           id = cat.getIdPriceCategory();
         } else {
           LOG.error("SaveExperimentPlatform: Invalid default illumina seq option price category name -- " + catName);
+          this.errorDetails = Util.GNLOG(LOG, "SaveExperimentPlatform: Invalid default illumina seq option price category name -- " + catName, null);
           id = null;
         }
       } catch (HibernateException e) {
@@ -1633,10 +1647,13 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
           id = cat.getIdPriceCategory();
         } else {
           LOG.error("SaveExperimentPlatform: Invalid default isolation prep type price category name -- " + catName);
+          this.errorDetails = Util.GNLOG(LOG, "SaveExperimentPlatform: Invalid default isolation prep type price category name -- " + catName, null);
+
           id = null;
         }
       } catch (HibernateException e) {
         LOG.error("SaveExperimentPlatform: Invalid default isolation prep type price category name -- " + catName, e);
+        this.errorDetails = Util.GNLOG(LOG, "SaveExperimentPlatform: Invalid default isolation prep type price category name -- " + catName, e);
         id = null;
       }
     }
@@ -1722,6 +1739,7 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
         }
       } catch (Exception e) {
         LOG.error("Error in SaveExperimentPlatform", e);
+        this.errorDetails = Util.GNLOG(LOG, "Error in SaveExperimentPlatform getnextassignedappnumber ",e);
       }
     }
     return lastNumber + 1;
@@ -1759,6 +1777,7 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
         }
       } catch (Exception e) {
         LOG.error("Error in SaveExperimentPlatform", e);
+        this.errorDetails = Util.GNLOG(LOG, "Error in SaveExperimentPlatform getNextAssignedRequestCategoryNumber ",e);
       }
     }
     return lastNumber + 1;

@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import javax.json.Json;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -44,6 +45,7 @@ private String dataTrackFileServerURL;
 private String dataTrackFileServerWebContext;
 private Integer idAnalysisFile;
 private Integer idAnalysis;
+private String analysisNumber;
 private String pathName;
 
 public static final Pattern TO_STRIP = Pattern.compile("\\n");
@@ -77,6 +79,12 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 		idAnalysis = new Integer(request.getParameter("idAnalysis"));
 	}
 
+	analysisNumber = null;
+	if (request.getParameter("analysisNumber") != null && !request.getParameter("analysisNumber").equals("")) {
+		analysisNumber = request.getParameter("analysisNumber");
+	}
+
+	System.out.println ("[MakeDataTrackLinks] idAnalysis: " + idAnalysis + " pathName: " + pathName);
 	serverName = request.getServerName();
 }
 
@@ -120,8 +128,19 @@ public Command execute() throws RollBackCommandException {
 
 			// post results with link urls
 			System.out.println("[MakeDataTrackUCSCLinks] url1: " + url1);
-			this.xmlResult = "<SUCCESS ucscURL1=\"" + url1 + "\" ucscURL2=\"" + url2 + "\"" + "/>";
+
+
+//			this.xmlResult = "<SUCCESS ucscURL1=\"" + url1 + "\" ucscURL2=\"" + url2 + "\"" + "/>";
+//			setResponsePage(this.SUCCESS_JSP);
+
+
+			this.jsonResult =  Json.createObjectBuilder()
+					.add("result", "SUCCESS")
+					.add("ucscURL1", url1 ) //"<SUCCESS urlsToLink=\"" +  theURL + "\"" + "/>";
+					.add("ucscURL2", url2 ).build().toString();
 			setResponsePage(this.SUCCESS_JSP);
+
+
 
 		} else {
 			this.addInvalidField("insufficient permission", "Insufficient permission to access data track");
@@ -190,7 +209,12 @@ private ArrayList<String> makeUCSCLink(Session sess) throws Exception {
 	} else {
 
 		// check genome has UCSC name
-		Analysis analysis = (Analysis) sess.load(Analysis.class, idAnalysis);
+		Analysis analysis = null;
+		if (idAnalysis != null) {
+        	analysis = (Analysis) sess.load(Analysis.class, idAnalysis);
+		} else if (analysisNumber != null) {
+			analysis = GetAnalysis.getAnalysisFromAnalysisNumber(sess, analysisNumber);
+		}
 		Set<GenomeBuild> gvs = analysis.getGenomeBuilds();
 		if (gvs != null) {
 			GenomeBuild gv = gvs.iterator().next();

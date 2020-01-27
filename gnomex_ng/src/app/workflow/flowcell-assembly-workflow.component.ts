@@ -338,7 +338,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
         this.runFC        = new FormControl("", Validators.pattern("^[0-9]*$"));
         this.createDateFC = new FormControl("");
         this.instrumentFC = new FormControl("");
-        this.protocolFC   = new FormControl("", Validators.required);
+        this.protocolFC   = new FormControl("");
         this.sideFC = new FormControl("");
 
         this.createDateFC.disable();
@@ -571,9 +571,10 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
                         this.sideFC.disable();
                         this.sideFC.setValue(null);
                         this.sideFC.clearValidators();
-                    }else{
-                        this.sideFC.setValidators(Validators.required);
-                        this.sideFC.updateValueAndValidity();
+                    }
+                    else{
+//                        this.sideFC.setValidators(Validators.required);
+//                      this.sideFC.updateValueAndValidity();
                         this.sideFC.enable();
 
                     }

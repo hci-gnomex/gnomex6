@@ -492,7 +492,8 @@ private boolean makeSoftLinkViaUNIXCommandLine(String path, ArrayList<String[]> 
 		script.createNewFile();
 		BufferedWriter bw = new BufferedWriter(new FileWriter(script));
 		for (String[] links : linksToMake) {
-			bw.write("ln -s \"" + links[0] + "\" \"" + links[1] + "\"\n");
+//			bw.write("ln -s \"" + links[0] + "\" \"" + links[1] + "\"\n");
+			bw.write("ln -s '" + links[0] + "' '" + links[1] + "'\n");
 		}
 		bw.close();
 
