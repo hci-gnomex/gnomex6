@@ -10,7 +10,7 @@ import java.io.*;
 
 public class JSONtoXML {
     public static boolean debugHint = false;
-    public static boolean debugConvert = true;
+    public static boolean debugConvert = false;
     public static boolean debugTesting = false;
 
     public HashMap initHints(String fileName) throws Exception {
@@ -470,6 +470,10 @@ public class JSONtoXML {
 
         // get the hint information
         HintInformation theHint = (HintInformation) xmlHashMap.get(hintKey);
+        if (theHint == null) {
+            System.out.println ("[JSONtoXML] *** WARNING WARNING WARNING *** theHint is null, hintKey: " + hintKey);
+            return null;
+        }
         String nodePrefix = theHint.getNodePrefix();
         String[] theNodePrefix = new String[256];
         String[] theEnclosingNode = new String[256];
@@ -837,9 +841,9 @@ public class JSONtoXML {
         System.out.println ("[GNomExFrontController] xmlHintMap size: " + xmlHintMap.size());
 
         try {
-            debugConvert = true;
+            debugConvert = false;
             debugHint = false;
-            debugTesting = true;
+            debugTesting = false;
 
             // setup hintKey, the json to convert
             String hintKey = args[1];

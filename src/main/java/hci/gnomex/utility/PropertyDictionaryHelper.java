@@ -38,7 +38,6 @@ public class PropertyDictionaryHelper implements Serializable {
   public static final String ANALYSIS_DIRECTORY_ALT = "analysis_directory_alternative";
   public static final String ANALYSIS_ALTERNATIVE_USERS = "analysis_alternative_users";
 
-
   public PropertyDictionaryHelper() {
   }
 

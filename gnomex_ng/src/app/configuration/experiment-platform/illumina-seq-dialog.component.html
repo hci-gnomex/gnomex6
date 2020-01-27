@@ -44,7 +44,7 @@
                 {{this.formGroup.get('sortOrder').errors.numberRange }}
             </mat-error>
         </mat-form-field>
-
+<!--
         <custom-combo-box class="medium-form-input" placeholder="Cycles"
                           [options]="this.cycleList" valueField="value" displayField="display"
                           [formControlName]="'idNumberSequencingCycles'">
@@ -53,6 +53,7 @@
                           [options]="this.seqTypeRunList" valueField="value" displayField="display"
                           [formControlName]="'idSeqRunType'">
         </custom-combo-box>
+-->
         <mat-form-field class="propFormField full-width">
             <textarea matInput placeholder="Protocol Description" formControlName="protocolDescription"
                       matTextareaAutosize matAutosizeMinRows="5" matAutosizeMaxRows="10">

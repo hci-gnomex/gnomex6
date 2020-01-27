@@ -150,6 +150,7 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                                 // File was not successfully created
                                 throw new Exception("Unable to create directory " + directoryName);
                             }
+                            FileUtil.chmod ("770",dir.getAbsolutePath());
                         }
 
                         // tim 01/28/2019 added (converted to json 8/16/2019)
@@ -243,6 +244,9 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
                                 if (!success) {
                                     throw new Exception("Unable to create directory " + targetDir.getAbsolutePath().replace("\\", Constants.FILE_SEPARATOR));
                                 }
+
+                                FileUtil.chmod ("770",targetDirName);
+
                             }
 
                             // Don't try to move if the file is in the same directory

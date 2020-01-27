@@ -34,6 +34,7 @@ private String contextPath;
 private boolean isSecure = false;
 private int serverPort;
 private Integer idCoreFacility;
+private boolean htgonly;
 
 public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 	try {
@@ -67,6 +68,14 @@ public Command execute() throws RollBackCommandException {
 		String siteLogo = PropertyDictionaryHelper.getSiteLogo(sess, idCoreFacility);
 		String siteSplash = PropertyDictionaryHelper.getSiteSplash(sess, idCoreFacility);
 		String experimentAlias = PropertyDictionaryHelper.getExperimentAlias(sess, idCoreFacility);
+
+		// Pragmatic programming...
+		htgonly = false;
+		PropertyDictionary htgonlyProp = (PropertyDictionary) sess.createQuery("from PropertyDictionary p where p.propertyName='" + PropertyDictionary.HTGONLY + "'").uniqueResult();
+		if (htgonlyProp != null || htgonlyProp.getPropertyValue().equals("Y")) {
+			htgonly = true;
+		}
+
 
 		String baseURL = "";
 		if (serverPort == 80 || (serverPort == 443 && isSecure)) {
@@ -130,6 +139,11 @@ private void getCoreFacilities(Session sess, Document doc) {
 		if (cf.getIsActive() != null && cf.getIsActive().equals("Y")) {
 			String facilityName = cf.getFacilityName();
 			int idCoreFacility = cf.getIdCoreFacility();
+
+			if (htgonly && idCoreFacility != 1) {
+				continue;
+			}
+
 
 			Element facilityNode = new Element("CoreFacility");
 			facilitiesNode.addContent(facilityNode);

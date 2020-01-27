@@ -1,15 +1,20 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.*;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
+import hci.gnomex.utility.FileDescriptor;
+import hci.gnomex.utility.DictionaryHelper;
+import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.gnomex.utility.Util;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -169,8 +174,6 @@ public class GetExpandedAnalysisFileList extends GNomExCommand implements Serial
     return this;
   }
 
-
-
   public static void getFileNamesToDownload(String baseDir, String keysString, List analysisNumbers, Map analysisMap, Map directoryMap, boolean flattenSubDirs) {
     String[] keys = keysString.split(":");
     for (int i = 0; i < keys.length; i++) {
@@ -224,7 +227,7 @@ public class GetExpandedAnalysisFileList extends GNomExCommand implements Serial
       Arrays.sort(fileList, new Comparator<File>(){
         public int compare(File f1, File f2)     {
           return f1.getName().compareTo(f2.getName());
-        } });
+          } });
 
 
       for (int x = 0; x < fileList.length; x++) {
@@ -232,10 +235,27 @@ public class GetExpandedAnalysisFileList extends GNomExCommand implements Serial
 
         if (f1.isDirectory()) {
           Path p = Paths.get(f1.getAbsolutePath());
+          try {
+          String dirrealpath = p.toRealPath().toString();
+              Path sl = Files.readSymbolicLink(p);
+              Path slrp = sl.toRealPath();
+              String dirlinkrealpath = slrp.toString();
+              if (dirrealpath.equals(dirlinkrealpath)) {
+                  continue;
+              }
 
-          if (Files.isSymbolicLink(p) && FileUtil.symlinkLoop(f1.getAbsolutePath()) ) {
-            continue;
-          }
+          } catch (Exception ee)
+          {}
+/*
+            try {
+                if (Files.isSymbolicLink(p) && FileUtil.symlinkLoop(p.toRealPath().toString()) ) {
+                  continue;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            */
+
         }
 
 

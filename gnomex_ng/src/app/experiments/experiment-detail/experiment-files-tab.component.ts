@@ -20,7 +20,6 @@ import {UtilService} from "../../services/util.service";
         <div class="padded flex-container-col full-height">
             <div class="flex-container-row">
                 <button mat-button (click)="this.handleUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD" class="icon">Upload Files</button>
-                <button mat-button (click)="this.handleSFTPUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">SFTP Upload Files</button>
                 <button mat-button *ngIf="!isClinicalResearch && isFDTSupported" (click)="this.handleFDTUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Files</button>
                 <button mat-button *ngIf="!isClinicalResearch && isFDTSupported" (click)="this.handleFDTUploadCommandLine()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Command Line</button>
                 <button mat-button (click)="this.handleManageFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon">Manage Files</button>

@@ -1149,6 +1149,10 @@ export class Experiment {
             tempSamples.push(sample.getJSONObjectRepresentation());
         }
 
+        if (!Array.isArray(this.collaborators)) {
+            this.collaborators = [this.collaborators];
+        }
+
         let temp: any = {
             idCoreFacility:                     this.idCoreFacility,
             idProductOrder:                     this.idProductOrder,
@@ -1242,7 +1246,6 @@ export class Experiment {
             hasPlates:                          this.hasPlates,
             isOpeningNewBillingTemplate:        this.isOpeningNewBillingTemplate,
             amendState:                         this.amendState,
-
             analysisExperimentItems:  this.analysisExperimentItems,
             billingItems:             this.billingItems,
             collaborators:            this.collaborators,

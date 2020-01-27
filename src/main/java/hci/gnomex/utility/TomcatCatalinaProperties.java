@@ -29,7 +29,7 @@ public class TomcatCatalinaProperties {
     catalinaProperties = new Properties();
     catalinaProperties.load(new FileInputStream(filePath));
     
-    filePath = "/properties/gnomex_tomcat.properties";
+    filePath = "/properties/gnomex_tomcat1.properties";
     if (catalinaProperties.getProperty(GNOMEX_PROPERTIES_PATH) != null) {
       filePath = catalinaProperties.getProperty(GNOMEX_PROPERTIES_PATH);
     }

@@ -2,6 +2,7 @@ package hci.gnomex.controller;
 
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.PropertyDictionaryHelper;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
@@ -41,11 +42,35 @@ public class GetLoginProperties extends HttpServlet {
                 noPublicAccess = false;
             }
 
+            boolean maintenanceMode = false;
+            String maintenanceSplash = "";
+            PropertyDictionary maintenanceModeProp = (PropertyDictionary) sess.createQuery("from PropertyDictionary p where p.propertyName='" + PropertyDictionary.MAINTENANCEMODE + "'").uniqueResult();
+            if (maintenanceModeProp != null && maintenanceModeProp.getPropertyValue().equalsIgnoreCase("YES")) {
+                maintenanceMode = true;
+
+                // then you can't do much else
+                disableUserSignup = true;
+                noGuestAccess = true;
+
+                PropertyDictionary maintenanceSplashProp = (PropertyDictionary)
+                sess.createQuery(
+                        "from PropertyDictionary p where p.propertyName='"
+                            + PropertyDictionary.MAINTENANCE_SPLASH
+                            + "'")
+                    .uniqueResult();
+                if (maintenanceSplashProp != null) {
+                    maintenanceSplash = maintenanceSplashProp.getPropertyValue();
+                }
+            }
+
+
             String jsonResult = Json.createObjectBuilder()
                     .add("result", "SUCCESS")
                     .add(PropertyDictionary.DISABLE_USER_SIGNUP, disableUserSignup)
                     .add(PropertyDictionary.NO_GUEST_ACCESS, noGuestAccess)
                     .add(PropertyDictionary.NO_PUBLIC_VISIBILITY,noPublicAccess)
+                    .add(PropertyDictionary.MAINTENANCEMODE,maintenanceMode)
+                    .add(PropertyDictionary.MAINTENANCE_SPLASH,maintenanceSplash)
                     .build()
                     .toString();
 

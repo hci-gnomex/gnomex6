@@ -83,6 +83,8 @@ public class DownloadSampleSheet extends ReportCommand implements Serializable {
 
     if (!this.usingJSON) {
       String       requestXMLString = request.getParameter("requestXMLString");
+
+      System.out.println ("[downloadsamplesheet] requestXMLString: " + requestXMLString);
       StringReader requestReader    = new StringReader(requestXMLString);
       try {
         SAXBuilder sax = new SAXBuilder();
@@ -95,9 +97,11 @@ public class DownloadSampleSheet extends ReportCommand implements Serializable {
       }
     } else {
       try (JsonReader jsonReader = Json.createReader(new StringReader(request.getParameter("requestJSONString")))) {
+        String rjstring = request.getParameter("requestJSONString");
+        System.out.println ("[downloadsamplesheet] rjstring: \n" + rjstring);
         requestParser = new RequestParser(jsonReader, this.secAdvisor);
       } catch (Exception e) {
-        this.addInvalidField( "requestJSONString", "Invalid request xml");
+        this.addInvalidField( "requestJSONString", "Invalid request json");
         this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestJSONString", e);
       }
     }
@@ -150,8 +154,10 @@ public class DownloadSampleSheet extends ReportCommand implements Serializable {
         setResponsePage(this.ERROR_JSP);
       }
     
-    }catch (Exception e) {
+    } catch (Exception e) {
       LOG.error("An exception has occurred in DownloadSampleSheet ", e);
+      this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in DownloadSampleSheet ", e);
+    
       throw new RollBackCommandException(e.getMessage());
     } finally {
       try {
@@ -171,7 +177,7 @@ public class DownloadSampleSheet extends ReportCommand implements Serializable {
       fileName = requestParser.getRequest().getNumber() + "_" + today;
     } else{
       fileName = labName + "_new_" + today;
-      fileName = fileName.replace(",", "");
+      fileName = fileName.replace(",", "").replace(" ","-");
     }
     
     // set up the ReportTray

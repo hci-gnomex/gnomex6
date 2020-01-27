@@ -103,6 +103,7 @@ export class FileService {
             let analysisParams: HttpParams = new HttpParams()
                 .append('idAnalysis', params.idAnalysis)
                 .append('showUploads', 'Y');
+//                .append( 'getdatatrackdata','Y');
             let downloadParams: HttpParams = new HttpParams()
                 .set('idAnalysis', params.idAnalysis);
 

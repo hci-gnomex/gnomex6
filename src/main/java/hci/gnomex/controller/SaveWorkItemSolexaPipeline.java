@@ -211,6 +211,8 @@ public class SaveWorkItemSolexaPipeline extends GNomExCommand implements Seriali
               resultMessage.append("Unable to notify " + request.getAppUser().getFirstLastDisplayName() + " that their sequence lanes have been completed because either they have no email address listed in gnomex or their email address is malformed.");
               resultMessage.append(" deleted.\r\n");
               LOG.error("Error in SaveWorkItemSolexaPipeline", e);
+              this.errorDetails = Util.GNLOG(LOG,"Error in SaveWorkItemSolexaPipeline ", e);
+
             }
           }
           this.jsonResult = Json.createObjectBuilder().add("result", "SUCCESS").add("message", resultMessage.toString()).build().toString();

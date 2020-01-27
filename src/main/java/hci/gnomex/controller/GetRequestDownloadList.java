@@ -1,8 +1,7 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
+import hci.gnomex.utility.*;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.constants.Constants;
@@ -12,10 +11,6 @@ import hci.gnomex.model.Request;
 import hci.gnomex.model.RequestCategory;
 import hci.gnomex.model.RequestDownloadFilter;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.FileDescriptor;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.UploadDownloadHelper;
 
 import java.io.File;
 import java.io.Serializable;
@@ -576,7 +571,9 @@ public class GetRequestDownloadList extends GNomExCommand implements Serializabl
                 String fileName = directoryName + Constants.FILE_SEPARATOR + fileListItem;
                 File f1 = new File(fileName);
                 if (f1.isDirectory()) {
-                    folders.add(fileListItem);
+                    // ignore any symlink directories that would cause loops
+                    if (!FileUtil.symlinkLoop(f1))
+                        folders.add(fileListItem);
                 }
             }
         }

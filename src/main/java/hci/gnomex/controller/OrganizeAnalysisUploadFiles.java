@@ -113,7 +113,8 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
                     // These are directories the user created explicitly in UI Manage_Files
                     for (Iterator i = parser.getNewDirectoryNames().iterator(); i.hasNext(); ) {
                         String directoryName = (String) i.next();
-                        File dir = new File(baseDir + "/" + directoryName);
+                        String dirPath = baseDir + "/" + directoryName;
+                        File dir = new File(dirPath);
                         if (!dir.exists()) {
 //                            System.out.println("[OAUF] creating new directory: " + baseDir + "/" + directoryName);
                             boolean success = dir.mkdirs();
@@ -121,6 +122,8 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
                                 // Directory not successfully created
                                 throw new Exception("Unable to create directory " + directoryName);
                             }
+
+                            FileUtil.chmod ("770",dirPath);
                         }
 
                         // tim 01/28/2019 added
@@ -298,6 +301,7 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
                                 if (!success) {
                                     throw new Exception("Unable to create directory " + targetDir.getAbsolutePath().replace("\\", Constants.FILE_SEPARATOR));
                                 }
+                                FileUtil.chmod ("770",targetDirName);
                             }
 
                             // Don't try to move if the file is in the same directory
@@ -323,6 +327,7 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
                             // it's not there and should be a directory, make it
                             if (!destFile.exists() && sourceFile.isDirectory()) {
                                 destFile.mkdirs();
+                                FileUtil.chmod ("770",destFile.getAbsolutePath());
                             }
 
                             if (sourceFile.isDirectory() && destFile.exists() && destFile.isDirectory()) {

@@ -17,6 +17,7 @@
 		<param-value>/api/user-session*,/ChangePassword.gx*,/PublicSaveSelfRegisteredAppUser.gx*,/ReportIssueServlet.gx*,/CreateUserPreferences.gx*</param-value>
 	</context-param>
 
+
 	<context-param>
 		<param-name>html5-push-state-filter-target</param-name>
 		<param-value>/index.html</param-value>
@@ -24,7 +25,7 @@
 
 	<context-param>
 		<param-name>html5-push-state-filter-pass-through-patterns</param-name>
-		<param-value>/api,/css,/resources,/images,/img,/assets,.js,.ttf,.eot,.woff,.svg,.woff2,favicon.ico,.css,.gx,.jsp</param-value>
+		<param-value>/URLLinks,/IGVLinks,/api,/css,/resources,/images,/img,/assets,.js,.ttf,.eot,.woff,.svg,.woff2,favicon.ico,.css,.gx,.jsp</param-value>
 	</context-param>
 
 	<listener>
@@ -649,7 +650,7 @@
 		<filter-class>hci.servlet.filter.CorsFilter</filter-class>
 		<init-param>
 			<param-name>cors.allowed.origins</param-name>
-			<param-value>http://localhost,http://localhost:3000</param-value>
+			<param-value>http://localhost,http://localhost:8080,http://localhost:8081,http://localhost:8084</param-value>
 		</init-param>
 		<init-param>
 			<param-name>cors.support.credentials</param-name>
