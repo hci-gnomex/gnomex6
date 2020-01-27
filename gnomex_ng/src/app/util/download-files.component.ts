@@ -282,12 +282,17 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     }
 
     private updateFilesToDownloadTree(): void {
-        this.filesToDownloadTreeComponent.treeModel.filterNodes((node: TreeNode) => {
-            return node.data.isSelected === 'Y';
+        setTimeout(() => {
+            this.filesToDownloadTreeComponent.treeModel.filterNodes((node: TreeNode) => {
+                return node.data.isSelected === 'Y';
+            });
         });
-        this.filesToDownloadCount = this.countFilesRecursively(this.filesToDownloadNodes[0], true);
-        this.filesToDownloadSize = this.countFileSizeRecursively(this.filesToDownloadNodes[0], true);
-        this.filesToDownloadSizeLabel = FileService.formatFileSize(this.filesToDownloadSize);
+
+        setTimeout(() => {
+            this.filesToDownloadCount = this.countFilesRecursively(this.filesToDownloadNodes[0], true);
+            this.filesToDownloadSize = this.countFileSizeRecursively(this.filesToDownloadNodes[0], true);
+            this.filesToDownloadSizeLabel = FileService.formatFileSize(this.filesToDownloadSize);
+        });
     }
 
     private countFilesRecursively(fileNode: any, filterSelectedOnly: boolean = false): number {
@@ -381,7 +386,9 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     };
 
     public onDropInDownload(event: any): void {
-        return this.moveNode(this.filesToDownloadTreeComponent.treeModel, null, event, {from: this.availableFilesTreeComponent, to: this.filesToDownloadTreeComponent});
+        setTimeout(() => {
+            this.moveNode(this.filesToDownloadTreeComponent.treeModel, null, event, {from: this.availableFilesTreeComponent, to: this.filesToDownloadTreeComponent});
+        });
     }
 
     public onRemoveFromDownload(event: any): void {
