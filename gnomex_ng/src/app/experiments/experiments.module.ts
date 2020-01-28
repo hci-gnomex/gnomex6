@@ -73,6 +73,7 @@ import {TabExternalSetupComponent} from "./new-experiment/tab-external-setup.com
 import {TabExternalDescriptionComponent} from "./new-experiment/tab-external-description.component";
 import {AmendExperimentOverviewComponent} from "./amend-experiment-overview.component";
 import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.component";
+import {AddAdditionalAccountsComponent} from "./new-experiment/add-additional-accounts.component";
 
 @NgModule({
     imports: [
@@ -134,6 +135,7 @@ import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.com
         TabSampleSetupViewComponent,
         TabSeqSetupViewComponent,
         TabSeqProtoViewComponent,
+        AddAdditionalAccountsComponent,
         NewExperimentComponent,
         NewExperimentSetupComponent,
         TabAnnotationViewComponent,
@@ -166,6 +168,7 @@ import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.com
         TabNotesViewComponent,
         TabSampleSetupViewComponent,
         TabSeqSetupViewComponent,
+        AddAdditionalAccountsComponent,
         NewExperimentComponent,
         NewExperimentSetupComponent,
         TabSeqProtoViewComponent,
@@ -189,6 +192,7 @@ import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.com
         TabNotesViewComponent,
         TabSampleSetupViewComponent,
         TabSeqSetupViewComponent,
+        AddAdditionalAccountsComponent,
         NewExperimentComponent,
         NewExperimentSetupComponent,
         TabSeqProtoViewComponent,
