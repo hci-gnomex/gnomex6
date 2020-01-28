@@ -135,6 +135,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 					theLab.setContactEmail(labEmail);
 					theLab.setContactPhone(labPhone);
 					theLab.setDepartment(department);
+					theLab.setIsActive("Y");
 				}
 
 			} else if (requestedLabId != -1) {
@@ -144,6 +145,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 			HashSet labSet = new HashSet();
 			labSet.add(theLab);
 			au.setLabs(labSet);
+			theLab.setCoreFacilities();
 
 			String url = request.getRequestURL().substring(0, request.getRequestURL().indexOf("ApproveUser.gx"));
 			String gnomexURL = "<a href='" + url + "'>Click here</a> to login.";
