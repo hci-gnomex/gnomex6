@@ -3316,6 +3316,8 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			if (!success) {
 				LOG.error("Unable to create directory " + rootDir);
 			}
+
+			FileUtil.chmod ("770",rootDir);
 		}
 
 		String baseRequestNumber = Request.getBaseRequestNumber(req.getNumber());
@@ -3326,6 +3328,8 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			if (!success) {
 				LOG.error("Unable to create directory " + directoryName);
 			}
+
+			FileUtil.chmod ("770",directoryName);
 		}
 
 		String qcDirectoryName = directoryName + Constants.FILE_SEPARATOR + qcDirectory;
@@ -3335,6 +3339,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			if (!success) {
 				LOG.error("Unable to create directory " + qcDirectoryName);
 			}
+			FileUtil.chmod ("770",qcDirectoryName);
 		}
 
 		if (req.getHybridizations() != null) {
@@ -3346,6 +3351,8 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					if (!success) {
 						LOG.error("Unable to create directory " + hybDirectoryName);
 					}
+					FileUtil.chmod ("770",hybDirectoryName);
+
 				}
 			}
 		}

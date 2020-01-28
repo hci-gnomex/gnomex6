@@ -22,71 +22,89 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
         <div class="full-height full-width flex-container-col small-font double-padded">
 
             <div class="padded-outer flex-grow">
-                <form class="full-height full-width padded-inner flex-container-col"  [formGroup]="formGroup">
-                    <div  class="flex-container-row align-center spaced-children-margin" >
+                <form class="full-height full-width padded-inner flex-container-col"
+                      [formGroup]="formGroup">
+                    <div class="flex-container-row align-center spaced-children-margin">
                         <mat-form-field class="medium-form-input">
-                            <input matInput placeholder="QC Experiment Type" formControlName="application">
-                            <mat-error  *ngIf="this.formGroup?.controls['application']?.hasError('required')">
+                            <input matInput placeholder="QC Experiment Type"
+                                   formControlName="application">
+                            <mat-error
+                                    *ngIf="this.formGroup?.controls['application']?.hasError('required')">
                                 Field is required
                             </mat-error>
                         </mat-form-field>
                         <mat-form-field class="short-input">
                             <input matInput placeholder="Sort Order" formControlName="sortOrder">
-                            <mat-error  *ngIf="this.formGroup?.controls['sortOrder']?.hasError('numberRange')">
-                               {{this.formGroup.get('sortOrder')?.errors.numberRange }}
+                            <mat-error
+                                    *ngIf="this.formGroup?.controls['sortOrder']?.hasError('numberRange')">
+                                {{this.formGroup.get('sortOrder')?.errors.numberRange }}
                             </mat-error>
                         </mat-form-field>
                         <div>
-                            <mat-checkbox  formControlName="hasChipTypes" > Has Assays </mat-checkbox>
+                            <mat-checkbox formControlName="hasChipTypes"> Has Assays</mat-checkbox>
                         </div>
                     </div>
-                    <div class="flex-container-col" *ngIf="!this.formGroup.get('hasChipTypes').value">
+                    <div class="flex-container-col"
+                         *ngIf="!this.formGroup.get('hasChipTypes').value">
                         <div *ngIf="!this.canEnterPrice || this.secAdvisor.isSuperAdmin">
-                            <context-help name="ExperimentPlatformQCPricingHelp" [isEditMode]="this.secAdvisor.isSuperAdmin"
+                            <context-help name="ExperimentPlatformQCPricingHelp"
+                                          [hasEditPermission]="this.secAdvisor.isSuperAdmin"
                                           label="Why can't I edit prices?" popupTitle="Pricing Help"
                                           tooltipPosition="right"></context-help>
                         </div>
                         <div class="flex-container-row spaced-children-margin">
                             <mat-form-field class="flex-grow">
                                 <span matPrefix>$ &nbsp;</span>
-                                <input matInput placeholder="Internal Pricing" formControlName="unitPriceInternal">
-                                <mat-error  *ngIf="this.formGroup?.controls['unitPriceInternal']?.hasError('pattern')">
+                                <input matInput placeholder="Internal Pricing"
+                                       formControlName="unitPriceInternal">
+                                <mat-error
+                                        *ngIf="this.formGroup?.controls['unitPriceInternal']?.hasError('pattern')">
                                     Invalid dollar amount
                                 </mat-error>
                             </mat-form-field>
 
-                            <mat-form-field  class="flex-grow">
+                            <mat-form-field class="flex-grow">
                                 <span matPrefix>$ &nbsp;</span>
-                                <input matInput placeholder="External Academic Pricing" formControlName="unitPriceExternalAcademic">
-                                <mat-error  *ngIf="this.formGroup?.controls['unitPriceExternalAcademic']?.hasError('pattern')">
+                                <input matInput placeholder="External Academic Pricing"
+                                       formControlName="unitPriceExternalAcademic">
+                                <mat-error
+                                        *ngIf="this.formGroup?.controls['unitPriceExternalAcademic']?.hasError('pattern')">
                                     Invalid dollar amount
                                 </mat-error>
                             </mat-form-field>
-                            <mat-form-field  class="flex-grow">
+                            <mat-form-field class="flex-grow">
                                 <span matPrefix>$ &nbsp;</span>
-                                <input matInput placeholder="External Commercial Pricing" formControlName="unitPriceExternalCommercial">
-                                <mat-error  *ngIf="this.formGroup?.controls['unitPriceExternalCommercial']?.hasError('pattern')">
+                                <input matInput placeholder="External Commercial Pricing"
+                                       formControlName="unitPriceExternalCommercial">
+                                <mat-error
+                                        *ngIf="this.formGroup?.controls['unitPriceExternalCommercial']?.hasError('pattern')">
                                     Invalid dollar amount
                                 </mat-error>
                             </mat-form-field>
                         </div>
                     </div>
 
-                    <div *ngIf="this.formGroup.get('hasChipTypes').value" class="flex-container-col flex-grow">
+                    <div *ngIf="this.formGroup.get('hasChipTypes').value"
+                         class="flex-container-col flex-grow">
                         <div class="flex-container-row align-center justify-space-between">
                             <div class="flex-container-row">
-                                <button  mat-button color="primary" type="button" (click)="addChip()">
+                                <button mat-button color="primary" type="button"
+                                        (click)="addChip()">
                                     <img [src]="this.constService.ICON_ADD"> Add
                                 </button>
-                                <button [disabled]="selectedAssay.length === 0" (click)="removeChip()" mat-button color="primary">
+                                <button [disabled]="selectedAssay.length === 0"
+                                        (click)="removeChip()" mat-button color="primary">
                                     <img [src]="this.constService.ICON_DELETE"> Remove
                                 </button>
-                                <button mat-button [disabled]="selectedAssay.length === 0" color="primary" (click)="openAssayEditor()">
+                                <button mat-button [disabled]="selectedAssay.length === 0"
+                                        color="primary" (click)="openAssayEditor()">
                                     Edit QC Assay
                                 </button>
                             </div>
-                            <context-help name="QCAssayConfigurationHelp" label="Assays Help" popupTitle="QC Assay Help"
-                                          [isEditMode]="this.secAdvisor.isSuperAdmin" tooltipPosition="right">
+                            <context-help name="QCAssayConfigurationHelp" label="Assays Help"
+                                          popupTitle="QC Assay Help"
+                                          [hasEditPermission]="this.secAdvisor.isSuperAdmin"
+                                          tooltipPosition="right">
                             </context-help>
                         </div>
 

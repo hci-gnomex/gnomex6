@@ -123,7 +123,7 @@ export class TabSeqSetupViewComponent implements OnInit {
                 && this._experiment.requestCategory.type === NewExperimentService.TYPE_NANOSTRING;
 
             if (!this.showCoreFacilityPrepQuestion) {
-                this.form.get("seqPrepByCore").setValue("YES");
+                this.form.get("seqPrepByCore").setValue("YES");     // was ""
             }
         });
     }

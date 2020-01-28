@@ -5,6 +5,11 @@
 @import '~ag-grid-community/dist/styles/ag-theme-balham.css';
 @import './gnomex-app-color.css';
 
+:host ::ng-deep.mat-tab-label.mat-tab-label-active {
+    min-width: 0!important;
+    font-size: 12px!important;
+}
+
 
 html {
     position: relative;
@@ -232,6 +237,13 @@ mat-tab-group.flex-style mat-tab-header .mat-tab-label-container .mat-tab-list .
 .white-split-gutter .as-split-gutter.ng-star-inserted {
     background-color: white !important;
 }
+
+.silver-bordered-gutter .as-split-gutter.ng-star-inserted {
+    border-style: solid !important;
+    border-color: silver !important;
+    border-width: 0 1px 0 1px !important;
+}
+
 
 .no-height {
     height: 0;

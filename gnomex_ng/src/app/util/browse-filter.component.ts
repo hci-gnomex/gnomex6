@@ -659,6 +659,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy, OnChanges {
     getAnalysisBrowseParameters(): HttpParams {
         let params: HttpParams = new HttpParams();
 
+//        params = params.set('getdatatrackdata','N');
+
         if (this.showAllCheckbox && this.allFlag) {
             params = params.set("allAnalysis", "Y");
         } else {

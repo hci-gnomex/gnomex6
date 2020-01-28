@@ -338,7 +338,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
         this.runFC        = new FormControl("", Validators.pattern("^[0-9]*$"));
         this.createDateFC = new FormControl("");
         this.instrumentFC = new FormControl("");
-        this.protocolFC   = new FormControl("", Validators.required);
+        this.protocolFC   = new FormControl("");
         this.sideFC = new FormControl("");
 
         this.createDateFC.disable();
@@ -383,6 +383,11 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
 
     private initialize(): void {
         this.sideFC.disable();
+        this.assmItemList = [];
+        this.selectedSeqlanes = [];
+        this.allFG.reset();
+        this.allFG.markAsPristine();
+
         if (this.allRequestGridApi) {
             this.allRequestGridApi.setRowData([]);
         }
@@ -566,9 +571,10 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
                         this.sideFC.disable();
                         this.sideFC.setValue(null);
                         this.sideFC.clearValidators();
-                    }else{
-                        this.sideFC.setValidators(Validators.required);
-                        this.sideFC.updateValueAndValidity();
+                    }
+                    else{
+//                        this.sideFC.setValidators(Validators.required);
+//                      this.sideFC.updateValueAndValidity();
                         this.sideFC.enable();
 
                     }
@@ -760,15 +766,11 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
         this.workflowService.saveWorkItemSolexaAssemble(params).subscribe((response: any) => {
             let responseJSON: any = response;
             if (responseJSON && responseJSON.result && responseJSON.result === "SUCCESS") {
-                this.allFG.reset();
-                this.allFG.markAsPristine();
-
                 if (!responseJSON.flowCellNumber) {
                     responseJSON.flowCellNumber = "";
                 }
 
                 this.dialogsService.alert("Flowcell " + responseJSON.flowCellNumber + " created", null, DialogType.SUCCESS);
-                this.assmItemList = [];
                 this.initialize();
             }
 

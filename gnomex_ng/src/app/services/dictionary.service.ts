@@ -270,6 +270,15 @@ export class DictionaryService {
         return this.getEntries(className).filter((value: DictionaryEntry) => value.value !== "");
     }
 
+    public getEntriesCF(className: string): DictionaryEntry[] {
+        let entries: DictionaryEntry[] = DictionaryService.cloneObject(this.getCachedEntries(className));
+        return DictionaryService.sortArrayByField(entries, "value");
+    }
+
+    public getEntriesExcludeBlankCF(className: string): DictionaryEntry[] {
+        return this.getEntriesCF(className).filter((value: DictionaryEntry) => value.value !== "");
+    }
+
     public getEntry(className: string, value: string): DictionaryEntry {
         let entry: DictionaryEntry = this.getCachedEntries(className).find((entry: DictionaryEntry) => entry.value === value);
         return DictionaryService.cloneObject(entry);

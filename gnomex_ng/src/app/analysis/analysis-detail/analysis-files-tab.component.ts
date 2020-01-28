@@ -216,10 +216,11 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
 
     private makeUCSCLink: (data: any) => void = (data:any) => {
         let params: HttpParams = new HttpParams()
-            .set("idAnalysis", data.idAnalysis)
+            .set("idAnalysis", this.analysisService.analysis.idAnalysis)
             .set("pathName", data.fileName);
         this.dataTrackService.makeUCSCLinks(params).subscribe((result: any) => {
             if (result && result.ucscURL1) {
+//                this.dialogsService.alert(result.ucscURL1,"Debug", DialogType.SUCCESS);
                 window.open(result.ucscURL1, "_blank");
             }
         },(err:IGnomexErrorResponse) => {
@@ -252,7 +253,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
 
     private makeGENELink: (data: any) => void = (data: any) => {
         let params: HttpParams = new HttpParams()
-            .set("idAnalysis", data.idAnalysis)
+            .set("idAnalysis", this.analysisService.analysis.idAnalysis)
             .set("fileName", data.fileName)
             .set("VCFInfo", JSON.stringify(this.getAnalysisDownloadListResult.VCFInfo))
             .set("BAMInfo", JSON.stringify(this.getAnalysisDownloadListResult.BAMInfo))

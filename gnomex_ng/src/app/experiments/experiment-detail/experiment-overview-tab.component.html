@@ -160,7 +160,7 @@
                 <!--<div class="field-width flex-container-row padded">-->
                     <!--<div class="label label-width flex-container-col">-->
                         <!--Visibility-->
-                        <!--<context-help name="visibilityLevel" [isEditMode]="isAdmin && isEditMode"-->
+                        <!--<context-help name="visibilityLevel" [hasEditPermission]="isAdmin && hasEditPermission"-->
                                       <!--popupTitle="Visibility Level Help"-->
                                       <!--[idCoreFacility]="this._experiment.idCoreFacility"></context-help>-->
                     <!--</div>-->
@@ -169,7 +169,7 @@
                             <!--<mat-radio-button-->
                                     <!--*ngFor="let rad of visibilityOptions"-->
                                     <!--[value]="rad.value"-->
-                                    <!--[disabled]="!isEditMode || !isAdmin"-->
+                                    <!--[disabled]="!hasEditPermission || !isAdmin"-->
                                     <!--[matTooltip]="rad.tooltip">-->
                                 <!--<img [src]="rad.icon">-->
                                 <!--{{ rad.display }}-->
@@ -188,7 +188,7 @@
                                 <!--<mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>-->
                                 <!--<mat-datepicker #privacyPicker disabled="false"></mat-datepicker>-->
                             <!--</mat-form-field>-->
-                            <!--<context-help name="visibilityPrivacyExpiration" [isEditMode]="isAdmin && isEditMode"-->
+                            <!--<context-help name="visibilityPrivacyExpiration" [hasEditPermission]="isAdmin && hasEditPermission"-->
                                           <!--popupTitle="Visibility Privacy Expiration Help"-->
                                           <!--[idCoreFacility]="this._experiment.idCoreFacility"></context-help>-->
                         <!--</div>-->
@@ -204,7 +204,7 @@
                             <!--Collaborators-->
                         <!--</button>-->
                     <!--</div>-->
-                    <!--<context-help name="visibilityCollaborators" [isEditMode]="isAdmin && isEditMode"-->
+                    <!--<context-help name="visibilityCollaborators" [hasEditPermission]="isAdmin && hasEditPermission"-->
                                   <!--popupTitle="Visibility Collaborator Help"-->
                                   <!--[idCoreFacility]="this._experiment.idCoreFacility"></context-help>-->
                     <!--<div class="flex-grow flex-container-col multi-line max-height padded">-->

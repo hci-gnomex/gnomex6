@@ -1,5 +1,6 @@
 <div class="flex-container-row align-center children-margin-right padded">
-    <context-help name="billingTemplateHelp" [isEditMode]="this.createSecurityAdvisorService.isSuperAdmin" label="Help" popupTitle="Billing Templates"></context-help>
+    <context-help name="billingTemplateHelp"
+                  [hasEditPermission]="this.createSecurityAdvisorService.isSuperAdmin" label="Help" popupTitle="Billing Templates"></context-help>
     <custom-combo-box placeholder="Lab" [options]="this.labList" displayField="name"
                       [(ngModel)]="this.selectedLab" (optionSelected)="this.loadAccountsForLab()">
     </custom-combo-box>

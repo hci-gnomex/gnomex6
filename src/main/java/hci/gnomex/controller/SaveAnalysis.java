@@ -1,24 +1,12 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.*;
 import hci.gnomex.model.*;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.AnalysisCollaboratorParser;
-import hci.gnomex.utility.AnalysisFileParser;
-import hci.gnomex.utility.AnalysisGenomeBuildParser;
-import hci.gnomex.utility.AnalysisGroupParser;
-import hci.gnomex.utility.AnalysisHybParser;
-import hci.gnomex.utility.AnalysisLaneParser;
-import hci.gnomex.utility.AnalysisSampleParser;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.PropertyOptionComparator;
-import hci.gnomex.utility.RequestParser;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -630,6 +618,7 @@ public class SaveAnalysis extends GNomExCommand implements Serializable {
 				File ad = new File(analysisDir);
 				if (!ad.exists()) {
 					ad.mkdirs();
+					FileUtil.chmod ("770",analysisDir);
 				}
 
 				String filePathInfo = "";

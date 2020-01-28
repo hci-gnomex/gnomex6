@@ -64,12 +64,14 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 			String tda = request.getParameter("totalDollarAmountDisplay");
 			tda = tda.replaceAll("\\$", "");
 			tda = tda.replaceAll(",", "");
+			System.out.println ("[submitworkauthform] tda: " + tda);
 			billingAccountScreen.setTotalDollarAmount(new BigDecimal(tda));
 		}
 
 		String coreFacilitiesXMLString = "";
 		if (request.getParameter("coreFacilitiesXMLString") != null && !request.getParameter("coreFacilitiesXMLString").equals("")) {
 			coreFacilitiesXMLString = request.getParameter("coreFacilitiesXMLString");
+			System.out.println ("[SubmitWorkAuthForm] coreFacilitiesXMLString: " + coreFacilitiesXMLString);
 
 			StringReader reader = new StringReader(coreFacilitiesXMLString);
 			try {
@@ -94,6 +96,8 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 		serverName = request.getServerName();
 		this.requestURL = request.getRequestURL();
 
+		System.out.println ("[SubmitWorkAuthForm] launchAppURL: " + launchAppURL);
+
 	}
 
 	public Command execute() throws RollBackCommandException {
@@ -103,6 +107,7 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 			DictionaryHelper dh   = DictionaryHelper.getInstance(sess);
 
 			lab = (Lab) sess.load(Lab.class, billingAccountScreen.getIdLab());
+			System.out.println ("[SubmitWorkAuthForm] lab: " + lab);
 
 			PropertyDictionaryHelper pdh          = PropertyDictionaryHelper.getInstance(sess);
 			String                   configurable = pdh.getProperty(PropertyDictionary.CONFIGURABLE_BILLING_ACCOUNTS);
@@ -119,7 +124,7 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 							((billingAccountScreen.getAccountNumberProject() == null || billingAccountScreen.getAccountNumberProject().equals("")) && (billingAccountScreen.getAccountNumberActivity() == null || billingAccountScreen.getAccountNumberActivity().length() != 5)) ||
 							((billingAccountScreen.getAccountNumberActivity() == null || billingAccountScreen.getAccountNumberActivity().equals("")) && (billingAccountScreen.getAccountNumberProject() == null || billingAccountScreen.getAccountNumberProject().length() != 8)) ||
 							billingAccountScreen.getExpirationDate() == null || billingAccountScreen.getStartDate() == null) {
-
+						System.out.println ("[SubmitWorkAuthForm] **** Billing Account Error ****");
 						this.addInvalidField("Billing Account Error", "Please make sure all fields are entered and that the correct number of digits are used for each account number field.");
 						this.setResponsePage(this.ERROR_JSP);
 					}
@@ -128,6 +133,7 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 						&& (billingAccountScreen.getIsCreditCard() != null && billingAccountScreen.getIsCreditCard().equals("Y"))) {
 
 					if (billingAccountScreen.getExpirationDate() == null || billingAccountScreen.getStartDate() == null) {
+						System.out.println ("[SubmitWorkAuthForm] **** Billing Account Error (1) ****");
 						this.addInvalidField("Billing Account Error", "Please make sure all fields are entered and that the correct number of digits are used for each account number field.");
 						this.setResponsePage(this.ERROR_JSP);
 					}
@@ -136,6 +142,7 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 						&& (billingAccountScreen.getIsCreditCard() == null || billingAccountScreen.getIsCreditCard().equals("N"))) {
 
 					if (billingAccountScreen.getExpirationDate() == null || billingAccountScreen.getStartDate() == null) {
+						System.out.println ("[SubmitWorkAuthForm] **** Billing Account Error (2) ****");
 						this.addInvalidField("Billing Account Error", "Please make sure all fields are entered and that the correct number of digits are used for each account number field.");
 						this.setResponsePage(this.ERROR_JSP);
 					}
@@ -155,6 +162,7 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 
 					for (Iterator i = coreFacilityParser.getCoreFacilityMap().keySet().iterator(); i.hasNext(); ) {
 						Integer idCoreFacility = (Integer) i.next();
+						System.out.println ("[SubmitWorkAuthForm] idCoreFacility: " + idCoreFacility );
 						facility = (CoreFacility) coreFacilityParser.getCoreFacilityMap().get(idCoreFacility);
 
 						billingAccount = new BillingAccount();
@@ -163,6 +171,7 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 						billingAccount.setIdBillingAccount(null);
 						billingAccount.setIdCoreFacility(idCoreFacility);
 
+						System.out.println ("[SubmitWorkAuthForm] right before sess.save" );
 						sess.save(billingAccount);
 						sess.flush();
 

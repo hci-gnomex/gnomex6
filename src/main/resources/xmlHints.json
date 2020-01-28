@@ -321,6 +321,19 @@
       ]
     },
     {
+      "command": "SaveRequest",
+      "parameter": "propertiesXML",
+      "nodeheader": "RequestProperties",
+      "nodeprefix": "PropertyEntry",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    
+    {
       "command": "SaveMultiRequestSampleSheet",
       "parameter": "sampleSheetHeaderXMLString",
       "nodeheader": "Headers",
