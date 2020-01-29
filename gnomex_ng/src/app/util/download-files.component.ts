@@ -404,6 +404,10 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     }
 
     private gatherFilesToDownloadHelper(fileNode: any): any[] {
+        if (fileNode.isSelected === 'N') {
+            return [];
+        }
+
         if (fileNode.fileSize && fileNode.type !== 'dir') {
             return [fileNode];
         } else if (fileNode.FileDescriptor && fileNode.FileDescriptor.length > 0) {
