@@ -26,6 +26,7 @@ import {ConstantsService} from "../services/constants.service";
 import {AboutComponent} from "../about/about.component";
 import {ContactUsComponent} from "../about/contact-us.component";
 import {ManageLinksComponent} from "./manageLinks/manage-links.component";
+import {EmailAllUsersComponent} from "../reports/email-all-users.component";
 import {first} from "rxjs/operators";
 
 @Component({
@@ -322,6 +323,23 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                 params.gnomexService.emitFaqUpdateObservable();
             }
         });
+    }
+
+    public launchEmailAllUsers(params: any): void {
+        if(!params.dialogsService || !params.constService) {
+            return;
+        }
+
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "45em";
+        config.height = "41em";
+        config.autoFocus = false;
+        params.dialogsService.genericDialogContainer(EmailAllUsersComponent, "Send Email To All GNomEx Users",
+            params.constService.EMAIL_GO_LINK, config, {actions: [
+                    {type: ActionType.PRIMARY, icon: params.constService.EMAIL_GO_LINK, name: "Send Email", internalAction: "send"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]});
+
     }
 
     public logout(params: any): void {
@@ -1227,7 +1245,8 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Send email to all GNomEx users',
                         iconName: './assets/email_go.png',
-                        route: [{outlets: {modal: ['EmailAll']}}]
+                        callback: this.launchEmailAllUsers,
+                        params: this.serviceParams
                     }
                 ]
             }
@@ -1457,7 +1476,8 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         displayName: 'Send email to all GNomEx users',
                         iconName: './assets/email_go.png',
-                        route: [{outlets: {modal: ['EmailAll']}}]
+                        callback: this.launchEmailAllUsers,
+                        params: this.serviceParams
                     }
                 ]
             },

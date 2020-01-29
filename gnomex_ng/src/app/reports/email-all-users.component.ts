@@ -7,6 +7,7 @@ import {MatDialogRef} from "@angular/material";
 import {AngularEditorConfig} from "@kolkov/angular-editor";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 
 @Component({
     selector: 'email-all-users',
@@ -63,6 +64,7 @@ export class EmailAllUsersComponent extends BaseGenericContainerDialog implement
 
     constructor(private dialogRef: MatDialogRef<EmailAllUsersComponent>,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
+                private dialogsService: DialogsService,
                 private broadcastEmailService: BroadcastEmailService) {
         super();
         this.coresFormControl = new FormControl("", Validators.required);
@@ -119,11 +121,20 @@ export class EmailAllUsersComponent extends BaseGenericContainerDialog implement
     }
 
     private handleResponse(response: any): void {
-        if (response) {
-            let resultWindow = window.open('', '_blank', "height=200, width=500");
-            resultWindow.document.open();
-            resultWindow.document.write(response);
-            resultWindow.document.close();
+        if(response) {
+            let messages: string[] = [];
+            let message: string = "The email has been successfully sent to ";
+            message = message + "<strong>" + (response.userCount ? response.userCount : "0") + "</strong> GNomEx users.";
+            messages.push(message);
+
+            if (response.InvalidEmails && response.InvalidEmails.length > 0) {
+                messages.push("");
+                messages.push("The email was not sent to the following user(s) due to invalid email(s):");
+                for (let invalidEmail of response.InvalidEmails) {
+                    messages.push(invalidEmail.email);
+                }
+            }
+            this.dialogsService.alert(messages, null, DialogType.SUCCESS);
         }
         this.showSpinner = false;
         this.dialogRef.close();
