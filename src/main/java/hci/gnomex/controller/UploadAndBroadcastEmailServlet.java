@@ -17,10 +17,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import javax.json.Json;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonWriter;
+
 import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
@@ -152,8 +155,10 @@ public class UploadAndBroadcastEmailServlet extends HttpServlet {
             appUserQuery.setParameterList("ids", coreIds);
             List appUsers = appUserQuery.list();
 
+            JsonObjectBuilder jsonResult = null;
+            JsonArrayBuilder jsonArrayInvalidEmails = Json.createArrayBuilder();
+
             int userCount = 0;
-            List<String> invalidEmails = new ArrayList<>();
             if (body != null && body.length() > 0) {
 
                 for (Iterator i = appUsers.iterator(); i.hasNext(); ) {
@@ -161,7 +166,11 @@ public class UploadAndBroadcastEmailServlet extends HttpServlet {
 
                     String emailRecipients = appUser.getEmail();
                     if (!MailUtil.isValidEmail(emailRecipients)) {
-                        invalidEmails.add(emailRecipients);
+                        JsonObject jsonObjectValidEmail = Json.createObjectBuilder()
+                                          .add("idAppUser", appUser.getIdAppUser())
+                                          .add("email", emailRecipients)
+                                          .build();
+                        jsonArrayInvalidEmails.add(jsonObjectValidEmail);
                         continue;
                     }
 
@@ -182,46 +191,29 @@ public class UploadAndBroadcastEmailServlet extends HttpServlet {
             }
 
             res.setHeader("Cache-Control", "max-age=0, must-revalidate");
-
-            String baseURL = "";
-            StringBuffer fullPath = req.getRequestURL();
-            String extraPath = req.getServletPath() + (req.getPathInfo() != null ? req.getPathInfo() : "");
-            int pos = fullPath.lastIndexOf(extraPath);
-            if (pos > 0) {
-                baseURL = fullPath.substring(0, pos);
-            }
-
-            org.dom4j.io.OutputFormat format1 = org.dom4j.io.OutputFormat.createPrettyPrint();
-            org.dom4j.io.HTMLWriter writer;
-            res.setContentType("text/html; charset=UTF-8");
-
-            Document doc = DocumentHelper.createDocument();
-            Element root = doc.addElement("HTML");
-            Element head = root.addElement("HEAD");
-            Element link = head.addElement("link");
-            link.addAttribute("rel", "stylesheet");
-            link.addAttribute("type", "text/css");
-            link.addAttribute("href", baseURL + "/css/message.css");
-            Element body1 = root.addElement("BODY");
-            Element h3 = body1.addElement("H3");
-            h3.addCDATA("The email has been successfully sent to " + userCount + " GNomEx users.\n\n");
-            if (invalidEmails.size() > 0) {
-                h3.addCDATA("The email was not sent to the following user(s): ");
-                for (Iterator i = invalidEmails.iterator(); i.hasNext(); ) {
-                    String email = (String) i.next();
-                    h3.addCDATA(email);
-                    if (i.hasNext()) {
-                        h3.addCDATA(", ");
-                    }
-                }
-            }
-            body1.addElement("BR");
-            body1.addElement("BR");
-            writer = new org.dom4j.io.HTMLWriter(res.getWriter(), format1);
-            writer.write(doc);
-            writer.flush();
-            writer.close();
             res.setStatus(HttpServletResponse.SC_ACCEPTED);
+            res.setContentType("application/json; charset=UTF-8");
+            jsonResult = Json.createObjectBuilder()
+                       .add("result", "SUCCESS")
+                       .add("userCount", "" + userCount)
+                       .add("InvalidEmails", jsonArrayInvalidEmails.build());
+
+            JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
+            jsonWriter.writeObject(jsonResult.build());
+            jsonWriter.close();
+
+        } catch (ServletException e) {
+            LOG.error("An exception has occurred in UploadAndBroadcastEmailServlet ", e);
+            res.addHeader("message", e.getMessage());
+            res.setContentType("application/json; charset=UTF-8");
+
+            JsonObject jsonResultError = Json.createObjectBuilder()
+                                             .add("result", "ERROR")
+                                             .add("message", e.getMessage())
+                                             .build();
+            JsonWriter jsonWriter = Json.createWriter(res.getOutputStream());
+            jsonWriter.writeObject(jsonResultError);
+            jsonWriter.close();
 
         } catch (Exception e) {
             LOG.error("An exception has occurred in UploadAndBroadcastEmailServlet ", e);
