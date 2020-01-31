@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {ChangeDetectorRef, ChangeDetectionStrategy, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {ConstantsService} from "../services/constants.service";
 import {ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
@@ -128,6 +128,7 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
             </mat-dialog-actions>
         </div>
     `,
+    changeDetection: ChangeDetectionStrategy.OnPush,
     styles: [`
         div.trees-container {
             width: 60em;
@@ -197,7 +198,8 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     }
 
     ngOnInit() {
-        this.utilService.registerChangeDetectorRef(this.changeDetector);
+        this.isFDTSupported = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_FDT_SUPPORTED);
+
         this.filesOptions = {
             idField: 'fileTreeID',
             displayField: 'displayName',
@@ -243,15 +245,9 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
             this.selectFilesRecursively(this.data.downloadListSource, 'N');
             this.data.downloadListSource.isSelected = 'Y';
             this.filesToDownloadNodes = [this.data.downloadListSource];
-            setTimeout(() => {
-                this.updateFilesToDownloadTree();
-            });
         }
 
-        this.isFDTSupported = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_FDT_SUPPORTED);
-
         if (this.securityAdvisor.isGuest) {
-            setTimeout(() => {
                 let terms: string = this.propertyService.getPropertyValue(PropertyService.PROPERTY_GUEST_DOWNLOAD_TERMS);
                 if (terms) {
                     let guestTermsConfig: MatDialogConfig = new MatDialogConfig();
@@ -273,30 +269,24 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
                                 }
                     });
                 }
-            });
         }
     }
 
     ngOnDestroy(): void {
-        this.utilService.removeChangeDetectorRef(this.changeDetector);
     }
 
     private updateFilesToDownloadTree(): void {
-        setTimeout(() => {
             this.filesToDownloadTreeComponent.treeModel.filterNodes((node: TreeNode) => {
                 return node.data.isSelected === 'Y';
             });
-        });
 
-        setTimeout(() => {
             this.filesToDownloadCount = this.countFilesRecursively(this.filesToDownloadNodes[0], true);
             this.filesToDownloadSize = this.countFileSizeRecursively(this.filesToDownloadNodes[0], true);
             this.filesToDownloadSizeLabel = FileService.formatFileSize(this.filesToDownloadSize);
-        });
     }
 
     private countFilesRecursively(fileNode: any, filterSelectedOnly: boolean = false): number {
-        if (filterSelectedOnly && fileNode.isSelected === 'N') {
+        if (filterSelectedOnly && fileNode.isSelected === 'N' && fileNode.type !== 'dir') {
             return 0;
         }
 
@@ -314,7 +304,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     }
 
     private countFileSizeRecursively(fileNode: any, filterSelectedOnly: boolean = false): number {
-        if (filterSelectedOnly && fileNode.isSelected === 'N') {
+        if (filterSelectedOnly && fileNode.isSelected === 'N' && fileNode.type !== 'dir') {
             return 0;
         }
 
@@ -386,9 +376,8 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     };
 
     public onDropInDownload(event: any): void {
-        setTimeout(() => {
+            this.changeDetector.markForCheck();
             this.moveNode(this.filesToDownloadTreeComponent.treeModel, null, event, {from: this.availableFilesTreeComponent, to: this.filesToDownloadTreeComponent});
-        });
     }
 
     public onRemoveFromDownload(event: any): void {
@@ -404,7 +393,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     }
 
     private gatherFilesToDownloadHelper(fileNode: any): any[] {
-        if (fileNode.isSelected === 'N') {
+        if (fileNode.isSelected === 'N' && fileNode.type !== 'dir') {
             return [];
         }
 
@@ -503,8 +492,8 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     }
 
     public permitDrop($event: any) {
-        if (event) {
-            event.preventDefault();
+        if ($event) {
+            $event.preventDefault();
         }
     }
 }

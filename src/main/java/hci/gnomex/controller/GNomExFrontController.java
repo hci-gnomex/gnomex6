@@ -202,7 +202,7 @@ protected static void initLog4j() {
         && (!requestName.equals("ShowTopicTree"))) {
       LOG.debug("Invalid SecurityAdvisor");
       commandInstance.addInvalidField(
-          "SecurityAdvisor", "You must create a SecurityAdvisor in order to run this command.");
+          "SecurityAdvisor", "GNomEx has logged out due to inactivity. Please login.");
     }
     // if command still valid, call the loadCommand method
     if (commandInstance.isValid()) {
