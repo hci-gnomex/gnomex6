@@ -106,7 +106,7 @@ public class LinkData extends TimerTask {
                 regex = args[++i];
             }else if(args[i].equals("-cp")){
                 i++;
-                while(args[i].charAt(0) != '-'){
+                while(i < args.length && args[i].charAt(0) != '-'){
                     captureGroupIndexes.add(Integer.parseInt(args[i]));
                     i++;
                 }

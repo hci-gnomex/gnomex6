@@ -1,5 +1,7 @@
 package hci.gnomex.daemon.auto_import;
 
+import org.apache.commons.lang3.builder.Diff;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,6 +14,7 @@ import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.*;
 import java.sql.Timestamp;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
@@ -19,7 +22,7 @@ public class Downloader {
 
 
 	private String mode;
-	private Map<String,String>fileNameList;
+	private Map<String,List<String>> fileNameMap;
 	private String dependentDataPath;
 	private String fileOfPaths;
 
@@ -27,7 +30,8 @@ public class Downloader {
 	private final String rootAvatar = "HCI_Molecular_Data:/";
 	private List<String> flaggedFileList;
 	private boolean allowClearFile = false;
-	
+	private String filterRegex;
+
 	Downloader(String[] args ){
 		this.mode = "avatar";
 		for (int i = 0; i < args.length; i++) {
@@ -50,6 +54,8 @@ public class Downloader {
 
 			}else if(args[i].equals("-allowclearfile")){
 				this.allowClearFile = true;
+			}else if(args[i].equals("-filterregex")){
+				filterRegex = args[++i];
 			} else if (args[i].equals("-help")) {
 				//printUsage();
 				System.exit(0);
@@ -60,7 +66,7 @@ public class Downloader {
 			System.exit(1);
 		}
 
-		this.fileNameList = new TreeMap<String,String>();
+		this.fileNameMap = new TreeMap<String,List<String>>();
 		this.flaggedFileList = new ArrayList<String>();
 	}
 
@@ -94,19 +100,19 @@ public class Downloader {
 		}
 		return hasError;
 	}
-	
+
 	private void executeCommands(List<String> commands) {
 
 		File tempScript = null;
-		
+
 		try {
 			System.out.println("started executing command");
 			tempScript = createTempScript(commands);
 			ProcessBuilder pb = new ProcessBuilder("bash", tempScript.toString());
 			pb.inheritIO();
 			Process process;
-            File errorFile = new File( dependentDataPath +"download-error.log");
-            pb.redirectError(errorFile);
+			File errorFile = new File( dependentDataPath +"download-error.log");
+			pb.redirectError(errorFile);
 
 			process = pb.start();
 			process.waitFor();
@@ -130,53 +136,52 @@ public class Downloader {
 			tempScript.delete();
 		}
 	}
-	
-	
-	
+
+
+
 
 	private File createTempScript(List<String> commands) throws IOException {
 		File tempScript = File.createTempFile("script", null);
 
 		Writer streamWriter = new OutputStreamWriter(new FileOutputStream(tempScript));
 		PrintWriter printWriter = new PrintWriter(streamWriter);
-		
-		
+
+
 		for(int i =0; i < commands.size(); i++) {
 			printWriter.println(commands.get(i));
 		}
-		
+
 		printWriter.close();
 
 		return tempScript;
 	}
-	
+
 	public void executeAvatarDownload() {
-		
+
 		List<String> commands = new ArrayList<String>();
-		
+
 		String parsedDownloadList = prepDownloadString(this.rootAvatar);
-		
+
 		if(parsedDownloadList.equals("unsafe")) { // downloading is in progress, no need to continue
 			System.out.println("The process has been aborted because files are already downloading" );
 			System.exit(3);
 		}
-		
-		
-		
+
+
+
 		//["Downloading in Progress..."]
-		
 		List<String> status = Arrays.asList("Downloading in progress...");
 		writeToFile(this.dependentDataPath + "download.log",status); // /home/u0566434/parser_data/download.log
 
 
 		// Execute download actually
 		String downloadCommand = "dx download " + parsedDownloadList;
+
 		//dx download "project-xxxx:/my_folder/example.bam"
 		System.out.println("These command for files to be downloaded: " + downloadCommand);
-		
 		commands.add("#!/bin/bash");
 		commands.add("cd " + this.downloadPath);
-		commands.add("mv -t ./ " + this.downloadPath+ "/Flagged/*" );
+		commands.add("mv -t ." + File.separator + " " +  this.downloadPath + File.separator +"Flagged" + File.separator +  "*" );
 		if(!parsedDownloadList.equals("")){
 			commands.add(downloadCommand);
 		}else{
@@ -184,34 +189,19 @@ public class Downloader {
 		}
 
 
-		//commands.add("sleep 40s");
-		//commands.add("wget /dev/null http://speedtest.dal01.softlayer.com/downloads/test100.zip");
-	
 		executeCommands(commands);
-		
-		List<String> reDownloadList = Arrays.asList("SL8834234");
-		//boolean dSuccess = downloadSuccesful(reDownloadList);
-		
-		// determine if download successful && make log
-		if(!true) {
-			System.out.println("One or more downloads failed, and will be requeued for downloading.");
-			writeToFile(this.fileOfPaths,reDownloadList); ///home/u0566434/parser_data/uniqueFilesToDownload.txt
-			// need to limit  fileNameList
-		}else {
-			
-			System.out.println("The dowload was a success!!!!!!");
-			ArrayList<String> downloadedList = new ArrayList<String>();
-			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-	    
-			
-			downloadedList.add("Dowloaded successfully, " + timestamp );
-			downloadedList.add(this.createFormattedPath("~/", true, true).replace("\"", ""));
 
-			writeToFile(this.dependentDataPath + "download.log", downloadedList);
-			
-			
-		}
-			
+		System.out.println("The dowload finished");
+		ArrayList<String> downloadedList = new ArrayList<String>();
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+
+		downloadedList.add("Dowloaded successfully, " + timestamp );
+		downloadedList.add(this.createFormattedPath("", true, true).replace("\"", ""));
+
+		writeToFile(this.dependentDataPath + "download.log", downloadedList);
+
+
 	}
 
 	public void executeTempusDownload() {
@@ -219,7 +209,7 @@ public class Downloader {
 
 		List<String> status = Arrays.asList("Downloading in progress...");
 		writeToFile(this.dependentDataPath + "download.log",status); // /home/u0566434/parser_data/download.log
-		writeToFile(this.fileOfPaths, this.fileNameList);
+		writeToFile(fileOfPaths,this.fileNameMap);
 
 		String downloadCommand = "cat " + this.fileOfPaths + " | xargs -P10 -I {} aws --profile tempus s3 cp {} " + this.downloadPath;
 		System.out.println(downloadCommand);
@@ -236,82 +226,91 @@ public class Downloader {
 		writeToFile(this.dependentDataPath + "download.log", downloadedList);
 
 	}
-	
-	private boolean downloadSuccesful(List<String> requeueList ) {
-		
-		String sumNewFiles = this.dependentDataPath + "tempNewFilesSum.out";
-		String sumRemoteFiles = this.dependentDataPath + "FakeSum.out";
-		
-		
-		List<String> commands = new ArrayList<String>();
-		commands.add("md5sum " + this.downloadPath + "* > " + sumNewFiles);
-		executeCommands(commands);
 
-		
-		//Differ d = new Differ(Arrays.asList("remote","tempNewFilesSum.out"));
-		//d.findDifference();
-		
-		
-		
-		//call a subprocess(perform checksum on downloaded files and compare to )
-		//
-		return false;
-	}
-	
 
-	
-	private void executeNewFilesList(List<String> requeueList ) {
-		List<String> commands = new ArrayList<String>();
-		
-		if(requeueList.size() > 0 ) {
-			
+	private void addToFileNameMap(String aliasKey,  String fullPathFileVal){
+		if(fileNameMap.get(aliasKey) != null){
+			fileNameMap.get(aliasKey).add(fullPathFileVal);
+		}else{
+			fileNameMap.put(aliasKey, new ArrayList<>(Arrays.asList(fullPathFileVal)));
 		}
-		else {
-		
-			
-		}
-		
-		executeCommands(commands);
-		
 	}
 
 	public void loadFileNames(){
-		
-		
+
+
 		FileReader reader = null;
 		try {
 			reader = new FileReader(new File(this.fileOfPaths));
 			BufferedReader buffReader = new BufferedReader(reader);
-			
+			Pattern pattern = null;
+			Set<String> removedFlaggedSet = new TreeSet<String>();
+
+			if(filterRegex != null){
+				pattern = Pattern.compile(filterRegex);
+			}
+
+
+
 			String line = "";
 			while((line = buffReader.readLine()) != null) {
 				if(!line.trim().equals("")){
 					String[] fullPath = line.split("/");
 					String fileName = fullPath[fullPath.length - 1];
-					fileNameList.put(fileName, line);
 
+					if(filterRegex != null){
+						Matcher m = pattern.matcher(fileName);
+						if(m.matches()){
+							String matchedFileName = Differ.constructMatchedFileName(1,3,m, new StringBuilder() );
+							addToFileNameMap(matchedFileName, line);
+						}else{
+							System.out.println("Could not match pattern " + pattern.pattern() + " ON text " + fileName );
+						}
+					}else{
+						addToFileNameMap(fileName, line);
+					}
 				}
 
 			}
-			if(fileNameList.size() < 1) {
+			if(fileNameMap.size() < 1) {
 				throw new Exception("Appears to be no new files to download");
 			}
-			System.out.println("Total files to download: " + fileNameList.size());
+			System.out.println("Total files to download: " + fileNameMap.size());
 
 			File flaggedFolder = new File(this.downloadPath + "/Flagged/");
 			for(File file: flaggedFolder.listFiles()){
 				if(!file.isDirectory()){
-					String fileName = this.fileNameList.remove(file.getName());
-					if(fileName != null){
-						System.out.println("Filtering out: " + fileName);
-						this.flaggedFileList.add(fileName);
+					String flaggedFileName = "";
+					if(filterRegex != null){
+						Matcher m = pattern.matcher(file.getName());
+						if(m.matches()){
+							flaggedFileName = Differ.constructMatchedFileName(1,3,m, new StringBuilder() );
+						}else{
+							System.out.println("Could not match pattern " + pattern.pattern() + " ON text " + file.getName() );
+						}
+
 					}else{
-						System.out.println("[downloader] This flagged file wasn't found: "  +  file.getName());
+						flaggedFileName = file.getName();
+					}
+					if(removedFlaggedSet.contains(flaggedFileName)){
+						continue;
+					}
+
+					List<String> fileNames = this.fileNameMap.remove(flaggedFileName);
+					removedFlaggedSet.add(flaggedFileName);
+
+					if(fileNames != null){
+						for(String fileName : fileNames){
+							System.out.println("Filtering out: " + fileName);
+							this.flaggedFileList.add(fileName);
+						}
+					}else{
+						System.out.println("[downloader] This flagged file wasn't found: "  +  file.getName() + " to filter out for download");
 					}
 
 				}
 			}
-			System.out.println("Files to download after excluding already downloaded Flagged Files: " + fileNameList.size() );
+			System.out.println("Files to download after excluding already downloaded Flagged Files: " + fileNameMap.size() );
 
 			if(this.allowClearFile){
 				writeToFile(this.fileOfPaths, new ArrayList<String>());
@@ -333,16 +332,16 @@ public class Downloader {
 				System.out.print("Couldn't close the file reader");
 			}
 		}
-		
+
 	}
-	
-	
-	
+
+
+
 	public String prepDownloadString(String root) {
 		String strPaths = "unsafe";
 		boolean hasNewLines = false;
 		boolean safe = downloadSafe();
-		
+
 		if (safe) {
 			strPaths = createFormattedPath(root, hasNewLines, false);
 		}
@@ -351,11 +350,11 @@ public class Downloader {
 		return strPaths;
 
 	}
-	
+
 	private boolean downloadSafe() {
 		boolean safe = false;
 		PrintWriter writer = null;
-		
+
 		try {
 			BufferedReader bf = new BufferedReader(new FileReader(this.dependentDataPath + "download.log")); /// home/u0566434/parser_data/download.log
 			String line = bf.readLine();
@@ -363,7 +362,7 @@ public class Downloader {
 			if (!line.equals("Downloading in progress...")) { // If downloading in progress it is not 'safe' to continue
 				safe = true;
 			}
-			
+
 		} catch (FileNotFoundException e) { // File hasn't been created so lets make it
 			// TODO Auto-generated catch block
 			try {
@@ -382,39 +381,43 @@ public class Downloader {
 			if(writer != null) {
 				writer.close();
 			}
-			
+
 		}
 		return safe;
-		
+
 	}
 
-	public Map<String,String> getFileNameList() {
-		return fileNameList;
+	public Map<String,List<String>> getFileNameMap() {
+		return fileNameMap;
 	}
-	
+
 	public String createFormattedPath(String root, boolean hasNewLine, boolean afterDownload) {
 		StringBuilder strBuild = new StringBuilder();
 		int count = 0;
 
-		for (Map.Entry<String, String> entry : fileNameList.entrySet()) {
-			String pathWithFileName = entry.getValue();
-				strBuild.append("\"");
-				strBuild.append(root);
-			String safeFileName = pathWithFileName.replaceAll(" ", "\\\\ ");
-			strBuild.append(safeFileName);
-				strBuild.append("\"");
-			if(hasNewLine) {
-				if(count < fileNameList.size()) {
-					strBuild.append("\n");
+		for (Map.Entry<String, List<String>> entry : fileNameMap.entrySet()) {
+			List<String> fullPathFileList = entry.getValue();
+			for(int i = 0; i <  fullPathFileList.size(); i++){
+				String pathFile = fullPathFileList.get(i);
+
+				if(mode.equals("avatar")){
+					strBuild.append("\"");
 				}
-			}
-			else {
-				if(count < fileNameList.size() - 1) {
+
+				strBuild.append(root);
+				String safeFileName = pathFile.replaceAll(" ", "\\\\");
+				strBuild.append(safeFileName);
+
+				if(mode.equals("avatar")){
+					strBuild.append("\"");
+				}
+
+				if(hasNewLine) {
+					strBuild.append("\n");
+				} else {
 					strBuild.append(" ");
 				}
 			}
-		
-			count++;
 		}
 
 		// flagged files added now, even though they weren't downloaded this attempt. Since they were in the past
@@ -425,15 +428,15 @@ public class Downloader {
 				String safeFileName = flaggedFileName.replaceAll(" ", "\\\\ ");
 
 				strBuild.append(safeFileName);
+
+				if(i == (flaggedFileList.size() - 1) ){
+					continue;
+				}
 				if(hasNewLine) {
-					if(i < flaggedFileList.size() - 1) {
-						strBuild.append("\n");
-					}
+					strBuild.append("\n");
 				}
 				else {
-					if(i < flaggedFileList.size() - 1) {
-						strBuild.append(" ");
-					}
+					strBuild.append(" ");
 				}
 
 			}
@@ -443,20 +446,20 @@ public class Downloader {
 
 		return strBuild.toString();
 	}
-	
-	
-	
+
+
+
 	public List<String> readFile(String fileName) throws IOException{
 		BufferedReader bf = null;
-		List<String> dataFromFileList = new ArrayList(); 
-		
+		List<String> dataFromFileList = new ArrayList();
+
 		try {
 			bf = new BufferedReader(new FileReader(fileName));
 			String line = "";
 			while((line= bf.readLine()) != null) {
 				dataFromFileList.add(line);
 			}
-			
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -465,12 +468,14 @@ public class Downloader {
 		}
 		return dataFromFileList;
 	}
-	public void writeToFile(String fileName, Map<String,String> dataToWrite) {
+	public void writeToFile(String fileName, Map<String, List<String>> dataToWrite) {
 		PrintWriter writer = null;
 		try {
 			writer = new PrintWriter(fileName);
-			for (Map.Entry<String,String> entry : dataToWrite.entrySet()) {
-				writer.println(entry.getValue());
+			for (Map.Entry<String,List<String>> entry : dataToWrite.entrySet()) {
+				for(String val : entry.getValue()){
+					writer.println(val);
+				}
 			}
 
 
@@ -481,7 +486,7 @@ public class Downloader {
 		}
 
 	}
-	
+
 	public void writeToFile(String fileName, List<String> dataToWrite) {
 		PrintWriter writer = null;
 		try {
@@ -489,14 +494,14 @@ public class Downloader {
 			for (int i = 0; i < dataToWrite.size(); i++) {
 				writer.println(dataToWrite.get(i));
 			}
-			
-			
+
+
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}finally {
 			writer.close();
 		}
-		
+
 	}
 
 

@@ -66,7 +66,7 @@ public class Differ {
 					}
 				}
 
-			} else if (args[i].equals("-help")) {
+			}else if (args[i].equals("-help")) {
 				//printUsage();
 				System.exit(0);
 			}
@@ -261,8 +261,11 @@ public class Differ {
 
 	}
 
-	public static String  constructMatchedFileName(Integer startCaptureGroup, Integer endCaptureGroup, Matcher m, StringBuilder renameBuildStr ){
+
+
+	public static String  constructMatchedFileName(Integer startCaptureGroup, Integer endCaptureGroup, Matcher m, StringBuilder renameBuildStr){
 		int endRange =  0;
+
 		if(startCaptureGroup == null ){ // if cp wasn't specified in args default to capture all groups
 			startCaptureGroup = 0;
 			endCaptureGroup = m.groupCount();
@@ -275,11 +278,15 @@ public class Differ {
 
 
 		for(int i = startCaptureGroup ; i <= endCaptureGroup; i++ ){
+			if (m.group(i) == null) {
+				continue;
+			}
 			renameBuildStr.append(m.group(i));
 			if(i < m.groupCount()){
 				renameBuildStr.append("-");
 			}
 		}
+
 		String rename = renameBuildStr.toString();
 		renameBuildStr.setLength(0);
 
@@ -288,7 +295,9 @@ public class Differ {
 
 	public static String getNameByExistingCaptureGroup( List<Integer> captureGroups, Matcher m ){
 		String matchedName = "";
-
+		if(!m.matches()){
+			System.out.println("With your given pattern: " + m.pattern() + " no match is found please check pattern");
+		}
 
 		for(Integer cp : captureGroups){
 			if(m.groupCount() < cp){
@@ -297,7 +306,7 @@ public class Differ {
 			}
 
 			String name  = m.group(cp);
-			if(name != null || !name.equals("")){
+			if(name != null ){
 				matchedName = name;
 				break;
 			}

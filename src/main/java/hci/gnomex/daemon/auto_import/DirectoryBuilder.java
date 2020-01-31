@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 public class DirectoryBuilder {
 
 
+
 	private String inFileName;
 	private String root;
 	private String currentDownloadLocation;
@@ -39,12 +40,14 @@ public class DirectoryBuilder {
 	private static final Integer TEMPUS_GROUP_ID = 22;
 	private static final int TEST_TYPE_PROPERTY_ID = 21;
 	private boolean isWindows;
+	private List<Integer> captureGroupIndexes;
+	private String sampleIdRegex;
 
 
 
 
 	public DirectoryBuilder(String[] args) {
-
+		captureGroupIndexes = new ArrayList<Integer>();
 		for (int i = 0; i < args.length; i++) {
 			args[i] =  args[i].toLowerCase();
 
@@ -64,11 +67,29 @@ public class DirectoryBuilder {
 				this.mode = args[++i];
 			}else if(args[i].equals("-linkfolder")){
 				addWrapperFolder = true;
-			} else if (args[i].equals("-help")) {
+			}else if(args[i].equals("-cp")){
+				i++;
+				while(i < args.length && args[i].charAt(0) != '-' ){
+					captureGroupIndexes.add(Integer.parseInt(args[i]));
+					i++;
+				}
+				if(captureGroupIndexes.size() == 0){
+					System.out.println("If you want to specify which capture groups. You need to provide atleast one index");
+					System.exit(1);
+				}
+
+			}else if(args[i].equals("-regex")){
+				// this regex is to help match sample id so you can determine it's request and get the HCI Person ID off it
+				sampleIdRegex = args[++i];
+			}  else if (args[i].equals("-help")) {
 				//printUsage();
 				System.exit(0);
 			}
 		}
+		if(sampleIdRegex != null && captureGroupIndexes.size() == 0){
+			captureGroupIndexes.add(1);
+		}
+
 		if(System.getProperty("os.name").startsWith("Windows")){
 			isWindows = true;
 		}else{
@@ -333,6 +354,11 @@ public class DirectoryBuilder {
 			String file = pathChunks[pathChunks.length - 1];
 			String[] fileChunks = file.split("\\.");
 			String fileName = fileChunks[0].split("_")[0];
+			if(sampleIdRegex != null){ // if regex override default split by '_'
+				Pattern samplePattern = Pattern.compile(sampleIdRegex);
+				Matcher m = samplePattern.matcher(fileChunks[0]);
+				fileName = Differ.getNameByExistingCaptureGroup(captureGroupIndexes,m);
+			}
 
 			String staged = "";
 			//sometimes the file in read in has the relative path on the stage folder others it is the remote path
@@ -397,7 +423,8 @@ public class DirectoryBuilder {
 
 		}catch(Exception e){
 			e.printStackTrace();
-			return false;
+			q.closeConnection();
+			System.exit(1);
 		}finally {
 			q.closeConnection();
 		}
@@ -434,7 +461,6 @@ public class DirectoryBuilder {
 			}
 
 		}
-
 
 		return filterID ;
 	}
