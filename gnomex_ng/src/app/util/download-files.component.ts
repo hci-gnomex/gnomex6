@@ -296,7 +296,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     }
 
     private countFilesRecursively(fileNode: any, filterSelectedOnly: boolean = false): number {
-        if (filterSelectedOnly && fileNode.isSelected === 'N') {
+        if (filterSelectedOnly && fileNode.isSelected === 'N' && fileNode.type !== 'dir') {
             return 0;
         }
 
@@ -314,7 +314,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     }
 
     private countFileSizeRecursively(fileNode: any, filterSelectedOnly: boolean = false): number {
-        if (filterSelectedOnly && fileNode.isSelected === 'N') {
+        if (filterSelectedOnly && fileNode.isSelected === 'N' && fileNode.type !== 'dir') {
             return 0;
         }
 
@@ -404,7 +404,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     }
 
     private gatherFilesToDownloadHelper(fileNode: any): any[] {
-        if (fileNode.isSelected === 'N') {
+        if (fileNode.isSelected === 'N' && fileNode.type !== 'dir') {
             return [];
         }
 
