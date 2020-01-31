@@ -242,6 +242,9 @@ public class FastDataTransferDownloadProductOrderServlet extends HttpServlet {
                     response.getOutputStream().println("<BR>2) Open port 54321 in all firewalls surrounding your computer (this may occur automatically upon transfer).");
                     response.getOutputStream().println("<BR>3) Execute the following on the command line(Make sure paths reflect your environment):");
                     response.getOutputStream().println("<BR>4) There is a 24 hour timeout on this command.  After that time please generate a new command line using the FDT Upload Command Line link.");
+                    response.getOutputStream().println("<BR><BR>For a Windows system use this command line:");
+                    response.getOutputStream().println("<BR>java -jar fdtCommandLine.jar -noupdates -pull -r -c " + fdtServerName + " -d . " + softLinksPath + "</P>");
+                    response.getOutputStream().println("<BR><BR>Otherwise use this command line:");
                     response.getOutputStream().println("<BR>java -jar ./fdtCommandLine.jar -noupdates -pull -r -c " + fdtServerName + " -d ./ " + softLinksPath + "</P>");
                     response.getOutputStream().flush();
                     return;

@@ -99,10 +99,11 @@ public class FastDataTransferUploadGetJnlpServlet extends HttpServlet {
                     response.getOutputStream().println("3) Execute the following on the command line(Make sure paths reflect your environment):");
                     response.getOutputStream().println("<br>");
                     response.getOutputStream().println("4) There is a 24 hour timeout on this command.  After that time please generate a new command line using the FDT Upload Command Line link.");
-                    response.getOutputStream().println("<br>");
+                    response.getOutputStream().println("<BR><BR>For a Windows system use this command line:");
+                    response.getOutputStream().println("java -jar fdtCommandLine.jar -noupdates -ka 999999 -r -c " + fdtServerName + " -d " + softLinksPath + " .");
+                    response.getOutputStream().println("<BR><BR>Otherwise use this command line:");
                     response.getOutputStream().println("java -jar ./fdtCommandLine.jar -noupdates -ka 999999 -r -c " + fdtServerName + " -d " + softLinksPath + " ./");
                     response.getOutputStream().println("</p>");
-
                     response.getOutputStream().flush();
                     return;
                 }
