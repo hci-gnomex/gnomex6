@@ -1,11 +1,13 @@
 package hci.gnomex.controller;
 
 import hci.gnomex.model.AppUser;
+import hci.gnomex.model.CoreFacility;
 import hci.gnomex.model.Lab;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.*;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -45,6 +47,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 	String labEmail = "";
 	String labPhone = "";
 	Integer requestedLabId = new Integer(-1);
+	List<Integer> idCoreFacilities = null;
 
 	try {
 		Session sess = HibernateSession.currentSession("approveUserServlet");
@@ -81,6 +84,20 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 		if (request.getParameter("department") != null && !request.getParameter("department").equals("")) {
 			department = request.getParameter("department");
 		}
+		if(request.getParameter("idCoreFacilities") != null && !request.getParameter("idCoreFacilities").equals("")){
+			try{
+				String[] coreFacilitiesArray =  (request.getParameter("idCoreFacilities")).split(",");
+				idCoreFacilities = new ArrayList<>();
+				for(String idCoreFacility : coreFacilitiesArray){
+					idCoreFacilities.add(Integer.parseInt(idCoreFacility));
+				}
+			}catch(Exception e){
+				message = "Error was cause when trying to determine which core facility lab belongs to please contact GNomEx Support ";
+				throw new Exception(message);
+			}
+
+		}
+
 
 		PropertyDictionaryHelper pdh = PropertyDictionaryHelper.getInstance(sess);
 		DictionaryHelper dictionaryHelper = DictionaryHelper.getInstance(sess);
@@ -136,6 +153,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 					theLab.setContactPhone(labPhone);
 					theLab.setDepartment(department);
 					theLab.setIsActive("Y");
+					theLab.setCoreFacilities(new HashSet<CoreFacility>());
 				}
 
 			} else if (requestedLabId != -1) {
@@ -145,7 +163,16 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 			HashSet labSet = new HashSet();
 			labSet.add(theLab);
 			au.setLabs(labSet);
-			theLab.setCoreFacilities();
+			if(requestedLabId == -1 && idCoreFacilities != null ){
+				for(Integer idCoreFacilty :  idCoreFacilities){
+					CoreFacility cf =  sess.load(CoreFacility.class, idCoreFacilty);
+					theLab.getCoreFacilities().add(cf);
+				}
+
+			}
+
+
+			//theLab.setCoreFacilities();
 
 			String url = request.getRequestURL().substring(0, request.getRequestURL().indexOf("ApproveUser.gx"));
 			String gnomexURL = "<a href='" + url + "'>Click here</a> to login.";
@@ -170,7 +197,9 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 		}
 
 	} catch (Exception e) {
-		message = "There was an issue activating the user.  Please activate through the GNomEx app and contact GNomEx support.  Thanks.";
+		if(message == null || message.equals("")){
+			message = "There was an issue activating the user.  Please activate through the GNomEx app and contact GNomEx support.  Thanks.";
+		}
 		LOG.error(message, e);
 	} finally {
 		try {
