@@ -91,9 +91,9 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 				for(String idCoreFacility : coreFacilitiesArray){
 					idCoreFacilities.add(Integer.parseInt(idCoreFacility));
 				}
-			}catch(Exception e){
+			}catch(NumberFormatException e){
 				message = "Error was cause when trying to determine which core facility lab belongs to please contact GNomEx Support ";
-				throw new Exception(message);
+				throw new NumberFormatException(message);
 			}
 
 		}
