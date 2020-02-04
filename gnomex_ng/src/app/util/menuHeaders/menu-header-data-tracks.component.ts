@@ -117,6 +117,8 @@ export class MenuHeaderDataTracksComponent implements OnInit {
 
     public makeNewDataTrack(): void {
         let title: string = "Add new data track to ";
+        let idAppUser:string = "" + this.createSecurityAdvisorService.idAppUser;
+
         if(this.selectedNode.data.isDataTrack) {
             title += this.selectedNode.parent.data.label;
         } else {
@@ -128,7 +130,8 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         config.width = "40em";
         config.height = "23em";
         config.data = {
-            selectedItem: this.selectedNode
+            selectedItem: this.selectedNode,
+            idAppUser: idAppUser
         };
         this.dialogsService.genericDialogContainer(NewDataTrackComponent, title, this.constantsService.ICON_DATATRACK, config,
             {actions: [
@@ -143,6 +146,7 @@ export class MenuHeaderDataTracksComponent implements OnInit {
 
     public makeNewFolder(): void {
         let title: string = "Add new data track folder to ";
+
         if(this.selectedNode.data.isDataTrack) {
             title += this.selectedNode.parent.data.label;
         } else {
@@ -156,6 +160,8 @@ export class MenuHeaderDataTracksComponent implements OnInit {
         config.data = {
             selectedItem: this.selectedNode
         };
+
+
 
         this.dialogsService.genericDialogContainer(NewDataTrackFolderComponent, title, this.constantsService.ICON_FOLDER_GROUP, config,
             {actions: [
