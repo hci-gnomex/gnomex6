@@ -142,6 +142,15 @@ export class DatatracksVisibilityTabComponent implements OnInit, OnDestroy{
 
         let allMembers : Array<any> =  activeMembers.concat(uniqueManagers);
         let sortedActiveMembers = allMembers.sort( this.getLabService.sortLabMembersFn );
+        let selectedOwner = sortedActiveMembers.find((mem) => {
+            return this.visibilityForm.get("idAppUser").value === mem.idAppUser
+        });
+        if(selectedOwner){
+            this.visibilityForm.get("idAppUser").setValue(selectedOwner.idAppUser)
+        }else{
+            this.visibilityForm.get("idAppUser").setValue("");
+        }
+
         this.getLabService.labMembersSubject.next(sortedActiveMembers);
 
     }
@@ -161,7 +170,6 @@ export class DatatracksVisibilityTabComponent implements OnInit, OnDestroy{
 
             this.getLabService.getLab(params).pipe(first()).subscribe( data =>{
                 if(data.Lab){
-                    this.visibilityForm.get("idAppUser").setValue(""); // setting empty string because new lab won't match owner
                     this.visibilityForm.get("lab").setValue(data.Lab.idLab);
                     this.lab = data.Lab;
                     this.makeOwnerList(data.Lab);
