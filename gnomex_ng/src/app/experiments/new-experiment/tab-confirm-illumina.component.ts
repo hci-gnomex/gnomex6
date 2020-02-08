@@ -129,6 +129,10 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
             let temp = this.propertyService.getProperty(PropertyService.PROPERTY_ESTIMATED_PRICE_WARNING, this._experiment.idCoreFacility, this._experiment.codeRequestCategory);
             this._estimatedChargesWarning = temp && temp.propertyValue ? temp.propertyValue : '';
+    
+            let emailInvoicePrice = this.propertyService.getProperty(PropertyService.PROPERTY_EMAIL_INVOICE_PRICE_AMOUNT, this._experiment.idCoreFacility, this._experiment.codeRequestCategory);
+            this.emailInvoicePriceAmount = emailInvoicePrice ? (emailInvoicePrice.propertyValue ? emailInvoicePrice.propertyValue : "$0.00") : '';
+    
 
             this.recalculateShowGenerateQuote();
         });
@@ -186,6 +190,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
     public totalEstimatedCharges: string = '$-.--';
     private _estimatedChargesWarning: string = '';
+    private emailInvoicePriceAmount: string = '';
 
     private tabIndexToInsertAnnotations: number;
 
@@ -807,6 +812,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
         this.isCheckboxChecked = false;
 
         if (this._experiment) {
+            this._experiment.invoicePrice = "";
             if (this._experiment.isExternal === 'Y') {
                 // This is an external experiment submission.  Don't attempt to get estimated charges.
                 this.totalEstimatedCharges = '$-.--';
@@ -860,6 +866,16 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                     }
 
                     this._experiment.billingItems = this.billingItems;
+                    
+                    // If the total estimated charges is bigger than the email_invoice_price_amount,
+                    // pass the invoice price to send emails to the lab's PI, managers and the submitter.
+                    if(this.emailInvoicePriceAmount && this.totalEstimatedCharges.match(/^.[\d,]+\.\d{2}$/)) {
+                        let estimatedCharges = this.totalEstimatedCharges.replace("$", "").replace(",", "");
+                        let invoicePrice = this.emailInvoicePriceAmount.replace("$", "").replace(",", "");
+                        if(parseFloat(estimatedCharges) > parseFloat(invoicePrice)) {
+                            this._experiment.invoicePrice = this.totalEstimatedCharges;
+                        }
+                    }
                 });
             }
         }
