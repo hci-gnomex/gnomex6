@@ -106,6 +106,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             codeIsolationPrepType: '',
             coreToExtractDNA: '',
             includeBisulfideConversion: '',
+            invoicePrice: '',
             includeQubitConcentration: ''
         }
     };

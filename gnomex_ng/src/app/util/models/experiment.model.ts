@@ -24,6 +24,7 @@ export class Experiment {
     public avgInsertSizeTo:                    string = "";
     public idSlideProduct:                     string = "";
     public protocolNumber:                     string = "";
+    public invoicePrice:                       string = "";
 
     public get numberOfSamples(): string {
         return this._numberOfSamples;

@@ -243,6 +243,7 @@ export class ExperimentsService {
             .set("requestJSONString", JSON.stringify(experiment.getJSONObjectRepresentation()))
             .set("description", experiment.description)
             .set("idProject", experiment.idProject)
+            .set("invoicePrice", experiment.invoicePrice)
             .set("propertiesXML", propertiesXML)
             .set("noJSONToXMLConversionNeeded","true");
 
