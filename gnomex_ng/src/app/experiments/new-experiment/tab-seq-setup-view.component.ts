@@ -247,7 +247,14 @@ export class TabSeqSetupViewComponent implements OnInit {
         }
     }
     set poolingType(value: string) {
-        // do nothing, value should change in form automatically.  This function needs to be defined for ngModel
+        if (this.form
+            && this.form.get("pooledLib")
+            && this.form.get("pooledLib").value) {
+
+            this._experiment.hasPrePooledLibraries = 'Y';
+        } else {
+            this._experiment.hasPrePooledLibraries = '';
+        }
     }
 
     get sequenceType(): any {
@@ -425,7 +432,13 @@ export class TabSeqSetupViewComponent implements OnInit {
     }
 
     public onNumTubesChanged(event): void {
-        this._experiment.numPrePooledTubes = event;
+        if (this._experiment
+            && this.form
+            && this.form.get('numTubes')
+            && this.form.get('numTubes')) {
+
+            this._experiment.numPrePooledTubes = this.form.get('numTubes').value
+        }
     }
 
     public filterApplication(requestCategory, seqPrepByCore): any[] {
