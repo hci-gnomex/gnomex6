@@ -75,6 +75,9 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
             }
         }
     }
+    get disabled(): boolean {
+        return this._disabled;
+    }
 
     @Input()
     set annotations(a: IAnnotation[]) {
