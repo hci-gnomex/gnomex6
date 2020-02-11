@@ -36,13 +36,9 @@ import {DialogType} from "./dialogs.service";
             </div>
             <mat-dialog-content class="flex-grow no-margin no-padding">
                 <hr>
-                <div *ngIf="message.length === 1"
-                     class="flex-grow full-width extra-padded message"
-                     [innerHTML]="message" style="white-space: pre-line"></div>
-                <div *ngIf="message.length > 1"
-                     class="flex-grow full-width extra-padded message">
-                    <div *ngFor="let line of message" class="full-width">
-                        {{ line }}
+                <div class="flex-grow full-width extra-padded message">
+                    <div *ngFor="let line of message" class="full-width"
+                        [innerHTML]="line" style="white-space: pre-line">
                     </div>
                 </div>
                 <br>
@@ -150,8 +146,8 @@ import {DialogType} from "./dialogs.service";
         if(this.dialogType) {
             this.defaultTitle = this.dialogType;
         }
-        if(this.message.length === 1) {
-            this.message[0] = this.message[0].replace(/\n/g, "<br>");
+        for(let i = 0; i < this.message.length; i++) {
+            this.message[i] = this.message[i].replace(/\n/g, "<br>") + "<br>";
         }
     }
 

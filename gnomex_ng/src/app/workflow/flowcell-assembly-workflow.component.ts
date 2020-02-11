@@ -756,11 +756,11 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             .set("flowCellDate", WorkflowService.convertDate(this.createDateFC.value))
             .set("idInstrument", this.instrumentFC.value ? this.instrumentFC.value.idInstrument : "")
             .set("idNumberSequencingCyclesAllowed", this.protocolFC.value ? this.protocolFC.value.idNumberSequencingCyclesAllowed : "")
-            .set("idSeqRunType", this.protocolFC.value.idSeqRunType)
+            .set("idSeqRunType", this.protocolFC.value.idSeqRunType ? this.protocolFC.value.idSeqRunType : "")
             .set("numberSequencingCyclesActual", this.protocolFC.value ? this.protocolFC.value.numberSequencingCyclesDisplay : "" )
-            .set("runNumber", this.runFC.value)
-            .set("side", this.sideFC.value ? this.sideFC.value : '')
-            .set("flowCellBarcode", this.barcodeFC.value)
+            .set("runNumber", this.runFC.value ? this.runFC.value : "")
+            .set("side", this.sideFC.value ? this.sideFC.value : "")
+            .set("flowCellBarcode", this.barcodeFC.value ? this.barcodeFC.value : "")
             .set("workItemXMLString", JSON.stringify(this.assmItemList));
 
         this.workflowService.saveWorkItemSolexaAssemble(params).subscribe((response: any) => {

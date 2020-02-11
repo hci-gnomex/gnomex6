@@ -38,7 +38,7 @@
         </div>
     </form>
     <div *ngIf="showConfigureAnnotationsButton" class="flex-grow">
-        <button mat-button color="primary" style="margin:1em" (click)="loadConfigAnnotations()"> Configure Annotations </button>
+        <button mat-raised-button class="minimize link-button" [disabled]="this.disabled" style="margin:1em" (click)="loadConfigAnnotations()"> Configure Annotations </button>
     </div>
 </div>
 

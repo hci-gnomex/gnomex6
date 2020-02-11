@@ -11,7 +11,6 @@ import {AgGridModule} from "ag-grid-angular/main";
 import {TrackUsageComponent} from "./track-usage.component";
 import {ChartsModule} from "ng2-charts";
 import {EmailAllUsersComponent} from "./email-all-users.component";
-import {EmailAllUsersLauncherComponent} from "./email-all-users-launcher.component";
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {AngularSplitModule} from "angular-split";
 import {TrackUsageDetailComponent} from "./track-usage-detail.component";
@@ -35,7 +34,6 @@ import {TrackUsageDetailComponent} from "./track-usage-detail.component";
         AnnotationReportComponent,
         TrackUsageComponent,
         EmailAllUsersComponent,
-        EmailAllUsersLauncherComponent,
         TrackUsageDetailComponent,
     ],
     exports: [
@@ -43,7 +41,6 @@ import {TrackUsageDetailComponent} from "./track-usage-detail.component";
         ProjectExperimentReportComponent,
         AnnotationReportComponent,
         TrackUsageComponent,
-        EmailAllUsersComponent,
         TrackUsageDetailComponent,
     ],
     entryComponents: [
