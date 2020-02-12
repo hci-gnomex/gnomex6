@@ -1221,6 +1221,12 @@ public class RequestParser implements Serializable {
       }
     }
 
+    if (n.get("qcLibConcentration") != null && !n.getString("qcLibConcentration").equals("")) {
+      sample.setQcLibConcentration(new BigDecimal(n.getString("qcLibConcentration")));
+    } else {
+      sample.setQcLibConcentration(null);
+    }
+
     sampleMap.put(idSampleString, sample);
     sampleIds.add(idSampleString);
 
@@ -1573,6 +1579,13 @@ public class RequestParser implements Serializable {
       } else {
         sample.setCcNumber(null);
       }
+    }
+
+    if (n.getAttributeValue("qcLibConcentration") != null && !n.getAttributeValue("qcLibConcentration").equals("")) {
+      String qcLibConcentration = n.getAttributeValue("qcLibConcentration").replaceAll(",", "");
+      sample.setQcLibConcentration(new BigDecimal(qcLibConcentration));
+    } else {
+      sample.setQcLibConcentration(null);
     }
 
     sampleMap.put(idSampleString, sample);

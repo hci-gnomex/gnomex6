@@ -518,10 +518,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
             value: 'Terminated',
             display: 'Terminate'
         });
-        temp.push({
-            value: 'Bypassed',
-            display: 'Bypass'
-        });
 
         return temp;
     }
@@ -886,6 +882,25 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     suppressSizeToFit: true,
                     editable: false,
                     sortOrder: 315
+                });
+    
+                temp.push({
+                    headerName: "Lib QC Conc.",
+                    field: "qcLibConcentration",
+                    width:    8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    maxWidth: 10 * this.emToPxConversionRate,
+                    cellEditorFramework: TextAlignLeftMiddleEditor,
+                    cellRendererFramework: TextAlignLeftMiddleRenderer,
+                    showFillButton: true,
+                    fillGroupAttribute: 'frontEndGridGroup',
+                    validators: [Validators.pattern(/^\d*\.\d{1}$/)],
+                    errorNameErrorMessageMap: [
+                        {errorName: "pattern", errorMessage: "Lib QC Conc must be numeric(8,1)"}
+                    ],
+                    suppressSizeToFit: true,
+                    editable: true,
+                    sortOrder: 320
                 });
             }
         }
@@ -1257,6 +1272,26 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 editable: true,
                 sortOrder: 303
             });
+    
+            temp.push({
+                headerName: "Lib QC Conc.",
+                field: "qcLibConcentration",
+                width:    8.5 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 10 * this.emToPxConversionRate,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup',
+                validators: [Validators.pattern(/^\d*\.\d{1}$/)],
+                errorNameErrorMessageMap: [
+                    {errorName: "pattern", errorMessage: "Lib QC Conc must be numeric(8,1)"}
+                ],
+                suppressSizeToFit: true,
+                editable: true,
+                sortOrder: 304
+            });
+    
             temp.push({
                 headerName: "QC Status",
                 field: "qualStatus",
@@ -1551,6 +1586,16 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 //     sortOrder: 302
                 // });
             }
+    
+            temp.push({
+                headerName: "Lib QC Conc.",
+                field: "qcLibConcentration",
+                width:    8.5 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 10 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false,
+            });
 
             temp.push({
                 headerName: "QC Status",

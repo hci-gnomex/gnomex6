@@ -105,6 +105,7 @@ export class Sample implements OnDestroy {
     public qualRINNumber:                   string = '';
     public otherSamplePrepMethod:           string = '';
     public isDirty:                         string = ''; // "Y";
+    public qcLibConcentration:              string = '';
 
     private _organism: any = {};
     public get organism(): any {
@@ -268,6 +269,7 @@ export class Sample implements OnDestroy {
         sample.cloneProperty("containerType", source);
         sample.cloneProperty("plateName", source);
         sample.cloneProperty("wellName", source);
+        sample.cloneProperty("qcLibConcentration", source);
 
         if (source) {
             for (let attribute of Object.keys(source)) {
@@ -383,6 +385,7 @@ export class Sample implements OnDestroy {
                     obj.treatment = '';
                     obj.frontEndGridGroup = '0';
                     obj.codeBioanalyzerChipType = experiment.codeBioanalyzerChipType;
+                    obj.qcLibConcentration = '';
 
                     experiment.samples.push(obj);
                 }
@@ -458,6 +461,7 @@ export class Sample implements OnDestroy {
             containerType:                   this.containerType,
             plateName:                       this.plateName,
             wellName:                        this.wellName,
+            qcLibConcentration:              this.qcLibConcentration,
             // index:                           "" + this.index
             };
 
