@@ -1,0 +1,16 @@
+<div class="full-height full-width flex-container-col small-font">
+    <div class="padded">
+        <custom-combo-box placeholder="Select a Lab"
+                          displayField="name"
+                          [options]="labList_filtered"
+                          (optionSelected)="selectLabOption($event)">
+        </custom-combo-box>
+    </div>
+    <div class="padded-left-right-bottom">
+        <custom-combo-box placeholder="Select an Account"
+                          displayField="accountNameDisplay"
+                          [options]="this.allAuthorizedBillingAccounts_filtered"
+                          (optionSelected)="selectBillingAccount($event)">
+        </custom-combo-box>
+    </div>
+</div>
