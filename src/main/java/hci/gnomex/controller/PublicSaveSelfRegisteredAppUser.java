@@ -67,7 +67,7 @@ public class PublicSaveSelfRegisteredAppUser extends GNomExCommand implements Se
     appUserScreen = new AppUser();
     HashMap errors = this.loadDetailObject(request, appUserScreen);
     this.addInvalidFields(errors);
-    if (request.getParameter("uofuAffiliate") != null && request.getParameter("uofuAffiliate").equals("y")) {
+    if (request.getParameter("uofuAffiliate") != null && request.getParameter("uofuAffiliate").equals("Y")) {
       uofuAffiliate = true;
       appUserScreen.setUserNameExternal("");
       appUserScreen.setPasswordExternal("");
