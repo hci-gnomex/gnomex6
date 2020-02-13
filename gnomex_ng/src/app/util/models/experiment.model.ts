@@ -249,9 +249,7 @@ export class Experiment {
 
     public extractionMethod_forSamples:        string = "";
     public get extractionMethod(): string {
-        // The sample should always return "", but save what the choice was in case we
-        // save more samples, because samples save this information individually (???)
-        return "";
+        return this.extractionMethod_forSamples;
     }
     public set extractionMethod(value: string) {
         this.extractionMethod_forSamples = value ? value : '';

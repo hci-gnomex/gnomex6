@@ -265,7 +265,7 @@ export class Sample implements OnDestroy {
         sample.cloneProperty("application_object", source);
         sample.cloneProperty("index", source);
         sample.cloneProperty("prepInstructions", source);
-        sample.cloneProperty("frontEndGridGroup", source);
+        // sample.cloneProperty("frontEndGridGroup", source);
         sample.cloneProperty("containerType", source);
         sample.cloneProperty("plateName", source);
         sample.cloneProperty("wellName", source);
@@ -306,21 +306,32 @@ export class Sample implements OnDestroy {
             let protocol: any = '';
             let numberSequencingLanes: string = experiment.isRapidMode === 'Y' ? '2' : '1';
             let seqPrepByCore: any = '';
+            let otherSamplePrepMethod: string = '';
 
             if (gnomexService.submitInternalExperiment() && experiment.sampleType) {
                 idSampleType = experiment.sampleType.idSampleType;
-            } else if (experiment.idSampleTypeDefault != null) {
-                idSampleType = experiment.idSampleTypeDefault
+            } else if (experiment.idSampleTypeDefault) {
+                idSampleType = experiment.idSampleTypeDefault;
             } else {
-                // do nothing, leave idSampleType as default.
+                if(gnomexService.submitInternalExperiment() && experiment.samples.length > 0) {
+                    idSampleType = experiment.samples[0].idSampleType;
+                }
             }
 
-            if (gnomexService.submitInternalExperiment() && experiment.organism) {
-                idOrganism = experiment.organism.idOrganism;
-            } else if (experiment.idOrganismSampleDefault != null) {
-                idOrganism = experiment.idOrganismSampleDefault;
-            } else {
-                // do nothing, leave idOrganism as default.
+            if(gnomexService.submitInternalExperiment()) {
+                if(experiment.idOrganism) {
+                    idOrganism = experiment.idOrganism;
+                } else if(experiment.idOrganismSampleDefault) {
+                    idOrganism = experiment.idOrganismSampleDefault;
+                } else if(experiment.samples.length > 0) {
+                    idOrganism = experiment.samples[0].idOrganism;
+                }
+            }
+
+            if (gnomexService.submitInternalExperiment() && experiment.extractionMethod) {
+                otherSamplePrepMethod = experiment.extractionMethod;
+            } else if(gnomexService.submitInternalExperiment() && experiment.samples.length > 0) {
+                otherSamplePrepMethod = experiment.samples[0].otherSamplePrepMethod;
             }
 
             if (gnomexService.submitInternalExperiment() && experiment.selectedProtocol) {
@@ -332,7 +343,7 @@ export class Sample implements OnDestroy {
             }
 
             if (gnomexService.submitInternalExperiment() && experiment.selectedProtocol) {
-                idSeqRunType = experiment.selectedProtocol.idSeqRunType
+                idSeqRunType = experiment.selectedProtocol.idSeqRunType;
             }
 
             if (experiment.codeApplication) {
@@ -383,9 +394,10 @@ export class Sample implements OnDestroy {
                     obj.prepInstructions = '';
                     obj.otherOrganism = '';
                     obj.treatment = '';
-                    obj.frontEndGridGroup = '0';
+                    // obj.frontEndGridGroup = '0';
                     obj.codeBioanalyzerChipType = experiment.codeBioanalyzerChipType;
                     obj.qcLibConcentration = '';
+                    obj.otherSamplePrepMethod = otherSamplePrepMethod;
 
                     experiment.samples.push(obj);
                 }
@@ -406,7 +418,7 @@ export class Sample implements OnDestroy {
     // extra variables for grid stuff?  Not needed back-end.
     public index: number;
     public prepInstructions: string; // ???
-    public frontEndGridGroup: string;
+    public frontEndGridGroup: string; // Is this necessary?
 
     [prop: string]: any;
 

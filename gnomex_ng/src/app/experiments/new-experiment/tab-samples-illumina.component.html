@@ -14,22 +14,21 @@
                               [codeRequestCategory]="this.requestCategoryType">
                 </context-help>
 
-                <div class="flex-container-row" *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && experiment?.isExternal === 'Y'">
+                <div class="flex-container-row" *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && !this.isAmendState">
                     <button mat-button class="padded-right" (click)="onAddSample()">
                         <img class="icon" [src]="this.constService.ICON_ADD" alt="">
                         Add sample
                     </button>
+                    <button mat-button class="padded-right" (click)="onRemoveSamples()" [disabled]="selectedSamples.length < 1">
+                        <img class="icon" [src]="this.constService.ICON_DELETE" alt="">
+                        Remove samples
+                    </button>
                     <context-help name="addSampleHelp"
                                   [hasEditPermission]="this.createSecurityAdvisor.isAdmin"
-                                  popupTitle="Add Samples Help">
+                                  popupTitle="Add/Remove Samples Help" label="">
                     </context-help>
                 </div>
 
-                <context-help *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && experiment?.isExternal !== 'Y'"
-                              name="addSampleHelp"
-                              [hasEditPermission]="this.createSecurityAdvisor.isAdmin"
-                              popupTitle="Add Samples Help" label="Adding samples">
-                </context-help>
                 <button *ngIf="_state === this.STATE_NEW || _state === this.STATE_EDIT" mat-button
                         class="padded-right"
                         color="link"
@@ -62,8 +61,10 @@
                                  [animateRows]="true"
                                  [getNodeChildDetails]="nodeChildDetails"
                                  [enableColResize]="true"
-                                 [rowSelection]="'single'"
+                                 [rowSelection]="'multiple'"
                                  [singleClickEdit]="true"
+                                 [rowDeselection]="true"
+                                 (selectionChanged)="onSelectionChanged($event)"
                                  (cellValueChanged)="onCellValueChanged($event)"
                                  (gridReady)="this.onSamplesGridReady($event)">
                 </ag-grid-angular>
