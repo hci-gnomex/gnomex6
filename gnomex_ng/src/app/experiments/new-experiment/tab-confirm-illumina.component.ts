@@ -739,7 +739,10 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
         if (this.isAmendState) {
             this.prepareAmendSequenceLanes();
         } else if (!this._experiment.sequenceLanes || this._experiment.sequenceLanes.length === 0) {
-            this._experiment.replaceAllSequenceLanes();
+            //TODO: Need to confirm if only IlluminaType needs to set up sequence lanes
+            if(this._experiment.requestCategory.isIlluminaType && this._experiment.requestCategory.isIlluminaType === "Y") {
+                this._experiment.replaceAllSequenceLanes();
+            }
         }
 
         if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
