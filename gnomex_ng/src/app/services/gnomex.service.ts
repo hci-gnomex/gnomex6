@@ -58,6 +58,8 @@ export class GnomexService {
     public showBioinformaticsLinks: boolean = true;
     public showCoreGenomicsLinks: boolean = true;
     public isUniversityUserAuthentication: boolean = false;
+    public maintenanceMode: boolean = false;
+    public logoOrMaint: string = 'assets/gnomex_logo_hdr.png';
     public idCoreFacilityHTG: any;
     public idCoreFacilityDNASeq: any;
     public idCoreFacilityMolecular: any;
@@ -96,6 +98,7 @@ export class GnomexService {
 
     public disableUserSignup: boolean = false;
     public noGuestAccess: boolean = true;
+    public maintenanceSplash: string;
 
 
     constructor(
@@ -867,10 +870,10 @@ export class GnomexService {
         //idInstead equals true means using you'll be using the id in place of the number
         // it still should have a letter in it for example for a request '12425R'
 
-        if(number){
+        if (number) {
             let match = number.match(/([A-Za-z]*)([0-9]+)([A-Za-z]?)/);
             let path:Array<string> = [];
-            if(match){
+            if(match) {
                 if( match[3].toUpperCase() === 'R'){
 
                     //path = ["experiments","idProject","browsePanel","idRequest"];
@@ -928,7 +931,7 @@ export class GnomexService {
                 }
 
             }
-        }else{
+                } else {
             this.dialogService.alert("Lookup ID is Invalid", null, DialogType.VALIDATION);
         }
     }
@@ -991,6 +994,11 @@ export class GnomexService {
             if (response && response.result === "SUCCESS") {
                 this.disableUserSignup = response[PropertyService.PROPERTY_DISABLE_USER_SIGNUP];
                 this.noGuestAccess = response[PropertyService.PROPERTY_NO_GUEST_ACCESS];
+                this.maintenanceMode = response[PropertyService.PROPERTY_MAINTENANCEMODE];
+                this.maintenanceSplash = response[PropertyService.PROPERTY_MAINTENANCE_SPLASH];
+                if (this.maintenanceMode) {
+                    this.logoOrMaint = this.maintenanceSplash;
+                }
             }
         }, (err: IGnomexErrorResponse) => {
         });

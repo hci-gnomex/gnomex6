@@ -21,7 +21,7 @@ import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
 public class CheckSessionStatus extends HttpServlet {
-  private static Logger LOG = Logger.getLogger(CheckSessionStatus.class);
+//  private static Logger LOG = Logger.getLogger(CheckSessionStatus.class);
 
   /**
    * Initialize global variables
@@ -36,7 +36,7 @@ public class CheckSessionStatus extends HttpServlet {
 
   /**
    * Process the HTTP Get request
-   *
+   * 
    * @param request
    *          Description of the Parameter
    * @param response
@@ -52,7 +52,7 @@ public class CheckSessionStatus extends HttpServlet {
 
   /**
    * Process the HTTP Post request
-   *
+   * 
    * @param request
    *          Description of the Parameter
    * @param response
@@ -62,19 +62,19 @@ public class CheckSessionStatus extends HttpServlet {
    * @exception IOException
    *              Description of the Exception
    */
-  public void doPost(HttpServletWrappedRequest request, HttpServletResponse response) throws ServletException, IOException {
+  public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     // get the users session
     String xmlResult;
     if (!request.isRequestedSessionIdValid()) {
       xmlResult = "<data><sa exists='false' lastAccessedTime='-1' inactiveTime='-1' currentTime='-1' "
           + "sessionMaxInActiveTime='0' kiosk='true' /></data>";
-      LOG.debug("Session is not valid anymore");
+//      LOG.debug("Session is not valid anymore");
     } else {
       HttpSession session = request.getSession();
       if (session == null || session.isNew()) {
         xmlResult = "<data><sa exists='false' lastAccessedTime='-1' inactiveTime='-1' currentTime='-1' "
             + "sessionMaxInActiveTime='0' /></data>";
-        LOG.debug("Session is new or not exist");
+//        LOG.debug("Session is new or not exist");
       } else {
         Long slac = (Long) session.getAttribute("lastGNomExAccessTime");
         long lastTime;
@@ -87,7 +87,7 @@ public class CheckSessionStatus extends HttpServlet {
             + new Date().getTime() + "' sessionMaxInActiveTime='" + request.getSession().getMaxInactiveInterval()
             + "' " + " /></data>";
       }
-      LOG.debug(xmlResult);
+//      LOG.debug(xmlResult);
     }
 
     String jsonResult = Util.xmlToJson(xmlResult);

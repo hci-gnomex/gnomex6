@@ -19,7 +19,7 @@ import {GnomexService} from "../services/gnomex.service";
                     </div>
                     <div class="container foreground">
                         <div class="horizontal-centered login-heading">
-                            <img [src]="'./assets/gnomex_logo_hdr.png'" alt="GNomEx">
+                            <img [src]="this.gnomexService.logoOrMaint" alt="GNomEx">
                         </div>
                         <div class="full-width major-vertical-spacer flex-container-row align-center">
                             <div *ngIf="_errorMsg" class="horizontal-centered small-font {{ errorClasses }}">
@@ -62,7 +62,7 @@ import {GnomexService} from "../services/gnomex.service";
                                 </button>
                                 <div class="full-width vertical-spacer">
                                 </div>
-                                <div class="full-width flex-container-row">
+                                <div *ngIf="!this.gnomexService.noGuestAccess" class="full-width flex-container-row">
                                     <button class="flex-grow secondary-button padded" (click)="this.onResetPassword()">
                                         Reset Password
                                     </button>
@@ -425,16 +425,25 @@ export class DirectLoginComponent implements OnInit {
      */
     login() {
         this.numberOfAttempts++;
+        this._errorMsg = null;
 
-        this._authenticationService.login(this._loginForm.value.username, this._loginForm.value.password)
-            .subscribe((res) => {
-                if (res) {
-                    this._errorMsg = null;
-                    this._authenticationService.requestAccessToken(true);
-                }
-            }, (error: any) => {
-                this._errorMsg = "Please check your credentials.";
-            });
+        let okToLogin: boolean = true;
+        console.log("username: " + this._loginForm.value.username);
+        if (this.gnomexService.maintenanceMode && !(this._loginForm.value.username === "adminBatch" ) ) {
+            this._errorMsg = "GNomEx is undergoing maintenance.  Please try again later.";
+            okToLogin = false;
+        }
+        if (okToLogin) {
+            this._authenticationService.login(this._loginForm.value.username, this._loginForm.value.password)
+                .subscribe((res) => {
+                    if (res) {
+                        this._errorMsg = null;
+                        this._authenticationService.requestAccessToken(true);
+                    }
+                }, (error: any) => {
+                    this._errorMsg = "Please check your credentials.";
+                });
+        }
     }
 
     guestLogin(): void {

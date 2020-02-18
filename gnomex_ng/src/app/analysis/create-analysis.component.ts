@@ -197,8 +197,8 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
             this.idLabString = event;
             if (this.showOwnerComboBox) {
                 this.getLabService.getLabByIdOnlyForHistoricalOwnersAndSubmitters(this.idLabString).subscribe((response: any) => {
-                    if(response && response.Lab && response.Lab.historicalOwnersAndSubmitters) {
-                        this.ownerList = UtilService.getJsonArray(response.Lab.historicalOwnersAndSubmitters, response.Lab.historicalOwnersAndSubmitters.AppUser);
+                    if(response && response.Lab && response.Lab.members) {
+                        this.ownerList = UtilService.getJsonArray(response.Lab.members, response.Lab.members.AppUser);
                     }
                 });
             }

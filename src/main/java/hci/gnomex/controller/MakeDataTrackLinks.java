@@ -175,7 +175,7 @@ public class MakeDataTrackLinks extends GNomExCommand implements Serializable {
                     if (theURL.toLowerCase().contains(".vcf.gz")) {
                         theURL = vcfiobioviewerURL + URLEncoder.encode(theURL, "UTF-8") + "&build=" + gBN;
                     } else {
-                        theURL = bamiobioviewerURL + URLEncoder.encode(theURL, "UTF-8") + "&build=" + gBN;
+                        theURL = bamiobioviewerURL + URLEncoder.encode(theURL, "UTF-8") + "&build=" + gBN;          // may also be .cram
                     }
 
         }
@@ -225,21 +225,23 @@ public class MakeDataTrackLinks extends GNomExCommand implements Serializable {
     	filesToLink = new File[2];
     	filesToLink[0] = new File(pathName);
 
-    	// add the correct index file
-    	if (pathName.endsWith(".vcf.gz")) {
-    		filesToLink[1] = new File(pathName + ".tbi");
-    	} else {
-    		// figure out whether the .bam.bai or the .bai file exists
-    		File bambai = new File (pathName + ".bai");
-    		if (bambai.exists()) {
-    			filesToLink[1] = new File(pathName + ".bai");
-    		} else {
-    			// we will assume the index file ends in .bai (without the .bam)
-    			// we don't check or complain if it doesn't because the user can't do anything anyway
-    			filesToLink[1] = new File (pathName.substring(0, pathName.length() - 4) + ".bai");
-    		}
-    	}
-    }
+            // add the correct index file
+            if (pathName.endsWith(".vcf.gz")) {
+                filesToLink[1] = new File(pathName + ".tbi");
+            } else if (pathName.endsWith(".cram")) {
+                filesToLink[1] = new File(pathName + ".crai");
+            } else {
+                // figure out whether the .bam.bai or the .bai file exists
+                File bambai = new File(pathName + ".bai");
+                if (bambai.exists()) {
+                    filesToLink[1] = new File(pathName + ".bai");
+                } else {
+                    // we will assume the index file ends in .bai (without the .bam)
+                    // we don't check or complain if it doesn't because the user can't do anything anyway
+                    filesToLink[1] = new File(pathName.substring(0, pathName.length() - 4) + ".bai");
+                }
+            }
+        }
 
     //look and or make directory to hold softlinks to data
     File urlLinkDir = DataTrackUtil.checkUCSCLinkDirectory(baseURL, dataTrackFileServerWebContext);
@@ -261,11 +263,10 @@ public class MakeDataTrackLinks extends GNomExCommand implements Serializable {
       File annoFile = new File(dir, DataTrackUtil.stripBadURLChars(f.getName(), "_"));
       String dataTrackString = annoFile.toString().replace("\\", Constants.FILE_SEPARATOR);
 
-      //make soft link
-      DataTrackUtil.makeSoftLinkViaUNIXCommandLine(f, annoFile);
-
-      //is it a bam index xxx.bai? If so then skip after making soft link.
-      if (dataTrackString.endsWith(".bam.bai") || dataTrackString.endsWith(".vcf.gz.tbi")) continue;
+            //make soft link
+                DataTrackUtil.makeSoftLinkViaUNIXCommandLine(f, annoFile);
+            //is it a bam index xxx.bai? If so then skip after making soft link.
+            if (dataTrackString.endsWith(".bam.bai") || dataTrackString.endsWith(".vcf.gz.tbi") || dataTrackString.endsWith(".cram.crai")) continue;
 
       // if it's just a .bai, make a .bam.bai link so IOBIO will work
       if (!dataTrackString.endsWith(".bam.bai") && dataTrackString.endsWith(".bai")) {

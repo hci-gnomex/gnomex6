@@ -188,6 +188,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
             this.showSpinner = false;
             if (resp && resp.result && resp.result === "SUCCESS") {
                 console.log(resp.ucscURL1);
+                this.dialogService.alert(resp.ucscURL1, null, DialogType.SUCCESS);
                 window.open(resp.ucscURL1, "_blank");
 
             }

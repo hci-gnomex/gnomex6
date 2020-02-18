@@ -226,7 +226,7 @@ export class AdvancedSearchService implements OnDestroy {
         if (!this.isAwaitingGetSearchMetaInformationResponse) {
             this.isAwaitingGetSearchMetaInformationResponse = true;
 
-            this._getSearchMetaInformationSubscription = this.httpClient.get('gnomex/GetSearchMetaInformation.gx', {}).subscribe((response) => {
+            this._getSearchMetaInformationSubscription = this.httpClient.get('/gnomex/GetSearchMetaInformation.gx', {}).subscribe((response) => {
                 this._getSearchMetaInformationSubject.next(response);
                 this.isAwaitingGetSearchMetaInformationResponse = false;
             }, (err: IGnomexErrorResponse) => {
@@ -344,9 +344,18 @@ export class AdvancedSearchService implements OnDestroy {
                     }
                     this._searchResultSubject.next(data);
                 }
-            }, (err: IGnomexErrorResponse) => {
             });
 
+            // this.httpClient.post('/gnomex/SearchIndex.gx', finalParams).subscribe((response: any|any[]) => {
+            //     if (response) {
+            //         let data = response;
+            //
+            //         if (!Array.isArray(response)) {
+            //             data = [response];
+            //         }
+            //         this._searchResultSubject.next(data);
+            //     }
+            // });
         }
     }
 }

@@ -21,7 +21,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
     templateUrl: 'experiment-overview-tab.component.html',
     styles: [`
 
-        .text-center {
+         .text-center {
             text-align: center;
         }
 
@@ -127,6 +127,12 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
         .allow-line-breaks {
             white-space: pre-line;
         }
+        
+        ::ng-deep.mat-tab-label.mat-tab-label-active {
+        min-width: 0!important;
+        font-size: 12px!important;
+        }
+
 
     `]
 }) export class ExperimentOverviewTabComponent implements OnInit, OnDestroy, OnChanges {

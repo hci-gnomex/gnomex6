@@ -14,8 +14,6 @@ import {NavigationService} from "./services/navigation.service";
 
 /**
  * The gnomex application component.
- *
- * @author jason.holmberg <jason.holmberg@hci.utah.edu>
  */
 @Component({
     selector: "gnomex-app",

@@ -45,6 +45,7 @@ export class NewDataTrackComponent extends BaseGenericContainerDialog implements
     public visibilityList: any[] = [];
     public labList: any[] = [];
     public primaryDisable: (action?: GDAction) => boolean;
+    private idAppUser: string;
 
     constructor(public dialogRef: MatDialogRef<NewDataTrackComponent>,
                 public constantsService: ConstantsService,
@@ -66,6 +67,8 @@ export class NewDataTrackComponent extends BaseGenericContainerDialog implements
         });
 
         this.selectedItem = this.data.selectedItem;
+        this.idAppUser = this.data.idAppUser;
+
         this.labListService.getSubmitRequestLabList().subscribe((response: any[]) => {
             this.labList = response.sort(this.prefService.createLabDisplaySortFunction());
             if(this.selectedItem.data.idLab) {
@@ -90,7 +93,8 @@ export class NewDataTrackComponent extends BaseGenericContainerDialog implements
             .set("idLab", this.form.get("idLab").value)
             .set("idGenomeBuild", this.selectedItem.data.idGenomeBuild)
             .set("name", this.form.get("name").value)
-            .set("codeVisibility", this.form.get("codeVisibility").value);
+            .set("codeVisibility", this.form.get("codeVisibility").value)
+            .set("idAppUser", this.idAppUser ? this.idAppUser : "");
         if (this.selectedItem.data.idDataTrackFolder) {
             params = params.set("idDataTrackFolder", this.selectedItem.data.idDataTrackFolder);
         }

@@ -33,15 +33,24 @@ import {DistributeDatatrackDialogComponent} from "./distribute-datatrack-dialog.
     templateUrl: "./analysis-detail-overview.component.html"
     ,
     styles: [`
+        .mat-tab-group-border{
+            border: 1px solid #e8e8e8;
+            width:100%;
+        }
 
-        .child-margins * {
-            margin-right: 0.3em;
+        ::ng-deep.mat-tab-label.mat-tab-label-active {
+        min-width: 0!important;
+        font-size: 12px!important;
         }
         
-        .label-min-width {
-            min-width: 15em;
+        .label-title{
+            margin-top: 0.2rem;
+            margin-bottom: 0;
         }
-        
+
+        .label-title-width {
+            width: 25rem;
+        }
     `]
 })
 export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, OnDestroy {
@@ -65,6 +74,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
     public analysisTreeNode: any;
     private analysisTreeNodeSubscription: Subscription;
     private cachedDistributeFilesSubscription: Subscription;
+
 
 
     constructor(public analysisService: AnalysisService,
@@ -130,7 +140,6 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
             this.showManagePEDFile = this.showAutoDistributeDataTracks && !isCollaborator;
         });
     }
-
     ngAfterViewInit(): void {
         this.analysisService.addAnalysisOverviewFormMember(this.annotTab.form, "AnnotationTabComponent");
     }

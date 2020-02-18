@@ -67,7 +67,7 @@ public class PublicSaveSelfRegisteredAppUser extends GNomExCommand implements Se
     appUserScreen = new AppUser();
     HashMap errors = this.loadDetailObject(request, appUserScreen);
     this.addInvalidFields(errors);
-    if (request.getParameter("uofuAffiliate") != null && request.getParameter("uofuAffiliate").equals("y")) {
+    if (request.getParameter("uofuAffiliate") != null && request.getParameter("uofuAffiliate").equals("Y")) {
       uofuAffiliate = true;
       appUserScreen.setUserNameExternal("");
       appUserScreen.setPasswordExternal("");
@@ -452,10 +452,12 @@ public class PublicSaveSelfRegisteredAppUser extends GNomExCommand implements Se
     // Get approve and delete URLs.  Have to create a url with extra parameters when requesting a new lab
     String uuidStr = appUser.getGuid();
     String approveURL = "";
+    //todo adding idCoreFacilities denoting we plan to make it so at signup you can request to be apart of more than just one. delimit string by commas as ApproveUser will parse them that way.
     if(existingLab){
       approveURL = url + Constants.FILE_SEPARATOR + Constants.APPROVE_USER_SERVLET + "?guid=" + uuidStr + "&idAppUser=" + appUser.getIdAppUser().intValue() + "&requestedLabId=" + this.requestedLabId;
     } else{
-      approveURL = url + Constants.FILE_SEPARATOR + Constants.APPROVE_USER_SERVLET + "?guid=" + uuidStr + "&idAppUser=" + appUser.getIdAppUser().intValue() + "&requestedLabName=" + this.requestedLabName + "&department=" + department + "&contactEmail=" + contactEmail + "&contactPhone=" + contactPhone + "&requestedLabFirstName=" + requestedLabFirstName ;
+      approveURL = url + Constants.FILE_SEPARATOR + Constants.APPROVE_USER_SERVLET + "?guid=" + uuidStr + "&idAppUser=" + appUser.getIdAppUser().intValue() + "&requestedLabName=" + this.requestedLabName
+              + "&department=" + department + "&contactEmail=" + contactEmail + "&contactPhone=" + contactPhone + "&requestedLabFirstName=" + requestedLabFirstName + "&idCoreFacilities="+ facility.getIdCoreFacility() ;
     }
 
     String deleteURL = url + Constants.FILE_SEPARATOR + Constants.APPROVE_USER_SERVLET + "?guid=" + uuidStr + "&idAppUser=" + appUser.getIdAppUser().intValue() + "&deleteUser=Y";

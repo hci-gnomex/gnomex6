@@ -115,4 +115,18 @@ public class FileUtil {
 		return false;
 	}
 
+	/* set permissions on a file or directory
+	 */
+	public static boolean chmod (String permissions, String pathname) {
+		try {
+			String[] cmd = { "chmod", permissions, pathname};
+			Runtime.getRuntime().exec(cmd);
+			return true;
+		} catch (IOException e) {
+
+		}
+
+		return false;
+	}
+
 }

@@ -191,7 +191,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
         if(!this.progressService.hideLoader) {
             this.progressService.hideLoader = new BehaviorSubject<boolean>(false);
             this.hideLoader = this.progressService.hideLoader;
-        } else {
+        }else{
             this.hideLoader = this.progressService.hideLoader;
         }
 

@@ -42,6 +42,7 @@ import {ConstantsService} from "../../services/constants.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {GridApi} from "ag-grid-community";
 
 export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
     isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -1794,6 +1795,12 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 }
             }
         }
+    }
+
+    public prepBillingAccountForSave(){
+        this.chartfieldGridApi.stopEditing();
+        this.poGridApi.stopEditing();
+        this.creditCardGridApi.stopEditing();
     }
 
     private markAsPristine(): void {

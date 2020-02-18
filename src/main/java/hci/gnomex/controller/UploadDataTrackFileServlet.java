@@ -222,40 +222,40 @@ public class UploadDataTrackFileServlet extends HttpServlet {
                         }
                     }
 
-                    if (fileName != null) {
-                        // the part actually contained a file
-                        File file = new File(dataTrackFileDir, fileName);
-                        long size = filePart.writeTo(file);
-                        // check size of text files
-                        if (DataTrackUtil.tooManyLines(file)) {
-                            if (!file.delete()) {
-                                LOG.warn("Unable to delete file " + file.getName() + ".");
-                            }
-                            throw new Exception(
-                                    "Aborting upload, text formatted dataTrack file '"
-                                            + dataTrack.getName()
-                                            + " exceeds the maximum allowed size ("
-                                            + Constants.MAXIMUM_NUMBER_TEXT_FILE_LINES
-                                            + " lines). Convert to xxx.useq (see http://useq.sourceforge.net/useqArchiveFormat.html) or other binary form (xxx.bar).");
-                        }
-                        // bam file? check if it is sorted and can be read
-                        if (fileName.toUpperCase().endsWith(".BAM")) {
-                            try {
-                                String error = DataTrackUtil.checkBamFile(file);
-                                if (error != null) {
-                                    if (!file.delete()) {
-                                        LOG.warn("Unable to delete file " + file.getName() + ".");
-                                    }
-                                    throw new Exception("Errors found with bam file -> " + fileName + ". Aborting upload. "
-                                            + error);
-                                }
-                            } catch (Exception e) {
-                                LOG.error("Error in UploadDataTrackFileServlet", e);
-                                throw new Exception("Bypassing upload of BAM file " + file.getName()
-                                        + ". Unexpected error encountered " + e.toString());
-                            }
-                        }
-                    }
+				if (fileName != null) {
+					// the part actually contained a file
+					File file = new File(dataTrackFileDir, fileName);
+					long size = filePart.writeTo(file);
+					// check size of text files
+					if (DataTrackUtil.tooManyLines(file)) {
+						if (!file.delete()) {
+							LOG.warn("Unable to delete file " + file.getName() + ".");
+						}
+						throw new Exception(
+								"Aborting upload, text formatted dataTrack file '"
+										+ dataTrack.getName()
+										+ " exceeds the maximum allowed size ("
+										+ Constants.MAXIMUM_NUMBER_TEXT_FILE_LINES
+										+ " lines). Convert to xxx.useq (see http://useq.sourceforge.net/useqArchiveFormat.html) or other binary form (xxx.bar).");
+					}
+					// bam file? check if it is sorted and can be read
+					if (fileName.toUpperCase().endsWith(".BAM") || fileName.toUpperCase().endsWith(".CRAM")) {
+						try {
+							String error = DataTrackUtil.checkBamFile(file);
+							if (error != null) {
+								if (!file.delete()) {
+									LOG.warn("Unable to delete file " + file.getName() + ".");
+								}
+								throw new Exception("Errors found with bam file -> " + fileName + ". Aborting upload. "
+										+ error);
+							}
+						} catch (Exception e) {
+							LOG.error("Error in UploadDataTrackFileServlet", e);
+							throw new Exception("Bypassing upload of BAM or CRAM file " + file.getName()
+									+ ". Unexpected error encountered " + e.toString());
+						}
+					}
+				}
 
                 }
             }
@@ -483,66 +483,80 @@ public class UploadDataTrackFileServlet extends HttpServlet {
                 if (line.length() == 0 || line.startsWith("#") || line.startsWith("Name"))
                     continue;
 
-                // parse name, fileName, summary, description
-                Matcher mat = BULK_UPLOAD_LINE_SPLITTER.matcher(line);
-                if (mat.matches() == false) {
-                    errors.append("Malformed data line -> " + line + " . \n");
-                    continue;
-                }
-                // name is required
-                String name = mat.group(1).trim();
-                if (name.length() == 0) {
-                    errors.append("Missing name -> " + line + " . \n");
-                }
-                // check file
-                File dataFile = new File(mat.group(2).trim());
-                if (dataFile.canRead() == false || dataFile.canWrite() == false) {
-                    errors.append("Cannot find/modify file -> " + line + " . \n");
-                }
-                // check live file
-                else {
-                    // check file extension
-                    String fileName = dataFile.toString();
-                    if (DataTrackUtil.isValidDataTrackFileType(fileName) == false) {
-                        errors.append("Unsupported file type ->  " + line + " . \n");
-                    } else {
-                        // too many lines in txt file?
-                        if (DataTrackUtil.tooManyLines(dataFile))
-                            errors.append("Too many lines in file ->  " + line
-                                    + " . Convert to xxx.useq (see http://useq.sourceforge.net/useqArchiveFormat.html).\n");
-                        // bam or bai?
-                        if (fileName.endsWith(".bam") || fileName.endsWith(".bai"))
-                            bamBaiFiles.add(name + "__" + fileName);
-                        // check bam file
-                        if (fileName.endsWith(".bam")) {
-                            String log = DataTrackUtil.checkBamFile(dataFile);
-                            if (log != null)
-                                errors.append("Problems were found with this bam file ->  " + line + " . " + log);
-                        }
-                    }
-                }
-            }
+			// parse name, fileName, summary, description
+			Matcher mat = BULK_UPLOAD_LINE_SPLITTER.matcher(line);
+			if (mat.matches() == false) {
+				errors.append("Malformed data line -> " + line + " . \n");
+				continue;
+			}
+			// name is required
+			String name = mat.group(1).trim();
+			if (name.length() == 0) {
+				errors.append("Missing name -> " + line + " . \n");
+			}
+			// check file
+			File dataFile = new File(mat.group(2).trim());
+			if (dataFile.canRead() == false || dataFile.canWrite() == false) {
+				errors.append("Cannot find/modify file -> " + line + " . \n");
+			}
+			// check live file
+			else {
+				// check file extension
+				String fileName = dataFile.toString();
+				if (DataTrackUtil.isValidDataTrackFileType(fileName) == false) {
+					errors.append("Unsupported file type ->  " + line + " . \n");
+				} else {
+					// too many lines in txt file?
+					if (DataTrackUtil.tooManyLines(dataFile))
+						errors.append("Too many lines in file ->  " + line
+								+ " . Convert to xxx.useq (see http://useq.sourceforge.net/useqArchiveFormat.html).\n");
+					// bam or bai?
+					if (fileName.endsWith(".bam") || fileName.endsWith(".bai") || fileName.endsWith(".cram") || fileName.endsWith(".crai"))
+						bamBaiFiles.add(name + "__" + fileName);
+					// check bam file
+					if (fileName.endsWith(".bam") || fileName.endsWith(".cram")) {
+						String log = DataTrackUtil.checkBamFile(dataFile);
+						if (log != null)
+							errors.append("Problems were found with this bam or cram file ->  " + line + " . " + log);
+					}
+				}
+			}
+		}
 
-            // check bam and bai files, must be paired
-            for (String f : bamBaiFiles) {
-                if (f.endsWith(".bam")) {
-                    String bai1 = f.substring(0, f.length() - 4) + ".bai";
-                    String bai2 = f + ".bai";
-                    if (bamBaiFiles.contains(bai1) == false && bamBaiFiles.contains(bai2) == false)
-                        errors.append("Missing xxx.bai index file for ->  " + f + " . \n");
-                } else {
-                    // else bai, might be .bam.bai
-                    String bam = f.substring(0, f.length() - 4);
-                    if (bam.endsWith(".bam") == false)
-                        bam += ".bam";
-                    if (bamBaiFiles.contains(bam) == false)
-                        errors.append("Missing xxx.bam alignment file for ->  " + f + " . \n");
-                }
-            }
-            if (errors.length() != 0) {
-                errors.append("Aborting bulk uploading. \n");
-                return errors.toString();
-            }
+		// check bam and bai files or cram and crai files, must be paired
+		for (String f : bamBaiFiles) {
+			if (f.endsWith(".bam")) {
+				String bai1 = f.substring(0, f.length() - 4) + ".bai";
+				String bai2 = f + ".bai";
+				if (bamBaiFiles.contains(bai1) == false && bamBaiFiles.contains(bai2) == false)
+					errors.append("Missing xxx.bai index file for ->  " + f + " . \n");
+			} else {
+				// else bai, might be .bam.bai
+				String bam = f.substring(0, f.length() - 4);
+				if (bam.endsWith(".bam") == false)
+					bam += ".bam";
+				if (bamBaiFiles.contains(bam) == false)
+					errors.append("Missing xxx.bam alignment file for ->  " + f + " . \n");
+			}
+
+			if (f.endsWith(".cram")) {
+				String bai1 = f.substring(0, f.length() - 5) + ".crai";
+				String bai2 = f + ".crai";
+				if (bamBaiFiles.contains(bai1) == false && bamBaiFiles.contains(bai2) == false)
+					errors.append("Missing xxx.crai index file for ->  " + f + " . \n");
+			} else {
+				// else bai, might be .cram.crai
+				String cram = f.substring(0, f.length() - 5);
+				if (cram.endsWith(".cram") == false)
+					cram += ".cram";
+				if (bamBaiFiles.contains(cram) == false)
+					errors.append("Missing xxx.cram alignment file for ->  " + f + " . \n");
+			}
+		}
+		if (errors.length() != 0) {
+			errors.append("Aborting bulk uploading. \n");
+			return errors.toString();
+		}
 
         } catch (Exception e) {
             LOG.error("Error in UploadDataTrackFileServlet", e);

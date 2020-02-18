@@ -28,6 +28,7 @@ import {
     BillingTemplateWindowComponent,
     BillingTemplateWindowParams
 } from "../../util/billing-template-window.component";
+import {AddAdditionalAccountsComponent} from "./add-additional-accounts.component";
 
 @Component({
     selector: "new-experiment-setup",
@@ -194,6 +195,8 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
     public authorizedBillingAccounts: any;
     public filteredProjectList: any[] = [];
 
+    private allAuthorizedBillingAccounts: any[] = [];
+
     private coreFacility: any;
     private defaultCodeRequestCategory: any = null;
 
@@ -202,10 +205,10 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
 
     private QCChipPriceList: BehaviorSubject<any[]> = new BehaviorSubject<any[]>([]);
 
-    private workButtonText: string;
+    public workButtonText: string;
 
-    private workAuthInstructions: string;
-    private accessAuthorizedBillingAccountInstructions: string;
+    public workAuthInstructions: string;
+    public accessAuthorizedBillingAccountInstructions: string;
     public accessAuthorizedBillingAccountLinkText: string = "Show Other Billing Accounts";
 
 
@@ -213,13 +216,16 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
 
     private _showBilling_previousValue: boolean = false;
 
-    private showAccessAuthorizedAccountsLink: boolean = false;
+    public showAccessAuthorizedAccountsLink: boolean = false;
 
 
     private submittersSubscription: Subscription;
 
     private project: any;
 
+    private addAdditionalAccountDialog: any;
+
+    public otherSelectedLab: any;
 
     public get submitter(): any {
         if (this.form && this.form.get('selectName')) {
@@ -238,6 +244,7 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
             this._experiment.idOwner = "";
         }
 
+        this.checkForOtherAccounts();
         this.selectDefaultUserProject();
     }
 
@@ -275,6 +282,19 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
         this._showBilling_previousValue = newValue;
 
         return newValue;
+    }
+    public get disableShowMoreAccounts(): boolean {
+        if (this.showName) {
+            return !(this.form.controls['selectName'].value)
+                && !(this.allAuthorizedBillingAccounts
+                    && Array.isArray(this.allAuthorizedBillingAccounts)
+                    && this.allAuthorizedBillingAccounts.length > 0);
+        } else {
+            return (!this._experiment.idAppUser)
+                && !(this.allAuthorizedBillingAccounts
+                    && Array.isArray(this.allAuthorizedBillingAccounts)
+                    && this.allAuthorizedBillingAccounts.length > 0);
+        }
     }
     public get showProject(): boolean {
         return this.showBilling && this.form && this.form.get("billingSelected").value;
@@ -392,18 +412,26 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
         }
     }
 
-    checkForOtherAccounts(): void {
+    private checkForOtherAccounts(): void {
         if (this.createSecurityAdvisor.isAdmin || this.createSecurityAdvisor.isBillingAdmin || this.createSecurityAdvisor.isSuperAdmin) {
             this.showAccessAuthorizedAccountsLink = true;
             let authorizedBillingAccountsParams: HttpParams = new HttpParams().set("idCoreFacility", this._experiment.idCoreFacility);
 
             this.billingService.getAuthorizedBillingAccounts(authorizedBillingAccountsParams).subscribe((response: any) => {
                 this.showAccessAuthorizedAccountsLink = response && response.hasAccountsWithinCore && response.hasAccountsWithinCore === 'Y';
+                this.allAuthorizedBillingAccounts = response;
             });
         }
-        // else if (this._experiment.idAppUser != null && this._experiment.idAppUser != '') {
-        //     let idCoreFacility: string = this._experiment.idCoreFacility;
-        // }
+        else if (this._experiment.idAppUser != null && this._experiment.idAppUser != '') {
+            let authorizedBillingAccountsParams: HttpParams = new HttpParams()
+                .set("idCoreFacility", this._experiment.idCoreFacility)
+                .set("idAppUser", this._experiment.idAppUser);
+
+            this.billingService.getAuthorizedBillingAccounts(authorizedBillingAccountsParams).subscribe((response: any) => {
+                this.showAccessAuthorizedAccountsLink = response && response.hasAccountsWithinCore && response.hasAccountsWithinCore === 'Y';
+                this.allAuthorizedBillingAccounts = response;
+            });
+        }
     }
 
 
@@ -681,7 +709,31 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
     }
 
     public onClickShowMoreAccounts(): void {
-        //TODO: create dialog
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width  = "30em";
+        configuration.data = {
+            idLab: "" + this.currentIdLab,
+            labList: this.labList,
+            allAuthorizedBillingAccounts: this.allAuthorizedBillingAccounts
+        };
+
+        this.addAdditionalAccountDialog = this.dialogService.genericDialogContainer(AddAdditionalAccountsComponent, "Add Authorized Billing Account", null, configuration, {
+            actions: [
+                {
+                    type: ActionType.PRIMARY,
+                    name: "Add Account",
+                    internalAction: "addAdditionalAccount"
+                }
+            ]
+        }).subscribe((result: any) => {
+            if (result) {
+                // do something
+                this.authorizedBillingAccounts = result.accountsForLab;
+                this.otherSelectedLab = result.selectedLab;
+                this.updateBilling(result.selectedAccount, null);
+                console.log("attempting to add account");
+            }
+        });
     }
 
     public onClickSplitBilling(): void {

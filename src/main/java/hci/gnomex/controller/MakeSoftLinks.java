@@ -130,7 +130,9 @@ public class MakeSoftLinks extends GNomExCommand implements Serializable {
 
     private static void makeSoftLinkViaUNIXCommandLine(String realFile, String link) {
         try {
-            String[] cmd = {"ln", "-s", realFile, link};
+            String realFile1 = "'" + realFile + "'";
+            String link1 = "'" + link + "'";
+            String[] cmd = {"ln", "-s", realFile1, link1};
             Runtime.getRuntime().exec(cmd);
         } catch (IOException e) {
             LOG.error("Error in MakeSoftLinks", e);

@@ -282,10 +282,10 @@ public class ManagePedFile extends GNomExCommand implements Serializable {
             return status;
         }
 
-        if (bamList.size() == 0) {
-            status = "Error: No .bam files found in analysis.";
-            return status;
-        }
+    if (bamList.size() == 0) {
+        status = "Error: No .bam or .cram files found in analysis.";
+        return status;
+    }
 
         // build headerMap
         int numcol = 0;
@@ -310,10 +310,10 @@ public class ManagePedFile extends GNomExCommand implements Serializable {
             }
         } // end of for
 
-        // any overlap?
-        if (numoverlap == 0) {
-            status = "Error: no overlapping bam and vcf files.";
-        }
+    // any overlap?
+    if (numoverlap == 0) {
+        status = "Error: no overlapping bam/cram and vcf files.";
+    }
 
         return status;
     }
