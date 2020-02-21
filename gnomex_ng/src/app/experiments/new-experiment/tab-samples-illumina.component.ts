@@ -188,6 +188,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     this.bioanalyzerChips = this.bioanalyzerChips.filter((a) => {
                         return a.codeApplication && a.codeApplication === value;
                     });
+                    this.bioanalyzerChips.unshift("");
                 }
             });
         }
@@ -622,11 +623,11 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 fillGroupAttribute: 'frontEndGridGroup',
                 validators: [
                     Validators.required,
-                    Validators.pattern(/^\d*$/)
+                    Validators.pattern(/^\d{1,10}$/)
                 ],
                 errorNameErrorMessageMap: [
                     { errorName: 'required', errorMessage: 'Multiplex Group required' },
-                    { errorName: 'pattern',  errorMessage: 'Multiplex Group must be numeric' }
+                    { errorName: 'pattern',  errorMessage: 'Expects an integer number' }
                 ],
                 outerForm: this.form,
                 formName:  "gridFormGroup",
@@ -645,10 +646,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 editable: true,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
-                // validators: [Validators.required],
-                // errorNameErrorMessageMap: [
-                //     {errorName: 'required', errorMessage: 'Sample Name required'}
-                // ],
+                validators: [Validators.maxLength(200)],
+                errorNameErrorMessageMap: [
+                    {errorName: "maxlength", errorMessage: "Maximum of 200 characters"}
+                ],
                 pinned: "left",
                 outerForm: this.form,
                 formName: "gridFormGroup",
@@ -664,9 +665,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 editable: true,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
-                validators: [Validators.required],
+                validators: [Validators.required, Validators.maxLength(200)],
                 errorNameErrorMessageMap: [
-                    {errorName: 'required', errorMessage: 'Sample Name required'}
+                    {errorName: 'required', errorMessage: 'Sample Name required'},
+                    {errorName: 'maxlength', errorMessage: 'Maximum of 200 characters'}
                 ],
                 pinned: "left",
                 outerForm: this.form,
@@ -705,7 +707,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
                 if (columnProperty.requiredInNewMode && columnProperty.requiredInNewMode === 'Y') {
                     newColumn.validators.push(Validators.required);
-                    newColumn.errorNameErrorMessageMap.push({ errorName: 'required', errorMessage: 'Multiplex Group required' });
+                    newColumn.errorNameErrorMessageMap.push({ errorName: 'required', errorMessage: columnProperty.header + ' is required' });
                 }
 
                 if (columnProperty.patternToMatch) {
@@ -713,6 +715,17 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
                     newColumn.validators.push(Validators.pattern(columnProperty.patternToMatch));
                     newColumn.errorNameErrorMessageMap.push({ errorName: 'pattern', errorMessage: message });
+                }
+
+                // Temporary solution for maxLength check. It would be better to add a maximumLength column to columnProperties table for these columns.
+                if(columnProperty.field === 'qualRINNumber') {
+                    newColumn.validators.push(Validators.maxLength(10));
+                    newColumn.errorNameErrorMessageMap.push({ errorName: 'maxlength', errorMessage: 'Maximum of 10 characters'});
+                }
+
+                if(columnProperty.field === 'otherSamplePrepMethod') {
+                    newColumn.validators.push(Validators.maxLength(300));
+                    newColumn.errorNameErrorMessageMap.push({ errorName: 'maxlength', errorMessage: 'Maximum of 300 characters'});
                 }
 
                 switch(columnProperty.columnType) {
@@ -727,7 +740,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
                         if (columnProperty.nameFrontEndDictionaryToUse) {
                             newColumn.selectOptions = this['' + columnProperty.nameFrontEndDictionaryToUse];
                         } else if (columnProperty.fullDictionaryModelPathToLoad) {
-                            newColumn.selectOptions = this.dictionaryService.getEntries('' + columnProperty.fullDictionaryModelPathToLoad);
+                            let fullDictionaryModelPathToLoad: any[] = this.dictionaryService.getEntriesExcludeBlank('' + columnProperty.fullDictionaryModelPathToLoad);
+                            fullDictionaryModelPathToLoad.unshift("");
+                            newColumn.selectOptions = fullDictionaryModelPathToLoad;
                         } else {
                             newColumn.selectOptions = [];
                         }
@@ -761,6 +776,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
             editable: true,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
+            validators: [Validators.maxLength(20)],
+            errorNameErrorMessageMap: [
+                {errorName: "maxlength", errorMessage: "Maximum of 20 characters"}
+            ],
             showFillButton: true,
             fillGroupAttribute: 'frontEndGridGroup',
             hide: this.hideCCNum,
@@ -779,6 +798,12 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 editable: !this.isAmendState,
                 cellRendererFramework: TextAlignRightMiddleRenderer,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
+                validators: [
+                    Validators.pattern(/^\d{0,10}$/)
+                ],
+                errorNameErrorMessageMap: [
+                    { errorName: 'pattern',  errorMessage: 'Expects an integer number' }
+                ],
                 showFillButton: true,
                 fillGroupAttribute: 'frontEndGridGroup',
                 headerTooltip: "This is the number of times(1 or greater) that you want to sequence this sample.",
@@ -799,9 +824,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     showFillButton: true,
                     fillGroupAttribute: 'frontEndGridGroup',
                     headerTooltip: "This is the number of times (0 or greater) that you want to sequence this sample again.",
-                    validators: [Validators.required],
+                    validators: [Validators.required, Validators.pattern(/^\d{1,10}$/)],
                     errorNameErrorMessageMap: [
                         {errorName: 'required', errorMessage: 'Addtl # Seq Lanes required'},
+                        { errorName: 'pattern',  errorMessage: 'Expects an integer number' }
                     ],
                     sortOrder: 200
                 });
@@ -912,9 +938,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     cellRendererFramework: TextAlignLeftMiddleRenderer,
                     showFillButton: true,
                     fillGroupAttribute: 'frontEndGridGroup',
-                    validators: [Validators.pattern(/^\d*\.\d{1}$/)],
+                    validators: [Validators.pattern(/^\d{0,7}(\.\d{1})?$/)],
                     errorNameErrorMessageMap: [
-                        {errorName: "pattern", errorMessage: "Lib QC Conc must be numeric(8,1)"}
+                        {errorName: "pattern", errorMessage: "Expects a decimal numeric(8,1)"}
                     ],
                     suppressSizeToFit: true,
                     editable: true,
@@ -993,11 +1019,11 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 fillGroupAttribute: 'frontEndGridGroup',
                 validators: [
                     Validators.required,
-                    Validators.pattern(/^\d*$/)
+                    Validators.pattern(/^\d{1,10}$/)
                 ],
                 errorNameErrorMessageMap: [
-                    {errorName: 'required', errorMessage: 'Multiplex Group required'},
-                    {errorName: 'pattern', errorMessage: 'Multiplex Group must be numeric'}
+                    { errorName: 'required', errorMessage: 'Multiplex Group required' },
+                    { errorName: 'pattern',  errorMessage: 'Expects an integer number' }
                 ],
                 outerForm: this.form,
                 formName: "gridFormGroup",
@@ -1026,9 +1052,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
             editable: true,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
-            validators: [ Validators.required ],
+            validators: [Validators.required, Validators.maxLength(200)],
             errorNameErrorMessageMap: [
-                { errorName: 'required', errorMessage: 'Sample Name required' }
+                {errorName: 'required', errorMessage: 'Sample Name required'},
+                {errorName: 'maxlength', errorMessage: 'Maximum of 200 characters'}
             ],
             sortOrder: 20,
             outerForm: this.form,
@@ -1066,7 +1093,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
                 if (columnProperty.requiredInEditMode && columnProperty.requiredInEditMode === 'Y') {
                     newColumn.validators.push(Validators.required);
-                    newColumn.errorNameErrorMessageMap.push({ errorName: 'required', errorMessage: 'Multiplex Group required' });
+                    newColumn.errorNameErrorMessageMap.push({ errorName: 'required', errorMessage: columnProperty.header + ' is required' });
                 }
 
                 if (columnProperty.patternToMatch) {
@@ -1074,6 +1101,16 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
                     newColumn.validators.push(Validators.pattern(columnProperty.patternToMatch));
                     newColumn.errorNameErrorMessageMap.push({ errorName: 'pattern', errorMessage: message });
+                }
+                // Temporary solution for maxLength check. It would be better to add a maximumLength column to columnProperties table for these columns.
+                if(columnProperty.field === 'qualRINNumber') {
+                    newColumn.validators.push(Validators.maxLength(10));
+                    newColumn.errorNameErrorMessageMap.push({ errorName: 'maxlength', errorMessage: 'Maximum of 10 characters'});
+                }
+
+                if(columnProperty.field === 'otherSamplePrepMethod') {
+                    newColumn.validators.push(Validators.maxLength(300));
+                    newColumn.errorNameErrorMessageMap.push({ errorName: 'maxlength', errorMessage: 'Maximum of 300 characters'});
                 }
 
                 switch(columnProperty.columnType) {
@@ -1088,7 +1125,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
                         if (columnProperty.nameFrontEndDictionaryToUse) {
                             newColumn.selectOptions = this['' + columnProperty.nameFrontEndDictionaryToUse];
                         } else if (columnProperty.fullDictionaryModelPathToLoad) {
-                            newColumn.selectOptions = this.dictionaryService.getEntries('' + columnProperty.fullDictionaryModelPathToLoad);
+                            let fullDictionaryModelPathToLoad: any[] = this.dictionaryService.getEntriesExcludeBlank('' + columnProperty.fullDictionaryModelPathToLoad);
+                            fullDictionaryModelPathToLoad.unshift("");
+                            newColumn.selectOptions = fullDictionaryModelPathToLoad;
                         } else {
                             newColumn.selectOptions = [];
                         }
@@ -1122,6 +1161,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
             editable: true,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
+            validators: [Validators.maxLength(20)],
+            errorNameErrorMessageMap: [
+                {errorName: "maxlength", errorMessage: "Maximum of 20 characters"}
+            ],
             showFillButton: true,
             fillGroupAttribute: 'frontEndGridGroup',
             hide: this.hideCCNum,
@@ -1283,7 +1326,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 minWidth: 8.5 * this.emToPxConversionRate,
                 maxWidth: 10 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
-                editable: true,
+                editable: false,
                 sortOrder: 303
             });
 
@@ -1297,9 +1340,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 showFillButton: true,
                 fillGroupAttribute: 'frontEndGridGroup',
-                validators: [Validators.pattern(/^\d*\.\d{1}$/)],
+                validators: [Validators.pattern(/^\d{0,7}(\.\d{1})?$/)],
                 errorNameErrorMessageMap: [
-                    {errorName: "pattern", errorMessage: "Lib QC Conc must be numeric(8,1)"}
+                    {errorName: "pattern", errorMessage: "Expects a decimal numeric(8,1)"}
                 ],
                 suppressSizeToFit: true,
                 editable: true,
@@ -1329,8 +1372,11 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 width:    8.5 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
                 maxWidth: 10 * this.emToPxConversionRate,
-                cellRendererFramework: TextAlignLeftMiddleRenderer,
-                cellEditorFramework: TextAlignLeftMiddleEditor,
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.workflowStatus,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "value",
                 suppressSizeToFit: true,
                 editable: true,
                 showFillButton: true,
@@ -1432,11 +1478,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
             maxWidth: 12 * this.emToPxConversionRate,
             editable: false,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
-            cellEditorFramework: TextAlignLeftMiddleEditor,
-            validators: [ Validators.required ],
-            errorNameErrorMessageMap: [
-                { errorName: 'required', errorMessage: 'Sample Name required' }
-            ],
             outerForm: this.form,
             formName:  "gridFormGroup",
             pinned: 'left'
@@ -1481,7 +1522,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
                         if (columnProperty.nameFrontEndDictionaryToUse) {
                             newColumn.selectOptions = this['' + columnProperty.nameFrontEndDictionaryToUse];
                         } else if (columnProperty.fullDictionaryModelPathToLoad) {
-                            newColumn.selectOptions = this.dictionaryService.getEntries('' + columnProperty.fullDictionaryModelPathToLoad);
+                            let fullDictionaryModelPathToLoad: any[] = this.dictionaryService.getEntriesExcludeBlank('' + columnProperty.fullDictionaryModelPathToLoad);
+                            fullDictionaryModelPathToLoad.unshift("");
+                            newColumn.selectOptions = fullDictionaryModelPathToLoad;
                         } else {
                             newColumn.selectOptions = [];
                         }
@@ -1527,10 +1570,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 selectOptionsDisplayField: "display",
                 selectOptionsValueField: "idOligoBarcode",
                 indexTagLetter: 'A',
-                validators: [Validators.required],
-                errorNameErrorMessageMap: [
-                    {errorName: 'required', errorMessage: 'Index Tag A required'}
-                ],
                 sortOrder: 300
             });
             temp.push({
@@ -1564,10 +1603,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     selectOptionsDisplayField: "display",
                     selectOptionsValueField: "idOligoBarcodeB",
                     indexTagLetter: 'B',
-                    validators: [Validators.required],
-                    errorNameErrorMessageMap: [
-                        {errorName: 'required', errorMessage: 'Index Tag B required'}
-                    ],
                     sortOrder: 302
                 });
 
@@ -1836,6 +1871,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
 
         this.sampleTypes = types.sort(TabSampleSetupViewComponent.sortSampleTypes);
+        this.sampleTypes.unshift("");
     }
 
     private seqLibProtocols: any[];
@@ -1869,6 +1905,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 }
             }
         });
+        this.seqLibProtocols.unshift("");
     }
 
 
