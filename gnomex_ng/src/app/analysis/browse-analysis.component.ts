@@ -222,12 +222,22 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             setTimeout(() => {
                 this.treeModel.expandAll();
                 if(this.navService.navMode === NavigationService.URL) { // this is if component is being navigated to by url
+                    let idName = "";
+                    let idVal = "";
+                    if (this.paramMap.get("idAnalysis") ){
+                        idName = "idAnalysis";
+                        idVal = this.paramMap.get("idAnalysis")
+                    }else if(this.qParamMap.get("idAnalysisGroup")){
+                        idName = "idAnalysisGroup";
+                        idVal = this.qParamMap.get("idAnalysisGroup")
+                    }else if(this.qParamMap.get("idLab")){
+                        idName = "idLab";
+                        idVal = this.qParamMap.get("idLab");
+                    }
 
 
-                    let id: string = this.paramMap.get("idAnalysis") ? 'a'+ this.paramMap.get("idAnalysis")
-                        : this.qParamMap.get("idAnalysisGroup") ? 'p' + this.qParamMap.get("idAnalysisGroup") : null;
-                    if(this.treeModel && id) {
-                        let node: ITreeNode = this.findNodeById( id);
+                    if(this.treeModel) {
+                        let node = UtilService.findTreeNode(this.treeModel, idName, idVal);
                         if(node) {
                             node.setIsActive(true);
                             node.scrollIntoView();

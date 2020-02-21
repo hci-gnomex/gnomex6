@@ -92,6 +92,9 @@ export class AuthRouteGuardService implements CanActivate {
 
                     return false;
                 } else {
+                    if(!isAuthed){
+                        this._authenticationService.guestLogin();
+                    }
                     return true;
                 }
 

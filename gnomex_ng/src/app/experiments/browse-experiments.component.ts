@@ -206,13 +206,24 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 this.toggleButton = "Collapse Projects";
                 this.treeModel.expandAll();
                 if(this.navService.navMode === NavigationService.URL) {
-                    let id: string = this.paramMap.get("idRequest") ? 'r'+ this.paramMap.get("idRequest")
-                        : this.qParamMap.get("idProject") ? 'p' + this.qParamMap.get("idProject") : null;
-                    if(this.treeModel && id) {
-                        let node: ITreeNode = this.treeModel.getNodeById(id);
+                    let idName = "";
+                    let idVal = "";
+                   if (this.paramMap.get("idRequest") ){
+                       idName = "idRequest";
+                       idVal = this.paramMap.get("idRequest")
+                   }else if(this.qParamMap.get("idProject")){
+                       idName = "idProject";
+                       idVal = this.qParamMap.get("idProject")
+                   }else if(this.qParamMap.get("idLab")){
+                       idName = "idLab";
+                       idVal = this.qParamMap.get("idLab");
+                   }
+
+                    if(this.treeModel) {
+                        let node = UtilService.findTreeNode(this.treeModel, idName, idVal);
                         if(node) {
-                            this.treeModel.getNodeById(id).setIsActive(true);
-                            this.treeModel.getNodeById(id).scrollIntoView();
+                            node.setIsActive(true);
+                            node.scrollIntoView();
                         }
                     }
                 } else if(this.setActiveNodeId) {

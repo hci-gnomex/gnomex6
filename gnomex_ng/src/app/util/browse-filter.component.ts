@@ -200,7 +200,6 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
 
     public showLabComboBox: boolean = false;
     private showLabMultiSelectComboBox: boolean = false;
-    private multiSelectIdLabs: Set<string> = new Set<string>();
     public labList: any[] = [];
     public ownerList: any[] = [];
     public showOwnerComboBox: boolean = false;
@@ -482,12 +481,17 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                     //now set actual value in component
                     if (typeof this[classPropName] === "boolean") {
                         this[classPropName] = this.qParamMap.get(navKey) === 'Y';
-                    } else {
+                    } else if(typeof this[classPropName] === "string") {
                         this[classPropName] = this.qParamMap.get(navKey);
+                    }else{ // an array
+                        this[classPropName] = (<string>this.qParamMap.get(navKey)).split(":")
                     }
 
                 }
 
+            }
+            if(this.selectedLab && this.showLabMultiSelectComboBox){
+                this.selectedLabs = [this.selectedLab];
             }
         }catch(e){
             console.debug(e);
@@ -510,7 +514,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         this.redosFlag = false;
         this.orderNumberString = "";
         this.selectedLab = "";
-        this.multiSelectIdLabs.clear();
+        this.selectedLabs = [];
         this.ownerList = [];
         this.selectedOwner = "";
         this.dateFromString = "";
@@ -556,7 +560,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     toggleShowMore(): void {
         this.showMore = !this.showMore;
         if (!this.showMore) {
-            this.multiSelectIdLabs.clear();
+            this.selectedLabs = [];
             this.resetCoreFacilitySelection();
             if (this.showLabMembersComboBox) {
                 this.selectedOwner = "";
@@ -594,9 +598,9 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     }
 
     onMultiLabChange(labs: any[]): void {
-        this.multiSelectIdLabs.clear();
+        this.selectedLabs = [];
         for (let lab of labs) {
-            this.multiSelectIdLabs.add(lab);
+            this.selectedLabs.push(lab);
         }
     }
 
@@ -897,9 +901,10 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 params = params.delete("idLab");
             }
 
-            if (this.showLabMultiSelectComboBox && this.multiSelectIdLabs.size > 0) {
+            if (this.showLabMultiSelectComboBox && this.selectedLabs.length > 0) {
                 let labKeys: string = "";
-                this.multiSelectIdLabs.forEach(function (lab: string) {
+                let  multiSelectIdLabs: Set<string> = new Set<string>(this.selectedLabs);
+                multiSelectIdLabs.forEach(function (lab: string) {
                     if (labKeys === "") {
                         labKeys = labKeys.concat(lab);
                     } else {
