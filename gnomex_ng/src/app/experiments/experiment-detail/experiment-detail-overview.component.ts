@@ -188,7 +188,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                     || (this.experiment.codeIsolationPrepType && this.experiment.codeIsolationPrepType !== "")
                     || protocols.length > 0);
 
-                let annots = this.experiment.RequestProperties;
+                let annots = this.experiment.RequestProperties ? (this.experiment.RequestProperties.PropertyEntry ? this.experiment.RequestProperties.PropertyEntry : this.experiment.RequestProperties) : "";
                 this.showRelatedDataTab = this.initRelatedData(this.experiment);
 
                 if (annots) {

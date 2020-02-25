@@ -1,6 +1,6 @@
 <div style="display:flex; flex-direction:column; height:100%; width:100%;">
-    <div style="display:flex; font-size:small; " >
-        <label>
+    <div class="flex-container-row">
+        <label class="label label-min-width">
             <img class="icon" [src]="dataTrackService?.datatrackListTreeNode.icon">
             Data Track {{this.dataTrackService?.datatrackListTreeNode.number}}
         </label>
@@ -67,7 +67,10 @@
                 <dt-summary-tab [editable]="routeOutlet === 'datatracksPanel' && !this.secAdvisorService.isGuest"></dt-summary-tab>
             </mat-tab>
             <mat-tab style="height:100%" label="Annotations">
-                <annotation-tab [annotations]="annotations" [orderType]="types.DATATRACK" [disabled]="routeOutlet !== 'datatracksPanel'"> </annotation-tab>
+                <annotation-tab [annotations]="annotations" [orderType]="types.DATATRACK"
+                                [disabled]="routeOutlet !== 'datatracksPanel' || !canWrite"
+                                [showConfigureAnnotationsButton] = "routeOutlet === 'datatracksPanel' && canWrite">
+                </annotation-tab>
             </mat-tab>
             <mat-tab class="full-height" label="Files">
                 <datatracks-files-tab></datatracks-files-tab>
