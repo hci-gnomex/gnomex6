@@ -1,13 +1,10 @@
 package hci.gnomex.daemon.auto_import;
 
-import org.apache.commons.lang3.builder.Diff;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -228,11 +225,11 @@ public class Downloader {
 	}
 
 
-	private void addToFileNameMap(String aliasKey,  String fullPathFileVal){
-		if(fileNameMap.get(aliasKey) != null){
-			fileNameMap.get(aliasKey).add(fullPathFileVal);
+	private void addToIDMap(String aliasKey, String fullPathFileVal, Map<String, List<String>> idMap){
+		if(idMap.get(aliasKey) != null){
+			idMap.get(aliasKey).add(fullPathFileVal);
 		}else{
-			fileNameMap.put(aliasKey, new ArrayList<>(Arrays.asList(fullPathFileVal)));
+			idMap.put(aliasKey, new ArrayList<>(Arrays.asList(fullPathFileVal)));
 		}
 	}
 
@@ -245,6 +242,8 @@ public class Downloader {
 			BufferedReader buffReader = new BufferedReader(reader);
 			Pattern pattern = null;
 			Set<String> removedFlaggedSet = new TreeSet<String>();
+			Map<String,List<String>> flaggedIDMap = new HashMap<>();
+
 
 			if(filterRegex != null){
 				pattern = Pattern.compile(filterRegex);
@@ -262,12 +261,12 @@ public class Downloader {
 						Matcher m = pattern.matcher(fileName);
 						if(m.matches()){
 							String matchedFileName = Differ.constructMatchedFileName(1,3,m, new StringBuilder() );
-							addToFileNameMap(matchedFileName, line);
+							addToIDMap(matchedFileName, line, fileNameMap);
 						}else{
 							System.out.println("Could not match pattern " + pattern.pattern() + " ON text " + fileName );
 						}
 					}else{
-						addToFileNameMap(fileName, line);
+						addToIDMap(fileName, line, fileNameMap);
 					}
 				}
 
@@ -277,38 +276,26 @@ public class Downloader {
 			}
 			System.out.println("Total files to download: " + fileNameMap.size());
 
-			File flaggedFolder = new File(this.downloadPath + "/Flagged/");
-			for(File file: flaggedFolder.listFiles()){
-				if(!file.isDirectory()){
-					String flaggedFileName = "";
-					if(filterRegex != null){
-						Matcher m = pattern.matcher(file.getName());
-						if(m.matches()){
-							flaggedFileName = Differ.constructMatchedFileName(1,3,m, new StringBuilder() );
-						}else{
-							System.out.println("Could not match pattern " + pattern.pattern() + " ON text " + file.getName() );
-						}
+			this.loadFlaggedFiles(pattern,flaggedIDMap);
 
-					}else{
-						flaggedFileName = file.getName();
-					}
-					if(removedFlaggedSet.contains(flaggedFileName)){
-						continue;
-					}
 
-					List<String> fileNames = this.fileNameMap.remove(flaggedFileName);
-					removedFlaggedSet.add(flaggedFileName);
-
-					if(fileNames != null){
-						for(String fileName : fileNames){
-							System.out.println("Filtering out: " + fileName);
-							this.flaggedFileList.add(fileName);
-						}
-					}else{
-						System.out.println("[downloader] This flagged file wasn't found: "  +  file.getName() + " to filter out for download");
-					}
-
+			for(Map.Entry<String,List<String>> e : flaggedIDMap.entrySet()){
+				String flaggedIDName = e.getKey();
+				// only need to remove once
+				if(!removedFlaggedSet.add(flaggedIDName)){
+					continue;
 				}
+
+				this.fileNameMap.remove(flaggedIDName);
+				List<String> fileNames = flaggedIDMap.get(flaggedIDName);
+
+				if(fileNames != null){
+					for(String fileName : fileNames){
+						System.out.println("Filtering out: " + fileName);
+						this.flaggedFileList.add(fileName);
+					}
+				}
+
 			}
 			System.out.println("Files to download after excluding already downloaded Flagged Files: " + fileNameMap.size() );
 
@@ -333,6 +320,45 @@ public class Downloader {
 			}
 		}
 
+	}
+
+
+	private void loadFlaggedFiles(Pattern pattern, Map<String, List<String>> flaggedIDMap){
+		File flaggedFolder = new File(this.downloadPath + "/Flagged/");
+		for(File file: flaggedFolder.listFiles()) {
+			if (!file.isDirectory()) {
+				String flaggedFileName = "";
+				if (filterRegex != null) {
+					Matcher m = pattern.matcher(file.getName());
+					if (m.matches()) {
+						flaggedFileName = Differ.constructMatchedFileName(1, 3, m, new StringBuilder());
+						if (!mode.equals("avatar")) {
+							addToIDMap(flaggedFileName, file.getName(), flaggedIDMap);
+						}
+					} else {
+						System.out.println("Could not match pattern " + pattern.pattern() + " ON text " + file.getName());
+					}
+
+				} else {
+					flaggedFileName = file.getName();
+					if (!mode.equals("avatar")) {
+						addToIDMap(flaggedFileName, file.getName(), flaggedIDMap);
+					}
+				}
+
+				if(mode.equals("avatar")){
+					List<String> fileNames = this.fileNameMap.remove(flaggedFileName);
+
+					if (fileNames != null) {
+						for (String fileName : fileNames) {
+							System.out.println("Filtering out: " + fileName);
+							this.flaggedFileList.add(fileName);
+						}
+					}
+				}
+
+			}
+		}
 	}
 
 
