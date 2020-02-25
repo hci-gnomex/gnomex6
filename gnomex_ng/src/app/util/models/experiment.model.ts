@@ -672,7 +672,7 @@ export class Experiment {
         return this._RequestProperties;
     }
     public set RequestProperties(value: any[]) {
-        this._RequestProperties = value;
+        this._RequestProperties = value ? (Array.isArray(value) ? value : value["PropertyEntry"] ? [value["PropertyEntry"]] : []) : [];
 
         if (this.idCoreFacility) {
             this.filterRequestProperties();
