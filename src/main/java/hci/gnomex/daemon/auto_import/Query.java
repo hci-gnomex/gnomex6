@@ -357,14 +357,13 @@ public class Query {
         return hasLink;
     }
 
-    public Map<Integer, List<Integer>> getCollaboratorsForIRB(List<String> irbs, List<Integer> analysisIDs) {
+    public Map<Integer, List<Integer>> getCollaboratorsForIRB(List<String> irbs, List<Integer> analysisRequestIDs, String collabToAnalysisRequestQuery ) {
         Statement statement = null;
         PreparedStatement pStatement = null;
         ArrayList<Integer> collabIDsInLab = new ArrayList();
         HashMap collabsToAddForAnalysis = new HashMap();
 
         try {
-            Iterator var7 = irbs.iterator();
 
             String collabToAnalysisQuery = "SELECT * from Lab l JOIN LabUser lu ON lu.idLab = l.idLab WHERE l.lastName LIKE ?";
 
@@ -389,26 +388,25 @@ public class Query {
             }
 
 
-            for (Integer aID : analysisIDs) {
-                collabToAnalysisQuery = "SELECT * from AnalysisCollaborator ac WHERE ac.idAnalysis = ? AND ac.idAppUser = ?";
-                collabsToAddForAnalysis.put(aID, new ArrayList());
+            for (Integer arID : analysisRequestIDs) {
+                collabsToAddForAnalysis.put(arID, new ArrayList());
                 System.out.println("-------------------------------------------------------------------");
 
 
                 for (Integer collabID : collabIDsInLab) {
 
-                    boolean existingRelation = false;
-                    pStatement = conn.prepareStatement(collabToAnalysisQuery);
-                    pStatement.setInt(1, aID);
+                    pStatement = conn.prepareStatement(collabToAnalysisRequestQuery);
+                    pStatement.setInt(1, arID);
                     pStatement.setInt(2, collabID);
-                    System.out.print("SELECT * from AnalysisCollaborator ac \nWhere ac.idAnalysis = " + aID + " AND ac.idAppUser = " + collabID);
+
+                    String[] queryArray = collabToAnalysisRequestQuery.split("\\?");
+                    System.out.print(queryArray[0] + arID + queryArray[1] + collabID);
+                    //System.out.print("SELECT * from AnalysisCollaborator ac \nWhere ac.idAnalysis = " + arID + " AND ac.idAppUser = " + collabID);
                     ResultSet rs = pStatement.executeQuery();
                     if (rs.next()) {
-                        existingRelation = true;
-                    }
-
-                    if (!existingRelation) {
-                        ((List) collabsToAddForAnalysis.get(aID)).add(collabID);
+                        System.out.println( " collab: "+ collabID + "  already added. skipping.... ");
+                    }else{
+                        ((List) collabsToAddForAnalysis.get(arID)).add(collabID);
                         System.out.println("   actual collabs added " + collabID);
                     }
                 }
@@ -460,50 +458,38 @@ public class Query {
         return strIDList.toString();
     }
 
-    public void assignPermissions(List<Integer> collabsToAddToAnalysis, Integer analysisID) {
-        String assignPermissionsQuery = "INSERT INTO AnalysisCollaborator VALUES (?,?,?,?)";
-
+    public void assignPermissions(List<Integer> collabsToAddToAnalysis, Integer analysisID, String assignPermissionsQuery)  {
+        PreparedStatement ps = null;
+        if(collabsToAddToAnalysis.size() == 0){
+            return;
+        }
         try {
-            PreparedStatement ps = this.conn.prepareStatement(assignPermissionsQuery);
-            Throwable var5 = null;
+            ps = this.conn.prepareStatement(assignPermissionsQuery);
+            this.conn.setAutoCommit(false);
 
-            try {
-                this.conn.setAutoCommit(false);
-                Iterator var6 = collabsToAddToAnalysis.iterator();
-
-                while (var6.hasNext()) {
-                    Integer collabID = (Integer) var6.next();
-                    ps.setInt(1, analysisID);
-                    ps.setInt(2, collabID);
-                    ps.setString(3, "Y");
-                    ps.setString(4, "Y");
-                    ps.addBatch();
-                }
-
-                ps.executeBatch();
-                this.conn.commit();
-            } catch (Throwable var18) {
-                var5 = var18;
-                throw var18;
-            } finally {
-                if (ps != null) {
-                    if (var5 != null) {
-                        try {
-                            ps.close();
-                        } catch (Throwable var17) {
-                            var5.addSuppressed(var17);
-                        }
-                    } else {
-                        ps.close();
-                    }
-                }
-
+            for (Integer collabID : collabsToAddToAnalysis) {
+                ps.setInt(1, analysisID);
+                ps.setInt(2, collabID);
+                ps.setString(3, "Y");
+                ps.setString(4, "Y");
+                ps.addBatch();
             }
-        } catch (SQLException var20) {
+
+            ps.executeBatch();
+            this.conn.commit();
+
+
+        } catch (SQLException sqle) {
             try {
                 this.conn.rollback();
-            } catch (SQLException var16) {
-                var16.printStackTrace();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }finally {
+            try {
+                if(ps != null)  ps.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
 
@@ -530,26 +516,35 @@ public class Query {
         return personIDList;
     }
 
-    public List<Integer> getAnalysisIdFromPersonID(Set<String> personIDList, String inStatement) throws Exception {
+    public List<Integer> getAnalysisRequestIdFromPersonID(String baseQuery, Set<String> personIDList, String inStatement) throws Exception {
         Statement stmnt = null;
-        List<Integer> analysisIDs = new ArrayList<>();
+        //analysis or request ids can be
+        List<Integer> analysisRequestIDs = new ArrayList<>();
+        boolean forAnalysis = baseQuery.contains("Analysis");
+
 
         try {
             stmnt = this.conn.createStatement();
-            String query = "SELECT a.idAnalysis FROM Analysis a WHERE " + inStatement;
+            String query = baseQuery + inStatement;
 
 
             ResultSet rs = stmnt.executeQuery(query);
 
             while (rs.next()) {
-                analysisIDs.add(rs.getInt("idAnalysis"));
+                if(forAnalysis){
+                    analysisRequestIDs.add(rs.getInt("idAnalysis"));
+                }else{
+                    analysisRequestIDs.add(rs.getInt("idRequest"));
+                }
+
+
             }
 
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
             throw new Exception(sqlException.getMessage() + " : Could not execute query to find Analysis With Criteria");
         }
-        return analysisIDs;
+        return analysisRequestIDs;
     }
 
     public void filterPersonIDList(String filterQuery, Set<String> personIDList) throws Exception {

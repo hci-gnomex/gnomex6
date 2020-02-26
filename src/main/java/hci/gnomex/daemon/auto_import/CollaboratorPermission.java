@@ -11,11 +11,13 @@ public class CollaboratorPermission {
     private Query query;
     private static Set<String> levelOptions;
     private String level;
-    private boolean authCollaborators;
+    private boolean authRequestCollaborators;
     private static Set<String> dataVendorOptions;
     private List<String> dataVendors = new ArrayList();
     private List<String> excludedVendors = new ArrayList<>();
     private String attributeType;
+    private List<Integer> requestIDList;
+
     private List<String> attributeIDs = new ArrayList();
     public List<String> IRBs = new ArrayList();
     private static int AVATAR_FOLDER_ID = 11;
@@ -90,7 +92,7 @@ public class CollaboratorPermission {
 
 
     CollaboratorPermission(String[] args) throws Exception {
-        authCollaborators = false;
+        authRequestCollaborators = false;
         for(int i = 0; i < args.length; ++i) {
             args[i] = args[i].toLowerCase();
             if (args[i].equals("-irb")) {
@@ -143,8 +145,9 @@ public class CollaboratorPermission {
             else if (args[i].equals("-dbcredentials")) {
                 ++i;
                 this.query = new Query(args[i]);
-            }else if(args[i].equals("-auth")){
-                this.authCollaborators = true;
+            }else if(args[i].equals("-authrequest")){
+                this.authRequestCollaborators = true;
+                this.requestIDList = new ArrayList<>();
             }
         }
 
@@ -156,10 +159,15 @@ public class CollaboratorPermission {
         try {
             cp = new CollaboratorPermission(args);
             List<Integer> analysisList = cp.getAnalysesWithCriteria();
-            if(cp.isCollaboratorsAuthed()){
-                Map<Integer, List<Integer>> analysisForCollabs = cp.query.getCollaboratorsForIRB(cp.IRBs, analysisList);
-                cp.assignAnalysisToCollabs(analysisForCollabs);
+            String query = "SELECT * from AnalysisCollaborator ac WHERE ac.idAnalysis = ? AND ac.idAppUser = ?";
+            Map<Integer, List<Integer>> analysisForCollabs = cp.query.getCollaboratorsForIRB(cp.IRBs, analysisList, query);
+            cp.assignAnalysisToCollabs(analysisForCollabs, true);
+            if(cp.isRequestAuthed()){
+                query = "SELECT * from RequestCollaborator rc WHERE rc.idRequest = ? AND rc.idAppUser = ?";
+                Map<Integer, List<Integer>> requestForCollabs = cp.query.getCollaboratorsForIRB(cp.IRBs, cp.requestIDList, query);
+                cp.assignAnalysisToCollabs(requestForCollabs,false);
             }
+
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -174,8 +182,8 @@ public class CollaboratorPermission {
 
     }
 
-    public boolean isCollaboratorsAuthed() {
-        return  this.authCollaborators;
+    public boolean isRequestAuthed() {
+        return  this.authRequestCollaborators;
     }
     private List<Integer> getAnalysesWithCriteria() throws Exception {
         List<Integer> analysisIDList = new ArrayList<>();
@@ -183,6 +191,7 @@ public class CollaboratorPermission {
             analysisIDList = getAnalysisIDsFromProperty();
 
         }else if(this.level.equals("analysis") && this.attributeType.equals("name")){
+            //todo currently only supports getting requestIDList from personID
             analysisIDList = getAnalysisFromPersonID();
         }
         else if (this.level.equals("analysis") && this.attributeType.equals("idanalysis")) {
@@ -243,8 +252,8 @@ public class CollaboratorPermission {
 
         }
 
-
-        analysisIDList = this.query.getAnalysisIdFromPersonID(personIDList, makePersonIdINstatement(personIDList, "a.name"));
+        String baseQuery = "SELECT a.idAnalysis FROM Analysis a WHERE ";
+        analysisIDList = this.query.getAnalysisRequestIdFromPersonID( baseQuery, personIDList, makePersonIdINstatement(personIDList, "a.name"));
         outSummary(personIDList, analysisIDList);
         return analysisIDList;
 
@@ -261,8 +270,6 @@ public class CollaboratorPermission {
             String allPatientQuery = "SELECT a.name as PersonID FROM Analysis a";
             this.query.executeAnalysisWithCriteriaQuery(allPatientQuery,personIDList);
         }
-
-
 
 
         for(int i = 0; i < this.dataVendors.size(); i++){
@@ -288,7 +295,13 @@ public class CollaboratorPermission {
             this.query.filterPersonIDList(strBuilder.toString(), personIDList);
 
         }
-        analysisIDList = this.query.getAnalysisIdFromPersonID(personIDList, makePersonIdINstatement(personIDList, "a.name"));
+        String baseQuery = "SELECT a.idAnalysis FROM Analysis a WHERE ";
+        analysisIDList = this.query.getAnalysisRequestIdFromPersonID(baseQuery, personIDList, makePersonIdINstatement(personIDList, "a.name"));
+        if(isRequestAuthed()){
+            baseQuery = "SELECT r.idRequest FROM Request r WHERE ";
+            requestIDList = this.query.getAnalysisRequestIdFromPersonID(baseQuery, personIDList, makePersonIdINstatement(personIDList, "r.name"));
+        }
+
         outSummary(personIDList, analysisIDList);
         return analysisIDList;
     }
@@ -431,14 +444,19 @@ public class CollaboratorPermission {
         return targetStr;
     }
 
-    public void assignAnalysisToCollabs(Map<Integer, List<Integer>> collabsForAnalysis) {
+    public void assignAnalysisToCollabs(Map<Integer, List<Integer>> collabsForAnalysis, boolean forAnalysis) {
         Iterator it = collabsForAnalysis.entrySet().iterator();
 
         while(it.hasNext()) {
             Entry<Integer, List<Integer>> entry = (Entry)it.next();
             Integer aKey = (Integer)entry.getKey();
             List<Integer> collabs = (List)collabsForAnalysis.get(aKey);
-            this.query.assignPermissions(collabs, aKey);
+            if(forAnalysis){
+                this.query.assignPermissions(collabs, aKey, "INSERT INTO AnalysisCollaborator VALUES (?,?,?,?)");
+            }else{
+                this.query.assignPermissions(collabs, aKey, "INSERT INTO RequestCollaborator VALUES (?,?,?,?)");
+            }
+
         }
 
     }
