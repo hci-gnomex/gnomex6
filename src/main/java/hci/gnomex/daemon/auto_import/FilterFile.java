@@ -11,25 +11,30 @@ import java.util.regex.Pattern;
 public class FilterFile {
 
 	public static void main(String[] args) {
-		/* filter file was written for filter out files that don't have their associated checksum and vice versa.
-		*  It also serves to write all non filter files and put the checksums into one file so the next script can ingest it   */
+		/* filter file was written for filtering out files that don't have their associated checksum and vice versa.
+		*  It also serves to write all non filter files and put the checksums into one file so the next script can ingest it
+		*  Update we no longer enforce there to be a checksum with the file because we don't run the checksum against */
 
 		String inFile = "";
 		String remoteFileList = ""; // the list of only xml and pdf files (small files)
 		String credFile ="";
 		String filteredFile = "";
+		String filterRegex = "";
+		String localDataPath = "";
 
 
 		List<String> smallFilesList = new ArrayList<String>();
 		List<String> filterOutList = new ArrayList<String>();
 
 
-		if(args.length == 4) {
+		if(args.length == 6) {
 			inFile = args[0];
 			remoteFileList = args[1]; //output: pdf and xml files
 			credFile=args[2];
 			filteredFile=args[3]; // output: The files that were filtered out
 			System.out.println("credFile: " + credFile);
+			filterRegex=args[4];
+			localDataPath=args[5];
 
 
 		}else {
@@ -52,9 +57,10 @@ public class FilterFile {
 			e.printStackTrace();
 		}
 		String currentLine = "";
-		String regex = "^(.*)([TCQ]RF[0-9]+_?[a-zA-Z]*)\\.(.*)$";
-		Pattern r = Pattern.compile(regex);
+
+		Pattern r = Pattern.compile(filterRegex);
 		Query query = new Query(credFile);
+		System.out.println(r.toString());
 
 		String newGroup = "";
 
@@ -65,23 +71,39 @@ public class FilterFile {
 			Matcher m = r.matcher(currentLine);
 
 			String path = "";
+			String fileID = "";
+			String nucType = "";
 			String fileName = "";
 			String extension ="";
 			String fullFileName = "";
 
 			if(m.matches()) {
 				path = m.group(1);
-				fileName = m.group(2);
-				extension= m.group(3);
+				fileID = m.group(2);
+				nucType= m.group(3);
+				fileName = nucType.equals("") ? fileID : fileID + nucType;
+				extension = m.group(4);
+
+//				System.out.println("path: " + path);
+//				System.out.println("filename: " + fileName);
+//				System.out.println("extension: " + extension);
+
 				fullFileName =  fileName+"."+extension;
+			}else{
+				System.out.println();
+				System.out.println("The current path doesn't match anything: ");
+				System.out.println(currentLine);
+				continue;
 			}
 
 
 			String[] splitExtension = null;
 			splitExtension = extension.split("\\.");
 
+
 			if(extension.equals("xml")){
-				boolean processed  = hasXMLBeenProcessed(fullFileName,query, currentLine);
+				//todo issue if no path is just filename. tried to have way fix but currentline is pass by value, its a rare case
+				boolean processed  = hasXMLBeenProcessed(fullFileName,query, currentLine,localDataPath);
 				if(!processed){
 					// unprocessed list
 					filterOutList.add(currentLine);
@@ -140,14 +162,20 @@ public class FilterFile {
 
 	}
 
-	private static boolean hasXMLBeenProcessed(String fileName,Query q, String pathWithName) {
+	private static boolean hasXMLBeenProcessed(String fileName,Query q, String pathWithName,String localDataPath) {
 		boolean processed = false;
 
-		File file = new File(pathWithName);
-		System.out.println(pathWithName);
+		File file = new File(pathWithName.toString());
+
 		if(!file.exists()){
-			System.out.println("The file doesn't exist");
-			return processed;
+			pathWithName = localDataPath + File.separator + pathWithName;
+			file = new File(pathWithName.toString());
+			if(!file.exists()){
+				System.out.println(pathWithName);
+				System.out.println("The file doesn't exist");
+				return processed;
+			}
+
 		}
 
 		Date d = new Date(file.lastModified());
@@ -160,6 +188,7 @@ public class FilterFile {
 
 			Timestamp timestamp = ((java.sql.Timestamp)row.get(1));
 			Instant instTimeStamp = timestamp.toInstant();
+			System.out.println(pathWithName);
 			if(instTimeStamp.equals(instDate)){
 				processed = true;
 				System.out.println("This file has been processed :) ");

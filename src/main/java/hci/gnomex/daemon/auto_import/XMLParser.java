@@ -578,20 +578,26 @@ public class XMLParser {
 		try {
 			System.out.println("started executing command");
 			tempScript = createTempScript(commands);
+			System.out.println("from this temp file " + tempScript.getCanonicalPath() );
 			ProcessBuilder pb = new ProcessBuilder("bash", tempScript.toString());
 			pb.inheritIO();
 			Process process;
-			File errorFile = new File(outError);
-			pb.redirectError(errorFile);
+			File errorFile = null;
 
+			if(outError != null){
+				errorFile = new File(outError);
+				pb.redirectError(errorFile);
+			}
 
 			process = pb.start();
 			process.waitFor();
-
-			if(hasSubProccessErrors(errorFile)){
-				System.out.println("Error detected exiting script");
-				throw new Exception("Error detected in executing subprocess");
+			if(outError != null){
+				if(hasSubProccessErrors(errorFile)){
+					System.out.println("Error detected exiting script");
+					throw new Exception("Error detected in executing subprocess");
+				}
 			}
+
 			System.out.println("finished executing command");
 		}
 
@@ -602,9 +608,7 @@ public class XMLParser {
 			// TODO Auto-generated catch block
 			throw new Exception(e1);
 		}
-		finally
-
-		{
+		finally {
 			tempScript.delete();
 		}
 	}
@@ -699,7 +703,7 @@ public class XMLParser {
 				List<String> slIDs = flaggedIDs.get(i);
 				if(slIDs.get(1) != null && !slIDs.get(1).equals("")){
 					// only true for tempus else no split and index 0 will be the original string
-					String sampleID =  importMode.equals("tempus") ?  slIDs.get(1).split("_")[0] : slIDs.get(1);
+					String sampleID =  importMode.equals("tempus") && !slIDs.get(1).startsWith("result") ?  slIDs.get(1).split("_")[0] : slIDs.get(1);
 					if(dupIDSet.add(sampleID)) {
 						if (i < flaggedIDs.size() - 1) {
 
