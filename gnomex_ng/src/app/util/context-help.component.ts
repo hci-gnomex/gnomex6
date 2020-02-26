@@ -7,7 +7,10 @@ import {DialogsService} from "./popup/dialogs.service";
 @Component({
     selector: "context-help",
     template: `
-        <button mat-button [matTooltip]="this.tooltip" [matTooltipPosition]="this.tooltipPosition" (click)="this.showPopup()"><img [src]="'./assets/information.png'" class="icon">{{this.label}}</button>
+        <button mat-button [matTooltip]="tooltip" [matTooltipPosition]="tooltipPosition" (click)="showPopup()">
+            <img [src]="'./assets/information.png'" alt="" class="icon">
+            {{ label }}
+        </button>
     `,
     styles: [`
         * {
@@ -24,7 +27,7 @@ export class ContextHelpComponent implements OnInit {
     @Input() public idCoreFacility: string = "";
     @Input() public codeRequestCategory: string = "";
 
-    @Input() public isEditMode: boolean = false;
+    @Input() public hasEditPermission: boolean = false;
     @Input() public label: string = "";
     @Input() public popupTitle: string = "";
     @Input() public tooltipPosition: TooltipPosition = "below";
@@ -47,6 +50,7 @@ export class ContextHelpComponent implements OnInit {
                 (!this.idCoreFacility || dict.context2 === this.idCoreFacility) &&
                 (!this.codeRequestCategory || dict.context3 === this.codeRequestCategory);
         });
+
         if (entries.length === 1) {
             this.dictionary = entries[0];
             this.tooltip = this.dictionary.toolTipText;
@@ -71,23 +75,22 @@ export class ContextHelpComponent implements OnInit {
         config.data = {
             popupTitle: this.popupTitle,
             dictionary: this.dictionary,
-            isEditMode: this.isEditMode
+            hasEditPermission: this.hasEditPermission
         };
         let icon: string = "";
-        if(this.isEditMode) {
+        if(this.hasEditPermission) {
             icon = "<i class='fa fa-wrench fa-1x' style='color: var(--bluewarmvivid-medlight);'></i>";
         } else {
             icon = "<i class='fa fa-info-circle fa-1x' style='color: var(--bluewarmvivid-medlight);'></i>";
         }
-        this.dialogsService.genericDialogContainer(ContextHelpPopupComponent, "", icon, config)
-            .subscribe((result: any) => {
-                if (result) {
-                    this.dialogsService.startDefaultSpinnerDialog();
-                    this.dictionaryService.reloadAndRefresh(() => {
-                        this.loadDictionary();
-                        this.dialogsService.stopAllSpinnerDialogs();
-                    }, null, DictionaryService.CONTEXT_SENSITIVE_HELP);
-                }
+        this.dialogsService.genericDialogContainer(ContextHelpPopupComponent, "", icon, config).subscribe((result: any) => {
+            if (result) {
+                this.dialogsService.startDefaultSpinnerDialog();
+                this.dictionaryService.reloadAndRefresh(() => {
+                    this.loadDictionary();
+                    this.dialogsService.stopAllSpinnerDialogs();
+                }, null, DictionaryService.CONTEXT_SENSITIVE_HELP);
+            }
         });
     }
 

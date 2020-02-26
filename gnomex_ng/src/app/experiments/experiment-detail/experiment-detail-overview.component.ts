@@ -16,13 +16,13 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
 import {PropertyService} from "../../services/property.service";
 import {TabSamplesIlluminaComponent} from "../new-experiment/tab-samples-illumina.component";
 import {ConstantsService} from "../../services/constants.service";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {DownloadFilesComponent} from "../../util/download-files.component";
 import {FileService} from "../../services/file.service";
 import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
 import {CreateAnalysisComponent} from "../../analysis/create-analysis.component";
 import {HttpParams} from "@angular/common/http";
-import {first, map} from "rxjs/operators";
+import {map} from "rxjs/operators";
 import {BasicEmailDialogComponent} from "../../util/basic-email-dialog.component";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {VisibilityDetailTabComponent} from "../../util/visibility-detail-tab.component";
@@ -188,7 +188,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                     || (this.experiment.codeIsolationPrepType && this.experiment.codeIsolationPrepType !== "")
                     || protocols.length > 0);
 
-                let annots = this.experiment.RequestProperties;
+                let annots = this.experiment.RequestProperties ? (this.experiment.RequestProperties.PropertyEntry ? this.experiment.RequestProperties.PropertyEntry : this.experiment.RequestProperties) : "";
                 this.showRelatedDataTab = this.initRelatedData(this.experiment);
 
                 if (annots) {
@@ -322,11 +322,54 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
     saveRequest(): void {
         this._experiment.idBillingAccount = "";
         this._experiment.billingItems = [];
+
+        //TODO: Remove sequence lanes from the experiment that is not illumina type. Need to confirm, so comment this temporary.
+        // if(!this._experiment.requestCategory.isIlluminaType ||
+        //     (this._experiment.requestCategory.isIlluminaType && this._experiment.requestCategory.isIlluminaType === 'N')) {
+        //     if(this._experiment.sequenceLanes && this._experiment.sequenceLanes.length > 0) {
+        //         this._experiment.sequenceLanes = [];
+        //     }
+        // }
+
         this.experimentService.saveRequest(this._experiment).subscribe((response) => {
             if (response && response.requestNumber) {
+                let message: string[] = [];
+                message.push("Request " + response.requestNumber + "has been saved.");
+
+                // If samples, hybs or lanes have been removed, warn if billing should be adjusted to take into account
+                if (response.deleteSampleCount > 0 || response.deleteHybCount > 0 || response.deleteLaneCount > 0) {
+                    if(this.secAdvisor.hasPermission("canWriteAnyObject")) {
+                        let deleteTarget: string = "";
+                        if(response.deleteSampleCount > 0) {
+                            deleteTarget += "Samples";
+                        }
+                        if(response.deleteHybCount > 0) {
+                            deleteTarget += deleteTarget.length > 0 ? " and Hybs" : "Hybs";
+                        }
+                        if(response.deleteLaneCount > 0) {
+                            deleteTarget += deleteTarget.length > 0 ? " and Sequence Lanes" : "Sequence Lanes";
+                        }
+                        if(deleteTarget.length > 0 ) {
+                            deleteTarget = "Some " + deleteTarget + " have been deleted. Please view its billing items to adjust accordingly.";
+                            message.push("");
+                            message.push(deleteTarget);
+                        }
+                    }
+                }
+
+                // Inform if billing accounts reassigned on billing items
+                if(response.billingAccountMessage) {
+                    message.push("");
+                    message.push(response.billingAccountMessage);
+                }
                 this.experimentService.usePreviousURLParams = true;
                 this.gnomexService.navByNumber(response.requestNumber);
                 this.dialogsService.stopAllSpinnerDialogs();
+                setTimeout(() => {
+                    if(message.length > 1) {
+                        this.dialogsService.alert(message, "", DialogType.WARNING);
+                    }
+                });
             } else {
                 this.dialogsService.stopAllSpinnerDialogs();
             }

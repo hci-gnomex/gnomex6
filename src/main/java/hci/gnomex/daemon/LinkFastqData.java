@@ -760,7 +760,11 @@ public class LinkFastqData extends TimerTask {
         try {
 //			String[] cmd1 = { "rm", "-f", link.toString() };
 //			Runtime.getRuntime().exec(cmd1);
-            String[] cmd = {"ln", subCommand, realFile.getAbsolutePath(), link.toString()};
+
+            String realFile1 = "'" + realFile.getAbsolutePath() + "'";
+            String link1 = "'" + link.toString() + "'";
+            String[] cmd = {"ln", subCommand, realFile1, link1};
+
             Runtime.getRuntime().exec(cmd);
             return true;
         } catch (IOException e) {

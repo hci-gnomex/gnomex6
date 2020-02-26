@@ -24,6 +24,7 @@ export class Experiment {
     public avgInsertSizeTo:                    string = "";
     public idSlideProduct:                     string = "";
     public protocolNumber:                     string = "";
+    public invoicePrice:                       string = "";
 
     public get numberOfSamples(): string {
         return this._numberOfSamples;
@@ -248,9 +249,7 @@ export class Experiment {
 
     public extractionMethod_forSamples:        string = "";
     public get extractionMethod(): string {
-        // The sample should always return "", but save what the choice was in case we
-        // save more samples, because samples save this information individually (???)
-        return "";
+        return this.extractionMethod_forSamples;
     }
     public set extractionMethod(value: string) {
         this.extractionMethod_forSamples = value ? value : '';
@@ -673,7 +672,7 @@ export class Experiment {
         return this._RequestProperties;
     }
     public set RequestProperties(value: any[]) {
-        this._RequestProperties = value;
+        this._RequestProperties = value ? (Array.isArray(value) ? value : value["PropertyEntry"] ? [value["PropertyEntry"]] : []) : [];
 
         if (this.idCoreFacility) {
             this.filterRequestProperties();
@@ -1149,6 +1148,10 @@ export class Experiment {
             tempSamples.push(sample.getJSONObjectRepresentation());
         }
 
+        if (!Array.isArray(this.collaborators)) {
+            this.collaborators = [this.collaborators];
+        }
+
         let temp: any = {
             idCoreFacility:                     this.idCoreFacility,
             idProductOrder:                     this.idProductOrder,
@@ -1242,7 +1245,6 @@ export class Experiment {
             hasPlates:                          this.hasPlates,
             isOpeningNewBillingTemplate:        this.isOpeningNewBillingTemplate,
             amendState:                         this.amendState,
-
             analysisExperimentItems:  this.analysisExperimentItems,
             billingItems:             this.billingItems,
             collaborators:            this.collaborators,

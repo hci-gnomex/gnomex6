@@ -227,7 +227,7 @@ public class GetExpandedAnalysisFileList extends GNomExCommand implements Serial
       Arrays.sort(fileList, new Comparator<File>(){
         public int compare(File f1, File f2)     {
           return f1.getName().compareTo(f2.getName());
-        } });
+          } });
 
 
       for (int x = 0; x < fileList.length; x++) {
@@ -236,13 +236,13 @@ public class GetExpandedAnalysisFileList extends GNomExCommand implements Serial
         if (f1.isDirectory()) {
           Path p = Paths.get(f1.getAbsolutePath());
           try {
-            String dirrealpath = p.toRealPath().toString();
-            Path sl = Files.readSymbolicLink(p);
-            Path slrp = sl.toRealPath();
-            String dirlinkrealpath = slrp.toString();
-            if (dirrealpath.equals(dirlinkrealpath)) {
-              continue;
-            }
+          String dirrealpath = p.toRealPath().toString();
+              Path sl = Files.readSymbolicLink(p);
+              Path slrp = sl.toRealPath();
+              String dirlinkrealpath = slrp.toString();
+              if (dirrealpath.equals(dirlinkrealpath)) {
+                  continue;
+              }
 
           } catch (Exception ee)
           {}

@@ -1,7 +1,6 @@
 import {Injectable} from "@angular/core";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {concat, Observable, ObservableInput, of, throwError} from "rxjs";
-import {Http, Response} from "@angular/http";
 import {catchError, flatMap, map} from "rxjs/operators";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
@@ -9,7 +8,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 
 @Injectable()
 export class UploadFileService {
-    constructor(private http: Http, private httpClient: HttpClient,
+    constructor(private httpClient: HttpClient,
                 private dialogService: DialogsService) {}
 
 
@@ -29,9 +28,13 @@ export class UploadFileService {
             formData.append("Filedata", file.file, file.name);
             formData.append("Upload", "Submit Query");
 
-            fileUploadObservableList.push(this.http.post(url, formData, {withCredentials: true})
-                .pipe(map((resp: Response) => {
-                    return resp.json();
+            fileUploadObservableList.push(this.httpClient.post(url, formData, {withCredentials: true, reportProgress: true})
+                .pipe(map((resp: any) => {
+                    if(resp) {
+                        return resp;
+                    }
+                }), catchError((err: IGnomexErrorResponse) => {
+                    return throwError(err);
                 })),
             );
         });

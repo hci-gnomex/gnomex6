@@ -60,6 +60,7 @@ export class PropertyService {
     public static readonly PROPERTY_HIDE_MULTIPLEX_LANE_OOLUMN: string = "hide_multiplex_lane_column";
     public static readonly PROPERTY_DEFAULT_VALUE_MULTIPLEX_LANE_COLUMN: string = "default_value_multiplex_lane_column";
     public static readonly PROPERTY_ESTIMATED_PRICE_WARNING: string = "estimated_price_warning";
+    public static readonly PROPERTY_EMAIL_INVOICE_PRICE_AMOUNT: string = "email_invoice_price_amount";
 
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_GROUP: string  = "analysis_assistance_group";
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_HEADER: string = "analysis_assistance_header";
@@ -70,6 +71,9 @@ export class PropertyService {
     public static readonly PROPERTY_QC_INSTRUCTIONS: string = "qc_instructions";
     public static readonly PROPERTY_BST_LINKAGE_SUPPORTED: string = "bst_linkage_supported";
     public static readonly PROPERTY_CAN_ACCESS_BSTX: string = "can_access_bstx";
+
+    public static readonly PROPERTY_MAINTENANCEMODE: string = "maintenancemode";
+    public static readonly PROPERTY_MAINTENANCE_SPLASH: string = "maintenance_splash";
 
     constructor(private dictionaryService: DictionaryService,
                 private httpClient: HttpClient,

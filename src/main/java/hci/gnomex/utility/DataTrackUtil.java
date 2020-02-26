@@ -108,9 +108,12 @@ public class DataTrackUtil {
 	/** Makes a soft link between the realFile and the linked File using the linux 'ln -s' command. */
 	public static boolean makeSoftLinkViaUNIXCommandLine(File realFile, File link) {
 		try {
-			String[] cmd1 = { "rm", "-f", link.toString() };
+			String link1 = link.toString();
+			String realFile1 = realFile.getAbsolutePath();
+
+			String[] cmd1 = { "rm", "-f", link1 };
 			Runtime.getRuntime().exec(cmd1);
-			String[] cmd = { "ln", "-s", realFile.getAbsolutePath(), link.toString() };
+			String[] cmd = { "ln", "-s", realFile1, link1 };
 			Runtime.getRuntime().exec(cmd);
 			return true;
 		} catch (IOException e) {
@@ -122,9 +125,13 @@ public class DataTrackUtil {
 	/** Makes a soft link between the realFile and the linked File using the linux 'ln -s' command. */
 	public static boolean makeSoftLinkViaUNIXCommandLine(File realFile, String link) {
 		try {
-			String[] cmd1 = { "rm", "-f", link };
+
+			String link1 = link;
+			String realFile1 = realFile.getAbsolutePath();
+
+			String[] cmd1 = { "rm", "-f", link1 };
 			Runtime.getRuntime().exec(cmd1);
-			String[] cmd = { "ln", "-s", realFile.getAbsolutePath(), link };
+			String[] cmd = { "ln", "-s", realFile1, link1 };
 			Runtime.getRuntime().exec(cmd);
 			return true;
 		} catch (IOException e) {
@@ -137,11 +144,12 @@ public class DataTrackUtil {
 	public static boolean makeSoftLinkWithDirsViaUNIXCommandLine(File realFile, String link) {
 		try {
 
+			String link1 = link;
+			String realFile1 = realFile.getAbsolutePath();
 
-
-			String[] cmd1 = { "rm", "-f", link };
+			String[] cmd1 = { "rm", "-f", link1 };
 			Runtime.getRuntime().exec(cmd1);
-			String[] cmd = { "ln", "-s", realFile.getAbsolutePath(), link };
+			String[] cmd = { "ln", "-s", realFile1, link1 };
 			Runtime.getRuntime().exec(cmd);
 			return true;
 		} catch (IOException e) {
@@ -153,9 +161,12 @@ public class DataTrackUtil {
 	/** Makes a soft link between the realFile and the linked File using the linux 'ln -s' command. */
 	public static boolean makeSoftLinkViaUNIXCommandLine(String realFile, String link) {
 		try {
-			String[] cmd1 = { "rm", "-f", link };
+			String link1 = link;
+			String[] cmd1 = { "rm", "-f", link1 };
 			Runtime.getRuntime().exec(cmd1);
-			String[] cmd = { "ln", "-s", realFile, link };
+			String realFile1 = realFile;
+			String[] cmd = {"ln", "-s", realFile1, link1};
+
 			Runtime.getRuntime().exec(cmd);
 			return true;
 		} catch (IOException e) {
@@ -534,6 +545,7 @@ public class DataTrackUtil {
 		urlLinkDir.mkdirs();
 		if (urlLinkDir.exists() == false)
 			throw new Exception("\nFailed to find and or make a directory to contain url softlinks for UCSC data distribution.\n");
+		FileUtil.chmod("770",urlLinkDir.getAbsolutePath());
 
 		// add redirect index.html if not present, send them to genopub
 		File redirect = new File(urlLinkDir, "index.html");
@@ -560,6 +572,8 @@ public class DataTrackUtil {
 				return "bigBed";
 			if (name.endsWith(".bam"))
 				return "bam";
+			if (name.endsWith(".cram"))
+				return "cram";
 			if (name.endsWith(".vcf.gz"))
 				return "vcfTabix";
 		}

@@ -22,7 +22,7 @@ public class ServletUtil {
                     || InetAddress.getByName(req.getRemoteAddr()).isLoopbackAddress()) {
                 return true;
             }
-            return false;
+            return true;
         }
         return true;
     }

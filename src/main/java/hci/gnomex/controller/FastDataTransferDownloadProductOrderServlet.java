@@ -235,21 +235,24 @@ public class FastDataTransferDownloadProductOrderServlet extends HttpServlet {
                 }
 
                 if(showCommandLineInstructions != null && showCommandLineInstructions.equals("Y")) {
-                    response.setContentType("text/html; charset=UTF-8");
-                    response.getOutputStream().println("***** Please read, the directions have changed *****");
-                    response.getOutputStream().println("Complete the following steps to run FDT from the command line:");
-                    response.getOutputStream().println("1) Download the fdtCommandLine.jar app from " + fdtJarLoc);
-                    response.getOutputStream().println("2) Open port 54321 in all firewalls surrounding your computer (this may occur automatically upon transfer).");
-                    response.getOutputStream().println("3) Execute the following on the command line(Make sure paths reflect your environment):");
-                    response.getOutputStream().println("4) There is a 24 hour timeout on this command.  After that time please generate a new command line using the FDT Upload Command Line link.");
-                    response.getOutputStream().println("java -jar ./fdtCommandLine.jar -noupdates -pull -r -c " + fdtServerName + " -d ./ " + softLinksPath);
+                    response.setContentType("text/html");
+                    response.getOutputStream().println("<P>***** Please read, the directions have changed *****");
+                    response.getOutputStream().println("<BR>Complete the following steps to run FDT from the command line:");
+                    response.getOutputStream().println("<BR>1) Download the fdtCommandLine.jar app from " + fdtJarLoc);
+                    response.getOutputStream().println("<BR>2) Open port 54321 in all firewalls surrounding your computer (this may occur automatically upon transfer).");
+                    response.getOutputStream().println("<BR>3) Execute the following on the command line(Make sure paths reflect your environment):");
+                    response.getOutputStream().println("<BR>4) There is a 24 hour timeout on this command.  After that time please generate a new command line using the FDT Upload Command Line link.");
+                    response.getOutputStream().println("<BR><BR>For a Windows system use this command line:");
+                    response.getOutputStream().println("<BR>java -jar fdtCommandLine.jar -noupdates -pull -r -c " + fdtServerName + " -d . " + softLinksPath + "</P>");
+                    response.getOutputStream().println("<BR><BR>Otherwise use this command line:");
+                    response.getOutputStream().println("<BR>java -jar ./fdtCommandLine.jar -noupdates -pull -r -c " + fdtServerName + " -d ./ " + softLinksPath + "</P>");
                     response.getOutputStream().flush();
                     return;
                 }
 
 
                 response.setHeader("Content-Disposition","attachment;filename=\"gnomex.jnlp\"");
-                response.setContentType("application/jnlp; charset=UTF-8");
+                response.setContentType("application/jnlp");
                 response.setHeader("Cache-Control", "max-age=0, must-revalidate");
                 try {
                     ServletOutputStream out = response.getOutputStream();

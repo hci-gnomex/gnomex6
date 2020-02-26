@@ -6,6 +6,7 @@ import {ReportIssueService} from "../../services/report-issue.service";
 import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {UtilService} from "../../services/util.service";
 
 @Component({
     selector: "report-problem",
@@ -85,8 +86,9 @@ export class ReportProblemComponent extends BaseGenericContainerDialog {
         let formData: FormData = new FormData();
 
         this.reportIssueService.reportIssueServletGetURL().subscribe((response: any) => {
-            let urlString = response.url.substring(0, response.url.indexOf(';'));
-            this.url = urlString.substring(urlString.indexOf('gnomex')-1, urlString.length);
+            if(response && response.url) {
+                this.url = UtilService.getUrlString(response.url);
+
             formData.append("fromAddress", this.fromFormControl.value);
             if (this.feedback) {
                 formData.append("body", this.feedback);
@@ -102,8 +104,9 @@ export class ReportProblemComponent extends BaseGenericContainerDialog {
             setTimeout(() => this.dialogRef.close());
             this.reportIssueService.sendReportIssueEmail(this.url, formData).subscribe((response: any) => {
                 this.dialogsService.alert("Issue has been submitted. Thank you.", null, DialogType.SUCCESS);
-            }, (err: IGnomexErrorResponse) => {
+                }, (err: IGnomexErrorResponse) => {
             });
+            }
         }, (err: IGnomexErrorResponse) => {
         });
     }

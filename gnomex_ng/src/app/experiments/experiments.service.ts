@@ -243,7 +243,9 @@ export class ExperimentsService {
             .set("requestJSONString", JSON.stringify(experiment.getJSONObjectRepresentation()))
             .set("description", experiment.description)
             .set("idProject", experiment.idProject)
-            .set("propertiesXML", propertiesXML);
+            .set("invoicePrice", experiment.invoicePrice)
+            .set("propertiesXML", propertiesXML)
+            .set("noJSONToXMLConversionNeeded","true");
 
         let headers: HttpHeaders = new HttpHeaders()
             .set("Content-Type", "application/x-www-form-urlencoded");

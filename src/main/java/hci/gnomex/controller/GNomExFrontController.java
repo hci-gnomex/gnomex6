@@ -60,7 +60,8 @@ public void init(ServletConfig config) throws ServletException {
 	// Get the mail session
 	try {
 		Context ec = (Context) new InitialContext().lookup("java:comp/env");
-		mailSession = (Session) ec.lookup(Constants.MAIL_SESSION);
+//		mailSession = (Session) ec.lookup(Constants.MAIL_SESSION);
+		mailSession = (javax.mail.Session) ec.lookup(Constants.MAIL_SESSION);
 	} catch (Exception me) {
 		LOG.error("Error in gnomexFrontController cannot get mail session: ", me);
 	}
@@ -179,6 +180,7 @@ protected static void initLog4j() {
       commandInstance.setSecurityAdvisor((SecurityAdvisor) session.getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY));
     }
 
+	  String username = commandInstance.getUsername();
     if (commandInstance instanceof GNomExCommand) {
 		((GNomExCommand) commandInstance).setUserPreferences((UserPreferences) session.getAttribute(UserPreferences.USER_PREFERENCES_SESSION_KEY));
 	}
@@ -200,7 +202,7 @@ protected static void initLog4j() {
         && (!requestName.equals("ShowTopicTree"))) {
       LOG.debug("Invalid SecurityAdvisor");
       commandInstance.addInvalidField(
-          "SecurityAdvisor", "You must create a SecurityAdvisor in order to run this command.");
+          "SecurityAdvisor", "GNomEx has logged out due to inactivity. Please login.");
     }
     // if command still valid, call the loadCommand method
     if (commandInstance.isValid()) {
@@ -210,7 +212,7 @@ protected static void initLog4j() {
       // just testing....
         boolean [] converted = new boolean[1];
         converted[0] = false;
-        convertJSONRequesttoXML(request, requestName,converted);
+        convertJSONRequesttoXML(request, requestName,converted,username);
 
       commandInstance.loadCommand(request, session);
     }
@@ -229,7 +231,7 @@ protected static void initLog4j() {
 			commandInstance.setRequestState(request);
 
 			String errorMessage = (String) request.getAttribute("errorDetails");
-			String username = commandInstance.getUsername();
+			username = commandInstance.getUsername();
 
                 Util.sendErrorReport(HibernateSession.currentSession(), "GNomEx.Support@hci.utah.edu", "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
 
@@ -428,7 +430,7 @@ private void sendRedirect(HttpServletResponse response, String url) {
   /*
    *   Convert all the parameter values in the httpservletrequest from json to xml
    */
-  public void convertJSONRequesttoXML(HttpServletWrappedRequest httpRequest, String requestName, boolean [] converted) {
+  public void convertJSONRequesttoXML(HttpServletWrappedRequest httpRequest, String requestName, boolean [] converted, String username) {
   	String noConversionNecessary = httpRequest.getParameter("noJSONToXMLConversionNeeded");
   	//if not a param look for it in the header
     if(!Util.isParameterNonEmpty(noConversionNecessary) ){
@@ -463,6 +465,9 @@ private void sendRedirect(HttpServletResponse response, String url) {
     Enumeration params = httpRequest.getParameterNames();
     while (params.hasMoreElements()) {
       String paramName = (String) params.nextElement();
+      if (paramName.contains("JSONString")) {
+      		continue;
+	}
       String parameterValue = (String) httpRequest.getParameter(paramName);
 //      System.out.println("[convertJSONRequesttoXML] paramName: " + paramName + " parameterValue: " + parameterValue);
 
@@ -486,14 +491,29 @@ private void sendRedirect(HttpServletResponse response, String url) {
                     + " parameterValue: "
                     + parameterValue);
             e.printStackTrace();
-          }
+
+            	String errorMessage = e.toString();
+            	String requestDump1 = "[GNomExFrontController] ERROR ERROR from jsonTOxml.convertJSONtoXML hintKey: " + hintKey ;
+            	requestDump1 = requestDump1 + " parameterValue: " + parameterValue + "\n" + Arrays.toString(e.getStackTrace());
+				StringBuilder requestDump = new StringBuilder(requestDump1);
+
+			  //String username = "guest";
+			  if (username == null) {
+			  	username = "Not Specified";
+			  }
+			  converted[0] = false;
+			  Util.sendErrorReport(HibernateSession.currentSession(), "GNomEx.Support@hci.utah.edu", "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
+			  xmlParameterValue = null;
+		  }
 
           // debug ******
           System.out.println("[convertJSONRequesttoXML]  *** AFTER *** paramName: " + paramName + " xmlParameterValue:\n" + xmlParameterValue);
 
-          // Modify the value...
-          httpRequest.setParameter(paramName,xmlParameterValue);
+        // Modify the value...
+        if (xmlParameterValue != null) {
+          httpRequest.setParameter(paramName, xmlParameterValue);
           converted[0] = true;
+          }
         } else {
 //          System.out.println("[convertJSONRequesttoXML] ** Nothing to convert **");
         }

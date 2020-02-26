@@ -15,6 +15,8 @@ export class AnalysisService {
     public invalid: boolean = false;
     public dirty: boolean = false;
 
+    public analysis: any;
+
     public setActiveNodeId: string;
     public selectedNodeId: string;
     public modeChangedAnalysis: any;
@@ -64,10 +66,16 @@ export class AnalysisService {
     }
 
     getAnalysis(params: HttpParams): Observable<any> {
-        return this.httpClient.get("/gnomex/GetAnalysis.gx", {params: params})
-            .pipe(catchError((err: IGnomexErrorResponse) => {
-                return throwError(err);
-            }));
+        return this.httpClient.get("/gnomex/GetAnalysis.gx", {params: params}).pipe(map((response: any) => {
+            if (response && response.Analysis) {
+                this.analysis = response.Analysis;
+                return response;
+            }
+            }), catchError((err: IGnomexErrorResponse) => {
+            this.dialogService.stopAllSpinnerDialogs();
+            return throwError(err);
+        }));
+
     }
 
     saveAnalysis(params: HttpParams): Observable<any> {

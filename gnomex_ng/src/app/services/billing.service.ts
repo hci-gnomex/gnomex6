@@ -66,8 +66,12 @@ export class BillingService {
     }
 
     public saveBillingItemList(params: HttpParams): Observable<any> {
+
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+
         this.cookieUtilService.formatXSRFCookie();
-        return this.httpClient.post("/gnomex/SaveBillingItemList.gx", null, {params: params});
+        return this.httpClient.post("/gnomex/SaveBillingItemList.gx", params.toString(), { headers: headers});
     }
 
     public getBillingTemplate(targetClassIdentifier: string, targetClassName: string): Observable<BillingTemplate> {

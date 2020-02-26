@@ -45,6 +45,7 @@ private static Logger LOG = Logger.getLogger(GetAnalysis.class);
 private Integer idAnalysis;
 private String analysisNumber;
 private String showUploads = "N";
+private String getdatatrackdata = "Y";
 private String serverName;
 private String baseDir;
 
@@ -63,6 +64,11 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 	if (request.getParameter("showUploads") != null && !request.getParameter("showUploads").equals("")) {
 		showUploads = request.getParameter("showUploads");
 //		System.out.println ("[GetAnalysis] showUploads: " + showUploads);
+	}
+
+	if (request.getParameter("getdatatrackdata") != null && !request.getParameter("getdatatrackdata").equals("")) {
+		getdatatrackdata = request.getParameter("getdatatrackdata");
+		System.out.println ("[GetAnalysis] getdatatrackdata: " + getdatatrackdata);
 	}
 
 	if (idAnalysis == null && analysisNumber == null) {
@@ -222,8 +228,8 @@ public Command execute() throws RollBackCommandException {
 			doc.getRootElement().addContent(aNode);
 			Util.setIcons(doc);
 
-			// Append related nodes
-			this.appendRelatedNodes(this.getSecAdvisor(), sess, a, aNode);
+        // Append related nodes
+           	this.appendRelatedNodes(this.getSecAdvisor(), sess, a, aNode, getdatatrackdata);
 
 			XMLOutputter out = new org.jdom.output.XMLOutputter();
 			this.xmlResult = out.outputString(doc);
@@ -443,11 +449,17 @@ public HttpServletResponse setResponseState(HttpServletResponse response) {
  * Append related experiments, data tracks, and topics.
  */
 @SuppressWarnings("unchecked")
-private static void appendRelatedNodes(SecurityAdvisor secAdvisor, Session sess, Analysis analysis, Element node)
+private static void appendRelatedNodes(SecurityAdvisor secAdvisor, Session sess, Analysis analysis, Element node, String getdatatrackdata)
 		throws Exception {
 	Element relatedNode = new Element("relatedObjects");
 	relatedNode.setAttribute("label", "Related Items");
 	node.addContent(relatedNode);
+
+	// if only getting datatracks just get them and leave
+	if (getdatatrackdata.equalsIgnoreCase("only")) {
+		GetAnalysis.appendDataTrackNodes(secAdvisor, sess, analysis, relatedNode);
+		return;
+	}
 
 	// Hash experiments, and linked sequence lanes and hybs
 	TreeMap<Integer, Element> requestNodeMap = new TreeMap<Integer, Element>();
@@ -530,7 +542,7 @@ private static void appendRelatedNodes(SecurityAdvisor secAdvisor, Session sess,
 	}
 
 	// Append data tracks
-	if (analysis.getFiles().size() > 0) {
+	if (analysis.getFiles().size() > 0  && getdatatrackdata.equalsIgnoreCase("Y") ) {
 		GetAnalysis.appendDataTrackNodes(secAdvisor, sess, analysis, relatedNode);
 	}
 

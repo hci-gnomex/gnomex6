@@ -304,6 +304,14 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     private initialize(): void {
         this.dialogsService.startDefaultSpinnerDialog();
         this.sideFC.disable();
+        this.selectedFlowCells = [];
+        this.assmFlowCellNumber = 0;
+        this.flowCellNumber = "";
+        this.assmItemList = [];
+        this.originalProtocol = "";
+        this.flowCellRunFolder = "";
+        this.allFG.reset();
+        this.allFG.markAsPristine();
 
         let temp: string = this.workflowService.ILLSEQ_FINALIZE_FC + ','
             + this.workflowService.NOSEQ_FINALIZE_FC + ','
@@ -541,11 +549,11 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             return seqProto.idNumberSequencingCyclesAllowed === this.protocolFC.value;
         });
 
-        if(!fcProtocol.name){
+        if(!fcProtocol || !fcProtocol.name){
             return {
                 errorMessage: "Please select a protocol for the flow cell",
                 warningMessage: ""
-            }
+            };
         }
         assmItemProtocolSet.add(fcProtocol.name);
 
@@ -557,7 +565,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             let filteredSeqProtocol = this.sequenceProtocolsList.find(seqProto => {
                 return seqProto.idNumberSequencingCyclesAllowed === wi.idNumberSequencingCyclesAllowed;
             });
-            if(!assmItemProtocolSet.has(filteredSeqProtocol.name)) {
+            if(!filteredSeqProtocol || !assmItemProtocolSet.has(filteredSeqProtocol.name)) {
                 warningMessage += "One or more samples have different protocols from the flow cell.\n\n";
                 break;
             }
@@ -634,7 +642,6 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
             .set("idNumberSequencingCyclesAllowed", this.protocolFC.value ? this.protocolFC.value : "")
             .set("notes", this.flowCell.notes)
             .set("number", this.flowCell.number)
-            .set("numberSequencingCyclesActual", this.protocolFC.value.numberSequencingCyclesDisplay)
             .set("runFolder", this.flowCellRunFolder)
             .set("runNumber", this.runFC.value)
             .set("side", this.sideFC.value ? this.sideFC.value : '')
@@ -654,17 +661,10 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
 
         this.showSpinner = true;
         this.workflowService.saveFlowCell(params).subscribe((response: any) => {
-            this.allFG.markAsPristine();
             if (!response.flowCellNumber) {
                 response.flowCellNumber = "";
             }
             this.dialogsService.alert("Flowcell " + response.flowCellNumber + " created", null, DialogType.SUCCESS);
-            this.assmItemList = [];
-            this.originalProtocol = "";
-            this.allFG.reset();
-            this.flowCellRunFolder = "";
-            this.createDateFC.setValue(null);
-            this.createDateFC.updateValueAndValidity();
 
             this.initialize();
 
@@ -675,7 +675,6 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     public refreshWorkItemList(): void {
-        this.assmItemList = [];
         this.initialize();
     }
 
@@ -696,12 +695,10 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
 
         this.workflowService.deleteFlowCell(params).subscribe((response: any) => {
             if (response && response.result && response.result === 'SUCCESS') {
-                this.allFG.markAsPristine();
                 if (!response.flowCellNumber) {
                     response.flowCellNumber = "";
                 }
                 this.dialogsService.alert("Flowcell " + response.flowCellNumber + " deleted", null, DialogType.SUCCESS);
-                this.assmItemList = [];
                 this.initialize();
             } else {
                 let message: string = "";

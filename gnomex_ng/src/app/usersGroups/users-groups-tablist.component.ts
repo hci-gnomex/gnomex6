@@ -1005,6 +1005,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         let stringifiedSF: string = "";
         let stringifiedMF: string = "";
         this.showSpinner = true;
+
         let params: HttpParams = new HttpParams()
             .set("idAppUser", this.idAppUser)
             .set("codeUserPermissionKind", this.codeUserPermissionKind)
@@ -1056,6 +1057,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             this.userForm.markAsPristine();
             this.showSpinner = false;
         });
+
+
     }
 
     public saveUser(): void {
@@ -1248,133 +1251,139 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         let poAccounts:         any[] = [];
         let creditCardAccounts: any[] = [];
 
-        if (this.selectedGroup) {
-            if (this.selectedGroup.internalBillingAccounts) {
-                chartfieldAccounts = Array.isArray(this.selectedGroup.internalBillingAccounts)   ? this.selectedGroup.internalBillingAccounts   : [this.selectedGroup.internalBillingAccounts.BillingAccount];
+        //this method tells all grids to stop editing. need Timeout to make sure all events handlers have had time to run
+        this.billingAccountTab.prepBillingAccountForSave();
+        setTimeout(()=>{
+            if (this.selectedGroup) {
+                if (this.selectedGroup.internalBillingAccounts) {
+                    chartfieldAccounts = Array.isArray(this.selectedGroup.internalBillingAccounts)   ? this.selectedGroup.internalBillingAccounts   : [this.selectedGroup.internalBillingAccounts.BillingAccount];
+                }
+                if (this.selectedGroup.pOBillingAccounts) {
+                    poAccounts         = Array.isArray(this.selectedGroup.pOBillingAccounts)         ? this.selectedGroup.pOBillingAccounts         : [this.selectedGroup.pOBillingAccounts.BillingAccount];
+                }
+                if (this.selectedGroup.creditCardBillingAccounts) {
+                    creditCardAccounts = Array.isArray(this.selectedGroup.creditCardBillingAccounts) ? this.selectedGroup.creditCardBillingAccounts : [this.selectedGroup.creditCardBillingAccounts.BillingAccount];
+                }
             }
-            if (this.selectedGroup.pOBillingAccounts) {
-                poAccounts         = Array.isArray(this.selectedGroup.pOBillingAccounts)         ? this.selectedGroup.pOBillingAccounts         : [this.selectedGroup.pOBillingAccounts.BillingAccount];
+
+            let billingAccounts: any[] = [];
+
+            for (let account of chartfieldAccounts) {
+                this.clearPoFields(account);
+                this.clearCreditCardFields(account);
+
+                billingAccounts.push(account);
             }
-            if (this.selectedGroup.creditCardBillingAccounts) {
-                creditCardAccounts = Array.isArray(this.selectedGroup.creditCardBillingAccounts) ? this.selectedGroup.creditCardBillingAccounts : [this.selectedGroup.creditCardBillingAccounts.BillingAccount];
+            for (let account of poAccounts) {
+                this.clearChartfieldFields(account);
+                this.clearCreditCardFields(account);
+
+                billingAccounts.push(account);
             }
-        }
+            for (let account of creditCardAccounts) {
+                this.clearChartfieldFields(account);
+                this.clearPoFields(account);
 
-        let billingAccounts: any[] = [];
+                billingAccounts.push(account);
+            }
 
-        for (let account of chartfieldAccounts) {
-            this.clearPoFields(account);
-            this.clearCreditCardFields(account);
-
-            billingAccounts.push(account);
-        }
-        for (let account of poAccounts) {
-            this.clearChartfieldFields(account);
-            this.clearCreditCardFields(account);
-
-            billingAccounts.push(account);
-        }
-        for (let account of creditCardAccounts) {
-            this.clearChartfieldFields(account);
-            this.clearPoFields(account);
-
-            billingAccounts.push(account);
-        }
-
-        let stringifiedAccounts: string = JSON.stringify(billingAccounts);
-        params = params.set("accountsJSONString", stringifiedAccounts);
+            let stringifiedAccounts: string = JSON.stringify(billingAccounts);
+            params = params.set("accountsJSONString", stringifiedAccounts);
 
 
-        if (this.groupForm) {
-            for (let field in this.groupForm.controls) {
-                const control = this.groupForm.get(field);
-                if (control) {
-                    if (field === "pricing") {
-                        switch (control.value) {
-                            case this.EXACADEMIC: {
-                                params = params.set("isExternalPricing", 'Y');
-                                params = params.set("isExternalPricingCommercial", 'N');
-                                break;
+            if (this.groupForm) {
+                for (let field in this.groupForm.controls) {
+                    const control = this.groupForm.get(field);
+                    if (control) {
+                        if (field === "pricing") {
+                            switch (control.value) {
+                                case this.EXACADEMIC: {
+                                    params = params.set("isExternalPricing", 'Y');
+                                    params = params.set("isExternalPricingCommercial", 'N');
+                                    break;
+                                }
+                                case this.EXCOMM: {
+                                    params = params.set("isExternalPricing", 'Y');
+                                    params = params.set("isExternalPricingCommercial", 'Y');
+                                    break;
+                                }
+                                case this.INTERNAL: {
+                                    params = params.set("isExternalPricing", 'N');
+                                    params = params.set("isExternalPricingCommercial", 'N');
+                                    break;
+                                }
                             }
-                            case this.EXCOMM: {
-                                params = params.set("isExternalPricing", 'Y');
-                                params = params.set("isExternalPricingCommercial", 'Y');
-                                break;
+                        } else if (this.myCoreFacilities.filter((core => core.facilityName === field)).length > 0) {
+                            if (control.value === true) {
+                                let cf: any = this.myCoreFacilities.filter((core => core.facilityName === field));
+                                let coreObj = {
+                                    "idCoreFacility": cf[0].idCoreFacility,
+                                    "facilityName": cf[0].facilityName
+                                };
+                                cores.push(coreObj);
                             }
-                            case this.INTERNAL: {
-                                params = params.set("isExternalPricing", 'N');
-                                params = params.set("isExternalPricingCommercial", 'N');
-                                break;
-                            }
+
+                        } else {
+                            params = params.set(field, control.value);
                         }
-                    } else if (this.myCoreFacilities.filter((core => core.facilityName === field)).length > 0) {
-                        if (control.value === true) {
-                            let cf: any = this.myCoreFacilities.filter((core => core.facilityName === field));
-                            let coreObj = {
-                                "idCoreFacility": cf[0].idCoreFacility,
-                                "facilityName": cf[0].facilityName
-                            };
-                            cores.push(coreObj);
-                        }
-
-                    } else {
+                    }
+                }
+                let stringifiedSF = JSON.stringify(cores);
+                params = params.set("coreFacilitiesJSONString", stringifiedSF);
+                params = params.set("excludeUsage", this.selectedGroup.excludeUsage);
+                params = params.set("isActive", this.selectedGroup.isActive);
+                params = params.set("idLab", this.selectedGroup.idLab);
+                params = params.set("version", this.selectedGroup.version);
+            }
+            if (this.billingAdminTab) {
+                for (let field in this.billingAdminTab.billingForm.controls) {
+                    const control = this.billingAdminTab.billingForm.get(field);
+                    if (control) {
                         params = params.set(field, control.value);
                     }
                 }
             }
-            let stringifiedSF = JSON.stringify(cores);
-            params = params.set("coreFacilitiesJSONString", stringifiedSF);
-            params = params.set("excludeUsage", this.selectedGroup.excludeUsage);
-            params = params.set("isActive", this.selectedGroup.isActive);
-            params = params.set("idLab", this.selectedGroup.idLab);
-            params = params.set("version", this.selectedGroup.version);
-        }
-        if (this.billingAdminTab) {
-            for (let field in this.billingAdminTab.billingForm.controls) {
-                const control = this.billingAdminTab.billingForm.get(field);
-                if (control) {
-                    params = params.set(field, control.value);
-                }
+            if (this.membershipTab) {
+                // let stringifiedMembers = JSON.stringify(this.addAppUser(this.membershipTab.membersDataSource.data));
+                let stringifiedMembers = JSON.stringify(this.membershipTab.membersDataSource.data);
+                params = params.set("membersJSONString", stringifiedMembers);
+                let stringifiedColls = JSON.stringify(this.addAppUser(this.membershipTab.collaboratorsDataSource.data));
+                params = params.set("collaboratorsJSONString", stringifiedColls);
+                let stringifiedManagers = JSON.stringify(this.addAppUser(this.membershipTab.managersDataSource.data));
+                params = params.set("managersJSONString", stringifiedManagers);
+
             }
-        }
-        if (this.membershipTab) {
-            // let stringifiedMembers = JSON.stringify(this.addAppUser(this.membershipTab.membersDataSource.data));
-            let stringifiedMembers = JSON.stringify(this.membershipTab.membersDataSource.data);
-            params = params.set("membersJSONString", stringifiedMembers);
-            let stringifiedColls = JSON.stringify(this.addAppUser(this.membershipTab.collaboratorsDataSource.data));
-            params = params.set("collaboratorsJSONString", stringifiedColls);
-            let stringifiedManagers = JSON.stringify(this.addAppUser(this.membershipTab.managersDataSource.data));
-            params = params.set("managersJSONString", stringifiedManagers);
 
-        }
-
-        if (this.showInstitutions) {
-            params = params.set("institutionsJSONString", JSON.stringify(this.labInstitutions));
-        }
-
-        params = params.set("noJSONToXMLConversionNeeded", "Y");
-
-        this.labListService.saveLab(params).subscribe((responseJSON: any) => {
-            if (responseJSON.result && responseJSON.result === "SUCCESS") {
-                this.groupForm.markAsPristine();
-                if (this.showInstitutions) {
-                    this.resetInstitutionControls();
-                }
-                this.touchGroupFields();
-
-                let config: MatSnackBarConfig = new MatSnackBarConfig();
-                config.duration = 2000;
-
-                this.snackBar.open("Changes Saved", "Lab", config);
-                this.buildLabList(responseJSON.idLab);
-                this.onGroupsSelectionChanged();
+            if (this.showInstitutions) {
+                params = params.set("institutionsJSONString", JSON.stringify(this.labInstitutions));
             }
-            this.dialogsService.stopAllSpinnerDialogs();
-            this.showSpinner = false;
-        }, (err: IGnomexErrorResponse) => {
-            this.dialogsService.stopAllSpinnerDialogs();
-            this.showSpinner = false;
+
+            params = params.set("noJSONToXMLConversionNeeded", "Y");
+
+            this.labListService.saveLab(params).subscribe((responseJSON: any) => {
+                if (responseJSON.result && responseJSON.result === "SUCCESS") {
+                    this.groupForm.markAsPristine();
+                    if (this.showInstitutions) {
+                        this.resetInstitutionControls();
+                    }
+                    this.touchGroupFields();
+
+                    let config: MatSnackBarConfig = new MatSnackBarConfig();
+                    config.duration = 2000;
+
+                    this.snackBar.open("Changes Saved", "Lab", config);
+                    this.buildLabList(responseJSON.idLab);
+                    this.onGroupsSelectionChanged();
+                }
+                this.dialogsService.stopAllSpinnerDialogs();
+                this.showSpinner = false;
+            }, (err: IGnomexErrorResponse) => {
+                this.dialogsService.stopAllSpinnerDialogs();
+                this.showSpinner = false;
+            });
+
         });
+
     }
 
     addAppUser(users: any[]): any[] {

@@ -2,11 +2,12 @@ import {Component, OnInit} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {BroadcastEmailService} from "../services/broadcast-email.service";
-import {Response, URLSearchParams} from "@angular/http";
+import {HttpParams} from "@angular/common/http";
 import {MatDialogRef} from "@angular/material";
 import {AngularEditorConfig} from "@kolkov/angular-editor";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 
 @Component({
     selector: 'email-all-users',
@@ -63,6 +64,7 @@ export class EmailAllUsersComponent extends BaseGenericContainerDialog implement
 
     constructor(private dialogRef: MatDialogRef<EmailAllUsersComponent>,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
+                private dialogsService: DialogsService,
                 private broadcastEmailService: BroadcastEmailService) {
         super();
         this.coresFormControl = new FormControl("", Validators.required);
@@ -118,12 +120,21 @@ export class EmailAllUsersComponent extends BaseGenericContainerDialog implement
         this.resetFileUpload();
     }
 
-    private handleResponse(response: Response): void {
-        if (response && response.status == 200) {
-            let resultWindow = window.open('', '_blank', "height=200, width=500");
-            resultWindow.document.open();
-            resultWindow.document.write(response.text());
-            resultWindow.document.close();
+    private handleResponse(response: any): void {
+        if(response) {
+            let messages: string[] = [];
+            let message: string = "The email has been successfully sent to ";
+            message = message + "<strong>" + (response.userCount ? response.userCount : "0") + "</strong> GNomEx users.";
+            messages.push(message);
+
+            if (response.InvalidEmails && response.InvalidEmails.length > 0) {
+                messages.push("");
+                messages.push("The email was not sent to the following user(s) due to invalid email(s):");
+                for (let invalidEmail of response.InvalidEmails) {
+                    messages.push(invalidEmail.email);
+                }
+            }
+            this.dialogsService.alert(messages, null, DialogType.SUCCESS);
         }
         this.showSpinner = false;
         this.dialogRef.close();
@@ -140,18 +151,22 @@ export class EmailAllUsersComponent extends BaseGenericContainerDialog implement
             formData.append("Filedata", this.uploadFile, this.uploadFile.name);
             formData.append("Upload", "Submit Query");
             formData.append("fromAddress", this.fromFormControl.value);
-            this.broadcastEmailService.sendBroadcastEmailWithFile(formData).subscribe((response: Response) => {
+            this.broadcastEmailService.sendBroadcastEmailWithFile(formData).subscribe((response: any) => {
                 this.handleResponse(response);
+            }, (err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
         } else {
-            let params: URLSearchParams = new URLSearchParams();
-            params.set("subject", this.subjectFormControl.value);
-            params.set("format", "html");
-            params.set("fromAddress", this.fromFormControl.value);
-            params.set("body", this.bodyFormControl.value);
-            params.set("coreFacilityIds", this.coresFormControl.value);
-            this.broadcastEmailService.sendBroadcastEmail(params).subscribe((response: Response) => {
+            let params: HttpParams = new HttpParams()
+                .set("subject", this.subjectFormControl.value)
+                .set("format", "html")
+                .set("fromAddress", this.fromFormControl.value)
+                .set("body", this.bodyFormControl.value)
+                .set("coreFacilityIds", this.coresFormControl.value);
+            this.broadcastEmailService.sendBroadcastEmail(params).subscribe((response: any) => {
                 this.handleResponse(response);
+            }, (err: IGnomexErrorResponse) => {
+                this.showSpinner = false;
             });
         }
     }

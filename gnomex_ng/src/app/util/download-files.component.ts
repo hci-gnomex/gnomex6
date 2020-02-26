@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {ChangeDetectorRef, ChangeDetectionStrategy, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {ConstantsService} from "../services/constants.service";
 import {ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
@@ -18,64 +18,122 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
     template: `
         <div class="full-height full-width flex-container-col">
             <div class="full-height full-width flex-container-col padded">
-                <div class="flex-container-row justify-space-between">
-                    <label>Drag files or folders that you want to download. Hold CTRL or SHIFT key to select multiple.</label>
-                    <context-help name="downloadhelp" label="Download Help"
-                                  popupTitle="Download Help" [isEditMode]="this.securityAdvisor.isAdmin"></context-help>
+                <div class="flex-container-row align-center justify-space-between">
+                    <label>
+                        Drag files or folders that you want to download. Hold CTRL or SHIFT key to select multiple.
+                    </label>
+                    <context-help name="downloadhelp"
+                                  label="Download Help"
+                                  popupTitle="Download Help"
+                                  [hasEditPermission]="this.securityAdvisor.isAdmin">
+                    </context-help>
                 </div>
                 <div class="trees-container">
-                    <as-split>
+                    <as-split class="white-split-gutter silver-bordered-gutter">
                         <as-split-area size="50">
-                            <label>Available Files</label>
-                            <tree-root #availableFilesTreeComponent
-                                       [nodes]="this.availableFilesNodes"
-                                       [options]="this.filesOptions">
-                                <ng-template #treeNodeTemplate let-node>
-                                    <div class="tree-node-font">
-                                        <img src="{{node.data.icon}}" class="icon tree-node-icon">
-                                        <span>{{node.data.displayName}}</span>
-                                    </div>
-                                </ng-template>
-                            </tree-root>
+                            <div class="full-width full-height flex-container-col padded">
+                                <label>
+                                    Available Files
+                                </label>
+                                <div class="flex-grow" ondrop="permitDrop($event)" (dragover)="onRemoveFromDownload($event)">
+                                    <tree-root #availableFilesTreeComponent
+                                               [nodes]="availableFilesNodes"
+                                               [options]="filesOptions"
+                                               (initialized)="initOrganizeTree($event)">
+                                        <ng-template #treeNodeTemplate let-node draggable="true">
+                                            <div class="flex-container-row tree-node-font">
+                                                <img [src]="node.data.icon" alt="" class="icon tree-node-icon">
+                                                <div>
+                                                    {{ node.data.displayName }}
+                                                </div>
+                                            </div>
+                                        </ng-template>
+                                    </tree-root>
+                                </div>
+                            </div>
                         </as-split-area>
                         <as-split-area size="50">
-                            <label>Files to Download</label>
-                            <tree-root #filesToDownloadTreeComponent
-                                       [nodes]="this.filesToDownloadNodes"
-                                       [options]="this.filesOptions">
-                                <ng-template #treeNodeTemplate let-node>
-                                    <div class="tree-node-font">
-                                        <img src="{{node.data.icon}}" class="icon tree-node-icon">
-                                        <span>{{node.data.displayName}}</span>
-                                    </div>
-                                </ng-template>
-                            </tree-root>
+                            <div class="full-width full-height flex-container-col padded">
+                                <label>Files to Download</label>
+                                <div class="flex-grow" ondrop="permitDrop($event)" (dragover)="onDropInDownload($event)">
+                                    <tree-root #filesToDownloadTreeComponent
+                                               [nodes]="filesToDownloadNodes"
+                                               [options]="filesOptions">
+                                        <ng-template #treeNodeTemplate let-node draggable="true">
+                                            <div class="flex-container-row tree-node-font">
+                                                <img [src]="node.data.icon" alt="" class="icon tree-node-icon">
+                                                <div>
+                                                    {{ node.data.displayName }}
+                                                </div>
+                                            </div>
+                                        </ng-template>
+                                    </tree-root>
+                                </div>
+                            </div>
                         </as-split-area>
                     </as-split>
                 </div>
                 <div class="flex-container-row justify-space-between">
-                    <label>{{this.availableFilesCount}} file(s)</label>
-                    <label>{{this.filesToDownloadCount}} file(s) ({{this.filesToDownloadSizeLabel}}
-                        )</label>
+                    <label>
+                        {{ availableFilesCount }} file(s)
+                    </label>
+                    <label>
+                        {{ filesToDownloadCount }} file(s) ({{ filesToDownloadSizeLabel }})
+                    </label>
                 </div>
             </div>
-            <mat-dialog-actions class="justify-flex-end no-margin no-padding generic-dialog-footer-colors">
+            <mat-dialog-actions
+                    class="justify-flex-end no-margin no-padding generic-dialog-footer-colors">
                 <div class="double-padded-right">
-                    <button mat-raised-button color="primary" class="primary-action" [disabled]="this.filesToDownloadCount < 1" (click)="this.download()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download</button>
-                    <button mat-raised-button color="primary" class="primary-action" [disabled]="this.filesToDownloadCount < 1 || !this.isFDTSupported" (click)="this.downloadFDTCommandLine()"><img [src]="this.constantsService.ICON_DOWNLOAD_LARGE" class="icon">FDT Command Line</button>
-                    <button mat-raised-button color="primary" class="primary-action" [disabled]="this.filesToDownloadCount < 1 || !this.isFDTSupported" (click)="this.downloadFDT()"><img [src]="this.constantsService.ICON_DOWNLOAD_LARGE" class="icon">FDT Download</button>
-                    <button mat-raised-button color="primary" class="primary-action" *ngIf="this.showCreateSoftLinks" [disabled]="this.filesToDownloadCount < 1" (click)="this.createSoftLinks()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Create Soft Links</button>
-                    <button mat-raised-button color="accent" class="secondary-action" mat-dialog-close>Cancel</button>
+                    <button mat-raised-button
+                            color="primary"
+                            class="primary-action"
+                            [disabled]="filesToDownloadCount < 1"
+                            (click)="download()">
+                        <img [src]="constantsService.ICON_DOWNLOAD" alt="" class="icon">
+                        Download
+                    </button>
+                    <button mat-raised-button
+                            color="primary"
+                            class="primary-action"
+                            [disabled]="filesToDownloadCount < 1 || !isFDTSupported"
+                            (click)="downloadFDTCommandLine()">
+                        <img [src]="constantsService.ICON_DOWNLOAD_LARGE" alt="" class="icon">
+                        FDT Command Line
+                    </button>
+                    <button mat-raised-button
+                            color="primary"
+                            class="primary-action"
+                            [disabled]="filesToDownloadCount < 1 || !isFDTSupported"
+                            (click)="downloadFDT()">
+                        <img [src]="constantsService.ICON_DOWNLOAD_LARGE" alt="" class="icon">
+                        FDT Download
+                    </button>
+                    <button mat-raised-button
+                            color="primary"
+                            class="primary-action"
+                            *ngIf="showCreateSoftLinks"
+                            [disabled]="filesToDownloadCount < 1"
+                            (click)="createSoftLinks()">
+                        <img [src]="constantsService.ICON_DOWNLOAD" alt="" class="icon">
+                        Create Soft Links
+                    </button>
+                    <button mat-raised-button
+                            mat-dialog-close
+                            color="accent"
+                            class="secondary-action">
+                        Cancel
+                    </button>
                 </div>
             </mat-dialog-actions>
         </div>
     `,
+    changeDetection: ChangeDetectionStrategy.OnPush,
     styles: [`
         div.trees-container {
             width: 60em;
             height: 25em;
-            border: solid lightgrey 1px;
-            padding: 0.3em;
+            border: solid silver 1px;
         }
         .no-margin {
             margin: 0;
@@ -95,7 +153,7 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
             border: var(--bluewarmvivid-medlight)  solid 1px;
         }
         /*tree-root.tree-viewport {*/
-            /*height: 93%;*/
+        /*height: 93%;*/
         /*}*/
         tree-viewport {
             height: 93%;
@@ -125,6 +183,8 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
 
     private email: string = "";
 
+    private treeMostRecentlySelectedFrom: TreeModel;
+
     constructor(private dialogRef: MatDialogRef<DownloadFilesComponent>,
                 @Inject(MAT_DIALOG_DATA) private data: any,
                 public constantsService: ConstantsService,
@@ -138,7 +198,8 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     }
 
     ngOnInit() {
-        this.utilService.registerChangeDetectorRef(this.changeDetector);
+        this.isFDTSupported = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_FDT_SUPPORTED);
+
         this.filesOptions = {
             idField: 'fileTreeID',
             displayField: 'displayName',
@@ -161,6 +222,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
                     dragStart : (tree:TreeModel, node, $event) => {
                         if(!node.isActive){
                             TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event)
+                            this.treeMostRecentlySelectedFrom = tree
                         }
                     }
                 },
@@ -179,59 +241,51 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
 
             this.availableFilesNodes = [this.data.downloadListSource];
             this.availableFilesCount = this.countFilesRecursively(this.availableFilesNodes[0]);
-
             this.selectFilesRecursively(this.data.downloadListSource, 'N');
             this.data.downloadListSource.isSelected = 'Y';
             this.filesToDownloadNodes = [this.data.downloadListSource];
-            setTimeout(() => {
-                this.updateFilesToDownloadTree();
-            });
         }
 
-        this.isFDTSupported = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_FDT_SUPPORTED);
-
         if (this.securityAdvisor.isGuest) {
-            setTimeout(() => {
-                let terms: string = this.propertyService.getPropertyValue(PropertyService.PROPERTY_GUEST_DOWNLOAD_TERMS);
-                if (terms) {
-                    let guestTermsConfig: MatDialogConfig = new MatDialogConfig();
-                    guestTermsConfig.autoFocus = false;
-                    guestTermsConfig.width = "30em";
-                    guestTermsConfig.height = "30em";
-                    guestTermsConfig.data = {
-                        terms: terms,
-                    };
-                    this.dialogsService.genericDialogContainer(GuestTermsDialogComponent, "Download Terms", null, guestTermsConfig,
-                        {actions: [
-                                {type: ActionType.PRIMARY, icon: this.constantsService.ICON_ACCEPT, name: "Accept", internalAction: "accept"},
-                                {type: ActionType.SECONDARY, icon: this.constantsService.ICON_DECLINE, name: "Decline", internalAction: "onClose"}
-                            ]}).subscribe((result: any) => {
-                                if(result) {
-                                    this.email = result;
-                                } else {
-                                    this.dialogRef.close();
-                                }
-                    });
-                }
-            });
+            let terms: string = this.propertyService.getPropertyValue(PropertyService.PROPERTY_GUEST_DOWNLOAD_TERMS);
+            if (terms) {
+                let guestTermsConfig: MatDialogConfig = new MatDialogConfig();
+                guestTermsConfig.autoFocus = false;
+                guestTermsConfig.width = "30em";
+                guestTermsConfig.height = "30em";
+                guestTermsConfig.data = {
+                    terms: terms,
+                };
+                this.dialogsService.genericDialogContainer(GuestTermsDialogComponent, "Download Terms", null, guestTermsConfig,
+                    {actions: [
+                            {type: ActionType.PRIMARY, icon: this.constantsService.ICON_ACCEPT, name: "Accept", internalAction: "accept"},
+                            {type: ActionType.SECONDARY, icon: this.constantsService.ICON_DECLINE, name: "Decline", internalAction: "onClose"}
+                        ]}).subscribe((result: any) => {
+                    if(result) {
+                        this.email = result;
+                    } else {
+                        this.dialogRef.close();
+                    }
+                });
+            }
         }
     }
 
     ngOnDestroy(): void {
-        this.utilService.removeChangeDetectorRef(this.changeDetector);
     }
 
     private updateFilesToDownloadTree(): void {
         this.filesToDownloadTreeComponent.treeModel.filterNodes((node: TreeNode) => {
             return node.data.isSelected === 'Y';
         });
+
         this.filesToDownloadCount = this.countFilesRecursively(this.filesToDownloadNodes[0], true);
         this.filesToDownloadSize = this.countFileSizeRecursively(this.filesToDownloadNodes[0], true);
         this.filesToDownloadSizeLabel = FileService.formatFileSize(this.filesToDownloadSize);
     }
 
     private countFilesRecursively(fileNode: any, filterSelectedOnly: boolean = false): number {
-        if (filterSelectedOnly && fileNode.isSelected === 'N') {
+        if (filterSelectedOnly && fileNode.isSelected === 'N' && fileNode.type !== 'dir') {
             return 0;
         }
 
@@ -249,7 +303,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     }
 
     private countFileSizeRecursively(fileNode: any, filterSelectedOnly: boolean = false): number {
-        if (filterSelectedOnly && fileNode.isSelected === 'N') {
+        if (filterSelectedOnly && fileNode.isSelected === 'N' && fileNode.type !== 'dir') {
             return 0;
         }
 
@@ -294,19 +348,24 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
         // File selected to be downloaded
         if (tree === this.filesToDownloadTreeComponent.treeModel) {
             let files : TreeNode[] = from.treeModel.getActiveNodes();
+
             for(let file of files ){
                 this.selectFilesRecursively(file.data, 'Y');
                 let n: TreeNode = from;
                 while (n) {
-                    n.data.isSelected = 'Y';
+                    if (n.data) {
+                        n.data.isSelected = 'Y';
+                    } else {
+                        n.data = { isSelected: 'Y'}
+                    }
                     n = n.parent;
                 }
             }
-            this.updateFilesToDownloadTree();
 
+            this.updateFilesToDownloadTree();
         }
         // File de-selected to be downloaded
-        else if (tree === this.availableFilesTreeComponent.treeModel) {
+        else if (tree === this.availableFilesTreeComponent.treeModel && from === this.filesToDownloadTreeComponent) {
             let files : TreeNode[] = from.treeModel.getActiveNodes();
             for(let file of files){
                 this.selectFilesRecursively(file.data, 'N');
@@ -315,8 +374,25 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
         }
     };
 
-    private gatherFilesToDownload(fileNode: any): any[] {
-        if (fileNode.isSelected === 'N') {
+    public onDropInDownload(event: any): void {
+        this.changeDetector.markForCheck();
+        this.moveNode(this.filesToDownloadTreeComponent.treeModel, null, event, {from: this.availableFilesTreeComponent, to: this.filesToDownloadTreeComponent});
+    }
+
+    public onRemoveFromDownload(event: any): void {
+        if (this.treeMostRecentlySelectedFrom === this.filesToDownloadTreeComponent.treeModel) {
+            return this.moveNode(this.availableFilesTreeComponent.treeModel, null, event, {from: this.filesToDownloadTreeComponent, to: this.availableFilesTreeComponent});
+        }
+    }
+
+    private gatherFilesToDownload(): any[] {
+        if (this.filesToDownloadNodes && Array.isArray(this.filesToDownloadNodes) && this.filesToDownloadNodes.length > 0) {
+            return this.gatherFilesToDownloadHelper(this.filesToDownloadNodes[0]);
+        }
+    }
+
+    private gatherFilesToDownloadHelper(fileNode: any): any[] {
+        if (fileNode.isSelected === 'N' && fileNode.type !== 'dir') {
             return [];
         }
 
@@ -325,7 +401,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
         } else if (fileNode.FileDescriptor && fileNode.FileDescriptor.length > 0) {
             let children: any[] = [];
             for (let childNode of fileNode.FileDescriptor) {
-                children.push(...this.gatherFilesToDownload(childNode));
+                children.push(...this.gatherFilesToDownloadHelper(childNode));
             }
             return children;
         } else {
@@ -334,7 +410,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     }
 
     public download(): void {
-        let files: any[] = this.gatherFilesToDownload(this.filesToDownloadNodes[0]);
+        let files: any[] = this.gatherFilesToDownload();
         this.cacheDownloadListFn(files).subscribe((result: any) => {
             if (result && result.result === 'SUCCESS') {
                 let downloadParams: HttpParams = new HttpParams()
@@ -360,7 +436,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     }
 
     public downloadFDTCommandLine(): void {
-        let files: any[] = this.gatherFilesToDownload(this.filesToDownloadNodes[0]);
+        let files: any[] = this.gatherFilesToDownload();
         this.cacheDownloadListFn(files).subscribe((result: any) => {
             if (result && result.result === 'SUCCESS') {
                 this.fdtDownloadFn(this.email, true).subscribe((result: any) => {
@@ -375,7 +451,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     }
 
     public downloadFDT(): void {
-        let files: any[] = this.gatherFilesToDownload(this.filesToDownloadNodes[0]);
+        let files: any[] = this.gatherFilesToDownload();
         this.cacheDownloadListFn(files).subscribe((result: any) => {
             if (result && result.result === 'SUCCESS') {
                 this.fdtDownloadFn(this.email, false).subscribe((result: any) => {
@@ -390,7 +466,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     }
 
     public createSoftLinks(): void {
-        let files: any[] = this.gatherFilesToDownload(this.filesToDownloadNodes[0]);
+        let files: any[] = this.gatherFilesToDownload();
         this.makeSoftLinksFn(files).subscribe((result: any) => {
             if (result && result.result === 'SUCCESS' && result.softLinkPath) {
                 this.dialogsService.alert(result.softLinkPath, "Soft Link Path:", DialogType.SUCCESS);
@@ -408,4 +484,20 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
         this.dialogsService.error("An error occurred while " + action + message);
     }
 
+    public initOrganizeTree(event: any) {
+        if (event && event.treeModel) {
+            let treeModel = event.treeModel;
+            if (this.availableFilesCount < 300) {
+                treeModel.expandAll();
+            } else {
+                treeModel.roots[0].expand();
+            }
+        }
+    }
+
+    public permitDrop($event: any) {
+        if ($event) {
+            $event.preventDefault();
+        }
+    }
 }

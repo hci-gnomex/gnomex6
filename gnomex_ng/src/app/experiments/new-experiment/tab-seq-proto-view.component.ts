@@ -269,6 +269,7 @@ export class TabSeqProtoViewComponent implements OnInit, OnDestroy {
         }
     }
 
+
     public static filterNumberSequencingCyclesAllowed(cycles: any[], requestCategory: any): any[] {
         if (!cycles || !Array.isArray(cycles) || !requestCategory) {
             return [];
@@ -281,6 +282,22 @@ export class TabSeqProtoViewComponent implements OnInit, OnDestroy {
                 seqCycles.push(cycle);
             }
         }
+
+        return seqCycles;
+    }
+
+    public static filterNumberSequencingCyclesAllowedByType(cycles: any[], theType: string): any[] {
+        if (!cycles || !Array.isArray(cycles) || !theType) {
+            return [];
+        }
+
+        let seqCycles: any[] = [];
+
+        for (let cycle of cycles) {
+            if (cycle.display && cycle.display.toLowerCase().substr(0, 8) === theType) {
+                    seqCycles.push(cycle);
+                }
+            }
 
         return seqCycles;
     }

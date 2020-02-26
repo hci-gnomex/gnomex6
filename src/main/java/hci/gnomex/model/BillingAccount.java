@@ -23,6 +23,7 @@ public class BillingAccount extends HibernateDetailObject {
 	private String accountNumberYear;
 	private Integer idFundingAgency;
 	private Integer idCreditCardCompany;
+	private String sc;
 	private String isPO;
 	private String isCreditCard;
 	private String zipCode;

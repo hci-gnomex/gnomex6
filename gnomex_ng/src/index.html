@@ -4,16 +4,14 @@
   <title>GNomEx</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <base href="/gnomex/">
   <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
-  <!-- Styles
-  <link rel="stylesheet" href="./assets/angular-tree-component.css" type="text/css" />
-  -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.js"></script>
 </head>
-<body>
+<body onload="zoom()">
 <gnomex-app>
   <div class="flex-container-col full-height full-width">
     <div class="flex-grow">
@@ -37,5 +35,11 @@
     </div>
   </div>
 </gnomex-app>
+<script type="text/javascript" src="./Chart.js"></script>
+<script type="text/javascript">
+        function zoom() {
+            document.body.style.zoom = "90%"
+        }
+</script>
 </body>
 </html>

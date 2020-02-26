@@ -9,6 +9,7 @@ import {Subscription} from "rxjs";
 import {GnomexService} from "../services/gnomex.service";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: 'bulk-sample-upload-launcher',
@@ -617,10 +618,12 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
                     } else {
                         this.dialogService.alert("File failed to upload.", null, DialogType.FAILED);
                     }
+                }, (err: IGnomexErrorResponse) => {
+                    this.dialogService.stopAllSpinnerDialogs();
                 });
             } else {
                 this.dialogService.startDefaultSpinnerDialog();
-                this.sampleUploadService.uploadBulkSampleSheet(formData)
+                this.sampleUploadService.uploadBulkSampleSheet(formData);
             }
         }
     }

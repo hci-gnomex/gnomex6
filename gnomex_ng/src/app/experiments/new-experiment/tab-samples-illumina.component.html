@@ -7,25 +7,28 @@
         <div class="full-width flex-grow flex-container-col">
             <div class="full-width flex-container-row align-center padded">
                 <context-help *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && experiment?.isExternal !== 'Y'"
-                              name="samplesTabHelp" [isEditMode]="this.createSecurityAdvisor.isAdmin"
+                              name="samplesTabHelp"
+                              [hasEditPermission]="this.createSecurityAdvisor.isAdmin"
                               popupTitle="Samples Tab Instructions" label="Instructions"
                               [idCoreFacility]="this._experiment.idCoreFacility"
                               [codeRequestCategory]="this.requestCategoryType">
                 </context-help>
 
-                <div class="flex-container-row" *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && experiment?.isExternal === 'Y'">
+                <div class="flex-container-row" *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && !this.isAmendState">
                     <button mat-button class="padded-right" (click)="onAddSample()">
                         <img class="icon" [src]="this.constService.ICON_ADD" alt="">
                         Add sample
                     </button>
-                    <context-help name="addSampleHelp" [isEditMode]="this.createSecurityAdvisor.isAdmin" popupTitle="Add Samples Help">
+                    <button mat-button class="padded-right" (click)="onRemoveSamples()" [disabled]="selectedSamples.length < 1">
+                        <img class="icon" [src]="this.constService.ICON_DELETE" alt="">
+                        Remove samples
+                    </button>
+                    <context-help name="addSampleHelp"
+                                  [hasEditPermission]="this.createSecurityAdvisor.isAdmin"
+                                  popupTitle="Add/Remove Samples Help" label="">
                     </context-help>
                 </div>
 
-                <context-help *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && experiment?.isExternal !== 'Y'"
-                              name="addSampleHelp" [isEditMode]="this.createSecurityAdvisor.isAdmin"
-                              popupTitle="Add Samples Help" label="Adding samples">
-                </context-help>
                 <button *ngIf="_state === this.STATE_NEW || _state === this.STATE_EDIT" mat-button
                         class="padded-right"
                         color="link"
@@ -35,7 +38,8 @@
                     Upload Sample Sheet
                 </button>
                 <context-help *ngIf="_state === this.STATE_NEW || _state === this.STATE_EDIT"
-                              name="uploadSampleSheetHelp" [isEditMode]="this.createSecurityAdvisor.isAdmin"
+                              name="uploadSampleSheetHelp"
+                              [hasEditPermission]="this.createSecurityAdvisor.isAdmin"
                               popupTitle="Upload Sample Sheet Instructions">
                 </context-help>
                 <input type="file" #fileInput accept=".txt" class="hidden" (change)="onFileSelected($event)" multiple>
@@ -57,8 +61,10 @@
                                  [animateRows]="true"
                                  [getNodeChildDetails]="nodeChildDetails"
                                  [enableColResize]="true"
-                                 [rowSelection]="'single'"
+                                 [rowSelection]="'multiple'"
                                  [singleClickEdit]="true"
+                                 [rowDeselection]="true"
+                                 (selectionChanged)="onSelectionChanged($event)"
                                  (cellValueChanged)="onCellValueChanged($event)"
                                  (gridReady)="this.onSamplesGridReady($event)">
                 </ag-grid-angular>

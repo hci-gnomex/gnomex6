@@ -13,8 +13,6 @@ import {AuthenticationService} from "./auth/authentication.service";
 
 /**
  * The gnomex application component.
- *
- * @author jason.holmberg <jason.holmberg@hci.utah.edu>
  */
 @Component({
     selector: "gnomex-app",

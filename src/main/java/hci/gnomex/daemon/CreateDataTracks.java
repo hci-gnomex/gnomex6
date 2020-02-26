@@ -229,7 +229,7 @@ public class CreateDataTracks {
     		  String afBaseFileName = fetchBaseName(af.getFileName(), Constants.DATATRACK_FILE_EXTENSIONS);
     		  if (fileName.toUpperCase().equals(afBaseFileName.toUpperCase())) {
     			  String afFileNameUpperCase = af.getFileName().toUpperCase();
-  				  if (afFileNameUpperCase.endsWith(".BAM")) {
+  				  if (afFileNameUpperCase.endsWith(".BAM") || afFileNameUpperCase.endsWith(".CRAM")) {
   						bamFiles.add(af);
   				  } else if (afFileNameUpperCase.endsWith(".USEQ") || afFileNameUpperCase.endsWith(".USEQ")) {
   						covFiles.add(af);
@@ -440,11 +440,12 @@ public class CreateDataTracks {
 			sess.flush();
 
 			// Validate the the bam file
-			if (analysisFile.getFileName().endsWith(".bam") || analysisFile.getFileName().endsWith(".BAM")) {
+			if (analysisFile.getFileName().endsWith(".bam") || analysisFile.getFileName().endsWith(".BAM") ||
+					analysisFile.getFileName().endsWith(".cram") || analysisFile.getFileName().endsWith(".CRAM")) {
 				File file = analysisFile.getFile(baseDirAnalysis);
 				String error = DataTrackUtil.checkBamFile(file);
 				if (error != null) {
-					System.out.println("Invalid BAM file: " + error + ". Please correct errors before distributing the data track");
+					System.out.println("Invalid BAM or CRAM file: " + error + ". Please correct errors before distributing the data track");
 				}
 			}
 
@@ -455,6 +456,9 @@ public class CreateDataTracks {
 			
 			boolean lookForBam = false;
 			boolean lookForBai = false;
+			boolean lookForCram = false;
+			boolean lookForCrai = false;
+
 			boolean lookForBigWig = false;
 			boolean lookForUSeq = false;
 			boolean lookForVCF = false;
@@ -465,6 +469,8 @@ public class CreateDataTracks {
 			String fileName = analysisFile.getFileName().toUpperCase();
 			if (fileName.endsWith(".BAI")) lookForBam = true;
 			else if (fileName.endsWith(".BAM")) lookForBai = true;
+			else if (fileName.endsWith(".CRAI")) lookForCram = true;
+			else if (fileName.endsWith(".CRAM")) lookForCrai = true;
 			else if (fileName.endsWith(".USEQ")) lookForBigWig = true;
 			else if (fileName.endsWith(".BW") || fileName.endsWith(".BB")  ) lookForUSeq = true;
 			else if (fileName.endsWith(".VCF.GZ")) lookForVCFTBI = true;
@@ -481,6 +487,10 @@ public class CreateDataTracks {
 						idAnalysisFileOther = af.getIdAnalysisFile();
 					} else if (lookForBam && afFileNameUpperCase.endsWith(".BAM")) {
 						idAnalysisFileOther = af.getIdAnalysisFile();
+					} else if (lookForCrai && afFileNameUpperCase.endsWith(".CRAI")) {
+						idAnalysisFileOther = af.getIdAnalysisFile();
+					} else if (lookForCram && afFileNameUpperCase.endsWith(".CRAM")) {
+						idAnalysisFileOther = af.getIdAnalysisFile();
 					} else if (lookForBigWig && (afFileNameUpperCase.endsWith(".BW") || afFileNameUpperCase.endsWith(".BB"))) {
 						idAnalysisFileOther = af.getIdAnalysisFile();
 					} else if (lookForUSeq && (afFileNameUpperCase.endsWith(".USEQ") || afFileNameUpperCase.endsWith(".USEQ"))) {
@@ -496,7 +506,8 @@ public class CreateDataTracks {
 			//is it a paired file set? then must have other
 			String afFileNameUpper = analysisFile.getFileName().toUpperCase(); 
 			boolean saveDataTrack = true;
-			if (afFileNameUpper.endsWith(".BAM") || afFileNameUpper.endsWith(".BAI") || afFileNameUpper.endsWith(".VCF.GZ") || afFileNameUpper.endsWith(".VCF.GZ.TBI")){
+			if (afFileNameUpper.endsWith(".BAM") || afFileNameUpper.endsWith(".BAI") || afFileNameUpper.endsWith(".CRAM") || afFileNameUpper.endsWith(".CRAI") ||
+					afFileNameUpper.endsWith(".VCF.GZ") || afFileNameUpper.endsWith(".VCF.GZ.TBI")){
 				if (idAnalysisFileOther == null){
 					//not sure if this makes this invalid so using boolean
 					System.out.println("Missing indexed file or file index?!  Please add either a matching xxx.bam or xxx.bai; or add a xxx.vcf.gz or xxx.vcf.gz.tbi.");

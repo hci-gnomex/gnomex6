@@ -163,7 +163,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
                 private progressService: ProgressService,
                 private gnomexService: GnomexService,
                 private createSecurityAdvisor: CreateSecurityAdvisorService,
-                private router: Router,
+                private router:Router,
                 private authService: AuthenticationService,
                 private propertyService: PropertyService
     ) {
@@ -182,10 +182,10 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     ngOnInit() {
 
-        if(!this.progressService.hideLoader) {
+        if(!this.progressService.hideLoader){
             this.progressService.hideLoader = new BehaviorSubject<boolean>(false);
             this.hideLoader = this.progressService.hideLoader;
-        } else {
+        }else{
             this.hideLoader = this.progressService.hideLoader;
         }
 

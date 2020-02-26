@@ -64,6 +64,10 @@ public class PropertyDictionary extends DictionaryEntry implements Serializable 
 	public static final String TOPICS_SUPPORTED = "topics_supported";
 	public static final String DATATRACK_FILESERVER_URL = "datatrack_fileserver_url";
 	public static final String DATATRACK_FILESERVER_WEB_CONTEXT = "datatrack_fileserver_web_context";
+
+	public static final String GNOMEXDATA_FILESERVER_URL = "gnomexdata_fileserver_url";
+	public static final String GNOMEXDATA_FILESERVER_WEB_CONTEXT = "gnomexdata_fileserver_web_context";
+
 	public static final String BAM_IOBIO_VIEWER_URL = "bam_iobio_viewer_url";
 	public static final String GENE_IOBIO_VIEWER_URL = "gene_iobio_viewer_url";
 	public static final String VCF_IOBIO_VIEWER_URL = "vcf_iobio_viewer_url";
@@ -82,6 +86,9 @@ public class PropertyDictionary extends DictionaryEntry implements Serializable 
 	public static final String ID_DEFAULT_INSTITUTION = "id_default_institution";
 	public static final String SITE_LOGO = "site_logo";
 	public static final String SITE_SPLASH = "site_splash";
+	public static final String MAINTENANCE_SPLASH = "maintenance_splash";
+	public static final String HTGONLY = "htgonly";
+
 	public static final String CONFIGURABLE_BILLING_ACCOUNTS = "configurable_billing_accounts";
 	public static final String INVOICE_NOTE_1 = "invoice_note_1";
 	public static final String INVOICE_NOTE_2 = "invoice_note_2";
@@ -190,6 +197,8 @@ public class PropertyDictionary extends DictionaryEntry implements Serializable 
 	public static final String ANALYSIS_ALTERNATIVE = "analysis_alternative";
 
 	public static final String EXPERIMENTALIAS = "experiment_alias";
+	public static final String MAINTENANCEMODE = "maintenancemode";
+
 	public static final String FORMAT_NAMES_LAST_FIRST = "format_names_last_first";
 
 	private Integer idPropertyDictionary;

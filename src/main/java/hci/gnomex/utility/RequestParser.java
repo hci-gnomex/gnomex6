@@ -903,6 +903,8 @@ public class RequestParser implements Serializable {
     }
     request.setProtocolNumber(n.getString("protocolNumber"));
 
+    try {
+
     if (n.getJsonArray("PropertyEntries") != null) {
       for (int i = 0; i < n.getJsonArray("PropertyEntries").size(); i++) {
         JsonObject property = n.getJsonArray("PropertyEntries").getJsonObject(i);
@@ -911,13 +913,23 @@ public class RequestParser implements Serializable {
         }
       }
     }
+} catch (Exception ee)
+    {
+      System.out.println("[RequestParser:init] PropertyEntries is not an array, ignoring it. " + ee.toString());
+    }
 
+ try {
     if (n.getJsonArray("SeqLibTreatmentEntries") != null) {
       for (int i = 0; i < n.getJsonArray("SeqLibTreatmentEntries").size(); i++) {
         this.seqLibTreatmentMap.put(n.getJsonArray("SeqLibTreatmentEntries").getJsonObject(i).getString("value"), null);
       }
     }
+ } catch (Exception ee)
+ {
+   System.out.println("[RequestParser:init] SeqLibTreatmentEntries is not an array, ignoring it. " + ee.toString());
+ }
 
+ try {
     if (n.getJsonArray("collaborators") != null) {
       for (int i = 0; i < n.getJsonArray("collaborators").size(); i++) {
         JsonObject collaborator = n.getJsonArray("collaborators").getJsonObject(i);
@@ -925,6 +937,11 @@ public class RequestParser implements Serializable {
         this.collaboratorUpdateMap.put(collaborator.getString("idAppUser"), collaborator.getString("canUpdate"));
       }
     }
+ } catch (Exception ee)
+ {
+   System.out.println("[RequestParser:init] collaborators is not an array, ignoring it. " + ee.toString());
+ }
+
 
     // Figure out if the user intended to save sample treatments
     if (n.get(TreatmentEntry.TREATMENT) != null && n.getString(TreatmentEntry.TREATMENT).equalsIgnoreCase("Y")) {
@@ -1202,6 +1219,12 @@ public class RequestParser implements Serializable {
       } else {
         sample.setCcNumber(null);
       }
+    }
+
+    if (n.get("qcLibConcentration") != null && !n.getString("qcLibConcentration").equals("")) {
+      sample.setQcLibConcentration(new BigDecimal(n.getString("qcLibConcentration")));
+    } else {
+      sample.setQcLibConcentration(null);
     }
 
     sampleMap.put(idSampleString, sample);
@@ -1556,6 +1579,13 @@ public class RequestParser implements Serializable {
       } else {
         sample.setCcNumber(null);
       }
+    }
+
+    if (n.getAttributeValue("qcLibConcentration") != null && !n.getAttributeValue("qcLibConcentration").equals("")) {
+      String qcLibConcentration = n.getAttributeValue("qcLibConcentration").replaceAll(",", "");
+      sample.setQcLibConcentration(new BigDecimal(qcLibConcentration));
+    } else {
+      sample.setQcLibConcentration(null);
     }
 
     sampleMap.put(idSampleString, sample);

@@ -304,13 +304,13 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
     }
 
     filterExperimentPlatform(){
-        if (this.showInactive) {
-            this.rowData = this.allExpPlatorms;
-            this.gridOpt.api.setRowData( this.rowData)// = this.allExpPlatorms;
-        } else {
+//        if (this.showInactive) {
+//            this.rowData = this.allExpPlatorms;
+//            this.gridOpt.api.setRowData( this.rowData)// = this.allExpPlatorms;
+//        } else {
             this.rowData = this.allExpPlatorms.filter(expPlat => expPlat.isActive === 'Y' );
             this.gridOpt.api.setRowData(this.rowData);
-        }
+ //       }
     }
 
     onSplitDragEnd(event:any){
