@@ -23,6 +23,19 @@ export let VIEW_EXPERIMENT_ENDPOINT = new InjectionToken("view_experiment_url");
 @Injectable()
 export class ExperimentsService {
 
+    public readonly TYPE_MICROARRAY: string = "MICROARRAY";
+    public readonly TYPE_QC: string = "QC";
+    public readonly TYPE_CAP_SEQ: string = "CAPSEQ";
+    public readonly TYPE_FRAG_ANAL: string = "FRAGANAL";
+    public readonly TYPE_MIT_SEQ: string = "MITSEQ";
+    public readonly TYPE_CHERRY_PICK: string = "CHERRYPICK";
+    public readonly TYPE_ISCAN: string = "ISCAN";
+    public readonly TYPE_ISOLATION: string = "ISOLATION";
+    public readonly TYPE_CLINICAL_SEQUENOM: string = "CLINSEQ";
+    public readonly TYPE_SEQUENOM: string = "SEQUENOM";
+    public readonly TYPE_NANOSTRING: string = "NANOSTRING";
+    public readonly TYPE_GENERIC: string = "GENERIC";
+
     private experimentOrders: any[];
     public projectRequestList: any;
     public selectedTreeNode: any;
