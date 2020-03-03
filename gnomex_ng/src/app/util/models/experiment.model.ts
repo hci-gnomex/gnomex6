@@ -1107,6 +1107,7 @@ export class Experiment {
     public refreshSampleAnnotationList(): void {
 
         this.propertyService.getPropertyList(false).subscribe((response: any[]) => {
+            this.gnomexService.propertyList = response;
             response = this.filterPropertiesByCore(response);
             response = this.filterPropertiesByRequestCategory(response);
             response = Experiment.filterOnlyPropertiesForSamples(response);
@@ -1131,7 +1132,8 @@ export class Experiment {
                 }
             }
 
-            Experiment.addDescriptionFieldToAnnotations(response);
+            // Fixme: This actually doesn't work properly. Need to figure out why needed and how to make it work.
+            // Experiment.addDescriptionFieldToAnnotations(response);
             this.PropertyEntries = response;
         }, (err: IGnomexErrorResponse) => {
         });
@@ -1328,15 +1330,15 @@ export class Experiment {
         return properties;
     }
 
+    //Fixme: not used. Need to make it work for adding sample description
     private static addDescriptionFieldToAnnotations(props: any[]): void {
         let descNode: any = {
-            PropertyEntry: {
-                idProperty: "-1",
-                name: "Description",
-                otherLabel: "",
-                Description: "false",
-                isActive: "Y"
-            }
+            idProperty: "-1",
+            display: "Description",
+            name: "Description",
+            otherLabel: "",
+            isSelected: "false",
+            isActive: "Y",
         };
         props.splice(1, 0, descNode);
     }
