@@ -25,7 +25,9 @@ public class DirectoryBuilder {
 	private String mode;
 	private String accountForFilesMoved;
 	private Set<String> fileTypeCategorySet;
+	private Set<String> optionalFileTypeCategorySet;
 	private boolean addWrapperFolder = false;
+	private String remotePath;
 
 
 
@@ -67,7 +69,12 @@ public class DirectoryBuilder {
 				this.mode = args[++i];
 			}else if(args[i].equals("-linkfolder")){
 				addWrapperFolder = true;
-			}else if(args[i].equals("-cp")){
+			}else if(args[i].equals("-remotepath")){ // accountfilesmoved is considered path to local files
+													// need remote if you want to compare
+				if(accountForFilesMoved != null){
+					this.remotePath = args[++i];
+				}
+			} else if(args[i].equals("-cp")){
 				i++;
 				while(i < args.length && args[i].charAt(0) != '-' ){
 					captureGroupIndexes.add(Integer.parseInt(args[i]));
@@ -121,36 +128,60 @@ public class DirectoryBuilder {
 
 	public void makeAccountingForFiles(){
 		this.fileTypeCategorySet = new HashSet<String>();
+
 		Map<String,List<String>> missingMap = new TreeMap<String,List<String>>();
-		fileTypeCategorySet = new HashSet<>(Arrays.asList(".pdf", ".xml",".deident.xml", ".bam.bai",".bam",".bam.bai.md5",".bam.md5",".json" ));
 
-
+		fileTypeCategorySet = new HashSet<>(Arrays.asList(".pdf", ".xml",".deident.xml", ".bam.bai",".bam",".bam.bai.md5",".bam.md5" ));
+		optionalFileTypeCategorySet = new HashSet<String>(Arrays.asList(".bam.bai.S3.txt", ".bam.S3.txt" ));
 
 		File root = new File(this.accountForFilesMoved);
+		Map<String, Set<String>> localFileMap = null;
+
 		if(root.exists() && root.isDirectory()){
-			Map<String, Set<String>> fileMap = this.findAllFiles(root);
-			for(String key : fileMap.keySet()) {
+			localFileMap = this.findAllFiles(root);
 
-				Set<String> fileTypes = fileMap.get(key);
-				for(String type : fileTypeCategorySet ) {
-					if(!fileTypes.contains(type)) {
-						if(missingMap.get(key) != null ) {
-							missingMap.get(key).add(type);
-						}else {
-							missingMap.put(key, new ArrayList<String>(Arrays.asList(type)));
-						}
-					}
-				}
-
-			}
 			// prints out the missing file type sets like for example ID has except missing its xml
-			printAccoutedForFiles(missingMap);
-
-
+			findMissingFiles(localFileMap,missingMap);
+			missingMap.clear();
 
 		}else{
 			System.out.println("This path is invalid");
 			System.exit(1);
+		}
+		System.out.println("Files still missing after checking what is stored remotely");
+		Map<String, Set<String>> remotefileMap = this.findAllFiles(new File(this.remotePath));
+		// we want a full picture(remote and local) if the file is on the disk or not
+		addRemoteFromLocalFiles(localFileMap,remotefileMap);
+		findMissingFiles(localFileMap,missingMap);
+
+	}
+
+	private void findMissingFiles(Map<String,Set<String>> fileMap, Map<String,List<String>> missingMap){
+		for(String key : fileMap.keySet()) {
+			Set<String> fileTypes = fileMap.get(key);
+			for(String type : fileTypeCategorySet ) {
+				if(!fileTypes.contains(type)) {
+					if(fileTypes.contains(type + ".S3.txt")){
+						continue;
+					}
+					if(missingMap.get(key) != null ) {
+						missingMap.get(key).add(type);
+					}else {
+						missingMap.put(key, new ArrayList<String>(Arrays.asList(type)));
+					}
+				}
+			}
+		}
+		printAccoutedForFiles(missingMap);
+	}
+
+
+	private void addRemoteFromLocalFiles(Map<String, Set<String>> localFileMap, Map<String, Set<String>> remoteFileMap) {
+		for(String lKey : localFileMap.keySet()){
+			if(remoteFileMap.containsKey(lKey)){
+				Set<String> remoteExtensionSet = remoteFileMap.get(lKey);
+				localFileMap.get(lKey).addAll(remoteExtensionSet);
+			}
 		}
 	}
 
@@ -169,7 +200,7 @@ public class DirectoryBuilder {
 			//String extension =  name.substring(startIndx + 1 , name.length());
 
 
-			String regex = "^([a-zA-Z0-9]+)_?[a-zA-Z]*(\\..+)$";
+			String regex = "^([A-Za-z0-9-]+)_?[A-Za-z]*(\\..+)$";
 			Pattern r = Pattern.compile(regex);
 
 			Matcher m = r.matcher(name);
@@ -179,17 +210,19 @@ public class DirectoryBuilder {
 			if(m.matches()) {
 				id = m.group(1);
 				extension= m.group(2);
+
+				if(fileMap.get(id) != null) {
+					fileMap.get(id).add(extension);
+				}else{
+					HashSet<String> extensionList = new HashSet<String>();
+					extensionList.add(extension);
+					fileMap.put(id, extensionList);
+				}
+
 			}else{
 				System.out.println("didn't match " + name);
 			}
 
-			if(fileMap.get(id) != null) {
-				fileMap.get(id).add(extension);
-			}else{
-				HashSet<String> extensionList = new HashSet<String>();
-				extensionList.add(extension);
-				fileMap.put(id, extensionList);
-			}
 
 		}else{
 			File[] fileList =  file.listFiles();
