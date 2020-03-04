@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy} from "@angular/core";
+import {Component, ElementRef, Input, OnDestroy, ViewChild} from "@angular/core";
 import {HttpParams} from "@angular/common/http";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {MatDialogConfig} from "@angular/material";
@@ -22,7 +22,7 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 
 
 @Component({
-    selector: "tabAnnotationView",
+    selector: "tab-annotation-view",
     templateUrl: "./tab-annotation-view.component.html",
     styles: [`
         
@@ -45,6 +45,7 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 })
 
 export class TabAnnotationViewComponent implements OnDestroy {
+    @ViewChild("customAnnotInput") customAnnotInput: ElementRef;
 
     @Input("experiment") set experiment(value: Experiment) {
         this._experiment = value;
@@ -74,6 +75,12 @@ export class TabAnnotationViewComponent implements OnDestroy {
                                 this.addAnnotationGridApi.getRowNode('' + i).setSelected(true);
                             }
                         }
+
+                        if(this.newCustomAnnot && this.addAnnotationGridApi.getRowNode('' + i).data.idProperty === this.newCustomAnnot) {
+                            this.addAnnotationGridApi.getRowNode('' + i).setSelected(true);
+                            this.addAnnotationGridApi.setFocusedCell(this.addAnnotationGridApi.getRowNode('' + i).rowIndex, "name");
+                            this.newCustomAnnot = "";
+                        }
                     }
 
                 }
@@ -95,6 +102,8 @@ export class TabAnnotationViewComponent implements OnDestroy {
 
     private experimentSubscription: Subscription;
     private onChange_codeRequestCategorySubscription: Subscription;
+
+    private newCustomAnnot: string = "";
 
     public addAnnotationGridApi: GridApi;
     public removeAnnotationGridApi: GridApi;
@@ -218,7 +227,7 @@ export class TabAnnotationViewComponent implements OnDestroy {
         configuration.autoFocus = false;
         configuration.data = {
             isDialog: true,
-            orderType: OrderType.EXPERIMENT
+            orderType: OrderType.SAMPLE
         };
 
         this.dialogsService.genericDialogContainer(ConfigureAnnotationsComponent, "Configure Annotations", null, configuration,
@@ -233,6 +242,24 @@ export class TabAnnotationViewComponent implements OnDestroy {
     }
 
     onCustomAnnot(event?: any) {
+        // Check if the annotation is already used in the same name
+        let found: boolean = false;
+        let newAnnotationName: string = this.form.get("customAnnot").value;
+        for(let i = 0; i < this.addAnnotationGridApi.getDisplayedRowCount(); i++ ) {
+            if(this.addAnnotationGridApi.getRowNode("" + i).data.name.toLowerCase() === newAnnotationName.trim().toLowerCase()) {
+                this.addAnnotationGridApi.setFocusedCell(this.addAnnotationGridApi.getRowNode("" + i).rowIndex, "name");
+                found = true;
+                break;
+            }
+        }
+        if(found) {
+            this.form.get("customAnnot").setErrors({"notUnique": true});
+            setTimeout(() => {
+                this.customAnnotInput.nativeElement.focus();
+            });
+            return;
+        }
+
         this.dialogsService.startDefaultSpinnerDialog();
         this.currentUsers = [];
         let userObj = {idAppUser: this._experiment.idAppUser};
@@ -242,6 +269,7 @@ export class TabAnnotationViewComponent implements OnDestroy {
             .set("name", this.form.get("customAnnot").value)
             .set("isActive", "Y")
             .set("isRequired", "N")
+            .set("isSelected", "Y")
             .set("forSample", "Y")
             .set("forDataTrack", "N")
             .set("forAnalysis", "N")
@@ -262,10 +290,9 @@ export class TabAnnotationViewComponent implements OnDestroy {
                     this.dialogsService.alert("Certain options were inactivated instead of deleted because they are associated with existing samples", "Succeed With Warning", DialogType.SUCCESS);
                 }
 
-                this._experiment.refreshSampleAnnotationList();
+                this.newCustomAnnot = response.idProperty;
 
                 this.propertyService.getPropertyList(false).pipe(first()).subscribe((response: any[]) => {
-                    this.gnomexService.propertyList = response;
                     this._experiment.refreshSampleAnnotationList();
                     this.dialogsService.stopAllSpinnerDialogs();
                 }, (err: IGnomexErrorResponse) => {
