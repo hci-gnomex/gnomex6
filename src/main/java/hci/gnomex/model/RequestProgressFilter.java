@@ -17,6 +17,7 @@ public class RequestProgressFilter extends DetailObject {
   protected String                requestNumber;
   protected Integer               idAppUser;
   protected Integer               idLab;
+  protected Integer               idCoreFacility;
   protected Date                  createDateFrom;
   protected Date                  createDateTo;
   protected String                isComplete;
@@ -54,6 +55,7 @@ public class RequestProgressFilter extends DetailObject {
         idAppUser != null ||
         idLab != null ||
         idProject != null ||
+        idCoreFacility != null ||
         createDateFrom != null ||
         createDateTo != null ||
         (publicExperimentsInOtherGroups != null && publicExperimentsInOtherGroups.equalsIgnoreCase("Y")) ||
@@ -218,6 +220,13 @@ public class RequestProgressFilter extends DetailObject {
     if (isExternalOnly != null && isExternalOnly.equals("Y")){
       this.addWhereOrAnd();
       queryBuf.append(" req.isExternal = 'Y'");
+    }
+
+    //  Search by core facility
+    if (idCoreFacility != null){
+      this.addWhereOrAnd();
+      queryBuf.append(" req.idCoreFacility = ");
+      queryBuf.append(idCoreFacility);
     }
 
     // Search by request date last year
@@ -425,6 +434,12 @@ public class RequestProgressFilter extends DetailObject {
     this.idLab = idLab;
   }
 
+  public Integer getIdCoreFacility() {
+    return idCoreFacility;
+  }
+  public void setIdCoreFacility(Integer idCoreFacility) {
+    this.idCoreFacility = idCoreFacility;
+  }
 
   public void setIdUser(Integer idAppUser) {
     this.idAppUser = idAppUser;

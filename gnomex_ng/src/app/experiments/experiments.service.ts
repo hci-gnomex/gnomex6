@@ -354,9 +354,13 @@ export class ExperimentsService {
     getRequestProgressList_FromBackend(params: HttpParams): void {
         this.httpClient.get("/gnomex/GetRequestProgressList.gx", {params: params})
             .subscribe((response: any) => {
-                this.requestProgressList.next(response);
+                if(response && !Array.isArray(response) && response["RequestProgress"]) {
+                    this.requestProgressList.next([response["RequestProgress"]]);
+                } else {
+                    this.requestProgressList.next(response);
+                }
             }, (err: IGnomexErrorResponse) => {
-                this.dialogService.stopAllSpinnerDialogs(); // Fixme: required?
+                this.dialogService.stopAllSpinnerDialogs();
             });
     }
 
@@ -364,11 +368,15 @@ export class ExperimentsService {
         return this.requestProgressSolexaList.asObservable();
     }
     getRequestProgressSolexaList_FromBackend(params: HttpParams): void {
-        this.httpClient.get("/gnomex/GetRequestProgressSolexaList.gx", {params: params})
+        this.httpClient.get("/gnomex/GetRequestProgressSolexaList.gx", {params: params}).pipe()
             .subscribe((response: any) => {
-                this.requestProgressSolexaList.next(response);
+                if(response && !Array.isArray(response) && response["RequestProgress"]) {
+                    this.requestProgressSolexaList.next([response["RequestProgress"]]);
+                } else {
+                    this.requestProgressSolexaList.next(response);
+                }
             }, (err: IGnomexErrorResponse) => {
-                this.dialogService.stopAllSpinnerDialogs(); // Fixme: required?
+                this.dialogService.stopAllSpinnerDialogs();
             });
 
     }
@@ -379,9 +387,13 @@ export class ExperimentsService {
     getRequestProgressDNASeqList_FromBackend(params: HttpParams): void {
         this.httpClient.get("/gnomex/GetRequestProgressDNASeqList.gx", {params: params})
             .subscribe((response: any) => {
-                this.requestProgressDNASeqList.next(response);
+                if(response && !Array.isArray(response) && response["RequestProgress"]) {
+                    this.requestProgressDNASeqList.next([response["RequestProgress"]]);
+                } else {
+                    this.requestProgressDNASeqList.next(response);
+                }
             }, (err: IGnomexErrorResponse) => {
-                this.dialogService.stopAllSpinnerDialogs(); // Fixme: required?
+                this.dialogService.stopAllSpinnerDialogs();
             });
     }
     emitExperimentOverviewList(data: any): void {
