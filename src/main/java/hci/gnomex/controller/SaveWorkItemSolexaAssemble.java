@@ -241,7 +241,7 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
             }
             
             
-            String runFolder = flowCell.getRunFolderName(dh); // one folder for all channels in this flow cell?
+            String runFolder = flowCell.getRunFolderName(sess, dh); // one folder for all channels in this flow cell?
             TreeSet<FlowCellChannel> channels = new TreeSet<FlowCellChannel>(new FlowCellChannelComparator());
             int laneNumber = 1;
             HashMap<String,Object> requestNumbers = new HashMap<String,Object>();

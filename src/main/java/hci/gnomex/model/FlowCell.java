@@ -1,5 +1,7 @@
 package hci.gnomex.model;
 
+import org.hibernate.Session;
+
 import hci.gnomex.utility.DictionaryHelper;
 import hci.hibernate5utils.HibernateDetailObject;
 
@@ -140,14 +142,20 @@ public class FlowCell extends HibernateDetailObject {
     return createDate.split("/")[2];
   }
   
-  public String getRunFolderName(DictionaryHelper dh) {
+  public String getRunFolderName(Session sess, DictionaryHelper dh) {
     // Only allowed for certain types
+    // ideally, this would be more configurable.
     Set<String> allowedSequencingPlatforms = new HashSet<>();
-
     allowedSequencingPlatforms.add(SequencingPlatform.ILLUMINA_HISEQ_2000_SEQUENCING_PLATFORM);
     allowedSequencingPlatforms.add(SequencingPlatform.ILLUMINA_MISEQ_SEQUENCING_PLATFORM);
     allowedSequencingPlatforms.add(SequencingPlatform.ILLUMINA_NOSEQ_SEQUENCING_PLATFORM);
     allowedSequencingPlatforms.add(SequencingPlatform.ILLUMINA_ILLSEQ_SEQUENCING_PLATFORM);
+
+    Set<String> sequencingPlatforms_ignoreSide = new HashSet<>();
+    sequencingPlatforms_ignoreSide.add(SequencingPlatform.ILLUMINA_MISEQ_SEQUENCING_PLATFORM);
+
+    Set<String> sequencingPlatforms_ignoreSideSpecial = new HashSet<>();
+    sequencingPlatforms_ignoreSideSpecial.add(SequencingPlatform.ILLUMINA_ILLSEQ_SEQUENCING_PLATFORM);
 
     if (!allowedSequencingPlatforms.contains(this.getCodeSequencingPlatform())) {
       return null;
@@ -177,8 +185,20 @@ public class FlowCell extends HibernateDetailObject {
     runFolder += ((Integer) (this.getRunNumber() + 10000)).toString().substring(1,5);
     runFolder += "_";
 
-    if (this.getSide() != null && this.getSide().length() > 0) {
-      runFolder += this.getSide();
+    if ((!sequencingPlatforms_ignoreSide.contains(this.getCodeSequencingPlatform())) && this.getSide() != null && this.getSide().length() > 0) {
+      NumberSequencingCyclesAllowed tempNumberSequencingCyclesAllowed = null;
+
+      if (this.idNumberSequencingCyclesAllowed != null) {
+        tempNumberSequencingCyclesAllowed = sess.load(NumberSequencingCyclesAllowed.class, this.idNumberSequencingCyclesAllowed);
+      }
+
+      if (sequencingPlatforms_ignoreSideSpecial.contains(this.getCodeSequencingPlatform())
+          && tempNumberSequencingCyclesAllowed != null
+          && tempNumberSequencingCyclesAllowed.getDisplay().toLowerCase().contains("miseq ")) {
+        // Do nothing; do not include Side in the name.
+      } else {
+        runFolder += this.getSide();
+      }
     }
 
     runFolder += this.getBarcode();

@@ -176,7 +176,7 @@ public class SaveFlowCell extends GNomExCommand implements Serializable {
         // runFolder is provided if SaveFlowCell called from FinalizeFlowCell screen
         // if called from EditFlowCell then it will need to be recreated here.
         if(runFolder == null || runFolder.equals("")) {
-          runFolder = flowCell.getRunFolderName(dh);
+          runFolder = flowCell.getRunFolderName(sess, dh);
         }
 
         java.sql.Date lastCycleDate = null;
