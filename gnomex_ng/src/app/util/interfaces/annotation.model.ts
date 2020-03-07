@@ -3,12 +3,13 @@
 import {IAnnotationOption} from "./annotation-option.model";
 
 export interface IAnnotation {
-    codePropertyType: string
-    name: string
-    idProperty: string
-    idPropertyEntry: string
-    isRequired: string
+    codePropertyType: string;
+    name: string;
+    idProperty: string;
+    idPropertyEntry: string;
+    isRequired: string;
     value: string;
+    description: string;
     PropertyEntryValue? : IPropertyEntryValue[];
 
     PropertyOption? : IAnnotationOption[];
@@ -16,10 +17,10 @@ export interface IAnnotation {
 }
 
 export interface IPropertyEntryValue {
-    idPropertyEntryValue: string,
-    urlAlias: string,
-    urlDisplay: string ,
-    url:string ,
-    value: string,
-    edit:boolean
+    idPropertyEntryValue: string;
+    urlAlias: string;
+    urlDisplay: string;
+    url: string;
+    value: string;
+    edit: boolean;
 }
