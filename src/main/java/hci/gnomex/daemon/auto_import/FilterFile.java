@@ -157,7 +157,6 @@ public class FilterFile {
 		query.closeConnection();
 
 		fContainer.makeLocalCheckSums(filterOutList,fileList);
-		fContainer.mergeLargeFileMapToFileList(fileList);
 		fContainer.writeFilesList(remoteFileList, fileList );
 		outFile(filteredFile, filterOutList);
 

@@ -165,6 +165,7 @@ public class FoundationContainer {
 			String fileChecksum = entry.getValue();
 			if(!isCompletelyWritten(new File(bamFile))){
 				filterOutList.add(bamFile);
+				filterOutList.add(bamFile+".md5");
 				continue;
 			}
 
