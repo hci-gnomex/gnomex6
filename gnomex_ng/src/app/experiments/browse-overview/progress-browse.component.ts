@@ -189,23 +189,23 @@ export class ProgressBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
         this.columns = this.microColumns;
 
         this.microArraySubscription = this.experimentService.getRequestProgressListObservable()
-            .subscribe(data =>{
+            .subscribe(data => {
                 this.rpList = data;
-                if(this.selectedOpt == this.MICRO) {
+                if(this.selectedOpt === this.MICRO) {
                     this.selectSubFilter();
                 }
             });
-        this.dnaSeqSubscription =this.experimentService.getRequestProgressDNASeqListObservable()
-            .subscribe((data)=>{
+        this.dnaSeqSubscription = this.experimentService.getRequestProgressDNASeqListObservable()
+            .subscribe((data) => {
                 this.rpDNASeqList = data;
-                if(this.selectedOpt == this.DNASEQ) {
+                if(this.selectedOpt === this.DNASEQ) {
                     this.selectSubFilter();
                 }
             });
-        this.solexaSubscription= this.experimentService.getRequestProgressSolexaListObservable()
-            .subscribe(data =>{
+        this.solexaSubscription = this.experimentService.getRequestProgressSolexaListObservable()
+            .subscribe(data => {
                 this.rpSolexaList = data;
-                if(this.selectedOpt == this.IllUMINA) {
+                if(this.selectedOpt === this.IllUMINA) {
                     this.selectSubFilter();
                 }
             });
@@ -240,21 +240,22 @@ export class ProgressBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
         let len:number = 0;
         let progressList:Array<any> = [];
 
+        if(this.experimentService.experimentList.length > 0) {
 
+            if(this.selectedOpt === this.MICRO ){
+                progressList = this.rpList;
+                this.columns = this.microColumns;
 
-        if(this.selectedOpt === this.MICRO ){
-            progressList = this.rpList;
-            this.columns = this.microColumns;
+            }else if(this.selectedOpt === this.IllUMINA){
+                progressList = this.rpSolexaList;
+                this.columns = this.illuminaColumns;
 
-        }else if(this.selectedOpt === this.IllUMINA){
-            progressList = this.rpSolexaList;
-            this.columns = this.illuminaColumns;
-
-        }else if(this.selectedOpt === this.DNASEQ){
-            progressList = this.rpDNASeqList;
-            this.columns = this.dnaSeqColumns;
+            }else if(this.selectedOpt === this.DNASEQ){
+                progressList = this.rpDNASeqList;
+                this.columns = this.dnaSeqColumns;
+            }
+            this.gridApi.setColumnDefs(this.columns);
         }
-        this.gridApi.setColumnDefs(this.columns);
 
         //let start= new Date().getTime();
         this.progressRowData = [];

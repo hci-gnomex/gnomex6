@@ -60,6 +60,7 @@ dependencies {
     compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
     compile group: 'jdom', name: 'jdom', version: '1.0b8'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
+    compile group: 'com.github.fracpete', name: 'rsync4j-all', version: '3.1.2-17'
 
     providedRuntime group: 'com.sun.mail', name: 'javax.mail', version: '1.5.0'
 

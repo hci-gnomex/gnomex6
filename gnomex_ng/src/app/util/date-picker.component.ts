@@ -1,5 +1,5 @@
-import {Component, Input, OnInit, forwardRef, Output, EventEmitter} from "@angular/core";
-import {ControlValueAccessor, NG_VALUE_ACCESSOR} from "@angular/forms";
+import {Component, Input, OnInit, forwardRef, Output, EventEmitter, Self, AfterViewInit, Injector} from "@angular/core";
+import {AbstractControl, ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, NgControl} from "@angular/forms";
 
 import {DateParserComponent} from "./parsers/date-parser.component";
 
@@ -14,71 +14,14 @@ const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     templateUrl: 'date-picker.component.html',
     styles: [``],
     providers: [CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR]
-}) export class DatePickerComponent implements OnInit, ControlValueAccessor {
+}) export class DatePickerComponent implements OnInit, AfterViewInit, ControlValueAccessor {
 
     // ngModel stuff!
     private _date: Date = null;
     private _dateString: string = '';
     private valueHasBeenSet: boolean = false;
 
-    set value(value: string) {
-        this._dateString = (value === null ? "" : value);
-        if(this._dateString === this.value) {
-            return;
-        }
-        this.valueHasBeenSet = true;
 
-        // This setTimeout is needed because on initialization, inputs are run before ngOnInit, and
-        // we need information from both it and the other inputs before processing this one.
-        setTimeout(() => {
-            if (!this.dateParser_valueToDisplay || !this.dateParser_displayToValue) {
-                console.error("dateParsers not initialized");
-                return;
-            }
-
-            let tokens = this.dateParser_valueToDefault.parseDateString(this._dateString).split("/");
-
-            if (tokens.length === 3) {
-                this._date = new Date();
-                this._date.setFullYear(+tokens[2], +tokens[0] - 1, +tokens[1]);
-            } else {
-                if (this._defaultToToday) {
-                    this._date = new Date();
-                    this._dateString = this.value;
-                }
-            }
-
-            this.onChangeCallback(this._dateString);
-        });
-    }
-    get value(): string {
-        if (!this._date) {
-            return "";
-        }
-
-        let months: string = (this._date.getMonth() + 1) > 9 ? "" + (this._date.getMonth() + 1) : "0" + (this._date.getMonth() + 1);
-        let day:    string = (this._date.getDate() > 9) ? "" + this._date.getDate() : "0" + this._date.getDate();
-        let year:   string = "" + this._date.getFullYear();
-
-        let formattedString: string = months + "/" + day + "/" + year;
-
-        return this.dateParser_defaultToValue.parseDateString(formattedString);
-    }
-
-    private onTouchedCallback: () => void = () => {};
-    private onChangeCallback: (_: any) => void = () => {};
-
-    writeValue(value: string) {
-        if(!value) {
-            this._date = null;
-        }
-        this.value = value;
-    }
-
-    public registerOnChange(fn: any)  { this.onChangeCallback = fn; }
-    public registerOnTouched(fn: any) { this.onTouchedCallback = fn; }
-
-    // end ngModel stuff!
 
     private _defaultToToday: boolean = false;
     @Input() set defaultToToday(value: boolean) {
@@ -106,6 +49,48 @@ const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
         this.dateParser_valueToDisplay = new DateParserComponent(this._formatReceived,  this._formatDisplayed);
         this.dateParser_displayToValue = new DateParserComponent(this._formatDisplayed, this._formatReceived);
     }
+    set value(value: string) {
+        this._dateString = (value === null ? "" : value);
+        if(this._dateString === this.value) {
+            return;
+        }
+        this.valueHasBeenSet = true;
+
+        // This setTimeout is needed because on initialization, inputs are run before ngOnInit, and
+        // we need information from both it and the other inputs before processing this one.
+        setTimeout(() => {
+            if (!this.dateParser_valueToDisplay || !this.dateParser_displayToValue) {
+                console.error("dateParsers not initialized");
+                return;
+            }
+
+            let tokens = this.dateParser_valueToDefault.parseDateString(this._dateString).split("/");
+
+            if (tokens.length === 3) {
+                this.innerDateFC.setValue(new Date(+tokens[2], +tokens[0] - 1, +tokens[1]));
+            } else {
+                if (this._defaultToToday) {
+                    this.innerDateFC.setValue(new Date());
+                    this._dateString = this.value;
+                }
+            }
+
+            this.onChangeCallback(this._dateString);
+        });
+    }
+    get value(): string {
+        if (!this.innerDateFC.value) {
+            return "";
+        }
+
+        let months: string = (this.innerDateFC.value.getMonth() + 1) > 9 ? "" + (this.innerDateFC.value.getMonth() + 1) : "0" + (this.innerDateFC.value.getMonth() + 1);
+        let day:    string = (this.innerDateFC.value.getDate() > 9) ? "" + this.innerDateFC.value.getDate() : "0" + this.innerDateFC.value.getDate();
+        let year:   string = "" + this.innerDateFC.value.getFullYear();
+
+        let formattedString: string = months + "/" + day + "/" + year;
+
+        return this.dateParser_defaultToValue.parseDateString(formattedString);
+    }
 
     private _formatReceived:  string = 'YYYY-MM-DD';
     private _formatDisplayed: string = 'MM/DD/YYYY';
@@ -116,8 +101,14 @@ const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
 
     private dateParser_valueToDisplay: DateParserComponent;
     private dateParser_displayToValue: DateParserComponent;
+    public innerDateFC: FormControl = new FormControl();
+    public outerDateFC: AbstractControl;
+
+    constructor(private injector: Injector){
+    }
 
     ngOnInit(): void {
+
         this.dateParser_defaultToValue = new DateParserComponent('MM/DD/YYYY', this._formatReceived);
         this.dateParser_valueToDefault = new DateParserComponent(this._formatReceived, 'MM/DD/YYYY');
 
@@ -127,10 +118,41 @@ const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
         this.waitForInputsThenSetDateToToday();
     }
 
+    ngAfterViewInit():void{
+        setTimeout(()=>{
+            let ngControl: NgControl = this.injector.get(NgControl, null);
+            if(ngControl && ngControl.control){
+                this.outerDateFC = ngControl.control;
+                this.innerDateFC.setValidators(this.outerDateFC.validator);
+                this.innerDateFC.updateValueAndValidity();
+            }
+        });
+
+
+    }
+
+
+
+    private onTouchedCallback: () => void = () => {};
+    private onChangeCallback: (_: any) => void = () => {};
+
+    writeValue(value: string) {
+        if(!value) {
+            this.innerDateFC.setValue(null);
+        }
+        this.value = value;
+    }
+
+    public registerOnChange(fn: any)  { this.onChangeCallback = fn; }
+    public registerOnTouched(fn: any) { this.onTouchedCallback = fn; }
+
+    // end ngModel stuff!
+
+
     waitForInputsThenSetDateToToday(): void {
         setTimeout(() => {
             if (this._defaultToToday && !this.valueHasBeenSet) {
-                this._date = new Date();
+                this.innerDateFC.setValue(new Date());
                 this._dateString = this.value;
                 this.onChangeCallback(this._dateString);
             }
