@@ -74,7 +74,8 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
     private experimentIdSet: Set<string> = new Set();
     private overviewListSubscript: Subscription;
     private initialized: boolean = false;
-    private readonly PROJECT_INDEX: number = 1;
+    private readonly PROGRESS_INDEX: number = 1;
+    private selectedOverviewData: any = null;
 
 
     constructor(private appConstants: ConstantsService, private route: ActivatedRoute,
@@ -128,6 +129,7 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
                 };
                 this.orderedExperimentIds = Array.from(this.experimentIdSet).sort(sortIdFn);
                 this.refreshOnSearch(data);
+                this.selectedOverviewData = data;
 
                 if(data && !data.idRequest) {
                     this.nodeTitle = data.label;
@@ -137,25 +139,39 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
 
 
     refreshOnSearch(data?: any): void {
-        if( this.tabs.selectedIndex === this.PROJECT_INDEX) {
+        if( this.tabs.selectedIndex === this.PROGRESS_INDEX) {
             this.refreshProgress(data);
         }
 
     }
 
-    refreshProgress(data?:any):void{
-        let params:HttpParams = this.experimentsService.browsePanelParams;
-        if(params){
+    refreshProgress(data?: any): void {
+        let params: HttpParams = this.experimentsService.browsePanelParams;
+        if(params) {
 
-            if(data){//when user selects from the tree
-                let idProject = data['idProject'];
-                if(idProject){
-                    params = params.set('idProject',idProject);
-                }
-            }else{// Use when user changes to tab to progress
-                let idProject = this.route.snapshot.paramMap.get('idProject');
-                if(idProject){
-                    params = params.set('idProject',idProject);
+            if(data) {
+                if(Array.isArray(data) && this.experimentsService.experimentList.length > 0) {
+                    if(data[0].Project) {
+                        let projectList = Array.isArray(data[0].Project) ? data[0].Project : [data[0].Project];
+                        if (projectList.length > 0 && projectList[0].Request) {
+                            let idProject = projectList[0]['idProject'];
+                            if(idProject) {
+                                params = params.set('idProject', idProject);
+                            }
+                        }
+                    }
+                } else {//when user selects from the tree
+                    if(data.Project) {
+                        let idLab = data['idLab'];
+                        if(idLab) {
+                            params = params.set('idLab', idLab);
+                        }
+                    } else if(data.Request) {
+                        let idProject = data['idProject'];
+                        if(idProject) {
+                            params = params.set('idProject', idProject);
+                        }
+                    }
                 }
             }
 
@@ -245,8 +261,10 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
 
 
     tabChanged(event: MatTabChangeEvent) {
-        if(event.index  <= this.PROJECT_INDEX) {
-            this.refreshProgress();
+        if(event.index  <= this.PROGRESS_INDEX) {
+            if(event.index === this.PROGRESS_INDEX) {
+                this.refreshProgress(this.selectedOverviewData);
+            }
             this.noSave = true;
         } else {
             this.noSave = false;

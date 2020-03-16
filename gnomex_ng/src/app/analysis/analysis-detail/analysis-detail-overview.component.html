@@ -1,6 +1,6 @@
 <div class="full-width full-height flex-container-col">
     <div class="flex-container-row align-center padded-left-right-bottom small-font overflow-auto">
-        <div class="flex-container-row align-center label-min-width minimize">
+        <div class="flex-container-row align-center label-min-width">
             <img [src]="analysisTreeNode?.icon" alt="">
             <div class="medium-font padded-left">
                 Analysis {{ analysisTreeNode?.number }}
@@ -41,7 +41,10 @@
                 <analysis-description-tab [isEditMode]="isEditMode"></analysis-description-tab>
             </mat-tab>
             <mat-tab label="Annotations">
-                <annotation-tab [annotations]="annotations" [disabled]="!isEditMode" [orderType]="types.ANALYSIS"></annotation-tab>
+                <annotation-tab [annotations]="annotations" [disabled]="!isEditMode"
+                                [orderType]="types.ANALYSIS"
+                                [showConfigureAnnotationsButton]="isEditMode">
+                </annotation-tab>
             </mat-tab>
             <mat-tab  label="Experiment">
                <analysis-experiment-tab [tabVisible]="showExpAnalysisTab"></analysis-experiment-tab>

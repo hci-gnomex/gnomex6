@@ -35,6 +35,16 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
             border: 1px solid #e8e8e8;
         }
 
+        .label-min-width {
+            min-width: 20rem;
+            width: 20rem;
+        }
+
+        .label {
+            margin-top: 0.2rem;
+            margin-bottom: 0;
+        }
+
     `]
 })
 export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -103,7 +113,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
                     UtilService.markChildrenAsTouched(this.dtOverviewForm);
                 });
 
-                let annots = this.datatrack.DataTrackProperties;
+                let annots = this.datatrack.DataTrackProperties ? (this.datatrack.DataTrackProperties.PropertyEntry ? this.datatrack.DataTrackProperties.PropertyEntry : this.datatrack.DataTrackProperties) : "";
 
                 if (annots) {
                     this.annotations = Array.isArray(annots) ? <IAnnotation[]>annots : <IAnnotation[]>[annots];

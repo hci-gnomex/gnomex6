@@ -1,6 +1,6 @@
 import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
 import {HttpParams} from "@angular/common/http";
-import {FormControl, FormGroupDirective, NgForm, Validators} from "@angular/forms";
+import {FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, Validators} from "@angular/forms";
 import {MatDialogRef, MatDialog, ErrorStateMatcher, MatDialogConfig, MAT_DIALOG_DATA } from "@angular/material";
 import {Router} from "@angular/router";
 import {Subscription} from "rxjs";
@@ -19,6 +19,8 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 import {ConstantsService} from "../../services/constants.service";
+import {thisOrThat} from "../../util/validators/this-or-that.validator";
+import {UtilService} from "../../services/util.service";
 
 @Component({
 	selector: "new-billing-account-launcher",
@@ -46,7 +48,7 @@ export class NewBillingAccountLauncher {
 
 export class NewBillingAccountStateMatcher implements ErrorStateMatcher {
 	isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
-		return !!(control && control.invalid && control.touched && (control.dirty || (form && form.submitted)));
+		return !!((control && control.invalid && control.touched) || ((control.invalid && form.submitted)));
 	}
 }
 
@@ -54,102 +56,102 @@ export class NewBillingAccountStateMatcher implements ErrorStateMatcher {
 	selector: "new-billing-account-window",
 	templateUrl: "./new-billing-account.component.html",
 	styles: [`
-      .mat-dialog-title {
-          margin: 0;
-          padding: 0;
-      }
-      .mat-dialog-content {
-          margin: 0;
-          padding: 0;
-      }
-      .mat-dialog-actions {
-          margin: 0;
-          padding: 0;
-      }
+		.mat-dialog-title {
+			margin: 0;
+			padding: 0;
+		}
+		.mat-dialog-content {
+			margin: 0;
+			padding: 0;
+		}
+		.mat-dialog-actions {
+			margin: 0;
+			padding: 0;
+		}
 
-      div.t {
-          display: table;
-      }
-      div.tr {
-          display: table-row;
-      }
-      div.td {
-          display: table-cell;
-      }
-			
-			p {
-					margin: 1em 0.5em;
-			}
-			
-			.full-height {
-					height: 100%;
-			}
-			.full-width {
-					width: 100%;
-			}
-			
-			.center {
-					text-align: center;
-			}
-			
-			.cell-label {
-          width: 8rem;
-          height: 2.6em;
-					vertical-align: middle;
-					font-style: italic;
-					font-size: small;
-					color: #1601db;
-			}
+		div.t {
+			display: table;
+		}
+		div.tr {
+			display: table-row;
+		}
+		div.td {
+			display: table-cell;
+		}
 
-      .radio-button {
-          margin: 0 4em 0 0;
-          padding: 0;
-      }
+		p {
+			margin: 1em 0.5em;
+		}
 
-      .background {
-          display: block;
-          position: relative;
-          background-color: white;
-          border: #d2d2d2 solid 1px;
-      }
-      .background-sideless {
-          display: block;
-          position: relative;
-          background-color: white;
-          border-color: #d2d2d2;
-					border-style: solid;
-					border-top-width: 1px;
-					border-bottom-width: 1px;
-          border-left-width: 0;
-          border-right-width: 0;
-      }
-			
-			.inline-block {
-					display: inline-block;
-			}
-			
-      .row-spacer {
-					height: 0.7em;
-			}
-			
-			.center-vertical-align {
-					vertical-align: middle;
-			}
-			
-			.checkbox-container {
-					display: inline-block;
-					vertical-align: middle;
-					width: fit-content;
-			}
-			
-			.horizontal-break {
-					display: inline-block;
-					vertical-align: middle;
-					height: 3em;
-					width: 1px;
-					background-color: #c4cccc;
-					margin: 0.5em 0.5em 0.5em 0.5em;
-			}
+		.full-height {
+			height: 100%;
+		}
+		.full-width {
+			width: 100%;
+		}
+
+		.center {
+			text-align: center;
+		}
+
+		.cell-label {
+			width: 8rem;
+			height: 2.6em;
+			vertical-align: middle;
+			font-style: italic;
+			font-size: small;
+			color: #1601db;
+		}
+
+		.radio-button {
+			margin: 0 4em 0 0;
+			padding: 0;
+		}
+
+		.background {
+			display: block;
+			position: relative;
+			background-color: white;
+			border: #d2d2d2 solid 1px;
+		}
+		.background-sideless {
+			display: block;
+			position: relative;
+			background-color: white;
+			border-color: #d2d2d2;
+			border-style: solid;
+			border-top-width: 1px;
+			border-bottom-width: 1px;
+			border-left-width: 0;
+			border-right-width: 0;
+		}
+
+		.inline-block {
+			display: inline-block;
+		}
+
+		.row-spacer {
+			height: 0.7em;
+		}
+
+		.center-vertical-align {
+			vertical-align: middle;
+		}
+
+		.checkbox-container {
+			display: inline-block;
+			vertical-align: middle;
+			width: fit-content;
+		}
+
+		.horizontal-break {
+			display: inline-block;
+			vertical-align: middle;
+			height: 3em;
+			width: 1px;
+			background-color: #c4cccc;
+			margin: 0.5em 0.5em 0.5em 0.5em;
+		}
 	`]
 })
 export class NewBillingAccountComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
@@ -162,130 +164,33 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 
 	usesCustomChartfields: boolean;
 
-	accountName_Chartfield: string = '';
-	accountNameFormControl_Chartfield = new FormControl('', []);
-	accountNameStateMatcher_Chartfield = new NewBillingAccountStateMatcher();
+	accountStateMatcher = new NewBillingAccountStateMatcher();
 
-	accountName_po: string = '';
-	accountNameFormControl_po = new FormControl('', []);
-	accountNameStateMatcher_po = new NewBillingAccountStateMatcher();
-
-	accountName_creditCard: string = '';
-	accountNameFormControl_creditCard = new FormControl('', []);
-	accountNameStateMatcher_creditCard = new NewBillingAccountStateMatcher();
-
-	shortAccountName_Chartfield: string = '';
-	shortNameFormControl_Chartfield = new FormControl('', []);
-	shortNameStateMatcher_Chartfield = new NewBillingAccountStateMatcher();
-	requireShortAcct: boolean = false;
-
-	shortAccountName_po: string = '';
-	shortNameFormControl_po = new FormControl('', []);
-	shortNameStateMatcher_po = new NewBillingAccountStateMatcher();
-
-	accountNumberBus_Chartfield: string = '';
-	accountNumberBusFormControl_chartfield  = new FormControl('', [ Validators.pattern(/^\d*$/) ]);
-	accountNumberBusStateMatcher_chartfield = new NewBillingAccountStateMatcher();
-
-	accountNumberOrg_Chartfield: string = '';
-	accountNumberOrgFormControl_chartfield  = new FormControl('', [ Validators.pattern(/^\d*$/) ]);
-	accountNumberOrgStateMatcher_chartfield = new NewBillingAccountStateMatcher();
-
-	accountNumberFund_Chartfield: string = '';
-	accountNumberFundFormControl_chartfield  = new FormControl('', [ Validators.pattern(/^\d*$/) ]);
-	accountNumberFundStateMatcher_chartfield = new NewBillingAccountStateMatcher();
-
-	accountNumberActivity_Chartfield: string = '';
-	accountNumberActivityFormControl_chartfield  = new FormControl('', [ Validators.pattern(/^\d*$/) ]);
-	accountNumberActivityStateMatcher_chartfield = new NewBillingAccountStateMatcher();
-
-	accountNumberProject_Chartfield: string = '';
-	accountNumberProjectFormControl_chartfield  = new FormControl('', [ Validators.pattern(/^\d*$/) ]);
-	accountNumberProjectStateMatcher_chartfield = new NewBillingAccountStateMatcher();
-
-	accountNumberAccount_Chartfield: string = '';
-	accountNumberAccountFormControl_chartfield  = new FormControl('', [ Validators.pattern(/^\d*$/) ]);
-	accountNumberAccountStateMatcher_chartfield = new NewBillingAccountStateMatcher();
-
-	accountNumberAU_Chartfield: string = '1';
-
-	startDate_chartfield = new Date();
-	startDate_po = new Date();
-	startDate_creditcard = new Date();
-
-	requireStartDate: boolean = true;
-
-	effectiveUntilDate_chartfield: Date;
-	expirationDate_po: Date;
-	expirationDate_creditcard: Date;
-
-	requireExpirationDate: boolean = true;
-
-	totalDollarAmount_Chartfield: string = '';
-	totalDollarAmountFormControl_chartfield  = new FormControl('', [ Validators.pattern(/^\d*\.\d{2}$/) ]);
-	totalDollarAmountStateMatcher_chartfield = new NewBillingAccountStateMatcher();
-
-	totalDollarAmount_po: string = '';
-	totalDollarAmountFormControl_po  = new FormControl('', [ Validators.pattern(/^\d*\.\d{2}$/) ]);
-	totalDollarAmountStateMatcher_po = new NewBillingAccountStateMatcher();
-
-	totalDollarAmount_creditCard: string = '';
-	totalDollarAmountFormControl_creditCard  = new FormControl('', [ Validators.pattern(/^\d*\.\d{2}$/) ]);
-	totalDollarAmountStateMatcher_creditCard = new NewBillingAccountStateMatcher();
 
 	// The definition of valid email addresses can be found at
 	//     https://en.wikipedia.org/wiki/Email_address#Domain
 	//   at the time of writing, which this does not fully support...
 	private emailPatternValidator = Validators.pattern(/^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/);
 
-	submitterEmail_chartfield: string = '';
-	submitterEmailFormControl_chartfield  = new FormControl('', [ this.emailPatternValidator ]);
-	submitterEmailStateMatcher_chartfield = new NewBillingAccountStateMatcher();
-
-	submitterEmail_po: string = '';
-	submitterEmailFormControl_po  = new FormControl('', [ this.emailPatternValidator ]);
-	submitterEmailStateMatcher_po = new NewBillingAccountStateMatcher();
-
-	submitterEmail_creditcard: string = '';
-	submitterEmailFormControl_creditcard  = new FormControl('', [ this.emailPatternValidator ]);
-	submitterEmailStateMatcher_creditcard = new NewBillingAccountStateMatcher();
-
-	activeCheckBox_chartfield: boolean = false;
-	activeCheckBox_po: boolean = false;
-	activeCheckBox_creditcard: boolean = false;
-
-	agreementCheckbox: boolean = false;
+	formGroup:FormGroup;
 
 	labList: any[] = [];
 	coreFacilityReducedList: any[] = [];
 
-	selectedLab: any = null;
 	selectedCoreFacilities: any[] = [];
-	selectedCreditCardCompany: any;
 
 	private labListSubscription: Subscription = null;
 
 	fundingAgencies: any;
 
-	selectedFundingAgency_chartfield: any;
-	selectedFundingAgency_po: any;
-	selectedFundingAgency_creditCard: any;
-
 	creditCardCompanies: any;
 
 	showFundingAgencies: boolean = false;
-	requireFundingAgency: boolean = false;
-
-	zipCodeInput_creditCard: string = "";
-	zipCodeInputFormControl_creditCard  = new FormControl('', [ Validators.pattern(/^\d{5}((\s*|(\s*-\s*))(\d{4}))?$/) ]);
-	zipCodeInputStateMatcher_creditCard = new NewBillingAccountStateMatcher();
 
 	private selectedCoreFacilitiesString: string = "";
 
 	private internalAccountFieldsConfigurationSubscription: Subscription;
 	private otherAccountFieldsConfigurationSubscription: Subscription;
-
-	requireDollarAmount: boolean = false;
 
 	successMessage: string = '';
 	errorMessage: string = '';
@@ -293,51 +198,52 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 	isActivity: boolean = false;
 	disableCoreFacilitiesSelector = true;
 
+	otherAccountFieldsConfiguration: any[] = [];
 	internalAccountFieldsConfiguration: any = [
 		{
 			displayName : 'customField1 default name',
-			value       : '',
 			isRequired  : 'N',
 			minLength   : 1,
 			maxLength   : 20,
 			isNumber    : 'N',
-			sortOrder   : 0
+			sortOrder   : 0,
+			fieldName: 'customField1'
 		},
 		{
 			displayName : 'customField2 default name',
-			value       : '',
 			isRequired  : 'N',
 			minLength   : 10,
 			maxLength   : 20,
 			isNumber    : 'N',
-			sortOrder   : 0
+			sortOrder   : 0,
+			fieldName: 'customField2'
 		},
 		{
 			displayName : 'customField3 default name',
-			value       : '',
 			isRequired  : 'N',
 			minLength   : 20,
 			maxLength   : 20,
 			isNumber    : 'N',
-			sortOrder   : 0
+			sortOrder   : 0,
+			fieldName: 'customField3'
 		},
 		{
 			displayName : 'customField4 default name',
-			value       : '',
 			isRequired  : 'N',
 			minLength   : 1,
 			maxLength   : 20,
 			isNumber    : 'N',
-			sortOrder   : 0
+			sortOrder   : 0,
+			fieldName: 'customField4'
 		},
 		{
 			displayName : 'customField5 default name',
-			value       : '',
 			isRequired  : 'N',
 			minLength   : 1,
 			maxLength   : 20,
 			isNumber    : 'N',
-			sortOrder   : 0
+			sortOrder   : 0,
+			fieldName: 'customField5'
 		}
 	];
 
@@ -349,6 +255,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 	includeInCustomField_expirationDate: boolean    = false;
 	includeInCustomField_fundingAgency: boolean     = false;
 	includeInCustomField_totalDollarAmount: boolean = false;
+	private showTotalDollarAmount: boolean;
 
 
 	constructor(private accountFieldsConfigurationService: AccountFieldsConfigurationService,
@@ -361,32 +268,40 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 				private newBillingAccountService: NewBillingAccountService,
 				private propertyService: PropertyService,
 				public prefService: UserPreferencesService,
+				public utilService: UtilService,
+				private fb:FormBuilder,
 				@Inject(MAT_DIALOG_DATA) private data) {
 		super();
 
 		this.primaryDisable = (action) => {
-			if (this.showField) {
-				if (this.showField === this.CHARTFIELD) {
-					return !this.areChartfieldValuesValid();
-				} else if (this.showField === this.PO) {
-					return !this.arePoValuesValid();
-				} else if (this.showField === this.CREDIT_CARD) {
-					return !this.areCreditCardValuesValid();
-				}
-			}
-
-			return true;
+			return this.formGroup.invalid;
 		};
 	}
 
 	ngOnInit(): void {
+
+		this.formGroup = this.fb.group({
+			lab: ['', Validators.required],
+			accountName: '',
+			shortAccountName: '',
+			idFundingAgency: '',
+			startDate: [(new Date()).toLocaleDateString(),[Validators.required]],
+			expirationDate:['',[Validators.required]],
+			totalDollarAmount:['',[ Validators.pattern(/^[0-9,]*(\.\d{2})?$/)]],
+			active: false,
+			email:['', [ this.emailPatternValidator, Validators.required ]],
+			agreement:[false, [Validators.requiredTrue] ],
+			creditLastFour:['',[Validators.pattern(/^\d{4}$/), Validators.required]],
+			creditZipCode: ['', [ Validators.required,  Validators.pattern(/^\d{5}((\s*|(\s*-\s*))(\d{4}))?$/) ]],
+			idCreditCardCompany: ['', [Validators.required]]
+		});
+
 		if (this.data && this.data.idLab) {
 			setTimeout(() => {
 				this.dialogService.startDefaultSpinnerDialog();
 			});
 		}
 
-		this.selectedLab = null;
 		this.selectedCoreFacilities = [];
 
 		this.labListSubscription = this.labListService.getLabList().subscribe((response: any[]) => {
@@ -398,7 +313,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 				});
 
 				if (temp.length === 1) {
-					this.selectedLab = temp[0];
+					this.formGroup.get('lab').setValue(temp);
 
 					this.onLabListSelection( temp[0] );
 				}
@@ -407,13 +322,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			}
 		});
 
-		this.submitterEmail_chartfield = this.createSecurityAdvisorService.userEmail;
-		this.submitterEmail_po         = this.createSecurityAdvisorService.userEmail;
-		this.submitterEmail_creditcard = this.createSecurityAdvisorService.userEmail;
-
-		this.submitterEmailFormControl_chartfield.reset();
-		this.submitterEmailFormControl_po.reset();
-		this.submitterEmailFormControl_creditcard.reset();
+		this.formGroup.get('email').setValue(this.createSecurityAdvisorService.userEmail);
 
 		let originalFundingAgencies = this.dictionaryService.getEntries('hci.gnomex.model.FundingAgency');
 		this.fundingAgencies = [];
@@ -439,27 +348,51 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		}
 
 		this.usesCustomChartfields = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CONFIGURABLE_BILLING_ACCOUNTS);
+		this.showTotalDollarAmount = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_SHOW_TOTAL_DOLLAR_AMOUNT);
+
+
 
 		if (this.usesCustomChartfields) {
-			for (let i = 0; i < 5; i++) {
+
+			for (let i = 0;  i < this.internalAccountFieldsConfiguration.length; i++) {
 				this.InternalCustomFieldsFormControl[i] = new FormControl('', []);
-				this.InternalCustomFieldsStateMatcher[i] = new NewBillingAccountStateMatcher();
+				this.InternalCustomFieldsStateMatcher[i] = this.accountStateMatcher;
 			}
+
+			let customChartfieldValidators = null;
 
 			this.internalAccountFieldsConfigurationSubscription =
 				this.accountFieldsConfigurationService.getInternalAccountFieldsConfigurationObservable().subscribe((response) => {
-					this.processInternalAccountFieldsConfigurations(response);
+					this.addInternalAccountFieldsConfigurationControls(response);
+					customChartfieldValidators = this.addInternalAccountFieldsConfigurationValidators();
+					this.handleConditionalValidators(customChartfieldValidators)
 				});
 
 			this.otherAccountFieldsConfigurationSubscription =
 				this.accountFieldsConfigurationService.getOtherAccountFieldsConfigurationObservable().subscribe((response) => {
 					this.processOtherAccountFieldsConfigurations(response);
+					this.handleConditionalValidators(customChartfieldValidators)
 				});
 
 			this.accountFieldsConfigurationService.publishAccountFieldConfigurations();
 		} else {
-			this.accountNumberAccount_Chartfield = this.propertyService.getPropertyValue(PropertyService.PROPERTY_ACCOUNT_NUMBER_ACCOUNT_DEFAULT);
+
+			this.formGroup.addControl('chartfieldBus', new FormControl(''));
+			this.formGroup.addControl('chartfieldOrg', new FormControl(''));
+			this.formGroup.addControl('chartfieldFund', new FormControl(''));
+			this.formGroup.addControl('chartfieldActivity', new FormControl(''));
+			this.formGroup.addControl('chartfieldProject', new FormControl(''));
+			this.formGroup.addControl('chartfieldAccountNum', new FormControl(''));
+			this.formGroup.addControl('chartfieldAccountAU', new FormControl({value: "1"  , disabled: true}));
+
+			this.handleConditionalValidators();
+
+			this.formGroup.get('chartfieldAccountNum')
+				.setValue( this.propertyService.getPropertyValue(PropertyService.PROPERTY_ACCOUNT_NUMBER_ACCOUNT_DEFAULT));
 		}
+
+
+
 	}
 
 	ngOnDestroy(): void {
@@ -474,12 +407,97 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		}
 	}
 
+
+	handleConditionalValidators(customChartfieldValidators?:any[]){
+		let chartfieldValidators = null;
+
+		if(this.usesCustomChartfields && customChartfieldValidators){
+			chartfieldValidators = customChartfieldValidators;
+			chartfieldValidators['accountName'] = [];
+			chartfieldValidators['shortAccountName'] = [];
+
+		}else{
+			chartfieldValidators = {
+				chartfieldBus:  [ Validators.pattern(/^\d*$/), Validators.required, Validators.minLength(2), Validators.maxLength(2) ],
+				chartfieldOrg: [Validators.pattern(/^\d*$/), Validators.required, Validators.minLength(5), Validators.maxLength(5) ],
+				chartfieldFund: [Validators.pattern(/^\d*$/), Validators.required, Validators.minLength(4), Validators.maxLength(4) ],
+				chartfieldActivity:  [Validators.pattern(/^\d*$/), thisOrThat('chartfieldActivity', 'chartfieldProject') , Validators.minLength(5),  Validators.maxLength(5) ],
+				chartfieldProject:  [Validators.pattern(/^\d*$/), thisOrThat('chartfieldProject','chartfieldActivity'), Validators.minLength(8) , Validators.maxLength(8) ],
+				chartfieldAccountNum: [Validators.pattern(/^\d*$/), Validators.required, Validators.minLength(5), Validators.maxLength(5)  ],
+				chartfieldAccountAU : []
+			};
+		}
+
+		let creditCardValidators = {
+			creditLastFour: [Validators.required, Validators.pattern(/^\d{4}$/)],
+			creditZipCode: [ Validators.required,  Validators.pattern(/^\d{5}((\s*|(\s*-\s*))(\d{4}))?$/) ],
+			idCreditCardCompany:  [Validators.required]
+		};
+		let poValidators = {};
+		// overlap shortAcct and Acct only for po and chatfield
+		let overlapValidators = {
+			accountName : [Validators.required],
+			shortAccountName: [Validators.maxLength(10)]
+		};
+
+
+		if(this.usesCustomChartfields && this.otherAccountFieldsConfiguration){
+			for(let otherConfig of this.otherAccountFieldsConfiguration){
+				if(otherConfig.include === 'Y'){
+					if(otherConfig.fieldName === 'shortAcct' && otherConfig.isRequired === 'Y'){
+						(<any[]>poValidators['shortAccountName']).push(Validators.required);
+						(<any[]>chartfieldValidators['shortAccountName']).push(Validators.required);
+					}
+				}
+			}
+		}
+
+
+		if(this.CHARTFIELD === this.showField){
+			this.setConditionalValidators(chartfieldValidators,true);
+		}else{
+			this.setConditionalValidators(chartfieldValidators,false);
+		}
+		if ( this.PO === this.showField){
+			this.setConditionalValidators(poValidators,true);
+		}else{
+			this.setConditionalValidators(poValidators,false);
+		}
+
+		if(this.CREDIT_CARD === this.showField){
+			this.setConditionalValidators(creditCardValidators,true);
+			this.setConditionalValidators(overlapValidators, false );
+		}else{
+			this.setConditionalValidators(creditCardValidators,false);
+			this.setConditionalValidators(overlapValidators, true );
+		}
+
+		this.formGroup.markAsUntouched();
+		this.formGroup.markAsPristine();
+
+	}
+
+	setConditionalValidators(validatorsObj:any, addValidators:boolean): void{
+		if(addValidators){
+			for(let validatorKey in validatorsObj){
+				this.formGroup.get(validatorKey).setValidators(validatorsObj[validatorKey]);
+				this.formGroup.get(validatorKey).updateValueAndValidity();
+			}
+		}else{
+			for(let validatorKey in validatorsObj){
+				this.formGroup.get(validatorKey).clearValidators();
+				this.formGroup.get(validatorKey).updateValueAndValidity();
+			}
+		}
+
+	}
+
 	/**
 	 * This function is responsible for cleaning up any custom fields being used and arranging them
 	 *   correctly, as well as hooking up their validation.
 	 * @param {any[]} internalAccountFieldsConfiguration
 	 */
-	processInternalAccountFieldsConfigurations(internalAccountFieldsConfiguration: any[]): void {
+	addInternalAccountFieldsConfigurationControls(internalAccountFieldsConfiguration: any[]): void {
 		if (!internalAccountFieldsConfiguration.length) {
 			return;
 		}
@@ -487,6 +505,18 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		this.internalAccountFieldsConfiguration = internalAccountFieldsConfiguration
 			.filter((a) => { return a.include === 'Y'; })
 			.sort((a, b) => { return a.sortOrder - b.sortOrder; });
+
+		for (let i = 0; i < this.internalAccountFieldsConfiguration.length; i++) {
+			this.InternalCustomFieldsFormControl[i].setErrors({'pattern':null});
+			this.formGroup.addControl(this.internalAccountFieldsConfiguration[i].fieldName, this.InternalCustomFieldsFormControl[i]);
+		}
+
+
+	}
+
+	addInternalAccountFieldsConfigurationValidators():any{
+		// these are also all specific to chartFields thus need to be removed when working with another payment method
+		let customChartFieldValidators = {};
 
 		for (let i = 0; i < this.internalAccountFieldsConfiguration.length; i++) {
 			let validators = [];
@@ -510,14 +540,14 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			if (this.internalAccountFieldsConfiguration[i].isRequired === 'Y') {
 				validators.push(Validators.required);
 			}
-
-			this.InternalCustomFieldsFormControl[i].setValidators(validators);
-			this.InternalCustomFieldsFormControl[i].setErrors({'pattern':null});
-			this.InternalCustomFieldsFormControl[i].updateValueAndValidity();
+			customChartFieldValidators[this.internalAccountFieldsConfiguration.fieldName] = validators;
 		}
+		return customChartFieldValidators;
 	}
 
+
 	processOtherAccountFieldsConfigurations(otherAccountFieldsConfiguration: any[]): void {
+		// these validators only need to be determined at Init and remain the same between PO,chartfield,creditcard
 		if (!otherAccountFieldsConfiguration.length) {
 			return;
 		}
@@ -527,29 +557,38 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		this.includeInCustomField_startDate         = false;
 		this.includeInCustomField_expirationDate    = false;
 		this.includeInCustomField_totalDollarAmount = false;
+		this.otherAccountFieldsConfiguration = otherAccountFieldsConfiguration;
 
-		for (let i = 0; i < otherAccountFieldsConfiguration.length; i++) {
+		for (let i = 0; i < this.otherAccountFieldsConfiguration.length; i++) {
 			if (otherAccountFieldsConfiguration[i].include === 'Y') {
 				switch(otherAccountFieldsConfiguration[i].fieldName) {
 					case 'shortAcct' :
+						// set validator in conditional Validators
 						this.includeInCustomField_shortAccount      = true;
-						this.requireShortAcct = otherAccountFieldsConfiguration[i].isRequired === 'Y';
 						break;
 					case 'idFundingAgency' :
 						this.includeInCustomField_fundingAgency     = true;
-						this.requireFundingAgency = otherAccountFieldsConfiguration[i].isRequired === 'Y';
+						if(otherAccountFieldsConfiguration[i].isRequired === 'Y'){
+							this.formGroup.get('idFundingAgency').setValidators([Validators.required]);
+						}
 						break;
 					case 'startDate' :
 						this.includeInCustomField_startDate         = true;
-						this.requireStartDate = otherAccountFieldsConfiguration[i].isRequired === 'Y';
+						if(otherAccountFieldsConfiguration[i].isRequired === 'Y'){
+							this.formGroup.get('startDate').setValidators([Validators.required]);
+						}
 						break;
 					case 'expirationDate' :
 						this.includeInCustomField_expirationDate    = true;
-						this.requireExpirationDate = otherAccountFieldsConfiguration[i].isRequired === 'Y';
+						if(otherAccountFieldsConfiguration[i].isRequired === 'Y'){
+							this.formGroup.get('expirationDate').setValidators([Validators.required]);
+						}
 						break;
 					case 'totalDollarAmount' :
 						this.includeInCustomField_totalDollarAmount = true;
-						this.requireDollarAmount = otherAccountFieldsConfiguration[i].isRequired === 'Y';
+						if(otherAccountFieldsConfiguration[i].isRequired === 'Y'){
+							this.formGroup.get('totalDollarAmount').setValidators([Validators.required]);
+						}
 						break;
 					default : // Do nothing.
 				}
@@ -572,7 +611,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 	private saveChartfield(): void {
 
 		let isPO: string = (this.showField === this.PO) ? 'Y' : 'N';
-		let idLab: string = !this.selectedLab ? '' : '' + this.selectedLab.idLab;
+		let idLab: string = !this.formGroup.get('lab').value  ? '' : '' + this.formGroup.get('lab').value.idLab;
 
 		let coreFacilitiesXMLString: string = "";
 		let coreFacilities:any[] = [];
@@ -607,8 +646,8 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 				}
 			}
 		} else {
-			accountNumberProject = this.accountNumberProject_Chartfield;
-			accountNumberAccount = this.accountNumberAccount_Chartfield;
+			accountNumberProject = this.formGroup.get('chartfieldProject').value;
+			accountNumberAccount = this.formGroup.get('chartfieldAccountNum').value;
 		}
 
 		if (this.selectedCoreFacilities.length) {
@@ -629,245 +668,79 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			coreFacilitiesXMLString = JSON.stringify(coreFacilities);
 		}
 
-		if (this.activeCheckBox_chartfield != null) {
-			if (this.activeCheckBox_chartfield) {
+		if (this.formGroup.get("active").value != null) {
+			if (this.formGroup.get("active").value) {
 				activeAccount = 'Y';
 			} else {
 				activeAccount = 'N';
 			}
 		}
 
-		if (!!this.selectedFundingAgency_chartfield && (this.showFundingAgencies && !this.usesCustomChartfields || this.includeInCustomField_fundingAgency)) {
-			idFundingAgency = this.selectedFundingAgency_chartfield;
+		if (!!(this.formGroup.get('idFundingAgency').value && (this.showFundingAgencies && !this.usesCustomChartfields || this.includeInCustomField_fundingAgency))) {
+			idFundingAgency = this.formGroup.get('idFundingAgency').value;
 		}
 
-		// console.log("" +
-		// 		"You clicked the save button with parameters : \n" +
-		// 		"    idLab                    : " + idLab + "\n" +
-		// 		"    coreFacilitiesXMLString  : " + coreFacilitiesXMLString + "\n" +
-		// 		"    accountName              : " + this.accountName_Chartfield + "\n" +
-		// 		"    shortAcct                : " + this.shortAccountName_Chartfield + "\n" +
-		// 		"    accountNumberBus         : " + this.accountNumberBus_Chartfield + "\n" +
-		// 		"    accountNumberOrg         : " + this.accountNumberOrg_Chartfield + "\n" +
-		// 		"    accountNumberFund        : " + this.accountNumberFund_Chartfield + "\n" +
-		// 		"    accountNumberActivity    : " + this.accountNumberActivity_Chartfield + "\n" +
-		// 		"    accountNumberProject     : " + accountNumberProject + "\n" +
-		// 		"    accountNumberAccount     : " + accountNumberAccount + "\n" +
-		// 		"    accountNumberAu          : " + (this.accountNumberActivity_Chartfield.length > 0 ? this.accountNumberAU_Chartfield : '')+ "\n" +
-		// 		"    idFundingAgency          : " + idFundingAgency + "\n" +
-		// 		"    custom1                  : " + custom1 + "\n" +
-		// 		"    custom2                  : " + custom2 + "\n" +
-		// 		"    custom3                  : " + custom3 + "\n" +
-		// 		"    submitterEmail           : " + this.submitterEmail_chartfield + "\n" +
-		// 		"    startDate                : " + this.startDate_chartfield.toLocaleDateString() + "\n" +
-		// 		"    expirationDate           : " + (this.effectiveUntilDate_chartfield ? this.effectiveUntilDate_chartfield.toLocaleDateString() : '') + "\n" +
-		// 		"    totalDollarAmountDisplay : " + this.totalDollarAmount_Chartfield + "\n" +
-		// 		"    activeAccount            : " + activeAccount + "\n" +
-		// 		"    isPO                     : " + isPO + "\n"
-		// );
 
-		if (this.areChartfieldValuesValid()) {
-			let parameters: HttpParams = new HttpParams()
-				.set('idLab', idLab)
-				.set('coreFacilitiesXMLString', coreFacilitiesXMLString)
-				.set('coreFacilitiesJSONString', coreFacilitiesXMLString)
-				.set('accountName', this.accountName_Chartfield)
-				.set('shortAcct', this.shortAccountName_Chartfield)
-				.set('accountNumberBus', this.accountNumberBus_Chartfield)
-				.set('accountNumberOrg', this.accountNumberOrg_Chartfield)
-				.set('accountNumberFund', this.accountNumberFund_Chartfield)
-				.set('accountNumberActivity', this.accountNumberActivity_Chartfield)
-				.set('accountNumberProject', accountNumberProject)
-				.set('accountNumberAccount', accountNumberAccount)
-				.set('accountNumberAu', (this.accountNumberActivity_Chartfield.length > 0 ? this.accountNumberAU_Chartfield : ''))
-				.set('idFundingAgency', idFundingAgency)
-				.set('custom1', custom1)
-				.set('custom2', custom2)
-				.set('custom3', custom3)
-				.set('submitterEmail', this.submitterEmail_chartfield)
-				.set('startDate', this.startDate_chartfield.toLocaleDateString())
-				.set('expirationDate', (this.effectiveUntilDate_chartfield ? this.effectiveUntilDate_chartfield.toLocaleDateString() : ''))
-				.set('totalDollarAmountDisplay', this.totalDollarAmount_Chartfield)
-				.set('activeAccount', activeAccount)
-				.set('isPO', isPO);
+		let parameters: HttpParams = new HttpParams()
+			.set('idLab', idLab)
+			.set('coreFacilitiesXMLString', coreFacilitiesXMLString)
+			.set('coreFacilitiesJSONString', coreFacilitiesXMLString)
+			.set('accountName', this.formGroup.get('accountName').value)
+			.set('shortAcct', this.formGroup.get('shortAccountName').value)
+			.set('accountNumberBus', this.formGroup.get('chartfieldBus').value)
+			.set('accountNumberOrg', this.formGroup.get('chartfieldOrg').value)
+			.set('accountNumberFund', this.formGroup.get('chartfieldFund').value)
+			.set('accountNumberActivity', this.formGroup.get('chartfieldActivity').value)
+			.set('accountNumberProject', accountNumberProject)
+			.set('accountNumberAccount', accountNumberAccount)
+			.set('accountNumberAu', (this.formGroup.get('chartfieldActivity').value > 0 ? this.formGroup.get('chartfieldAccountAU').value : ''))
+			.set('idFundingAgency', idFundingAgency)
+			.set('custom1', custom1)
+			.set('custom2', custom2)
+			.set('custom3', custom3)
+			.set('submitterEmail', this.formGroup.get('email').value)
+			.set('startDate', this.formGroup.get('startDate').value)
+			.set('expirationDate', (this.formGroup.get('expirationDate').value ? this.formGroup.get('expirationDate').value : ''))
+			.set('totalDollarAmountDisplay', this.formGroup.get('totalDollarAmount').value)
+			.set('activeAccount', activeAccount)
+			.set('isPO', isPO);
 
 
-			// in original, called SubmitWorkAuthForm.gx with params :
-			//    idLab: "1507"
-			//    coreFacilitiesXMLString: "<coreFacilities> <CoreFacility ... /> </coreFacilities>"
-			//    accountName: "tempAccount"
-			//    shortAcct: ""
-			//    accountNumberBus: "01"
-			//    accountNumberOrg: "12345"
-			//    accountNumberFund: "1234"
-			//    accountNumberActivity: "12345"
-			//    accountNumberProject: ""
-			//    accountNumberAccount: "64300"
-			//    accountNumberAu: "1"
-			//    idFundingAgency: ""
-			//    custom1: ""
-			//    custom2: ""
-			//    custom3: ""
-			//    submitterEmail: "John.Hofer@hci.utah.edu"
-			//    startDate: "11/01/2017"
-			//    expirationDate: "03/01/2018"
-			//    totalDollarAmountDisplay: ""
-			//    activeAccount: "Y"
-			//    isPO: "N"
+		//  On the groups screen, the saving is done by SaveLab.gx
 
-			//  On the groups screen, the saving is done by SaveLab.gx
+		this.successMessage = 'Billing Account \"' + this.formGroup.get('accountName').value + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
 
-			this.successMessage = 'Billing Account \"' + this.accountName_Chartfield + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
+		//this.window.close();
+		this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe((result) => {
+			console.log('testing');
+			this.openSuccessDialog();
+		},(err:IGnomexErrorResponse) => {
+			this.dialogService.stopAllSpinnerDialogs();
+		});
 
-			//this.window.close();
-			this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe((result) => {
-				console.log('testing');
-				this.openSuccessDialog();
-			},(err:IGnomexErrorResponse) => {
-				this.dialogService.stopAllSpinnerDialogs();
-			});
-		} else {
-			// validation has caught problems - report them.
-			this.openErrorDialog();
-		}
 	}
 
-	private areChartfieldValuesValid(): boolean {
 
-		this.errorMessage = '';
-		let errorFound: boolean = false;
 
-		// let isLabInvalid: boolean = !(this.selectedLab != undefined && this.selectedLab != null && this.selectedLab !== '');
-		// let isCoreFacilitiesInvalid: boolean = !(this.selectedCoreFacilities.length > 0);
-		//
-		// console.log("selectedLab                                   invalid : " + isLabInvalid);
-		// console.log("selectedCoreFacilitiesString                  invalid : " + isCoreFacilitiesInvalid);
-		//
-		// console.log("accountNameFormControl_Chartfield             invalid : " + this.accountNameFormControl_Chartfield.invalid);
-		// console.log("shortNameFormControl_Chartfield               invalid : " + this.shortNameFormControl_Chartfield.invalid);
-		//
-		// console.log("accountNumberBusFormControl_chartfield        invalid : " + this.accountNumberBusFormControl_chartfield.invalid);
-		// console.log("accountNumberOrgFormControl_chartfield        invalid : " + this.accountNumberOrgFormControl_chartfield.invalid);
-		// console.log("accountNumberFundFormControl_chartfield       invalid : " + this.accountNumberFundFormControl_chartfield.invalid);
-		// console.log("accountNumberActivityFormControl_chartfield   invalid : " + this.accountNumberActivityFormControl_chartfield.invalid);
-		// console.log("accountNumberProjectFormControl_chartfield    invalid : " + this.accountNumberProjectFormControl_chartfield.invalid);
-		// console.log("accountNumberAccountFormControl_chartfield    invalid : " + this.accountNumberAccountFormControl_chartfield.invalid);
-		//
-		// for (let i: number = 0; i < this.InternalCustomFieldsFormControl.length; i++) {
-		// 	console.log("InternalCustomFieldsFormControl[" + i + "]            invalid : " + this.InternalCustomFieldsFormControl[i].invalid);
-		// }
-		//
-		// console.log("startDate_chartfield                          invalid : " + !(this.startDate_chartfield && this.startDate_chartfield.toLocaleDateString() != ''));
-		// console.log("effectiveUntilDate_chartfield                 invalid : " + !(this.effectiveUntilDate_chartfield && this.effectiveUntilDate_chartfield.toLocaleDateString() != ''));
-		//
-		// console.log("submitterEmailFormControl_chartfield          invalid : " + this.submitterEmailFormControl_chartfield.invalid);
-		//
-		// console.log("activeCheckBox_chartfield                     invalid : " + (false && this.activeCheckBox_chartfield));
-		//
-		// console.log("agreementCheckbox                             invalid : " + !this.agreementCheckbox.valueOf());
+	public onAccountTypeChange(event:any ){
+		//todo need to clear form and reset validators
+		console.log(event);
+		this.handleConditionalValidators();
 
-		if (!(this.selectedLab !== undefined && this.selectedLab != null && this.selectedLab !== '')) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please select a Lab\n';
-		}
-		if (!this.selectedCoreFacilities.length) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please select one or more Core Facilities\n';
-		}
-
-		if (this.accountNameFormControl_Chartfield.invalid) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please provide a name for your account\n';
-		}
-		if (this.shortNameFormControl_Chartfield.invalid) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Error with short account name\n';
-		}
-
-		if (!this.usesCustomChartfields) {
-			if (this.accountNumberBusFormControl_chartfield.invalid) {
-				errorFound = errorFound || true;
-				this.errorMessage += '- "Bus" must be 2 digits\n';
-			}
-			if (this.accountNumberOrgFormControl_chartfield.invalid) {
-				errorFound = errorFound || true;
-				this.errorMessage += '- "Org" must be 5 digits\n';
-			}
-			if (this.accountNumberFundFormControl_chartfield.invalid) {
-				errorFound = errorFound || true;
-				this.errorMessage += '- "Fund" must be 4 digits\n';
-			}
-			if (this.accountNumberActivity_Chartfield.length === 0 && this.accountNumberProject_Chartfield.length === 0) {
-				errorFound = errorFound || true;
-				this.errorMessage += '- Please enter either an "Activity" or "Project" number\n';
-			} else if (this.accountNumberActivity_Chartfield.length > 0 && this.accountNumberProject_Chartfield.length > 0) {
-				errorFound = errorFound || true;
-				this.errorMessage += '- Can only have one of "Activity" or "Project" numbers\n';
-			} else {
-				if (this.accountNumberActivityFormControl_chartfield.invalid) {
-					errorFound = errorFound || true;
-					this.errorMessage += '- "Activity" must be 5 digits\n';
-				}
-				if (this.accountNumberProjectFormControl_chartfield.invalid) {
-					errorFound = errorFound || true;
-					this.errorMessage += '- "Project" must be 5 digits\n';
-				}
-			}
-			if (this.accountNumberAccountFormControl_chartfield.invalid) {
-				errorFound = errorFound || true;
-				this.errorMessage += '- "Account" must be 5 digits\n';
-			}
-		} else {
-			for (let i: number = 0; i < this.InternalCustomFieldsFormControl.length; i++) {
-				if (this.InternalCustomFieldsFormControl[i].invalid) {
-					errorFound = errorFound || true;
-					this.errorMessage += '- "' + this.internalAccountFieldsConfiguration[i].displayName + '" must be 5 digits\n';
-				}
-			}
-		}
-		if (!((this.usesCustomChartfields && !this.includeInCustomField_startDate)
-			|| (this.startDate_chartfield && this.startDate_chartfield.toLocaleDateString() !== ''))) {
-
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please pick a start date\n';
-		}
-		if (!((this.usesCustomChartfields && !this.includeInCustomField_startDate && !this.includeInCustomField_expirationDate)
-			|| (this.effectiveUntilDate_chartfield && this.effectiveUntilDate_chartfield.toLocaleDateString() !== ''))) {
-
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please pick an expiration date\n';
-		}
-
-		if(this.totalDollarAmountFormControl_chartfield.invalid) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please enter an valid dollar limit\n';
-		}
-
-		if (this.submitterEmailFormControl_chartfield.invalid) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please enter an email address you can be reached at\n';
-		}
-
-		if (!this.agreementCheckbox.valueOf()) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please agree to the terms and conditions.\n';
-		}
-
-		return !errorFound;
 	}
 
 	private savePo(): void {
 		let isPO: string = (this.showField === this.PO) ? 'Y' : 'N';
 		let isCreditCard: string = (this.showField === this.CREDIT_CARD) ? 'Y' : 'N';
-		let idLab: string = !this.selectedLab ? '' : '' + this.selectedLab.idLab;
+		let idLab: string = !this.formGroup.get('lab').value ? '' : '' +this.formGroup.get('lab').value.idLab;
 
 		let coreFacilitiesXMLString: string = "";
 		let coreFacilities:any[] = [];
 
 		let idFundingAgency: string = "";
 
-		let startDate: string = (this.startDate_po ? this.startDate_po.toLocaleDateString() : '');
-		let expirationDate: string = (this.expirationDate_po ? this.expirationDate_po.toLocaleDateString() : '');
+		let startDate: string = this.formGroup.get('startDate').value;
+		let expirationDate: string = this.formGroup.get('expirationDate').value ? this.formGroup.get('expirationDate').value : '' ;
 
 		let activeAccount: string = "";
 
@@ -898,122 +771,52 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			coreFacilitiesXMLString = JSON.stringify(coreFacilities);
 		}
 
-		if (!!this.selectedFundingAgency_po && this.showFundingAgencies) {
-			idFundingAgency = this.selectedFundingAgency_po;
+		if (!!this.formGroup.get('idFundingAgency').value && this.showFundingAgencies) {
+			idFundingAgency = this.formGroup.get('idFundingAgency').value;
 		}
 
-		if (this.activeCheckBox_po != null) {
-			if (this.activeCheckBox_po) {
+		if (this.formGroup.get("active").value != null) {
+			if (this.formGroup.get("active").value) {
 				activeAccount = 'Y';
 			} else {
 				activeAccount = 'N';
 			}
 		}
 
-		// console.log("" +
-		// 		"You clicked the save button with parameters : \n" +
-		// 		"    idLab                    : " + idLab + "\n" +
-		// 		"    coreFacilitiesXMLString  : " + coreFacilitiesXMLString + "\n" +
-		// 		"    accountName              : " + this.accountName_po + "\n" +
-		// 		"    shortAcct                : " + this.shortAccountName_po + "\n" +
-		// 		"    idFundingAgency          : " + idFundingAgency + "\n" +
-		// 		"    custom1                  : " + custom1 + "\n" +
-		// 		"    custom2                  : " + custom2 + "\n" +
-		// 		"    custom3                  : " + custom3 + "\n" +
-		// 		"    submitterEmail           : " + this.submitterEmail_po + "\n" +
-		// 		"    startDate                : " + startDate + "\n" +
-		// 		"    expirationDate           : " + expirationDate + "\n" +
-		// 		"    totalDollarAmountDisplay : " + this.totalDollarAmount_po + "\n" +
-		// 		"    activeAccount            : " + activeAccount + "\n" +
-		// 		"    isPO                     : " + isPO + "\n" +
-		// 		"    isCreditCard             : " + isCreditCard + "\n"
-		// );
 
-		if (this.arePoValuesValid()) {
-			let parameters: HttpParams = new HttpParams()
-				.set('idLab', idLab)
-				.set('coreFacilitiesXMLString', coreFacilitiesXMLString)
-				.set('coreFacilitiesJSONString', coreFacilitiesXMLString)
-				.set('accountName', this.accountName_po)
-				.set('shortAcct', this.shortAccountName_po)
-				.set('idFundingAgency', idFundingAgency)
-				.set('custom1', custom1)
-				.set('custom2', custom2)
-				.set('custom3', custom3)
-				.set('submitterEmail', this.submitterEmail_po)
-				.set('startDate', startDate)
-				.set('expirationDate', expirationDate)
-				.set('totalDollarAmountDisplay', this.totalDollarAmount_po)
-				.set('activeAccount', activeAccount)
-				.set('isPO', isPO)
-				.set('isCreditCard', isCreditCard);
+		let parameters: HttpParams = new HttpParams()
+			.set('idLab', idLab)
+			.set('coreFacilitiesXMLString', coreFacilitiesXMLString)
+			.set('coreFacilitiesJSONString', coreFacilitiesXMLString)
+			.set('accountName', this.formGroup.get('accountName').value)
+			.set('shortAcct', this.formGroup.get('shortAccountName').value)
+			.set('idFundingAgency', idFundingAgency)
+			.set('custom1', custom1)
+			.set('custom2', custom2)
+			.set('custom3', custom3)
+			.set('submitterEmail', this.formGroup.get('email').value)
+			.set('startDate', startDate)
+			.set('expirationDate', expirationDate)
+			.set('totalDollarAmountDisplay', this.formGroup.get('totalDollarAmount').value)
+			.set('activeAccount', activeAccount)
+			.set('isPO', isPO)
+			.set('isCreditCard', isCreditCard);
 
-			this.successMessage = 'Billing Account \"' + this.accountName_po + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
+		this.successMessage = 'Billing Account \"' + this.formGroup.get('accountName').value+ '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
 
-			this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe(() => {
-				this.openSuccessDialog();
-			},(err:IGnomexErrorResponse) => {
-				this.dialogService.stopAllSpinnerDialogs();
-			});
-		} else {
-			// validation has caught problems - report them.
-			this.openErrorDialog();
-		}
+		this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe(() => {
+			this.openSuccessDialog();
+		},(err:IGnomexErrorResponse) => {
+			this.dialogService.stopAllSpinnerDialogs();
+		});
+
 	}
 
-	private arePoValuesValid(): boolean {
-		this.errorMessage = '';
-		let errorFound: boolean = false;
-
-		if (!(this.selectedLab !== undefined && this.selectedLab != null && this.selectedLab !== '')) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please select a Lab\n';
-		}
-		if (!this.selectedCoreFacilities.length) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please select one or more Core Facilities\n';
-		}
-
-		if (this.accountNameFormControl_po.invalid) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please provide a name for your account\n';
-		}
-		if (this.shortNameFormControl_po.invalid) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Error with short account name\n';
-		}
-
-		if (!(this.startDate_po && this.startDate_po.toLocaleDateString() !== '')) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please pick a start date\n';
-		}
-		if (!(this.expirationDate_po && this.expirationDate_po.toLocaleDateString() !== '')) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please pick an expiration date\n';
-		}
-
-		if(this.totalDollarAmountFormControl_po.invalid) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please enter an valid dollar limit\n';
-		}
-
-		if (this.submitterEmailFormControl_po.invalid) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please enter an email address you can be reached at\n';
-		}
-
-		if (!this.agreementCheckbox.valueOf()) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please agree to the terms and conditions.\n';
-		}
-
-		return !errorFound;
-	}
 
 	private saveCreditCard(): void {
 		let isPO: string = (this.showField === this.PO) ? 'Y' : 'N';
 		let isCreditCard: string = (this.showField === this.CREDIT_CARD) ? 'Y' : 'N';
-		let idLab: string = !this.selectedLab ? '' : '' + this.selectedLab.idLab;
+		let idLab: string = !this.formGroup.get('lab').value ? '' : '' + this.formGroup.get('lab').value.idLab;
 
 		let coreFacilitiesXMLString: string = "";
 		let coreFacilities:any[] = [];
@@ -1022,13 +825,13 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 
 		let idFundingAgency: string = "";
 
-		let startDate: string = !!this.startDate_creditcard ? this.startDate_creditcard.toLocaleDateString() : '';
-		let expirationDate: string = !!this.expirationDate_creditcard ? this.expirationDate_creditcard.toLocaleDateString() : '';
+		let startDate: string = this.formGroup.get('startDate').value;
+		let expirationDate: string = this.formGroup.get('expirationDate').value ? this.formGroup.get('expirationDate').value : '';
 
-		let idCreditCardCompany: string = '' + this.selectedCreditCardCompany;
+		let idCreditCardCompany: string = '' + this.formGroup.get('idCreditCardCompany').value;
 
-		let totalDollarAmountDisplay: string = "" + this.totalDollarAmount_creditCard;
-		let submitterEmail: string = "" + this.submitterEmail_creditcard;
+		let totalDollarAmountDisplay: string = "" + this.formGroup.get('totalDollarAmount').value;
+		let submitterEmail: string = this.formGroup.get('email').value;
 		let activeAccount: string = "";
 
 		// The custom fields only displayed in the flex version of GNomEx if there were certain entries in the
@@ -1059,126 +862,49 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			coreFacilitiesXMLString = JSON.stringify(coreFacilities);
 		}
 
-		if (!!this.selectedFundingAgency_creditCard && this.showFundingAgencies) {
-			idFundingAgency = this.selectedFundingAgency_creditCard;
+		if (!!this.formGroup.get('idFundingAgency').value && this.showFundingAgencies) {
+			idFundingAgency = this.formGroup.get('idFundingAgency').value;
 		}
 
-		if (this.activeCheckBox_creditcard != null) {
-			if (this.activeCheckBox_creditcard) {
+		if (this.formGroup.get("active").value != null) {
+			if (this.formGroup.get("active").value) {
 				activeAccount = 'Y';
 			} else {
 				activeAccount = 'N';
 			}
 		}
 
-		// console.log("" +
-		// 		"You clicked the save button with parameters : \n" +
-		// 		"    idLab                    : " + idLab + "\n" +
-		// 		"    coreFacilitiesXMLString  : " + coreFacilitiesXMLString + "\n" +
-		// 		"    accountName              : " + this.accountName_creditCard + "\n" +
-		// 		"    shortAcct                : " + shortAcct + "\n" +
-		// 		"    idFundingAgency          : " + idFundingAgency + "\n" +
-		// 		"    custom1                  : " + custom1 + "\n" +
-		// 		"    custom2                  : " + custom2 + "\n" +
-		// 		"    custom3                  : " + custom3 + "\n" +
-		// 		"    submitterEmail           : " + submitterEmail + "\n" +
-		// 		"    idCreditCardCompany      : " + idCreditCardCompany + "\n" +
-		// 		"    zipCode                  : " + this.zipCodeInput_creditCard + "\n" +
-		// 		"    startDate                : " + startDate + "\n" +
-		// 		"    expirationDate           : " + expirationDate + "\n" +
-		// 		"    totalDollarAmountDisplay : " + this.totalDollarAmount_po + "\n" +
-		// 		"    activeAccount            : " + activeAccount + "\n" +
-		// 		"    isPO                     : " + isPO + "\n" +
-		// 		"    isCreditCard             : " + isCreditCard + "\n");
 
-		if (this.areCreditCardValuesValid()) {
-			let parameters: HttpParams = new HttpParams()
-				.set('idLab', idLab)
-				.set('coreFacilitiesXMLString', coreFacilitiesXMLString)
-				.set('coreFacilitiesJSONString', coreFacilitiesXMLString)
-				.set('accountName', this.accountName_creditCard)
-				.set('shortAcct', shortAcct)
-				.set('idFundingAgency', idFundingAgency)
-				.set('custom1', custom1)
-				.set('custom2', custom2)
-				.set('custom3', custom3)
-				.set('submitterEmail', submitterEmail)
-				.set('idCreditCardCompany', idCreditCardCompany)
-				.set('zipCode', this.zipCodeInput_creditCard)
-				.set('startDate', startDate)
-				.set('expirationDate', expirationDate)
-				.set('totalDollarAmountDisplay', totalDollarAmountDisplay)
-				.set('activeAccount', activeAccount)
-				.set('isPO', isPO)
-				.set('isCreditCard', isCreditCard);
+		let parameters: HttpParams = new HttpParams()
+			.set('idLab', idLab)
+			.set('coreFacilitiesXMLString', coreFacilitiesXMLString)
+			.set('coreFacilitiesJSONString', coreFacilitiesXMLString)
+			.set('accountName', this.formGroup.get('accountName').value)
+			.set('shortAcct', shortAcct)
+			.set('idFundingAgency', idFundingAgency)
+			.set('custom1', custom1)
+			.set('custom2', custom2)
+			.set('custom3', custom3)
+			.set('submitterEmail', submitterEmail)
+			.set('idCreditCardCompany', idCreditCardCompany)
+			.set('zipCode', this.formGroup.get('creditZipCode').value)
+			.set('startDate', startDate)
+			.set('expirationDate', expirationDate)
+			.set('totalDollarAmountDisplay', totalDollarAmountDisplay)
+			.set('activeAccount', activeAccount)
+			.set('isPO', isPO)
+			.set('isCreditCard', isCreditCard);
 
-			this.successMessage = 'Billing Account \"' + this.accountName_creditCard + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
+		this.successMessage = 'Billing Account \"' + this.formGroup.get('accountName').value + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
 
-			this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe(() => {
-				this.openSuccessDialog();
-			}, (err: IGnomexErrorResponse) => {
-				this.dialogService.stopAllSpinnerDialogs();
-			});
-		} else {
-			// validation has caught problems - report them.
-			this.openErrorDialog();
-		}
+		this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe(() => {
+			this.openSuccessDialog();
+		}, (err: IGnomexErrorResponse) => {
+			this.dialogService.stopAllSpinnerDialogs();
+		});
+
 	}
 
-	private areCreditCardValuesValid(): boolean {
-		this.errorMessage = '';
-		let errorFound: boolean = false;
-
-		if (!(this.selectedLab !== undefined && this.selectedLab != null && this.selectedLab !== '')) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please select a Lab\n';
-		}
-		if (!this.selectedCoreFacilities.length) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please select one or more Core Facilities\n';
-		}
-
-		if (this.accountNameFormControl_creditCard.invalid) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please provide a name for your account\n';
-		}
-
-		if (!(this.startDate_creditcard && this.startDate_creditcard.toLocaleDateString() !== '')) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please pick a start date\n';
-		}
-		if (!(this.expirationDate_creditcard && this.expirationDate_creditcard.toLocaleDateString() !== '')) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please pick an expiration date\n';
-		}
-
-		if (this.zipCodeInputFormControl_creditCard.invalid) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please enter an valid zip code\n';
-		}
-
-		if (!this.selectedCreditCardCompany) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please choose your credit card company\n';
-		}
-
-		if (this.totalDollarAmountFormControl_creditCard.invalid) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please enter an valid dollar limit\n';
-		}
-
-		if (this.submitterEmailFormControl_creditcard.invalid) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please enter an email address you can be reached at\n';
-		}
-
-		if (!this.agreementCheckbox.valueOf()) {
-			errorFound = errorFound || true;
-			this.errorMessage += '- Please agree to the terms and conditions.\n';
-		}
-
-		return !errorFound;
-	}
 
 	private onLabListSelection(event: any): void {
 		let coreFacilityApplicable: any[] = [];
@@ -1196,9 +922,8 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 						}
 					}
 				} else {
-					if (coreFacilities.CoreFacility !== undefined && coreFacilities.CoreFacility != null) {
-						if (coreFacilities.CoreFacility.acceptOnlineWorkAuth != null
-							&& coreFacilities.CoreFacility.acceptOnlineWorkAuth !== undefined
+					if (coreFacilities.CoreFacility) {
+						if (coreFacilities.CoreFacility.acceptOnlineWorkAuth
 							&& coreFacilities.CoreFacility.acceptOnlineWorkAuth === 'Y') {
 							coreFacilityApplicable.push(coreFacilities.CoreFacility);
 						}
@@ -1280,15 +1005,15 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 	}
 
 	private clearAccountNumberActivity(): void {
-		if (this.showField === this.CHARTFIELD && this.accountNumberProject_Chartfield !== '') {
-			this.accountNumberActivity_Chartfield = '';
+		if (this.showField === this.CHARTFIELD && this.formGroup.get('chartfieldProject').value !== '') {
+			this.formGroup.get('chartfieldActivity').setValue('');
 			this.isActivity = false;
 		}
 	}
 
 	private clearAccountNumberProject(): void {
-		if (this.showField === this.CHARTFIELD && this.accountNumberActivity_Chartfield !== '')  {
-			this.accountNumberProject_Chartfield = '';
+		if (this.showField === this.CHARTFIELD && this.formGroup.get('chartfieldActivity').value !== '')  {
+			this.formGroup.get('chartfieldProject').setValue( '');
 			this.isActivity = true;
 		}
 	}

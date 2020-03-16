@@ -405,6 +405,19 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 disabled: true,
                 component: TabSampleSetupViewComponent
             });
+
+            if (this.annotationInputs
+                && this.annotationInputs.annotations
+                && Array.isArray(this.annotationInputs.annotations)
+                && this.annotationInputs.annotations.length) {
+
+                this.tabs.push({
+                    label: "Other Details",
+                    disabled: true,
+                    component: AnnotationTabComponent
+                });
+            }
+
             this.tabs.push({
                 label: "Samples",
                 disabled: true,

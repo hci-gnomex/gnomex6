@@ -42,14 +42,10 @@ import {DistributeDatatrackDialogComponent} from "./distribute-datatrack-dialog.
         min-width: 0!important;
         font-size: 12px!important;
         }
-        
-        .label-title{
-            margin-top: 0.2rem;
-            margin-bottom: 0;
-        }
 
-        .label-title-width {
-            width: 25rem;
+        .label-min-width {
+            min-width: 20rem;
+            width: 20rem;
         }
     `]
 })
@@ -105,7 +101,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
             this.analysisService.analysisOverviewForm.reset();
             this.analysis = data.analysis ? data.analysis.Analysis : null;
             if(this.analysis) {
-                let annots = this.analysis.AnalysisProperties;
+                let annots = this.analysis.AnalysisProperties ? (this.analysis.AnalysisProperties.PropertyEntry ? this.analysis.AnalysisProperties.PropertyEntry : this.analysis.AnalysisProperties) : "";
                 this.showRelatedDataTab = this.initRelatedData(this.analysis);
                 this.showLinkToExp = !this.secAdvisor.isGuest && this.analysis.canRead === "Y";
                 this.showEdit = this.analysis.canUpdate === "Y" && !this.fromTopic;

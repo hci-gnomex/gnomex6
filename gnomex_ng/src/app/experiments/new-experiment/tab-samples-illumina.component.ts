@@ -31,7 +31,6 @@ import {GridApi, SelectionChangedEvent} from "ag-grid-community";
 import {SampleUploadService} from "../../upload/sample-upload.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
-import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
 @Component({
     selector: "tab-samples-illumina",
@@ -949,6 +948,23 @@ export class TabSamplesIlluminaComponent implements OnInit {
             }
         }
 
+        if (this.showDescription) {
+            temp.push({
+                headerName: "Description",
+                field: "description",
+                width:    9 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 12 * this.emToPxConversionRate,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                suppressSizeToFit: true,
+                editable: true,
+                showFillButton: true,
+                fillGroupAttribute: 'frontEndGridGroup',
+                sortOrder: 325
+            });
+        }
+
         return temp;
     }
 
@@ -1389,24 +1405,41 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 && this._experiment.requestCategory
                 && this._experiment.requestCategory.type !== NewExperimentService.TYPE_GENERIC
                 && !this.usingPlates) {
-
-                temp.push({
-                    headerName: "QC Status",
-                    field: "qualStatus",
-                    width:    8.5 * this.emToPxConversionRate,
-                    minWidth: 8.5 * this.emToPxConversionRate,
-                    maxWidth: 10 * this.emToPxConversionRate,
-                    cellRendererFramework: SelectRenderer,
-                    cellEditorFramework: SelectEditor,
-                    selectOptions: this.workflowStatus,
-                    selectOptionsDisplayField: "display",
-                    selectOptionsValueField: "value",
-                    suppressSizeToFit: true,
-                    editable: true,
-                    showFillButton: true,
-                    fillGroupAttribute: 'frontEndGridGroup',
-                    sortOrder: 500
-                });
+                    if (this.showQCStatus) {
+                        temp.push({
+                            headerName: "QC Status",
+                            field: "qualStatus",
+                            width: 8.5 * this.emToPxConversionRate,
+                            minWidth: 8.5 * this.emToPxConversionRate,
+                            maxWidth: 10 * this.emToPxConversionRate,
+                            cellRendererFramework: SelectRenderer,
+                            cellEditorFramework: SelectEditor,
+                            selectOptions: this.workflowStatus,
+                            selectOptionsDisplayField: "display",
+                            selectOptionsValueField: "value",
+                            suppressSizeToFit: true,
+                            editable: true,
+                            showFillButton: true,
+                            fillGroupAttribute: 'frontEndGridGroup',
+                            sortOrder: 500
+                        });
+                    }
+                    if (this.showDescription) {
+                        temp.push({
+                            headerName: "Description",
+                            field: "description",
+                            width:    9 * this.emToPxConversionRate,
+                            minWidth: 8.5 * this.emToPxConversionRate,
+                            maxWidth: 12 * this.emToPxConversionRate,
+                            cellRendererFramework: TextAlignLeftMiddleRenderer,
+                            cellEditorFramework: TextAlignLeftMiddleEditor,
+                            suppressSizeToFit: true,
+                            editable: true,
+                            showFillButton: true,
+                            fillGroupAttribute: 'frontEndGridGroup',
+                            sortOrder: 510
+                        });
+                    }
             }
         }
 
@@ -1714,9 +1747,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 temp.push({
                     headerName: "Description",
                     field: "description",
-                    width:    8.5 * this.emToPxConversionRate,
+                    width:    9 * this.emToPxConversionRate,
                     minWidth: 8.5 * this.emToPxConversionRate,
-                    maxWidth: 10 * this.emToPxConversionRate,
+                    maxWidth: 12 * this.emToPxConversionRate,
                     suppressSizeToFit: true,
                     editable: false,
                     cellRendererFramework: TextAlignLeftMiddleRenderer
@@ -1782,20 +1815,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
         this.samplesGridColumnDefs = TabSamplesIlluminaComponent.sortColumns(this.defaultSampleColumnDefinitions);
         this.nodeChildDetails = this.getItemNodeChildDetails;
 
-        setTimeout(() => {
-            this.dialogService.startDefaultSpinnerDialog();
-        });
+        this.rebuildColumnDefinitions();
 
-        this.annotationService.getPropertyList().subscribe((result) => {
-            this.propertyList = result;
-            this.rebuildColumnDefinitions();
-
-            this.dialogService.stopAllSpinnerDialogs();
-        }, (err: IGnomexErrorResponse) => {
-            this.dialogService.stopAllSpinnerDialogs();
-        });
-
-        // this.sampleTypes = this.samplesService.filterSampleTypes(this.dictionaryService.getEntries("hci.gnomex.model.SampleType"), null);
         this.loadSampleTypes();
         this.showHideColumns();
 
@@ -1991,10 +2012,14 @@ export class TabSamplesIlluminaComponent implements OnInit {
         if (temp && this._experiment
             && this._experiment.requestCategory
             && this._experiment.requestCategory.type !== NewExperimentService.TYPE_QC
+            && this._experiment.requestCategory.type !== NewExperimentService.TYPE_CAP_SEQ
+            && this._experiment.requestCategory.type !== NewExperimentService.TYPE_FRAG_ANAL
+            && this._experiment.requestCategory.type !== NewExperimentService.TYPE_MIT_SEQ
+            && this._experiment.requestCategory.type !== NewExperimentService.TYPE_CHERRY_PICK
             && this._experiment.requestCategory.type !== NewExperimentService.TYPE_GENERIC) {
 
             for (let sampleAnnotation of this._experiment.getSelectedSampleAnnotations()) {
-                let fullProperty = this.propertyList.filter((value: any) => {
+                let fullProperty = this.gnomexService.propertyList.filter((value: any) => {
                     return value.idProperty === sampleAnnotation.idProperty;
                 });
 
@@ -2203,10 +2228,14 @@ export class TabSamplesIlluminaComponent implements OnInit {
             if (temp && this._experiment
                 && this._experiment.requestCategory
                 && this._experiment.requestCategory.type !== NewExperimentService.TYPE_QC
+                && this._experiment.requestCategory.type !== NewExperimentService.TYPE_CAP_SEQ
+                && this._experiment.requestCategory.type !== NewExperimentService.TYPE_FRAG_ANAL
+                && this._experiment.requestCategory.type !== NewExperimentService.TYPE_MIT_SEQ
+                && this._experiment.requestCategory.type !== NewExperimentService.TYPE_CHERRY_PICK
                 && this._experiment.requestCategory.type !== NewExperimentService.TYPE_GENERIC) {
 
                 for (let sampleAnnotation of this._experiment.getSelectedSampleAnnotations()) {
-                    let fullProperty = this.propertyList.filter((value: any) => {
+                    let fullProperty = this.gnomexService.propertyList.filter((value: any) => {
                         return value.idProperty === sampleAnnotation.idProperty;
                     });
 

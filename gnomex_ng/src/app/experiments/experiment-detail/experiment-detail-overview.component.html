@@ -49,7 +49,10 @@
                 <related-data-tab [relatedObjects]="relatedObjects" ></related-data-tab>
             </mat-tab>
             <mat-tab label="Other Details" *ngIf="annotations && annotations.length > 0">
-                <annotation-tab [annotations]="annotations" [disabled]="false" [orderType]="types.EXPERIMENT"> </annotation-tab>
+                <annotation-tab [annotations]="annotations" [disabled]="!isEditMode" [orderType]="types.EXPERIMENT" [showConfigureAnnotationsButton]="false"> </annotation-tab>
+            </mat-tab>
+            <mat-tab label="Annotations" *ngIf="isEditMode && showAnnotationsTab">
+                <tab-annotation-view [experiment]="_experiment"> </tab-annotation-view>
             </mat-tab>
             <mat-tab label="Experiment Design">
                  <tab-samples-illumina #tabSamplesIlluminaComponent [experiment]="_experiment" [stateChangeSubject]="modeSubject"></tab-samples-illumina>
