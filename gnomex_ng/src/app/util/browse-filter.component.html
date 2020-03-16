@@ -53,13 +53,14 @@
                                       (optionSelected)="onLabSelect($event)">
                     </custom-combo-box>
                 </div>
-                <div *ngIf="showOwnerComboBox && idLabString" class="flex-container-row align-center children-spaced">
+                <div *ngIf="showOwnerComboBox && selectedLab" class="flex-container-row align-center children-spaced">
                     <label>Owner/Submitter</label>
                     <custom-combo-box [options]="this.ownerList"
                                       placeholder="Select an Owner..."
                                       [temporaryPlaceholder]="true"
                                       valueField="idAppUser"
                                       [displayField]="this.prefService.userDisplayField"
+                                      [(ngModel)]="selectedOwner"
                                       (optionSelected)="onAppUserSelect($event)">
                     </custom-combo-box>
                 </div>
@@ -76,14 +77,16 @@
                                   [temporaryPlaceholder]="true"
                                   valueField="idOrganism"
                                   displayField="display"
+                                  [(ngModel)]="selectedOrganism"
                                   (optionSelected)="onOrganismSelect($event)">
                 </custom-combo-box>
-                <div class="flex-container-row align-center" *ngIf="showGenomeBuildComboBox && idOrganismString">
+                <div class="flex-container-row align-center" *ngIf="showGenomeBuildComboBox && selectedOrganism">
                     <custom-combo-box [options]="this.genomeBuildList"
                                       placeholder="Genome Build..."
                                       [temporaryPlaceholder]="true"
                                       valueField="idGenomeBuild"
                                       displayField="display"
+                                      [(ngModel)]="selectedGenomeBuild"
                                       (optionSelected)="onGenomeBuildSelect($event)">
                     </custom-combo-box>
                 </div>
@@ -151,6 +154,7 @@
             <custom-multi-combo-box [options]="labList"
                                     [displayField]="this.prefService.labDisplayField"
                                     [valueField]="'idLab'"
+                                    [(ngModel)]="selectedLabs"
                                     (selectionChanged)="onMultiLabChange($event)">
             </custom-multi-combo-box>
         </div>
@@ -160,6 +164,7 @@
                           [temporaryPlaceholder]="true"
                           valueField="idAppUser"
                           [displayField]="this.prefService.userDisplayField"
+                          [(ngModel)]="selectedLabMember"
                           (optionSelected)="onAppUserSelect($event)">
         </custom-combo-box>
         <div class="inlineDiv children-spaced" *ngIf="showCoreFacilityComboBox">
@@ -168,14 +173,16 @@
                               [temporaryPlaceholder]="true"
                               valueField="idCoreFacility"
                               displayField="display"
+                              [(ngModel)]="selectedCoreFacility"
                               (optionSelected)="onCoreFacilitySelect($event)">
             </custom-combo-box>
-            <custom-combo-box *ngIf="showRequestCategoryComboBox && idCoreFacilityString"
+            <custom-combo-box *ngIf="showRequestCategoryComboBox && selectedCoreFacility"
                               [options]="this.requestCategoryList"
                               placeholder="Experiment type..."
                               [temporaryPlaceholder]="true"
                               valueField="codeRequestCategory"
                               displayField="display"
+                              [(ngModel)]="selectedRequestCategory"
                               (optionSelected)="onRequestCategorySelect($event)">
             </custom-combo-box>
         </div>

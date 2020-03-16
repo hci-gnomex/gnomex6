@@ -15,7 +15,7 @@ export class DatatrackResolverService implements Resolve<any> {
         let segGroup  = (<UrlTree>this.router.parseUrl(this.router.url)).root.children["modal"];
         if(!segGroup) {
             let ids: HttpParams = new HttpParams();
-            let idDataTrack = route.params["id"];
+            let idDataTrack = route.params["idDataTrack"];
             ids = ids.set("idDataTrack", idDataTrack);
             if(idDataTrack) {
                 return this.datatrackService.getDataTrack(ids);

@@ -19,11 +19,28 @@ import {DatatracksDetailOverviewComponent} from "./datatracks-detail/datatrack-d
  * @since 12/19/16
  */
 const ROUTES: Routes = [
-    { path: "datatracks", component: BrowseDatatracksComponent, children:[
-        {path:'organism',component: DatatracksOrganismComponent, outlet: 'datatracksPanel'},
-        {path:'genomeBuild',component:DatatracksGenomeBuildComponent, outlet:'datatracksPanel',resolve: {genomeBuild: GenomeBuildResolverService}},
-        {path:'folder',component: DatatracksFolderComponent , outlet: 'datatracksPanel'},
-        {path:':id', component: DatatracksDetailOverviewComponent, outlet: 'datatracksPanel',resolve: {datatrack: DatatrackResolverService }, runGuardsAndResolvers: "always"}
+    {
+        path: "datatracks", component: BrowseDatatracksComponent, children:[
+            {
+                path:'organism',
+                component: DatatracksOrganismComponent
+            },
+            {
+                path:'genomebuild',
+                component:DatatracksGenomeBuildComponent,
+                resolve: {genomeBuild: GenomeBuildResolverService},
+                runGuardsAndResolvers: "always"
+            },
+            {
+                path:'folder',
+                component: DatatracksFolderComponent
+            },
+            {
+                path:'detail/:idDataTrack',
+                component: DatatracksDetailOverviewComponent,
+                resolve: {datatrack: DatatrackResolverService },
+                runGuardsAndResolvers: "always"
+            }
         ],
         canActivate: [SubRouteGuardService]
     }

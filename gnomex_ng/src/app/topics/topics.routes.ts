@@ -22,10 +22,10 @@ import {ExperimentDetailOverviewComponent} from "../experiments/experiment-detai
  */
 const ROUTES: Routes = [
     { path: "topics", component: BrowseTopicsComponent, children:[
-            {path:':idLab', component: TopicDetailComponent, outlet: 'topicsPanel', resolve: {topicLab: LabResolverService}, runGuardsAndResolvers: 'always'},
-            {path: 'experiment/:id', component: ExperimentDetailOverviewComponent, outlet: 'topicsPanel',resolve: {experiment: ExperimentResolverService}},
-            {path: 'datatrack/:id', component: DatatracksDetailOverviewComponent , data:{fromTopic:true}, outlet: 'topicsPanel', resolve:{datatrack:DatatrackResolverService}},
-            {path: 'analysis/:idAnalysis', component: AnalysisDetailOverviewComponent, outlet: 'topicsPanel', resolve: {analysis: AnalysisResolverService }},
+            {path:'detail/:idLab', component: TopicDetailComponent, data:{fromTopic:true}, resolve: {topicLab: LabResolverService}, runGuardsAndResolvers: 'always'},
+            {path: 'experiment/:idRequest', component: ExperimentDetailOverviewComponent, data:{fromTopic:true} ,resolve: {experiment: ExperimentResolverService}},
+            {path: 'datatrack/:idDataTrack', component: DatatracksDetailOverviewComponent , data:{fromTopic:true}, resolve:{datatrack:DatatrackResolverService}},
+            {path: 'analysis/:idAnalysis', component: AnalysisDetailOverviewComponent, data:{fromTopic:true}, resolve: {analysis: AnalysisResolverService }},
         ],
         canActivate: [SubRouteGuardService]
     }

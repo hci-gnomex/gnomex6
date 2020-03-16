@@ -14,7 +14,11 @@ export class TopicService {
     public startSearchSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
     private _previousURLParams: HttpParams = null;
     private topicsListSubject: Subject<any[]> = new Subject();
-    private topicTreeNodeSubject: BehaviorSubject<any> = new BehaviorSubject({});
+    private topicTreeNodeSubject: BehaviorSubject<any> = new BehaviorSubject(null);
+    public static readonly DATATRACK : string = 'datatrack';
+    public static readonly ANALYSIS : string = 'analysis';
+    public static readonly EXPERIMENT: string = 'experiment';
+    public static readonly TOPIC: string = 'detail';
 
     public topicsList: any[];
 
