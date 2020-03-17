@@ -13,7 +13,7 @@ import {GenomeBuildResolverService} from "../../services/resolvers/genome-build-
     selector: 'datatracks-panel',
     template: `        
         <div style="height:100%;">
-            <router-outlet name="datatracksPanel"></router-outlet>
+            <router-outlet></router-outlet>
         </div>
 `
 })

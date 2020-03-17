@@ -10,6 +10,7 @@ import {CreateSecurityAdvisorService} from "./services/create-security-advisor.s
 import {ProgressService} from "./home/progress.service";
 import {DictionaryService} from "./services/dictionary.service";
 import {AuthenticationService} from "./auth/authentication.service";
+import {NavigationService} from "./services/navigation.service";
 
 /**
  * The gnomex application component.
@@ -35,7 +36,9 @@ export class GnomexAppComponent implements OnInit {
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dictionaryService: DictionaryService,
                 private http: Http,
-                private progressService: ProgressService) {
+                private progressService: ProgressService,
+                private navService: NavigationService) {
+        navService.trackNavState();
     }
 
 
@@ -48,9 +51,4 @@ export class GnomexAppComponent implements OnInit {
 
     }
 
-    searchFn(): (keywords: string) => void {
-        return (keywords) => {
-            window.location.href = "http://localhost/gnomex/experiments/"+keywords;
-        };
-    }
 }

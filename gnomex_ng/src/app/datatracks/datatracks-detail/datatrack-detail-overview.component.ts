@@ -68,7 +68,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     public canWrite = false;
     public folderList: any[];
     public types = OrderType;
-    public routeOutlet: string = "";
+    public fromTopic: boolean = false;
 
     private datatrack: any;
     private datatrackFiles: Array<any>;
@@ -88,14 +88,15 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
     ngOnInit() {
 
         this.route.data.forEach(data => {
-            this.routeOutlet = this.route.outlet;
+            this.fromTopic = !!data.fromTopic;
+
             this.datatrack = data.datatrack;
             this.initLinkVisibility();
             this.dtOverviewForm = new FormGroup({});
             if (this.datatrack) {
                 this.canWrite = this.datatrack.canWrite === "Y";
                 this.initLinkVisibility();
-                this.showDownloadLink = data.fromTopic ? data.fromTopic : false;
+                this.showDownloadLink = this.fromTopic;
                 this.showRelatedDataTab = this.initRelatedData(this.datatrack);
                 this.dtOverviewForm = new FormGroup({});
                 if (this.datatrack.DataTrackFolders) {

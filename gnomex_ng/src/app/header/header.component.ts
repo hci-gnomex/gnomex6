@@ -19,6 +19,7 @@ import {AuthenticationService} from "../auth/authentication.service";
 import {PropertyService} from "../services/property.service";
 import {BehaviorSubject, Subscription} from "rxjs/index";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {NavigationService} from "../services/navigation.service";
 import * as html2canvas from "html2canvas";
 import {ReportProblemComponent} from "./reportProblem/report-problem.component";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
@@ -133,6 +134,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                 private gnomexService: GnomexService,
                 private formBuilder: FormBuilder,
                 private dialogsService: DialogsService,
+                private navService:NavigationService,
                 private constService: ConstantsService) {
 
         this.options = this.formBuilder.group({
@@ -354,10 +356,8 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     params.gnomexService.redirectURL = null;
                     params.progressService.hideLoaderStatus(false);
                     params.progressService.loaderStatus = new BehaviorSubject<number> (0);
-                    params.router.navigate([{ outlets: { modal: null }}], {skipLocationChange: true})
-                        .then( () => {
-                            params.router.navigate(["/logout-loader"]);
-                        });
+                    params.router.navigate(["/logout-loader"]);
+
                 }
             });
         });
@@ -2266,6 +2266,9 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         if (this.gnomexService.allowExternal === false) {
             this.hideMenusByContext(navMenu, "newExternalExperiment");
         }
+    }
+    setNavModeType(){
+        this.navService.navMode = NavigationService.USER;
     }
 
     /**

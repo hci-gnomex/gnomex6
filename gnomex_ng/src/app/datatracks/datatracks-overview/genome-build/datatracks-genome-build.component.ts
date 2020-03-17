@@ -6,6 +6,7 @@ import {DialogsService, DialogType} from "../../../util/popup/dialogs.service";
 import {MatTabChangeEvent} from "@angular/material";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../../../util/interfaces/gnomex-error.response.model";
+import {Subscription} from "rxjs";
 
 
 @Component({
@@ -14,7 +15,7 @@ import {IGnomexErrorResponse} from "../../../util/interfaces/gnomex-error.respon
         <div style="display:flex; flex-direction:column; height:100%; width:100%;">
 
             <div style="padding-bottom: .5em;padding-left:1em;">
-                <img [src]="dtService.datatrackListTreeNode.icon">Genome Build: {{dtService.datatrackListTreeNode.label}}
+                <img [src]="dtService?.datatrackListTreeNode?.icon">Genome Build: {{dtService?.datatrackListTreeNode?.label}}
             </div>
             <div class="overflow-auto" style="display:flex; flex: 1;">
 
@@ -56,6 +57,7 @@ export class DatatracksGenomeBuildComponent implements OnInit {
     public state: string = TabContainer.VIEW;
     @ViewChild(TabContainer) tabs: TabContainer;
     public canWrite: boolean = false;
+    private datatracksTreeNodeSubscription: Subscription;
 
 
     constructor(public gbValidateService: GenomeBuildValidateService,
@@ -65,7 +67,12 @@ export class DatatracksGenomeBuildComponent implements OnInit {
 
     ngOnInit(): void {
         this.componentNames = ["GBDetailTabComponent", "GBSegmentsTabComponent", "GBSequenceFilesTabComponent"];
-        this.canWrite = this.dtService.datatrackListTreeNode.canWrite === "Y";
+        this.datatracksTreeNodeSubscription = this.dtService.datatrackListTreeNodeSubject.subscribe((data) =>{
+            if(data){
+                this.canWrite = data.canWrite === "Y";
+            }
+        });
+
 
     }
 
@@ -121,6 +128,10 @@ export class DatatracksGenomeBuildComponent implements OnInit {
 
         this.gbValidateService.resetValidation();
 
+    }
+
+    ngOnDestroy(){
+        this.datatracksTreeNodeSubscription.unsubscribe();
     }
 
 }
