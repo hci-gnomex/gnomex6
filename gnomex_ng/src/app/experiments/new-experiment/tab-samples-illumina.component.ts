@@ -1815,10 +1815,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
         this.samplesGridColumnDefs = TabSamplesIlluminaComponent.sortColumns(this.defaultSampleColumnDefinitions);
         this.nodeChildDetails = this.getItemNodeChildDetails;
 
-        setTimeout(() => {
-            this.dialogService.startDefaultSpinnerDialog();
-        });
-
         this.rebuildColumnDefinitions();
 
         this.loadSampleTypes();

@@ -65,7 +65,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
     public showManagePEDFile: boolean = false;
     public showEdit: boolean = false;
     public isEditMode: boolean = false;
-    public routeOutlet: string = "";
+    public fromTopic: boolean = false;
 
     public analysisTreeNode: any;
     private analysisTreeNodeSubscription: Subscription;
@@ -95,14 +95,16 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
         });
 
         this.route.data.forEach((data: any) => {
-            this.routeOutlet = this.route.outlet;
+            this.fromTopic = !!data.fromTopic;
+
+
             this.analysisService.analysisOverviewForm.reset();
             this.analysis = data.analysis ? data.analysis.Analysis : null;
             if(this.analysis) {
                 let annots = this.analysis.AnalysisProperties ? (this.analysis.AnalysisProperties.PropertyEntry ? this.analysis.AnalysisProperties.PropertyEntry : this.analysis.AnalysisProperties) : "";
                 this.showRelatedDataTab = this.initRelatedData(this.analysis);
                 this.showLinkToExp = !this.secAdvisor.isGuest && this.analysis.canRead === "Y";
-                this.showEdit = this.analysis.canUpdate === "Y" && this.routeOutlet === "analysisPanel";
+                this.showEdit = this.analysis.canUpdate === "Y" && !this.fromTopic;
                 this.isEditMode = this.analysisService.getEditMode();
 
                 if(annots) {

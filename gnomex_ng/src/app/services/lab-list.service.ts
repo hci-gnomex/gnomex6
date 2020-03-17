@@ -18,7 +18,6 @@ export class LabListService {
         return this.httpClient.get("/gnomex/GetLabList.gx", {params: params});
     }
 
-
     getLabListSubject(): Observable<any> {
         return this.labListSubject.asObservable();
     }
@@ -88,4 +87,7 @@ export class LabListService {
         })));
     }
 
+    resetLabListSubject() {
+        this.labListSubject = new BehaviorSubject<any>([]);
+    }
 }

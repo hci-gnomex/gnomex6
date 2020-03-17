@@ -75,6 +75,7 @@ export class PropertyService {
     public static readonly PROPERTY_MAINTENANCEMODE: string = "maintenancemode";
     public static readonly PROPERTY_MAINTENANCE_SPLASH: string = "maintenance_splash";
     public static readonly PROPERTY_OFFSET_BILLING_PERIOD:string = "property_offset_billing_period";
+    public static readonly PROPERTY_SHOW_TOTAL_DOLLAR_AMOUNT:string = "property_show_total_dollar_amount";
 
     constructor(private dictionaryService: DictionaryService,
                 private httpClient: HttpClient,

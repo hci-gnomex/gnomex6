@@ -1,9 +1,10 @@
-import {AfterViewInit, Component, Input, OnInit, ViewChild} from "@angular/core";
+import {AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {FormGroup, FormBuilder, Validators, FormControl} from "@angular/forms"
 import {DataTrackService} from "../../services/data-track.service";
 import {ActivatedRoute} from "@angular/router";
 import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
 import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
+import {Subscription} from "rxjs";
 
 
 @Component({
@@ -19,12 +20,13 @@ import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-edito
     `]
 
 })
-export class DatatracksSummaryTabComponent implements OnInit {
+export class DatatracksSummaryTabComponent implements OnInit, OnDestroy {
     //Override
     public showSpinner: boolean = false;
     public editorConfig: AngularEditorConfig;
     public summaryFormGroup: FormGroup;
     description: string = "";
+    public datatrackTreeNodeSubscription: Subscription;
     @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
     @Input() private editable: boolean = false;
 
@@ -51,15 +53,21 @@ export class DatatracksSummaryTabComponent implements OnInit {
             description:''
         });
 
+        this.datatrackTreeNodeSubscription =  this.dtService.datatrackListTreeNodeSubject.subscribe((data) =>{
+            this.orderValidateService.dirtyNote = false;
+            if(data){
+                let folderName = data.name;
+                let summary = data.summary;
+                let description = data.description;
+
+                this.summaryFormGroup.get("folderName").setValue(folderName);
+                this.summaryFormGroup.get("summary").setValue(summary);
+                this.summaryFormGroup.get("description").setValue(description);
+            }
+        });
+
         this.route.data.forEach(params =>{
             this.orderValidateService.dirtyNote = false;
-            let folderName = this.dtService.datatrackListTreeNode.name;
-            let summary = this.dtService.datatrackListTreeNode.summary;
-            let description = this.dtService.datatrackListTreeNode.description;
-
-            this.summaryFormGroup.get("folderName").setValue(folderName);
-            this.summaryFormGroup.get("summary").setValue(summary);
-            this.summaryFormGroup.get("description").setValue(description);
         });
 
         this.summaryFormGroup.markAsPristine();
@@ -73,6 +81,10 @@ export class DatatracksSummaryTabComponent implements OnInit {
             this.editorConfig.showToolbar = false;
         }
 
+    }
+
+    ngOnDestroy(){
+        this.datatrackTreeNodeSubscription.unsubscribe();
     }
 
 }

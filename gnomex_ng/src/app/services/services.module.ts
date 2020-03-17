@@ -54,6 +54,7 @@ import {UtilService} from "./util.service";
 import {UserPreferencesService} from "./user-preferences.service";
 import {NewExternalExperimentService} from "./new-external-experiment.service";
 import {AmendExperimentService} from "./amend-experiment.service";
+import {NavigationService} from "./navigation.service";
 
 @NgModule({
     imports: [CommonModule],
@@ -118,6 +119,7 @@ import {AmendExperimentService} from "./amend-experiment.service";
         UserPreferencesService,
         NewExternalExperimentService,
         AmendExperimentService,
+        NavigationService
     ]})
 export class ServicesModule {
 }

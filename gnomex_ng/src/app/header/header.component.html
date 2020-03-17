@@ -92,7 +92,8 @@
             <!-- Leaf node buttons here -->
             <span *ngIf="!item.children || item.children.length === 0" class="full-height">
                 <button mat-button class="top-menu-item full-height full-width" [hidden]="item.hidden"
-                        [routerLink]="item.route">
+                        [routerLink]="item.route"
+                        (click)="setNavModeType()">
                     <img class="icon" *ngIf="item.iconName" [src]="item.iconName" alt="">
                     <span>{{item.displayName}}</span>
                 </button>

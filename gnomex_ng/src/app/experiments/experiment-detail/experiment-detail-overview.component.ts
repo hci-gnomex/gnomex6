@@ -33,6 +33,7 @@ import {ExperimentBioinformaticsTabComponent} from "./experiment-bioinformatics-
 import {ExperimentBillingTabComponent} from "./experiment-billing-tab.component";
 import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {NavigationService} from "../../services/navigation.service";
 
 export const TOOLTIPS = Object.freeze({
     PRINT_EXPERIMENT_ORDER: "Create PDF form for this experiment order",
@@ -101,7 +102,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
     public showBillingTab: boolean = false;
     public isDirty: boolean = false;
     public showCreateAnalysisButton: boolean = false;
-    public routeOutlet: string = "";
+    public fromTopic: boolean = false;
     public showAnnotationsTab: boolean = false;
 
     public types = OrderType;
@@ -130,6 +131,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                 private fileService: FileService,
                 private snackBar: MatSnackBar,
                 private billingService: BillingService,
+                private navService: NavigationService,
                 private orderValidateService: BrowseOrderValidateService) {
     }
 
@@ -147,7 +149,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
             this.showBillingTab = false;
             this.showCreateAnalysisButton = false;
             this.showAnnotationsTab = false;
-            this.routeOutlet = this.route.outlet;
+            this.fromTopic = !!data.fromTopic;
 
             this.experimentService.experimentOverviewForm.reset();
 
@@ -174,7 +176,10 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                         && this.experiment.isExternal !== 'Y';
                 }
 
-                this.showCreateAnalysisButton = !this.secAdvisor.isGuest && this.routeOutlet === "browsePanel" && this.requestCategory.codeRequestCategory === this.experiment.codeRequestCategory && this.requestCategory.associatedWithAnalysis === "Y";
+                this.showCreateAnalysisButton = !this.secAdvisor.isGuest && !this.fromTopic
+                    && this.requestCategory.codeRequestCategory === this.experiment.codeRequestCategory
+                    && this.requestCategory.associatedWithAnalysis === "Y";
+
                 this.showSequenceLanesTab = this.requestCategory.isIlluminaType === "Y" && this.experiment.isExternal !== "Y";
                 this.showBillingTab = this.experiment.canRead === "Y" && this.experiment.isExternal !== "Y";
                 this.showAnnotationsTab = this.requestCategory
@@ -212,7 +217,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                     this.annotations = [];
                 }
 
-                this.showEdit = this.experiment && !this.secAdvisor.isGuest && this.experiment.canUpdate === "Y" && this.routeOutlet === "browsePanel";
+                this.showEdit = this.experiment && !this.secAdvisor.isGuest && this.experiment.canUpdate === "Y" && !this.fromTopic;
                 this.isEditMode = this.experimentService.getEditMode();
                 this.setNodeTitle();
             }

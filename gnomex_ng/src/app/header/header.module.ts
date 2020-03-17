@@ -16,7 +16,6 @@ import {ExternalLinkComponent} from "./external-routes.module";
 import {ExternalLinkResolver} from "./external-routes.module";
 import {HeaderComponent} from "./header.component";
 import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-renderer.component";
-import {LogoutComponent} from "./logout.component";
 import {ManageLinksComponent} from "./manageLinks/manage-links.component";
 import {MenuItemComponent} from "./menu-item/menu-item.component";
 import {ReportProblemComponent} from "./reportProblem/report-problem.component";
@@ -69,7 +68,6 @@ import {UtilModule} from "../util/util.module";
         AdvancedSearchComponent,
         ExternalLinkComponent,
         HeaderComponent,
-        LogoutComponent,
         ManageLinksComponent,
         MenuItemComponent,
         ReportProblemComponent,
@@ -84,7 +82,6 @@ import {UtilModule} from "../util/util.module";
     exports: [
         AdvancedSearchComponent,
         HeaderComponent,
-        LogoutComponent,
         ManageLinksComponent,
         ReportProblemComponent,
     ]
