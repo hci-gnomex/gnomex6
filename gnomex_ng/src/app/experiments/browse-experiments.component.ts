@@ -318,6 +318,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             } else {
                 this.items = response;
             }
+            (<any[]>this.items).sort(UtilService.sortObjectAlphabetically("labName"));
+
             this.labs = this.labs.concat(this.items);
             this.experimentsService.filteredLabs = this.labs;
             for (var lab of this.items) {
@@ -332,6 +334,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                     } else {
                         lab.items = lab.Project;
                     }
+
                     for (var project of lab.items) {
                         project.icon = "assets/folder.png";
                         project.labId = lab.labId;
@@ -344,6 +347,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                             } else {
                                 project.items = project.Request;
                             }
+                            (<any[]>project.items).sort(UtilService.sortOrderIDNumerically("requestNumber"));
+
                             for (var request of project.items) {
                                 if (request) {
                                     if (request.label) {
@@ -623,8 +628,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      * @param event
      */
     treeOnSelect(event: any) {
-
-
         this.selectedItem = event.node;
         let idLab = this.selectedItem.data.idLab;
         let idProject = this.selectedItem.data.idProject;

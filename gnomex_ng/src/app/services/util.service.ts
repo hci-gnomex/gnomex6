@@ -5,6 +5,7 @@ import {Subscription} from "rxjs";
 import {TreeModel, TreeNode} from "angular-tree-component";
 import * as _ from "lodash";
 import {FileService} from "./file.service";
+import {archifyDependencyTree} from "typings/dist/support/cli";
 
 @Injectable()
 export class UtilService {
@@ -223,4 +224,44 @@ export class UtilService {
 
     public static shrinkCellText(params): any {
         return {'font-size': '.70rem'};
-    }}
+    }
+    public static sortObjectAlphabetically(attributeName:string){
+        return (obj1, obj2) => {
+            if(!obj1[attributeName]){
+                return -1;
+            }
+            if(!obj2[attributeName]){
+                return 1;
+            }
+            if(obj1[attributeName] && obj2[attributeName]){
+                let attrStr1:string = <string>obj1[attributeName];
+                let attrStr2:string = <string>obj2[attributeName];
+                return attrStr1.localeCompare(attrStr2);
+            }
+
+
+        }
+    }
+    public static sortOrderIDNumerically(attributeName:string) {
+        return (obj1,obj2) =>  {
+            if(!obj1[attributeName]){
+                return -1;
+            }
+            if(!obj2[attributeName]){
+                return 1
+            }
+
+            if(obj1[attributeName] && obj2[attributeName]){
+                let numRegex  = /[A-Za-z]?(\d+)[A-Za-z]?/;
+                let matchNum1 = +(numRegex.exec(obj1[attributeName])[1]);
+                let matchNum2 = +(numRegex.exec(obj2[attributeName])[1]);
+                return matchNum1 - matchNum2;
+            }
+        }
+    }
+}
+
+
+
+
+
