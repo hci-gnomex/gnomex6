@@ -41,8 +41,7 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
         .padded { padding: 0.3rem; }
         
         .padded-left-right-bottom {
-            padding: 0;
-            
+            padding-top:    0;
             padding-left:   0.3rem;
             padding-right:  0.3rem;
             padding-bottom: 0.3rem;
@@ -304,14 +303,8 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
         this.allImportedRowsSucceeded = true;
         this.reportText = UploadSampleSheetComponent.formatColumns("Row", "SS Col", "Grid Col", "Status");
 
-        let allRowsSucceeded = true;
-
-        let existingRowsStartingIndex: number = 0;
         let fileRowsStartingIndex: number = 0;
 
-        if (this.appendSamples) {
-            existingRowsStartingIndex = (this.existingRows ? this.existingRows.length : 0);
-        }
         if (this.firstRowIsColumnHeadings) {
             fileRowsStartingIndex = 1;
         }
@@ -376,7 +369,7 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
                             && column.selectOptionsDisplayField) {
 
                             let filteredOptions: any[] = column.selectOptions.filter((a) => {
-                                return a[column.selectOptionsDisplayField].toLowerCase() === uploadColumnValue.toLowerCase();
+                                return a[column.selectOptionsDisplayField] && uploadColumnValue && a[column.selectOptionsDisplayField].toLowerCase() === uploadColumnValue.toLowerCase();
                             });
 
                             if (filteredOptions.length > 0) {
@@ -407,7 +400,7 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
                             let thisEntryFound = false;
 
                             for (let option of column.selectOptions) {
-                                if (option[column.selectOptionsValueField].toLowerCase() === value.toLowerCase()) {
+                                if (option[column.selectOptionsValueField] && option[column.selectOptionsValueField].toLowerCase() === value.toLowerCase()) {
                                     thisEntryFound = true;
                                     if (optionsFound > 0) {
                                         constructedValue = constructedValue + ',';
