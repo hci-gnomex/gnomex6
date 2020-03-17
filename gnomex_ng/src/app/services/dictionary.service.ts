@@ -183,6 +183,14 @@ export class DictionaryService {
         return this.httpClient.post("/gnomex/ManageDictionaries.gx", params.toString(), {headers: headers});
     }
 
+    public saveDictionaries(dictionaryEntries: any[], className: string, callback?: () => void | null, errorCallback?: () => void | null): void {
+        for (let entry of dictionaryEntries) {
+            let object: HttpParams = <HttpParams> entry["object"];
+            let action: string = entry["action"];
+            this.changeDictionary(object, action, className, callback, errorCallback);
+        }
+    }
+
     private loadDictionaries(className?: string): Observable<any> {
         let params: HttpParams = new HttpParams()
             .set("action", "load");

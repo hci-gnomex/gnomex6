@@ -29,6 +29,7 @@ import {ContactUsComponent} from "../about/contact-us.component";
 import {ManageLinksComponent} from "./manageLinks/manage-links.component";
 import {EmailAllUsersComponent} from "../reports/email-all-users.component";
 import {first} from "rxjs/operators";
+import {BrowseDictionaryComponent} from "../configuration/browse-dictionary.component";
 
 @Component({
     selector: "gnomex-header",
@@ -149,6 +150,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             gnomexService: this.gnomexService,
             dialogsService: this.dialogsService,
             constService: this.constService,
+            dictionaryService: this.dictionaryService,
         };
 
     }
@@ -360,6 +362,44 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
 
                 }
             });
+        });
+    }
+
+    public bulkBarCode(params: any): void {
+        if(!params.dialogsService || !params.constService || ! params.dictionaryService) {
+            return;
+        }
+
+        let preSelectedDictionary = [
+            DictionaryService.OLIGO_BARCODE,
+            DictionaryService.OLIGO_BARCODE_SCHEME,
+            DictionaryService.OLIGO_BARCODE_SCHEME_ALLOWED
+        ];
+
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "80em";
+        config.height = "63em";
+        config.autoFocus = false;
+        config.disableClose = true;
+        config.data = {
+            isDialog: true,
+            preSelectedDictionary: preSelectedDictionary,
+            preSelectedEntry: "",
+            dictionaryEditable: true,
+        };
+
+        params.dialogsService.genericDialogContainer(BrowseDictionaryComponent, "Bulk Bar Code Editor", params.constService.ICON_BOOK, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: null, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                ]}).subscribe(() => {
+                    params.dialogsService.addSpinnerWorkItem();
+                    params.dictionaryService.reloadAndRefresh(() => {
+                        //TODO: refresh dictionaries if on Add/Edit Dictionaries page?
+                        params.dialogsService.removeSpinnerWorkItem();
+                    }, () => {
+                        params.dialogsService.stopAllSpinnerDialogs();
+                    });
         });
     }
 
@@ -1209,6 +1249,12 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         route: '/manage-protocols'
                     },
                     {
+                        displayName: 'Bulk Bar Code',
+                        iconName: './assets/book.png',
+                        callback: this.bulkBarCode,
+                        params: this.serviceParams
+                    },
+                    {
                         displayName: 'Configure Billing Account Fields',
                         iconName: './assets/page_white_wrench.png',
                         route: ''
@@ -1510,7 +1556,13 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         displayName: 'Manage Protocols',
                         iconName: './assets/page_white_wrench.png',
                         route: '/manage-protocols'
-                    }
+                    },
+                    {
+                        displayName: 'Bulk Bar Code',
+                        iconName: './assets/book.png',
+                        callback: this.bulkBarCode,
+                        params: this.serviceParams
+                    },
 
                 ]
             },
@@ -1805,7 +1857,13 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         displayName: 'Manage Protocols',
                         iconName: './assets/brick.png',
                         route: '/manage-protocols'
-                    }
+                    },
+                    {
+                        displayName: 'Bulk Bar Code',
+                        iconName: './assets/book.png',
+                        callback: this.bulkBarCode,
+                        params: this.serviceParams
+                    },
                 ]
             },
             {

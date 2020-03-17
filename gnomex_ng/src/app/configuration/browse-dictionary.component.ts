@@ -6,8 +6,8 @@ import {Dictionary} from "./dictionary.interface";
 import {DictionaryEntry} from "./dictionary-entry.type";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {DialogsService} from "../util/popup/dialogs.service";
-import {GridApi, GridReadyEvent} from "ag-grid-community";
-import {FormControl, FormGroup} from "@angular/forms";
+import {GridApi, GridReadyEvent, SelectionChangedEvent} from "ag-grid-community";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {ValueFormatterParams} from "ag-grid-community/dist/lib/entities/colDef";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
@@ -16,6 +16,11 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {GDAction} from "../util/interfaces/generic-dialog-action.model";
+import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignLeftMiddleEditor} from "../util/grid-editors/text-align-left-middle.editor";
+import {SelectRenderer} from "../util/grid-renderers/select.renderer";
+import {SelectEditor} from "../util/grid-editors/select.editor";
+import {ConstantsService} from "../services/constants.service";
 
 @Component({
     selector: "browse-dictionary",
@@ -58,12 +63,45 @@ import {GDAction} from "../util/interfaces/generic-dialog-action.model";
                 </div>
             </div>
             <div class="full-height flex-container-col detail-view extra-padded">
-                <div [hidden]="!this.dictionaryName">
-                    <label>{{this.dictionaryName}}</label>
+                <div class="flex-container-row justify-space-between" [hidden]="!this.dictionaryName">
+                    <div [hidden]="!this.dictionaryName">
+                        <label>{{this.dictionaryName}}</label>
+                    </div>
+                    <div>
+<!--                        <button mat-button [hidden]="!dictionaryEditable || isEditMode" (click)="changeMode()">-->
+                        <button mat-button [hidden]="!dictionaryEditable" (click)="changeMode()">
+                            <img *ngIf="!isEditMode" class="icon" [src]="this.constService.ICON_TAG_BLUE_EDIT">
+                            <img *ngIf="isEditMode" class="icon" [src]="this.constService.PAGE">
+                            {{isEditMode ? "View" : "Edit"}}
+                        </button>
+                    </div>
                 </div>
-                <div [hidden]="!this.selectedDictionary" class="flex-one extra-padded-top">
+                <div class="flex-container-row extra-padded-top justify-space-between" [hidden]="!dictionaryEditable || !this.isEditMode">
+                    <div class="flex-grow">
+                        <button mat-button class="padded-right" (click)="onAddRow()">
+                            <img class="icon" [src]="this.constService.ICON_ADD" alt="">
+                            Add Row
+                        </button>
+                        <button mat-button class="padded-right" (click)="onRemoveRows()" [disabled]="selectedRows.length < 1">
+                            <img class="icon" [src]="this.constService.ICON_DELETE" alt="">
+                            Remove Rows
+                        </button>
+                    </div>
+<!--                    <button mat-button (click)="changeMode()">-->
+<!--                        <img class="icon" [src]="this.constService.PAGE">-->
+<!--                        {{isEditMode ? "View" : "Edit"}}-->
+<!--                    </button>-->
+                </div>
+                <div [hidden]="!this.selectedDictionary" class="flex-one {{isEditMode ? '' : 'extra-padded-top' }}">
                     <ag-grid-angular class="ag-theme-balham full-height full-width"
                                      (gridReady)="this.onGridReady($event)"
+                                     [enableFilter]="dictionaryFilterable"
+                                     (selectionChanged)="onSelectionChanged($event)"
+                                     [rowSelection]="'multiple'"
+                                     [rowDeselection]="true"
+                                     [stopEditingWhenGridLosesFocus]="true"
+                                     (rowDataChanged)="onRowDataChanged($event)"
+                                     (cellValueChanged)="onCellValueChanged($event)"
                                      [enableSorting]="true"
                                      [enableColResize]="true">
                     </ag-grid-angular>
@@ -82,12 +120,10 @@ import {GDAction} from "../util/interfaces/generic-dialog-action.model";
                                               [options]="field.options" valueField="value" displayField="display"
                                               [formControlName]="field.dataField">
                             </custom-combo-box>
-                            <mat-form-field *ngSwitchCase="'isActive'" class="full-width">
-                                <mat-select [placeholder]="field.caption" [formControlName]="field.dataField">
-                                    <mat-option value="Y">Yes</mat-option>
-                                    <mat-option value="N">No</mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                            <custom-combo-box *ngSwitchCase="'isActive'" class="full-width" [placeholder]="field.caption"
+                                              [options]="field.options" valueField="value" displayField="display"
+                                              [formControlName]="field.dataField">
+                            </custom-combo-box>
                             <mat-checkbox *ngSwitchCase="'YN'" [formControlName]="field.dataField">{{field.caption}}</mat-checkbox>
                             <mat-form-field *ngSwitchCase="'date'" class="full-width">
                                 <input matInput [matDatepicker]="datePicker" [placeholder]="field.caption" [formControlName]="field.dataField">
@@ -156,6 +192,10 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
     public selectedEntry: DictionaryEntry = null;
     public dictionaryName: string = "";
     public searchText: string = "";
+    public dictionaryEditable: boolean = false;
+    public isEditMode: boolean = true;  // TODO: need to fix as false
+    public dictionaryFilterable: boolean = false;
+    public selectedRows: any[] = [];
 
     public entryForm: FormGroup;
     public entryFields: any[] = [];
@@ -163,13 +203,21 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
     public showSpinner: boolean = false;
     public primaryDisable: (action?: GDAction) => boolean;
     private isDialog: boolean = false;
-    private preSelectedDictionary: string;
-    private preSelectedEntry: string;
+    private preSelectedDictionary: any[] = [];
+    private preSelectedEntry: string = "";
 
     private cachedMetaDataClassName: string = "";
     private cachedMetaDataFields: any[] = [];
+    private changedRowDataMap: Map<string, any> = new Map<string, any>();
 
     private gridApi: GridApi;
+    private gridDataDirty: boolean = false;
+
+    private optionsYN: any[] = [
+        {value: "Y", display: "Yes"},
+        {value: "N", display: "No"}
+        ];
+
 
     constructor(private dialogRef: MatDialogRef<BrowseDictionaryComponent>,
                 @Inject(MAT_DIALOG_DATA) private data: any,
@@ -177,12 +225,14 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                 private changeDetector: ChangeDetectorRef,
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private utilService: UtilService,
+                public constService: ConstantsService,
                 private dialogsService: DialogsService) {
         super();
         if(this.data && Object.keys(this.data).length > 0) {
             this.isDialog = this.data.isDialog;
-            this.preSelectedDictionary = this.data.preSelectedDictionary;
+            this.preSelectedDictionary = Array.isArray(this.data.preSelectedDictionary) ? this.data.preSelectedDictionary : [this.data.preSelectedDictionary];
             this.preSelectedEntry = this.data.preSelectedEntry;
+            this.dictionaryEditable = this.data.dictionaryEditable ? this.data.dictionaryEditable : false;
         }
     }
 
@@ -192,14 +242,20 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         this.entryForm = new FormGroup({});
         this.buildTree();
         this.entryForm.markAsPristine();
+        this.dictionaryFilterable = this.dictionaryEditable ? true : false;
         this.primaryDisable = (action) => {
-            return this.entryForm.invalid || !this.selectedEntry || !this.entryForm.dirty;
+            if(this.selectedDictionary) {
+                return !this.dictionaryEditable || !this.gridDataDirty; //TODO: or if the grid is invalid.
+            } else {
+                return this.entryForm.invalid || !this.selectedEntry || !this.entryForm.dirty;
+            }
         };
+        this.dirty = () => this.selectedDictionary ? this.gridDataDirty : this.entryForm.dirty;
 
         if(this.isDialog) {
             setTimeout(() => {
                 let node: ITreeNode;
-                node = this.findNodeByIdAndClassName(this.preSelectedDictionary, this.preSelectedEntry);
+                node = this.findNodeByIdAndClassName((Array.isArray(this.preSelectedDictionary) ? this.preSelectedDictionary[0] : [this.preSelectedDictionary][0]), this.preSelectedEntry);
                 if (node) {
                     node.setIsActive(true);
                     node.scrollIntoView();
@@ -213,10 +269,112 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         this.utilService.removeChangeDetectorRef(this.changeDetector);
     }
 
+    public changeMode() {
+        if(this.isEditMode) {
+            this.isEditMode = false;
+        } else {
+            this.isEditMode = true;
+        }
+        for(let dictionaryColDef of this.dictionaryColDefs) {
+            dictionaryColDef.editable = this.isEditMode;
+        }
+        if(this.gridApi) {
+            setTimeout(() => {
+                this.gridApi.setColumnDefs(this.dictionaryColDefs);
+                // this.gridApi.setRowData(this.selectedDictionary.DictionaryEntry);
+                this.gridApi.redrawRows();
+                this.gridApi.redrawRows({rowNodes: this.gridApi.getSelectedNodes()});
+                this.gridApi.sizeColumnsToFit();
+            });
+        }
+    }
+
+    public onSelectionChanged(event: SelectionChangedEvent): void {
+        this.selectedRows = event.api.getSelectedRows();
+    }
+
+    public onRowDataChanged(event: any): void {
+        if(this.gridApi) {
+            console.log(event);
+        }
+    }
+
+    public onCellValueChanged(event: any): void {
+        if(event.colDef.field === "sortOrder") {
+            //FixMe: validator required
+            // let errorMessage: string = event.colDef.field + " expects a numeric";
+            // event.colDef.validators = [Validators.pattern(/^\d{1,10}$/)];
+            // event.colDef.errorNameErrorMessageMap = [{errorName: "pattern", errorMessage: errorMessage}];
+            // event.colDef.setErrors = (value: any, data: any, node: any, colDef: any, rowIndex: any, gridApi: any) => {
+            //     return (value && value.match(/^d{0,10}$/)) ? "" : event.colDef.field + " expects a numeric";
+            // };
+            // console.log(event.colDef.setErrors(event.newValue, event.data, event.node, event.colDef, event.rowIndex, this.gridApi) === true);
+            // if(event.colDef.setErrors(event.newValue, event.data, event.node, event.colDef, event.rowIndex, this.gridApi)) {
+            //     return;
+            // }
+        }
+
+        // if(event.newValue !== event.oldValue) {
+            this.changedRowDataMap.set(event.data.datakey, event.data);
+            this.gridDataDirty = true;
+        // }
+    }
+
+    public onAddRow(): void {
+        if(!this.selectedDictionary) {
+            return;
+        }
+
+        let template = this.selectedRows.length > 0 ? this.selectedRows[0] : this.selectedDictionary.DictionaryEntry.length > 0 ? this.selectedDictionary.DictionaryEntry[0] : null;
+        let newEntry = {
+            canDelete: template && template.canDelete ? template.canDelete : "",
+            canRead: template && template.canRead ? template.canRead : "",
+            canWrite: template && template.canWrite ? template.canWrite : "",
+            canUpdate: template && template.canUpdate ? template.canUpdate : "",
+            display: "",
+            value: "",
+            datakey: "",
+            action: "add"
+        };
+
+        this.selectedDictionary.DictionaryEntry.push(newEntry);
+        this.gridApi.setRowData(this.selectedDictionary.DictionaryEntry);
+        this.gridApi.redrawRows();
+
+        this.gridApi.deselectAll();
+        let rowIndex  = "" + this.selectedDictionary.DictionaryEntry.indexOf(newEntry);
+        this.gridApi.getRowNode(rowIndex).setSelected(true);
+        this.gridApi.setFocusedCell(this.gridApi.getRowNode(rowIndex).rowIndex, "name");
+        this.gridApi.ensureIndexVisible(this.gridApi.getRowNode(rowIndex).rowIndex, "bottom");
+        this.gridDataDirty = true;
+    }
+
+    public onRemoveRows(): void {
+     if(this.selectedRows.length > 0) {
+         for(let selectedRow of this.selectedRows) {
+             this.selectedDictionary.DictionaryEntry.splice(this.selectedDictionary.DictionaryEntry.indexOf(selectedRow), 1)
+             selectedRow.action = "delete";
+             this.changedRowDataMap.set(selectedRow.datakey, selectedRow);
+         }
+         this.gridApi.setRowData(this.selectedDictionary.DictionaryEntry);
+         this.gridDataDirty = true;
+
+         this.selectedRows = [];
+         this.gridApi.deselectAll();
+     }
+    }
+
     private buildTree(): void {
         let dictionariesTemp: Dictionary[] = this.dictionaryService.getEditableDictionaries();
+        this.preSelectedDictionary = Array.isArray(this.preSelectedDictionary) ? this.preSelectedDictionary : [this.preSelectedDictionary];
         if(this.isDialog) {
-            dictionariesTemp = dictionariesTemp.filter((value: Dictionary) => (value.className === this.preSelectedDictionary));
+            dictionariesTemp = dictionariesTemp.filter((value: Dictionary) => {
+                for(let dictionary of this.preSelectedDictionary) {
+                    if(value.className === dictionary) {
+                        return true;
+                    }
+                }
+            });
         }
         for (let dictionary of dictionariesTemp) {
             dictionary.display = dictionary.displayName;
@@ -264,6 +422,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
     public selectTreeItem(event: any): void {
         this.selectedDictionary = null;
         this.selectedEntry = null;
+        this.changedRowDataMap = new Map<string, any>();
 
         this.selectedTreeNode = event.node;
         let selectedData: any = JSON.parse(JSON.stringify(this.selectedTreeNode.data));
@@ -297,25 +456,53 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                     callback();
                 }
             }
-        },(err:IGnomexErrorResponse) =>{
+        }, (err: IGnomexErrorResponse) => {
         });
     }
+
+    private dictionaryColDefs: any[] = [];
 
     private prepareGrid(): void {
         let colDefs: any[] = [];
         for (let field of this.cachedMetaDataFields) {
             if (field.visible === 'Y') {
+                //TODO: Validation needed. Adding validators here causes a slow down of loading
                 let colDef: any = {
-                    headerName: field.caption, headerTooltip: field.caption, field: field.dataField, tooltipField: field.dataField
+                    headerName: field.caption, headerTooltip: field.caption, field: field.dataField,
+                    tooltipField: field.dataField, editable: this.dictionaryEditable && this.isEditMode,
+                    isIdentifier: field.isIdentifier
                 };
                 if (field.dataType === "comboBox") {
-                    colDef.valueFormatter = this.optionsFieldValueFormatter;
-                    colDef.comboBoxOptions = this.dictionaryService.getEntriesExcludeBlank(field.className);
+                    if(this.dictionaryEditable && this.isEditMode) {
+                        colDef.cellRendererFramework = SelectRenderer;
+                        colDef.cellEditorFramework = SelectEditor;
+                        colDef.selectOptions = this.dictionaryService.getEntriesExcludeBlank(field.className);
+                        colDef.selectOptionsDisplayField = "display";
+                        colDef.selectOptionsValueField = "value";
+                    } else {
+                        colDef.valueFormatter = this.optionsFieldValueFormatter;
+                        colDef.comboBoxOptions = this.dictionaryService.getEntriesExcludeBlank(field.className);
+                    }
+                } else if(field.dataType === "text") {
+                    colDef.cellRendererFramework = TextAlignLeftMiddleRenderer;
+                    colDef.cellEditorFramework = TextAlignLeftMiddleEditor;
+                } else if(field.dataType === "isActive" || field.dataType === "YN") {
+                    if (this.dictionaryEditable && this.isEditMode) {
+                        colDef.cellRendererFramework = SelectRenderer;
+                        colDef.cellEditorFramework = SelectEditor;
+                        colDef.selectOptions = this.optionsYN;
+                        colDef.selectOptionsDisplayField = "value";
+                        colDef.selectOptionsValueField = "value";
+                    }
                 }
+
                 colDefs.push(colDef);
             }
         }
+
+        this.dictionaryColDefs = colDefs; // used for changing mode, may not work
         this.gridApi.setColumnDefs(colDefs);
+        //TODO: need to ordered first by "oligo barcode scheme" and then by barcode sort order. Brian's request
         this.gridApi.setRowData(this.selectedDictionary.DictionaryEntry);
         this.gridApi.sizeColumnsToFit();
     }
@@ -359,6 +546,9 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             if (field.dataType === "comboBox") {
                 entryField.options = this.dictionaryService.getEntriesExcludeBlank(field.className);
             }
+            if(field.dataType === "isActive") {
+                entryField.options = this.optionsYN;
+            }
             if (field.dataType === "YN") {
                 this.entryForm.addControl(entryField.dataField, new FormControl(entryField.value === 'Y'));
             } else if (field.dataType === 'date') {
@@ -366,6 +556,9 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                 this.entryForm.get(entryField.dataField).disable();
             } else {
                 this.entryForm.addControl(entryField.dataField, new FormControl(entryField.value));
+            }
+            if(field.visible === "Y" && field.dataField === "sortOrder") {
+                this.entryForm.get(entryField.dataField).setValidators(Validators.pattern(/^\d{0,10}$/));
             }
             if (field.visible !== 'Y' || (field.isIdentifier && field.isIdentifier === "Y" && !isInsertMode)) {
                 this.entryForm.get(entryField.dataField).disable();
@@ -450,6 +643,66 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                 this.showSpinner = false;
                 this.dialogsService.error("An error occurred while saving dictionary");
             });
+        } else if(this.selectedDictionary && this.dirty) {
+            this.showSpinner = true;
+            let dictionaryEntries: any[] = [];
+            for(let value of Array.from(this.changedRowDataMap.values())) {
+                dictionaryEntries.push(value);
+            }
+            let savedDictionaryEntries: any[] = [];
+            let className: string = this.selectedDictionary.className;
+            let entryCount: number = 0;
+            // let savedDictionaryEntriesMap: Map<string, any> = new Map<string, any>();
+            for(let entry of dictionaryEntries) {
+                let entryObject: HttpParams = new HttpParams();
+                // Get fields of the entry
+                if(entry && typeof entry === "object") {
+                    Object.keys(entry).forEach(key => {
+                        for (let field of this.cachedMetaDataFields) {
+                            if (key === field.dataField) {
+                                entryObject = entryObject.set(key, entry[key]);
+                                break;
+                            }
+                        }
+                    });
+                }
+                let action: string = entry.action ? entry.action : "save";
+                // savedDictionaryEntriesMap.set(action, entryObject);
+                savedDictionaryEntries.push({
+                    action: action,
+                    object: entryObject
+                });
+            }
+
+
+            if(savedDictionaryEntries.length > 0) {
+                // this.showSpinner = true;
+                this.dictionaryService.saveDictionaries(savedDictionaryEntries, className, () => {
+                    //Succeed
+                    entryCount++;
+                    if(entryCount === dictionaryEntries.length) {
+                        this.changedRowDataMap = new Map<string, any>();
+                        this.buildTree();
+                        this.showSpinner = false;
+                        setTimeout(() => {
+                            for(let dict of this.treeComponent.treeModel.roots) {
+                                if(dict.data.className === className) {
+                                    dict.expand();
+                                    dict.toggleActivated(null);
+                                    this.gridDataDirty = false;
+                                }
+                            }
+                        });
+                    }
+                }, () => {
+                    //Error
+                    this.showSpinner = false;
+                    this.dialogsService.error("An error occurred while saving dictionary");
+                });
+            } else {
+                this.showSpinner = false;
+            }
+
         }
     }
 
