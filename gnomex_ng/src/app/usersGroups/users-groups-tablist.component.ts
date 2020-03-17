@@ -281,8 +281,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 editable: false,
                 cellRenderer: this.pricingCellRenderer,
                 field: "pricing",
-                width: 20,
-                maxWidth:20,
+                width: 1,
                 minWidth:20
             }
         ];

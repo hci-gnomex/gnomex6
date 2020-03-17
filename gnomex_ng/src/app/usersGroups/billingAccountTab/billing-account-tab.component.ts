@@ -89,7 +89,7 @@ export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
         
 	`]
 })
-export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDestroy {
+export class BillingAccountTabComponent implements OnInit, OnDestroy {
 
     @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
 
@@ -156,7 +156,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
     requireExpirationDate : boolean = false;
     requireDollarAmount   : boolean = false;
 
-    private emToPxConversionRate: number = 1;
+    private emToPxConversionRate: number = 13;
 
     // In GNomEx, it is possible to customize how the chartfield billing accounts appear.
     // This requires the "usesCustomChartfields" property to be 'Y'.
@@ -243,12 +243,6 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             }
 
             this.accountFieldsConfigurationService.publishAccountFieldConfigurations();
-        }
-    }
-
-    ngAfterViewInit(): void {
-        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
-            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
         }
     }
 
@@ -580,8 +574,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             columnDefinitions.push({
                 headerName: "",
                 editable: false,
-                width:    4 * this.emToPxConversionRate,
-                maxWidth: 4 * this.emToPxConversionRate,
+                width:    1,
                 minWidth: 4 * this.emToPxConversionRate,
                 cellRendererFramework: ApproveButtonRenderer,
                 onClick: "onApproveButtonClicked_chartfield",
@@ -604,9 +597,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 columnDefinitions.push({
                     headerName: "Starts",
                     editable: true,
-                    width:    4 * this.emToPxConversionRate,
-                    maxWidth: 6 * this.emToPxConversionRate,
-                    minWidth: 4 * this.emToPxConversionRate,
+                    width:    1,
+                    minWidth: 5 * this.emToPxConversionRate,
                     cellRendererFramework: DateRenderer,
                     cellEditorFramework: DateEditor,
                     dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
@@ -617,9 +609,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 columnDefinitions.push({
                     headerName: "Expires",
                     editable: true,
-                    width:    4 * this.emToPxConversionRate,
-                    maxWidth: 4 * this.emToPxConversionRate,
-                    minWidth: 4 * this.emToPxConversionRate,
+                    width:    1,
+                    minWidth: 5 * this.emToPxConversionRate,
                     cellRendererFramework: DateRenderer,
                     cellEditorFramework: DateEditor,
                     dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
@@ -657,8 +648,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 columnDefinitions.push({
                     headerName: "Funding Agency",
                     editable: true,
-                    width:    10 * this.emToPxConversionRate,
-                    maxWidth: 10 * this.emToPxConversionRate,
+                    width:    1,
                     minWidth: 10 * this.emToPxConversionRate,
                     field: "idFundingAgency",
                     cellRendererFramework: SelectRenderer,
@@ -672,9 +662,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             columnDefinitions.push({
                 headerName: "Starts",
                 editable: true,
-                width:    4 * this.emToPxConversionRate,
-                maxWidth: 4 * this.emToPxConversionRate,
-                minWidth: 4 * this.emToPxConversionRate,
+                width:    1,
+                minWidth: 5 * this.emToPxConversionRate,
                 cellRendererFramework: DateRenderer,
                 cellEditorFramework: DateEditor,
                 dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
@@ -683,9 +672,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             columnDefinitions.push({
                 headerName: "Expires",
                 editable: true,
-                width:    4 * this.emToPxConversionRate,
-                maxWidth: 4 * this.emToPxConversionRate,
-                minWidth: 4 * this.emToPxConversionRate,
+                width:    1,
+                minWidth: 5 * this.emToPxConversionRate,
                 cellRendererFramework: DateRenderer,
                 cellEditorFramework: DateEditor,
                 dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
@@ -707,9 +695,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             columnDefinitions.push({
                 headerName: "Bus",
                 editable: true,
-                width:    2 * this.emToPxConversionRate,
-                maxWidth: 2 * this.emToPxConversionRate,
-                minWidth: 2 * this.emToPxConversionRate,
+                width:    1,
+                minWidth: 3 * this.emToPxConversionRate,
                 validators: [
                     Validators.pattern(/^\d{2}$/)
                 ],
@@ -723,9 +710,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             columnDefinitions.push({
                 headerName: "Org",
                 editable: true,
-                width:    3 * this.emToPxConversionRate,
-                maxWidth: 3 * this.emToPxConversionRate,
-                minWidth: 3 * this.emToPxConversionRate,
+                width:    1,
+                minWidth: 4 * this.emToPxConversionRate,
                 validators: [
                     Validators.pattern(/^\d{5}$/)
                 ],
@@ -739,8 +725,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             columnDefinitions.push({
                 headerName: "Fund",
                 editable: true,
-                width:    3 * this.emToPxConversionRate,
-                maxWidth: 3 * this.emToPxConversionRate,
+                width:    1,
                 minWidth: 3 * this.emToPxConversionRate,
                 validators: [
                     Validators.pattern(/^\d{4}$/)
@@ -755,9 +740,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             columnDefinitions.push({
                 headerName: "Activity",
                 editable: true,
-                width:    3 * this.emToPxConversionRate,
-                maxWidth: 3 * this.emToPxConversionRate,
-                minWidth: 3 * this.emToPxConversionRate,
+                width:    1,
+                minWidth: 4 * this.emToPxConversionRate,
                 validators: [
                     Validators.pattern(/^\d{5}$/)
                 ],
@@ -771,9 +755,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             columnDefinitions.push({
                 headerName: "Project",
                 editable: true,
-                width:    4.5 * this.emToPxConversionRate,
-                maxWidth: 4.5 * this.emToPxConversionRate,
-                minWidth: 4.5 * this.emToPxConversionRate,
+                width:    1,
+                minWidth: 6 * this.emToPxConversionRate,
                 validators: [
                     Validators.pattern(/^\d{8}$/)
                 ],
@@ -787,9 +770,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             columnDefinitions.push({
                 headerName: "Acct",
                 editable: true,
-                width:    3 * this.emToPxConversionRate,
-                maxWidth: 3 * this.emToPxConversionRate,
-                minWidth: 3 * this.emToPxConversionRate,
+                width:    1,
+                minWidth: 4 * this.emToPxConversionRate,
                 validators: [
                     Validators.pattern(/^\d{5}$/)
                 ],
@@ -803,9 +785,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             columnDefinitions.push({
                 headerName: "AU",
                 editable: true,
-                width:    1.5 * this.emToPxConversionRate,
-                maxWidth: 1.5 * this.emToPxConversionRate,
-                minWidth: 1.5 * this.emToPxConversionRate,
+                width:    1,
+                minWidth: 2 * this.emToPxConversionRate,
                 validators: [
                     Validators.pattern(/^\d{1}$/)
                 ],
@@ -821,9 +802,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
         columnDefinitions.push({
             headerName: "Submitter email",
             editable: true,
-            width:    10 * this.emToPxConversionRate,
-            maxWidth: 10 * this.emToPxConversionRate,
-            minWidth: 10 * this.emToPxConversionRate,
+            width:    1,
+            minWidth: 12 * this.emToPxConversionRate,
             validators: [
                 Validators.pattern(/^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/)
             ],
@@ -840,9 +820,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 columnDefinitions.push({
                     headerName: "Total $ Amt",
                     editable: true,
-                    width:    4 * this.emToPxConversionRate,
-                    maxWidth: 4 * this.emToPxConversionRate,
-                    minWidth: 4 * this.emToPxConversionRate,
+                    width:    1,
+                    minWidth: 5 * this.emToPxConversionRate,
                     cellRendererFramework: TextAlignLeftMiddleRenderer,
                     field: "totalDollarAmount"
                 });
@@ -851,9 +830,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
                 columnDefinitions.push({
                     headerName: "Short acct",
                     editable: true,
-                    width:    4 * this.emToPxConversionRate,
-                    maxWidth: 4 * this.emToPxConversionRate,
-                    minWidth: 4 * this.emToPxConversionRate,
+                    width:    1,
+                    minWidth: 5 * this.emToPxConversionRate,
                     cellRendererFramework: TextAlignLeftMiddleRenderer,
                     field: "shortAcct"
                 });
@@ -863,9 +841,8 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
         columnDefinitions.push({
             headerName: "Users",
             editable: false,
-            width: 200,
-            maxWidth: 12 * this.emToPxConversionRate,
-            minWidth: 6 * this.emToPxConversionRate,
+            width: 1,
+            minWidth: 12 * this.emToPxConversionRate,
             field: "acctUsers",
             rendererOptions: this.labActiveSubmitters,
             rendererOptionDisplayField: "display",
@@ -877,18 +854,16 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             headerName: "Active",
             editable: false,
             checkboxEditable: true,
-            width:    2.5 * this.emToPxConversionRate,
-            maxWidth: 2.5 * this.emToPxConversionRate,
-            minWidth: 2.5 * this.emToPxConversionRate,
+            width:    1,
+            minWidth: 4 * this.emToPxConversionRate,
             cellRendererFramework: CheckboxRenderer,
             field: "activeAccount"
         });
         columnDefinitions.push({
             headerName: "$ Billed",
             editable: false,
-            width:    5 * this.emToPxConversionRate,
-            maxWidth: 5 * this.emToPxConversionRate,
-            minWidth: 5 * this.emToPxConversionRate,
+            width:    1,
+            minWidth: 6 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignRightMiddleRenderer,
             field: "totalChargesToDateDisplay"
         });
@@ -905,8 +880,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             columnDefinitions.push({
                 headerName: "",
                 editable: false,
-                width:    4 * this.emToPxConversionRate,
-                maxWidth: 4 * this.emToPxConversionRate,
+                width:    1,
                 minWidth: 4 * this.emToPxConversionRate,
                 cellRendererFramework: RemoveLinkButtonRenderer,
                 onRemoveClicked: "removeChartfieldRow"
@@ -931,8 +905,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 			columnDefinitions.push({
 				headerName: "",
 				editable: false,
-                width:    4 * this.emToPxConversionRate,
-                maxWidth: 4 * this.emToPxConversionRate,
+                width:    1,
                 minWidth: 4 * this.emToPxConversionRate,
 				cellRendererFramework: ApproveButtonRenderer,
 				onClick: "onApproveButtonClicked_po",
@@ -944,8 +917,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 			headerName: "PO",
 			editable: false,
 			width: 200,
-            minWidth: 10 * this.emToPxConversionRate,
-            maxWidth: 15 * this.emToPxConversionRate,
+            minWidth: 1,
 			cellRendererFramework: IconLinkButtonRenderer,
 			icon: "./assets/email_open.png",
 			onClick: "openPoEditor",
@@ -954,8 +926,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 		columnDefinitions.push({
 			headerName: "Starts",
 			editable:  true,
-            width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
+            width:    1,
             minWidth: 4 * this.emToPxConversionRate,
 			cellRendererFramework: DateRenderer,
 			cellEditorFramework: DateEditor,
@@ -965,8 +936,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 		columnDefinitions.push({
 			headerName: "Expires",
 			editable:  true,
-            width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
+            width:    1,
             minWidth: 4 * this.emToPxConversionRate,
 			cellRendererFramework: DateRenderer,
 			cellEditorFramework: DateEditor,
@@ -977,8 +947,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 			headerName: "Purchase Order Form",
 			editable:  false,
 			cellRendererFramework: UploadViewRemoveRenderer,
-            width:    12 * this.emToPxConversionRate,
-            maxWidth: 12 * this.emToPxConversionRate,
+            width:    1,
             minWidth: 12 * this.emToPxConversionRate,
 			field: "purchaseOrderForm"
 		});
@@ -986,7 +955,6 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 			headerName: "Users",
 			editable: false,
             width: 200,
-            maxWidth: 12 * this.emToPxConversionRate,
             minWidth: 6 * this.emToPxConversionRate,
 			field: "acctUsers",
 			rendererOptions: this.labActiveSubmitters,
@@ -999,8 +967,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 			headerName: "Active",
 			editable: false,
             checkboxEditable: true,
-            width:    2.5 * this.emToPxConversionRate,
-            maxWidth: 2.5 * this.emToPxConversionRate,
+            width:    1,
             minWidth: 2.5 * this.emToPxConversionRate,
             field: "activeAccount",
 			cellRendererFramework: CheckboxRenderer
@@ -1008,8 +975,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 		columnDefinitions.push({
 			headerName: "$ Billed",
 			editable: false,
-            width:    5 * this.emToPxConversionRate,
-            maxWidth: 5 * this.emToPxConversionRate,
+            width:    1,
             minWidth: 5 * this.emToPxConversionRate,
 			field: "totalChargesToDateDisplay",
 			cellRendererFramework: TextAlignRightMiddleRenderer
@@ -1027,8 +993,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             columnDefinitions.push({
                 headerName: "",
                 editable: false,
-                width:    4 * this.emToPxConversionRate,
-                maxWidth: 4 * this.emToPxConversionRate,
+                width:    1,
                 minWidth: 4 * this.emToPxConversionRate,
                 cellRendererFramework: RemoveLinkButtonRenderer,
                 onRemoveClicked: "removePoRow"
@@ -1053,8 +1018,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 			columnDefinitions.push({
 				headerName: "",
 				editable: false,
-                width:    4 * this.emToPxConversionRate,
-                maxWidth: 4 * this.emToPxConversionRate,
+                width:    1,
                 minWidth: 4 * this.emToPxConversionRate,
 				cellRendererFramework: ApproveButtonRenderer,
 				onClick: "onApproveButtonClicked_creditCard",
@@ -1067,7 +1031,6 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 			editable: false,
             width: 200,
             minWidth: 10 * this.emToPxConversionRate,
-            maxWidth: 15 * this.emToPxConversionRate,
 			cellRendererFramework: IconLinkButtonRenderer,
 			icon: "./assets/creditcards.png",
 			onClick: "openCreditCardEditor",
@@ -1076,8 +1039,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 		columnDefinitions.push({
 			headerName: "Expires",
 			editable:  true,
-            width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
+            width:    1,
             minWidth: 4 * this.emToPxConversionRate,
 			cellRendererFramework: DateRenderer,
 			cellEditorFramework: DateEditor,
@@ -1087,8 +1049,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 		columnDefinitions.push({
 			headerName: "Credit Card Company",
 			editable:  true,
-            width:    8 * this.emToPxConversionRate,
-            maxWidth: 8 * this.emToPxConversionRate,
+            width:    1,
             minWidth: 8 * this.emToPxConversionRate,
 			field: "idCreditCardCompany",
 			cellRendererFramework: SelectRenderer,
@@ -1100,8 +1061,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 		columnDefinitions.push({
 			headerName: "Zip",
 			editable:  true,
-            width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
+            width:    1,
             minWidth: 4 * this.emToPxConversionRate,
 			field: "zipCode"
 		});
@@ -1109,7 +1069,6 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 			headerName: "Users",
 			editable: false,
             width: 200,
-            maxWidth: 12 * this.emToPxConversionRate,
             minWidth: 6 * this.emToPxConversionRate,
 			field: "acctUsers",
 			rendererOptions: this.labActiveSubmitters,
@@ -1122,8 +1081,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 			headerName: "Active",
 			editable: false,
             checkboxEditable: true,
-            width:    2.5 * this.emToPxConversionRate,
-            maxWidth: 2.5 * this.emToPxConversionRate,
+            width:    1,
             minWidth: 2.5 * this.emToPxConversionRate,
 			field: "activeAccount",
 			cellRendererFramework: CheckboxRenderer
@@ -1131,8 +1089,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 		columnDefinitions.push({
 			headerName: "$ Billed",
 			editable: false,
-            width:    5 * this.emToPxConversionRate,
-            maxWidth: 5 * this.emToPxConversionRate,
+            width:    1,
             minWidth: 5 * this.emToPxConversionRate,
 			field: "totalChargesToDateDisplay",
 			cellRendererFramework: TextAlignRightMiddleRenderer
@@ -1150,8 +1107,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
             columnDefinitions.push({
                 headerName: "",
                 editable: false,
-                width:    4 * this.emToPxConversionRate,
-                maxWidth: 4 * this.emToPxConversionRate,
+                width:    1,
                 minWidth: 4 * this.emToPxConversionRate,
                 cellRendererFramework: RemoveLinkButtonRenderer,
                 onRemoveClicked: "removeCreditCardRow"
@@ -1170,6 +1126,10 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
 
 
 	onChartfieldGridReady(event: any): void {
+	    if (this.oneEmWidth && this.oneEmWidth.nativeElement && this.oneEmWidth.nativeElement.offsetWidth && this.oneEmWidth.nativeElement.offsetWidth > 0) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
 		this.chartfieldGridApi = event.api;
 		this.chartfieldGridColumnApi = event.columnApi;
 
@@ -1598,7 +1558,7 @@ export class BillingAccountTabComponent implements AfterViewInit, OnInit, OnDest
     }
 
 	onGridSizeChanged(event: any): void {
-        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement && this.oneEmWidth.nativeElement.offsetWidth && this.oneEmWidth.nativeElement.offsetWidth > 0) {
             this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
         }
 

@@ -77,19 +77,18 @@ export class LibprepQcWorkflowComponent {
             field: "sampleNumber",
             width:    1,
             minWidth: 4.5 * this.emToPxConversionRate,
-            maxWidth: 9 * this.emToPxConversionRate
         });
         result.push({
             headerName: "Client",
             editable: false,
             field: "appUserName",
-            width:    500,
+            width:    1,
             minWidth: 9 * this.emToPxConversionRate,
         });
         result.push({
             headerName: "Library QC Protocol",
             editable:  true,
-            width:    500,
+            width:    1,
             minWidth: 12 * this.emToPxConversionRate,
             field: "idLibPrepQCProtocol",
             cellRendererFramework: SelectRenderer,
@@ -103,7 +102,7 @@ export class LibprepQcWorkflowComponent {
         result.push({
             headerName: "Library QC Conc.",
             editable: true,
-            width:    500,
+            width:    1,
             minWidth: 9 * this.emToPxConversionRate,
             field: "qcLibConcentration",
             cellRendererFramework: TextAlignLeftMiddleRenderer,
@@ -111,7 +110,7 @@ export class LibprepQcWorkflowComponent {
         result.push({
             headerName: "Status",
             editable:  true,
-            width:    1,
+            width:    500,
             minWidth: 10 * this.emToPxConversionRate,
             field: "seqPrepQCStatus",
             cellRendererFramework: SelectRenderer,

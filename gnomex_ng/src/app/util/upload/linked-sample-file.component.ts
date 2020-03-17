@@ -1,6 +1,6 @@
 import {
     AfterViewInit,
-    Component,
+    Component, ElementRef,
     EventEmitter,
     Input,
     OnInit,
@@ -61,10 +61,18 @@ import {ActionType} from "../interfaces/generic-dialog-action.model";
             color: var(--bluewarmvivid-medlight);
             border: var(--bluewarmvivid-medlight)  solid 1px;
         }
+        
+        .no-height { height: 0;  }
+        .single-em { width: 1em; }
 
     `]
 })
 export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
+
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+
+    private emToPxConversionRate: number = 13;
+
     private manageFileSubscript: Subscription;
     public gridApi: GridApi;
     private gridColDefs: any[];
@@ -140,11 +148,29 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
                 field: "displayName",
                 cellRenderer: "agGroupCellRenderer",
                 cellRendererParams: {innerRenderer: getDownloadGroupRenderer(), suppressCount: true},
-                rowDrag: true
+                rowDrag: true,
+                width: 1,
+                minWidth: 150
             },
-            {headerName: "Name", field: "name", width: 150, maxWidth: 150},
-            {headerName: "Date", field: "lastModifyDateDisplay", width: 150, maxWidth: 150},
-            {headerName: "Size", field: "fileSizeText", width: 150, maxWidth: 150, type: "numericColumn"},
+            {
+                headerName: "Name",
+                field: "name",
+                width: 200,
+                minWidth: 8.5 * this.emToPxConversionRate,
+            },
+            {
+                headerName: "Date",
+                field: "lastModifyDateDisplay",
+                width: 1,
+                minWidth: 8.5 * this.emToPxConversionRate,
+            },
+            {
+                headerName: "Size",
+                field: "fileSizeText",
+                width: 1,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                type: "numericColumn"
+            },
         ];
 
         this.getNodeChildDetails = function getItemNodeChildDetails(rowItem) {
@@ -692,11 +718,19 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
 
 
     public onGridReady(event: GridReadyEvent): void {
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement && this.oneEmWidth.nativeElement.offsetWidth) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
         event.api.setColumnDefs(this.gridColDefs);
         event.api.sizeColumnsToFit();
         this.gridApi = event.api;
     }
     public onGridSizeChanged(event: GridSizeChangedEvent): void {
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement && this.oneEmWidth.nativeElement.offsetWidth) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
         event.api.sizeColumnsToFit();
     }
     public selectedGridRow(event: RowClickedEvent){

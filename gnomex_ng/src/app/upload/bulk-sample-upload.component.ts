@@ -146,7 +146,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "Import?",
             checkboxSelection: true,
             width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
             minWidth: 4 * this.emToPxConversionRate,
             suppressSizeToFit: true
         });
@@ -154,7 +153,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "Experiment #",
             editable: false,
             width:    7 * this.emToPxConversionRate,
-            maxWidth: 7 * this.emToPxConversionRate,
             minWidth: 7 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "requestNumber"
@@ -163,7 +161,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "# Samples Unchanged",
             editable: false,
             width:    9 * this.emToPxConversionRate,
-            maxWidth: 9 * this.emToPxConversionRate,
             minWidth: 9 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "numUnmodifiedSamples"
@@ -172,7 +169,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "# Samples Updated",
             editable: false,
             width:    8 * this.emToPxConversionRate,
-            maxWidth: 8 * this.emToPxConversionRate,
             minWidth: 8 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "numUpdatedSamples"
@@ -181,7 +177,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "# Samples Created",
             editable: false,
             width:    8 * this.emToPxConversionRate,
-            maxWidth: 8 * this.emToPxConversionRate,
             minWidth: 8 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "numCreatedSamples"
@@ -190,7 +185,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "# Errors/Warnings",
             editable: false,
             width:    8 * this.emToPxConversionRate,
-            maxWidth: 8 * this.emToPxConversionRate,
             minWidth: 8 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "numErrors"
@@ -217,7 +211,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "Row",
             editable: false,
             width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
             minWidth: 4 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "rowOrdinal"
@@ -226,7 +219,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "Col",
             editable: false,
             width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
             minWidth: 4 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "columnOrdinal"
@@ -235,7 +227,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "Experiment",
             editable: false,
             width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
             minWidth: 4 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "requestNumber"
@@ -244,7 +235,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "Sample",
             editable: false,
             width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
             minWidth: 4 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "sampleNumber"
@@ -253,7 +243,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "Col Name",
             editable: false,
             width:    6 * this.emToPxConversionRate,
-            maxWidth: 6 * this.emToPxConversionRate,
             minWidth: 6 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "header"
@@ -262,7 +251,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "Status",
             editable: false,
             width:    6 * this.emToPxConversionRate,
-            maxWidth: 6 * this.emToPxConversionRate,
             minWidth: 6 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "status"
@@ -290,7 +278,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "Row",
             editable: false,
             width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
             minWidth: 4 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "rowOrdinal"
@@ -299,7 +286,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "Col",
             editable: false,
             width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
             minWidth: 4 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "columnOrdinal"
@@ -308,7 +294,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "Experiment",
             editable: false,
             width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
             minWidth: 4 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "requestNumber"
@@ -317,7 +302,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "Sample",
             editable: false,
             width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
             minWidth: 4 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "sampleNumber"
@@ -326,7 +310,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "Col Name",
             editable: false,
             width:    6 * this.emToPxConversionRate,
-            maxWidth: 6 * this.emToPxConversionRate,
             minWidth: 6 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "header"
@@ -335,7 +318,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "Status",
             editable: false,
             width:    6 * this.emToPxConversionRate,
-            maxWidth: 6 * this.emToPxConversionRate,
             minWidth: 6 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "status"
@@ -359,7 +341,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             headerName: "Row",
             editable: false,
             width:    4 * this.emToPxConversionRate,
-            maxWidth: 4 * this.emToPxConversionRate,
             minWidth: 4 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "rowOrdinal"
@@ -372,7 +353,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
                 headerName: header.header,
                 editable: false,
                 width:    4 * this.emToPxConversionRate,
-                maxWidth: 4 * this.emToPxConversionRate,
                 minWidth: 4 * this.emToPxConversionRate,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 errorMessageHeader: 'Upload Error\n',

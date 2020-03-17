@@ -157,7 +157,6 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
             checkboxSelection: true,
             headerCheckboxSelection: true,
             width:    17,
-            maxWidth: 17,
             minWidth: 17,
             suppressSizeToFit: true
         });
@@ -166,7 +165,6 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
             editable: false,
             width:     7 * this.emToPxConversionRate,
             minWidth:  7 * this.emToPxConversionRate,
-            maxWidth: 10 * this.emToPxConversionRate,
             suppressSizeToFit: true,
             cellRendererFramework: IconTextRendererComponent,
             field: "requestNumber"
@@ -197,7 +195,6 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
             editable: false,
             width:    5 * this.emToPxConversionRate,
             minWidth: 5 * this.emToPxConversionRate,
-            maxWidth: 5 * this.emToPxConversionRate,
             suppressSizeToFit: true,
             cellRendererFramework: LinkButtonRenderer,
             buttonLabel: 'View',
@@ -209,7 +206,6 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
             editable: false,
             width:    6 * this.emToPxConversionRate,
             minWidth: 6 * this.emToPxConversionRate,
-            maxWidth: 6 * this.emToPxConversionRate,
             suppressSizeToFit: true,
             cellRendererFramework: TextAlignRightMiddleRenderer,
             field: "numberOfSamples"
@@ -219,7 +215,6 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
             editable: false,
             width:    8 * this.emToPxConversionRate,
             minWidth: 8 * this.emToPxConversionRate,
-            maxWidth: 8 * this.emToPxConversionRate,
             suppressSizeToFit: true,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "requestStatus"
@@ -239,7 +234,6 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
             editable: false,
             width:    12 * this.emToPxConversionRate,
             minWidth: 12 * this.emToPxConversionRate,
-            maxWidth: 12 * this.emToPxConversionRate,
             suppressSizeToFit: true,
             cellRendererFramework: TextAlignRightMiddleRenderer,
             field: "createDate"
@@ -249,7 +243,6 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
             editable: false,
             width:    8 * this.emToPxConversionRate,
             minWidth: 8 * this.emToPxConversionRate,
-            maxWidth: 8 * this.emToPxConversionRate,
             suppressSizeToFit: true,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "container"
@@ -258,6 +251,7 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
             headerName: "Submitter",
             editable: false,
             width: 400,
+            minWidth: 9 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "ownerName"
         });
@@ -265,6 +259,7 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
             headerName: "Lab",
             editable: false,
             width: 300,
+            minWidth: 10 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             field: "labName"
         });
