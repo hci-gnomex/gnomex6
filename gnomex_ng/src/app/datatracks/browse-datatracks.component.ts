@@ -76,7 +76,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     private navInitSubscription: Subscription;
 
     public options: ITreeOptions;
-    public items: any;
+    public items: any[];
     public organisms: any;
 
     public labMembers: any;
@@ -118,7 +118,10 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         this.organisms = [];
 
         this.dataTracksListSubscription = this.datatracksService.getDatatracksListObservable().subscribe(response => {
+            let start =  performance.now();
             this.buildTree(response);
+            let end = performance.now();
+            console.log("This is how long it took to complete build tree " + (end - start) + " in milliseconds");
 
             if(this.datatracksService.previousURLParams && this.datatracksService.previousURLParams["refreshParams"] ){ // this code occurs when searching
                 this.datatracksService.previousURLParams["refreshParams"] = false;
@@ -294,6 +297,8 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
             } else {
                 this.items = response;
             }
+            this.items.sort(UtilService.sortObjectAlphabetically("name"));
+
             this.organisms = this.organisms.concat(this.items);
             for (let org of this.items) {
                 org.isOrganism = true;
@@ -305,32 +310,13 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                     } else {
                         org.items = org.GenomeBuild;
                     }
+                    (<any[]>org.items).sort(UtilService.sortObjectAlphabetically("label"));
 
                     for (let gNomeBuild of org.items) {
                         if (gNomeBuild) {
                             this.assignIconToGenomeBuild(gNomeBuild);
                             gNomeBuild.labId = org.labId;
-                            if (gNomeBuild.DataTrack) {
-                                if (!this.isArray(gNomeBuild.DataTrack)) {
-                                    gNomeBuild.items = [gNomeBuild.DataTrack];
-                                } else {
-                                    gNomeBuild.items = gNomeBuild.DataTrack;
-                                }
-                                for (let dataTrack of gNomeBuild.items) {
-                                    if (dataTrack) {
-                                        if (dataTrack.label) {
-                                            this.assignIconToDT(dataTrack);
-                                        } else {
-                                            console.log("label not defined");
-                                        }
-                                    } else {
-                                        console.log("a is undefined");
-                                    }
-                                }
-                            }
-                            if (gNomeBuild.DataTrackFolder) {
-                                this.addDataTracksFromFolder(gNomeBuild, gNomeBuild.items);
-                            }
+                            this.addDataTracksFromFolder(gNomeBuild, gNomeBuild.DataTrack);
                         }
                     }
                 }
@@ -344,43 +330,39 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
     addDataTracksFromFolder(root, items: any[]): any[] {
         let dtItems: any[] = [];
-        if (!this.isArray(root.DataTrackFolder)) {
-            root.DataTrackFolder = [root.DataTrackFolder];
-        }
         if (!items) {
             items = [];
         }
 
+        if(!root.DataTrackFolder){
+            root.DataTrackFolder = [];
+        }
+
+
+        if (!this.isArray(root.DataTrackFolder)) {
+            root.DataTrackFolder = [root.DataTrackFolder];
+        }
+        (<any[]>root.DataTrackFolder).sort(UtilService.sortObjectAlphabetically("name"));
+
         if (!this.isArray(items)) {
             items = [items];
         }
+        items.sort(UtilService.sortObjectAlphabetically("number"));
+
         for (let dtf of root.DataTrackFolder) {
             this.assignIconToDTFolder(dtf);
         }
+        for (let dt of items) {
+            this.assignIconToDT(dt);
+        }
+
         dtItems = dtItems.concat(root.DataTrackFolder);
         dtItems = dtItems.concat(items);
         root.items = dtItems;
 
+
         for (let dtf of root.items) {
-
-            if (dtf.DataTrackFolder) {
-                this.assignIconToDTFolder(dtf);
-                this.addDataTracksFromFolder(dtf, dtf.DataTracks);
-            }
-            if (dtf.DataTrack) {
-                if (!this.isArray(dtf.DataTrack)) {
-                    dtf.DataTrack = [dtf.DataTrack];
-                }
-                for (let dt of dtf.DataTrack) {
-                    this.assignIconToDT(dt);
-                }
-                if (dtf.items) {
-                    dtf.items = dtf.items.concat(dtf.DataTrack);
-                } else {
-                    dtf.items = dtf.DataTrack;
-                }
-            }
-
+            this.addDataTracksFromFolder(dtf, dtf.DataTrack);
         }
 
         return root;
