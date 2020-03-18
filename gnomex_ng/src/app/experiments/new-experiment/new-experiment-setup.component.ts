@@ -409,6 +409,9 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
                         || (cat.idCoreFacility && account.idCoreFacility && account.idCoreFacility === cat.idCoreFacility)
                     );
             });
+            this.form.get("selectAccount").setValue("");
+            this.form.get("selectAccount").markAsPristine();
+            this.form.get("selectAccount").markAsUntouched();
         }
     }
 
@@ -476,6 +479,7 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
     }
 
     public selectDefaultUserProject(): void {
+        let foundProject:boolean = false;
         if (!this.showName) {
             this.form.controls['selectName'].setErrors(null);
         }
@@ -484,7 +488,7 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
             for (let project of this.filteredProjectList) {
                 if (this._experiment.experimentOwner
                     && this._experiment.experimentOwner.idAppUser === project.idAppUser) {
-
+                    foundProject = true;
                     setTimeout(() => {
                         this.form.get('selectProject').setValue(project);
                         this.project = this.form.get('selectProject').value;
@@ -498,6 +502,9 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
 
                     break;
                 }
+            }
+            if(!foundProject){
+                this.form.get("selectProject").setValue("");
             }
         }
 
@@ -644,24 +651,25 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
                         this.form.get("selectAccount").setValue(this.authorizedBillingAccounts[0]);
                         this.onBillingAccountSelection(this.authorizedBillingAccounts[0]);
                     }
+                    if (this.adminState !== "AdminState") {
+                        let temp: any[] = this.gnomexService.appUserList.filter((value: any) => {
+                            return value.idAppUser === '' + this.createSecurityAdvisor.idAppUser;
+                        });
+
+                        if (temp && temp.length === 1) {
+                            this._experiment.experimentOwner = temp[0];
+                            this._experiment.idOwner = '' + this.createSecurityAdvisor.idAppUser;
+
+                            this.selectDefaultUserProject();
+                        }
+                    }
+
                 });
             }
 
             this._experiment.lab = event;
         }
 
-        if (this.adminState !== "AdminState") {
-            let temp: any[] = this.gnomexService.appUserList.filter((value: any) => {
-                return value.idAppUser === '' + this.createSecurityAdvisor.idAppUser;
-            });
-
-            if (temp && temp.length === 1) {
-                this._experiment.experimentOwner = temp[0];
-                this._experiment.idOwner = '' + this.createSecurityAdvisor.idAppUser;
-
-                this.selectDefaultUserProject();
-            }
-        }
     }
 
     public onBillingAccountSelection(event: any): void {
