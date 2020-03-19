@@ -21,6 +21,7 @@ import {TextAlignLeftMiddleEditor} from "../util/grid-editors/text-align-left-mi
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
 import {ConstantsService} from "../services/constants.service";
+import {CellRendererValidation} from "../util/grid-renderers/cell-renderer-validation";
 
 @Component({
     selector: "browse-dictionary",
@@ -102,6 +103,7 @@ import {ConstantsService} from "../services/constants.service";
                                      [stopEditingWhenGridLosesFocus]="true"
                                      (rowDataChanged)="onRowDataChanged($event)"
                                      (cellValueChanged)="onCellValueChanged($event)"
+                                     (cellFocused)="onCellFocused($event)"
                                      [enableSorting]="true"
                                      [enableColResize]="true">
                     </ag-grid-angular>
@@ -299,6 +301,14 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         }
     }
 
+    public onCellFocused(event: any): void {
+        for (let instance of event.api.getCellRendererInstances({ rowNodes: [this.gridApi.getRowNode(event.rowIndex) ]})) {
+            if (instance._componentRef.instance instanceof CellRendererValidation) {
+                instance._componentRef.instance.updateValidation();
+            }
+        }
+    }
+
     public onCellValueChanged(event: any): void {
         if(event.colDef.field === "sortOrder") {
             //FixMe: validator required
@@ -476,6 +486,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                     if(this.dictionaryEditable && this.isEditMode) {
                         colDef.cellRendererFramework = SelectRenderer;
                         colDef.cellEditorFramework = SelectEditor;
+                        colDef.delayValidation = true;
                         colDef.selectOptions = this.dictionaryService.getEntriesExcludeBlank(field.className);
                         colDef.selectOptionsDisplayField = "display";
                         colDef.selectOptionsValueField = "value";
@@ -486,6 +497,15 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                 } else if(field.dataType === "text") {
                     colDef.cellRendererFramework = TextAlignLeftMiddleRenderer;
                     colDef.cellEditorFramework = TextAlignLeftMiddleEditor;
+                    colDef.validators = [
+                        Validators.required,
+                        Validators.pattern(/^\d{1,10}$/)
+                    ];
+                    colDef.errorNameErrorMessageMap = [
+                        { errorName: 'required', errorMessage: 'Multiplex Group required' },
+                        { errorName: 'pattern',  errorMessage: 'Expects an integer number' }
+                    ];
+                    colDef.validateOnlyRenderedCells = true;
                 } else if(field.dataType === "isActive" || field.dataType === "YN") {
                     if (this.dictionaryEditable && this.isEditMode) {
                         colDef.cellRendererFramework = SelectRenderer;
