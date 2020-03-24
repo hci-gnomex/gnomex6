@@ -32,10 +32,10 @@ import {CellRendererValidation} from "../util/grid-renderers/cell-renderer-valid
                     <label>Dictionaries</label>
                     <div>
                         <button mat-button (click)="refreshAll()"><img [src]="'./assets/refresh.png'" class="button-image"></button>
-                        <button mat-button [disabled]="!this.selectedDictionary && !this.selectedEntry" (click)="addEntry()">
+                        <button mat-button [disabled]="!this.selectedDictionary && !this.selectedEntry" (click)="addEntry()" matTooltip="Add single dictionary entry">
                             <img [src]="!this.selectedDictionary && !this.selectedEntry ? './assets/add_disable.png' : './assets/add.png'" class="button-image">
                         </button>
-                        <button mat-button [disabled]="!this.selectedEntry" (click)="deleteEntry()">
+                        <button mat-button [disabled]="!this.selectedEntry" (click)="deleteEntry()" matTooltip="Delete single dictionary entry">
                             <img [src]="!this.selectedEntry ? './assets/delete_disable.png' : './assets/delete.png'" class="button-image">
                         </button>
                     </div>
@@ -45,8 +45,12 @@ import {CellRendererValidation} from "../util/grid-renderers/cell-renderer-valid
                         <input matInput placeholder="Search" [(ngModel)]="this.searchText" (keydown.enter)="searchDictionary()">
                     </mat-form-field>
                     <div>
-                        <button mat-button (click)="searchDictionary()"><img [src]="'./assets/magnifier.png'" class="button-image"></button>
-                        <button mat-button (click)="clearSearch()"><img [src]="'./assets/cross.png'" class="button-image"></button>
+                        <button mat-button (click)="searchDictionary()">
+                            <img [src]="'./assets/magnifier.png'" class="button-image">
+                        </button>
+                        <button mat-button (click)="clearSearch()">
+                            <img [src]="'./assets/cross.png'" class="button-image">
+                        </button>
                     </div>
                 </div>
                 <div class="tree-container">
@@ -69,15 +73,14 @@ import {CellRendererValidation} from "../util/grid-renderers/cell-renderer-valid
                         <label>{{this.dictionaryName}}</label>
                     </div>
                     <div>
-<!--                        <button mat-button [hidden]="!dictionaryEditable || isEditMode" (click)="changeMode()">-->
-                        <button mat-button [hidden]="!dictionaryEditable" (click)="changeMode()">
-                            <img *ngIf="!isEditMode" class="icon" [src]="this.constService.ICON_TAG_BLUE_EDIT">
-                            <img *ngIf="isEditMode" class="icon" [src]="this.constService.PAGE">
-                            {{isEditMode ? "View" : "Edit"}}
-                        </button>
+                            <button mat-button [hidden]="!dicGridEditable" (click)="changeMode()">
+                                <img *ngIf="!isEditMode" class="icon" [src]="this.constService.ICON_TAG_BLUE_EDIT">
+                                <img *ngIf="isEditMode" class="icon" [src]="this.constService.PAGE">
+                                {{isEditMode ? "View" : "Edit"}}
+                            </button>
                     </div>
                 </div>
-                <div class="flex-container-row extra-padded-top justify-space-between" [hidden]="!dictionaryEditable || !this.isEditMode">
+                <div class="flex-container-row extra-padded-top justify-space-between" [hidden]="!dicGridEditable || !selectedDictionary || !isEditMode">
                     <div class="flex-grow">
                         <button mat-button class="padded-right" (click)="onAddRow()">
                             <img class="icon" [src]="this.constService.ICON_ADD" alt="">
@@ -88,22 +91,21 @@ import {CellRendererValidation} from "../util/grid-renderers/cell-renderer-valid
                             Remove Rows
                         </button>
                     </div>
-<!--                    <button mat-button (click)="changeMode()">-->
-<!--                        <img class="icon" [src]="this.constService.PAGE">-->
-<!--                        {{isEditMode ? "View" : "Edit"}}-->
-<!--                    </button>-->
                 </div>
-                <div [hidden]="!this.selectedDictionary" class="flex-one {{isEditMode ? '' : 'extra-padded-top' }}">
+                <div [hidden]="!this.selectedDictionary"
+                     class="flex-one {{dicGridEditable ? '' : 'extra-padded-top' }}">
                     <ag-grid-angular class="ag-theme-balham full-height full-width"
                                      (gridReady)="this.onGridReady($event)"
                                      [enableFilter]="dictionaryFilterable"
                                      (selectionChanged)="onSelectionChanged($event)"
-                                     [rowSelection]="'multiple'"
+                                     [rowSelection]="this.rowSelectionMode"
                                      [rowDeselection]="true"
                                      [stopEditingWhenGridLosesFocus]="true"
-                                     (rowDataChanged)="onRowDataChanged($event)"
                                      (cellValueChanged)="onCellValueChanged($event)"
                                      (cellFocused)="onCellFocused($event)"
+                                     (cellDoubleClicked)="onDellDoubleClicked($event)"
+                                     (cellClicked)="onDellClicked($event)"
+                                     [singleClickEdit]="isEditMode ? true : false"
                                      [enableSorting]="true"
                                      [enableColResize]="true">
                     </ag-grid-angular>
@@ -194,8 +196,8 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
     public selectedEntry: DictionaryEntry = null;
     public dictionaryName: string = "";
     public searchText: string = "";
-    public dictionaryEditable: boolean = false;
-    public isEditMode: boolean = true;  // TODO: need to fix as false
+    public dicGridEditable: boolean = false;
+    public isEditMode: boolean = false;
     public dictionaryFilterable: boolean = false;
     public selectedRows: any[] = [];
 
@@ -215,10 +217,16 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
     private gridApi: GridApi;
     private gridDataDirty: boolean = false;
 
+    private successSaved: boolean = false;
+    private addRowIndex: number = 0;
     private optionsYN: any[] = [
         {value: "Y", display: "Yes"},
         {value: "N", display: "No"}
         ];
+
+    public get rowSelectionMode(): string {
+        return this.isEditMode ? "multiple" : "single";
+    }
 
 
     constructor(private dialogRef: MatDialogRef<BrowseDictionaryComponent>,
@@ -234,7 +242,8 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             this.isDialog = this.data.isDialog;
             this.preSelectedDictionary = Array.isArray(this.data.preSelectedDictionary) ? this.data.preSelectedDictionary : [this.data.preSelectedDictionary];
             this.preSelectedEntry = this.data.preSelectedEntry;
-            this.dictionaryEditable = this.data.dictionaryEditable ? this.data.dictionaryEditable : false;
+            this.dicGridEditable = this.data.dicGridEditable ? this.data.dicGridEditable : false;
+            this.dictionaryFilterable = this.data.dictionaryFilterable ? this.data.dictionaryFilterable : false;
         }
     }
 
@@ -244,10 +253,9 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         this.entryForm = new FormGroup({});
         this.buildTree();
         this.entryForm.markAsPristine();
-        this.dictionaryFilterable = this.dictionaryEditable ? true : false;
         this.primaryDisable = (action) => {
             if(this.selectedDictionary) {
-                return !this.dictionaryEditable || !this.gridDataDirty; //TODO: or if the grid is invalid.
+                return !this.dicGridEditable || !this.gridDataDirty;
             } else {
                 return this.entryForm.invalid || !this.selectedEntry || !this.entryForm.dirty;
             }
@@ -255,6 +263,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         this.dirty = () => this.selectedDictionary ? this.gridDataDirty : this.entryForm.dirty;
 
         if(this.isDialog) {
+            this.successSaved = false;
             setTimeout(() => {
                 let node: ITreeNode;
                 node = this.findNodeByIdAndClassName((Array.isArray(this.preSelectedDictionary) ? this.preSelectedDictionary[0] : [this.preSelectedDictionary][0]), this.preSelectedEntry);
@@ -272,62 +281,75 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
     }
 
     public changeMode() {
-        if(this.isEditMode) {
-            this.isEditMode = false;
+        if(!this.selectedDictionary) {
+            return;
+        }
+
+        this.dialogsService.startDefaultSpinnerDialog();
+        this.isEditMode = !this.isEditMode;
+
+        if(this.gridDataDirty) {
+            this.dialogsService.confirm("Your changes haven't been saved. Continue anyway?")
+                .subscribe((result: boolean) => {
+                    if(result) {
+                        this.prepareGrid();
+                        for (let dict of this.treeComponent.treeModel.roots) {
+                            if (dict.data.className === this.selectedDictionary.className) {
+                                dict.expand();
+                                dict.toggleActivated(null);
+                                break;
+                            }
+                        }
+                        this.gridDataDirty = false;
+                        this.dialogsService.stopAllSpinnerDialogs();
+                    }
+                });
         } else {
-            this.isEditMode = true;
+            this.prepareGrid();
+            this.dialogsService.stopAllSpinnerDialogs();
         }
-        for(let dictionaryColDef of this.dictionaryColDefs) {
-            dictionaryColDef.editable = this.isEditMode;
-        }
-        if(this.gridApi) {
-            setTimeout(() => {
-                this.gridApi.setColumnDefs(this.dictionaryColDefs);
-                // this.gridApi.setRowData(this.selectedDictionary.DictionaryEntry);
-                this.gridApi.redrawRows();
-                this.gridApi.redrawRows({rowNodes: this.gridApi.getSelectedNodes()});
-                this.gridApi.sizeColumnsToFit();
-            });
-        }
+
+        this.changeDetector.detectChanges();
     }
 
     public onSelectionChanged(event: SelectionChangedEvent): void {
-        this.selectedRows = event.api.getSelectedRows();
+        if(this.isEditMode) {
+            this.selectedRows = event.api.getSelectedRows();
+        }
     }
 
-    public onRowDataChanged(event: any): void {
-        if(this.gridApi) {
-            console.log(event);
+    public onDellClicked(event: any): void {
+        if(!this.isEditMode) {
+            return;
+        }
+    }
+
+    public onDellDoubleClicked(event: any): void {
+        if(!this.isEditMode) {
+            let node: ITreeNode;
+            node = this.findNodeByIdAndClassName(this.selectedDictionary.className, event.data.datakey);
+            if (node) {
+                node.setIsActive(true);
+                node.scrollIntoView();
+            }
         }
     }
 
     public onCellFocused(event: any): void {
-        for (let instance of event.api.getCellRendererInstances({ rowNodes: [this.gridApi.getRowNode(event.rowIndex) ]})) {
-            if (instance._componentRef.instance instanceof CellRendererValidation) {
-                instance._componentRef.instance.updateValidation();
+        if(event.rowIndex != null) {
+            for (let instance of event.api.getCellRendererInstances({ rowNodes: [this.gridApi.getRowNode(event.rowIndex) ]})) {
+                if (instance._componentRef.instance instanceof CellRendererValidation) {
+                    instance._componentRef.instance.updateValidation();
+                }
             }
         }
     }
 
     public onCellValueChanged(event: any): void {
-        if(event.colDef.field === "sortOrder") {
-            //FixMe: validator required
-            // let errorMessage: string = event.colDef.field + " expects a numeric";
-            // event.colDef.validators = [Validators.pattern(/^\d{1,10}$/)];
-            // event.colDef.errorNameErrorMessageMap = [{errorName: "pattern", errorMessage: errorMessage}];
-            // event.colDef.setErrors = (value: any, data: any, node: any, colDef: any, rowIndex: any, gridApi: any) => {
-            //     return (value && value.match(/^d{0,10}$/)) ? "" : event.colDef.field + " expects a numeric";
-            // };
-            // console.log(event.colDef.setErrors(event.newValue, event.data, event.node, event.colDef, event.rowIndex, this.gridApi) === true);
-            // if(event.colDef.setErrors(event.newValue, event.data, event.node, event.colDef, event.rowIndex, this.gridApi)) {
-            //     return;
-            // }
-        }
-
-        // if(event.newValue !== event.oldValue) {
+        if((event.oldValue !== undefined && event.newValue !== event.oldValue) || (event.oldValue === undefined && event.newValue)) {
             this.changedRowDataMap.set(event.data.datakey, event.data);
             this.gridDataDirty = true;
-        // }
+        }
     }
 
     public onAddRow(): void {
@@ -343,9 +365,10 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             canUpdate: template && template.canUpdate ? template.canUpdate : "",
             display: "",
             value: "",
-            datakey: "",
+            datakey: "add-" + this.addRowIndex,
             action: "add"
         };
+        this.addRowIndex++;
 
         this.selectedDictionary.DictionaryEntry.push(newEntry);
         this.gridApi.setRowData(this.selectedDictionary.DictionaryEntry);
@@ -356,18 +379,28 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         this.gridApi.getRowNode(rowIndex).setSelected(true);
         this.gridApi.setFocusedCell(this.gridApi.getRowNode(rowIndex).rowIndex, "name");
         this.gridApi.ensureIndexVisible(this.gridApi.getRowNode(rowIndex).rowIndex, "bottom");
-        this.gridDataDirty = true;
     }
 
     public onRemoveRows(): void {
      if(this.selectedRows.length > 0) {
          for(let selectedRow of this.selectedRows) {
              this.selectedDictionary.DictionaryEntry.splice(this.selectedDictionary.DictionaryEntry.indexOf(selectedRow), 1)
-             selectedRow.action = "delete";
-             this.changedRowDataMap.set(selectedRow.datakey, selectedRow);
+             if(selectedRow.datakey && selectedRow.datakey.toString().substr(0, 4) !== "add-") {
+                 //Remove existing row data
+                 selectedRow.action = "delete";
+                 this.changedRowDataMap.set(selectedRow.datakey, selectedRow);
+                 this.gridDataDirty = true;
+             } else if(selectedRow.datakey && selectedRow.datakey.toString().substr(0, 4) === "add-") {
+                 //Remove new added row data
+                 for(let key of this.changedRowDataMap.keys()) {
+                     if (key.toString() === selectedRow.datakey) {
+                         this.changedRowDataMap.delete(key);
+                         break;
+                     }
+                 }
+             }
          }
          this.gridApi.setRowData(this.selectedDictionary.DictionaryEntry);
-         this.gridDataDirty = true;
 
          this.selectedRows = [];
          this.gridApi.deselectAll();
@@ -394,11 +427,15 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                 entry.icon = "./assets/page_white.png";
             }
         }
-        dictionariesTemp.sort((a: Dictionary, b:Dictionary) => {
+        dictionariesTemp.sort((a: Dictionary, b: Dictionary) => {
             return a.display.toUpperCase().localeCompare(b.display.toUpperCase());
         });
         dictionariesTemp = this.restrictCoreFacilityVisibility(dictionariesTemp);
         this.dictionaries = dictionariesTemp;
+    }
+
+    public close() {
+        this.dialogRef.close(this.successSaved);
     }
 
     private restrictCoreFacilityVisibility(dictionariesTemp: Dictionary[]): Dictionary[] {
@@ -433,6 +470,10 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         this.selectedDictionary = null;
         this.selectedEntry = null;
         this.changedRowDataMap = new Map<string, any>();
+        this.addRowIndex = 0;
+        this.gridDataDirty = false;
+        this.selectedRows = [];
+        this.isEditMode = false;
 
         this.selectedTreeNode = event.node;
         let selectedData: any = JSON.parse(JSON.stringify(this.selectedTreeNode.data));
@@ -470,20 +511,17 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         });
     }
 
-    private dictionaryColDefs: any[] = [];
-
     private prepareGrid(): void {
         let colDefs: any[] = [];
         for (let field of this.cachedMetaDataFields) {
             if (field.visible === 'Y') {
-                //TODO: Validation needed. Adding validators here causes a slow down of loading
                 let colDef: any = {
                     headerName: field.caption, headerTooltip: field.caption, field: field.dataField,
-                    tooltipField: field.dataField, editable: this.dictionaryEditable && this.isEditMode,
+                    tooltipField: field.dataField, editable: this.isEditMode,
                     isIdentifier: field.isIdentifier
                 };
                 if (field.dataType === "comboBox") {
-                    if(this.dictionaryEditable && this.isEditMode) {
+                    if(this.dicGridEditable) {
                         colDef.cellRendererFramework = SelectRenderer;
                         colDef.cellEditorFramework = SelectEditor;
                         colDef.delayValidation = true;
@@ -494,20 +532,12 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                         colDef.valueFormatter = this.optionsFieldValueFormatter;
                         colDef.comboBoxOptions = this.dictionaryService.getEntriesExcludeBlank(field.className);
                     }
+                    colDef.filter = "false"; //TODO: refactor when custom filer is ready
                 } else if(field.dataType === "text") {
                     colDef.cellRendererFramework = TextAlignLeftMiddleRenderer;
                     colDef.cellEditorFramework = TextAlignLeftMiddleEditor;
-                    colDef.validators = [
-                        Validators.required,
-                        Validators.pattern(/^\d{1,10}$/)
-                    ];
-                    colDef.errorNameErrorMessageMap = [
-                        { errorName: 'required', errorMessage: 'Multiplex Group required' },
-                        { errorName: 'pattern',  errorMessage: 'Expects an integer number' }
-                    ];
-                    colDef.validateOnlyRenderedCells = true;
                 } else if(field.dataType === "isActive" || field.dataType === "YN") {
-                    if (this.dictionaryEditable && this.isEditMode) {
+                    if (this.dicGridEditable) {
                         colDef.cellRendererFramework = SelectRenderer;
                         colDef.cellEditorFramework = SelectEditor;
                         colDef.selectOptions = this.optionsYN;
@@ -516,13 +546,16 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                     }
                 }
 
+                if(field.dataField === "sortOrder") {
+                    colDef.validators = [Validators.pattern(/^\d{0,10}$/)];
+                    colDef.errorNameErrorMessageMap = [{ errorName: "pattern",  errorMessage: "Expects an integer number" }];
+                    colDef.validateOnlyRenderedCells = true;
+                }
                 colDefs.push(colDef);
             }
         }
 
-        this.dictionaryColDefs = colDefs; // used for changing mode, may not work
         this.gridApi.setColumnDefs(colDefs);
-        //TODO: need to ordered first by "oligo barcode scheme" and then by barcode sort order. Brian's request
         this.gridApi.setRowData(this.selectedDictionary.DictionaryEntry);
         this.gridApi.sizeColumnsToFit();
     }
@@ -639,6 +672,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
 
             let className: string = this.selectedTreeNode.data.className ? this.selectedTreeNode.data.className : this.selectedTreeNode.parent.data.className;
             this.dictionaryService.save(isInsertMode, object, className, () => {
+                this.successSaved = true;
                 this.buildTree();
                 this.showSpinner = false;
                 setTimeout(() => {
@@ -661,12 +695,14 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                 });
             }, () => {
                 this.showSpinner = false;
-                this.dialogsService.error("An error occurred while saving dictionary");
             });
         } else if(this.selectedDictionary && this.dirty) {
             this.showSpinner = true;
             let dictionaryEntries: any[] = [];
             for(let value of Array.from(this.changedRowDataMap.values())) {
+                if(value.datakey && value.datakey.toString().substr(0, 4) === "add-") {
+                    value.datakey = "";
+                }
                 dictionaryEntries.push(value);
             }
             let savedDictionaryEntries: any[] = [];
@@ -702,6 +738,9 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                     entryCount++;
                     if(entryCount === dictionaryEntries.length) {
                         this.changedRowDataMap = new Map<string, any>();
+                        this.addRowIndex = 0;
+                        this.successSaved = true;
+                        this.isEditMode = false;
                         this.buildTree();
                         this.showSpinner = false;
                         setTimeout(() => {
@@ -717,7 +756,6 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                 }, () => {
                     //Error
                     this.showSpinner = false;
-                    this.dialogsService.error("An error occurred while saving dictionary");
                 });
             } else {
                 this.showSpinner = false;
@@ -772,7 +810,6 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             });
         }, () => {
             this.showSpinner = false;
-            this.dialogsService.error("An error occurred while deleting dictionary");
         });
     }
 
@@ -794,8 +831,30 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         this.selectedEntry = null;
         this.dialogsService.addSpinnerWorkItem();
         this.dictionaryService.reloadAndRefresh(() => {
+            this.gridDataDirty = false;
             this.buildTree();
             this.dialogsService.removeSpinnerWorkItem();
+            setTimeout(() => {
+                if(this.preSelectedDictionary.length > 0) {
+                    let className: string = this.preSelectedDictionary[0];
+                    for(let dict of this.treeComponent.treeModel.roots) {
+                        if(dict.data.className === className) {
+                            dict.expand();
+                            if (this.preSelectedEntry) {
+                                for (let entry of dict.children) {
+                                    if(entry.data.datakey === this.preSelectedEntry) {
+                                        entry.toggleActivated(null);
+                                        break;
+                                    }
+                                }
+                            } else {
+                                dict.toggleActivated(null);
+                            }
+                            break;
+                        }
+                    }
+                }
+            });
         }, () => {
             this.dialogsService.stopAllSpinnerDialogs();
         });
@@ -805,8 +864,8 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         return (obj && obj[field]) ? obj[field] : "";
     }
 
-    public cancel(): void {
-        this.dialogRef.close();
+    public cancel() {
+        this.dialogRef.close(this.successSaved);
     }
 
     private findNodeByIdAndClassName(className: string, id?: string): ITreeNode {

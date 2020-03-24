@@ -374,7 +374,7 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
                     this.params.node.gridApi.formGroup = new FormGroup({});
                 } else {
                     // check for any removed nodes & remove their validators if needed.
-                    for (let controlName of this.params.node.gridApi.formGroup.controls.keys()) {
+                    for (let controlName of Object.keys(this.params.node.gridApi.formGroup.controls)) {
                         if (('' + controlName).toLowerCase().substr(0, 9) === 'rowgroup_') {
                             let found: boolean = false;
                             for (let node of this.params.node.gridApi.getModel().rowsToDisplay) {

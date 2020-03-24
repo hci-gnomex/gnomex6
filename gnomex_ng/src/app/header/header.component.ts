@@ -385,21 +385,23 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             isDialog: true,
             preSelectedDictionary: preSelectedDictionary,
             preSelectedEntry: "",
-            dictionaryEditable: true,
+            dicGridEditable: true,
+            dictionaryFilterable: true,
         };
 
         params.dialogsService.genericDialogContainer(BrowseDictionaryComponent, "Bulk Bar Code Editor", params.constService.ICON_BOOK, config,
             {actions: [
                     {type: ActionType.PRIMARY, icon: null, name: "Save", internalAction: "save"},
-                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
-                ]}).subscribe(() => {
-                    params.dialogsService.addSpinnerWorkItem();
-                    params.dictionaryService.reloadAndRefresh(() => {
-                        //TODO: refresh dictionaries if on Add/Edit Dictionaries page?
-                        params.dialogsService.removeSpinnerWorkItem();
-                    }, () => {
-                        params.dialogsService.stopAllSpinnerDialogs();
-                    });
+                    {type: ActionType.SECONDARY, name: "Close", internalAction: "close"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        params.dialogsService.addSpinnerWorkItem();
+                        params.dictionaryService.reloadAndRefresh(() => {
+                            params.dialogsService.removeSpinnerWorkItem();
+                        }, () => {
+                            params.dialogsService.stopAllSpinnerDialogs();
+                        });
+                    }
         });
     }
 

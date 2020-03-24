@@ -5,6 +5,7 @@ import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {Dictionary} from "../configuration/dictionary.interface";
 import {DictionaryEntry} from "../configuration/dictionary-entry.type";
 import {CookieUtilService} from "./cookie-util.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Injectable()
 export class DictionaryService {
@@ -165,7 +166,7 @@ export class DictionaryService {
                     errorCallback();
                 }
             }
-        }, () => {
+        }, (err: IGnomexErrorResponse) => {
             if (errorCallback) {
                 errorCallback();
             }
