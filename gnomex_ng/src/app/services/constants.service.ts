@@ -103,6 +103,7 @@ export class ConstantsService {
     public readonly ICON_WORK_AUTH_FORM: string = "assets/work_auth_form.png";
     public readonly ICON_FLAG_YELLOW: string = "assets/flag_yellow.png";
     public readonly ICON_USER: string = "assets/user.png";
+    public readonly ICON_BOOK: string = "assets/book.png";
 
     public readonly ICON_ANALYSIS: string = "assets/map.png";
     public readonly ICON_ANALYSIS_ADD: string = "assets/map_add.png";

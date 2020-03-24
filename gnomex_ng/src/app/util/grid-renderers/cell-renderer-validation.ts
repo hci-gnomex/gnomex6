@@ -69,8 +69,18 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
             && this.params.node.gridApi
             && this.params.node.gridApi.formGroup === undefined) {
 
-            this.determineIfAllRowsNeedValidationInAdvance();
-            this.createAllFormControls();
+            let foundDelayValidationProperty: boolean = false;
+
+            for (let columnDef of params.node.gridApi.columnController.columnDefs) {
+                if (columnDef.delayValidation && columnDef.delayValidation === true) {
+                    foundDelayValidationProperty = true;
+                }
+            }
+
+            if (!foundDelayValidationProperty) {
+                this.determineIfAllRowsNeedValidationInAdvance();
+                this.createAllFormControls();
+            }
         }
 
         this.getErrorMessage();
@@ -314,7 +324,9 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
                 return column.colDef
                     && column.colDef.field
                     && (column.colDef.validators || column.colDef.setErrors)
-                    && column.colDef.editable === true;
+                    && column.colDef.editable === true
+                    && !(column.colDef.validateOnlyRenderedCells
+                        && column.colDef.validateOnlyRenderedCells === true);
             });
 
             this.params.node.gridApi.mode_needToValidateOnlyRenderedCells = Array.isArray(columns) && columns.length === 0;
@@ -334,5 +346,82 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
                 }
             }
         }
+    }
+
+    public updateValidation(): void {
+        console.log("Successfully reached!");
+        // add this form control
+
+        let columns = this.params.columnApi.columnController.gridColumns.filter((column) => {
+            return column.colDef
+                && column.colDef.field
+                && (column.colDef.validators || column.colDef.setErrors)
+                && column.colDef.field === this.params.field;
+        });
+
+        if (this.params.colDef
+            && this.params.colDef.field
+            && (this.params.colDef.validators || this.params.colDef.setErrors)) {
+
+            this.params.node[this.params.colDef.field + "_errorMessage"] = '';
+
+            let formControl: FormControl = new FormControl(this.params.colDef.field + '_formControl', []);
+
+            if (!this.params.node.formGroup) {
+                this.params.node.formGroup = new FormGroup({});
+
+                if (!this.params.node.gridApi.formGroup) {
+                    this.params.node.gridApi.formGroup = new FormGroup({});
+                } else {
+                    // check for any removed nodes & remove their validators if needed.
+                    for (let controlName of Object.keys(this.params.node.gridApi.formGroup.controls)) {
+                        if (('' + controlName).toLowerCase().substr(0, 9) === 'rowgroup_') {
+                            let found: boolean = false;
+                            for (let node of this.params.node.gridApi.getModel().rowsToDisplay) {
+                                if (('' + node.rowIndex) === ('' + controlName).substr(9)) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                this.params.node.gridApi.formGroup.removeControl(controlName);
+                            }
+                        }
+                    }
+
+                }
+
+                this.params.node.gridApi.formGroup.addControl('RowGroup_' + this.params.node.rowIndex, this.params.node.formGroup);
+            }
+
+            if (!this.params.node.formGroup.controls[this.params.colDef.field + '_formControl']) {
+                this.params.node.formGroup.addControl(this.params.colDef.field + '_formControl', formControl);
+
+                if (Array.isArray(this.params.colDef.validators)) {
+                    this.params.node.formGroup.controls[this.params.colDef.field + '_formControl'].setValidators(this.params.colDef.validators);
+                }
+
+                if (this.params.node.gridApi.columnController
+                    && this.params.node.gridApi.columnController.columnDefs) {
+
+                    for (let columnDef of this.params.node.gridApi.columnController.columnDefs) {
+                        if (columnDef.outerForm && columnDef.formName) {
+                            if (!columnDef.outerForm.get(columnDef.formName)) {
+                                columnDef.outerForm.addControl(columnDef.formName, this.params.node.gridApi.formGroup);
+                            } else {
+                                columnDef.outerForm.setControl(columnDef.formName, this.params.node.gridApi.formGroup);
+                            }
+                        }
+                    }
+                }
+            }
+
+            this.updateErrorMessage(formControl, this.params.node, this.params.colDef);
+        }
+
+        // add column control groups if needed
+        // add row control groups if needed
+        // setup grid control group if needed
+        // Might need to trigger cell validation to run with the new validation.
     }
 }

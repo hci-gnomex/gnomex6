@@ -6,8 +6,8 @@ import {Dictionary} from "./dictionary.interface";
 import {DictionaryEntry} from "./dictionary-entry.type";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {DialogsService} from "../util/popup/dialogs.service";
-import {GridApi, GridReadyEvent} from "ag-grid-community";
-import {FormControl, FormGroup} from "@angular/forms";
+import {GridApi, GridReadyEvent, SelectionChangedEvent} from "ag-grid-community";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {ValueFormatterParams} from "ag-grid-community/dist/lib/entities/colDef";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
@@ -16,6 +16,12 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material/dialog";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {GDAction} from "../util/interfaces/generic-dialog-action.model";
+import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignLeftMiddleEditor} from "../util/grid-editors/text-align-left-middle.editor";
+import {SelectRenderer} from "../util/grid-renderers/select.renderer";
+import {SelectEditor} from "../util/grid-editors/select.editor";
+import {ConstantsService} from "../services/constants.service";
+import {CellRendererValidation} from "../util/grid-renderers/cell-renderer-validation";
 
 @Component({
     selector: "browse-dictionary",
@@ -26,10 +32,10 @@ import {GDAction} from "../util/interfaces/generic-dialog-action.model";
                     <label>Dictionaries</label>
                     <div>
                         <button mat-button (click)="refreshAll()"><img [src]="'./assets/refresh.png'" class="button-image"></button>
-                        <button mat-button [disabled]="!this.selectedDictionary && !this.selectedEntry" (click)="addEntry()">
+                        <button mat-button [disabled]="!this.selectedDictionary && !this.selectedEntry" (click)="addEntry()" matTooltip="Add single dictionary entry">
                             <img [src]="!this.selectedDictionary && !this.selectedEntry ? './assets/add_disable.png' : './assets/add.png'" class="button-image">
                         </button>
-                        <button mat-button [disabled]="!this.selectedEntry" (click)="deleteEntry()">
+                        <button mat-button [disabled]="!this.selectedEntry" (click)="deleteEntry()" matTooltip="Delete single dictionary entry">
                             <img [src]="!this.selectedEntry ? './assets/delete_disable.png' : './assets/delete.png'" class="button-image">
                         </button>
                     </div>
@@ -39,8 +45,12 @@ import {GDAction} from "../util/interfaces/generic-dialog-action.model";
                         <input matInput placeholder="Search" [(ngModel)]="this.searchText" (keydown.enter)="searchDictionary()">
                     </mat-form-field>
                     <div>
-                        <button mat-button (click)="searchDictionary()"><img [src]="'./assets/magnifier.png'" class="button-image"></button>
-                        <button mat-button (click)="clearSearch()"><img [src]="'./assets/cross.png'" class="button-image"></button>
+                        <button mat-button (click)="searchDictionary()">
+                            <img [src]="'./assets/magnifier.png'" class="button-image">
+                        </button>
+                        <button mat-button (click)="clearSearch()">
+                            <img [src]="'./assets/cross.png'" class="button-image">
+                        </button>
                     </div>
                 </div>
                 <div class="tree-container">
@@ -58,12 +68,44 @@ import {GDAction} from "../util/interfaces/generic-dialog-action.model";
                 </div>
             </div>
             <div class="full-height flex-container-col detail-view extra-padded">
-                <div [hidden]="!this.dictionaryName">
-                    <label>{{this.dictionaryName}}</label>
+                <div class="flex-container-row justify-space-between" [hidden]="!this.dictionaryName">
+                    <div [hidden]="!this.dictionaryName">
+                        <label>{{this.dictionaryName}}</label>
+                    </div>
+                    <div>
+                            <button mat-button [hidden]="!dicGridEditable" (click)="changeMode()">
+                                <img *ngIf="!isEditMode" class="icon" [src]="this.constService.ICON_TAG_BLUE_EDIT">
+                                <img *ngIf="isEditMode" class="icon" [src]="this.constService.PAGE">
+                                {{isEditMode ? "View" : "Edit"}}
+                            </button>
+                    </div>
                 </div>
-                <div [hidden]="!this.selectedDictionary" class="flex-one extra-padded-top">
+                <div class="flex-container-row extra-padded-top justify-space-between" [hidden]="!dicGridEditable || !selectedDictionary || !isEditMode">
+                    <div class="flex-grow">
+                        <button mat-button class="padded-right" (click)="onAddRow()">
+                            <img class="icon" [src]="this.constService.ICON_ADD" alt="">
+                            Add Row
+                        </button>
+                        <button mat-button class="padded-right" (click)="onRemoveRows()" [disabled]="selectedRows.length < 1">
+                            <img class="icon" [src]="this.constService.ICON_DELETE" alt="">
+                            Remove Rows
+                        </button>
+                    </div>
+                </div>
+                <div [hidden]="!this.selectedDictionary"
+                     class="flex-one {{dicGridEditable ? '' : 'extra-padded-top' }}">
                     <ag-grid-angular class="ag-theme-balham full-height full-width"
                                      (gridReady)="this.onGridReady($event)"
+                                     [enableFilter]="dictionaryFilterable"
+                                     (selectionChanged)="onSelectionChanged($event)"
+                                     [rowSelection]="this.rowSelectionMode"
+                                     [rowDeselection]="true"
+                                     [stopEditingWhenGridLosesFocus]="true"
+                                     (cellValueChanged)="onCellValueChanged($event)"
+                                     (cellFocused)="onCellFocused($event)"
+                                     (cellDoubleClicked)="onDellDoubleClicked($event)"
+                                     (cellClicked)="onDellClicked($event)"
+                                     [singleClickEdit]="isEditMode ? true : false"
                                      [enableSorting]="true"
                                      [enableColResize]="true">
                     </ag-grid-angular>
@@ -82,12 +124,10 @@ import {GDAction} from "../util/interfaces/generic-dialog-action.model";
                                               [options]="field.options" valueField="value" displayField="display"
                                               [formControlName]="field.dataField">
                             </custom-combo-box>
-                            <mat-form-field *ngSwitchCase="'isActive'" class="full-width">
-                                <mat-select [placeholder]="field.caption" [formControlName]="field.dataField">
-                                    <mat-option value="Y">Yes</mat-option>
-                                    <mat-option value="N">No</mat-option>
-                                </mat-select>
-                            </mat-form-field>
+                            <custom-combo-box *ngSwitchCase="'isActive'" class="full-width" [placeholder]="field.caption"
+                                              [options]="field.options" valueField="value" displayField="display"
+                                              [formControlName]="field.dataField">
+                            </custom-combo-box>
                             <mat-checkbox *ngSwitchCase="'YN'" [formControlName]="field.dataField">{{field.caption}}</mat-checkbox>
                             <mat-form-field *ngSwitchCase="'date'" class="full-width">
                                 <input matInput [matDatepicker]="datePicker" [placeholder]="field.caption" [formControlName]="field.dataField">
@@ -156,6 +196,10 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
     public selectedEntry: DictionaryEntry = null;
     public dictionaryName: string = "";
     public searchText: string = "";
+    public dicGridEditable: boolean = false;
+    public isEditMode: boolean = false;
+    public dictionaryFilterable: boolean = false;
+    public selectedRows: any[] = [];
 
     public entryForm: FormGroup;
     public entryFields: any[] = [];
@@ -163,13 +207,27 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
     public showSpinner: boolean = false;
     public primaryDisable: (action?: GDAction) => boolean;
     private isDialog: boolean = false;
-    private preSelectedDictionary: string;
-    private preSelectedEntry: string;
+    private preSelectedDictionary: any[] = [];
+    private preSelectedEntry: string = "";
 
     private cachedMetaDataClassName: string = "";
     private cachedMetaDataFields: any[] = [];
+    private changedRowDataMap: Map<string, any> = new Map<string, any>();
 
     private gridApi: GridApi;
+    private gridDataDirty: boolean = false;
+
+    private successSaved: boolean = false;
+    private addRowIndex: number = 0;
+    private optionsYN: any[] = [
+        {value: "Y", display: "Yes"},
+        {value: "N", display: "No"}
+        ];
+
+    public get rowSelectionMode(): string {
+        return this.isEditMode ? "multiple" : "single";
+    }
+
 
     constructor(private dialogRef: MatDialogRef<BrowseDictionaryComponent>,
                 @Inject(MAT_DIALOG_DATA) private data: any,
@@ -177,12 +235,15 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                 private changeDetector: ChangeDetectorRef,
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private utilService: UtilService,
+                public constService: ConstantsService,
                 private dialogsService: DialogsService) {
         super();
         if(this.data && Object.keys(this.data).length > 0) {
             this.isDialog = this.data.isDialog;
-            this.preSelectedDictionary = this.data.preSelectedDictionary;
+            this.preSelectedDictionary = Array.isArray(this.data.preSelectedDictionary) ? this.data.preSelectedDictionary : [this.data.preSelectedDictionary];
             this.preSelectedEntry = this.data.preSelectedEntry;
+            this.dicGridEditable = this.data.dicGridEditable ? this.data.dicGridEditable : false;
+            this.dictionaryFilterable = this.data.dictionaryFilterable ? this.data.dictionaryFilterable : false;
         }
     }
 
@@ -193,13 +254,19 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         this.buildTree();
         this.entryForm.markAsPristine();
         this.primaryDisable = (action) => {
-            return this.entryForm.invalid || !this.selectedEntry || !this.entryForm.dirty;
+            if(this.selectedDictionary) {
+                return !this.dicGridEditable || !this.gridDataDirty;
+            } else {
+                return this.entryForm.invalid || !this.selectedEntry || !this.entryForm.dirty;
+            }
         };
+        this.dirty = () => this.selectedDictionary ? this.gridDataDirty : this.entryForm.dirty;
 
         if(this.isDialog) {
+            this.successSaved = false;
             setTimeout(() => {
                 let node: ITreeNode;
-                node = this.findNodeByIdAndClassName(this.preSelectedDictionary, this.preSelectedEntry);
+                node = this.findNodeByIdAndClassName((Array.isArray(this.preSelectedDictionary) ? this.preSelectedDictionary[0] : [this.preSelectedDictionary][0]), this.preSelectedEntry);
                 if (node) {
                     node.setIsActive(true);
                     node.scrollIntoView();
@@ -213,10 +280,144 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         this.utilService.removeChangeDetectorRef(this.changeDetector);
     }
 
+    public changeMode() {
+        if(!this.selectedDictionary) {
+            return;
+        }
+
+        this.dialogsService.startDefaultSpinnerDialog();
+        this.isEditMode = !this.isEditMode;
+
+        if(this.gridDataDirty) {
+            this.dialogsService.confirm("Your changes haven't been saved. Continue anyway?")
+                .subscribe((result: boolean) => {
+                    if(result) {
+                        this.prepareGrid();
+                        for (let dict of this.treeComponent.treeModel.roots) {
+                            if (dict.data.className === this.selectedDictionary.className) {
+                                dict.expand();
+                                dict.toggleActivated(null);
+                                break;
+                            }
+                        }
+                        this.gridDataDirty = false;
+                        this.dialogsService.stopAllSpinnerDialogs();
+                    }
+                });
+        } else {
+            this.prepareGrid();
+            this.dialogsService.stopAllSpinnerDialogs();
+        }
+
+        this.changeDetector.detectChanges();
+    }
+
+    public onSelectionChanged(event: SelectionChangedEvent): void {
+        if(this.isEditMode) {
+            this.selectedRows = event.api.getSelectedRows();
+        }
+    }
+
+    public onDellClicked(event: any): void {
+        if(!this.isEditMode) {
+            return;
+        }
+    }
+
+    public onDellDoubleClicked(event: any): void {
+        if(!this.isEditMode) {
+            let node: ITreeNode;
+            node = this.findNodeByIdAndClassName(this.selectedDictionary.className, event.data.datakey);
+            if (node) {
+                node.setIsActive(true);
+                node.scrollIntoView();
+            }
+        }
+    }
+
+    public onCellFocused(event: any): void {
+        if(event.rowIndex != null) {
+            for (let instance of event.api.getCellRendererInstances({ rowNodes: [this.gridApi.getRowNode(event.rowIndex) ]})) {
+                if (instance._componentRef.instance instanceof CellRendererValidation) {
+                    instance._componentRef.instance.updateValidation();
+                }
+            }
+        }
+    }
+
+    public onCellValueChanged(event: any): void {
+        if((event.oldValue !== undefined && event.newValue !== event.oldValue) || (event.oldValue === undefined && event.newValue)) {
+            this.changedRowDataMap.set(event.data.datakey, event.data);
+            this.gridDataDirty = true;
+        }
+    }
+
+    public onAddRow(): void {
+        if(!this.selectedDictionary) {
+            return;
+        }
+
+        let template = this.selectedRows.length > 0 ? this.selectedRows[0] : this.selectedDictionary.DictionaryEntry.length > 0 ? this.selectedDictionary.DictionaryEntry[0] : null;
+        let newEntry = {
+            canDelete: template && template.canDelete ? template.canDelete : "",
+            canRead: template && template.canRead ? template.canRead : "",
+            canWrite: template && template.canWrite ? template.canWrite : "",
+            canUpdate: template && template.canUpdate ? template.canUpdate : "",
+            display: "",
+            value: "",
+            datakey: "add-" + this.addRowIndex,
+            action: "add"
+        };
+        this.addRowIndex++;
+
+        this.selectedDictionary.DictionaryEntry.push(newEntry);
+        this.gridApi.setRowData(this.selectedDictionary.DictionaryEntry);
+        this.gridApi.redrawRows();
+
+        this.gridApi.deselectAll();
+        let rowIndex  = "" + this.selectedDictionary.DictionaryEntry.indexOf(newEntry);
+        this.gridApi.getRowNode(rowIndex).setSelected(true);
+        this.gridApi.setFocusedCell(this.gridApi.getRowNode(rowIndex).rowIndex, "name");
+        this.gridApi.ensureIndexVisible(this.gridApi.getRowNode(rowIndex).rowIndex, "bottom");
+    }
+
+    public onRemoveRows(): void {
+     if(this.selectedRows.length > 0) {
+         for(let selectedRow of this.selectedRows) {
+             this.selectedDictionary.DictionaryEntry.splice(this.selectedDictionary.DictionaryEntry.indexOf(selectedRow), 1)
+             if(selectedRow.datakey && selectedRow.datakey.toString().substr(0, 4) !== "add-") {
+                 //Remove existing row data
+                 selectedRow.action = "delete";
+                 this.changedRowDataMap.set(selectedRow.datakey, selectedRow);
+                 this.gridDataDirty = true;
+             } else if(selectedRow.datakey && selectedRow.datakey.toString().substr(0, 4) === "add-") {
+                 //Remove new added row data
+                 for(let key of this.changedRowDataMap.keys()) {
+                     if (key.toString() === selectedRow.datakey) {
+                         this.changedRowDataMap.delete(key);
+                         break;
+                     }
+                 }
+             }
+         }
+         this.gridApi.setRowData(this.selectedDictionary.DictionaryEntry);
+
+         this.selectedRows = [];
+         this.gridApi.deselectAll();
+     }
+    }
+
     private buildTree(): void {
         let dictionariesTemp: Dictionary[] = this.dictionaryService.getEditableDictionaries();
+        this.preSelectedDictionary = Array.isArray(this.preSelectedDictionary) ? this.preSelectedDictionary : [this.preSelectedDictionary];
         if(this.isDialog) {
-            dictionariesTemp = dictionariesTemp.filter((value: Dictionary) => (value.className === this.preSelectedDictionary));
+            dictionariesTemp = dictionariesTemp.filter((value: Dictionary) => {
+                for(let dictionary of this.preSelectedDictionary) {
+                    if(value.className === dictionary) {
+                        return true;
+                    }
+                }
+            });
         }
         for (let dictionary of dictionariesTemp) {
             dictionary.display = dictionary.displayName;
@@ -226,11 +427,15 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                 entry.icon = "./assets/page_white.png";
             }
         }
-        dictionariesTemp.sort((a: Dictionary, b:Dictionary) => {
+        dictionariesTemp.sort((a: Dictionary, b: Dictionary) => {
             return a.display.toUpperCase().localeCompare(b.display.toUpperCase());
         });
         dictionariesTemp = this.restrictCoreFacilityVisibility(dictionariesTemp);
         this.dictionaries = dictionariesTemp;
+    }
+
+    public close() {
+        this.dialogRef.close(this.successSaved);
     }
 
     private restrictCoreFacilityVisibility(dictionariesTemp: Dictionary[]): Dictionary[] {
@@ -264,6 +469,11 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
     public selectTreeItem(event: any): void {
         this.selectedDictionary = null;
         this.selectedEntry = null;
+        this.changedRowDataMap = new Map<string, any>();
+        this.addRowIndex = 0;
+        this.gridDataDirty = false;
+        this.selectedRows = [];
+        this.isEditMode = false;
 
         this.selectedTreeNode = event.node;
         let selectedData: any = JSON.parse(JSON.stringify(this.selectedTreeNode.data));
@@ -297,7 +507,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                     callback();
                 }
             }
-        },(err:IGnomexErrorResponse) =>{
+        }, (err: IGnomexErrorResponse) => {
         });
     }
 
@@ -306,15 +516,45 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         for (let field of this.cachedMetaDataFields) {
             if (field.visible === 'Y') {
                 let colDef: any = {
-                    headerName: field.caption, headerTooltip: field.caption, field: field.dataField, tooltipField: field.dataField
+                    headerName: field.caption, headerTooltip: field.caption, field: field.dataField,
+                    tooltipField: field.dataField, editable: this.isEditMode,
+                    isIdentifier: field.isIdentifier
                 };
                 if (field.dataType === "comboBox") {
-                    colDef.valueFormatter = this.optionsFieldValueFormatter;
-                    colDef.comboBoxOptions = this.dictionaryService.getEntriesExcludeBlank(field.className);
+                    if(this.dicGridEditable) {
+                        colDef.cellRendererFramework = SelectRenderer;
+                        colDef.cellEditorFramework = SelectEditor;
+                        colDef.delayValidation = true;
+                        colDef.selectOptions = this.dictionaryService.getEntriesExcludeBlank(field.className);
+                        colDef.selectOptionsDisplayField = "display";
+                        colDef.selectOptionsValueField = "value";
+                    } else {
+                        colDef.valueFormatter = this.optionsFieldValueFormatter;
+                        colDef.comboBoxOptions = this.dictionaryService.getEntriesExcludeBlank(field.className);
+                    }
+                    colDef.filter = "false"; //TODO: refactor when custom filer is ready
+                } else if(field.dataType === "text") {
+                    colDef.cellRendererFramework = TextAlignLeftMiddleRenderer;
+                    colDef.cellEditorFramework = TextAlignLeftMiddleEditor;
+                } else if(field.dataType === "isActive" || field.dataType === "YN") {
+                    if (this.dicGridEditable) {
+                        colDef.cellRendererFramework = SelectRenderer;
+                        colDef.cellEditorFramework = SelectEditor;
+                        colDef.selectOptions = this.optionsYN;
+                        colDef.selectOptionsDisplayField = "value";
+                        colDef.selectOptionsValueField = "value";
+                    }
+                }
+
+                if(field.dataField === "sortOrder") {
+                    colDef.validators = [Validators.pattern(/^\d{0,10}$/)];
+                    colDef.errorNameErrorMessageMap = [{ errorName: "pattern",  errorMessage: "Expects an integer number" }];
+                    colDef.validateOnlyRenderedCells = true;
                 }
                 colDefs.push(colDef);
             }
         }
+
         this.gridApi.setColumnDefs(colDefs);
         this.gridApi.setRowData(this.selectedDictionary.DictionaryEntry);
         this.gridApi.sizeColumnsToFit();
@@ -359,6 +599,9 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             if (field.dataType === "comboBox") {
                 entryField.options = this.dictionaryService.getEntriesExcludeBlank(field.className);
             }
+            if(field.dataType === "isActive") {
+                entryField.options = this.optionsYN;
+            }
             if (field.dataType === "YN") {
                 this.entryForm.addControl(entryField.dataField, new FormControl(entryField.value === 'Y'));
             } else if (field.dataType === 'date') {
@@ -366,6 +609,9 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                 this.entryForm.get(entryField.dataField).disable();
             } else {
                 this.entryForm.addControl(entryField.dataField, new FormControl(entryField.value));
+            }
+            if(field.visible === "Y" && field.dataField === "sortOrder") {
+                this.entryForm.get(entryField.dataField).setValidators(Validators.pattern(/^\d{0,10}$/));
             }
             if (field.visible !== 'Y' || (field.isIdentifier && field.isIdentifier === "Y" && !isInsertMode)) {
                 this.entryForm.get(entryField.dataField).disable();
@@ -426,6 +672,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
 
             let className: string = this.selectedTreeNode.data.className ? this.selectedTreeNode.data.className : this.selectedTreeNode.parent.data.className;
             this.dictionaryService.save(isInsertMode, object, className, () => {
+                this.successSaved = true;
                 this.buildTree();
                 this.showSpinner = false;
                 setTimeout(() => {
@@ -448,8 +695,72 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                 });
             }, () => {
                 this.showSpinner = false;
-                this.dialogsService.error("An error occurred while saving dictionary");
             });
+        } else if(this.selectedDictionary && this.dirty) {
+            this.showSpinner = true;
+            let dictionaryEntries: any[] = [];
+            for(let value of Array.from(this.changedRowDataMap.values())) {
+                if(value.datakey && value.datakey.toString().substr(0, 4) === "add-") {
+                    value.datakey = "";
+                }
+                dictionaryEntries.push(value);
+            }
+            let savedDictionaryEntries: any[] = [];
+            let className: string = this.selectedDictionary.className;
+            let entryCount: number = 0;
+            // let savedDictionaryEntriesMap: Map<string, any> = new Map<string, any>();
+            for(let entry of dictionaryEntries) {
+                let entryObject: HttpParams = new HttpParams();
+                // Get fields of the entry
+                if(entry && typeof entry === "object") {
+                    Object.keys(entry).forEach(key => {
+                        for (let field of this.cachedMetaDataFields) {
+                            if (key === field.dataField) {
+                                entryObject = entryObject.set(key, entry[key]);
+                                break;
+                            }
+                        }
+                    });
+                }
+                let action: string = entry.action ? entry.action : "save";
+                // savedDictionaryEntriesMap.set(action, entryObject);
+                savedDictionaryEntries.push({
+                    action: action,
+                    object: entryObject
+                });
+            }
+
+
+            if(savedDictionaryEntries.length > 0) {
+                // this.showSpinner = true;
+                this.dictionaryService.saveDictionaries(savedDictionaryEntries, className, () => {
+                    //Succeed
+                    entryCount++;
+                    if(entryCount === dictionaryEntries.length) {
+                        this.changedRowDataMap = new Map<string, any>();
+                        this.addRowIndex = 0;
+                        this.successSaved = true;
+                        this.isEditMode = false;
+                        this.buildTree();
+                        this.showSpinner = false;
+                        setTimeout(() => {
+                            for(let dict of this.treeComponent.treeModel.roots) {
+                                if(dict.data.className === className) {
+                                    dict.expand();
+                                    dict.toggleActivated(null);
+                                    this.gridDataDirty = false;
+                                }
+                            }
+                        });
+                    }
+                }, () => {
+                    //Error
+                    this.showSpinner = false;
+                });
+            } else {
+                this.showSpinner = false;
+            }
+
         }
     }
 
@@ -499,7 +810,6 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             });
         }, () => {
             this.showSpinner = false;
-            this.dialogsService.error("An error occurred while deleting dictionary");
         });
     }
 
@@ -521,8 +831,30 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         this.selectedEntry = null;
         this.dialogsService.addSpinnerWorkItem();
         this.dictionaryService.reloadAndRefresh(() => {
+            this.gridDataDirty = false;
             this.buildTree();
             this.dialogsService.removeSpinnerWorkItem();
+            setTimeout(() => {
+                if(this.preSelectedDictionary.length > 0) {
+                    let className: string = this.preSelectedDictionary[0];
+                    for(let dict of this.treeComponent.treeModel.roots) {
+                        if(dict.data.className === className) {
+                            dict.expand();
+                            if (this.preSelectedEntry) {
+                                for (let entry of dict.children) {
+                                    if(entry.data.datakey === this.preSelectedEntry) {
+                                        entry.toggleActivated(null);
+                                        break;
+                                    }
+                                }
+                            } else {
+                                dict.toggleActivated(null);
+                            }
+                            break;
+                        }
+                    }
+                }
+            });
         }, () => {
             this.dialogsService.stopAllSpinnerDialogs();
         });
@@ -532,8 +864,8 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         return (obj && obj[field]) ? obj[field] : "";
     }
 
-    public cancel(): void {
-        this.dialogRef.close();
+    public cancel() {
+        this.dialogRef.close(this.successSaved);
     }
 
     private findNodeByIdAndClassName(className: string, id?: string): ITreeNode {
