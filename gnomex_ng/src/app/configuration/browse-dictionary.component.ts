@@ -708,7 +708,6 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             let savedDictionaryEntries: any[] = [];
             let className: string = this.selectedDictionary.className;
             let entryCount: number = 0;
-            // let savedDictionaryEntriesMap: Map<string, any> = new Map<string, any>();
             for(let entry of dictionaryEntries) {
                 let entryObject: HttpParams = new HttpParams();
                 // Get fields of the entry
@@ -723,7 +722,6 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                     });
                 }
                 let action: string = entry.action ? entry.action : "save";
-                // savedDictionaryEntriesMap.set(action, entryObject);
                 savedDictionaryEntries.push({
                     action: action,
                     object: entryObject
@@ -732,9 +730,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
 
 
             if(savedDictionaryEntries.length > 0) {
-                // this.showSpinner = true;
                 this.dictionaryService.saveDictionaries(savedDictionaryEntries, className, () => {
-                    //Succeed
                     entryCount++;
                     if(entryCount === dictionaryEntries.length) {
                         this.changedRowDataMap = new Map<string, any>();
@@ -754,7 +750,6 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                         });
                     }
                 }, () => {
-                    //Error
                     this.showSpinner = false;
                 });
             } else {
