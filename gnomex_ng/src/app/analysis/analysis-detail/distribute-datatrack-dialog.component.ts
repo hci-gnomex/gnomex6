@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from "@angular/core";
+import {Component, ElementRef, Inject, OnInit, ViewChild} from "@angular/core";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 import {GDAction} from "../../util/interfaces/generic-dialog-action.model";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
@@ -24,6 +24,7 @@ import {FileService} from "../../services/file.service";
             <div class="flex-grow">
                 <ag-grid-angular class="ag-theme-balham full-height full-width"
                                  (gridReady)="this.onGridReady($event)"
+                                 (gridSizeChanged)="this.onGridSizeChanged($event)"
                                  [rowSelection]="this.rowSelection"
                                  [groupSelectsChildren]="true"
                                  [getNodeChildDetails]="this.getNodeChildDetails"
@@ -37,6 +38,10 @@ import {FileService} from "../../services/file.service";
 
 export class DistributeDatatrackDialogComponent extends BaseGenericContainerDialog implements OnInit {
 
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+
+    private emToPxConversionRate: number = 13;
+
     public analysis: any;
     public gridData:any[] = [];
     private selectAll:boolean  = true;
@@ -45,11 +50,38 @@ export class DistributeDatatrackDialogComponent extends BaseGenericContainerDial
 
 
     public columnDefs:ColDef[] =[
-        {headerName: "Folder or File", field: "displayName", tooltipField: "displayName", cellRenderer: "agGroupCellRenderer",
-            cellRendererParams: {innerRenderer: getDownloadGroupRenderer(), suppressCount: true}},
-        {headerName: "Size", field: "fileSizeText", tooltipField: "fileSizeText", width: 150, maxWidth: 150, type: "numericColumn"},
-        {headerName: "Datatrack Created", field: "hasDataTrack", width: 75},
-        {headerName: "", checkboxSelection:true },
+        {
+            headerName: "Folder or File",
+            field: "displayName",
+            tooltipField: "displayName",
+            width:    10 * this.emToPxConversionRate,
+            minWidth: 10 * this.emToPxConversionRate,
+            cellRenderer: "agGroupCellRenderer",
+            cellRendererParams: {
+                innerRenderer: getDownloadGroupRenderer(),
+                suppressCount: true
+            }
+        },
+        {
+            headerName: "Size",
+            field: "fileSizeText",
+            tooltipField: "fileSizeText",
+            width:    1,
+            minWidth: 6 * this.emToPxConversionRate,
+            type: "numericColumn"
+        },
+        {
+            headerName: "Datatrack Created",
+            field: "hasDataTrack",
+            width:    1,
+            minWidth: 12 * this.emToPxConversionRate,
+        },
+        {
+            headerName: "",
+            checkboxSelection:true,
+            width:    1,
+            minWidth: 3 * this.emToPxConversionRate
+        }
     ];
     private gridApi: GridApi;
     public getNodeChildDetails: (rowItem) => ({ expanded: boolean; children: any[]; key: any; group: boolean } | null);
@@ -71,6 +103,10 @@ export class DistributeDatatrackDialogComponent extends BaseGenericContainerDial
     ngOnInit() {
 
         this.getNodeChildDetails = (rowItem) =>  {
+            if (!rowItem) {
+                return null;
+            }
+
             let children: any[] = [];
             if (rowItem.FileDescriptor) {
                 for (let fd of rowItem.FileDescriptor) {
@@ -107,10 +143,13 @@ export class DistributeDatatrackDialogComponent extends BaseGenericContainerDial
     }
 
     onGridReady(event:GridReadyEvent){
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
         this.gridApi = event.api;
         this.gridApi.setColumnDefs(this.columnDefs);
         this.gridApi.sizeColumnsToFit();
-
 
         this.analysisService.getAnalysisFilesToDistribute(this.analysis.idAnalysis).subscribe((resp:any) => {
             let analysisFiles: IAnalysisFile[] = resp.AnalysisFiles;
@@ -124,9 +163,16 @@ export class DistributeDatatrackDialogComponent extends BaseGenericContainerDial
             this.gridApi.setRowData([this.gridData]);
             this.selectGrid(null);
         });
+    }
 
+    public onGridSizeChanged(event: any) {
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
 
-
+        if (event && event.api) {
+            event.api.sizeColumnsToFit();
+        }
     }
 
     public selectGrid(event):void{
@@ -187,15 +233,11 @@ export class DistributeDatatrackDialogComponent extends BaseGenericContainerDial
 
     }
 
-
-
-
     filterTree(root:any[],filterIDSet:Set<string>) : any {
         let copyTree = _.cloneDeep(root);
         return this.recurseFilterTree(root[0],filterIDSet)
 
     }
-
 }
 
 function getDownloadGroupRenderer() {

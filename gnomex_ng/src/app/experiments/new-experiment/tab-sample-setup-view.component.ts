@@ -345,8 +345,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             editable: true,
             field: "",
             checkboxSelection: true,
-            width: 22,
-            maxWidth: 22,
+            width: 1,
             minWidth: 22
         });
         temp.push({

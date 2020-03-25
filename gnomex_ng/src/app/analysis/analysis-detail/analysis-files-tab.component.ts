@@ -93,20 +93,79 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         this.isFDTSupported = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_FDT_SUPPORTED);
 
         this.gridColDefs = [
-            {headerName: "Folder or File", field: "displayName", tooltipField: "displayName", cellRenderer: "agGroupCellRenderer",
-                cellRendererParams: {innerRenderer: getDownloadGroupRenderer(), suppressCount: true}},
-            {headerName: "Size", field: "fileSizeText", tooltipField: "fileSizeText", width: 150, maxWidth: 150, type: "numericColumn"},
-            {headerName: "Modified", field: "lastModifyDateDisplay", tooltipField: "lastModifyDateDisplay", width: 120, maxWidth: 120},
-            {headerName: "URL", field: "URLLinkAllowed", width: 70, maxWidth: 70,
-                cellRendererFramework: ViewerLinkRenderer, cellRendererParams: {icon: this.constantsService.ICON_LINK, clickFunction: this.makeURLLink}},
-            {headerName: "UCSC", field: "UCSCViewer", width: 80, maxWidth: 80,
-                cellRendererFramework: ViewerLinkRenderer, cellRendererParams: {icon: this.constantsService.ICON_UCSC, clickFunction: this.makeUCSCLink}},
-            {headerName: "IGV", field: "IGVViewer", width: 70, maxWidth: 70,
-                cellRendererFramework: ViewerLinkRenderer, cellRendererParams: {icon: this.constantsService.ICON_IGV, clickFunction: this.makeIGVLink}},
-            {headerName: "IOBIO", field: "BAMIOBIOViewer", width: 90, maxWidth: 90,
-                cellRendererFramework: ViewerLinkRenderer, cellRendererParams: {icon: this.constantsService.ICON_IOBIO, clickFunction: this.makeIOBIOLink}},
-            {headerName: "GENE", field: "GENEIOBIOViewer", width: 90, maxWidth: 90,
-                cellRendererFramework: ViewerLinkRenderer, cellRendererParams: {icon: this.constantsService.ICON_IOBIO, clickFunction: this.makeGENELink}},
+            {
+                headerName: "Folder or File",
+                field: "displayName",
+                tooltipField: "displayName",
+                cellRenderer: "agGroupCellRenderer",
+                cellRendererParams: {
+                    innerRenderer: getDownloadGroupRenderer(),
+                    suppressCount: true
+                }
+            },
+            {
+                headerName: "Size",
+                field: "fileSizeText",
+                tooltipField: "fileSizeText",
+                width: 150,
+                type: "numericColumn"
+            },
+            {
+                headerName: "Modified",
+                field: "lastModifyDateDisplay",
+                tooltipField: "lastModifyDateDisplay",
+                width: 120,
+            },
+            {
+                headerName: "URL",
+                field: "URLLinkAllowed",
+                width: 70,
+                cellRendererFramework: ViewerLinkRenderer,
+                cellRendererParams: {
+                    icon: this.constantsService.ICON_LINK,
+                    clickFunction: this.makeURLLink
+                }
+            },
+            {
+                headerName: "UCSC",
+                field: "UCSCViewer",
+                width: 80,
+                cellRendererFramework: ViewerLinkRenderer,
+                cellRendererParams: {
+                    icon: this.constantsService.ICON_UCSC,
+                    clickFunction: this.makeUCSCLink
+                }
+            },
+            {
+                headerName: "IGV",
+                field: "IGVViewer",
+                width: 70,
+                cellRendererFramework: ViewerLinkRenderer,
+                cellRendererParams: {
+                    icon: this.constantsService.ICON_IGV,
+                    clickFunction: this.makeIGVLink
+                }
+            },
+            {
+                headerName: "IOBIO",
+                field: "BAMIOBIOViewer",
+                width: 90,
+                cellRendererFramework: ViewerLinkRenderer,
+                cellRendererParams: {
+                    icon: this.constantsService.ICON_IOBIO,
+                    clickFunction: this.makeIOBIOLink
+                }
+            },
+            {
+                headerName: "GENE",
+                field: "GENEIOBIOViewer",
+                width: 90,
+                cellRendererFramework: ViewerLinkRenderer,
+                cellRendererParams: {
+                    icon: this.constantsService.ICON_IOBIO,
+                    clickFunction: this.makeGENELink
+                }
+            }
         ];
         this.getNodeChildDetails = function getItemNodeChildDetails(rowItem) {
             let children: any[] = [];

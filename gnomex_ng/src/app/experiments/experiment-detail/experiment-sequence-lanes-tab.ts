@@ -129,8 +129,18 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
         const sequencingProtocolList: any[] = this.dictionaryService.getEntries(DictionaryService.NUMBER_SEQUENCING_CYCLES_ALLOWED);
 
         this.samplesGridColDefs = [
-            {headerName: "Name", headerTooltip: "Name", field: "name"},
-            {width: 50, maxWidth: 50, cellRendererFramework: IconRendererComponent},
+            {
+                headerName: "Name",
+                headerTooltip: "Name",
+                minWidth: 100,
+                width: 500,
+                field: "name"
+            },
+            {
+                width: 1,
+                minWidth: 50,
+                cellRendererFramework: IconRendererComponent
+            },
         ];
 
         this.route.data.forEach((data: any) => {

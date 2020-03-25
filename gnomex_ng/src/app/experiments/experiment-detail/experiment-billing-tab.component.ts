@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {ConstantsService} from "../../services/constants.service";
 import {GridReadyEvent, GridSizeChangedEvent} from "ag-grid-community";
 import {ActivatedRoute} from "@angular/router";
@@ -26,6 +26,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                 <label class="small-font"><span class="italic">Current Account(s):</span> {{this.currentAccountsLabel}}</label>
             </div>
             <div class="flex-grow">
+                <div #oneEmWidth class="no-height single-em"></div>
                 <ag-grid-angular class="ag-theme-balham full-height full-width"
                                  (gridReady)="this.onGridReady($event)"
                                  (gridSizeChanged)="this.onGridSizeChanged($event)"
@@ -42,9 +43,13 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 })
 export class ExperimentBillingTabComponent implements OnInit {
 
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+
     public getNodeChildDetails;
     public gridColDefs: any[] = [];
     public gridData: any[] = [];
+
+    private emToPxConversionRate: number = 13;
 
     private request: any;
     public canUpdate: boolean = false;
@@ -68,21 +73,87 @@ export class ExperimentBillingTabComponent implements OnInit {
         });
 
         this.gridColDefs = [
-            {headerName: "Group", field: "labName", tooltipField: "labName", cellRenderer: "agGroupCellRenderer",
-                cellRendererParams: {innerRenderer: getGroupRenderer(), suppressCount: true}},
-            {headerName: "Acct", field: "accountName", tooltipField: "accountName"},
-            {headerName: "Period", field: "idBillingPeriod", cellRendererFramework: SelectRenderer, maxWidth: 90,
-                selectOptions: billingPeriods, selectOptionsDisplayField: "display",
-                selectOptionsValueField: "idBillingPeriod"},
-            {headerName: "Description", field: "description", tooltipField: "description"},
-            {headerName: "Notes", field: "notes", tooltipField: "notes"},
-            {headerName: "Qty", field: "qty", tooltipField: "qty", maxWidth: 70},
-            {headerName: "Unit price", field: "unitPrice", tooltipField: "unitPrice"},
-            {headerName: "%", field: "percentageDisplay", tooltipField: "percentageDisplay", maxWidth: 70},
-            {headerName: "Total price", field: "invoicePrice", tooltipField: "invoicePrice"},
-            {headerName: "Status", field: "codeBillingStatus", cellRendererFramework: SelectRenderer, maxWidth: 100,
-                selectOptions: statuses, selectOptionsDisplayField: "display",
-                selectOptionsValueField: "codeBillingStatus"},
+            {
+                headerName: "Group",
+                field: "labName",
+                tooltipField: "labName",
+                minWidth: 10 * this.emToPxConversionRate,
+                width: 14 * this.emToPxConversionRate,
+                cellRenderer: "agGroupCellRenderer",
+                cellRendererParams: {
+                    innerRenderer: getGroupRenderer(),
+                    suppressCount: true
+                }
+            },
+            {
+                headerName: "Acct",
+                field: "accountName",
+                tooltipField: "accountName",
+                minWidth: 10 * this.emToPxConversionRate,
+                width: 14 * this.emToPxConversionRate
+            },
+            {
+                headerName: "Period",
+                field: "idBillingPeriod",
+                minWidth: 5 * this.emToPxConversionRate,
+                width: 5 * this.emToPxConversionRate,
+                cellRendererFramework: SelectRenderer,
+                selectOptions: billingPeriods,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "idBillingPeriod"
+            },
+            {
+                headerName: "Description",
+                field: "description",
+                tooltipField: "description",
+                minWidth: 10 * this.emToPxConversionRate,
+                width: 10 * this.emToPxConversionRate
+            },
+            {
+                headerName: "Notes",
+                field: "notes",
+                tooltipField: "notes",
+                minWidth: 10 * this.emToPxConversionRate,
+                width: 10 * this.emToPxConversionRate
+            },
+            {
+                headerName: "Qty",
+                field: "qty",
+                tooltipField: "qty",
+                minWidth: 6 * this.emToPxConversionRate,
+                width: 1
+            },
+            {
+                headerName: "Unit price",
+                field: "unitPrice",
+                tooltipField: "unitPrice",
+                minWidth: 5 * this.emToPxConversionRate,
+                width: 5 * this.emToPxConversionRate
+            },
+            {
+                headerName: "%",
+                field: "percentageDisplay",
+                tooltipField: "percentageDisplay",
+                minWidth: 6 * this.emToPxConversionRate,
+                width: 1
+            },
+            {
+                headerName: "Total price",
+                field: "invoicePrice",
+                tooltipField: "invoicePrice",
+                minWidth: 8 * this.emToPxConversionRate,
+                width: 1
+            },
+            {
+                headerName: "Status",
+                field: "codeBillingStatus",
+                minWidth: 7 * this.emToPxConversionRate,
+                width: 1,
+                cellRendererFramework: SelectRenderer,
+                selectOptions: statuses,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "codeBillingStatus"
+            },
         ];
         this.getNodeChildDetails = function getItemNodeChildDetails(rowItem: any): any {
             if (rowItem.BillingItem) {
@@ -132,11 +203,23 @@ export class ExperimentBillingTabComponent implements OnInit {
     }
 
     public onGridReady(event: GridReadyEvent): void {
-        event.api.sizeColumnsToFit();
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
+        if (event && event.api) {
+            event.api.sizeColumnsToFit();
+        }
     }
 
     public onGridSizeChanged(event: GridSizeChangedEvent): void {
-        event.api.sizeColumnsToFit();
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
+        if (event && event.api) {
+            event.api.sizeColumnsToFit();
+        }
     }
 
     private refreshBillingAccountsLabel(): void {

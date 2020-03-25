@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {ConstantsService} from "../../services/constants.service";
 import {GridApi, GridReadyEvent, GridSizeChangedEvent, SelectionChangedEvent} from "ag-grid-community";
 import {ActivatedRoute} from "@angular/router";
@@ -21,6 +21,7 @@ import {FormControl} from "@angular/forms";
                 </div>
             </div>
             <div class="flex-grow">
+                <div #oneEmWidth class="no-height single-em"></div>
                 <ag-grid-angular class="ag-theme-balham full-height full-width"
                                  (gridReady)="this.onGridReady($event)"
                                  (gridSizeChanged)="this.onGridSizeChanged($event)"
@@ -33,10 +34,18 @@ import {FormControl} from "@angular/forms";
             </div>
         </div>
     `,
-    styles: [`        
+    styles: [`
+
+        .no-height { height: 0;  }
+        .single-em { width: 1em; }
+        
     `]
 })
 export class DatatracksFilesTabComponent implements OnInit {
+
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+
+    private emToPxConversionRate: number = 13;
 
     public gridColDefs: any[] = [];
     public gridData: any[] = [];
@@ -57,11 +66,35 @@ export class DatatracksFilesTabComponent implements OnInit {
 
     ngOnInit() {
         this.gridColDefs = [
-            {headerName: "Name", field: "name"},
-            {headerName: "Modified", field: "lastModified", width: 120, maxWidth: 120},
-            {headerName: "Size", field: "size", type: "numericColumn", width: 120, maxWidth: 120},
-            {headerName: "Analysis", field: "analysisLabel", cellRendererFramework: IconLinkButtonRenderer,
-                icon: this.constantsService.ICON_ANALYSIS, editable: false, onClick: "goToAnalysis"}
+            {
+                headerName: "Name",
+                field: "name",
+                width:    1,
+                minWidth: 25 * this.emToPxConversionRate
+            },
+            {
+                headerName: "Modified",
+                field: "lastModified",
+                width:    1,
+                minWidth: 8.5 * this.emToPxConversionRate
+            },
+            {
+                headerName: "Size",
+                field: "size",
+                type: "numericColumn",
+                width:    1,
+                minWidth: 8.5 * this.emToPxConversionRate
+            },
+            {
+                headerName: "Analysis",
+                field: "analysisLabel",
+                width:    500,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                cellRendererFramework: IconLinkButtonRenderer,
+                icon: this.constantsService.ICON_ANALYSIS,
+                editable: false,
+                onClick: "goToAnalysis"
+            }
         ];
         this.gridContext = {
             componentParent: this
@@ -109,13 +142,25 @@ export class DatatracksFilesTabComponent implements OnInit {
     }
 
     public onGridReady(event: GridReadyEvent): void {
-        event.api.sizeColumnsToFit();
-        this.gridApi = event.api;
-        this.gridApi.setRowData(this.gridData);
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
+        if (event && event.api) {
+            event.api.sizeColumnsToFit();
+            this.gridApi = event.api;
+            this.gridApi.setRowData(this.gridData);
+        }
     }
 
     public onGridSizeChanged(event: GridSizeChangedEvent): void {
-        event.api.sizeColumnsToFit();
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
+        if (event && event.api) {
+            event.api.sizeColumnsToFit();
+        }
     }
 
     public onGridSelectionChanged(event: SelectionChangedEvent): void {
