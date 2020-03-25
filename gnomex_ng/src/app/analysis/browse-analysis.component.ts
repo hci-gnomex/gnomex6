@@ -320,7 +320,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             } else {
                 this.items = response;
             }
-
+            (<any[]>this.items).sort(UtilService.sortObjectAlphabetically("labName"));
             this.labs = this.labs.concat(this.items);
             this.analysisService.emitCreateAnalysisDataSubject({labs: this.labs, items: this.items});
             for (var l of this.items) {
@@ -345,6 +345,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                             } else {
                                 p.items = p.Analysis;
                             }
+                            (<any[]>p.items).sort(UtilService.sortOrderIDNumerically("number"));
                             for (var a of p.items) {
                                 if (a) {
                                     if (a.label) {

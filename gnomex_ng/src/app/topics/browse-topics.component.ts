@@ -345,6 +345,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
 
     private addTopic(root: any, items: any[]): void {
         root.items = UtilService.getJsonArray(items, items);
+        root.items.sort(UtilService.sortObjectAlphabetically("name"));
 
         for (let topic of items) {
             let topicArray: any[] = [];
@@ -374,6 +375,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
                         if (category.Request) {
                             category.id = "r" + topic.idTopic;
                             category.items = UtilService.getJsonArray(category.Request, category.Request);
+                            (<any[]>category.items).sort(UtilService.sortOrderIDNumerically("requestNumber"));
                             for (let request of category.items) {
                                 request.id = request.idRequest + category.id;
                                 this.setLabel(request);
@@ -382,6 +384,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
                         if (category.Analysis) {
                             category.id = "a" + topic.idTopic;
                             category.items = UtilService.getJsonArray(category.Analysis, category.Analysis);
+                            (<any[]>category.items).sort(UtilService.sortOrderIDNumerically("number"));
                             for (let analysis of category.items) {
                                 analysis.icon = this.constantsService.ICON_ANALYSIS;
                                 analysis.id = analysis.idAnalysis + category.id;
@@ -392,6 +395,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
                         if (category.DataTrack) {
                             category.id = "s" + topic.idTopic;
                             category.items = UtilService.getJsonArray(category.DataTrack, category.DataTrack);
+                            (<any[]>category.items).sort(UtilService.sortOrderIDNumerically("number"));
                             for (let datatrack of category.items) {
                                 this.assignIconToDT(datatrack);
                                 datatrack.id = datatrack.idDataTrack + category.id;

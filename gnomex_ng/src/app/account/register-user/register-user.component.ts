@@ -7,6 +7,7 @@ import {MatSlideToggleChange} from "@angular/material";
 import {PasswordUtilService} from "../../services/password-util.service";
 import {UserService} from "../../services/user.service";
 import {HttpParams} from "@angular/common/http";
+import {invalidExternalUsrName} from "../../util/validators/invalid-external-username.validator";
 
 @Component({
 
@@ -143,6 +144,9 @@ import {HttpParams} from "@angular/common/http";
                                         <mat-error *ngIf="this.formGroup?.get('externalToUniversityGroup.userNameExternal')?.hasError('required')">
                                             This field is required
                                         </mat-error>
+                                        <mat-error *ngIf="this.formGroup?.get('externalToUniversityGroup.userNameExternal')?.hasError('invalidExternalUsrName')">
+                                            {{this.formGroup?.get('externalToUniversityGroup.userNameExternal')?.errors["invalidExternalUsrName"]}}
+                                        </mat-error>
                                     </mat-form-field>
                                 </div>
                                 <div class="flex-container-row spaced-children-margin" >
@@ -218,7 +222,7 @@ export class RegisterUserComponent  implements OnInit, OnDestroy{
     private isUniversityAuthd: string;
     private publicNotice: string;
     public siteLogo: string;
-    private formGroup: FormGroup;
+    public formGroup: FormGroup;
     private newLabGroupTemplate: any;
     private emailRegex: RegExp  = /^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/;
     private externalToGroupTemplate: any;
@@ -231,10 +235,10 @@ export class RegisterUserComponent  implements OnInit, OnDestroy{
     }
 
     ngOnInit(): void {
-
+        let extUsrnameRegex = /^u\d{7}\d?$/i;
         this.externalToGroupTemplate = {
             institute: '',
-            userNameExternal: ['', Validators.required],
+            userNameExternal: ['', [Validators.required, invalidExternalUsrName('uofuAffiliate',extUsrnameRegex)]],
             passwordExternal: ['', [Validators.required, PasswordUtilService.validatePassword]],
             passwordExternalConfirm: ['', [Validators.required, PasswordUtilService.validatePasswordConfirm('passwordExternal')]],
         };
