@@ -22,7 +22,7 @@ public class FilterFile {
 		String credFile ="";
 		String filteredFile = "";
 		String filterRegex = "";
-		String localDataPath = "";
+		String dataPath = "";
 
 
 		List<String> fileList = new ArrayList<String>();
@@ -36,13 +36,17 @@ public class FilterFile {
 			filteredFile=args[3]; // output: The files that were filtered out
 			System.out.println("credFile: " + credFile);
 			filterRegex=args[4];
-			localDataPath=args[5];
+			dataPath=args[5];
 
 
 		}else {
-			System.out.println("Usage: ./FilterFile.java  arg1 fileList [Input: File List ]\n"+
-					"arg2 smallFileList [Output: name of file holding a list of xml and pdf files ]\n arg3 credFile [Input: credentials to make database connection]\n " +
-					"arg4 FilteredFileList [Output: Files that were filtered out because they hadn't been processed or were missing their file pair ie. bam without bam checksum ]\n ") ;
+			System.out.println("Usage: ./FilterFile.java \n"+
+					"arg0 inFile [Input: the main input source file for the script it is the list of file to be filtered ]\n" +
+					"arg1 fileList [Output: The list of files that weren't filtered out ]\n " +
+					"arg2 credFile [Input: credentials to make database connection for xml file]\n " +
+					"arg3 FilteredFileList [Output: Files that were filtered out because they hadn't been processed or were missing their file pair ie. bam without bam checksum ]\n " +
+					"args4 filterRegex [Input: The regex that can be used get segements of file name, extension and  path ]\n"+
+					"args5 dataPath [Input: The path to where the files reside, used if the inFile list doesn't provide paths ]\n") ;
 			System.exit(1);
 		}
 
@@ -64,6 +68,7 @@ public class FilterFile {
 		System.out.println(r.toString());
 
 		String newGroup = "";
+
 
 		while(scan.hasNext()) {
 			currentLine = scan.next();
@@ -104,7 +109,7 @@ public class FilterFile {
 
 			if(extension.equals("xml")){
 				//todo issue if no path is just filename. tried to have way fix but currentline is pass by value, its a rare case
-				boolean processed  = hasXMLBeenProcessed(fullFileName,query, currentLine,localDataPath);
+				boolean processed  = hasXMLBeenProcessed(fullFileName,query, currentLine,dataPath);
 				if(!processed){
 					// unprocessed list
 					filterOutList.add(currentLine);
@@ -138,6 +143,10 @@ public class FilterFile {
 					md5File = new File(md5);
 					bamOrBiaFile = new File(currentLine);
 				}
+				if(currentLine.contains("ORD-0700198-01_DNA")){
+					System.out.print("found ");
+					System.out.println(currentLine);
+				}
 
 
 				if(bamOrBiaFile.exists() && md5File.exists()){
@@ -155,6 +164,9 @@ public class FilterFile {
 		} // end of while
 
 		query.closeConnection();
+		System.out.print("key  /mnt/win/Results/ORD-0700198-01_DNA.bam  value:  ");
+		System.out.print(fContainer.getLargeFileValue("/mnt/win/Results/ORD-0700198-01_DNA.bam") );
+		System.out.println();
 
 		fContainer.makeLocalCheckSums(filterOutList,fileList);
 		fContainer.writeFilesList(remoteFileList, fileList );

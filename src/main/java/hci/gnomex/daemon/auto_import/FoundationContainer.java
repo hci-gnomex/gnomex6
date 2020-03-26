@@ -1,7 +1,6 @@
 package hci.gnomex.daemon.auto_import;
 
 import java.io.*;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -159,16 +158,16 @@ public class FoundationContainer {
 		int count = 0;
 		System.out.println("Building local checksum files list");
 
-
+		System.out.println("Bam set Map size: " + largeFilesMap.size());
 		for (Map.Entry<String, String> entry : largeFilesMap.entrySet()) {
 			String bamFile = entry.getKey();
 			String fileChecksum = entry.getValue();
+
 			if(!isCompletelyWritten(new File(bamFile))){
 				filterOutList.add(bamFile);
 				filterOutList.add(bamFile+".md5");
 				continue;
 			}
-
 
 			strBuild.append("md5sum ");
 			strBuild.append(bamFile);
@@ -177,24 +176,36 @@ public class FoundationContainer {
 
 			String localChecksumWithBam = this.executeCommands(strBuild.toString());
 			String localChecksum = localChecksumWithBam.split(" ")[0];
+			strBuild.setLength(0);
 
+			
 			// file is corrupt need to filter it out and move it
 			if(!localChecksum.equals(fileChecksum)){
 				System.out.println(bamFile);
 				System.out.println("no match: " + localChecksum + "  " + fileChecksum );
-				filterOutList.add(bamFile);
-				filterOutList.add(bamFile+".md5");
-				moveCorruptedFile(bamFile);
-				moveCorruptedFile(bamFile + ".md5");
+				//moveCorruptedFile(bamFile, filterOutList);
+				//moveCorruptedFile(bamFile + ".md5", filterOutList);
 			}else{
 				// we finally know its safe to add md5 and its bam
-				fileList.add(bamFile);
-				fileList.add(bamFile+".md5");
+				String samtoolsError = this.executeCommands("/usr/local/bin/samtools quickcheck " + bamFile);
+				if(!bamFile.endsWith("bai")){ // don't check bai since it is not valid check for samtools
+					System.out.println("samtools Test for " + bamFile);
+					if(samtoolsError == null || samtoolsError.equals("")){
+						fileList.add(bamFile);
+						fileList.add(bamFile+".md5");
+					}else{
+						System.out.print("samtools Error: " + samtoolsError);
+						//moveCorruptedFile(bamFile, filterOutList);
+						//moveCorruptedFile(bamFile + ".md5", filterOutList);
+					}
+				}else{
+					fileList.add(bamFile);
+					fileList.add(bamFile+".md5");
+				}
+
 			}
 
 			strBuild = new StringBuilder();
-
-			break;
 
 		}
 
@@ -223,11 +234,13 @@ public class FoundationContainer {
 		return false;
 	}
 	// this method makes assumption you'll have folder called Corrupted one folder up
-	private static boolean moveCorruptedFile(String filePath ){
+	private static boolean moveCorruptedFile(String filePath, List<String> filterOutList){
 		Path fileToMove = Paths.get(filePath);
-		Path targetPath = Paths.get(fileToMove.getParent().getParent().toString() + "/Corrupted/");
+		String corruptedDirectory = fileToMove.getParent().getParent().toString() + "/Corrupted/";
+		Path targetPath = Paths.get(corruptedDirectory);
 		try {
-			Files.move(fileToMove,targetPath.resolve(fileToMove.getFileName()));
+			Path corruptedPath = Files.move(fileToMove,targetPath.resolve(fileToMove.getFileName()));
+			filterOutList.add(corruptedPath.toString());
 			return true;
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -591,8 +591,9 @@ public class XMLParser {
 
 			process = pb.start();
 			process.waitFor();
+
 			if(outError != null){
-				if(hasSubProccessErrors(errorFile)){
+				if(hasSubProccessErrors(errorFile,process.exitValue())){
 					System.out.println("Error detected exiting script");
 					throw new Exception("Error detected in executing subprocess");
 				}
@@ -613,7 +614,7 @@ public class XMLParser {
 		}
 	}
 
-	private static boolean hasSubProccessErrors(File errorFile) {
+	private static boolean hasSubProccessErrors(File errorFile, int exitCode) {
 		Scanner scan = null;
 		boolean hasError = false;
 		try{
@@ -622,7 +623,7 @@ public class XMLParser {
 			System.out.println("Errors will appear below if found, in this file, " + errorFile.getName());
 			while(scan.hasNext()){
 				String line = scan.nextLine();
-				if(line != null && !line.equals("")){
+				if((line != null && !line.equals("")) && exitCode != 0){
 					hasError = true;
 					System.out.println(line);
 				}
