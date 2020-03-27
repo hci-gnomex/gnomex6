@@ -240,6 +240,13 @@
 	</servlet>
 
 	<servlet>
+		<servlet-name>CheckIsGNomExAccount</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.CheckIsGNomExAccount
+		</servlet-class>
+	</servlet>
+
+	<servlet>
 		<servlet-name>UploadSequenceURLServlet</servlet-name>
 		<servlet-class>
 			hci.gnomex.controller.UploadSequenceURLServlet
@@ -519,6 +526,10 @@
 	<servlet-mapping>
 		<servlet-name>GetLoginProperties</servlet-name>
 		<url-pattern>/GetLoginProperties.gx</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>CheckIsGNomExAccount</servlet-name>
+		<url-pattern>/CheckIsGNomExAccount.gx</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>UploadSequenceURLServlet</servlet-name>

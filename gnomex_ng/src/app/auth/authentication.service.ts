@@ -1,7 +1,7 @@
 import {Injectable, InjectionToken, Inject, Optional, isDevMode} from "@angular/core";
 import {LocationStrategy} from "@angular/common";
 import {Router} from "@angular/router";
-import {HttpClient, HttpHeaders, HttpRequest, HttpResponse} from "@angular/common/http";
+import {HttpClient, HttpHeaders, HttpParams, HttpRequest, HttpResponse} from "@angular/common/http";
 
 import {Observable, BehaviorSubject, Subscription, interval, of, throwError} from "rxjs";
 import {CoolLocalStorage} from "angular2-cool-storage";
@@ -10,6 +10,8 @@ import {JwtHelperService} from "@auth0/angular-jwt";
 import {AuthenticationProvider} from "./authentication.provider";
 import {catchError, first, map} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {DictionaryService} from "../services/dictionary.service";
+import {CookieUtilService} from "../services/cookie-util.service";
 
 /**
  * The token used for injection of the server side endpoint for the currently authenticated subject.
@@ -73,6 +75,8 @@ export class AuthenticationService {
                 private _localStorageService: CoolLocalStorage,
                 private _jwtHelper: JwtHelperService,
                 private authenticationProvider: AuthenticationProvider,
+                private dictionaryService: DictionaryService,
+                private cookieUtilService: CookieUtilService,
                 @Inject(AUTHENTICATION_ROUTE) private _authenticationRoute: string,
                 @Inject(AUTHENTICATION_LOGOUT_PATH) private _logoutPath: string,
                 @Inject(AUTHENTICATION_TOKEN_ENDPOINT) private _tokenEndpoint: string,
@@ -194,6 +198,14 @@ export class AuthenticationService {
         return this._redirectUrl;
     }
 
+    public findAppUserByUsername(username: string): Observable<any> {
+        this.cookieUtilService.formatXSRFCookie();
+        let params: HttpParams = new HttpParams()
+            .set("UID", username);
+        return this._http.get("/gnomex/CheckIsGNomExAccount.gx", {params: params})
+        // return this._http.post("/gnomex/CheckIsGNomExAccount.gx", {"UID": username}, {observe: "response"});
+    }
+
     requestAccessToken(redirectOnSuccess: boolean): void {
         this.unsubscribeFromTokenActivity();
 
@@ -264,6 +276,7 @@ export class AuthenticationService {
      */
     login(_username: string, _password: string): Observable<boolean> {
         this._isGuestMode = false;
+        let username = _username;
         return this._http.post(
             this.directLoginLocation(),
             {username: _username, password: _password},
