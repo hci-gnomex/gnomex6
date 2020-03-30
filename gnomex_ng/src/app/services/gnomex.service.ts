@@ -566,8 +566,8 @@ export class GnomexService {
         // will have a full list since they can submit a request on behalf
         // of any lab.
         if (this.createSecurityAdvisorService.isUniversityOnlyUser) {
-            this.workAuthLabList = labsNonNull;
-            this.promptedWorkAuthLabList = labsNonNull;
+//            this.workAuthLabList = labsNonNull;                               // tim
+//            this.promptedWorkAuthLabList = labsNonNull;
         } else if (this.isGuestState) {
         } else if (this.canSubmitRequestForALab()) {
             this.workAuthLabList = this.submitRequestLabList;

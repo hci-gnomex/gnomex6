@@ -119,7 +119,7 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
         this.appUser = appUser;
         this.isGNomExUniversityUser = isGNomExUniversityUser;
         this.isGNomExExternalUser = isGNomExExternalUser;
-        this.isUniversityOnlyUser = isUniversityOnlyUser;
+        this.isUniversityOnlyUser = false;
         this.loginDateTime = new SimpleDateFormat("MMM dd hh:mm a").format(System.currentTimeMillis());
         this.isLabManager = isLabManager;
         this.canAccessBSTX = canAccessBSTX;
@@ -154,7 +154,7 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
     }
 
     public boolean isUniversityOnlyUser() {
-        return isUniversityOnlyUser;
+        return false;
     }
 
     public boolean isLabManager() {
@@ -177,9 +177,6 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
     }
 
     public String getIsUniversityOnlyUser() {
-        if (this.isUniversityOnlyUser) {
-            return "Y";
-        }
         return "N";
     }
 
@@ -211,7 +208,7 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
 
         boolean isGNomExUniversityUser = false;
         boolean isGNomExExternalUser = false;
-        boolean isUniversityOnlyUser = true;
+        boolean isUniversityOnlyUser = false;
         boolean isLabManager = false;
         boolean canAccessBSTX = false;
 
@@ -264,26 +261,26 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
 
         }
 
-        // Is this a non-GNomEx University user?
-        if (appUser == null) {
-            isUniversityOnlyUser = true;
-            isGNomExExternalUser = false;
-            isGNomExUniversityUser = false;
-
-            appUser = new AppUser();
-            appUser.setuNID(uid);
-            appUser.setCodeUserPermissionKind(UserPermissionKind.UNIVERSITY_ONLY_PERMISSION_KIND);
-
-            // TODO: Would like to get user name from UofU LDAP
-            appUser.setLastName("University User " + uid);
-            appUser.setFirstName("");
-            appUser.setLabs(new TreeSet());
-            appUser.setCollaboratingLabs(new TreeSet());
-            appUser.setManagingLabs(new TreeSet());
-            appUser.setManagingCoreFacilities(new TreeSet());
-            appUser.setCoreFacilitiesICanSubmitTo(new TreeSet());
-
-        }
+//        // Is this a non-GNomEx University user?
+//        if (appUser == null) {
+//            isUniversityOnlyUser = true;
+//            isGNomExExternalUser = false;
+//            isGNomExUniversityUser = false;
+//
+//            appUser = new AppUser();
+//            appUser.setuNID(uid);
+//            appUser.setCodeUserPermissionKind(UserPermissionKind.UNIVERSITY_ONLY_PERMISSION_KIND);
+//
+//            // TODO: Would like to get user name from UofU LDAP
+//            appUser.setLastName("University User " + uid);
+//            appUser.setFirstName("");
+//            appUser.setLabs(new TreeSet());
+//            appUser.setCollaboratingLabs(new TreeSet());
+//            appUser.setManagingLabs(new TreeSet());
+//            appUser.setManagingCoreFacilities(new TreeSet());
+//            appUser.setCoreFacilitiesICanSubmitTo(new TreeSet());
+//
+//        }
 
         if (appUser == null) {
             throw new InvalidSecurityAdvisorException("Cannot find AppUser " + uid);
@@ -2226,9 +2223,9 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
     }
 
     public String getUID() {
-        if (isGuest) {
+        if (isGuest || this.isUniversityOnlyUser) {
             return "";
-        } else if (this.isGNomExUniversityUser || this.isUniversityOnlyUser) {
+        } else if (this.isGNomExUniversityUser) {
             return appUser.getuNID();
         } else {
             return appUser.getUserNameExternal();
