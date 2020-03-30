@@ -65,6 +65,7 @@
             <as-split-area  [size]="100 - this.expTreeSplitSize">
                 <div class="full-width full-height max-height flex-container-col border-subtle">
                     <div class="full-width flex-grow left-right-padded overflow-auto">
+                        <div #oneEmWidth class="no-height single-em"></div>
                         <ag-grid-angular class="ag-theme-balham full-height full-width"
                                          (gridReady)="this.onGridReady($event)"
                                          (gridSizeChanged)="this.onGridSizeChanged($event)"

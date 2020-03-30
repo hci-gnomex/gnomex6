@@ -5,6 +5,7 @@ import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {Dictionary} from "../configuration/dictionary.interface";
 import {DictionaryEntry} from "../configuration/dictionary-entry.type";
 import {CookieUtilService} from "./cookie-util.service";
+import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 
 @Injectable()
 export class DictionaryService {
@@ -165,7 +166,7 @@ export class DictionaryService {
                     errorCallback();
                 }
             }
-        }, () => {
+        }, (err: IGnomexErrorResponse) => {
             if (errorCallback) {
                 errorCallback();
             }
@@ -181,6 +182,14 @@ export class DictionaryService {
         let headers: HttpHeaders = new HttpHeaders()
             .set("Content-Type", "application/x-www-form-urlencoded");
         return this.httpClient.post("/gnomex/ManageDictionaries.gx", params.toString(), {headers: headers});
+    }
+
+    public saveDictionaries(dictionaryEntries: any[], className: string, callback?: () => void | null, errorCallback?: () => void | null): void {
+        for (let entry of dictionaryEntries) {
+            let object: HttpParams = <HttpParams> entry["object"];
+            let action: string = entry["action"];
+            this.changeDictionary(object, action, className, callback, errorCallback);
+        }
     }
 
     private loadDictionaries(className?: string): Observable<any> {

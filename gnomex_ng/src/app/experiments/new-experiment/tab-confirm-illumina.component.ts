@@ -332,7 +332,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             width:    10 * this.emToPxConversionRate,
             minWidth: 10 * this.emToPxConversionRate,
-            maxWidth: 12 * this.emToPxConversionRate,
             sortOrder: 5
         });
         temp.push({
@@ -341,7 +340,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             width:    6 * this.emToPxConversionRate,
             minWidth: 6 * this.emToPxConversionRate,
-            maxWidth: 8 * this.emToPxConversionRate,
             editable: false,
             sortOrder: 10
         });
@@ -351,7 +349,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             width:    8 * this.emToPxConversionRate,
             minWidth: 8 * this.emToPxConversionRate,
-            maxWidth: 10 * this.emToPxConversionRate,
             editable: false,
             sortOrder: 15
         });
@@ -368,7 +365,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                     field: columnProperty.field,
                     width: (+columnProperty.width) * this.emToPxConversionRate,
                     minWidth: (+columnProperty.minWidth) * this.emToPxConversionRate,
-                    maxWidth: (+columnProperty.maxWidth) * this.emToPxConversionRate,
                     suppressSizeToFit: true,
                     editable: editable,
 
@@ -376,6 +372,10 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                     fillGroupAttribute: columnProperty.fillGroupAttribute,
                     sortOrder: columnProperty.sortOrder
                 };
+
+                if (columnProperty.maxWidth) {
+                    newColumn.maxWidth = (+columnProperty.maxWidth) * this.emToPxConversionRate;
+                }
 
                 switch(columnProperty.columnType) {
                     case TabSamplesIlluminaComponent.TEXT_RIGHT:
@@ -419,7 +419,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 field: "ccNumber",
                 width: 9 * this.emToPxConversionRate,
                 minWidth: 8 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
@@ -435,7 +434,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 editable: false,
                 width:    12 * this.emToPxConversionRate,
                 minWidth: 12 * this.emToPxConversionRate,
-                maxWidth: 20 * this.emToPxConversionRate,
                 field: "idOligoBarcode",
                 cellRendererFramework: SelectRenderer,
                 selectOptions: this._barCodes,
@@ -451,7 +449,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 field: "barcodeSequence",
                 width:    7.5 * this.emToPxConversionRate,
                 minWidth: 6.5 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false
             });
@@ -461,7 +458,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                     editable: false,
                     width:    12 * this.emToPxConversionRate,
                     minWidth: 12 * this.emToPxConversionRate,
-                    maxWidth: 20 * this.emToPxConversionRate,
                     field: "idOligoBarcodeB",
                     cellRendererFramework: SelectRenderer,
                     selectOptions: this._barCodes,
@@ -474,7 +470,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                     field: "barcodeSequenceB",
                     width:    7 * this.emToPxConversionRate,
                     minWidth: 6.5 * this.emToPxConversionRate,
-                    maxWidth: 9 * this.emToPxConversionRate,
                     suppressSizeToFit: true,
                     editable: false,
                 });
@@ -488,7 +483,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             field: "numberSequencingLanes",
             width:    6 * this.emToPxConversionRate,
             minWidth: 6 * this.emToPxConversionRate,
-            maxWidth: 8 * this.emToPxConversionRate,
             editable: false,
             sortOrder: 200
         });
@@ -511,7 +505,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 field: "description",
                 width:    9 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 12 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false,
             });
@@ -541,7 +534,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 headerName: "",
                 field: "index",
                 width:    4 * this.emToPxConversionRate,
-                maxWidth: 4 * this.emToPxConversionRate,
                 minWidth: 4 * this.emToPxConversionRate,
                 cellRendererFramework: TextAlignRightMiddleRenderer,
                 suppressSizeToFit: true,
@@ -558,7 +550,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 pinned: "left",
                 width:    6.5 * this.emToPxConversionRate,
                 minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 sortOrder: 6,
                 cellRendererFramework: TextAlignLeftMiddleRenderer
@@ -570,7 +561,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 pinned: "left",
                 width:    6.5 * this.emToPxConversionRate,
                 minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 sortOrder: 7,
                 cellRendererFramework: SelectRenderer,
@@ -585,7 +575,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 pinned: "left",
                 width:    6.5 * this.emToPxConversionRate,
                 minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 sortOrder: 9,
                 cellRendererFramework: TextAlignLeftMiddleRenderer
@@ -598,7 +587,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             width:    8 * this.emToPxConversionRate,
             minWidth: 8 * this.emToPxConversionRate,
-            maxWidth: 10 * this.emToPxConversionRate,
             editable: false,
             sortOrder: 15
         });
@@ -620,7 +608,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                     field: columnProperty.field,
                     width: (+columnProperty.width) * this.emToPxConversionRate,
                     minWidth: (+columnProperty.minWidth) * this.emToPxConversionRate,
-                    maxWidth: (+columnProperty.maxWidth) * this.emToPxConversionRate,
                     suppressSizeToFit: true,
                     editable: editable,
 
@@ -628,6 +615,10 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                     fillGroupAttribute: columnProperty.fillGroupAttribute,
                     sortOrder: columnProperty.sortOrder
                 };
+
+                if (columnProperty.maxWidth) {
+                    newColumn.maxWidth = (+columnProperty.maxWidth) * this.emToPxConversionRate;
+                }
 
                 switch(columnProperty.columnType) {
                     case TabSamplesIlluminaComponent.TEXT_RIGHT:
@@ -671,7 +662,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 field: "ccNumber",
                 width: 9 * this.emToPxConversionRate,
                 minWidth: 8 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
@@ -687,7 +677,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 editable: false,
                 width:    12 * this.emToPxConversionRate,
                 minWidth: 12 * this.emToPxConversionRate,
-                maxWidth: 20 * this.emToPxConversionRate,
                 field: "idOligoBarcode",
                 cellRendererFramework: SelectRenderer,
                 selectOptions: this._barCodes,
@@ -703,7 +692,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 field: "barcodeSequence",
                 width:    7.5 * this.emToPxConversionRate,
                 minWidth: 6.5 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false
             });
@@ -712,7 +700,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 editable: false,
                 width:    12 * this.emToPxConversionRate,
                 minWidth: 12 * this.emToPxConversionRate,
-                maxWidth: 20 * this.emToPxConversionRate,
                 field: "idOligoBarcodeB",
                 cellRendererFramework: SelectRenderer,
                 selectOptions: this._barCodes,
@@ -725,7 +712,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 field: "barcodeSequenceB",
                 width:    7 * this.emToPxConversionRate,
                 minWidth: 6.5 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false,
             });
@@ -755,7 +741,6 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 field: "description",
                 width:    9 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 12 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false,
             });

@@ -83,7 +83,6 @@ export class LibprepWorkflowComponent {
             field: "sampleNumber",
             width:    1,
             minWidth: 4.5 * this.emToPxConversionRate,
-            maxWidth: 9 * this.emToPxConversionRate,
         });
 
         result.push({
@@ -91,22 +90,22 @@ export class LibprepWorkflowComponent {
             editable: false,
             field: "appUserName",
             width:    1,
-            minWidth: 9 * this.emToPxConversionRate,
+            minWidth: 10 * this.emToPxConversionRate,
         });
 
         result.push({
             headerName: "Multiplex Group",
             editable: false,
             field: "multiplexGroupNumber",
-            width:    7 * this.emToPxConversionRate,
-            maxWidth: 7 * this.emToPxConversionRate,
+            width:    1,
+            minWidth: 8 * this.emToPxConversionRate,
         });
 
         result.push({
             headerName: "Library Protocol",
             editable: true,
-            width:    12 * this.emToPxConversionRate,
-            minWidth: 12 * this.emToPxConversionRate,
+            width:    6 * this.emToPxConversionRate,
+            minWidth: 14 * this.emToPxConversionRate,
             field: "idSeqLibProtocol",
             cellRendererFramework: SelectRenderer,
             cellEditorFramework: SelectEditor,
@@ -191,7 +190,7 @@ export class LibprepWorkflowComponent {
         result.push({
             headerName: "Status",
             editable: true,
-            width:    1,
+            width:    600,
             minWidth: 8 * this.emToPxConversionRate,
             field: "seqPrepStatus",
             cellRendererFramework: SelectRenderer,
