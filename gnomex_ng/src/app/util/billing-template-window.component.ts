@@ -239,6 +239,10 @@ export class BillingTemplateWindowComponent extends BaseGenericContainerDialog i
         this.dialogRef.close(billingTemplate);
     }
 
+    onClose(){
+        this.dialogRef.close();
+    }
+
 }
 
 export class BillingTemplateWindowParams {

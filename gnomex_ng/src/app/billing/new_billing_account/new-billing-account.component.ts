@@ -409,6 +409,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 
 
 	handleConditionalValidators(customChartfieldValidators?:any[]){
+		let msg = "either activity or project";
 		let chartfieldValidators = null;
 
 		if(this.usesCustomChartfields && customChartfieldValidators){
@@ -421,8 +422,8 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 				chartfieldBus:  [ Validators.pattern(/^\d*$/), Validators.required, Validators.minLength(2), Validators.maxLength(2) ],
 				chartfieldOrg: [Validators.pattern(/^\d*$/), Validators.required, Validators.minLength(5), Validators.maxLength(5) ],
 				chartfieldFund: [Validators.pattern(/^\d*$/), Validators.required, Validators.minLength(4), Validators.maxLength(4) ],
-				chartfieldActivity:  [Validators.pattern(/^\d*$/), thisOrThat('chartfieldActivity', 'chartfieldProject') , Validators.minLength(5),  Validators.maxLength(5) ],
-				chartfieldProject:  [Validators.pattern(/^\d*$/), thisOrThat('chartfieldProject','chartfieldActivity'), Validators.minLength(8) , Validators.maxLength(8) ],
+				chartfieldActivity:  [Validators.pattern(/^\d*$/), thisOrThat('chartfieldActivity', 'chartfieldProject',msg) , Validators.minLength(5),  Validators.maxLength(5) ],
+				chartfieldProject:  [Validators.pattern(/^\d*$/), thisOrThat('chartfieldProject','chartfieldActivity',msg), Validators.minLength(8) , Validators.maxLength(8) ],
 				chartfieldAccountNum: [Validators.pattern(/^\d*$/), Validators.required, Validators.minLength(5), Validators.maxLength(5)  ],
 				chartfieldAccountAU : []
 			};
