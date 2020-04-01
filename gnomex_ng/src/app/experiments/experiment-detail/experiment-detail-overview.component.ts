@@ -154,7 +154,8 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
             this.experimentService.experimentOverviewForm.reset();
 
             if (data && data.experiment && data.experiment.Request) {
-                this.experiment  = data.experiment.Request;
+                this.experiment  = data.experiment.Request; // this is data from the backend
+                // below is the experiment model
                 this._experiment = Experiment.createExperimentObjectFromAny(
                     this.dictionaryService,
                     this.gnomexService,
@@ -344,6 +345,8 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
         //         this._experiment.sequenceLanes = [];
         //     }
         // }
+        // removing sequence lanes that aren't illumina will break auto link analysis in experiment due to it being the joiner
+        //
 
         this.experimentService.saveRequest(this._experiment).subscribe((response) => {
             if (response && response.requestNumber) {
@@ -531,6 +534,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                 selectedLab: this.experiment.idLab,
                 selectedOrganism: this.experiment.idOrganismSampleDefault,
                 parentComponent: "Experiment",
+                experiment: this._experiment
 
             };
 
