@@ -1,6 +1,7 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
+import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.BillingAccount;
 import hci.gnomex.model.BillingStatus;
@@ -9,6 +10,7 @@ import hci.gnomex.model.Invoice;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.naming.NamingException;
@@ -28,6 +30,8 @@ public class GetBillingAccountListForPeriodAndCore extends GNomExCommand impleme
   private Integer idBillingPeriod;
   private Integer idCoreFacility;
   private Integer idLab;
+  private List<String> accountStatusArray;
+
 
   @Override
   public void validate() {
@@ -47,9 +51,14 @@ public class GetBillingAccountListForPeriodAndCore extends GNomExCommand impleme
     }
     if (request.getParameter("idLab") != null && request.getParameter("idLab").length() > 0) {
       idLab = new Integer(request.getParameter("idLab"));
-    } else {
-      this.addInvalidField("idLab", "idLab is required");
     }
+
+    if (request.getParameter("accountStatusJSONString") != null && request.getParameter("accountStatusJSONString").length() > 0) {
+      accountStatusArray =  new ArrayList<String>(Arrays.asList(request.getParameter("accountStatusJSONString").split(",")));
+    } else {
+      this.addInvalidField("analysisGroupsJSONString", "analysisGroupsJSONString is required");
+    }
+
 
   }
 
@@ -61,17 +70,35 @@ public class GetBillingAccountListForPeriodAndCore extends GNomExCommand impleme
       Session sess = this.getSecAdvisor().getReadOnlyHibernateSession(this.getUsername());
 
       ArrayList<String> statuses = new ArrayList<String>();
-      statuses.add(BillingStatus.COMPLETED);
-      statuses.add(BillingStatus.APPROVED);
-      statuses.add(BillingStatus.APPROVED_CC);
-      statuses.add(BillingStatus.APPROVED_PO);
-      String queryString = "select distinct ba from BillingItem bi join bi.billingAccount ba where bi.idCoreFacility=:idCoreFacility and bi.idBillingPeriod=:idBillingPeriod and bi.idLab=:idLab and bi.codeBillingStatus in (:statuses)";
+      if(accountStatusArray != null &&  accountStatusArray.size() > 0 ){
+        for(String accountStatus : accountStatusArray ){
+            statuses.add(accountStatus);
+        }
+      }else {
+        statuses.add(BillingStatus.COMPLETED);
+        statuses.add(BillingStatus.APPROVED);
+        statuses.add(BillingStatus.APPROVED_CC);
+        statuses.add(BillingStatus.APPROVED_PO);
+      }
+
+
+      StringBuilder queryStrBuilder = new StringBuilder("select distinct ba from BillingItem bi join bi.billingAccount ba where bi.idCoreFacility=:idCoreFacility and bi.idBillingPeriod=:idBillingPeriod ");
+      if(idLab != null){
+        queryStrBuilder.append("and bi.idLab=:idLab ");
+      }
+      queryStrBuilder.append("and bi.codeBillingStatus in (:statuses) ");
+
+
+      String queryString = queryStrBuilder.toString();
       Query query = sess.createQuery(queryString);
       query.setParameter("idCoreFacility", idCoreFacility);
       query.setParameter("idBillingPeriod", idBillingPeriod);
-      query.setParameter("idLab", idLab);
+      if(idLab != null){
+        query.setParameter("idLab", idLab);
+      }
       query.setParameterList("statuses", statuses);
       List<BillingAccount> accts = (List<BillingAccount>)query.list();
+
       Document doc = new Document(new Element("BillingAccountList"));
       for(BillingAccount acct : accts) {
         Element baNode = acct.toXMLDocument(null, GNomExCommand.DATE_OUTPUT_SQL).getRootElement();
