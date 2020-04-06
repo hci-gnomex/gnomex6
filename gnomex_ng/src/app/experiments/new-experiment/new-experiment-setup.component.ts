@@ -29,6 +29,7 @@ import {
     BillingTemplateWindowParams
 } from "../../util/billing-template-window.component";
 import {AddAdditionalAccountsComponent} from "./add-additional-accounts.component";
+import {thisOrThat} from "../../util/validators/this-or-that.validator";
 
 @Component({
     selector: "new-experiment-setup",
@@ -327,13 +328,14 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
     }
 
     private prepareForm(): void {
+        let msg = "Account is required";
         this.form = this.formBuilder.group({
             selectedCategory:       ['', Validators.required],
             selectLab:              ['', Validators.required],
             selectName:             ['', Validators.required],
             selectProject:          ['', Validators.required],
-            selectAccount:          ['', Validators.required],
-            selectBillingTemplate:  [null],
+            selectAccount:          ['', thisOrThat('selectAccount','selectBillingTemplate',msg)],
+            selectBillingTemplate:  [null, thisOrThat('selectBillingTemplate','selectAccount',msg)],
             billingSelected:        [false, Validators.requiredTrue],
             experimentName:         [''],
             description:            ["", Validators.maxLength(5000)]
@@ -763,6 +765,11 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
                 ]}).subscribe((result: any) => {
             if (result) {
                 this.updateBilling(null, result);
+            }else{
+                let btValue = this.form.get('selectBillingTemplate').value;
+                if( btValue && btValue.items && btValue.items.length === 0 ){
+                    this.form.get("selectBillingTemplate").setValue(null);
+                }
             }
         });
     }

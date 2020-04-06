@@ -87,7 +87,9 @@
                                         {{ otherSelectedLab ? opt.accountNameDisplay + ' | ' + otherSelectedLab.name : opt.accountNameDisplay }}
                                     </mat-option>
                                 </mat-select>
-                                <mat-error *ngIf="form.controls['selectAccount'].hasError('required')">Account is required</mat-error>
+                                <mat-error *ngIf="form.controls['selectAccount'].hasError('thisOrThat')">
+                                    {{form.controls['selectAccount'].errors['thisOrThat'] }}
+                                </mat-error>
                             </mat-form-field>
                         </div>
                         <div class="flex-container-col" *ngIf="this.form.get('selectBillingTemplate').value">
