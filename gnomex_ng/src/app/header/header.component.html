@@ -1,5 +1,5 @@
 <div #headerRef
-     *ngIf="this.gnomexService.isLoggedIn"
+     *ngIf="showHeader"
      class="full-width header-one small-font align-center overflow-auto animation"
      (mouseenter)="onMouseIn($event)"
      (mouseleave)="onMouseOut($event)">
@@ -103,5 +103,5 @@
     <div #bottomNonCollapsing class="flex-container-row minor-height">
     </div>
 </div>
-<div #spacerRef class="animation collapse-bar">
+<div #spacerRef *ngIf="showHeader" class="animation collapse-bar">
 </div>

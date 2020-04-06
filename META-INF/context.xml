@@ -1,13 +1,12 @@
 <Context path="/gnomex" docBase="webapps/gnomex" debug="0" reloadable="true" allowLinking="true">
 
-
   <Valve
 	    className="org.apache.catalina.valves.AccessLogValve"
 	    directory="${catalina.home}/logs/"
 	    prefix="gnomex-"
-	    suffix="log"
-	    pattern="combined" />
-
+	    suffix=".log"
+	    pattern="combined"
+        conditionUnless="skipLogging" />
 	    
   <Resource auth="Container" 
     mail.smtp.host="${hci.mailserver}" 
