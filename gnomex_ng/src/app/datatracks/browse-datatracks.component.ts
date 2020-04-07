@@ -106,11 +106,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                 private createSecurityAdvisorService: CreateSecurityAdvisorService) {
 
         this.navService.navMode = this.navService.navMode !== NavigationService.USER ? NavigationService.URL : NavigationService.USER;
-        let activatedRoute = this.navService.getChildActivateRoute(this.route);
-        if(activatedRoute){
-            activatedRoute.queryParamMap.subscribe((qParam)=>{this.qParamMap = qParam });
-            activatedRoute.paramMap.subscribe((param)=>{ this.paramMap = param });
-        }
 
         this.items = [];
         this.labMembers = [];
@@ -118,10 +113,8 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         this.organisms = [];
 
         this.dataTracksListSubscription = this.datatracksService.getDatatracksListObservable().subscribe(response => {
-            let start =  performance.now();
             this.buildTree(response);
-            let end = performance.now();
-            console.log("This is how long it took to complete build tree " + (end - start) + " in milliseconds");
+
 
             if(this.datatracksService.previousURLParams && this.datatracksService.previousURLParams["refreshParams"] ){ // this code occurs when searching
                 this.datatracksService.previousURLParams["refreshParams"] = false;
@@ -131,6 +124,11 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
             setTimeout(_ => {
                 //this.treeModel.expandAll();
                 if(this.navService.navMode === NavigationService.URL) { // this is if component is being navigated to by url
+                    let activatedRoute = this.navService.getChildActivateRoute(this.route);
+                    if(activatedRoute){
+                        activatedRoute.queryParamMap.subscribe((qParam)=>{this.qParamMap = qParam });
+                        activatedRoute.paramMap.subscribe((param)=>{ this.paramMap = param });
+                    }
                     let idVal: string = null;
                     let idName: string = null;
                     let lastSeg: string  = this.navService.getLastRouteSegment();

@@ -37,7 +37,7 @@
         <mat-tab-group class="full-width full-height bordered" [selectedIndex]="this.experimentService.currentTabIndex"
                        (selectedTabChange)="tabChanged($event)">
             <mat-tab label="Overview">
-                <experiment-overview-tab [experiment]="experiment" [editMode]="isEditMode"></experiment-overview-tab>
+                <experiment-overview-tab [experiment]="_experiment" [editMode]="isEditMode"></experiment-overview-tab>
             </mat-tab>
             <mat-tab label="Description">
                 <description-tab [editMode]="isEditMode" ></description-tab>

@@ -161,11 +161,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.labs = [];
 
         this.navService.navMode = this.navService.navMode !== NavigationService.USER ? NavigationService.URL : NavigationService.USER;
-        let activatedRoute = this.navService.getChildActivateRoute(this.route);
-        if(activatedRoute){
-            activatedRoute.queryParamMap.subscribe((qParam)=>{this.qParamMap = qParam });
-            activatedRoute.paramMap.subscribe((param)=>{ this.paramMap = param });
-        }
 
 
         this.experimentsService.startSearchSubject.subscribe((value) => {
@@ -176,6 +171,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
 
         this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
+
             this.lookupLab = "";
             this.experimentCount = response.experimentCount ? response.experimentCount : "0";
             this.experimentCountMessage = response.message ? "(" + response.message + ")" : "";
@@ -206,6 +202,15 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 this.toggleButton = "Collapse Projects";
                 this.treeModel.expandAll();
                 if(this.navService.navMode === NavigationService.URL) {
+                    let activatedRoute = this.navService.getChildActivateRoute(this.route);
+                    if(activatedRoute){
+                        this.paramMap =  activatedRoute.snapshot.paramMap;
+                        this.qParamMap = activatedRoute.snapshot.queryParamMap;
+                        // activatedRoute.queryParamMap.subscribe((qParam)=>{this.qParamMap = qParam });
+                        // activatedRoute.paramMap.subscribe((param)=>{ this.paramMap = param });
+                    }
+
+
                     let idName = "";
                     let idVal = "";
                    if (this.paramMap.get("idRequest") ){

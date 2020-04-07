@@ -14,6 +14,7 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
 import {UtilService} from "../../services/util.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {Experiment} from "../../util/models/experiment.model";
 
 
 @Component({
@@ -139,8 +140,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
     private labListSubscription: Subscription;
 
     @Input() editMode: boolean;
-
-    @Input('experiment') set experiment(experiment: any) {
+    @Input('experiment') set experiment(experiment: Experiment) {
         this.isReady_filteredApplicationDictionary = false;
 
         setTimeout(() => {
@@ -293,9 +293,13 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
             this.updateCollaboratorsDisplay();
         });
     };
+    public _experiment: any | Experiment = {};
+    get experiment():Experiment{
+        return this._experiment;
+    }
 
-    public overviewTabForm: FormGroup;
-    public _experiment: any = {};
+    public overviewTabForm : FormGroup;
+
 
     public lab: any;
 
@@ -409,6 +413,10 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
         return this.secAdvisor.isAdmin;
     }
 
+    public disableProject:boolean = true;
+    public disableExperimentType:boolean = true;
+    public disableSubmitter:boolean = true;
+
 
     constructor(private constantsService: ConstantsService,
                 public secAdvisor: CreateSecurityAdvisorService,
@@ -443,12 +451,16 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
         
         this.overviewTabForm = this.fb.group({
             idLab: [{value: "", disabled: true}, Validators.required],
-            idProject: [{value: "", disabled: true}],
-            codeApplication: [{value: "", disabled: true}],
-            idAppUser: [{value: "", disabled: true}, Validators.required],
-            idSubmitter: [{value: "", disabled: true}],
+            idAppUser: [{value: "", disabled: true}, Validators.required]
         });
         this.experimentsService.addExperimentOverviewFormMember(this.overviewTabForm, this.constructor.name);
+
+        this.overviewTabForm.get("idLab").valueChanges.subscribe(val =>{
+            this._experiment.idLab = val;
+        });
+        this.overviewTabForm.get("idAppUser").valueChanges.subscribe(val =>{
+            this._experiment.idAppUser = val;
+        });
 
         this.applicationDictionary     = this.dictionaryService.getEntries('hci.gnomex.model.Application');
         this.coreFacilitiesDictionary  = this.dictionaryService.getEntries('hci.gnomex.model.CoreFacility');
@@ -556,30 +568,28 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 
     updateForm() {
         this.overviewTabForm.get("idLab").setValue(this._experiment.idLab);
-        this.overviewTabForm.get("idProject").setValue(this._experiment.idProject);
         this.overviewTabForm.get("idAppUser").setValue(this._experiment.idAppUser);
         if(!this.editMode || !(this.isAdmin || this._experiment.canUpdate === "Y")) {
             this.overviewTabForm.get("idLab").disable();
-            this.overviewTabForm.get("idProject").disable();
+            this.disableProject = true;
             this.overviewTabForm.get("idAppUser").disable();
         } else {
             this.overviewTabForm.get("idLab").enable();
-            this.overviewTabForm.get("idProject").enable();
+            this.disableProject = false;
             this.overviewTabForm.get("idAppUser").enable();
         }
 
-        this.overviewTabForm.get("codeApplication").setValue(this._experiment.codeApplication);
         if(!this.editMode || !(this.isAdmin || (this._experiment.canUpdate === "Y" && this._experiment.isExternal === "Y"))) {
-            this.overviewTabForm.get("codeApplication").disable();
+            this.disableExperimentType = true;
         } else {
-            this.overviewTabForm.get("codeApplication").enable();
+            this.disableExperimentType = false;
         }
 
-        this.overviewTabForm.get("idSubmitter").setValue(this._experiment.idSubmitter);
         if(!this.editMode || !this.isAdmin) {
-            this.overviewTabForm.get("idSubmitter").disable();
+            this.disableSubmitter = true;
         } else {
-            this.overviewTabForm.get("idSubmitter").enable();
+            this.disableSubmitter = false;
+
         }
     }
 
@@ -646,7 +656,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                 return a.codeApplication === event;
             });
 
-            this._experiment.application.Application = temp && temp.length === 1 ? temp[0] : null;
+            this._experiment.application = temp && temp.length === 1 ? temp[0] : null;
         }
     }
 
@@ -883,6 +893,13 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
         this.possibleSubmittersForLabDictionary.sort(this.createSortAppUsersFunction(this.prefService.userDisplayField));
 
         this.isReady_possibleSubmittersForLabDictionary = true;
+    }
+
+    onAppSelected(event:string){
+        if(event !== this._experiment.codeApplication){
+            this.dialogService.confirm("Changing Experiment Type will changes the Lib Protocol on Experiment Design, ","WARNING: Experiment Type",)
+        }
+        console.log(event);
     }
 
     private createSortAppUsersFunction(userDisplayField: string): (a,b) => number {
