@@ -897,7 +897,7 @@ import {Experiment} from "../../util/models/experiment.model";
 
     onAppSelected(event:string){
         if(event !== this._experiment.codeApplication){
-            this.dialogService.confirm("Changing Experiment Type will changes the Lib Protocol on Experiment Design, ","WARNING: Experiment Type",)
+            //todo here is a hook to tell users if they change application it will change it on lib protocol on experiment design
         }
         console.log(event);
     }
