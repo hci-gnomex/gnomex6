@@ -6,7 +6,7 @@
                               displayField="display"
                               valueField="idCoreFacility"
                               [formControl]="this.coreFacilityFC"
-                              [options]="filterCores(this.core)"
+                              [options]="filterCores()"
                               (optionSelected)="selectOption()">
             </custom-combo-box>
         </div>
@@ -32,7 +32,7 @@
         <div  *ngIf="billingAccounts.length>0">
             <mat-label>Billing Accounts</mat-label>
         </div>
-        <mat-selection-list [(ngModel)]="selectedAccounts" (ngModelChange)="onNgModelChange($event)">
+        <mat-selection-list [(ngModel)]="selectedAccounts" >
             <mat-list-option *ngFor="let account of billingAccounts" [value]="account.idBillingAccount">
                 {{account.accountNameDisplay}}
             </mat-list-option>

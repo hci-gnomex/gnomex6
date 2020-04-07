@@ -42,7 +42,12 @@
                                                     <ng-template #treeNodeTemplate  let-node>
                                                         <div class="flex-container-row tree-node-font ellipsis">
                                                             <img [src]="node?.data?.icon" alt="" class="icon tree-node-icon">
-                                                            <div class="single-line">{{ node?.data?.display }}</div>
+                                                            <div [ngStyle]="{'background-color': node.data?.expiring ? '#ff4d4d' : 'transparent' }"
+                                                                 [matTooltip]="node.data?.expiring"
+                                                                 [matTooltipDisabled]="!node.data?.expiring"
+                                                                 class="single-line">
+                                                                {{ node?.data?.display }}
+                                                            </div>
                                                         </div>
                                                     </ng-template>
                                                 </tree-root>
