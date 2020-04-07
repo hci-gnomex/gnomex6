@@ -202,11 +202,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
         this.utilService.registerChangeDetectorRef(this.changeDetector);
 
         this.navService.navMode = this.navService.navMode ?  this.navService.navMode :  NavigationService.URL;
-        let activatedRoute = this.navService.getChildActivateRoute(this.route);
-        if(activatedRoute){
-            activatedRoute.queryParamMap.subscribe((qParam)=>{this.qParamMap = qParam });
-            activatedRoute.paramMap.subscribe((param)=>{ this.paramMap = param });
-        }
 
         this.treeModel = this.treeComponent.treeModel;
         this.dataTreeModel = this.dataTreeComponent.treeModel;
@@ -223,9 +218,17 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
                 this.treeModel.expandAll();
 
                 if(this.navService.navMode === NavigationService.URL) { // this is if component is being navigated to by url
+                    let activatedRoute = this.navService.getChildActivateRoute(this.route);
+                    if(activatedRoute){
+                        this.paramMap =  activatedRoute.snapshot.paramMap;
+                        this.qParamMap = activatedRoute.snapshot.queryParamMap;
+                    }
+
                     let idVal: string = null;
                     let idName: string = null;
                     let lastSeg: string = this.navService.getLastRouteSegment();
+
+
 
                     if(lastSeg === TopicService.ANALYSIS){
                       idName = "idAnalysis";

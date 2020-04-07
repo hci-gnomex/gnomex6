@@ -634,6 +634,16 @@ export class Experiment {
     public SeqLibTreatmentEntries:  any[] = [];
     public protocols:               any[] = [];
 
+
+    //will alway return array just making typescript happy
+    public get submitterFromOtherCores():any|any[]{
+        return this._submitterFromOtherCores;
+    }
+    public set submitterFromOtherCores(value:any|any[]){
+        this._submitterFromOtherCores =  Array.isArray(value) ? value : [value.AppUser];
+    }
+    private _submitterFromOtherCores:any[] = [];
+
     public get sequenceLanes(): any[] {
         return this._sequenceLanes;
     }
@@ -732,7 +742,6 @@ export class Experiment {
         }
     }
     public sequencingOption_changed: Subject<any> = new Subject<any>();
-
 
     private _selectedProtocol: any;
     public get selectedProtocol(): any {
@@ -956,6 +965,7 @@ export class Experiment {
         experiment.cloneProperty("billingItems", value);
         experiment.cloneProperty("SeqLibTreatmentEntries", value);
         experiment.cloneProperty("protocols", value);
+        experiment.cloneProperty("submitterFromOtherCores",value);
         experiment.clonePropertyOnlyIfExists("sequenceLanes", value);
         experiment.cloneProperty("PropertyEntries", value);
         experiment.cloneProperty("organism", value);

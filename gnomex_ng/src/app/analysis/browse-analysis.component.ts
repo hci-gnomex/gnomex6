@@ -126,11 +126,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
     ngOnInit() {
         this.navService.navMode = this.navService.navMode !== NavigationService.USER ? NavigationService.URL : NavigationService.USER;
-        let activatedRoute = this.navService.getChildActivateRoute(this.route);
-        if(activatedRoute){
-            activatedRoute.queryParamMap.subscribe((qParam)=>{this.qParamMap = qParam });
-            activatedRoute.paramMap.subscribe((param)=>{ this.paramMap = param });
-        }
 
         this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
         this.treeModel = this.treeComponent.treeModel;
@@ -222,6 +217,13 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             setTimeout(() => {
                 this.treeModel.expandAll();
                 if(this.navService.navMode === NavigationService.URL) { // this is if component is being navigated to by url
+                    let activatedRoute = this.navService.getChildActivateRoute(this.route);
+                    if(activatedRoute){
+                        this.paramMap =  activatedRoute.snapshot.paramMap;
+                        this.qParamMap = activatedRoute.snapshot.queryParamMap;
+                        // activatedRoute.queryParamMap.subscribe((qParam)=>{this.qParamMap = qParam });
+                        // activatedRoute.paramMap.subscribe((param)=>{ this.paramMap = param });
+                    }
                     let idName = "";
                     let idVal = "";
                     if (this.paramMap.get("idAnalysis") ){
