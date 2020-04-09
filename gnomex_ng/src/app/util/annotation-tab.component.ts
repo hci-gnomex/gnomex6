@@ -16,6 +16,7 @@ export enum OrderType {
     ANALYSIS = 'a',
     DATATRACK = 'dt',
     EXPERIMENT = 'e',
+    SAMPLE = 's',
     NONE = ''
 }
 

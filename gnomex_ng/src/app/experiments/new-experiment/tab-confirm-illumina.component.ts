@@ -267,10 +267,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             }
         ];
 
-        this.annotationService.getPropertyList().subscribe((result) => {
-            this.propertyList = result;
+        setTimeout(() => {
             this.buildColumnDefinitions();
-        }, (err: IGnomexErrorResponse) => {
         });
 
         this.organisms = this.dictionaryService.getEntries("hci.gnomex.model.OrganismLite");
@@ -290,9 +288,18 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
     private buildColumnDefinitions(): void {
+        this._experiment.hasCCNumber = "";
         for(let sample of this._experiment.samples) {
             if (sample.ccNumber) {
                 this._experiment.hasCCNumber = "Y";
+                break;
+            }
+        }
+
+        this._experiment.hasSampleDescription = "";
+        for(let sample of this._experiment.samples) {
+            if (sample.description) {
+                this._experiment.hasSampleDescription = "Y";
                 break;
             }
         }
@@ -488,7 +495,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
         if (this._experiment) {
             for (let sampleAnnotation of this._experiment.getSelectedSampleAnnotations()) {
-                let fullProperty = this.propertyList.filter((value: any) => {
+                let fullProperty = this.gnomexService.propertyList.filter((value: any) => {
                     return value.idProperty === sampleAnnotation.idProperty;
                 });
 
@@ -496,6 +503,18 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                     TabSamplesIlluminaComponent.addColumnToColumnDef(temp, fullProperty[0], false, this.tabIndexToInsertAnnotations, this.emToPxConversionRate, TabSamplesIlluminaComponent.STATE_NEW, true);
                 }
             }
+        }
+
+        if(this._experiment.hasSampleDescription && this._experiment.hasSampleDescription === "Y") {
+            temp.push({
+                headerName: "Description",
+                field: "description",
+                width:    9 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 12 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false,
+            });
         }
 
         temp = TabSamplesIlluminaComponent.sortColumns(temp);
@@ -720,7 +739,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             && this._experiment.requestCategory.type !== NewExperimentService.TYPE_GENERIC) {
 
             for (let sampleAnnotation of this._experiment.getSelectedSampleAnnotations()) {
-                let fullProperty = this.propertyList.filter((value: any) => {
+                let fullProperty = this.gnomexService.propertyList.filter((value: any) => {
                     return value.idProperty === sampleAnnotation.idProperty;
                 });
 
@@ -728,6 +747,18 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                     TabSamplesIlluminaComponent.addColumnToColumnDef(temp, fullProperty[0], false, this.tabIndexToInsertAnnotations, this.emToPxConversionRate, TabSamplesIlluminaComponent.STATE_NEW, true);
                 }
             }
+        }
+
+        if(this._experiment.hasSampleDescription && this._experiment.hasSampleDescription === "Y") {
+            temp.push({
+                headerName: "Description",
+                field: "description",
+                width:    9 * this.emToPxConversionRate,
+                minWidth: 8.5 * this.emToPxConversionRate,
+                maxWidth: 12 * this.emToPxConversionRate,
+                suppressSizeToFit: true,
+                editable: false,
+            });
         }
 
         temp = TabSamplesIlluminaComponent.sortColumns(temp);

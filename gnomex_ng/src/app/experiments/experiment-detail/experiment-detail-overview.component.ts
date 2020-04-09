@@ -102,6 +102,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
     public isDirty: boolean = false;
     public showCreateAnalysisButton: boolean = false;
     public routeOutlet: string = "";
+    public showAnnotationsTab: boolean = false;
 
     public types = OrderType;
 
@@ -145,6 +146,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
             this.showSequenceLanesTab = false;
             this.showBillingTab = false;
             this.showCreateAnalysisButton = false;
+            this.showAnnotationsTab = false;
             this.routeOutlet = this.route.outlet;
 
             this.experimentService.experimentOverviewForm.reset();
@@ -175,6 +177,13 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                 this.showCreateAnalysisButton = !this.secAdvisor.isGuest && this.routeOutlet === "browsePanel" && this.requestCategory.codeRequestCategory === this.experiment.codeRequestCategory && this.requestCategory.associatedWithAnalysis === "Y";
                 this.showSequenceLanesTab = this.requestCategory.isIlluminaType === "Y" && this.experiment.isExternal !== "Y";
                 this.showBillingTab = this.experiment.canRead === "Y" && this.experiment.isExternal !== "Y";
+                this.showAnnotationsTab = this.requestCategory
+                    && this.requestCategory.type !== this.experimentService.TYPE_QC
+                    && this.requestCategory.type !== this.experimentService.TYPE_GENERIC
+                    && this.requestCategory.type !== this.experimentService.TYPE_CAP_SEQ
+                    && this.requestCategory.type !== this.experimentService.TYPE_FRAG_ANAL
+                    && this.requestCategory.type !== this.experimentService.TYPE_MIT_SEQ
+                    && this.requestCategory.type !== this.experimentService.TYPE_CHERRY_PICK;
 
                 let protocols: any[] = [];
                 if (this.experiment.protocols) {

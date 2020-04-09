@@ -1,13 +1,11 @@
 package hci.gnomex.daemon.auto_import;
 
-import hci.gnomex.model.PropertyDictionary;
+import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
+import com.github.fracpete.rsync4j.RSync;
 import hci.gnomex.utility.*;
-import org.hibernate.Session;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
-import javax.persistence.criteria.CriteriaBuilder;
 import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -25,7 +23,11 @@ public class DirectoryBuilder {
 	private String mode;
 	private String accountForFilesMoved;
 	private Set<String> fileTypeCategorySet;
+	private Set<String> optionalFileTypeCategorySet;
 	private boolean addWrapperFolder = false;
+	private String remotePath;
+	private boolean loadAccountFile = false;
+	private String outputAccountFile;
 
 
 
@@ -42,8 +44,7 @@ public class DirectoryBuilder {
 	private boolean isWindows;
 	private List<Integer> captureGroupIndexes;
 	private String sampleIdRegex;
-
-
+	private String logPath;
 
 
 	public DirectoryBuilder(String[] args) {
@@ -51,7 +52,7 @@ public class DirectoryBuilder {
 		for (int i = 0; i < args.length; i++) {
 			args[i] =  args[i].toLowerCase();
 
-			if(args[i].equals("-accountfilesmoved"))
+			if(args[i].equals("-accountfilesmoved")) // this switches the FileMover to a mode to reports about files moved
 				accountForFilesMoved = args[++i];
 			if (args[i].equals("-file")) {
 				this.inFileName = args[++i];
@@ -67,7 +68,22 @@ public class DirectoryBuilder {
 				this.mode = args[++i];
 			}else if(args[i].equals("-linkfolder")){
 				addWrapperFolder = true;
-			}else if(args[i].equals("-cp")){
+			}else if(args[i].equals("-log")){
+				this.logPath = args[++i];
+			}else if(args[i].equals("-remotepath")){ // accountfilesmoved is considered path to local files
+				// need remote if you want to compare
+				if(accountForFilesMoved != null){
+					this.remotePath = args[++i];
+				}
+			} else if(args[i].equals("-accountload")){ // load file for accounting don't look at disk
+				if(accountForFilesMoved != null){     // the loaded file will follow accountForFilesMoved param
+					this.loadAccountFile = true;
+				}
+			}else if(args[i].equals("-accountoutfile")){
+				if(accountForFilesMoved != null){
+					this.outputAccountFile = args[++i];
+				}
+			} else if(args[i].equals("-cp")){
 				i++;
 				while(i < args.length && args[i].charAt(0) != '-' ){
 					captureGroupIndexes.add(Integer.parseInt(args[i]));
@@ -102,7 +118,8 @@ public class DirectoryBuilder {
 		return (this.accountForFilesMoved != null);
 	}
 
-	public void printAccoutedForFiles(Map<String, List<String>> missingMap) {
+	public void printAccoutedForFiles(Map<String, List<String>> missingMap, List<String> foundfileIDList, Map<String, List<String>> fileMap)  {
+		Set<String> stopDuplicateSet = new HashSet<>();
 		for(String key : missingMap.keySet() ) {
 			List<String> missingList =  missingMap.get(key);
 			System.out.print( key + ": ");
@@ -115,61 +132,275 @@ public class DirectoryBuilder {
 				System.out.print(missingList.get(i) + comma);
 			}
 			System.out.println();
-
 		}
+		if(outputAccountFile != null){
+			PrintWriter pw = null;
+			System.out.println("Making output accounting file "+ outputAccountFile);
+			try {
+				pw = new PrintWriter(new FileWriter(outputAccountFile));
+				for(String foundFileID : foundfileIDList){
+					List<String> foundFileList = fileMap.get(foundFileID);
+					if(foundFileList != null){
+						for(String foundFile : foundFileList ){
+							if(stopDuplicateSet.add(foundFile)){
+								pw.println(foundFile);
+							}
+						}
+					}else{
+						System.out.print("Couldn't find  file ID that should have all its file extension set " + foundFileID + " from all files list " );
+						break;
+					}
+				}
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			}finally {
+				if(pw != null){pw.close();}
+			}
+		}
+
+
 	}
 
 	public void makeAccountingForFiles(){
 		this.fileTypeCategorySet = new HashSet<String>();
-		Map<String,List<String>> missingMap = new TreeMap<String,List<String>>();
-		fileTypeCategorySet = new HashSet<>(Arrays.asList(".pdf", ".xml",".deident.xml", ".bam.bai",".bam",".bam.bai.md5",".bam.md5",".json" ));
+		String regex = ".*((?:TRF|CRF|QRF|ORD)[A-Za-z0-9-]+_?[A-Za-z]*)(\\..+)";
 
+		Map<String,List<String>> missingMap = new TreeMap<String,List<String>>();
+		//deident.xml removed as it should be optional
+		fileTypeCategorySet = new HashSet<>(Arrays.asList(".pdf", ".xml", ".bam.bai",".bam",".bam.bai.md5",".bam.md5" ));
+		optionalFileTypeCategorySet = new HashSet<String>(Arrays.asList(".bam.bai.S3.txt", ".bam.S3.txt" ));
 
 
 		File root = new File(this.accountForFilesMoved);
-		if(root.exists() && root.isDirectory()){
-			Map<String, Set<String>> fileMap = this.findAllFiles(root);
-			for(String key : fileMap.keySet()) {
+		Map<String, Set<String>> localFileTypeMap= null;
+		Map<String, List<String>> localFileMap = new HashMap<>(); // keeps track of all files and their paths with the key being the ID
+		List<String> foundFileIDList = new ArrayList<>();
 
-				Set<String> fileTypes = fileMap.get(key);
-				for(String type : fileTypeCategorySet ) {
-					if(!fileTypes.contains(type)) {
-						if(missingMap.get(key) != null ) {
-							missingMap.get(key).add(type);
-						}else {
-							missingMap.put(key, new ArrayList<String>(Arrays.asList(type)));
-						}
+
+		if(this.loadAccountFile){
+			localFileTypeMap = this.loadFilesToAccount(accountForFilesMoved ,localFileMap, regex);
+			System.out.println("file map size: " + localFileMap.size());
+			System.out.println("This is the out file " + outputAccountFile);
+		}else{
+			if(root.exists() && root.isDirectory()){
+				localFileTypeMap = this.findAllFiles(root,regex);
+			}else{
+				System.out.println("Path " + accountForFilesMoved +  " is invalid for accounting");
+				System.exit(1);
+			}
+
+		}
+
+		// prints out the missing file type sets like for example ID has except missing its xml
+		findMissingFiles(localFileTypeMap,missingMap,foundFileIDList);
+		System.out.println("found File ID List size: " + foundFileIDList.size());
+		if(remotePath != null ){
+			// we don't want to report files yet if checking remote drive
+			foundFileIDList.clear();
+		}
+		printAccoutedForFiles(missingMap,foundFileIDList,localFileMap);
+
+		missingMap.clear();
+
+
+		if(this.remotePath != null ){
+			System.out.println("Files still missing after checking what is stored remotely");
+			Map<String, Set<String>> remoteFileTypeMap = this.findAllFiles(new File(this.remotePath), regex);
+			System.out.println("This the remote key TRF097883_DNA:  " + remoteFileTypeMap.get("TRF103536_DNA").toString());
+			System.out.println("This the local key TRF097883:  " + localFileTypeMap.get("TRF103536").toString());
+			// we want a full picture(remote and local) if the file is on the disk or not
+			addRemoteFromLocalFiles(localFileTypeMap,remoteFileTypeMap);
+			findMissingFiles(localFileTypeMap,missingMap, foundFileIDList);
+			printAccoutedForFiles(missingMap,foundFileIDList,localFileMap);
+		}
+
+
+	}
+
+	private void findMissingFiles(Map<String,Set<String>> fileTypeMap, Map<String,List<String>> missingMap, List<String> foundFileIDList){
+		for(String key : fileTypeMap.keySet()) {
+			Set<String> fileTypes = fileTypeMap.get(key);
+			for(String type : fileTypeCategorySet ) {
+				if(!fileTypes.contains(type)) {
+					if(fileTypes.contains(type + ".S3.txt")){
+						continue;
 					}
+					if(missingMap.get(key) != null ) {
+						missingMap.get(key).add(type);
+					}else {
+						missingMap.put(key, new ArrayList<String>(Arrays.asList(type)));
+					}
+				}
+			}
+			if(missingMap.get(key) == null){// nothing was missing
+				foundFileIDList.add(key);
+			}
+
+		}
+
+	}
+
+
+	private void addRemoteFromLocalFiles(Map<String, Set<String>> localFileTypeMap, Map<String, Set<String>> remoteFileTypeMap) {
+		// add additional found remote files types that have an entry to localFileMap
+		for(String lKey : localFileTypeMap.keySet()){
+			if(remoteFileTypeMap.containsKey(lKey)){
+				Set<String> remoteExtensionSet = remoteFileTypeMap.get(lKey);
+				localFileTypeMap.get(lKey).addAll(remoteExtensionSet);
+			}
+		}
+		// if remote has entry(keys) that local doesn't have, add new entry to local as well
+		for(String rKey : remoteFileTypeMap.keySet()){
+			String subID = "";
+			// temp code
+			int i = rKey.indexOf("_");
+			if(i != -1 ){
+				subID = rKey.substring(0, i);
+			}
+
+			if(!localFileTypeMap.containsKey(rKey) && !localFileTypeMap.containsKey(subID)){
+				Set<String> remoteExtensionSet = remoteFileTypeMap.get(rKey);
+				localFileTypeMap.put(rKey, remoteExtensionSet);
+			}
+		}
+
+	}
+
+
+	private Map<String, Set<String>> loadFilesToAccount(String accountFileName, Map<String, List<String>> fileMap,String regex) {
+		BufferedReader bf = null;
+		Map<String, Set<String>> fileTypeMap = new HashMap<>();
+		List<String> deferredFileList = new ArrayList<>();
+
+
+		try {
+			bf = new BufferedReader(new FileReader(accountFileName));
+
+
+			String line = "";
+			while ((line = bf.readLine()) != null) {
+				Pattern r = Pattern.compile(regex);
+
+				Matcher m = r.matcher(line);
+				String id ="";
+				String extension ="";
+
+				if(m.matches()) {
+					id = m.group(1);
+					extension = m.group(2);
+					// these files need to be represented in both file sets, so need to put in both sets even though only one file
+					if(extension.equals(".deident.xml") && extension.equals(".xml") || extension.equals(".pdf")){
+						deferredFileList.add(id);
+						continue;
+					}
+
+					if(fileTypeMap.get(id) != null) {
+						fileTypeMap.get(id).add(extension);
+						fileMap.get(id).add(line);
+
+					}else{
+						HashSet<String> extensionList = new HashSet<String>();
+						List<String> fullPathFileList = new ArrayList<>();
+						extensionList.add(extension);
+						fullPathFileList.add(line);
+						fileTypeMap.put(id, extensionList);
+						fileMap.put(id,fullPathFileList );
+					}
+
+				}
+			}
+			//todo need to add ids and full path to file to fileMap
+			addDeferredFiles(deferredFileList,fileTypeMap,regex);
+
+
+		}
+		catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}catch(IOException e){
+			e.printStackTrace();
+		}finally {
+			if(bf != null) {
+				try {
+					bf.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return fileTypeMap;
+	}
+
+	private Map<String, Set<String>> findAllFiles(File root,String regex){
+		Map<String, Set<String>> fileTypeMap = new TreeMap<String, Set<String> >();
+		List<String> deferredFilesList = new ArrayList<>();
+		findAllFilesRecursively(root, fileTypeMap,deferredFilesList,regex);
+		addDeferredFiles(deferredFilesList,fileTypeMap,regex);
+		return fileTypeMap;
+	}
+
+	private void addDeferredFiles(List<String> deferredFilesList, Map<String, Set<String>> fileTypeMap, String regex) {
+		Pattern r = Pattern.compile(regex);
+
+
+		for(String dFileName : deferredFilesList){
+			Matcher m = r.matcher(dFileName);
+			String id ="";
+			String extension ="";
+
+			if(m.matches()) {
+				id = m.group(1);
+				extension = m.group(2);
+				if(dFileName.contains("TRF103536")){
+					System.out.println("fullName: " + dFileName);
+					System.out.println("id: " + id);
+					System.out.println("extension: " + extension);
+				}
+
+				if(fileTypeMap.containsKey(id)){
+					fileTypeMap.get(id).add(extension);
+					if(dFileName.contains("TRF103536")){
+						System.out.println("this is extension that will be without DNA/RNA"  );
+					}
+				}else {
+
+
+					String idDNA = id + "_DNA";
+					String idRNA = id + "_RNA";
+					Set<String> valDNA = fileTypeMap.get(idDNA);
+					Set<String> valRNA = fileTypeMap.get(idRNA);
+
+					if(valDNA != null){
+						valDNA.add(extension);
+					}else{
+						fileTypeMap.put(idDNA, new HashSet<String>(Arrays.asList(extension)));
+					}
+					if(valRNA != null){ // not adding if not found because rna is optional for foundation, may need to reevaluate
+						valRNA.add(extension);
+					}
+
+					if(dFileName.contains("TRF103536")){
+						System.out.println("this is the extension add to DNA"  );
+					}
+
+
 				}
 
 			}
-			// prints out the missing file type sets like for example ID has except missing its xml
-			printAccoutedForFiles(missingMap);
 
-
-
-		}else{
-			System.out.println("This path is invalid");
-			System.exit(1);
 		}
 	}
 
-
-	private Map<String, Set<String>> findAllFiles(File root){
-		Map<String, Set<String>> fileMap = new TreeMap<String, Set<String> >();
-		findAllFilesRecursively(root, fileMap);
-		return fileMap;
-	}
-
-	private void findAllFilesRecursively(File file, Map<String, Set<String>> fileMap){
+	private void findAllFilesRecursively(File file, Map<String, Set<String>> fileTypeMap, List<String> deferredFilesList, String regex){
 
 		if(!file.isDirectory()){
 			String name  = file.getName();
+
+
+
 			//int startIndx = name.indexOf(".");
 			//String extension =  name.substring(startIndx + 1 , name.length());
 
-
-			String regex = "^([a-zA-Z0-9]+)_?[a-zA-Z]*(\\..+)$";
 			Pattern r = Pattern.compile(regex);
 
 			Matcher m = r.matcher(name);
@@ -179,22 +410,34 @@ public class DirectoryBuilder {
 			if(m.matches()) {
 				id = m.group(1);
 				extension= m.group(2);
+				if(extension.equals(".deident.xml") || extension.equals(".xml") || extension.equals(".pdf")){
+					deferredFilesList.add(name);
+					return;
+				}
+
+				if(name.contains("TRF103536")){
+					System.out.println("fullName of bam: " + name);
+					System.out.println("id of bam: " + id);
+					System.out.println("extension of bam: " + extension);
+				}
+
+				if (fileTypeMap.get(id) != null) {
+					fileTypeMap.get(id).add(extension);
+				} else {
+					HashSet<String> extensionList = new HashSet<String>();
+					extensionList.add(extension);
+					fileTypeMap.put(id, extensionList);
+				}
+
 			}else{
 				System.out.println("didn't match " + name);
 			}
 
-			if(fileMap.get(id) != null) {
-				fileMap.get(id).add(extension);
-			}else{
-				HashSet<String> extensionList = new HashSet<String>();
-				extensionList.add(extension);
-				fileMap.put(id, extensionList);
-			}
 
 		}else{
 			File[] fileList =  file.listFiles();
 			for(File f : fileList){
-				findAllFilesRecursively(f,fileMap);
+				findAllFilesRecursively(f,fileTypeMap, deferredFilesList,regex);
 			}
 		}
 
@@ -418,7 +661,7 @@ public class DirectoryBuilder {
 			if(!personIDDir.exists()){
 				boolean successDir = personIDDir.mkdir();
 				if(!successDir)
-				System.out.println("The directory was NOT CREATED... something went wrong");
+					System.out.println("The directory was NOT CREATED... something went wrong");
 			}
 
 		}catch(Exception e){
@@ -503,33 +746,75 @@ public class DirectoryBuilder {
 	}
 
 
-	public void moveTheFiles(Map<String,String> filesMap, List<String> extraCommands) throws Exception{
+	public void moveTheFiles(Map<String,String> filesMap, List<String> extraCommands) throws Exception {
 		StringBuilder strBuild = new StringBuilder();
 		List<String> commands = new ArrayList<String>();
+		//			strBuild.append("mv -vn");
+//			strBuild.append(" ");
+//			strBuild.append(fileKey);
+//			strBuild.append(" ");
+//			strBuild.append(filesMap.get(fileKey));
+//			commands.add(strBuild.toString());
+//			System.out.println(strBuild.toString());
+//			strBuild = new StringBuilder();
+
 
 		for(String fileKey: filesMap.keySet()) {
+			CollectingProcessOutput output = null;
+			try {
 
-			strBuild.append("mv -vn");
-			strBuild.append(" ");
-			strBuild.append(fileKey);
-			strBuild.append(" ");
-			strBuild.append(filesMap.get(fileKey));
-			commands.add(strBuild.toString());
-			System.out.println(strBuild.toString());
-			strBuild = new StringBuilder();
-
+				RSync rsync = new RSync()
+						.source(fileKey)
+						.destination(filesMap.get(fileKey))
+						.recursive(true);
+				output = rsync.execute();
+				logMoveDetails(output,filesMap,fileKey);
+			} catch(Exception e){
+				logMoveDetails(output,filesMap,fileKey);
+			}
 		}
 
 		for(String c : extraCommands){
 			commands.add(c);
 		}
+		if(this.logPath != null){
+			XMLParser.executeCommands(commands,logPath+ File.separator + "subProccesError.log");
+		}else{
+			XMLParser.executeCommands(commands,currentDownloadLocation+"subProccesError.log");
+		}
 
-		XMLParser.executeCommands(commands,currentDownloadLocation+"tempError.log");
 
 	}
 
+	private void logMoveDetails(CollectingProcessOutput output, Map<String, String> filesMap, String fileKey) throws Exception {
+		String logDetailsName = "moveDetails.log";
+		String errorMessage = "";
 
+		if(logPath != null){
+			try(PrintWriter pw  = new PrintWriter(new FileWriter(logPath + File.separator + logDetailsName, true));) {
+				if(output != null){
+					if(output.getExitCode() == 0 ){
+						pw.println(fileKey + "\t" + filesMap.get(fileKey));
+					}else{
+						errorMessage= "Error: sync failed  for " + fileKey + "  to  " + filesMap.get(fileKey);
+						pw.println(output.getStdErr());
+						pw.println(errorMessage);
+					}
 
+				}else{ // if output null we assume error log
+					errorMessage= "Error: sync failed  for " + fileKey + "  to  " + filesMap.get(fileKey);
+					pw.println(errorMessage);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw e;
+			}
+		}
+		if(!errorMessage.equals("")){
+			throw new Exception(errorMessage);
+		}
+
+	}
 
 
 	private  List<String> readSampleIDs(String fileName){

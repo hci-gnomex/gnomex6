@@ -1,18 +1,10 @@
 package hci.gnomex.daemon.auto_import;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 public class FoundationContainer {
 
@@ -47,14 +39,14 @@ public class FoundationContainer {
 
 
 
-	public String loadCheckSum(String sumFile) throws Exception{
+	public String loadCheckSum(File sumFile) throws Exception{
 
 
 		FileReader reader = null;
 		String line ="";
 
 		try {
-			reader = new FileReader(new File(sumFile));
+			reader = new FileReader(sumFile);
 			BufferedReader buffReader = new BufferedReader(reader);
 			line = buffReader.readLine();
 
@@ -86,7 +78,7 @@ public class FoundationContainer {
 
 	}
 
-	public void  writeSmallFilesList(String fileName, List<String> fileContent) {
+	public void  writeFilesList(String fileName, List<String> fileContent) {
 		PrintWriter pw = null;
 
 		try {
@@ -123,18 +115,28 @@ public class FoundationContainer {
 
 
 
-	private void executeCommands(List<String> commands) {
+	private String executeCommands(String command) {
 
 		File tempScript = null;
-
+		StringBuilder strBuild = new StringBuilder();
+		ProcessBuilder pb = new ProcessBuilder();
+		pb.redirectErrorStream(true);
+		pb.command("bash", "-c", command);
 		try {
 			System.out.println("started executing command");
-			tempScript = createTempScript(commands);
-			ProcessBuilder pb = new ProcessBuilder("bash", tempScript.toString());
-			pb.inheritIO();
-			Process process;
-			process = pb.start();
+			//tempScript = createTempScript(commands);
+
+			Process process	= pb.start();
+
+			InputStreamReader inputSR = new InputStreamReader(process.getInputStream());
+			BufferedReader br = new BufferedReader(inputSR);
+			String lineRead;
+			while ((lineRead = br.readLine()) != null) {
+				strBuild.append(lineRead);
+			}
+
 			process.waitFor();
+			process.destroy();
 			System.out.println("finished executing command");
 		}
 
@@ -146,47 +148,112 @@ public class FoundationContainer {
 			e1.printStackTrace();
 		}
 		finally{
-			tempScript.delete();
+			//tempScript.delete();
 		}
+		return strBuild.toString();
 	}
 
-	public void makeLocalCheckSums(String localChecksum, List<String> filterOutList) {
-		List<String>  commands = new ArrayList<String>();
+	public void makeLocalCheckSums( List<String> filterOutList, List<String> fileList) {
 		StringBuilder strBuild = new StringBuilder();
 		int count = 0;
 		System.out.println("Building local checksum files list");
 
-
+		System.out.println("Bam set Map size: " + largeFilesMap.size());
 		for (Map.Entry<String, String> entry : largeFilesMap.entrySet()) {
-			String file = entry.getKey();
+			String bamFile = entry.getKey();
 			String fileChecksum = entry.getValue();
-			if(file != null && fileChecksum != null && !fileChecksum.equals("")) {
-				strBuild.append("md5sum ");
-				strBuild.append(file);
-				strBuild.append(" >> ");
-				strBuild.append(localChecksum);
-				strBuild.append(";");
-				System.out.println(strBuild.toString());
 
-				commands.add(strBuild.toString());
-				strBuild = new StringBuilder();
+			if(!isCompletelyWritten(new File(bamFile))){
+				filterOutList.add(bamFile);
+				filterOutList.add(bamFile+".md5");
+				continue;
+			}
 
-			}else if( fileChecksum == null || fileChecksum.equals("")){
-				if(file != null){// missing .md5 file indirectly will filtering out bam or bam.bia file
-					filterOutList.add(file);
+			strBuild.append("md5sum ");
+			strBuild.append(bamFile);
+			strBuild.append(";");
+			System.out.println(strBuild.toString());
+
+			String localChecksumWithBam = this.executeCommands(strBuild.toString());
+			String localChecksum = localChecksumWithBam.split(" ")[0];
+			strBuild.setLength(0);
+
+			
+			// file is corrupt need to filter it out and move it
+			if(!localChecksum.equals(fileChecksum)){
+				System.out.println(bamFile);
+				System.out.println("no match: " + localChecksum + "  " + fileChecksum );
+				//moveCorruptedFile(bamFile, filterOutList);
+				//moveCorruptedFile(bamFile + ".md5", filterOutList);
+			}else{
+				// we finally know its safe to add md5 and its bam
+				String samtoolsError = this.executeCommands("/usr/local/bin/samtools quickcheck " + bamFile);
+				if(!bamFile.endsWith("bai")){ // don't check bai since it is not valid check for samtools
+					System.out.println("samtools Test for " + bamFile);
+					if(samtoolsError == null || samtoolsError.equals("")){
+						fileList.add(bamFile);
+						fileList.add(bamFile+".md5");
+					}else{
+						System.out.print("samtools Error: " + samtoolsError);
+						//moveCorruptedFile(bamFile, filterOutList);
+						//moveCorruptedFile(bamFile + ".md5", filterOutList);
+					}
 				}else{
-					System.out.println(" A bam or bam.bia file name is null, input file for FilterFile.java might be corrupt");
+					fileList.add(bamFile);
+					fileList.add(bamFile+".md5");
 				}
 
 			}
 
-		}
-		this.executeCommands(commands);
+			strBuild = new StringBuilder();
 
+		}
+
+	}
+	/* this approach deals with testing if the file is locked as another proccess
+	 could be writing to it. If it is locked it throws an exception.
+	 It would be better if Foundation had lock file when the proccess
+	 was writing and delete it when it was finished
+	 */
+	private boolean isCompletelyWritten(File file) {
+		RandomAccessFile stream = null;
+		try {
+			stream = new RandomAccessFile(file, "rw");
+			return true;
+		} catch (Exception e) {
+			System.out.println("Skipping file " + file.getName() + " for this iteration due it's not completely written");
+		} finally {
+			if (stream != null) {
+				try {
+					stream.close();
+				} catch (IOException e) {
+					System.out.println("Exception during closing file " + file.getName());
+				}
+			}
+		}
+		return false;
+	}
+	// this method makes assumption you'll have folder called Corrupted one folder up
+	private static boolean moveCorruptedFile(String filePath, List<String> filterOutList){
+		Path fileToMove = Paths.get(filePath);
+		String corruptedDirectory = fileToMove.getParent().getParent().toString() + "/Corrupted/";
+		Path targetPath = Paths.get(corruptedDirectory);
+		try {
+			Path corruptedPath = Files.move(fileToMove,targetPath.resolve(fileToMove.getFileName()));
+			filterOutList.add(corruptedPath.toString());
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 
+	public void mergeLargeFileMapToFileList(List<String> fileList) {
+		List<String> largeFiles = new ArrayList<>(largeFilesMap.keySet());
+		fileList.addAll(largeFiles);
 
+	}
 }
 
 

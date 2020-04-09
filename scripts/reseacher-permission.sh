@@ -19,5 +19,6 @@ CLASSPATH="$CLASSPATH:$JAR"
 
 done
 export CLASSPATH
+#bash  researcher-permission.sh -dbCredentials /home/u0566434/parser_data/gnomex-creds.properties -level analysis -irb "10924 Colon" -vendor all -attributeType "name" -attributeID 1202577 1229755
 #bash  researcher-permission.sh -dbCredentials ...gnomex-creds.properties -level sampleproperty -irb 88405_HEM -vendor avatar -attributeType "Submitted Diagnosis" -attributeID "HEM" -auth
 java -Xmx6000M hci.gnomex.daemon.auto_import.CollaboratorPermission $*
