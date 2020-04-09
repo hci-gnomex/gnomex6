@@ -319,6 +319,36 @@ public class Differ {
 		return matchedName;
 	}
 
+	public static String getNameByExistingCaptureGroup( Matcher m ){
+		String matchedName = "";
+
+		List<Integer> captureGroups = new ArrayList<>();
+		//starting at one because I want match only the match not the full string
+		// this assumes you don't want to specify the capture groups just want them starting from 1 to groupCount
+		for(int i = 1;  i  <= m.groupCount(); i++ ){
+			captureGroups.add(i);
+		}
+
+		for(Integer cp : captureGroups){
+			if(m.groupCount() < cp){
+				System.out.println("Error: End Capture Group  cannot greater than actual capture groups length: " +  m.groupCount());
+				System.exit(1);
+			}
+			String name  = m.group(cp);
+			if(name != null && !name.equals("")){
+				matchedName = name;
+				break;
+			}
+
+		}
+		if(matchedName.equals("")){
+			System.out.println("Error: With the given Capture Groups, no match was found");
+			System.exit(1);
+		}
+		return matchedName;
+	}
+
+
 
 
 	public void writeDiffToFile(List<String> uniqueFiles){ // use if you want to do std.out
