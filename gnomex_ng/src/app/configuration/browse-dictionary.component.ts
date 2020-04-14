@@ -6,10 +6,10 @@ import {Dictionary} from "./dictionary.interface";
 import {DictionaryEntry} from "./dictionary-entry.type";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {DialogsService} from "../util/popup/dialogs.service";
-import {GridApi, GridReadyEvent, SelectionChangedEvent} from "ag-grid-community";
+import {DateFilter, GridApi, GridReadyEvent, NumberFilter, SelectionChangedEvent} from "ag-grid-community";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
-import {ValueFormatterParams} from "ag-grid-community/dist/lib/entities/colDef";
+import {ValueGetterParams} from "ag-grid-community/src/ts/entities/colDef";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {UtilService} from "../services/util.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
@@ -35,8 +35,8 @@ import {CellRendererValidation} from "../util/grid-renderers/cell-renderer-valid
                         <button mat-button [disabled]="!this.selectedDictionary && !this.selectedEntry" (click)="addEntry()" matTooltip="Add single dictionary entry">
                             <img [src]="!this.selectedDictionary && !this.selectedEntry ? './assets/add_disable.png' : './assets/add.png'" class="button-image">
                         </button>
-                        <button mat-button [disabled]="!this.selectedEntry" (click)="deleteEntry()" matTooltip="Delete single dictionary entry">
-                            <img [src]="!this.selectedEntry ? './assets/delete_disable.png' : './assets/delete.png'" class="button-image">
+                        <button mat-button [disabled]="!this.selectedEntry || this.selectedEntry.canDelete !== 'Y'" (click)="deleteEntry()" matTooltip="Delete single dictionary entry">
+                            <img [src]="(!this.selectedEntry || this.selectedEntry.canDelete !== 'Y') ? './assets/delete_disable.png' : './assets/delete.png'" class="button-image">
                         </button>
                     </div>
                 </div>
@@ -72,12 +72,13 @@ import {CellRendererValidation} from "../util/grid-renderers/cell-renderer-valid
                     <div [hidden]="!this.dictionaryName">
                         <label>{{this.dictionaryName}}</label>
                     </div>
-                    <div>
+                    <div [hidden]="!selectedDictionary">
                             <button mat-button [hidden]="!dicGridEditable" (click)="changeMode()">
                                 <img *ngIf="!isEditMode" class="icon" [src]="this.constService.ICON_TAG_BLUE_EDIT">
                                 <img *ngIf="isEditMode" class="icon" [src]="this.constService.PAGE">
                                 {{isEditMode ? "View" : "Edit"}}
                             </button>
+                            <button mat-button [hidden]="!dictionaryFilterable || !this.isAnyFilterPresent" (click)="clearFilterModel()">Clear Filter</button>
                     </div>
                 </div>
                 <div class="flex-container-row extra-padded-top justify-space-between" [hidden]="!dicGridEditable || !selectedDictionary || !isEditMode">
@@ -177,6 +178,9 @@ import {CellRendererValidation} from "../util/grid-renderers/cell-renderer-valid
             width: 75%;
             min-width: 50em;
         }
+        .mat-input-element:disabled {
+            color: rgba(0,0,0,.78);
+        }
     `],
 })
 
@@ -198,7 +202,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
     public searchText: string = "";
     public dicGridEditable: boolean = false;
     public isEditMode: boolean = false;
-    public dictionaryFilterable: boolean = false;
+    public dictionaryFilterable: boolean = true;
     public selectedRows: any[] = [];
 
     public entryForm: FormGroup;
@@ -217,7 +221,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
     private gridApi: GridApi;
     private gridDataDirty: boolean = false;
 
-    private successSaved: boolean = false;
+    private dataChanged: boolean = false;
     private addRowIndex: number = 0;
     private optionsYN: any[] = [
         {value: "Y", display: "Yes"},
@@ -226,6 +230,10 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
 
     public get rowSelectionMode(): string {
         return this.isEditMode ? "multiple" : "single";
+    }
+
+    public get isAnyFilterPresent(): boolean {
+        return this.gridApi ? this.gridApi.isAnyFilterPresent() : false;
     }
 
 
@@ -243,7 +251,6 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             this.preSelectedDictionary = Array.isArray(this.data.preSelectedDictionary) ? this.data.preSelectedDictionary : [this.data.preSelectedDictionary];
             this.preSelectedEntry = this.data.preSelectedEntry;
             this.dicGridEditable = this.data.dicGridEditable ? this.data.dicGridEditable : false;
-            this.dictionaryFilterable = this.data.dictionaryFilterable ? this.data.dictionaryFilterable : false;
         }
     }
 
@@ -263,7 +270,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         this.dirty = () => this.selectedDictionary ? this.gridDataDirty : this.entryForm.dirty;
 
         if(this.isDialog) {
-            this.successSaved = false;
+            this.dataChanged = false;
             setTimeout(() => {
                 let node: ITreeNode;
                 node = this.findNodeByIdAndClassName((Array.isArray(this.preSelectedDictionary) ? this.preSelectedDictionary[0] : [this.preSelectedDictionary][0]), this.preSelectedEntry);
@@ -280,18 +287,25 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         this.utilService.removeChangeDetectorRef(this.changeDetector);
     }
 
+    public clearFilterModel(): void {
+        if(this.gridApi && this.gridApi.isAnyFilterPresent()) {
+            this.gridApi.setFilterModel(null);
+        }
+    }
+
     public changeMode() {
         if(!this.selectedDictionary) {
             return;
         }
 
         this.dialogsService.startDefaultSpinnerDialog();
-        this.isEditMode = !this.isEditMode;
 
         if(this.gridDataDirty) {
             this.dialogsService.confirm("Your changes haven't been saved. Continue anyway?")
                 .subscribe((result: boolean) => {
                     if(result) {
+                        this.isEditMode = !this.isEditMode;
+                        this.selectedRows = [];
                         this.prepareGrid();
                         for (let dict of this.treeComponent.treeModel.roots) {
                             if (dict.data.className === this.selectedDictionary.className) {
@@ -302,9 +316,13 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                         }
                         this.gridDataDirty = false;
                         this.dialogsService.stopAllSpinnerDialogs();
+                    } else {
+                        this.dialogsService.stopAllSpinnerDialogs();
                     }
                 });
         } else {
+            this.isEditMode = !this.isEditMode;
+            this.selectedRows = [];
             this.prepareGrid();
             this.dialogsService.stopAllSpinnerDialogs();
         }
@@ -357,12 +375,11 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             return;
         }
 
-        let template = this.selectedRows.length > 0 ? this.selectedRows[0] : this.selectedDictionary.DictionaryEntry.length > 0 ? this.selectedDictionary.DictionaryEntry[0] : null;
         let newEntry = {
-            canDelete: template && template.canDelete ? template.canDelete : "",
-            canRead: template && template.canRead ? template.canRead : "",
-            canWrite: template && template.canWrite ? template.canWrite : "",
-            canUpdate: template && template.canUpdate ? template.canUpdate : "",
+            canDelete: "Y",
+            canRead: "Y",
+            canWrite: "Y",
+            canUpdate: "Y",
             display: "",
             value: "",
             datakey: "add-" + this.addRowIndex,
@@ -434,8 +451,8 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         this.dictionaries = dictionariesTemp;
     }
 
-    public close() {
-        this.dialogRef.close(this.successSaved);
+    public onClose(): void {
+        this.dialogRef.close(this.dataChanged);
     }
 
     private restrictCoreFacilityVisibility(dictionariesTemp: Dictionary[]): Dictionary[] {
@@ -518,21 +535,16 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                 let colDef: any = {
                     headerName: field.caption, headerTooltip: field.caption, field: field.dataField,
                     tooltipField: field.dataField, editable: this.isEditMode,
-                    isIdentifier: field.isIdentifier
+                    isIdentifier: field.isIdentifier, filterParams: {clearButton: true}
                 };
                 if (field.dataType === "comboBox") {
-                    if(this.dicGridEditable) {
-                        colDef.cellRendererFramework = SelectRenderer;
-                        colDef.cellEditorFramework = SelectEditor;
-                        colDef.delayValidation = true;
-                        colDef.selectOptions = this.dictionaryService.getEntriesExcludeBlank(field.className);
-                        colDef.selectOptionsDisplayField = "display";
-                        colDef.selectOptionsValueField = "value";
-                    } else {
-                        colDef.valueFormatter = this.optionsFieldValueFormatter;
-                        colDef.comboBoxOptions = this.dictionaryService.getEntriesExcludeBlank(field.className);
-                    }
-                    colDef.filter = "false"; //TODO: refactor when custom filer is ready
+                    colDef.cellRendererFramework = SelectRenderer;
+                    colDef.cellEditorFramework = SelectEditor;
+                    colDef.delayValidation = true;
+                    colDef.selectOptions = this.dictionaryService.getEntriesExcludeBlank(field.className);
+                    colDef.selectOptionsDisplayField = "display";
+                    colDef.selectOptionsValueField = "value";
+                    colDef.filterValueGetter = this.comboFilterValueGetter;
                 } else if(field.dataType === "text") {
                     colDef.cellRendererFramework = TextAlignLeftMiddleRenderer;
                     colDef.cellEditorFramework = TextAlignLeftMiddleEditor;
@@ -544,12 +556,17 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                         colDef.selectOptionsDisplayField = "value";
                         colDef.selectOptionsValueField = "value";
                     }
-                }
-
-                if(field.dataField === "sortOrder") {
+                } else if(field.dataType === "date") {
+                    colDef.filter = DateFilter;
+                    colDef.filterValueGetter = this.dateFilterValueGetter;
+                } else if(field.dataType === "intNumber") {
+                    colDef.cellRendererFramework = TextAlignLeftMiddleRenderer;
+                    colDef.cellEditorFramework = TextAlignLeftMiddleEditor;
                     colDef.validators = [Validators.pattern(/^\d{0,10}$/)];
                     colDef.errorNameErrorMessageMap = [{ errorName: "pattern",  errorMessage: "Expects an integer number" }];
                     colDef.validateOnlyRenderedCells = true;
+                    colDef.filter = NumberFilter;
+                    colDef.filterValueGetter = this.numberFilterValueGetter;
                 }
                 colDefs.push(colDef);
             }
@@ -560,16 +577,27 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         this.gridApi.sizeColumnsToFit();
     }
 
-    private optionsFieldValueFormatter(params: ValueFormatterParams): any {
-        if (!params.value) {
-            return "";
+    private dateFilterValueGetter(params: ValueGetterParams): any {
+        let dateAsString: string = params.data[params.colDef.field];
+        if(dateAsString) {
+            let date: Date = new Date(dateAsString);
+            return date ? date : "";
         }
-        let option: DictionaryEntry = ((params.colDef as any).comboBoxOptions as DictionaryEntry[]).find((entry: DictionaryEntry) => (entry.value === params.value));
-        if (option) {
-            return option.display;
-        } else {
-            return "";
+        return "";
+    }
+
+    private numberFilterValueGetter(params: ValueGetterParams): any {
+        let number: number = +(params.data[params.colDef.field]);
+        return number;
+    }
+
+    private comboFilterValueGetter(params: ValueGetterParams): any {
+        let value = params.data[params.colDef.field];
+        if(value) {
+            let option: DictionaryEntry = ((params.colDef as any).selectOptions as DictionaryEntry[]).find((entry: DictionaryEntry) => (entry.value === value));
+            return option ? option.display : "";
         }
+        return "";
     }
 
     private selectEntry(entry: any) {
@@ -580,6 +608,11 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             this.gatherMetaData(this.selectedTreeNode.parent.data.className, () => {
                 this.prepareForm();
             });
+        }
+        if (this.selectedEntry.canUpdate === "Y") {
+            this.entryForm.enable();
+        } else {
+            this.entryForm.disable();
         }
     }
 
@@ -610,7 +643,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             } else {
                 this.entryForm.addControl(entryField.dataField, new FormControl(entryField.value));
             }
-            if(field.visible === "Y" && field.dataField === "sortOrder") {
+            if(field.visible === "Y" && field.datatype === "intNumber") {
                 this.entryForm.get(entryField.dataField).setValidators(Validators.pattern(/^\d{0,10}$/));
             }
             if (field.visible !== 'Y' || (field.isIdentifier && field.isIdentifier === "Y" && !isInsertMode)) {
@@ -672,7 +705,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
 
             let className: string = this.selectedTreeNode.data.className ? this.selectedTreeNode.data.className : this.selectedTreeNode.parent.data.className;
             this.dictionaryService.save(isInsertMode, object, className, () => {
-                this.successSaved = true;
+                this.dataChanged = true;
                 this.buildTree();
                 this.showSpinner = false;
                 setTimeout(() => {
@@ -696,7 +729,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             }, () => {
                 this.showSpinner = false;
             });
-        } else if(this.selectedDictionary && this.dirty) {
+        } else if(this.selectedDictionary && this.gridDataDirty) {
             this.showSpinner = true;
             let dictionaryEntries: any[] = [];
             for(let value of Array.from(this.changedRowDataMap.values())) {
@@ -735,7 +768,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                     if(entryCount === dictionaryEntries.length) {
                         this.changedRowDataMap = new Map<string, any>();
                         this.addRowIndex = 0;
-                        this.successSaved = true;
+                        this.dataChanged = true;
                         this.isEditMode = false;
                         this.buildTree();
                         this.showSpinner = false;
@@ -775,6 +808,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             datakey: ""
         };
         this.prepareForm();
+        this.entryForm.enable();
     }
 
     public deleteEntry(): void {
@@ -798,6 +832,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             object = object.set(field.dataField, value);
         }
         this.dictionaryService.delete(object, className, () => {
+            this.dataChanged = true;
             this.buildTree();
             this.showSpinner = false;
             setTimeout(() => {
@@ -857,10 +892,6 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
 
     private static getFieldAsString(obj: any, field: string): string {
         return (obj && obj[field]) ? obj[field] : "";
-    }
-
-    public cancel() {
-        this.dialogRef.close(this.successSaved);
     }
 
     private findNodeByIdAndClassName(className: string, id?: string): ITreeNode {
