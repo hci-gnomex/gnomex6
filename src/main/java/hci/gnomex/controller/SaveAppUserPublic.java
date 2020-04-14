@@ -68,9 +68,7 @@ public class SaveAppUserPublic extends GNomExCommand implements Serializable {
 			passwordEncrypter = new EncryptionUtility();
 
 			AppUser appUser = sess.load(AppUser.class, appUserScreen.getIdAppUser());
-			if (SaveAppUser.emailAlreadyExists(sess, appUserScreen.getEmail(), appUserScreen.getIdAppUser())) {
-				this.addInvalidField("invalid email", "The email address " + appUserScreen.getEmail() + " is already in use.");
-			} else if (isDuplicateUserName(sess)){
+			if (isDuplicateUserName(sess)){
 				this.addInvalidField("Duplicate login/uNID", "That login/uNID is already in use.");
 			} else if(initializeAppUser(appUser)) {
 				sess.save(appUser);
