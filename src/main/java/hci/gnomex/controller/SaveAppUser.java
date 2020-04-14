@@ -141,7 +141,6 @@ public class SaveAppUser extends GNomExCommand implements Serializable {
         boolean isManageFacilityError = false;
         boolean isNullEmail = false;
         boolean isBadEmail = false;
-        boolean isDupEmail = false;
         Boolean isNoLogon = false;
         Object[] user = null;
 
@@ -219,11 +218,6 @@ public class SaveAppUser extends GNomExCommand implements Serializable {
           if (appUserScreen.getEmail() != null && !appUserScreen.getEmail().equals("") && !MailUtil.isValidEmail(appUserScreen.getEmail())) {
             this.addInvalidField("invalid email", "The email address " + appUserScreen.getEmail() + " is not formatted properly.");
             isBadEmail = true;
-          }
-
-          if (emailAlreadyExists(sess, appUserScreen.getEmail(), appUserScreen.getIdAppUser())) {
-            this.addInvalidField("invalid email", "The email address " + appUserScreen.getEmail() + " is already in use.");
-            isDupEmail = true;
           }
 
           if (appUserScreen.getIsActive().equals("Y")) {
@@ -328,7 +322,7 @@ public class SaveAppUser extends GNomExCommand implements Serializable {
 
           setResponsePage(this.SUCCESS_JSP);
         } else {
-          if (isUsedUsername || isUseduNID || isManageFacilityError || isNullEmail || isBadEmail || isNoLogon || isDupEmail) {
+          if (isUsedUsername || isUseduNID || isManageFacilityError || isNullEmail || isBadEmail || isNoLogon) {
             if (isWebForm.equals("Y")) {
               String outMsg = "";
               if (isUsedUsername) {
@@ -344,8 +338,6 @@ public class SaveAppUser extends GNomExCommand implements Serializable {
                 sess.flush();
               } else if (isBadEmail) {
                 outMsg = "The email address " + appUserScreen.getEmail() + " is not formatted properly.";
-              } else if (isDupEmail) {
-                outMsg = "The email address " + appUserScreen.getEmail() + " is already in use.";
 
               }
               if (isNullEmail) {
@@ -566,33 +558,6 @@ public class SaveAppUser extends GNomExCommand implements Serializable {
       query.setParameter("idAppUser", idAppUser);
     }
     List users = query.list();
-    return users.size() > 0;
-  }
-
-  public static boolean emailAlreadyExists(Session sess, String email, Integer idAppUser) {
-    if (email == null || email.equals("")) {
-      return false;
-    }
-
-    StringBuffer buf = new StringBuffer();
-    // There are two cases.  ONe this is an existing user so we want to make sure we don't mark their own email as a duplicate
-    // Second case is that it is a new user so they don't have an idAppUser yet so just check on email
-    if(idAppUser != null){
-      buf.append("SELECT a.idAppUser from AppUser as a where a.email = :email and a.idAppUser != :idAppUser");
-    } else {
-      buf.append("SELECT a.idAppUser from AppUser as a where a.email = :email");
-    }
-
-    Query usersQuery = sess.createQuery(buf.toString());
-    if(idAppUser != null){
-      usersQuery.setParameter("email", email);
-      usersQuery.setParameter("idAppUser", idAppUser);
-    } else{
-      usersQuery.setParameter("email", email);
-    }
-
-    List users = usersQuery.list();
-
     return users.size() > 0;
   }
 
