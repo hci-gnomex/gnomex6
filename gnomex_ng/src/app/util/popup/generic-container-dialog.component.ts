@@ -102,7 +102,11 @@ export class GenericContainerDialogComponent implements OnInit, OnDestroy {
         }
         if(action.internalAction){
             if(action.internalAction === "cancel" || action.internalAction === "onClose") {
-                this.onClose();
+                if(this.dialogContent[action.internalAction]) {
+                    this.dialogContent[action.internalAction]();
+                } else {
+                    this.onClose();
+                }
             } else {
                 this.dialogContent[action.internalAction]();
             }

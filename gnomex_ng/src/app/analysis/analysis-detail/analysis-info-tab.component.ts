@@ -302,11 +302,11 @@ export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
         this.dialogsService.genericDialogContainer(BrowseDictionaryComponent, "Dictionary Editor", null, config,
             {actions: [
                     {type: ActionType.PRIMARY, icon: null, name: "Save", internalAction: "save"},
-                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
-                ]}).subscribe(() => {
-                    this.dictionaryService.reloadAndRefresh(() => {
+                    {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
+                ]}).subscribe((result: boolean) => {
+                    if(result) {
                         this.analysisTypes = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.ANALYSIS_TYPE);
-                        }, null, DictionaryService.ANALYSIS_TYPE);
+                    }
         });
     }
 
