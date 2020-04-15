@@ -21,6 +21,8 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
 import {ConstantsService} from "../../services/constants.service";
 import {thisOrThat} from "../../util/validators/this-or-that.validator";
 import {UtilService} from "../../services/util.service";
+import {DateParserComponent} from "../../util/parsers/date-parser.component";
+import {BillingUsersSelectorComponent} from "../../usersGroups/billingAccountTab/billingUsersSelector/billing-users-selector.component";
 
 @Component({
 	selector: "new-billing-account-launcher",
@@ -37,12 +39,21 @@ export class NewBillingAccountLauncher {
 		config.autoFocus = false;
 
 		this.dialogsService.genericDialogContainer(NewBillingAccountComponent, "Submit Campus Billing Account", this.constService.ICON_WORK_AUTH_FORM, config,
-			{actions: [
+			{
+				actions: [
 					{type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "onSaveButtonClicked"},
 					{type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
-				]}).subscribe((result: any) => {
+				]
+			}).subscribe((result: any) => {
 			this.router.navigate([{ outlets: {modal: null}}]);
 		});
+	}
+}
+
+
+export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
+	isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
+		return !!(control && control.invalid && control.touched && (control.dirty || (form && form.submitted)));
 	}
 }
 
@@ -56,48 +67,13 @@ export class NewBillingAccountStateMatcher implements ErrorStateMatcher {
 	selector: "new-billing-account-window",
 	templateUrl: "./new-billing-account.component.html",
 	styles: [`
-		.mat-dialog-title {
-			margin: 0;
-			padding: 0;
-		}
-		.mat-dialog-content {
-			margin: 0;
-			padding: 0;
-		}
-		.mat-dialog-actions {
-			margin: 0;
-			padding: 0;
-		}
-
-		div.t {
-			display: table;
-		}
-		div.tr {
-			display: table-row;
-		}
-		div.td {
-			display: table-cell;
-		}
 
 		p {
 			margin: 1em 0.5em;
 		}
 
-		.full-height {
-			height: 100%;
-		}
-		.full-width {
-			width: 100%;
-		}
-
-		.center {
-			text-align: center;
-		}
-
-		.cell-label {
-			width: 8rem;
-			height: 2.6em;
-			vertical-align: middle;
+		.label {
+			min-width: 13em;
 			font-style: italic;
 			font-size: small;
 			color: #1601db;
@@ -156,15 +132,15 @@ export class NewBillingAccountStateMatcher implements ErrorStateMatcher {
 })
 export class NewBillingAccountComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
-	readonly CHARTFIELD:  string = 'chartfield';
-	readonly PO:          string = 'po';
-	readonly CREDIT_CARD: string = 'creditCard';
+	public readonly CHARTFIELD:  string = 'chartfield';
+	public readonly PO:          string = 'po';
+	public readonly CREDIT_CARD: string = 'creditCard';
 
-	showField: string = this.CHARTFIELD;
+	public showField: string = this.CHARTFIELD;
 
-	usesCustomChartfields: boolean;
+	public usesCustomChartfields: boolean;
 
-	accountStateMatcher = new NewBillingAccountStateMatcher();
+	public accountStateMatcher = new NewBillingAccountStateMatcher();
 
 
 	// The definition of valid email addresses can be found at
@@ -172,34 +148,34 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 	//   at the time of writing, which this does not fully support...
 	private emailPatternValidator = Validators.pattern(/^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/);
 
-	formGroup:FormGroup;
+	public formGroup:FormGroup;
 
-	labList: any[] = [];
-	coreFacilityReducedList: any[] = [];
+	public labList: any[] = [];
+	public coreFacilityReducedList: any[] = [];
 
-	selectedCoreFacilities: any[] = [];
+	public selectedCoreFacilities: any[] = [];
 
 	private labListSubscription: Subscription = null;
 
-	fundingAgencies: any;
+	public fundingAgencies: any;
 
-	creditCardCompanies: any;
+	public creditCardCompanies: any;
 
-	showFundingAgencies: boolean = false;
+	public showFundingAgencies: boolean = false;
 
 	private selectedCoreFacilitiesString: string = "";
 
 	private internalAccountFieldsConfigurationSubscription: Subscription;
 	private otherAccountFieldsConfigurationSubscription: Subscription;
 
-	successMessage: string = '';
-	errorMessage: string = '';
+	private successMessage: string = '';
+	private errorMessage: string = '';
 
-	isActivity: boolean = false;
-	disableCoreFacilitiesSelector = true;
+	public isActivity: boolean = false;
+	public disableCoreFacilitiesSelector = true;
 
-	otherAccountFieldsConfiguration: any[] = [];
-	internalAccountFieldsConfiguration: any = [
+	private otherAccountFieldsConfiguration: any[] = [];
+	public internalAccountFieldsConfiguration: any = [
 		{
 			displayName : 'customField1 default name',
 			isRequired  : 'N',
@@ -247,16 +223,78 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		}
 	];
 
-	InternalCustomFieldsFormControl: FormControl[] = [];
-	InternalCustomFieldsStateMatcher: ErrorStateMatcher[] = [];
+	public InternalCustomFieldsFormControl: FormControl[] = [];
+	public InternalCustomFieldsStateMatcher: ErrorStateMatcher[] = [];
 
-	includeInCustomField_shortAccount: boolean      = false;
-	includeInCustomField_startDate: boolean         = false;
-	includeInCustomField_expirationDate: boolean    = false;
-	includeInCustomField_fundingAgency: boolean     = false;
-	includeInCustomField_totalDollarAmount: boolean = false;
+	public includeInCustomField_shortAccount: boolean      = false;
+	public includeInCustomField_startDate: boolean         = false;
+	public includeInCustomField_expirationDate: boolean    = false;
+	public includeInCustomField_fundingAgency: boolean     = false;
+	public includeInCustomField_totalDollarAmount: boolean = false;
 	private showTotalDollarAmount: boolean;
 
+	private _showCreditCard: boolean = false;
+
+	private _rowData: any;
+	private labActiveSubmitters: any[] = [];
+
+	private _data: any;
+
+	public get showCreditCard(): boolean {
+		return this._showCreditCard;
+	}
+
+	public get isEditAccountMode(): boolean {
+		return !!this._data.rowData;
+	}
+
+
+	private _approvedUsersValue: string = '';
+
+	set approvedUsersValue(approvedUsersValue: string) {
+		this._approvedUsersValue = approvedUsersValue;
+
+		let newDisplay = '';
+
+		if (!this._approvedUsersValue) {
+			this._approvedUsersValue = '';
+			return;
+		}
+
+		let idTokens: string[] = this._approvedUsersValue.split(/,/);
+		let nameTokens: string[] = [];
+		let foundUser: boolean = false;
+
+		for (let id of idTokens) {
+			foundUser = false;
+			for (let user of this.labActiveSubmitters) {
+				if (user.value === id) {
+					foundUser = true;
+					nameTokens.push(user.display);
+					break;
+				}
+			}
+			if (!foundUser) {
+				nameTokens.push(id);
+			}
+		}
+
+		nameTokens.sort((a, b) => {
+			if (a > b) {
+				return 1;
+			} else if (a === b) {
+				return 0;
+			} else {
+				return -1;
+			}
+		});
+
+		newDisplay = nameTokens.join(', ');
+		this.formGroup.get("approvedUsersDisplayFC").setValue(newDisplay);
+	}
+	get approvedUsersValue(): string {
+		return this._approvedUsersValue;
+	}
 
 	constructor(private accountFieldsConfigurationService: AccountFieldsConfigurationService,
 				private createSecurityAdvisorService: CreateSecurityAdvisorService,
@@ -276,9 +314,16 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		this.primaryDisable = (action) => {
 			return this.formGroup.invalid;
 		};
+
+		this._data = data;
 	}
 
 	ngOnInit(): void {
+		if (this.propertyService.getExactProperty(PropertyService.PROPERTY_SHOW_CREDIT_CARD)) {
+			if (this.propertyService.getExactProperty(PropertyService.PROPERTY_SHOW_CREDIT_CARD).propertyValue === "Y") {
+				this._showCreditCard = true;
+			}
+		}
 
 		this.formGroup = this.fb.group({
 			lab: ['', Validators.required],
@@ -293,7 +338,8 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			agreement:[false, [Validators.requiredTrue] ],
 			creditLastFour:['',[Validators.pattern(/^\d{4}$/), Validators.required]],
 			creditZipCode: ['', [ Validators.required,  Validators.pattern(/^\d{5}((\s*|(\s*-\s*))(\d{4}))?$/) ]],
-			idCreditCardCompany: ['', [Validators.required]]
+			idCreditCardCompany: ['', [Validators.required]],
+			approvedUsersDisplayFC: ["", []]
 		});
 
 		if (this.data && this.data.idLab) {
@@ -350,8 +396,6 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		this.usesCustomChartfields = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CONFIGURABLE_BILLING_ACCOUNTS);
 		this.showTotalDollarAmount = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_SHOW_TOTAL_DOLLAR_AMOUNT);
 
-
-
 		if (this.usesCustomChartfields) {
 
 			for (let i = 0;  i < this.internalAccountFieldsConfiguration.length; i++) {
@@ -387,12 +431,42 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 
 			this.handleConditionalValidators();
 
-			this.formGroup.get('chartfieldAccountNum')
-				.setValue( this.propertyService.getPropertyValue(PropertyService.PROPERTY_ACCOUNT_NUMBER_ACCOUNT_DEFAULT));
+			this.formGroup.get('chartfieldAccountNum').setValue( this.propertyService.getPropertyValue(PropertyService.PROPERTY_ACCOUNT_NUMBER_ACCOUNT_DEFAULT));
 		}
 
+		if (this._data && this._data.rowData) {
+			this.labActiveSubmitters = this._data.labActiveSubmitters;
+			this._rowData = this._data.rowData;
+			this.applyRowData();
+		}
+	}
 
+	private initializeCustomElements(): void {
+		if (!this.usesCustomChartfields) {
+			this.usesCustomChartfields = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CONFIGURABLE_BILLING_ACCOUNTS);
+		}
 
+		if (this.usesCustomChartfields) {
+			for (let i = 0; i < 5; i++) {
+				if (!this.InternalCustomFieldsFormControl[i]) {
+					this.InternalCustomFieldsFormControl[i] = new FormControl('', []);
+				}
+				if (!this.InternalCustomFieldsStateMatcher[i]) {
+					this.InternalCustomFieldsStateMatcher[i] = new EditBillingAccountStateMatcher();
+				}
+			}
+
+			if (!this.otherAccountFieldsConfigurationSubscription) {
+				this.otherAccountFieldsConfigurationSubscription =
+					this.accountFieldsConfigurationService.getOtherAccountFieldsConfigurationObservable().subscribe((response) => {
+						this.processOtherAccountFieldsConfigurations(response);
+					});
+			}
+
+			this.accountFieldsConfigurationService.publishAccountFieldConfigurations();
+		} else {
+			this.formGroup.get("chartfieldAccountNum").setValue(this.propertyService.getPropertyValue(PropertyService.PROPERTY_ACCOUNT_NUMBER_ACCOUNT_DEFAULT));
+		}
 	}
 
 	ngOnDestroy(): void {
@@ -407,6 +481,222 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		}
 	}
 
+
+	private applyRowData(): void {
+		this.initializeCustomElements();
+
+		if (this._rowData) {
+			if (this._rowData && this._rowData.isPO === 'Y') {
+				this.loadPOAccount();
+			} else if (this._rowData && this._rowData.isCreditCard === 'Y') {
+				this.loadCreditCardAccount();
+			} else {
+				this.loadChartfieldAccount();
+			}
+		}
+	}
+
+
+	private loadChartfieldAccount(): void {
+		this.showField = this.CHARTFIELD;
+
+		if (!this._rowData) {
+			return;
+		}
+
+		this.loadLabAndCoreFacilityFromRowData();
+
+		let originalFundingAgencies = this.dictionaryService.getEntries('hci.gnomex.model.FundingAgency');
+		this.fundingAgencies = [];
+
+		if (originalFundingAgencies.length != undefined && originalFundingAgencies.length != null) {
+			for (let i = 0; i < originalFundingAgencies.length; i++) {
+				if (originalFundingAgencies[i].fundingAgency != null && originalFundingAgencies[i].value != null) {
+					this.fundingAgencies.push(originalFundingAgencies[i]);
+				}
+			}
+		}
+
+		this.formGroup.get('accountName').setValue(this._rowData.accountName);
+		this.formGroup.get('shortAccountName').setValue(this._rowData.shortAcct);
+
+		this.formGroup.get('chartfieldBus').setValue(this._rowData.accountNumberBus);
+		this.formGroup.get('chartfieldOrg').setValue(this._rowData.accountNumberOrg);
+		this.formGroup.get('chartfieldFund').setValue(this._rowData.accountNumberFund);
+		this.formGroup.get('chartfieldActivity').setValue(this._rowData.accountNumberActivity);
+		this.formGroup.get('chartfieldAccountAU').setValue(this._rowData.accountNumberAu);
+
+		this.formGroup.get('idFundingAgency').setValue(this._rowData.idFundingAgency);
+
+		if (this.usesCustomChartfields) {
+			if (this.internalAccountFieldsConfiguration) {
+				for (let i: number = 0; i < this.internalAccountFieldsConfiguration.length; i++) {
+					switch(this.internalAccountFieldsConfiguration[i].fieldName) {
+						case 'project' : this.InternalCustomFieldsFormControl[i].setValue(this._rowData.accountNumberProject); break;
+						case 'account' : this.InternalCustomFieldsFormControl[i].setValue(this._rowData.accountNumberAccount); break;
+						case 'custom1' : this.InternalCustomFieldsFormControl[i].setValue(this._rowData.custom1); break;
+						case 'custom2' : this.InternalCustomFieldsFormControl[i].setValue(this._rowData.custom2); break;
+						case 'custom3' : this.InternalCustomFieldsFormControl[i].setValue(this._rowData.custom3); break;
+						default : break;
+					}
+				}
+			}
+		} else {
+			this.formGroup.get('chartfieldProject').setValue(this._rowData.accountNumberProject);
+			this.formGroup.get('chartfieldAccountNum').setValue(this._rowData.accountNumberAccount);
+		}
+
+		this.formGroup.get('startDate').setValue((this._rowData.startDate && this._rowData.startDate !== '') ? this._rowData.startDate : this._rowData.startDateOther);
+		this.formGroup.get('expirationDate').setValue((this._rowData.expirationDate && this._rowData.expirationDate !== '') ? this._rowData.expirationDate : this._rowData.expirationDateOther);
+
+		this.approvedUsersValue = this._rowData.acctUsers;
+
+		this.formGroup.get('email').setValue(this._rowData.submitterEmail);
+
+		this.formGroup.get('totalDollarAmount').setValue(this._rowData.totalDollarAmount);
+		this.formGroup.get("active").setValue(this._rowData.activeAccount && this._rowData.activeAccount.toLowerCase() === 'y');
+	}
+
+	private loadPOAccount(): void {
+		this.showField = this.PO;
+
+		if (!this._rowData) {
+			return;
+		}
+
+		this.loadLabAndCoreFacilityFromRowData();
+
+		this.formGroup.get('accountName').setValue(this._rowData.accountName);
+		this.formGroup.get('shortAccountName').setValue(this._rowData.shortAcct);
+
+		this.formGroup.get('idFundingAgency').setValue(this._rowData.idFundingAgency);
+
+		this.formGroup.get('email').setValue(this._rowData.submitterEmail);
+
+		this.formGroup.get('startDate').setValue((this._rowData.startDate && this._rowData.startDate !== '') ? this._rowData.startDate : this._rowData.startDateOther);
+		this.formGroup.get('expirationDate').setValue((this._rowData.expirationDate && this._rowData.expirationDate !== '') ? this._rowData.expirationDate : this._rowData.expirationDateOther);
+
+		this.formGroup.get('totalDollarAmount').setValue(this._rowData.totalDollarAmount);
+		this.formGroup.get("active").setValue(this._rowData.activeAccount && this._rowData.activeAccount.toLowerCase() === 'y');
+
+		this.approvedUsersValue = this._rowData.acctUsers;
+	}
+
+	private loadCreditCardAccount(): void {
+		this.showField = this.CREDIT_CARD;
+
+		if (!this._rowData) {
+			return;
+		}
+
+		this.loadLabAndCoreFacilityFromRowData();
+
+		this.formGroup.get('creditLastFour').setValue(this._rowData.accountName);
+
+		this.formGroup.get('idFundingAgency').setValue(this._rowData.idFundingAgency);
+
+		this.formGroup.get('startDate').setValue((this._rowData.startDate && this._rowData.startDate !== '') ? this._rowData.startDate : this._rowData.startDateOther);
+		this.formGroup.get('expirationDate').setValue((this._rowData.expirationDate && this._rowData.expirationDate !== '') ? this._rowData.expirationDate : this._rowData.expirationDateOther);
+
+		this.formGroup.get('creditZipCode').setValue(this._rowData.zipCode);
+
+		this.formGroup.get('idCreditCardCompany').setValue(this._rowData.idCreditCardCompany);
+
+		this.approvedUsersValue = this._rowData.acctUsers;
+
+		this.formGroup.get('email').setValue(this._rowData.submitterEmail);
+
+		this.formGroup.get('totalDollarAmount').setValue(this._rowData.totalDollarAmount);
+		this.formGroup.get("active").setValue(this._rowData.activeAccount && this._rowData.activeAccount.toLowerCase() === 'y');
+	}
+
+	private loadLabAndCoreFacilityFromRowData(): void {
+		if (!this._rowData) {
+			return;
+		}
+
+		// Set the selected lab!
+		this.labListSubscription = this.labListService.getLabList().subscribe((response: any[]) => {
+			this.labList = response;
+
+			this.formGroup.get("lab").setValue(null);
+
+			for (let lab of this.labList) {
+				if (lab.idLab === this._rowData.idLab) {
+					this.formGroup.get("lab").setValue(lab);
+					this.onLabLoad(lab);
+					break;
+				}
+			}
+
+			// This timeout is important to the sorting of the Core Facility list, for some reason.
+			setTimeout(() => {
+				if (!!this.formGroup.get("lab").value) {
+					for (let coreFacility of this.coreFacilityReducedList) {
+						if (coreFacility.idCoreFacility === this._rowData.idCoreFacility) {
+							this.selectedCoreFacilities = [coreFacility];
+							break;
+						}
+					}
+				}
+			});
+		});
+	}
+
+	private onLabLoad(lab: any): void {
+		let coreFacilityApplicable: any[] = [];
+
+		if (lab && lab.coreFacilities) {
+			let coreFacilities = lab.coreFacilities;
+
+			if (coreFacilities != undefined && coreFacilities != null) {
+				if (coreFacilities[0] != undefined && coreFacilities[0] != null) {
+					for (let i: number = 0; i < coreFacilities.length; i++) {
+						if (coreFacilities[i].acceptOnlineWorkAuth != null
+							&& coreFacilities[i].acceptOnlineWorkAuth != undefined
+							&& coreFacilities[i].acceptOnlineWorkAuth === 'Y') {
+							coreFacilityApplicable.push(coreFacilities[i]);
+						}
+					}
+				} else {
+					if (coreFacilities.CoreFacility != undefined && coreFacilities.CoreFacility != null) {
+						if (coreFacilities.CoreFacility.acceptOnlineWorkAuth != null
+							&& coreFacilities.CoreFacility.acceptOnlineWorkAuth != undefined
+							&& coreFacilities.CoreFacility.acceptOnlineWorkAuth === 'Y') {
+							coreFacilityApplicable.push(coreFacilities.CoreFacility);
+						}
+					}
+
+				}
+			}
+		}
+
+		coreFacilityApplicable.sort((a, b) => {
+			let difference: number = 0;
+
+			if (a.sortOrder && b.sortOrder) {
+				difference = a.sortOrder - b.sortOrder;
+			}
+
+			if (difference == 0 && a.displayName && b.displayName) {
+				difference = a.displayName.localeCompare(b.displayName);
+			}
+
+			return difference;
+		});
+
+		this.coreFacilityReducedList = coreFacilityApplicable;
+
+		if (coreFacilityApplicable.length > 0) {
+			this.disableCoreFacilitiesSelector = false;
+
+			if (this.coreFacilityReducedList.length == 1) {
+				this.selectedCoreFacilities = this.coreFacilityReducedList;
+			}
+		} else {
+			this.disableCoreFacilitiesSelector = true;
+		}
+	}
 
 	handleConditionalValidators(customChartfieldValidators?:any[]){
 		let msg = "either activity or project";
@@ -711,23 +1001,12 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 
 		this.successMessage = 'Billing Account \"' + this.formGroup.get('accountName').value + '\" has been submitted to ' + this.selectedCoreFacilitiesString + '.';
 
-		//this.window.close();
 		this.newBillingAccountService.submitWorkAuthForm_chartfield(parameters).subscribe((result) => {
 			console.log('testing');
 			this.openSuccessDialog();
 		},(err:IGnomexErrorResponse) => {
 			this.dialogService.stopAllSpinnerDialogs();
 		});
-
-	}
-
-
-
-	public onAccountTypeChange(event:any ){
-		//todo need to clear form and reset validators
-		console.log(event);
-		this.handleConditionalValidators();
-
 	}
 
 	private savePo(): void {
@@ -812,7 +1091,6 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		});
 
 	}
-
 
 	private saveCreditCard(): void {
 		let isPO: string = (this.showField === this.PO) ? 'Y' : 'N';
@@ -906,6 +1184,352 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 
 	}
 
+	private onUpdateButtonClicked(): void {
+		this.errorMessage = '';
+
+		if (this.showField == this.CHARTFIELD) {
+			this.updateChartfield();
+		} else if (this.showField == this.PO) {
+			this.updatePo();
+		} else if (this.showField == this.CREDIT_CARD) {
+			this.updateCreditCard();
+		}
+	}
+
+	private updateChartfield(): void {
+
+		let isPO: string = (this.showField === this.PO) ? 'Y' : 'N';
+		let idLab: string = !this.formGroup.get("lab").value || !this.formGroup.get("lab").value.idLab ? '' : '' + this.formGroup.get("lab").value.idLab;
+
+		let coreFacilitiesXMLString: string = "";
+		let coreFacilities:any[] = [];
+
+		let idFundingAgency: string = "";
+
+		let activeAccount: string = "";
+
+		// The custom fields only displayed in the flex version of GNomEx if there were certain entries in the
+		// "InternalAccountFieldsConfiguration" or "OtherAccountFieldsConfiguration" tables.  However, at time
+		// of development this feature seems to be unused, so its implementation is delayed.
+		// As a note for the future, the "AccountFieldsConfigurationService" is intended to provide access to
+		// those fields.
+		let custom1: string = '';
+		let custom2: string = '';
+		let custom3: string = '';
+
+		let accountNumberProject: string = '';
+		let accountNumberAccount: string = '';
+
+		if (this.usesCustomChartfields) {
+			if (this.internalAccountFieldsConfiguration) {
+				for (let i: number = 0; i < this.internalAccountFieldsConfiguration.length; i++) {
+					switch(this.internalAccountFieldsConfiguration[i].fieldName) {
+						case 'project' : accountNumberProject = this.internalAccountFieldsConfiguration[i].value; break;
+						case 'account' : accountNumberAccount = this.internalAccountFieldsConfiguration[i].value; break;
+						case 'custom1' : custom1 = this.internalAccountFieldsConfiguration[i].value; break;
+						case 'custom2' : custom2 = this.internalAccountFieldsConfiguration[i].value; break;
+						case 'custom3' : custom3 = this.internalAccountFieldsConfiguration[i].value; break;
+						default : break;
+					}
+				}
+			}
+		} else {
+			accountNumberProject = this.formGroup.get("chartfieldProject") && this.formGroup.get("chartfieldProject").value ? this.formGroup.get("chartfieldProject").value : "";
+			accountNumberAccount = this.formGroup.get("chartfieldActivity") && this.formGroup.get("chartfieldActivity").value ? this.formGroup.get("chartfieldActivity").value : "";
+		}
+
+		if (this.selectedCoreFacilities.length) {
+			for (let i: number = 0; i < this.selectedCoreFacilities.length; i++) {
+				let coreFacility: any = {
+					idCoreFacility: this.selectedCoreFacilities[i].idCoreFacility,
+					facilityName:   this.selectedCoreFacilities[i].display
+				};
+				coreFacilities.push(coreFacility);
+
+				if (i > 0 && i + 1 < this.selectedCoreFacilities.length) {
+					this.selectedCoreFacilitiesString += ', ';
+				} else if (i + 1 === this.selectedCoreFacilities.length && this.selectedCoreFacilities.length != 1) {
+					this.selectedCoreFacilitiesString += ' and ';
+				}
+				this.selectedCoreFacilitiesString += this.selectedCoreFacilities[i].display;
+			}
+			coreFacilitiesXMLString = JSON.stringify(coreFacilities);
+		}
+
+		if (this.formGroup.get("active").value != null) {
+			if (this.formGroup.get("active").value) {
+				activeAccount = 'Y';
+			} else {
+				activeAccount = 'N';
+			}
+		}
+
+
+		if (this.showFundingAgencies && !!this.formGroup.get("idFundingAgency") && this.formGroup.get("idFundingAgency").value) {
+			idFundingAgency = this.formGroup.get("idFundingAgency").value;
+		}
+
+		if (this._rowData && this.formGroup.valid) {
+
+			let valueToDisplayParser: DateParserComponent = new DateParserComponent('YYYY-MM-DD', 'MM/DD/YYYY');
+			let startDateOther: string = '';
+			let expirationDateOther: string = '';
+
+			let startDate: string = !!this.formGroup.get("startDate") && this.formGroup.get("startDate").value ? this.formGroup.get("startDate").value : '';
+			let expirationDate: string = !!this.formGroup.get("expirationDate") && this.formGroup.get("expirationDate").value ? this.formGroup.get("expirationDate").value : '';
+
+			if (startDate && startDate !== '') {
+				startDateOther = valueToDisplayParser.parseDateString(startDate);
+			}
+			if (expirationDate && expirationDate !== '') {
+				expirationDateOther = valueToDisplayParser.parseDateString(expirationDate);
+			}
+
+			let submitterEmail: string = !!this.formGroup.get("email") && this.formGroup.get("email").value ? this.formGroup.get("email").value : '';
+			let totalDollarAmountDisplay: string = !!this.formGroup.get("totalDollarAmount") && this.formGroup.get("totalDollarAmount").value ? this.formGroup.get("totalDollarAmount").value : '';
+
+			this._rowData.idLab                    = idLab;
+			this._rowData.coreFacilitiesXMLString  = coreFacilitiesXMLString;
+			this._rowData.coreFacilitiesJSONString = coreFacilitiesXMLString;
+			this._rowData.accountName              = this.formGroup.get("accountName") && this.formGroup.get("accountName").value ? this.formGroup.get("accountName").value : "";
+			this._rowData.shortAcct                = this.formGroup.get("shortAccountName") && this.formGroup.get("shortAccountName").value ? this.formGroup.get("shortAccountName").value : "";
+			this._rowData.accountNumberBus         = this.formGroup.get("chartfieldBus") && this.formGroup.get("chartfieldBus").value ? this.formGroup.get("chartfieldBus").value : "";
+			this._rowData.accountNumberOrg         = this.formGroup.get("chartfieldOrg") && this.formGroup.get("chartfieldOrg").value ? this.formGroup.get("chartfieldOrg").value : "";
+			this._rowData.accountNumberFund        = this.formGroup.get("chartfieldFund") && this.formGroup.get("chartfieldFund").value ? this.formGroup.get("chartfieldFund").value : "";
+			this._rowData.accountNumberActivity    = accountNumberAccount;
+			this._rowData.accountNumberProject     = accountNumberProject;
+			this._rowData.accountNumberAccount     = this.formGroup.get("chartfieldAccountNum") && this.formGroup.get("chartfieldAccountNum").value ? this.formGroup.get("chartfieldAccountNum").value : "";
+			this._rowData.accountNumberAu          = this.formGroup.get("chartfieldAccountAU") && this.formGroup.get("chartfieldAccountAU").value ? this.formGroup.get("chartfieldAccountAU").value : "";
+			this._rowData.idFundingAgency          = idFundingAgency;
+			this._rowData.custom1                  = custom1;
+			this._rowData.custom2                  = custom2;
+			this._rowData.custom3                  = custom3;
+			this._rowData.acctUsers                = this.approvedUsersValue;
+			this._rowData.submitterEmail           = submitterEmail;
+			this._rowData.startDate                = startDate;
+			this._rowData.startDateOther           = startDateOther;
+			this._rowData.expirationDate           = expirationDate;
+			this._rowData.expirationDateOther      = expirationDateOther;
+			this._rowData.totalDollarAmount        = totalDollarAmountDisplay ? totalDollarAmountDisplay : "";
+			this._rowData.totalDollarAmountDisplay = totalDollarAmountDisplay ? '$' + totalDollarAmountDisplay : "";
+			this._rowData.activeAccount            = activeAccount;
+			this._rowData.isPO                     = isPO;
+
+			this.dialogRef.close(this._rowData);
+		} else {
+			// validation has caught problems - report them.
+			this.openErrorDialog();
+		}
+	}
+
+	private updatePo(): void {
+		let isPO: string = (this.showField === this.PO) ? 'Y' : 'N';
+		let isCreditCard: string = (this.showField === this.CREDIT_CARD) ? 'Y' : 'N';
+		let idLab: string = !!this.formGroup.get("lab").value || !this.formGroup.get("lab").value.idLab ? '' : '' + this.formGroup.get("lab").value.idLab;
+
+		let coreFacilitiesXMLString: string = "";
+		let coreFacilities:any[] = [];
+
+		let idFundingAgency: string = "";
+
+		let startDate: string = !!this.formGroup.get("startDate") && this.formGroup.get("startDate").value ? this.formGroup.get("startDate").value : '';
+		let expirationDate: string = !!this.formGroup.get("expirationDate") && this.formGroup.get("expirationDate").value ? this.formGroup.get("expirationDate").value : '';
+
+		let activeAccount: string = "";
+
+		// The custom fields only displayed in the flex version of GNomEx if there were certain entries in the
+		// "InternalAccountFieldsConfiguration" or "OtherAccountFieldsConfiguration" tables.  However, at time
+		// of development this feature seems to be unused, so its implementation is delayed.
+		// As a note for the future, the "AccountFieldsConfigurationService" is intended to provide access to
+		// those fields.
+		let custom1: string = '';
+		let custom2: string = '';
+		let custom3: string = '';
+
+		if (this.selectedCoreFacilities.length) {
+			for (let i: number = 0; i < this.selectedCoreFacilities.length; i++) {
+				let coreFacility: any = {
+					idCoreFacility: this.selectedCoreFacilities[i].idCoreFacility,
+					facilityName:   this.selectedCoreFacilities[i].display
+				};
+				coreFacilities.push(coreFacility);
+
+				if (i > 0 && i + 1 < this.selectedCoreFacilities.length) {
+					this.selectedCoreFacilitiesString += ', ';
+				} else if (i + 1 === this.selectedCoreFacilities.length && this.selectedCoreFacilities.length != 1) {
+					this.selectedCoreFacilitiesString += ' and ';
+				}
+				this.selectedCoreFacilitiesString += this.selectedCoreFacilities[i].display;
+			}
+			coreFacilitiesXMLString = JSON.stringify(coreFacilities);
+		}
+
+		if (this.showFundingAgencies && !!this.formGroup.get("idFundingAgency") && this.formGroup.get("idFundingAgency").value) {
+			idFundingAgency = this.formGroup.get("idFundingAgency").value;
+		}
+
+		if (this.formGroup.get("active").value != null) {
+			if (this.formGroup.get("active").value) {
+				activeAccount = 'Y';
+			} else {
+				activeAccount = 'N';
+			}
+		}
+
+		if (this._rowData && this.formGroup.valid) {
+
+			let valueToDisplayParser: DateParserComponent = new DateParserComponent('YYYY-MM-DD', 'MM/DD/YYYY');
+			let startDateOther: string = '';
+			let expirationDateOther: string = '';
+
+			if (startDate && startDate !== '') {
+				startDateOther = valueToDisplayParser.parseDateString(startDate);
+			}
+			if (expirationDate && expirationDate !== '') {
+				expirationDateOther = valueToDisplayParser.parseDateString(expirationDate);
+			}
+
+			let submitterEmail: string = !!this.formGroup.get("email") && this.formGroup.get("email").value ? this.formGroup.get("email").value : '';
+			let totalDollarAmountDisplay: string = !!this.formGroup.get("totalDollarAmount") && this.formGroup.get("totalDollarAmount").value ? this.formGroup.get("totalDollarAmount").value : '';
+
+			this._rowData.idLab                    = idLab;
+			this._rowData.coreFacilitiesXMLString  = coreFacilitiesXMLString;
+			this._rowData.coreFacilitiesJSONString = coreFacilitiesXMLString;
+			this._rowData.accountName              = this.formGroup.get("accountName") && this.formGroup.get("accountName").value ? this.formGroup.get("accountName").value : "";
+			this._rowData.shortAcct                = this.formGroup.get("shortAccountName") && this.formGroup.get("shortAccountName").value ? this.formGroup.get("shortAccountName").value : "";
+			this._rowData.idFundingAgency          = idFundingAgency;
+			this._rowData.custom1                  = custom1;
+			this._rowData.custom2                  = custom2;
+			this._rowData.custom3                  = custom3;
+			this._rowData.acctUsers                = this.approvedUsersValue;
+			this._rowData.submitterEmail           = submitterEmail;
+			this._rowData.startDate                = startDate;
+			this._rowData.startDateOther           = startDateOther;
+			this._rowData.expirationDate           = expirationDate;
+			this._rowData.expirationDateOther      = expirationDateOther;
+			this._rowData.totalDollarAmount        = totalDollarAmountDisplay ? totalDollarAmountDisplay : "";
+			this._rowData.totalDollarAmountDisplay = totalDollarAmountDisplay ? '$' + totalDollarAmountDisplay : "";
+			this._rowData.activeAccount            = activeAccount;
+			this._rowData.isPO                     = isPO;
+			this._rowData.isCreditCard             = isCreditCard;
+
+			this.dialogRef.close(this._rowData);
+		} else {
+			// validation has caught problems - report them.
+			this.openErrorDialog();
+		}
+	}
+
+	private updateCreditCard(): void {
+		let isPO: string = (this.showField === this.PO) ? 'Y' : 'N';
+		let isCreditCard: string = (this.showField === this.CREDIT_CARD) ? 'Y' : 'N';
+		let idLab: string = !!this.formGroup.get("lab").value || !this.formGroup.get("lab").value.idLab ? '' : '' + this.formGroup.get("lab").value.idLab;
+
+		let coreFacilitiesXMLString: string = "";
+		let coreFacilities:any[] = [];
+
+		let shortAcct: string = "";
+
+		let idFundingAgency: string = "";
+
+		let startDate: string = !!this.formGroup.get("startDate") && this.formGroup.get("startDate").value ? this.formGroup.get("startDate").value : '';
+		let expirationDate: string = !!this.formGroup.get("expirationDate") && this.formGroup.get("expirationDate").value ? this.formGroup.get("expirationDate").value : '';
+
+		let idCreditCardCompany: string = !!this.formGroup.get("idCreditCardCompany") && this.formGroup.get("idCreditCardCompany").value ? this.formGroup.get("idCreditCardCompany").value : '';
+
+		let totalDollarAmountDisplay: string = !!this.formGroup.get("totalDollarAmount") && this.formGroup.get("totalDollarAmount").value ? this.formGroup.get("totalDollarAmount").value : '';
+		let submitterEmail: string = !!this.formGroup.get("email") && this.formGroup.get("email").value ? this.formGroup.get("email").value : '';
+		let activeAccount: string = "";
+
+		// The custom fields only displayed in the flex version of GNomEx if there were certain entries in the
+		// "InternalAccountFieldsConfiguration" or "OtherAccountFieldsConfiguration" tables.  However, at time
+		// of development this feature seems to be unused, so its implementation is delayed.
+		// As a note for the future, the "AccountFieldsConfigurationService" is intended to provide access to
+		// those fields.
+		let custom1: string = '';
+		let custom2: string = '';
+		let custom3: string = '';
+
+
+		if (this.selectedCoreFacilities.length) {
+			for (let i: number = 0; i < this.selectedCoreFacilities.length; i++) {
+				let coreFacility: any = {
+					idCoreFacility: this.selectedCoreFacilities[i].idCoreFacility,
+					facilityName:   this.selectedCoreFacilities[i].display
+				};
+				coreFacilities.push(coreFacility);
+
+				if (i > 0 && i + 1 < this.selectedCoreFacilities.length) {
+					this.selectedCoreFacilitiesString += ', ';
+				} else if (i + 1 === this.selectedCoreFacilities.length && this.selectedCoreFacilities.length != 1) {
+					this.selectedCoreFacilitiesString += ' and ';
+				}
+				this.selectedCoreFacilitiesString += this.selectedCoreFacilities[i].display;
+			}
+			coreFacilitiesXMLString = JSON.stringify(coreFacilities);
+		}
+
+		if (this.showFundingAgencies && !!this.formGroup.get("idFundingAgency") && this.formGroup.get("idFundingAgency").value) {
+			idFundingAgency = this.formGroup.get("idFundingAgency").value;
+		}
+
+		if (this.formGroup.get("active").value != null) {
+			if (this.formGroup.get("active").value) {
+				activeAccount = 'Y';
+			} else {
+				activeAccount = 'N';
+			}
+		}
+
+		if (this.formGroup.valid) {
+
+			let valueToDisplayParser: DateParserComponent = new DateParserComponent('YYYY-MM-DD', 'MM/DD/YYYY');
+			let startDateOther: string = '';
+			let expirationDateOther: string = '';
+
+			if (startDate && startDate !== '') {
+				startDateOther = valueToDisplayParser.parseDateString(startDate);
+			}
+			if (expirationDate && expirationDate !== '') {
+				expirationDateOther = valueToDisplayParser.parseDateString(expirationDate);
+			}
+
+			this._rowData.idLab                    = idLab;
+			this._rowData.coreFacilitiesXMLString  = coreFacilitiesXMLString;
+			this._rowData.coreFacilitiesJSONString  = coreFacilitiesXMLString;
+			this._rowData.accountName              = this.formGroup.get("accountName") && this.formGroup.get("accountName").value ? this.formGroup.get("accountName").value : "";
+			this._rowData.shortAcct                = shortAcct;
+			this._rowData.idFundingAgency          = idFundingAgency;
+			this._rowData.custom1                  = custom1;
+			this._rowData.custom2                  = custom2;
+			this._rowData.custom3                  = custom3;
+			this._rowData.submitterEmail           = submitterEmail;
+			this._rowData.idCreditCardCompany      = idCreditCardCompany;
+			this._rowData.zipCode                  = this.formGroup.get('creditZipCode').value;
+			this._rowData.acctUsers                = this.approvedUsersValue;
+			this._rowData.startDate                = startDate;
+			this._rowData.startDateOther           = startDateOther;
+			this._rowData.expirationDate           = expirationDate;
+			this._rowData.expirationDateOther      = expirationDateOther;
+			this._rowData.totalDollarAmount        = totalDollarAmountDisplay ? totalDollarAmountDisplay : "";
+			this._rowData.totalDollarAmountDisplay = totalDollarAmountDisplay ? '$' + totalDollarAmountDisplay : "";
+			this._rowData.activeAccount            = activeAccount;
+			this._rowData.isPO                     = isPO;
+			this._rowData.isCreditCard             = isCreditCard;
+
+			this.dialogRef.close(this._rowData);
+		} else {
+			// validation has caught problems - report them.
+			this.openErrorDialog();
+		}
+	}
+
+
+	public onAccountTypeChange(event:any ){
+		//todo need to clear form and reset validators
+		console.log(event);
+		this.handleConditionalValidators();
+	}
 
 	private onLabListSelection(event: any): void {
 		let coreFacilityApplicable: any[] = [];
@@ -1017,5 +1641,26 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			this.formGroup.get('chartfieldProject').setValue( '');
 			this.isActivity = true;
 		}
+	}
+
+	public onClickApprovedUsers(): void {
+		let configuration: MatDialogConfig = new MatDialogConfig();
+		configuration.width = '60em';
+		configuration.height = '40em';
+		configuration.autoFocus = false;
+		configuration.data = {
+			options: this.labActiveSubmitters,
+			optionName: "Users",
+			value: this.approvedUsersValue,
+			valueField: "value",
+			displayField: "display"
+		};
+
+		this.dialogService.genericDialogContainer(BillingUsersSelectorComponent, null, null, configuration)
+			.subscribe((result: any) => {
+				if (result) {
+					this.approvedUsersValue = result;
+				}
+			});
 	}
 }
