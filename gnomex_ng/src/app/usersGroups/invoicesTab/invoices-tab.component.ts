@@ -146,7 +146,7 @@ export class InvoicesTabComponent implements OnInit {
         }
     }
 
-    filterCores(name: any): any[] {
+    filterCores(): any[] {
         return this.cores;
     }
 

@@ -8,6 +8,7 @@ import {PropertyService} from "../../services/property.service";
 import {UtilService} from "../../services/util.service";
 
 export class Sample implements OnDestroy {
+    public idRequest:                       string = '';
     public idSample:                        string = ''; // "Sample0";
     public name:                            string = ''; // "asdffdsa";
     public number:                          string = ''; // "asdffdsa";
@@ -212,7 +213,7 @@ export class Sample implements OnDestroy {
 
     public static createSampleObjectFromAny(dictionaryService: DictionaryService, source: any): Sample {
         let sample: Sample = new Sample(dictionaryService);
-
+        sample.cloneProperty("idRequest", source);
         sample.cloneProperty("idSample", source);
         sample.cloneProperty("name", source);
         sample.cloneProperty("number", source);
@@ -425,6 +426,7 @@ export class Sample implements OnDestroy {
     public getJSONObjectRepresentation(): any {
 
         let temp: any = {
+            idRequest:                       this.idRequest,
             idSample:                        this.idSample,
             name:                            this.name,
             number:                          this.number,

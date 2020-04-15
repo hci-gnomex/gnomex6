@@ -36,7 +36,7 @@ import {
     BillingTemplateWindowComponent,
     BillingTemplateWindowParams,
 } from "../util/billing-template-window.component";
-import {Observable, Subscription} from "rxjs";
+import {forkJoin, Observable, Subscription} from "rxjs";
 import {PriceSheetViewComponent} from "./price-sheet-view.component";
 import {PriceCategoryViewComponent} from "./price-category-view.component";
 import {PriceViewComponent} from "./price-view.component";
@@ -47,6 +47,7 @@ import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-lef
 import {TextAlignLeftMiddleEditor} from "../util/grid-editors/text-align-left-middle.editor";
 import {TextAlignRightMiddleRenderer} from "../util/grid-renderers/text-align-right-middle.renderer";
 import {TextAlignRightMiddleEditor} from "../util/grid-editors/text-align-right-middle.editor";
+import {BillingPeriod} from "../util/billing-period-selector.component";
 
 @Component({
     selector: 'nav-billing',
@@ -140,6 +141,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     public statuses: any[] = [];
     private statusListShort: any[] = [];
     public changeStatusValue: string = '';
+    public static readonly EXPIRATION_WARNING = 30;
 
     // This "feature" is currently implemented by commented out. The Angular version behaves like the Flex version.
     // If in the future we want to add more explicit filtering based on billing status, uncommenting this code will
@@ -158,6 +160,9 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     public totalPrice: number = 0;
     private onCoreCommentsWindowRequestSelected: Subscription;
     private refreshSubscription: Subscription;
+    private billingAccounts:any[] = [];
+    private billingPeriodList: BillingPeriod[] = [];
+    private selectedBillingPeriod:any;
 
 
     public get billingItemGridColumnDefs(): any[] {
@@ -492,6 +497,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.utilService.registerChangeDetectorRef(this.changeDetector);
+        this.billingPeriodList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_PERIOD) as BillingPeriod[];
         this.billingItemsTreeOptions = {
             displayField: 'display',
         };
@@ -573,6 +579,10 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         this.showFilterByPo = false;
         this.expandLabs = true;
         this.invoiceMap = {};
+        let bpList:BillingPeriod[]  =  this.billingPeriodList.filter((bp) => (bp.idBillingPeriod === this.lastFilterEvent.idBillingPeriod));
+        this.selectedBillingPeriod = bpList.length > 0 ? bpList[0] : null;
+
+        console.log(event);
 
         this.hideEmptyRequests = this.propertyService.getProperty("hide_requests_with_no_billing_items", event.idCoreFacility) === 'Y';
         let excludeNewRequests: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_EXCLUDE_NEW_REQUESTS, event.idCoreFacility);
@@ -594,19 +604,28 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         }
 
         this.dialogsService.addSpinnerWorkItem();
-        this.billingService.getBillingRequestList(billingRequestListParams).subscribe((result: any) => {
-            this.dialogsService.removeSpinnerWorkItem();
-            this.billingItemsTreeLastResult = result;
-            this.buildBillingItemsTree(this.billingItemsTreeLastResult);
+        let params: HttpParams = new HttpParams()
+            .set("idBillingPeriod", event.idBillingPeriod ? event.idBillingPeriod : "")
+            .set("idCoreFacility", event.idCoreFacility ? event.idCoreFacility : "")
+            .set("accountStatusJSONString", ["PENDING","COMPLETE"].join(","));
 
-            this.refreshBillingItemList(event, !!nodeToReselect, nodeToReselect);
-        }, () => {
-            this.dialogsService.stopAllSpinnerDialogs();
-            this.billingItemsTreeLastResult = [];
-            this.buildBillingItemsTree(this.billingItemsTreeLastResult);
 
-            this.refreshBillingItemList(null);
-        });
+        forkJoin(this.billingService.getBillingRequestList(billingRequestListParams), this.billingService.getBillingAccountListForPeriodAndCore(params))
+            .subscribe((result:any[]) =>{
+                this.dialogsService.removeSpinnerWorkItem();
+                this.billingItemsTreeLastResult = result[0];
+                this.billingAccounts = result[1] ? Array.isArray(result[1]) ? result[1] : [result[1]] : [];
+                this.buildBillingItemsTree(this.billingItemsTreeLastResult);
+                this.refreshBillingItemList(event, !!nodeToReselect, nodeToReselect);
+
+            },() => {
+                this.dialogsService.stopAllSpinnerDialogs();
+                this.billingItemsTreeLastResult = [];
+                this.buildBillingItemsTree(this.billingItemsTreeLastResult);
+
+                this.refreshBillingItemList(null);
+            });
+
 
         // BillingInvoiceList
         let billingInvoiceListParams: HttpParams = new HttpParams()
@@ -755,6 +774,26 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         }
     }
 
+    markExpiringBillingAccounts(node:any):void{
+        if(node.idBillingAccount && this.billingAccounts){
+           let baList:any[] = this.billingAccounts.filter((ba) => (node.idBillingAccount === ba.idBillingAccount));
+           if(baList.length > 0 && this.selectedBillingPeriod ){
+               let ba = baList[0];
+               let expDateParser =  new DateParserComponent('YYYY-MM-DD', 'MM/DD/YYYY');
+               if(ba.expirationDate && this.selectedBillingPeriod.endDate){
+                   let baFormatExpDate: string = expDateParser.parseDateString(ba.expirationDate);
+                   let baExpDate:Date = new Date(baFormatExpDate);
+                   baExpDate.setDate(baExpDate.getDate() - NavBillingComponent.EXPIRATION_WARNING);
+                   let bpEndDate = new Date(this.selectedBillingPeriod.endDate);
+                   if( bpEndDate.getTime() >=  baExpDate.getTime() ){
+                       node.expiring = "WARNING account expires on: " +  baFormatExpDate;
+                   }
+               }
+           }
+        }
+        node.expiring = node.expiring ? node.expiring :  null;
+    }
+
     private makeStatusNode(obj: any): ITreeNode {
         let statusNode: any = obj;
         statusNode.display = statusNode.label;
@@ -764,6 +803,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         if (statusNode.status === this.STATUS_PENDING) {
             let children: any[] = Array.isArray(statusNode.Request) ? statusNode.Request : [statusNode.Request];
             for (let child of children) {
+                this.markExpiringBillingAccounts(child);
                 let requestNode: ITreeNode = this.makeRequestNode(child, false);
                 if (requestNode) {
                     childrenNodes.push(requestNode);
@@ -772,6 +812,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         } else {
             let children: any[] = Array.isArray(statusNode.Lab) ? statusNode.Lab : [statusNode.Lab];
             for (let child of children) {
+                this.markExpiringBillingAccounts(child);
                 let labNode: ITreeNode = this.makeLabNode(child);
                 if (labNode) {
                     childrenNodes.push(labNode);

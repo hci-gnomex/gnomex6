@@ -1,5 +1,4 @@
 import {
-    AfterViewInit,
     Component,
     ElementRef, EventEmitter,
     Input,
@@ -11,8 +10,6 @@ import {ErrorStateMatcher, MatDialogConfig} from "@angular/material";
 
 import {DictionaryService} from "../../services/dictionary.service";
 import {PropertyService} from "../../services/property.service";
-
-import {EditBillingAccountComponent} from "../../billing/edit_billing_account/edit-billing-account.component";
 
 import {ApproveButtonRenderer} from "../../util/grid-renderers/approve-button.renderer";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
@@ -27,7 +24,6 @@ import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-
 import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align-right-middle.renderer";
 import {UploadViewRemoveRenderer} from "../../util/grid-renderers/upload-view-remove.renderer";
 
-
 import * as _ from "lodash";
 import {DateParserComponent} from "../../util/parsers/date-parser.component";
 import {AccountFieldsConfigurationService} from "../../services/account-fields-configuration.service";
@@ -40,9 +36,9 @@ import {CopyAccountsDialogComponent} from "./dialogs/copy-accounts-dialog.compon
 import {UniqueIdGeneratorService} from "../../services/unique-id-generator.service";
 import {ConstantsService} from "../../services/constants.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
-import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {GridApi} from "ag-grid-community";
+import {TabSeqSetupViewComponent} from "../../experiments/new-experiment/tab-seq-setup-view.component";
+import {NewBillingAccountComponent} from "../../billing/new_billing_account/new-billing-account.component";
 
 export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
     isErrorState(control: FormControl | null, form: FormGroupDirective | NgForm | null): boolean {
@@ -56,36 +52,27 @@ export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
 	styles: [`
         
         .border {
-            width: 50%;
-            margin-bottom: 0.8em;
+            margin-bottom: 0.3em;
             padding: 0.5em;
             border: 1px solid lightgrey;
-            border-radius: 3px;
+            border-radius: 0.3em;
         }
-        
-        .t  { display: table;      }
-        .tr { display: table-row;  }
-        .td { display: table-cell; }
         
         .block        { display: block;        }
         .inline-block { display: inline-block; }
-        
-        
-        .padded { padding: 0.3em; }
-        
-        .padded-not-bottom {
-            padding-top:   0.3em;
-            padding-left:  0.3em;
-            padding-right: 0.3em;
-        }
 
         .medium-width    { width:  30em;  }
         .vertical-spacer { height: 0.3em; }
-        
-        .small-font { font-size: x-small; }
 
         .no-height { height: 0;   }
         .single-em { width:  1em; }
+        
+        .label { min-width: 10em; }
+        
+        .same-size-button {
+            min-width: 10.4em;
+            text-align: center;
+        }
         
 	`]
 })
@@ -123,7 +110,7 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 
 	private _isDirty: boolean = false;
 
-	coreFacilities: any[];
+	public coreFacilities: any[];
 	selectedCoreFacility: any;
 
 	labActiveSubmitters: any[];
@@ -184,6 +171,11 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
     private hasReceivedInternalAccountFieldsConfiguration: boolean = false;
     private hasReceivedOtherAccountFieldsConfiguration: boolean = false;
 
+    private _showCreditCard: boolean = false;
+
+    public get showCreditCard(): boolean {
+        return this._showCreditCard;
+    }
 
     constructor(private accountFieldsConfigurationService: AccountFieldsConfigurationService,
                 private constService: ConstantsService,
@@ -197,6 +189,12 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 	}
 
     ngOnInit(): void {
+        if (this.propertyService.getExactProperty(PropertyService.PROPERTY_SHOW_CREDIT_CARD)) {
+            if (this.propertyService.getExactProperty(PropertyService.PROPERTY_SHOW_CREDIT_CARD).propertyValue === "Y") {
+                this._showCreditCard = true;
+            }
+        }
+
         this.initializeCustomizedFields();
         this.onLabChanged();
     }
@@ -269,10 +267,10 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 		if (this.chartfieldGridApi) {
             this.chartfieldGridApi.formGroup = null;
         }
-        if (this.chartfieldGridApi) {
+        if (this.poGridApi) {
             this.poGridApi.formGroup = null;
         }
-        if (this.chartfieldGridApi) {
+        if (this.creditCardGridApi) {
             this.creditCardGridApi.formGroup = null;
         }
 
@@ -283,7 +281,6 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 		this.showAddAccountBox = false;
 		this.creditCardCompanies = this.dictionaryService.getEntries(DictionaryService.CREDIT_CARD_COMPANY);
         this.fundingAgencies = this.dictionaryService.getEntries(DictionaryService.FUNDING_AGENCY);
-		//this.userList = this.dictionaryService.getEntries(DictionaryService.USE)
 
         this.tabFormGroup.removeControl("chartfieldGridFormControl");
         this.tabFormGroup.removeControl("poGridFormControl");
@@ -315,29 +312,7 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 
 	private getDefaultCoreFacility(): any {
 		if (!!this._labInfo.coreFacilities && this._labInfo.coreFacilities.length > 0) {
-			this.coreFacilities = _.cloneDeep(this._labInfo.coreFacilities);
-
-			this.coreFacilities = this.coreFacilities.sort((a, b) => {
-				if (a.sortOrder && a.sortOrder != "") {
-					if (b.sortOrder && b.sortOrder != "") {
-						return parseInt(a.sortOrder) - parseInt(b.sortOrder);
-					} else {
-						return -1;
-					}
-				} else {
-					if (b.sortOrder && b.sortOrder != "") {
-						return 1;
-					} else {
-						if (a.display && b.display && a.display.toLowerCase() > b.display.toLowerCase()){
-							return 1;
-						} else if (a.display && b.display && a.display.toLowerCase() === b.display.toLowerCase()) {
-							return 0
-						} else {
-							return -1;
-						}
-					}
-				}
-			});
+			this.coreFacilities = _.cloneDeep(this._labInfo.coreFacilities).sort(TabSeqSetupViewComponent.sortBySortOrderThenDisplay);
 
 			return this.coreFacilities[0];
 		} else {
@@ -351,10 +326,10 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
             this.coreFacilities = _.cloneDeep(this._labInfo.coreFacilities).filter((value: any) => {
                 let manageList: any[] = this.createSecurityAdvisorService.coreFacilitiesICanManage.filter((value) => {
                     return !value.isActive || value.isActive !== 'N';
-                });
+                }).sort(TabSeqSetupViewComponent.sortBySortOrderThenDisplay);
 
                 for (let coreFacility of manageList) {
-                    if (coreFacility.idCoreFacility === value.idCoreFacility) {
+                    if (coreFacility.idCoreFacility === value.idCoreFacility && coreFacility.isActive && coreFacility.isActive === "Y") {
                         return true;
                     }
                 }
@@ -362,27 +337,7 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
                 return false;
             });
 
-            this.coreFacilities = this.coreFacilities.sort((a, b) => {
-                if (a.sortOrder && a.sortOrder != "") {
-                    if (b.sortOrder && b.sortOrder != "") {
-                        return parseInt(a.sortOrder) - parseInt(b.sortOrder);
-                    } else {
-                        return -1;
-                    }
-                } else {
-                    if (b.sortOrder && b.sortOrder != "") {
-                        return 1;
-                    } else {
-                        if (a.display && b.display && a.display.toLowerCase() > b.display.toLowerCase()){
-                            return 1;
-                        } else if (a.display && b.display && a.display.toLowerCase() === b.display.toLowerCase()) {
-                            return 0
-                        } else {
-                            return -1;
-                        }
-                    }
-                }
-            });
+            this.coreFacilities = this.coreFacilities.sort(TabSeqSetupViewComponent.sortBySortOrderThenDisplay);
 
             return this.coreFacilities[0];
         } else {
@@ -575,7 +530,7 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
                 headerName: "",
                 editable: false,
                 width:    1,
-                minWidth: 4 * this.emToPxConversionRate,
+                minWidth: 5.5 * this.emToPxConversionRate,
                 cellRendererFramework: ApproveButtonRenderer,
                 onClick: "onApproveButtonClicked_chartfield",
                 field: "isApproved"
@@ -679,19 +634,6 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
                 dateParser: new DateParserComponent("YYYY-MM-DD", "MM/DD/YYYY"),
                 field: "expirationDate"
             });
-        //        setErrors: (value: any,
-        //                    data: any,
-        //                    node: any,
-        //                    colDef: any,
-        //                    rowIndex: any,
-        //                    gridApi: any) => {
-        //            return (value && value === 'TEST') ? 'Invalid name' : '';
-        //        },
-        //        validators: [ Validators.minLength(10) ],
-        //        errorMessageHeader: 'TestingTestingTesting',
-        //        errorNameErrorMessageMap: [
-        //            { errorName: 'minlength', errorMessage: 'Name is too short' }
-        //        ],
             columnDefinitions.push({
                 headerName: "Bus",
                 editable: true,
@@ -906,7 +848,7 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 				headerName: "",
 				editable: false,
                 width:    1,
-                minWidth: 4 * this.emToPxConversionRate,
+                minWidth: 5.5 * this.emToPxConversionRate,
 				cellRendererFramework: ApproveButtonRenderer,
 				onClick: "onApproveButtonClicked_po",
 				field: "isApproved"
@@ -1019,7 +961,7 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 				headerName: "",
 				editable: false,
                 width:    1,
-                minWidth: 4 * this.emToPxConversionRate,
+                minWidth: 5.5 * this.emToPxConversionRate,
 				cellRendererFramework: ApproveButtonRenderer,
 				onClick: "onApproveButtonClicked_creditCard",
 				field: "isApproved"
@@ -1309,7 +1251,7 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
             rowData: rowNode.data
         };
 
-        this.dialogsService.genericDialogContainer(EditBillingAccountComponent, "Edit Billing Account", this.constService.ICON_WORK_AUTH_FORM, configuration,
+        this.dialogsService.genericDialogContainer(NewBillingAccountComponent, "Edit Billing Account", this.constService.ICON_WORK_AUTH_FORM, configuration,
             {actions: [
                     {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Update", internalAction: "onUpdateButtonClicked"},
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
@@ -1333,7 +1275,7 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
             rowData: rowNode.data
         };
 
-        this.dialogsService.genericDialogContainer(EditBillingAccountComponent, "Edit Billing Account", this.constService.ICON_WORK_AUTH_FORM, configuration,
+        this.dialogsService.genericDialogContainer(NewBillingAccountComponent, "Edit Billing Account", this.constService.ICON_WORK_AUTH_FORM, configuration,
             {actions: [
                     {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Update", internalAction: "onUpdateButtonClicked"},
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
@@ -1357,7 +1299,7 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
             rowData: rowNode.data
         };
 
-        this.dialogsService.genericDialogContainer(EditBillingAccountComponent, "Edit Billing Account", this.constService.ICON_WORK_AUTH_FORM, configuration,
+        this.dialogsService.genericDialogContainer(NewBillingAccountComponent, "Edit Billing Account", this.constService.ICON_WORK_AUTH_FORM, configuration,
             {actions: [
                     {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Update", internalAction: "onUpdateButtonClicked"},
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
@@ -1397,9 +1339,6 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
         } else {
             return;
         }
-
-        // let deleteTransaction = { remove: [originalGridApi.getRowNode(lastSelectedId).data] };
-        // originalGridApi.updateRowData(deleteTransaction);
 
         if (account.isPO !== 'Y' && account.isCreditCard !== 'Y') {
             if (this._labInfo && this._labInfo.internalBillingAccounts) {
@@ -1758,9 +1697,15 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
     }
 
     public prepBillingAccountForSave(){
-        this.chartfieldGridApi.stopEditing();
-        this.poGridApi.stopEditing();
-        this.creditCardGridApi.stopEditing();
+        if (this.creditCardGridApi) {
+            this.chartfieldGridApi.stopEditing();
+        }
+        if (this.creditCardGridApi) {
+            this.poGridApi.stopEditing();
+        }
+        if (this.creditCardGridApi) {
+            this.creditCardGridApi.stopEditing();
+        }
     }
 
     private markAsPristine(): void {

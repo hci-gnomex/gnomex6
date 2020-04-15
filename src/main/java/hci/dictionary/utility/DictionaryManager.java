@@ -1184,8 +1184,13 @@ private String createEditorMetaData(Session sess) {
 									field.setAttribute("id", fieldName);
 									field.setAttribute("className", this.getClassName());
 									field.setAttribute("dataField", fieldName);
-									field.setAttribute("dataType", "text");
 									field.setAttribute("caption", parseDisplay(fieldName));
+
+									if (m.getReturnType().equals(java.lang.Integer.class)) {
+										field.setAttribute("dataType", "intNumber");
+									} else {
+										field.setAttribute("dataType", "text");
+									}
 
 									// Hibernate mapped fields and identifiers (non-integers)
 									// are visible
