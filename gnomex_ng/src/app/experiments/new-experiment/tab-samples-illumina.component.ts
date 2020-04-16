@@ -571,7 +571,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 pinned: "left",
                 width:    6.5 * this.emToPxConversionRate,
                 minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 sortOrder: 7,
                 cellRendererFramework: SelectRenderer,
@@ -587,7 +586,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 pinned: "left",
                 width:    6.5 * this.emToPxConversionRate,
                 minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 sortOrder: 9,
                 cellRendererFramework: TextAlignLeftMiddleRenderer
@@ -598,7 +596,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 headerName: "",
                 field: "index",
                 width:    4 * this.emToPxConversionRate,
-                maxWidth: 4 * this.emToPxConversionRate,
                 minWidth: 4 * this.emToPxConversionRate,
                 cellRendererFramework: TextAlignRightMiddleRenderer,
                 suppressSizeToFit: true,
@@ -614,7 +611,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "multiplexGroupNumber",
                 width:    6.5 * this.emToPxConversionRate,
                 minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
@@ -641,7 +637,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "name",
                 width: 9 * this.emToPxConversionRate,
                 minWidth: 6.5 * this.emToPxConversionRate,
-                maxWidth: 12 * this.emToPxConversionRate,
                 editable: true,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
@@ -660,7 +655,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "name",
                 width: 9 * this.emToPxConversionRate,
                 minWidth: 6.5 * this.emToPxConversionRate,
-                maxWidth: 12 * this.emToPxConversionRate,
                 editable: true,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
@@ -693,7 +687,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     field: columnProperty.field,
                     width: (+columnProperty.width) * this.emToPxConversionRate,
                     minWidth: (+columnProperty.minWidth) * this.emToPxConversionRate,
-                    maxWidth: (+columnProperty.maxWidth) * this.emToPxConversionRate,
                     suppressSizeToFit: true,
                     editable: editable,
 
@@ -703,6 +696,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     validators: [],
                     errorNameErrorMessageMap: []
                 };
+
+                if (columnProperty.maxWidth) {
+                    newColumn.maxWidth = (+columnProperty.maxWidth) * this.emToPxConversionRate;
+                }
 
                 if (columnProperty.requiredInNewMode && columnProperty.requiredInNewMode === 'Y') {
                     newColumn.validators.push(Validators.required);
@@ -770,7 +767,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
             field: "ccNumber",
             width:    9 * this.emToPxConversionRate,
             minWidth: 8 * this.emToPxConversionRate,
-            maxWidth: 10 * this.emToPxConversionRate,
             suppressSizeToFit: true,
             editable: true,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
@@ -793,7 +789,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: this.isAmendState ? "sequenceLaneCount" : "numberSequencingLanes",
                 width: 6.5 * this.emToPxConversionRate,
                 minWidth: 5 * this.emToPxConversionRate,
-                maxWidth: 8 * this.emToPxConversionRate,
                 editable: !this.isAmendState,
                 cellRendererFramework: TextAlignRightMiddleRenderer,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
@@ -816,7 +811,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     field: "numberSequencingLanes",
                     width: 6.5 * this.emToPxConversionRate,
                     minWidth: 5 * this.emToPxConversionRate,
-                    maxWidth: 8 * this.emToPxConversionRate,
                     editable: true,
                     cellRendererFramework: TextAlignRightMiddleRenderer,
                     cellEditorFramework: TextAlignLeftMiddleEditor,
@@ -845,7 +839,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 editable: true,
                 width:    12 * this.emToPxConversionRate,
                 minWidth: 12 * this.emToPxConversionRate,
-                maxWidth: 20 * this.emToPxConversionRate,
                 field: "idOligoBarcode",
                 cellRendererFramework: SelectRenderer,
                 cellEditorFramework: BarcodeSelectEditor,
@@ -866,7 +859,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     field: "barcodeSequence",
                     width:    7.5 * this.emToPxConversionRate,
                     minWidth: 6.5 * this.emToPxConversionRate,
-                    maxWidth: 9 * this.emToPxConversionRate,
                     suppressSizeToFit: true,
                     editable: false,
                     sortOrder: 305
@@ -884,7 +876,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                         editable: true,
                         width:    12 * this.emToPxConversionRate,
                         minWidth: 12 * this.emToPxConversionRate,
-                        maxWidth: 20 * this.emToPxConversionRate,
                         field: "idOligoBarcodeB",
                         cellRendererFramework: SelectRenderer,
                         cellEditorFramework: BarcodeSelectEditor,
@@ -904,7 +895,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                         editable: true,
                         width:    12 * this.emToPxConversionRate,
                         minWidth: 12 * this.emToPxConversionRate,
-                        maxWidth: 20 * this.emToPxConversionRate,
                         field: "idOligoBarcodeB",
                         cellRendererFramework: SelectRenderer,
                         cellEditorFramework: BarcodeSelectEditor,
@@ -921,7 +911,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     field: "barcodeSequenceB",
                     width:    7 * this.emToPxConversionRate,
                     minWidth: 6.5 * this.emToPxConversionRate,
-                    maxWidth: 9 * this.emToPxConversionRate,
                     suppressSizeToFit: true,
                     editable: false,
                     sortOrder: 315
@@ -932,7 +921,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     field: "qcLibConcentration",
                     width:    8.5 * this.emToPxConversionRate,
                     minWidth: 8.5 * this.emToPxConversionRate,
-                    maxWidth: 10 * this.emToPxConversionRate,
                     cellEditorFramework: TextAlignLeftMiddleEditor,
                     cellRendererFramework: TextAlignLeftMiddleRenderer,
                     showFillButton: true,
@@ -954,7 +942,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "description",
                 width:    9 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 12 * this.emToPxConversionRate,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
                 suppressSizeToFit: true,
@@ -979,7 +966,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 pinned: "left",
                 width:    6.5 * this.emToPxConversionRate,
                 minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 sortOrder: 7,
                 cellRendererFramework: SelectRenderer,
@@ -995,7 +981,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 pinned: "left",
                 width:    6.5 * this.emToPxConversionRate,
                 minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 sortOrder: 9,
                 cellRendererFramework: SelectRenderer,
@@ -1009,7 +994,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 headerName: "",
                 field: "counter",
                 width:    4 * this.emToPxConversionRate,
-                maxWidth: 4 * this.emToPxConversionRate,
                 minWidth: 4 * this.emToPxConversionRate,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 suppressSizeToFit: true,
@@ -1027,7 +1011,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "multiplexGroupNumber",
                 width: 6.5 * this.emToPxConversionRate,
                 minWidth: 4 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
@@ -1053,7 +1036,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
             field: "number",
             width:    6 * this.emToPxConversionRate,
             minWidth: 6 * this.emToPxConversionRate,
-            maxWidth: 9 * this.emToPxConversionRate,
             editable: false,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             sortOrder: 15,
@@ -1064,7 +1046,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
             field: "name",
             width:    9 * this.emToPxConversionRate,
             minWidth: 6.5 * this.emToPxConversionRate,
-            maxWidth: 12 * this.emToPxConversionRate,
             editable: true,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
@@ -1096,7 +1077,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     field: columnProperty.field,
                     width: (+columnProperty.width) * this.emToPxConversionRate,
                     minWidth: (+columnProperty.minWidth) * this.emToPxConversionRate,
-                    maxWidth: (+columnProperty.maxWidth) * this.emToPxConversionRate,
                     suppressSizeToFit: true,
                     editable: editable,
 
@@ -1106,6 +1086,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     validators: [],
                     errorNameErrorMessageMap: []
                 };
+
+                if (columnProperty.maxWidth) {
+                    newColumn.maxWidth = (+columnProperty.maxWidth) * this.emToPxConversionRate;
+                }
 
                 if (columnProperty.requiredInEditMode && columnProperty.requiredInEditMode === 'Y') {
                     newColumn.validators.push(Validators.required);
@@ -1172,7 +1156,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
             field: "ccNumber",
             width:    9 * this.emToPxConversionRate,
             minWidth: 8 * this.emToPxConversionRate,
-            maxWidth: 10 * this.emToPxConversionRate,
             suppressSizeToFit: true,
             editable: true,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
@@ -1190,72 +1173,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
         this._tabIndexToInsertAnnotations = 150;
 
-        // if (this.showNucleicAcidExtractionMethod) {
-        //     temp.push({
-        //         headerName: "Nucl. acid extraction meth.",
-        //         field: "otherSamplePrepMethod",
-        //         width:    7.5 * this.emToPxConversionRate,
-        //         minWidth: 4 * this.emToPxConversionRate,
-        //         maxWidth: 9 * this.emToPxConversionRate,
-        //         suppressSizeToFit: true,
-        //         editable: true,
-        //         cellRendererFramework: TextAlignLeftMiddleRenderer,
-        //         cellEditorFramework: TextAlignLeftMiddleEditor,
-        //         showFillButton: true,
-        //         fillGroupAttribute: 'frontEndGridGroup'
-        //     });
-        // }
-
-        // if (this.showAssayColumn) {
-        //     temp.push({
-        //         headerName: "Assay",
-        //         editable: true,
-        //         width:    13 * this.emToPxConversionRate,
-        //         minWidth: 9 * this.emToPxConversionRate,
-        //         field: "codeBioanalyzerChipType",
-        //         cellRendererFramework: SelectRenderer,
-        //         cellEditorFramework: SelectEditor,
-        //         selectOptions: this.bioanalyzerChipType,
-        //         selectOptionsDisplayField: "display",
-        //         selectOptionsValueField: "value",
-        //         showFillButton: true,
-        //         fillGroupAttribute: 'frontEndGridGroup'
-        //     });
-        // }
-        //
-        // temp.push({
-        //     headerName: "QC Status",
-        //     field: "qualStatus",
-        //     width:    8.5 * this.emToPxConversionRate,
-        //     minWidth: 8.5 * this.emToPxConversionRate,
-        //     maxWidth: 10 * this.emToPxConversionRate,
-        //     cellRendererFramework: SelectRenderer,
-        //     cellEditorFramework: SelectEditor,
-        //     selectOptions: this.workflowStatus,
-        //     selectOptionsDisplayField: "display",
-        //     selectOptionsValueField: "value",
-        //     suppressSizeToFit: true,
-        //     editable: true,
-        //     showFillButton: true,
-        //     fillGroupAttribute: 'frontEndGridGroup'
-        // });
-        //
-        // if (this.showSeqLibPrepStatus) {
-        //     temp.push({
-        //         headerName: "Seq Lib Prep Status",
-        //         field: "seqPrepStatus",
-        //         width:    8.5 * this.emToPxConversionRate,
-        //         minWidth: 8.5 * this.emToPxConversionRate,
-        //         maxWidth: 10 * this.emToPxConversionRate,
-        //         cellRendererFramework: TextAlignLeftMiddleRenderer,
-        //         cellEditorFramework: TextAlignLeftMiddleEditor,
-        //         suppressSizeToFit: true,
-        //         editable: true,
-        //         showFillButton: true,
-        //         fillGroupAttribute: 'frontEndGridGroup'
-        //     });
-        // }
-
         if (this._experiment
             && this._experiment.requestCategory
             && this._experiment.requestCategory.isIlluminaType
@@ -1266,7 +1183,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 editable: true,
                 width:    12 * this.emToPxConversionRate,
                 minWidth: 12 * this.emToPxConversionRate,
-                maxWidth: 20 * this.emToPxConversionRate,
                 field: "idOligoBarcode",
                 cellRendererFramework: SelectRenderer,
                 cellEditorFramework: BarcodeSelectEditor,
@@ -1285,7 +1201,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "barcodeSequence",
                 width:    8.5 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false,
                 sortOrder: 301
@@ -1303,7 +1218,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     editable: true,
                     width:    12 * this.emToPxConversionRate,
                     minWidth: 12 * this.emToPxConversionRate,
-                    maxWidth: 20 * this.emToPxConversionRate,
                     field: "idOligoBarcodeB",
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: BarcodeSelectEditor,
@@ -1323,7 +1237,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     editable: false,
                     width:    12 * this.emToPxConversionRate,
                     minWidth: 12 * this.emToPxConversionRate,
-                    maxWidth: 20 * this.emToPxConversionRate,
                     field: "idOligoBarcodeB",
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: BarcodeSelectEditor,
@@ -1340,7 +1253,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "barcodeSequenceB",
                 width:    8.5 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false,
                 sortOrder: 303
@@ -1351,7 +1263,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "qcLibConcentration",
                 width:    8.5 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 showFillButton: true,
@@ -1370,7 +1281,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "qualStatus",
                 width:    8.5 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
                 cellRendererFramework: SelectRenderer,
                 cellEditorFramework: SelectEditor,
                 selectOptions: this.workflowStatus,
@@ -1387,7 +1297,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "seqPrepStatus",
                 width:    8.5 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
                 cellRendererFramework: SelectRenderer,
                 cellEditorFramework: SelectEditor,
                 selectOptions: this.workflowStatus,
@@ -1411,7 +1320,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                             field: "qualStatus",
                             width: 8.5 * this.emToPxConversionRate,
                             minWidth: 8.5 * this.emToPxConversionRate,
-                            maxWidth: 10 * this.emToPxConversionRate,
                             cellRendererFramework: SelectRenderer,
                             cellEditorFramework: SelectEditor,
                             selectOptions: this.workflowStatus,
@@ -1430,7 +1338,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                             field: "description",
                             width:    9 * this.emToPxConversionRate,
                             minWidth: 8.5 * this.emToPxConversionRate,
-                            maxWidth: 12 * this.emToPxConversionRate,
                             cellRendererFramework: TextAlignLeftMiddleRenderer,
                             cellEditorFramework: TextAlignLeftMiddleEditor,
                             suppressSizeToFit: true,
@@ -1454,7 +1361,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 headerName: "Multiplex Group",
                 field: "mainMultiplexGroupNumber",
                 width: 5 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
                 minWidth: 5 * this.emToPxConversionRate,
                 cellRenderer: "agGroupCellRenderer",
                 cellRendererParams: {
@@ -1468,7 +1374,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 headerName: "Plate",
                 field: "mainMultiplexGroupNumber",
                 width: 5 * this.emToPxConversionRate,
-                maxWidth: 9 * this.emToPxConversionRate,
                 minWidth: 5 * this.emToPxConversionRate,
                 cellRenderer: "agGroupCellRenderer",
                 cellRendererParams: {
@@ -1483,7 +1388,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
             headerName: "ID",
             field: "number",
             width:    5 * this.emToPxConversionRate,
-            maxWidth: 5 * this.emToPxConversionRate,
             minWidth: 5 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignRightMiddleRenderer,
             suppressSizeToFit: true,
@@ -1495,7 +1399,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 headerName: "Well",
                 field: "wellName",
                 width:    5 * this.emToPxConversionRate,
-                maxWidth: 5 * this.emToPxConversionRate,
                 minWidth: 5 * this.emToPxConversionRate,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 suppressSizeToFit: true,
@@ -1508,7 +1411,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
             field: "name",
             width:    9 * this.emToPxConversionRate,
             minWidth: 6.5 * this.emToPxConversionRate,
-            maxWidth: 12 * this.emToPxConversionRate,
             editable: false,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             outerForm: this.form,
@@ -1534,7 +1436,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     field: columnProperty.field,
                     width: (+columnProperty.width) * this.emToPxConversionRate,
                     minWidth: (+columnProperty.minWidth) * this.emToPxConversionRate,
-                    maxWidth: (+columnProperty.maxWidth) * this.emToPxConversionRate,
                     suppressSizeToFit: true,
                     editable: editable,
 
@@ -1542,6 +1443,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     fillGroupAttribute: columnProperty.fillGroupAttribute,
                     sortOrder: columnProperty.sortOrder
                 };
+
+                if (columnProperty.maxWidth) {
+                    newColumn.maxWidth = (+columnProperty.maxWidth) * this.emToPxConversionRate;
+                }
 
                 switch(columnProperty.columnType) {
                     case TabSamplesIlluminaComponent.TEXT_RIGHT:
@@ -1595,7 +1500,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 editable: false,
                 width:    12 * this.emToPxConversionRate,
                 minWidth: 12 * this.emToPxConversionRate,
-                maxWidth: 20 * this.emToPxConversionRate,
                 field: "idOligoBarcode",
                 cellRendererFramework: SelectRenderer,
                 cellEditorFramework: BarcodeSelectEditor,
@@ -1610,7 +1514,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "barcodeSequence",
                 width:    8.5 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false,
                 sortOrder: 301
@@ -1628,7 +1531,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     editable: false,
                     width:    12 * this.emToPxConversionRate,
                     minWidth: 12 * this.emToPxConversionRate,
-                    maxWidth: 20 * this.emToPxConversionRate,
                     field: "idOligoBarcodeB",
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: BarcodeSelectEditor,
@@ -1644,7 +1546,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     field: "barcodeSequenceB",
                     width:    8.5 * this.emToPxConversionRate,
                     minWidth: 8.5 * this.emToPxConversionRate,
-                    maxWidth: 10 * this.emToPxConversionRate,
                     suppressSizeToFit: true,
                     editable: false,
                     sortOrder: 303
@@ -1674,7 +1575,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "qcLibConcentration",
                 width:    8.5 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false,
             });
@@ -1684,7 +1584,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "qualStatus",
                 width:    8.5 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false,
             });
@@ -1693,7 +1592,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "seqPrepStatus",
                 width:    8.5 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false,
             });
@@ -1702,7 +1600,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "seqPrepByCore",
                 width:    8.5 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false,
             });
@@ -1711,7 +1608,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "seqPrepLibConcentration",
                 width:    8.5 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
-                maxWidth: 10 * this.emToPxConversionRate,
                 suppressSizeToFit: true,
                 editable: false,
             });
@@ -1722,7 +1618,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     field: "qualStatus",
                     width:    8.5 * this.emToPxConversionRate,
                     minWidth: 8.5 * this.emToPxConversionRate,
-                    maxWidth: 10 * this.emToPxConversionRate,
                     suppressSizeToFit: true,
                     editable: false,
                 });
@@ -1733,7 +1628,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     field: "ccNumber",
                     width:    8.5 * this.emToPxConversionRate,
                     minWidth: 8.5 * this.emToPxConversionRate,
-                    maxWidth: 10 * this.emToPxConversionRate,
                     suppressSizeToFit: true,
                     editable: false,
                     cellRendererFramework: LinkButtonRenderer,
@@ -1749,7 +1643,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     field: "description",
                     width:    9 * this.emToPxConversionRate,
                     minWidth: 8.5 * this.emToPxConversionRate,
-                    maxWidth: 12 * this.emToPxConversionRate,
                     suppressSizeToFit: true,
                     editable: false,
                     cellRendererFramework: TextAlignLeftMiddleRenderer
@@ -1762,7 +1655,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     field: "ccNumber",
                     width:    8.5 * this.emToPxConversionRate,
                     minWidth: 8.5 * this.emToPxConversionRate,
-                    maxWidth: 10 * this.emToPxConversionRate,
                     suppressSizeToFit: true,
                     editable: false,
                     cellRendererFramework: LinkButtonRenderer,
@@ -1814,10 +1706,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
         this.samplesGridColumnDefs = TabSamplesIlluminaComponent.sortColumns(this.defaultSampleColumnDefinitions);
         this.nodeChildDetails = this.getItemNodeChildDetails;
-
-        setTimeout(() => {
-            this.dialogService.startDefaultSpinnerDialog();
-        });
 
         this.rebuildColumnDefinitions();
 

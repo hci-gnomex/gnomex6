@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from "@angular/core";
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {ConstantsService} from "../../services/constants.service";
 import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode, RowDoubleClickedEvent} from "ag-grid-community";
 import {ActivatedRoute} from "@angular/router";
@@ -26,6 +26,7 @@ import {UtilService} from "../../services/util.service";
                 <button mat-button (click)="this.handleDownloadFiles()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download Files</button>
             </div>
             <div class="flex-grow">
+                <div #oneEmWidth class="no-height single-em"></div>
                 <ag-grid-angular class="ag-theme-balham full-height full-width"
                                  (gridReady)="this.onGridReady($event)"
                                  (gridSizeChanged)="this.onGridSizeChanged($event)"
@@ -43,6 +44,10 @@ import {UtilService} from "../../services/util.service";
     styles: [``]
 })
 export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
+
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+
+    private emToPxConversionRate: number = 13;
 
     public getNodeChildDetails;
     private gridApi: GridApi;
@@ -72,12 +77,47 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
 
 
         this.gridColDefs = [
-            {headerName: "Folder or File", field: "displayName", tooltipField: "displayName", cellRenderer: "agGroupCellRenderer",
-                cellRendererParams: {innerRenderer: getDownloadGroupRenderer(), suppressCount: true}},
-            {headerName: "User", field: "info", tooltipField: "info", width: 150, maxWidth: 150},
-            {headerName: "Linked Sample", field: "linkedSampleNumber", tooltipField: "linkedSampleNumber", width: 150, maxWidth: 150},
-            {headerName: "Size", field: "fileSizeText", tooltipField: "fileSizeText", width: 150, maxWidth: 150, type: "numericColumn"},
-            {headerName: "Modified", field: "lastModifyDateDisplay", tooltipField: "lastModifyDateDisplay", width: 150, maxWidth: 150},
+            {
+                headerName: "Folder or File",
+                field: "displayName",
+                tooltipField: "displayName",
+                width:    1,
+                minWidth: 25 * this.emToPxConversionRate,
+                cellRenderer: "agGroupCellRenderer",
+                cellRendererParams: {
+                    innerRenderer: getDownloadGroupRenderer(),
+                    suppressCount: true
+                }
+            },
+            {
+                headerName: "User",
+                field: "info",
+                tooltipField: "info",
+                width:    1,
+                minWidth: 10 * this.emToPxConversionRate
+            },
+            {
+                headerName: "Linked Sample",
+                field: "linkedSampleNumber",
+                tooltipField: "linkedSampleNumber",
+                width:    1,
+                minWidth: 10 * this.emToPxConversionRate
+            },
+            {
+                headerName: "Size",
+                field: "fileSizeText",
+                tooltipField: "fileSizeText",
+                width:    1,
+                minWidth: 10 * this.emToPxConversionRate,
+                type: "numericColumn"
+            },
+            {
+                headerName: "Modified",
+                field: "lastModifyDateDisplay",
+                tooltipField: "lastModifyDateDisplay",
+                width:    500,
+                minWidth: 10 * this.emToPxConversionRate
+            },
         ];
         this.getNodeChildDetails = function getItemNodeChildDetails(rowItem) {
             let children: any[] = [];
@@ -135,13 +175,25 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
     }
 
     public onGridReady(event: GridReadyEvent): void {
-        event.api.setColumnDefs(this.gridColDefs);
-        event.api.sizeColumnsToFit();
-        this.gridApi = event.api;
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
+        if (event && event.api) {
+            event.api.setColumnDefs(this.gridColDefs);
+            event.api.sizeColumnsToFit();
+            this.gridApi = event.api;
+        }
     }
 
     public onGridSizeChanged(event: GridSizeChangedEvent): void {
-        event.api.sizeColumnsToFit();
+        if (this.oneEmWidth && this.oneEmWidth.nativeElement) {
+            this.emToPxConversionRate = this.oneEmWidth.nativeElement.offsetWidth;
+        }
+
+        if (event && event.api) {
+            event.api.sizeColumnsToFit();
+        }
     }
 
     private determineFileCount(): void {

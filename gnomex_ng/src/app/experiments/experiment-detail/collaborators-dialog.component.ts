@@ -52,14 +52,13 @@ export class CollaboratorsDialogComponent extends BaseGenericContainerDialog imp
             {
                 headerName: "Collaborator",
                 field: this.prefService.userDisplayField,
-                width: 200,
+                width: 500,
                 editable:false
             },
             {
                 headerName: "Upload",
                 field: "canUploadData",
-                width:    3.5 * this.emToPxConversionRate,
-                maxWidth: 3.5 * this.emToPxConversionRate,
+                width:    1,
                 minWidth: 3.5 * this.emToPxConversionRate,
                 editable:false,
                 cellRendererFramework: CheckboxRenderer,
@@ -68,8 +67,7 @@ export class CollaboratorsDialogComponent extends BaseGenericContainerDialog imp
             {
                 headerName: "Update",
                 field: "canUpdate",
-                width:    3.5 * this.emToPxConversionRate,
-                maxWidth: 3.5 * this.emToPxConversionRate,
+                width:    1,
                 minWidth: 3.5 * this.emToPxConversionRate,
                 editable:false,
                 cellRendererFramework: CheckboxRenderer,
@@ -81,8 +79,7 @@ export class CollaboratorsDialogComponent extends BaseGenericContainerDialog imp
                 field: "buttonName",
                 onClick: "removeCollaborator",
                 editable: false,
-                width:    5 * this.emToPxConversionRate,
-                maxWidth: 5 * this.emToPxConversionRate,
+                width:    1,
                 minWidth: 5 * this.emToPxConversionRate
             }
         ];

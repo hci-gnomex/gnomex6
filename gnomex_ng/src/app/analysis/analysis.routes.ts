@@ -23,13 +23,12 @@ const ROUTES: Routes = [
         {
             path: 'overview',
             component: AnalysisOverviewComponent,
-            outlet: 'analysisPanel',
-            resolve: {analysisGroup: AnalysisGroupResolverService}
+            resolve: {analysisGroup: AnalysisGroupResolverService},
+            runGuardsAndResolvers: 'always'
         },
         {
-            path: ':idAnalysis',
+            path: 'detail/:idAnalysis',
             component: AnalysisDetailOverviewComponent,
-            outlet: 'analysisPanel',
             resolve: {analysis: AnalysisResolverService},
             runGuardsAndResolvers: 'always'
         }

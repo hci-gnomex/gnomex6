@@ -9,7 +9,7 @@ import {AnalysisService} from "../../services/analysis.service"
     selector: 'analysis-panel',
     template: `        
         <div class="full-width full-height">
-            <router-outlet name="analysisPanel"></router-outlet>
+            <router-outlet ></router-outlet>
         </div>
     `
 })

@@ -81,6 +81,7 @@ export class GBSegmentsTabComponent extends PrimaryTab implements OnInit, OnDest
     private enableImport: boolean = true;
     private validSubscription: Subscription;
     private idGenomeBuild: string = '';
+    private datatracksTreeNodeSubscription: Subscription;
 
 
     private editable = (): boolean => {
@@ -133,17 +134,20 @@ export class GBSegmentsTabComponent extends PrimaryTab implements OnInit, OnDest
                 this.gbValidateService.segmentsList = this.rowData;
             });
 
+        this.datatracksTreeNodeSubscription = this.datatracksService.datatrackListTreeNodeSubject.subscribe((data)=>{
+            if(data){
+                let canWrite: boolean = data.canWrite === 'Y';
+                this.newSegment = !this.secAdvisor.isGuest && canWrite ? this.constService.SEGMENT_NEW : this.constService.SEGMENT_NEW_DISABLE; // need to add check for canWrite
+                this.removeSegment = this.constService.SEGMENT_REMOVE_DISABLE; // need to add check for canWrite below
+                this.importSegment = !this.secAdvisor.isGuest ? this.constService.SEGMENT_IMPORT : this.constService.SEGMENT_IMPORT_DISABLE; // need to add check for canWrite
+
+                this.enableNew = canWrite;
+                this.enableImport = canWrite;
+            }
+        });
+
         this.route.data.forEach(data => { //asynchronous
             this.gbValidateService.resetValidation();
-            let canWrite: boolean = this.datatracksService.datatrackListTreeNode.canWrite === 'Y';
-
-            this.newSegment = !this.secAdvisor.isGuest && canWrite ? this.constService.SEGMENT_NEW : this.constService.SEGMENT_NEW_DISABLE; // need to add check for canWrite
-            this.removeSegment = this.constService.SEGMENT_REMOVE_DISABLE; // need to add check for canWrite below
-            this.importSegment = !this.secAdvisor.isGuest ? this.constService.SEGMENT_IMPORT : this.constService.SEGMENT_IMPORT_DISABLE; // need to add check for canWrite
-
-            this.enableNew = canWrite;
-            this.enableImport = canWrite;
-
             let segs = Array.isArray(data.genomeBuild.Segments) ? data.genomeBuild.Segments : [data.genomeBuild.Segments];
             this.rowData = segs;
         });
@@ -216,6 +220,9 @@ export class GBSegmentsTabComponent extends PrimaryTab implements OnInit, OnDest
     ngOnDestroy() {
         if (this.validSubscription) {
             this.validSubscription.unsubscribe();
+        }
+        if(this.datatracksTreeNodeSubscription){
+            this.datatracksTreeNodeSubscription.unsubscribe();
         }
 
     }

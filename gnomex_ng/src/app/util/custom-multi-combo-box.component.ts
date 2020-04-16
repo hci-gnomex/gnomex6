@@ -29,7 +29,9 @@ import {MatSelect} from "@angular/material";
             <div>
                 <mat-select #select [multiple]="true"
                             (selectionChange)="this.selectOptions($event.value)"
-                            (openedChange)="this.onOpenedChange($event)">
+                            (openedChange)="this.onOpenedChange($event)"
+                            [(ngModel)]="selectedListItems"
+                            [compareWith]="compareByID">
                     <mat-option *ngFor="let opt of this.loadedOptions" [value]="opt">
                         {{this.displayField ? opt[this.displayField] : opt}}
                     </mat-option>
@@ -70,6 +72,7 @@ export class CustomMultiComboBoxComponent implements AfterViewInit, OnChanges, O
     private ignoreInnerControlChanges: boolean = false;
     private innerControlSubscription: Subscription;
     private noNgControl: boolean = false;
+    private selectedListItems: any[] = [];
 
     private onChangeFn: (val: any) => void = () => {};
     private onTouchedFn: () => void = () => {};
@@ -145,7 +148,7 @@ export class CustomMultiComboBoxComponent implements AfterViewInit, OnChanges, O
                 }
             }
         }
-        this.selectElement.value = this.loadedOptions;
+        this.selectedListItems = this.loadedOptions;
 
 
         let currentValueLabel: string = "";
@@ -223,6 +226,20 @@ export class CustomMultiComboBoxComponent implements AfterViewInit, OnChanges, O
         if (this.isSelectOpen) {
             this.inputElement.nativeElement.focus();
         }
+    }
+
+    compareByID(itemOne, itemTwo) {
+         if(!itemOne){
+            return false;
+        }else if (!itemTwo){
+           return false;
+        }else{
+             if(this.valueField){
+                 return itemOne[this.valueField] && itemTwo[this.valueField] && itemOne[this.valueField] === itemTwo[this.valueField];
+             }else{
+                 return  itemOne === itemTwo;
+             }
+         }
     }
 
     ngOnDestroy(): void {

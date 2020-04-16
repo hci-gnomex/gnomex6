@@ -80,10 +80,11 @@ public class GetLabList extends GNomExCommand implements Serializable {
                 //workaround until NullPointer exception is dealt with
                 InternalAccountFieldsConfiguration.getConfiguration(sess);
 
-                // If this is a non-gnomex University-only user, we want to get
-                // all of the active labs
+                // If this is a non-gnomex University-only user, we want to get nothing
                 Map activeLabMap = new HashMap();
                 if (this.getSecAdvisor().isUniversityOnlyUser()) {
+                    }
+/*
                     StringBuffer buf = new StringBuffer();
                     buf.append("SELECT l.idLab  ");
                     buf.append(" FROM  Lab l ");
@@ -94,7 +95,7 @@ public class GetLabList extends GNomExCommand implements Serializable {
                         activeLabMap.put(idLab, idLab);
                     }
                 }
-
+*/
                 Map labsToSubmitOnBehalfOf = new HashMap();
                 if(this.getSecAdvisor().getAppUser().getCoreFacilitiesICanSubmitTo() != null && this.getSecAdvisor().getAppUser().getCoreFacilitiesICanSubmitTo().size() > 0 ) {
                     StringBuffer buf = new StringBuffer();

@@ -1,154 +1,159 @@
 <form [formGroup]="this.overviewTabForm">
-<div class="full-height full-width padded small-font">
-    <div class="full-width flex-container-col">
-        <div class="full-width flex-container-row">
-            <div class="flex-container-col">
-                <div class="field-width align-center flex-container-row padded">
-                    <div class="label label-width">
-                        Core Facility
-                    </div>
-                    <div class="flex-grow">
-                        {{ coreFacilityName }}
-                    </div>
-                </div>
-                <div class="field-width align-center flex-container-row padded">
-                    <div class="label label-width">
-                        Lab Group
-                    </div>
-                    <div class="flex-grow">
-                        <div [matTooltip]="_experiment?.labName">
-                            <custom-combo-box class="full-width" (optionSelected)="onChange_lab($event)" valueField="idLab"
-                                              [options]="filteredLabDictionary" [displayField]="this.prefService.labDisplayField"
-                                              [(ngModel)]="_experiment.idLab" [formControlName]="'idLab'">
-                            </custom-combo-box>
+    <div class="full-height full-width padded small-font">
+        <div class="full-width flex-container-col">
+            <div class="full-width flex-container-row">
+                <div class="flex-container-col">
+                    <div class="field-width align-center flex-container-row padded">
+                        <div class="label label-width">
+                            Core Facility
+                        </div>
+                        <div class="flex-grow">
+                            {{ coreFacilityName }}
                         </div>
                     </div>
-                </div>
-                <div class="field-width align-center flex-container-row padded">
-                    <div class="label label-width">
-                        Project
-                    </div>
-                    <div class="flex-grow">
-                        <div [matTooltip]="_experiment?.project?.Project?.name">
-                            <custom-combo-box class="full-width" (optionSelected)="onChange_project($event)"
-                                              [options]="projectsDictionary" displayField="name" valueField="idProject"
-                                              [(ngModel)]="_experiment.idProject" [formControlName]="'idProject'">
-                            </custom-combo-box>
+                    <div class="field-width align-center flex-container-row padded">
+                        <div class="label label-width">
+                            Lab Group
                         </div>
-                    </div>
-                </div>
-                <div class="field-width align-center flex-container-row padded">
-                    <div class="label label-width">
-                        Name
-                    </div>
-                    <div class="flex-grow">
-                        {{ _experiment?.name }}
-                    </div>
-                </div>
-                <div class="field-width align-center flex-container-row padded">
-                    <div class="full-height label label-width">
-                        Experiment
-                    </div>
-                    <div class="flex-grow">
-                        <div class="full-width">
-                            {{ requestCategoryName }}
-                        </div>
-                    </div>
-                </div>
-                <div class="field-width align-center flex-container-row padded">
-                    <div class="full-height label label-width">
-                        Experiment Type
-                    </div>
-                    <div class="flex-grow">
-                        <div class="full-width">
-                            <div [matTooltip]="_experiment?.application?.Application?.display">
-                                <custom-combo-box class="full-width" (optionSelected)="onChange_application($event)" displayField="display"
-                                                  [options]="filteredApplicationDictionary" valueField="value"
-                                                  [(ngModel)]="_experiment.codeApplication" [formControlName]="'codeApplication'">
+                        <div class="flex-grow">
+                            <div [matTooltip]="_experiment?.labName">
+                                <custom-combo-box class="full-width" (optionSelected)="onChange_lab($event)" valueField="idLab"
+                                                  [options]="filteredLabDictionary"
+                                                  [displayField]="this.prefService.labDisplayField"
+                                                  formControlName="idLab">
                                 </custom-combo-box>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="field-width align-center flex-container-row padded">
-                    <div class="label label-width">
-                        Organism
+                    <div class="field-width align-center flex-container-row padded">
+                        <div class="label label-width">
+                            Project
+                        </div>
+                        <div class="flex-grow">
+                            <div [matTooltip]="_experiment?.project?.Project?.name">
+                                <custom-combo-box class="full-width" (optionSelected)="onChange_project($event)"
+                                                  [disabled]="disableProject"
+                                                  [options]="projectsDictionary" displayField="name" valueField="idProject"
+                                                  [(ngModel)]="_experiment.idProject"   [ngModelOptions]="{standalone: true}">
+                                </custom-combo-box>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex-grow">
-                        {{ _experiment?.organismName }}
+                    <div class="field-width align-center flex-container-row padded">
+                        <div class="label label-width">
+                            Name
+                        </div>
+                        <div class="flex-grow">
+                            {{ _experiment?.name }}
+                        </div>
                     </div>
-                </div>
-                <div class="field-width align-center flex-container-row padded">
-                    <div class="label label-width">
-                        {{ isExternal ? 'Registered on' : 'Submitted on' }}
+                    <div class="field-width align-center flex-container-row padded">
+                        <div class="full-height label label-width">
+                            Experiment
+                        </div>
+                        <div class="flex-grow">
+                            <div class="full-width">
+                                {{ requestCategoryName }}
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex-grow">
-                        {{ _experiment?.createDate }}
+                    <div class="field-width align-center flex-container-row padded">
+                        <div class="full-height label label-width">
+                            Experiment Type
+                        </div>
+                        <div class="flex-grow">
+                            <div class="full-width">
+                                <div [matTooltip]="_experiment?.application?.Application?.display">
+                                    <custom-combo-box class="full-width"  displayField="display"
+                                                      [disabled]="disableExperimentType"
+                                                      (ngModelChange)="onAppSelected($event)"
+                                                      [options]="filteredApplicationDictionary" valueField="value"
+                                                      [(ngModel)]="_experiment.codeApplication" [ngModelOptions]="{standalone: true}">
+                                    </custom-combo-box>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div class="field-width align-center flex-container-row padded">
-                    <div class="label label-width">
-                        Last modified
+                    <div class="field-width align-center flex-container-row padded">
+                        <div class="label label-width">
+                            Organism
+                        </div>
+                        <div class="flex-grow">
+                            {{ _experiment?.organismName }}
+                        </div>
                     </div>
-                    <div class="flex-grow">
-                        {{ _experiment?.lastModifyDate }}
+                    <div class="field-width align-center flex-container-row padded">
+                        <div class="label label-width">
+                            {{ isExternal ? 'Registered on' : 'Submitted on' }}
+                        </div>
+                        <div class="flex-grow">
+                            {{ _experiment?.createDate }}
+                        </div>
                     </div>
-                </div>
-                <div *ngIf="!isExternal" class="field-width align-center flex-container-row padded">
-                    <div class="label label-width">
-                        Completion Date
+                    <div class="field-width align-center flex-container-row padded">
+                        <div class="label label-width">
+                            Last modified
+                        </div>
+                        <div class="flex-grow">
+                            {{ _experiment?.lastModifyDate }}
+                        </div>
                     </div>
-                    <div class="flex-grow">
-                        {{ _experiment?.completedDate }}
-                    </div>
-                </div>
-            </div>
-            <div class="full-width horizontal-spacing">
-            </div>
-            <div class="flex-container-col">
-                <div class="field-width align-center flex-container-row padded">
-                    <div class="label label-width">
-                        Owned by
-                    </div>
-                    <div class="flex-grow">
-                        <div [matTooltip]="_experiment?.ownerName">
-                            <custom-combo-box class="full-width" (optionSelected)="onChange_owner($event)" valueField="idAppUser"
-                                              [options]="possibleOwnersForLabDictionary" [displayField]="this.prefService.userDisplayField"
-                                              [(ngModel)]="_experiment.idAppUser" [formControlName]="'idAppUser'">
-                            </custom-combo-box>
+                    <div *ngIf="!isExternal" class="field-width align-center flex-container-row padded">
+                        <div class="label label-width">
+                            Completion Date
+                        </div>
+                        <div class="flex-grow">
+                            {{ _experiment?.completedDate }}
                         </div>
                     </div>
                 </div>
-                <div class="field-width align-center flex-container-row padded">
-                    <div class="label label-width">
-                        {{ isExternal ? 'Registered by' : 'Submitted by' }}
-                    </div>
-                    <div class="flex-grow">
-                        <div [matTooltip]="_experiment?.submitterName">
-                            <custom-combo-box class="full-width" (optionSelected)="onChange_submitter($event)" valueField="idAppUser"
-                                              [options]="possibleSubmittersForLabDictionary" [displayField]="this.prefService.userDisplayField"
-                                              [(ngModel)]="_experiment.idSubmitter" [formControlName]="'idSubmitter'">
-                            </custom-combo-box>
+                <div class="full-width horizontal-spacing">
+                </div>
+                <div class="flex-container-col">
+                    <div class="field-width align-center flex-container-row padded">
+                        <div class="label label-width">
+                            Owned by
+                        </div>
+                        <div class="flex-grow">
+                            <div [matTooltip]="_experiment?.ownerName">
+                                <custom-combo-box class="full-width" (optionSelected)="onChange_owner($event)" valueField="idAppUser"
+                                                  [options]="possibleOwnersForLabDictionary" [displayField]="this.prefService.userDisplayField"
+                                                  formControlName="idAppUser">
+                                </custom-combo-box>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div *ngIf="_experiment?.email" class="field-width align-center flex-container-row padded">
-                    <div class="label label-width">
-                        Email
+                    <div class="field-width align-center flex-container-row padded">
+                        <div class="label label-width">
+                            {{ isExternal ? 'Registered by' : 'Submitted by' }}
+                        </div>
+                        <div class="flex-grow">
+                            <div [matTooltip]="_experiment?.submitterName">
+                                <custom-combo-box class="full-width" (optionSelected)="onChange_submitter($event)" valueField="idAppUser"
+                                                  [disabled]="disableSubmitter"
+                                                  [options]="possibleSubmittersForLabDictionary" [displayField]="this.prefService.userDisplayField"
+                                                  [(ngModel)]="_experiment.idSubmitter" [ngModelOptions]="{standalone: true}">
+                                </custom-combo-box>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex-grow">
-                        {{ _experiment?.email }}
+                    <div *ngIf="_experiment?.email" class="field-width align-center flex-container-row padded">
+                        <div class="label label-width">
+                            Email
+                        </div>
+                        <div class="flex-grow">
+                            {{ _experiment?.email }}
+                        </div>
                     </div>
-                </div>
-                <div class="field-width align-center flex-container-row padded">
-                    <div class="label label-width">
-                        Phone
+                    <div class="field-width align-center flex-container-row padded">
+                        <div class="label label-width">
+                            Phone
+                        </div>
+                        <div class="flex-grow">
+                            {{ _experiment?.phone }}
+                        </div>
                     </div>
-                    <div class="flex-grow">
-                        {{ _experiment?.phone }}
-                    </div>
-                </div>
-                <!--<div class="field-width align-center flex-container-row padded">-->
+                    <!--<div class="field-width align-center flex-container-row padded">-->
                     <!--<div class="label label-width">-->
                         <!--Institution-->
                     <!--</div>-->
@@ -210,33 +215,33 @@
                     <!--<div class="flex-grow flex-container-col multi-line max-height padded">-->
                         <!--{{ currentCollaboratorsDisplay }}-->
                     <!--</div>-->
-                <!--</div>-->
-            </div>
-        </div>
-        <div *ngIf="processedWorkflowSteps && processedWorkflowSteps.length > 0" class="full-width max-width bordered padded margin-top-bottom">
-            <div class="label">
-                Order Status
-            </div>
-            <div class="full-width flex-container-col tiny-font">
-                <div class="full-width flex-container-row align-center margin-top">
-                    <div *ngFor="let step of processedWorkflowSteps" class="flex-grow text-center {{ step.found ? ' highlight ' : ' '}}">
-                        {{ step.name }}
-                    </div>
-                    <div class="minor-label minor-label-width"></div>
+                    <!--</div>-->
                 </div>
-                <div *ngFor="let progress of progresses" class="full-width flex-container-row align-center margin-top">
-                    <div class="full-height flex-grow bordered flex-container-row">
-                        <div *ngFor="let display of progress.displayArray" class="full-height flex-grow gnomex-progress-bar">
+            </div>
+            <div *ngIf="processedWorkflowSteps && processedWorkflowSteps.length > 0" class="full-width max-width bordered padded margin-top-bottom">
+                <div class="label">
+                    Order Status
+                </div>
+                <div class="full-width flex-container-col tiny-font">
+                    <div class="full-width flex-container-row align-center margin-top">
+                        <div *ngFor="let step of processedWorkflowSteps" class="flex-grow text-center {{ step.found ? ' highlight ' : ' '}}">
+                            {{ step.name }}
                         </div>
-                        <div *ngFor="let undisplay of progress.undisplayArray" class="full-height flex-grow">
-                        </div>
+                        <div class="minor-label minor-label-width"></div>
                     </div>
-                    <div class="minor-label minor-label-width padded align-right">
-                        {{ progress.title }}
+                    <div *ngFor="let progress of progresses" class="full-width flex-container-row align-center margin-top">
+                        <div class="full-height flex-grow bordered flex-container-row">
+                            <div *ngFor="let display of progress.displayArray" class="full-height flex-grow gnomex-progress-bar">
+                            </div>
+                            <div *ngFor="let undisplay of progress.undisplayArray" class="full-height flex-grow">
+                            </div>
+                        </div>
+                        <div class="minor-label minor-label-width padded align-right">
+                            {{ progress.title }}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </form>

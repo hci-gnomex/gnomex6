@@ -2,7 +2,7 @@
 
 ## Status 
 
-Flex to Angular 4 conversion is in progress. The current release of GNomEx can be found here: https://github.com/hci-gnomex/gnomex
+Angular version is now running in production. We are working on making GNomEx 6 easier to install.  Look for those changes in early April. The adobe flex version of GNomEx can be found here: https://github.com/hci-gnomex/gnomex
 
 
 ## Description

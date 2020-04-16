@@ -1,6 +1,6 @@
 <form (ngSubmit)="save()" [formGroup]="folderFormGroup" class="flex-container-col full-width full-height">
     <div style="margin-bottom: 1em;">
-        <img [src]="dtService.datatrackListTreeNode.icon"> Folder {{dtService.datatrackListTreeNode.name}}
+        <img [src]="dtService?.datatrackListTreeNode?.icon"> Folder {{dtService?.datatrackListTreeNode?.name}}
     </div>
     <div class="full-width full-height">
         <div class="flex-container-row full-width">
@@ -24,8 +24,8 @@
             <angular-editor #descEditorRef formControlName="description" [config]="this.editorConfig">
             </angular-editor>
         </div>
-        <div> Created By: {{this.dtService.datatrackListTreeNode.createdBy}}
-            {{this.dtService.datatrackListTreeNode.createDate}}
+        <div> Created By: {{this.dtService?.datatrackListTreeNode?.createdBy}}
+            {{this.dtService?.datatrackListTreeNode?.createDate}}
         </div>
     </div>
     <div>

@@ -3,6 +3,7 @@ import {AuthenticationService} from "./authentication.service";
 import {AbstractControl, FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {Router} from "@angular/router";
 import {GnomexService} from "../services/gnomex.service";
+import {DictionaryService} from "../services/dictionary.service";
 
 @Component({
     selector: "hci-login-form",
@@ -434,15 +435,27 @@ export class DirectLoginComponent implements OnInit {
             okToLogin = false;
         }
         if (okToLogin) {
-            this._authenticationService.login(this._loginForm.value.username, this._loginForm.value.password)
-                .subscribe((res) => {
-                    if (res) {
-                        this._errorMsg = null;
+            this._authenticationService.login(this._loginForm.value.username, this._loginForm.value.password).subscribe((res) => {
+                if (res) {
+                    this._errorMsg = null;
+
+                    if (('' + this._loginForm.value.username).match(/^[uU]\d{7,8}$/) ) {
+                        this._authenticationService.findAppUserByUsername(this._loginForm.value.username).subscribe((result: any) => {
+                            if (result && result.hasUserAccount && ('' + result.hasUserAccount).toLowerCase() === 'y') {
+                                this._authenticationService.requestAccessToken(true);
+                            } else {
+                                this._errorMsg = "That UID, while valid, does not belong to any labs. Please create an account or click \"Guest Login\"";
+                            }
+                        });
+                    } else {
                         this._authenticationService.requestAccessToken(true);
                     }
-                }, (error: any) => {
+                } else {
                     this._errorMsg = "Please check your credentials.";
-                });
+                }
+            }, (error: any) => {
+                this._errorMsg = "Please check your credentials.";
+            });
         }
     }
 

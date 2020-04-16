@@ -19,6 +19,7 @@ import {AuthenticationService} from "../auth/authentication.service";
 import {PropertyService} from "../services/property.service";
 import {BehaviorSubject, Subscription} from "rxjs/index";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {NavigationService} from "../services/navigation.service";
 import * as html2canvas from "html2canvas";
 import {ReportProblemComponent} from "./reportProblem/report-problem.component";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
@@ -28,6 +29,7 @@ import {ContactUsComponent} from "../about/contact-us.component";
 import {ManageLinksComponent} from "./manageLinks/manage-links.component";
 import {EmailAllUsersComponent} from "../reports/email-all-users.component";
 import {first} from "rxjs/operators";
+import {BrowseDictionaryComponent} from "../configuration/browse-dictionary.component";
 
 @Component({
     selector: "gnomex-header",
@@ -133,6 +135,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                 private gnomexService: GnomexService,
                 private formBuilder: FormBuilder,
                 private dialogsService: DialogsService,
+                private navService:NavigationService,
                 private constService: ConstantsService) {
 
         this.options = this.formBuilder.group({
@@ -147,6 +150,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
             gnomexService: this.gnomexService,
             dialogsService: this.dialogsService,
             constService: this.constService,
+            dictionaryService: this.dictionaryService,
         };
 
     }
@@ -354,12 +358,50 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     params.gnomexService.redirectURL = null;
                     params.progressService.hideLoaderStatus(false);
                     params.progressService.loaderStatus = new BehaviorSubject<number> (0);
-                    params.router.navigate([{ outlets: { modal: null }}], {skipLocationChange: true})
-                        .then( () => {
-                            params.router.navigate(["/logout-loader"]);
-                        });
+                    params.router.navigate(["/logout-loader"]);
+
                 }
             });
+        });
+    }
+
+    public bulkBarCode(params: any): void {
+        if(!params.dialogsService || !params.constService || ! params.dictionaryService) {
+            return;
+        }
+
+        let preSelectedDictionary = [
+            DictionaryService.OLIGO_BARCODE,
+            DictionaryService.OLIGO_BARCODE_SCHEME,
+            DictionaryService.OLIGO_BARCODE_SCHEME_ALLOWED
+        ];
+
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = "80em";
+        config.height = "63em";
+        config.autoFocus = false;
+        config.disableClose = true;
+        config.data = {
+            isDialog: true,
+            preSelectedDictionary: preSelectedDictionary,
+            preSelectedEntry: "",
+            dicGridEditable: true,
+            dictionaryFilterable: true,
+        };
+
+        params.dialogsService.genericDialogContainer(BrowseDictionaryComponent, "Bulk Bar Code Editor", params.constService.ICON_BOOK, config,
+            {actions: [
+                    {type: ActionType.PRIMARY, icon: null, name: "Save", internalAction: "save"},
+                    {type: ActionType.SECONDARY, name: "Close", internalAction: "close"}
+                ]}).subscribe((result: any) => {
+                    if(result) {
+                        params.dialogsService.addSpinnerWorkItem();
+                        params.dictionaryService.reloadAndRefresh(() => {
+                            params.dialogsService.removeSpinnerWorkItem();
+                        }, () => {
+                            params.dialogsService.stopAllSpinnerDialogs();
+                        });
+                    }
         });
     }
 
@@ -1209,6 +1251,12 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         route: '/manage-protocols'
                     },
                     {
+                        displayName: 'Bulk Bar Code',
+                        iconName: './assets/book.png',
+                        callback: this.bulkBarCode,
+                        params: this.serviceParams
+                    },
+                    {
                         displayName: 'Configure Billing Account Fields',
                         iconName: './assets/page_white_wrench.png',
                         route: ''
@@ -1510,7 +1558,13 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         displayName: 'Manage Protocols',
                         iconName: './assets/page_white_wrench.png',
                         route: '/manage-protocols'
-                    }
+                    },
+                    {
+                        displayName: 'Bulk Bar Code',
+                        iconName: './assets/book.png',
+                        callback: this.bulkBarCode,
+                        params: this.serviceParams
+                    },
 
                 ]
             },
@@ -1805,7 +1859,13 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         displayName: 'Manage Protocols',
                         iconName: './assets/brick.png',
                         route: '/manage-protocols'
-                    }
+                    },
+                    {
+                        displayName: 'Bulk Bar Code',
+                        iconName: './assets/book.png',
+                        callback: this.bulkBarCode,
+                        params: this.serviceParams
+                    },
                 ]
             },
             {
@@ -2266,6 +2326,9 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         if (this.gnomexService.allowExternal === false) {
             this.hideMenusByContext(navMenu, "newExternalExperiment");
         }
+    }
+    setNavModeType(){
+        this.navService.navMode = NavigationService.USER;
     }
 
     /**

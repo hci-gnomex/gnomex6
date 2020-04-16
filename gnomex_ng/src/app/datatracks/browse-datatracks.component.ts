@@ -11,7 +11,7 @@ import {
     TreeNode,
 } from "angular-tree-component";
 import {Subscription} from "rxjs";
-import {ActivatedRoute, Router} from "@angular/router";
+import {ActivatedRoute, NavigationExtras, ParamMap, Router, UrlSegment} from "@angular/router";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {LabListService} from "../services/lab-list.service";
 import {DataTrackService} from "../services/data-track.service";
@@ -23,6 +23,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {UtilService} from "../services/util.service";
 import {HttpParams} from "@angular/common/http";
+import {NavigationService} from "../services/navigation.service";
 
 
 @Component({
@@ -63,7 +64,7 @@ import {HttpParams} from "@angular/common/http";
         .no-overflow { overflow: hidden; }
 
         .no-word-wrap { white-space: nowrap; }
-        
+
     `]
 })
 
@@ -75,7 +76,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     private navInitSubscription: Subscription;
 
     public options: ITreeOptions;
-    public items: any;
+    public items: any[];
     public organisms: any;
 
     public labMembers: any;
@@ -90,9 +91,93 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     public searchText: string;
     private navDatatrackList: any;
     private labListSubscription: Subscription;
+    private qParamMap: ParamMap;
+    private paramMap: ParamMap;
+
+    constructor(private datatracksService: DataTrackService,
+                private dialogsService: DialogsService,
+                private router: Router,
+                private route: ActivatedRoute,
+                private labListService: LabListService,
+                private gnomexService: GnomexService,
+                private changeDetectorRef: ChangeDetectorRef,
+                private utilService: UtilService,
+                private navService: NavigationService,
+                private createSecurityAdvisorService: CreateSecurityAdvisorService) {
+
+        this.navService.navMode = this.navService.navMode !== NavigationService.USER ? NavigationService.URL : NavigationService.USER;
+
+        this.items = [];
+        this.labMembers = [];
+        this.billingAccounts = [];
+        this.organisms = [];
+
+        this.dataTracksListSubscription = this.datatracksService.getDatatracksListObservable().subscribe(response => {
+            this.buildTree(response);
+
+
+            if(this.datatracksService.previousURLParams && this.datatracksService.previousURLParams["refreshParams"] ){ // this code occurs when searching
+                this.datatracksService.previousURLParams["refreshParams"] = false;
+            }
+
+
+            setTimeout(_ => {
+                //this.treeModel.expandAll();
+                if(this.navService.navMode === NavigationService.URL) { // this is if component is being navigated to by url
+                    let activatedRoute = this.navService.getChildActivateRoute(this.route);
+                    if(activatedRoute){
+                        activatedRoute.queryParamMap.subscribe((qParam)=>{this.qParamMap = qParam });
+                        activatedRoute.paramMap.subscribe((param)=>{ this.paramMap = param });
+                    }
+                    let idVal: string = null;
+                    let idName: string = null;
+                    let lastSeg: string  = this.navService.getLastRouteSegment();
+
+                    if(lastSeg === DataTrackService.ORGANISM){
+                        idName = "idOrganism";
+                        idVal = this.qParamMap.get(idName);
+                    }else if(lastSeg === DataTrackService.GENOME_BUILD){
+                        idName = "idGenomeBuild";
+                        idVal = this.qParamMap.get(idName);
+                    }else if(lastSeg === DataTrackService.FOLDER){
+                        idName = "idDataTrackFolder";
+                        idVal = this.qParamMap.get(idName);
+                    }else if(lastSeg === DataTrackService.DATA_TRACK){
+                        idName = "idDataTrack";
+                        idVal = this.paramMap.get(idName);
+                    }else{
+                        return;
+                    }
+
+
+                    if (this.treeModel && idVal) {
+                        let dtNode: ITreeNode = UtilService.findTreeNode(this.treeModel, idName, idVal);
+                        if (dtNode) {
+                            dtNode.ensureVisible();
+                            dtNode.setIsActive(true);
+                            dtNode.scrollIntoView();
+                        }
+                    }
+                } else if(this.datatracksService.activeNodeToSelect) {
+                    let attribute = this.datatracksService.activeNodeToSelect.attribute;
+                    let value = this.datatracksService.activeNodeToSelect.value;
+                    let node: ITreeNode = UtilService.findTreeNode(this.treeModel, attribute, value);
+                    if (node) {
+                        node.ensureVisible();
+                        node.setIsActive(true);
+                        node.scrollIntoView();
+                    }
+                    this.datatracksService.activeNodeToSelect = null;
+                }
+            });
+
+        });
+
+    }
 
 
     ngOnInit() {
+
         this.options = {
             displayField: "label",
             childrenField: "items",
@@ -121,6 +206,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         };
         this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
         this.treeModel = this.treeComponent.treeModel;
+
         this.labListService.getLabList_FromBackEnd();
         this.labListSubscription = this.labListService.getLabListSubject().subscribe((response: any[]) => {
             this.labList = response;
@@ -130,80 +216,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     ngAfterViewInit() {
     }
 
-    constructor(private datatracksService: DataTrackService,
-                private dialogsService: DialogsService,
-                private router: Router,
-                private route: ActivatedRoute,
-                private labListService: LabListService,
-                private gnomexService: GnomexService,
-                private changeDetectorRef: ChangeDetectorRef,
-                private utilService: UtilService,
-                private createSecurityAdvisorService: CreateSecurityAdvisorService) {
 
-
-        this.items = [];
-        this.labMembers = [];
-        this.billingAccounts = [];
-        this.organisms = [];
-
-        this.dataTracksListSubscription = this.datatracksService.getDatatracksListObservable().subscribe(response => {
-            this.buildTree(response);
-
-            if(this.datatracksService.previousURLParams && this.datatracksService.previousURLParams["refreshParams"] ){ // this code occurs when searching
-                let navArray:any[] = ['/datatracks', { outlets: { datatracksPanel: null }}];
-
-                this.datatracksService.previousURLParams["refreshParams"] = false;
-                this.datatracksService.datatrackListTreeNode = response;
-                this.router.navigate(navArray);
-            }
-
-
-            setTimeout(_ => {
-                //this.treeModel.expandAll();
-                if(this.gnomexService.orderInitObj) { // this is if component is being navigated to by url
-                    let idDataTrack: string = this.gnomexService.orderInitObj.idDataTrack;
-                    if (this.treeModel && idDataTrack) {
-                        let dtNode: ITreeNode = UtilService.findTreeNode(this.treeModel, "idDataTrack", idDataTrack);
-                        if (dtNode) {
-                            dtNode.ensureVisible();
-                            dtNode.setIsActive(true);
-                            dtNode.scrollIntoView();
-                        } else {
-                            this.disableDelete = false;
-                            let navArray = ["/datatracks", {outlets: {"datatracksPanel": [idDataTrack]}}];
-                            this.router.navigate(navArray);
-                        }
-                        this.gnomexService.orderInitObj = null;
-                    }
-                } else if(this.datatracksService.activeNodeToSelect) {
-                    let attribute = this.datatracksService.activeNodeToSelect.attribute;
-                    let value = this.datatracksService.activeNodeToSelect.value;
-                    let node: ITreeNode = UtilService.findTreeNode(this.treeModel, attribute, value);
-                    if (node) {
-                        node.ensureVisible();
-                        node.setIsActive(true);
-                        node.scrollIntoView();
-                    }
-                    this.datatracksService.activeNodeToSelect = null;
-                }
-            });
-
-        });
-
-        this.navInitSubscription = this.gnomexService.navInitBrowseDatatrackSubject.subscribe( orderInitObj => {
-            if(orderInitObj) {
-                let ids: HttpParams = new HttpParams()
-                    .set("number", this.gnomexService.orderInitObj.dataTrackNumber ? this.gnomexService.orderInitObj.dataTrackNumber : '')
-                    .set("idOrganism", this.gnomexService.orderInitObj.idOrganism ? this.gnomexService.orderInitObj.idOrganism : '')
-                    .set("idLab", this.gnomexService.orderInitObj.idLab ? this.gnomexService.orderInitObj.idLab : '')
-                    .set("idGenomeBuild", this.gnomexService.orderInitObj.idGenomeBuild ? this.gnomexService.orderInitObj.idGenomeBuild : '');
-                this.datatracksService.previousURLParams = ids;
-                this.datatracksService.getDatatracksList_fromBackend(ids);
-            } else {
-                this.datatracksService.getDatatracksList_fromBackend(new HttpParams());
-            }
-        });
-    }
 
     private moveNode: (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => void = (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => {
         let currentItem: any = from.data;
@@ -282,6 +295,8 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
             } else {
                 this.items = response;
             }
+            this.items.sort(UtilService.sortObjectAlphabetically("name"));
+
             this.organisms = this.organisms.concat(this.items);
             for (let org of this.items) {
                 org.isOrganism = true;
@@ -293,32 +308,13 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
                     } else {
                         org.items = org.GenomeBuild;
                     }
+                    (<any[]>org.items).sort(UtilService.sortObjectAlphabetically("label"));
 
                     for (let gNomeBuild of org.items) {
                         if (gNomeBuild) {
                             this.assignIconToGenomeBuild(gNomeBuild);
                             gNomeBuild.labId = org.labId;
-                            if (gNomeBuild.DataTrack) {
-                                if (!this.isArray(gNomeBuild.DataTrack)) {
-                                    gNomeBuild.items = [gNomeBuild.DataTrack];
-                                } else {
-                                    gNomeBuild.items = gNomeBuild.DataTrack;
-                                }
-                                for (let dataTrack of gNomeBuild.items) {
-                                    if (dataTrack) {
-                                        if (dataTrack.label) {
-                                            this.assignIconToDT(dataTrack);
-                                        } else {
-                                            console.log("label not defined");
-                                        }
-                                    } else {
-                                        console.log("a is undefined");
-                                    }
-                                }
-                            }
-                            if (gNomeBuild.DataTrackFolder) {
-                                this.addDataTracksFromFolder(gNomeBuild, gNomeBuild.items);
-                            }
+                            this.addDataTracksFromFolder(gNomeBuild, gNomeBuild.DataTrack);
                         }
                     }
                 }
@@ -332,43 +328,39 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
     addDataTracksFromFolder(root, items: any[]): any[] {
         let dtItems: any[] = [];
-        if (!this.isArray(root.DataTrackFolder)) {
-            root.DataTrackFolder = [root.DataTrackFolder];
-        }
         if (!items) {
             items = [];
         }
 
+        if(!root.DataTrackFolder){
+            root.DataTrackFolder = [];
+        }
+
+
+        if (!this.isArray(root.DataTrackFolder)) {
+            root.DataTrackFolder = [root.DataTrackFolder];
+        }
+        (<any[]>root.DataTrackFolder).sort(UtilService.sortObjectAlphabetically("name"));
+
         if (!this.isArray(items)) {
             items = [items];
         }
+        items.sort(UtilService.sortObjectAlphabetically("number"));
+
         for (let dtf of root.DataTrackFolder) {
             this.assignIconToDTFolder(dtf);
         }
+        for (let dt of items) {
+            this.assignIconToDT(dt);
+        }
+
         dtItems = dtItems.concat(root.DataTrackFolder);
         dtItems = dtItems.concat(items);
         root.items = dtItems;
 
+
         for (let dtf of root.items) {
-
-            if (dtf.DataTrackFolder) {
-                this.assignIconToDTFolder(dtf);
-                this.addDataTracksFromFolder(dtf, dtf.DataTracks);
-            }
-            if (dtf.DataTrack) {
-                if (!this.isArray(dtf.DataTrack)) {
-                    dtf.DataTrack = [dtf.DataTrack];
-                }
-                for (let dt of dtf.DataTrack) {
-                    this.assignIconToDT(dt);
-                }
-                if (dtf.items) {
-                    dtf.items = dtf.items.concat(dtf.DataTrack);
-                } else {
-                    dtf.items = dtf.DataTrack;
-                }
-            }
-
+            this.addDataTracksFromFolder(dtf, dtf.DataTrack);
         }
 
         return root;
@@ -437,37 +429,70 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
         let datatrackListNode =  _.cloneDeep(this.selectedItem.data);
         this.datatracksService.datatrackListTreeNode = datatrackListNode;
 
-
         let navArray:Array<any> = [];
+        let navExtras: NavigationExtras = {};
+        let idObjList =[{'idOrganism':null},{'idGenomeBuild':null}, {'idDataTrackFolder': null}, {'idDataTrack': null}];
+
+        idObjList =  this.navService.setValueGoingUpTree(idObjList, event.node);
+        let idOrganism = idObjList[0]['idOrganism'];
+        let idGenomeBuild = idObjList[1]['idGenomeBuild'];
+        let idDataTrackFolder = idObjList[2]['idDataTrackFolder'];
+        let idDataTrack = idObjList[3]['idDataTrack'];
+        navExtras = {
+            queryParams: {
+                'idGenomeBuild': idGenomeBuild,
+                'idOrganism' : idOrganism,
+                'idDataTrackFolder': idDataTrackFolder,
+                'idDataTrack': idDataTrack
+            }};
 
 
-        if(datatrackListNode.isGenomeBuild){
-            datatrackListNode["treeNodeType"] = "GenomeBuild";
-            this.disableDelete = false;
-            let idGenomeBuild:string = datatrackListNode.idGenomeBuild;
+        if(this.navService.navMode === NavigationService.USER){
+            if(datatrackListNode.isGenomeBuild){
+                datatrackListNode["treeNodeType"] = "GenomeBuild";
+                this.disableDelete = false;
+                navArray = ['/datatracks', 'genomebuild'];
+                //['/datatracks', {outlets:{'datatracksPanel':['genomeBuild',{'idGenomeBuild':idGenomeBuild}]}}];
 
-            navArray = ['/datatracks', {outlets:{'datatracksPanel':['genomeBuild',{'idGenomeBuild':idGenomeBuild}]}}];
+            }else if (datatrackListNode.isDataTrackFolder){
+                datatrackListNode["treeNodeType"] = "Folder";
+                navArray = ['/datatracks', 'folder'];
+                //['/datatracks', {outlets:{'datatracksPanel':['folder',{'idDataTrackFolder': idDataTrackFolder}]}}];
+                this.disableDelete = false;
+            }else if (this.selectedItem.isRoot){
+                datatrackListNode["treeNodeType"] = "Organism";
+                this.disableDelete = true;
+                navArray =['/datatracks', 'organism'];
+                //['/datatracks', {outlets:{'datatracksPanel':['organism',{'idOrganism':idOrganism}]}}];
+            }
+            else { // isLeaf
+                //idDataTrack
+                datatrackListNode["treeNodeType"] = "Datatrack";
 
-        }else if (datatrackListNode.isDataTrackFolder){
-            datatrackListNode["treeNodeType"] = "Folder";
-            let idDataTrackFolder:string = datatrackListNode.idDataTrackFolder;
-            navArray =['/datatracks', {outlets:{'datatracksPanel':['folder',{'idDataTrackFolder': idDataTrackFolder}]}}];
-            this.disableDelete = false;
-        }else if (this.selectedItem.isRoot){
-            datatrackListNode["treeNodeType"] = "Organism";
-            this.disableDelete = true;
-            let idOrganism:string = datatrackListNode.idOrganism;
-            navArray =['/datatracks', {outlets:{'datatracksPanel':['organism',{'idOrganism':idOrganism}]}}];
+                this.disableDelete = false;
+                navArray = ['/datatracks','detail', idDataTrack];
+                navExtras = {
+                    queryParams: {
+                        "idOrganism":idOrganism,
+                        "idGenomeBuild":idGenomeBuild,
+                        "idDataTrackFolder": idDataTrackFolder
+                    }};
+            }
+
+            navExtras.relativeTo = this.route;
+            navExtras.queryParamsHandling = 'merge';
+            this.router.navigate(navArray,navExtras);
+        }else{
+            this.navService.emitResetNavModeSubject("organism");
+            this.navService.emitResetNavModeSubject("genomebuild");
+            this.navService.emitResetNavModeSubject("folder");
+            this.navService.emitResetNavModeSubject("detail");
+            this.dialogsService.removeSpinnerWorkItem();
+
         }
-        else{ // isLeaf
-            //idDataTrack
-            datatrackListNode["treeNodeType"] = "Datatrack";
-            let idDataTrack:string = datatrackListNode.idDataTrack;
-            this.disableDelete = false;
-            navArray = ['/datatracks',  {outlets:{'datatracksPanel':[idDataTrack]}}];
-        }
 
-        this.router.navigate(navArray);
+
+
 
 
     }
@@ -507,9 +532,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     ngOnDestroy(): void {
         this.utilService.removeChangeDetectorRef(this.changeDetectorRef);
         this.dataTracksListSubscription.unsubscribe();
-        this.navInitSubscription.unsubscribe();
         this.labListSubscription.unsubscribe();
-        this.gnomexService.navInitBrowseDatatrackSubject.next(null);
         this.navDatatrackList = null;
     }
 }

@@ -17,6 +17,7 @@ import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-d
 import {ActionType, GDAction} from "../util/interfaces/generic-dialog-action.model";
 import {ConfigureOrganismsComponent} from "../configuration/configure-organisms.component";
 import {UtilService} from "../services/util.service";
+import {Experiment} from "../util/models/experiment.model";
 
 @Component({
     selector: "create-analysis-dialog",
@@ -77,6 +78,7 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     private analysisGroup: any[] = [];
     private codeVisibility: string;
     private readonly parentComponent: string = "";
+    private experiment:Experiment;
 
     public labDisplayField: string = this.prefService.labDisplayField;
 
@@ -106,6 +108,7 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
         this.selectedAnalysisGroup = data.selectedAnalysisGroup;
         this.selectedOrganism = data.selectedOrganism;
         this.parentComponent = data.parentComponent;
+        this.experiment = data.experiment;
         this.createForm();
 
     }
@@ -310,8 +313,22 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
         if (this.analysisGroup.length > 0) {
             stringifiedAnalysisGroup = JSON.stringify(this.analysisGroup);
         }
-        params = params.set("lanesXMLString", "")
-            .set("samplesJSONString", "")
+        let experimentJSONRep = null;
+        let samples:any[] = null;
+        let seqLanes:any[] = null;
+        if(this.experiment){
+            experimentJSONRep = this.experiment.getJSONObjectRepresentation();
+            seqLanes = <any[]>experimentJSONRep.sequenceLanes;
+            (seqLanes).forEach(sl => {
+                sl.type = "SequenceLane";
+            });
+
+            samples = experimentJSONRep.samples;
+        }
+
+
+        params = params.set("lanesJSONString", seqLanes && seqLanes.length > 0 ? JSON.stringify(seqLanes) : "")
+            .set("samplesJSONString", samples && samples.length > 0 ? JSON.stringify(samples) : "")
             .set("collaboratorsJSONString", "")
             .set("analysisFilesJSONString", "")
             .set("hybsJSONString", "")

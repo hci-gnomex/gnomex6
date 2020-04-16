@@ -87,7 +87,7 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
         this.primaryDisable = (action) => !this.allFG.dirty || this.allFG.invalid;
     }
 
-    touchFields() {
+    private touchFields() {
         for (let field in this.allFG.controls) {
             const control = this.allFG.get(field);
             if (control) {
@@ -98,12 +98,12 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
         }
     }
 
-    onAssmGridReady(params) {
+    public onAssemblyGridReady(params) {
         this.assmGridApi = params.api;
         this.assmGridApi.sizeColumnsToFit();
     }
 
-    initializeAssm() {
+    private initializeAssm() {
         this.flowCellColDefs = [
             {
                 headerName: "Lane",
@@ -154,7 +154,7 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
         ];
     }
 
-    setEditForm() {
+    private setEditForm() {
         this.codeSequencingPlatform = this.flowCell.codeSequencingPlatform;
         this.flowCellColDefs = [];
         this.flowCellNumber = this.flowCell.number;
@@ -198,11 +198,11 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
         this.initializeAssm();
     }
 
-    onCellValueChanged(event) {
+    public onCellValueChanged(event) {
         this.allFG.markAsDirty();
     }
 
-    hasDuplicateSampleBarcodeSequence(): boolean{
+    private hasDuplicateSampleBarcodeSequence(): boolean{
         for (let channel of this.flowCellChannels){
             console.log("seq");
             if (!this.securityAdvisor.isArray(channel.sequenceLanes)) {
@@ -224,30 +224,26 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
         return false;
     }
 
-    checkForDuplicateBarcode(): boolean {
+    private checkForDuplicateBarcode(): void {
         if (this.hasDuplicateSampleBarcodeSequence()) {
             this.dialogsService.confirm("Some of the samples to be multiplexed in one flow cell lane have the same index tag.  This should only occur when samples (and their sequence reads) are meant to be pooled."
                 + "<br> Proceed with duplicate index tags?").subscribe((answer: boolean) => {
                 if (answer) {
-                    return true;
-                } else {
-                    return false;
+                    this.save();
                 }
             })
+        } else {
+            this.save();
         }
-        return true;
     }
 
     public saveFlowCell() {
         if (this.allFG.dirty) {
-            //SaveFlowCell will recalulate the folder name.
+            //SaveFlowCell will recalculate the folder name.
             this.dialogsService.confirm("You have changed the Bar Code, Run #, Cluster Gen Date, Instrument or Side which will cause the Folder Name to change."
                 + "<br> Do you wish to continue with this save?").subscribe((answer: boolean) => {
                 if (answer) {
                     let checkReply = this.checkForDuplicateBarcode();
-                    if (checkReply) {
-                        this.save();
-                    }
                 }
             });
         }
@@ -264,6 +260,7 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
             .set("idNumberSequencingCycles", this.protocolFC.value.idNumberSequencingCycles)
             .set("idNumberSequencingCyclesAllowed", this.protocolFC.value.idNumberSequencingCyclesAllowed)
             .set("idSeqRunType", this.protocolFC.value.idSeqRunType)
+            .set("side", this.flowCell.side)
             .set("notes", this.flowCell.notes)
             .set("number", this.flowCell.number)
             .set("numberSequencingCyclesActual", this.protocolFC.value.numberSequencingCyclesActual ? this.protocolFC.value.numberSequencingCyclesActual : "")
@@ -287,11 +284,11 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
         });
     }
 
-    selectedRow(event) {
+    public selectedRow(event) {
         this.channel = event.data;
     }
 
-    launchAddSample(event:RowDoubleClickedEvent) {
+    public launchAddSample(event:RowDoubleClickedEvent) {
         if(event.data){
             let actionConfig : GDActionConfig = {actions: [
                     {name:"Update", internalAction:"update", type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE},
@@ -308,7 +305,7 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
         }
     }
 
-    removeChannel(event) {
+    public removeChannel(event) {
         this.flowCellChannels = this.flowCellChannels.filter(channel =>
             channel.idFlowCellChannel != this.channel.idFlowCellChannel
         );

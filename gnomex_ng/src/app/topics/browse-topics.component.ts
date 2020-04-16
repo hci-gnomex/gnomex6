@@ -1,20 +1,9 @@
-import {
-    ChangeDetectorRef,
-    Component,
-    OnDestroy,
-    OnInit,
-    ViewChild,
-} from "@angular/core";
+import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild,} from "@angular/core";
 
-import {
-    ITreeOptions,
-    TreeComponent,
-    TreeModel,
-    TreeNode,
-} from "angular-tree-component";
+import {ITreeOptions, TreeComponent, TreeModel, TreeNode,} from "angular-tree-component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
-import {Router} from "@angular/router";
+import {ActivatedRoute, NavigationExtras, ParamMap, Router} from "@angular/router";
 import {MatDialogConfig} from "@angular/material";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
@@ -32,6 +21,7 @@ import {HttpParams} from "@angular/common/http";
 import {UtilService} from "../services/util.service";
 import {ConstantsService} from "../services/constants.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {NavigationService} from "../services/navigation.service";
 
 @Component({
     selector: "analysis",
@@ -130,6 +120,8 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
     private itemsCopy: any = [];
     private dataTreeItemsCopy: any[] = [];
     private selectedItem: ITreeNode;
+    private qParamMap:ParamMap;
+    private paramMap: ParamMap;
 
     private topicListSubscription: Subscription;
 
@@ -188,7 +180,9 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
         allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && (node.data.isDataTrackFolder || node.data.idDataTrack),
     };
 
-    constructor(private topicService: TopicService, private router: Router,
+    constructor(private topicService: TopicService,
+                private router: Router,
+                private route: ActivatedRoute,
                 private dialogService: DialogsService,
                 private gnomexService: GnomexService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
@@ -199,12 +193,16 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
                 private utilService: UtilService,
                 private changeDetector: ChangeDetectorRef,
                 public constantsService: ConstantsService,
-                public prefService: UserPreferencesService) {
+                public prefService: UserPreferencesService,
+                private navService: NavigationService) {
     }
 
     ngOnInit() {
         this.experimentsService.currentTabIndex = 0;
         this.utilService.registerChangeDetectorRef(this.changeDetector);
+
+        this.navService.navMode = this.navService.navMode ?  this.navService.navMode :  NavigationService.URL;
+
         this.treeModel = this.treeComponent.treeModel;
         this.dataTreeModel = this.dataTreeComponent.treeModel;
 
@@ -219,18 +217,44 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
                 this.treeModel.update();
                 this.treeModel.expandAll();
 
-                if(this.gnomexService.orderInitObj) { // this is if component is being navigated to by url
-                    let id: string = "t" + this.gnomexService.orderInitObj.idTopic;
-                    let capID = id.toUpperCase();
-                    if (this.treeModel && id) {
-                        let tNode = this.treeModel.getNodeById(id);
+                if(this.navService.navMode === NavigationService.URL) { // this is if component is being navigated to by url
+                    let activatedRoute = this.navService.getChildActivateRoute(this.route);
+                    if(activatedRoute){
+                        this.paramMap =  activatedRoute.snapshot.paramMap;
+                        this.qParamMap = activatedRoute.snapshot.queryParamMap;
+                    }
+
+                    let idVal: string = null;
+                    let idName: string = null;
+                    let lastSeg: string = this.navService.getLastRouteSegment();
+
+
+
+                    if(lastSeg === TopicService.ANALYSIS){
+                      idName = "idAnalysis";
+                      idVal = this.paramMap.get(idName);
+                    }else if(lastSeg === TopicService.DATATRACK){
+                        idName = "idDataTrack";
+                        idVal = this.paramMap.get(idName);
+                    }else if(lastSeg === TopicService.EXPERIMENT){
+                        idName = "idRequest";
+                        idVal = this.paramMap.get(idName);
+                    }else if(lastSeg === TopicService.TOPIC){
+                        idName = "idTopic";
+                        idVal = this.qParamMap.get(idName);
+                    }else{
+                        return;
+                    }
+
+                    let capID = idVal.toUpperCase();
+                    if (this.treeModel && idVal) {
+                        let tNode = UtilService.findTreeNode(this.treeModel, idName, idVal);
                         if (tNode) {
                             tNode.setIsActive(true);
                             tNode.scrollIntoView();
-                        } else {
+                        } else if(idName === 'idTopic') {
                             this.dialogService.alert("You do not have permission to view Topic " + capID , "INVALID", DialogType.FAILED);
                         }
-                        this.gnomexService.orderInitObj = null;
                     }
                 }
             });
@@ -238,9 +262,9 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
             this.dialogService.stopAllSpinnerDialogs();
         });
 
-        this.navInitSubscription = this.gnomexService.navInitBrowseTopicSubject.subscribe(() => {
-            this.topicService.refreshTopicsList_fromBackend();
-        });
+
+        this.topicService.refreshTopicsList_fromBackend();
+
 
         this.pickerLabs = [].concat(this.gnomexService.labList);
         this.organisms = [].concat(this.gnomexService.das2OrganismList);
@@ -324,6 +348,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
 
     private addTopic(root: any, items: any[]): void {
         root.items = UtilService.getJsonArray(items, items);
+        root.items.sort(UtilService.sortObjectAlphabetically("name"));
 
         for (let topic of items) {
             let topicArray: any[] = [];
@@ -353,6 +378,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
                         if (category.Request) {
                             category.id = "r" + topic.idTopic;
                             category.items = UtilService.getJsonArray(category.Request, category.Request);
+                            (<any[]>category.items).sort(UtilService.sortOrderIDNumerically("requestNumber"));
                             for (let request of category.items) {
                                 request.id = request.idRequest + category.id;
                                 this.setLabel(request);
@@ -361,6 +387,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
                         if (category.Analysis) {
                             category.id = "a" + topic.idTopic;
                             category.items = UtilService.getJsonArray(category.Analysis, category.Analysis);
+                            (<any[]>category.items).sort(UtilService.sortOrderIDNumerically("number"));
                             for (let analysis of category.items) {
                                 analysis.icon = this.constantsService.ICON_ANALYSIS;
                                 analysis.id = analysis.idAnalysis + category.id;
@@ -371,6 +398,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
                         if (category.DataTrack) {
                             category.id = "s" + topic.idTopic;
                             category.items = UtilService.getJsonArray(category.DataTrack, category.DataTrack);
+                            (<any[]>category.items).sort(UtilService.sortOrderIDNumerically("number"));
                             for (let datatrack of category.items) {
                                 this.assignIconToDT(datatrack);
                                 datatrack.id = datatrack.idDataTrack + category.id;
@@ -434,35 +462,52 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
         this.linkDataView = false;
         let name = this.selectedItem.displayField;
         let topicListNode = _.cloneDeep(this.selectedItem.data);
+        let navExtras:NavigationExtras = {};
 
-        if (this.selectedItem.isRoot) {
-            this.router.navigate(['/topics', { outlets: { topicsPanel: null }}]);
-        } else if (name === "Data Tracks" || name === "Experiments" || name === "Analysis" ) {
-            this.router.navigate(['/topics', { outlets: { topicsPanel: null }}]);
-        } else {
-            if ((this.selectedItem.data.label as string).endsWith('(Restricted Visibility)')) {
-                this.dialogService.alert("You do not have permission to view this", null, DialogType.FAILED);
-                return;
-            }
+        if(this.navService.navMode === NavigationService.USER){
+            if (this.selectedItem.isRoot) {
+                this.router.navigate(['/topics']);//, { outlets: { primary: null }}]);
+            } else if (name === "Data Tracks" || name === "Experiments" || name === "Analysis" ) {
+                this.router.navigate(['/topics']);//, { outlets: { primary: null }}]);
+            } else {
+                if ((this.selectedItem.data.label as string).endsWith('(Restricted Visibility)')) {
+                    this.dialogService.alert("You do not have permission to view this", null, DialogType.FAILED);
+                    return;
+                }
 
-            let pathPair: string = '';
-            if (this.selectedItem.data.idAnalysis) {
-                pathPair = "analysis/" + this.selectedItem.data.idAnalysis;
-                this.analysisService.emitAnalysisOverviewList(topicListNode);
-            } else if (this.selectedItem.data.idRequest) {
-                pathPair = "experiment/" + this.selectedItem.data.idRequest;
-                this.experimentsService.emitExperimentOverviewList(topicListNode);
-            } else if (this.selectedItem.data.idDataTrack) {
-                pathPair = "datatrack/" + this.selectedItem.data.idDataTrack;
-                this.datatrackService.datatrackListTreeNode = topicListNode;
-            } else if (this.selectedItem.data.idTopic) {
-                pathPair =  this.selectedItem.data.idLab;
-                this.topicService.emitSelectedTreeNode(topicListNode);
+                let pathPair: string[] = [];
+                if (this.selectedItem.data.idAnalysis) {
+                    pathPair = ["analysis", this.selectedItem.data.idAnalysis];
+                    this.analysisService.emitAnalysisOverviewList(topicListNode);
+                } else if (this.selectedItem.data.idRequest) {
+                    pathPair = ["experiment", this.selectedItem.data.idRequest];
+                    this.experimentsService.emitExperimentOverviewList(topicListNode);
+                } else if (this.selectedItem.data.idDataTrack) {
+                    pathPair = ["datatrack",  this.selectedItem.data.idDataTrack];
+                    this.datatrackService.datatrackListTreeNode = topicListNode;
+                } else if (this.selectedItem.data.idTopic) {
+                    pathPair = ["detail", this.selectedItem.data.idLab];
+                    navExtras.queryParams = {"idTopic": this.selectedItem.data.idTopic};
+                    this.topicService.emitSelectedTreeNode(topicListNode);
+                }
+                if (pathPair) {
+                    this.router.navigate(['/topics',pathPair[0],pathPair[1]], navExtras);
+                }
             }
-            if (pathPair) {
-                this.router.navigate(['/topics',{outlets:{topicsPanel:pathPair}}])
-            }
+        }else{
+            this.analysisService.emitAnalysisOverviewList(topicListNode);
+            this.experimentsService.emitExperimentOverviewList(topicListNode);
+            this.datatrackService.datatrackListTreeNode = topicListNode;
+            this.topicService.emitSelectedTreeNode(topicListNode);
+
+            this.navService.emitResetNavModeSubject(TopicService.ANALYSIS);
+            this.navService.emitResetNavModeSubject(TopicService.DATATRACK);
+            this.navService.emitResetNavModeSubject(TopicService.EXPERIMENT);
+            this.navService.emitResetNavModeSubject(TopicService.TOPIC);
+            this.dialogService.removeSpinnerWorkItem();
         }
+
+
     }
 
     public onDataTreeUpdateData(): void {
@@ -945,7 +990,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
         this.utilService.removeChangeDetectorRef(this.changeDetector);
         UtilService.safelyUnsubscribe(this.topicListSubscription);
         UtilService.safelyUnsubscribe(this.navInitSubscription);
-        this.gnomexService.navInitBrowseTopicSubject.next(null);
     }
 
 }
