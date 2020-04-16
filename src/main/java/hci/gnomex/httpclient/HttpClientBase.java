@@ -8,10 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
+import java.net.*;
 import java.util.Properties;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -120,18 +117,22 @@ public abstract class HttpClientBase {
       success = false;
       outputXML = new StringBuffer();
       URL url = new URL(serverURL + "/gnomex/" + getServletName() + ".gx");
-      URLConnection conn = url.openConnection();
+      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
       conn.setDoOutput(true);
-  
+      System.out.println("making request to: " + url.toString()+"?"+parms);
       OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
       wr.write(parms);
       wr.flush();
-  
-      in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-      success = checkSuccess(in);
-      System.out.println();
+      if(conn.getResponseCode() == 200){
+        in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        success = checkSuccess(in);
+        System.out.println();
+      }else{
+        System.out.println("Here is the Response code: " + conn.getResponseCode());
+      }
+
       if (!success) {
-        throw new Exception("Error calling servlet");
+        throw new Exception("Error calling servlet: " + getServletName());
       }
     } finally {
       if (in != null) {
@@ -159,17 +160,19 @@ public abstract class HttpClientBase {
   protected void callServlet() {
     try {
       init();
-      
       callServletImpl();
 
     } catch (MalformedURLException e) {
-
+      System.err.println(e.getMessage());
+      e.printStackTrace();
       System.err.println(e.toString());
     } catch (IOException e) {
-
+      System.err.println(e.getMessage());
+      e.printStackTrace();
       System.err.println(e.toString());
     } catch (Exception e) {
-
+      System.err.println(e.getMessage());
+      e.printStackTrace();
       System.err.println(e.toString());
     }
   }

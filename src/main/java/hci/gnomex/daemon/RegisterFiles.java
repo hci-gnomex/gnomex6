@@ -402,7 +402,8 @@ private void registerExperimentFiles() throws Exception {
 				if (fd == null) {
 					printDebugStatement("name: " + efFileName + "     size: " + ef.getFileSize()
 							+ "        sizeOfLinkedList: " + dirs.size());
-					newFilePath = recurseDirectoriesForFile(efFileName, ef.getFileSize(), request, dirs);
+					//temporary disable this often results into stackoverflow if file can't be found
+					//newFilePath = recurseDirectoriesForFile(efFileName, ef.getFileSize(), request, dirs);
 				}
 
 				// Create a new file descriptor to reference the experiment

@@ -218,7 +218,7 @@ public class GetExpandedAnalysisFileList extends GNomExCommand implements Serial
     }
   }
 
-  public static void getFileNames(String analysisNumber, String directoryName, List theFiles, String subDirName, String baseDir, boolean flattenSubDirs) {
+  public static void getFileNames(String analysisNumber, String directoryName, List theFiles, String subDirName, String baseDir, boolean flattenSubDirs)  {
     File fd = new File(directoryName);
 
     if (fd.isDirectory()) {
@@ -235,17 +235,18 @@ public class GetExpandedAnalysisFileList extends GNomExCommand implements Serial
 
         if (f1.isDirectory()) {
           Path p = Paths.get(f1.getAbsolutePath());
-          try {
-          String dirrealpath = p.toRealPath().toString();
-              Path sl = Files.readSymbolicLink(p);
-              Path slrp = sl.toRealPath();
-              String dirlinkrealpath = slrp.toString();
-              if (dirrealpath.equals(dirlinkrealpath)) {
-                  continue;
-              }
-
-          } catch (Exception ee)
-          {}
+          //todo this code below was attempting to deal with cases where there might be links that link back to themselves and ignore them
+          //todo it still needs some work, so leaving it alone for now.
+//          try {
+//          String dirrealpath = p.toRealPath().toString();
+//              Path sl = Files.readSymbolicLink(p).toRealPath();
+//              Path slrp = sl.toRealPath();
+//              String dirlinkrealpath = slrp.toString();
+//              if (dirrealpath.equals(dirlinkrealpath)) {
+//              }
+//
+//          } catch (Exception ee)
+//          {}
 /*
             try {
                 if (Files.isSymbolicLink(p) && FileUtil.symlinkLoop(p.toRealPath().toString()) ) {
