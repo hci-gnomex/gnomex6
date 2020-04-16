@@ -6,7 +6,7 @@ import {Dictionary} from "./dictionary.interface";
 import {DictionaryEntry} from "./dictionary-entry.type";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {DialogsService} from "../util/popup/dialogs.service";
-import {DateFilter, GridApi, GridReadyEvent, NumberFilter, SelectionChangedEvent} from "ag-grid-community";
+import {DateFilter, GridReadyEvent, NumberFilter, SelectionChangedEvent} from "ag-grid-community";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {ValueGetterParams} from "ag-grid-community/src/ts/entities/colDef";
@@ -116,10 +116,31 @@ import {CellRendererValidation} from "../util/grid-renderers/cell-renderer-valid
                         <div [ngSwitch]="field.dataType" class="full-width">
                             <mat-form-field *ngSwitchCase="'text'" class="full-width">
                                 <input matInput [placeholder]="field.caption" [formControlName]="field.dataField">
+                                <mat-error *ngIf="this.entryForm.get(field.dataField).hasError('maxlength')">
+                                    {{field.dataField}} requires a maximum of {{field.dataSize}} characters
+                                </mat-error>
+                                <mat-error *ngIf="this.entryForm.get(field.dataField).hasError('required')">
+                                    {{field.dataField}} is required
+                                </mat-error>
+                            </mat-form-field>
+                            <mat-form-field *ngSwitchCase="'number'" class="full-width">
+                                <input matInput [placeholder]="field.caption" [formControlName]="field.dataField">
+                                <mat-error *ngIf="this.entryForm.get(field.dataField).hasError('pattern')">
+                                    {{field.dataField}} requires an integer number of maximum 10 digits
+                                </mat-error>
+                                <mat-error *ngIf="this.entryForm.get(field.dataField).hasError('required')">
+                                    {{field.dataField}} is required
+                                </mat-error>
                             </mat-form-field>
                             <mat-form-field *ngSwitchCase="'textArea'" class="full-width">
                                 <textarea matInput [placeholder]="field.caption" [formControlName]="field.dataField"
                                           matTextareaAutosize matAutosizeMinRows="5" matAutosizeMaxRows="5"></textarea>
+                                <mat-error *ngIf="this.entryForm.get(field.dataField).hasError('maxlength')">
+                                    {{field.dataField}} can be at most {{field.dataSize}} characters
+                                </mat-error>
+                                <mat-error *ngIf="this.entryForm.get(field.dataField).hasError('required')">
+                                    {{field.dataField}} is required
+                                </mat-error>
                             </mat-form-field>
                             <custom-combo-box *ngSwitchCase="'comboBox'" class="full-width" [placeholder]="field.caption"
                                               [options]="field.options" valueField="value" displayField="display"
@@ -134,6 +155,9 @@ import {CellRendererValidation} from "../util/grid-renderers/cell-renderer-valid
                                 <input matInput [matDatepicker]="datePicker" [placeholder]="field.caption" [formControlName]="field.dataField">
                                 <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
                                 <mat-datepicker #datePicker [disabled]="false"></mat-datepicker>
+                                <mat-error *ngIf="this.entryForm.get(field.dataField).hasError('required')">
+                                    {{field.dataField}} is required
+                                </mat-error>
                             </mat-form-field>
                         </div>
                     </ng-container>
@@ -218,7 +242,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
     private cachedMetaDataFields: any[] = [];
     private changedRowDataMap: Map<string, any> = new Map<string, any>();
 
-    private gridApi: GridApi;
+    private gridApi: any;
     private gridDataDirty: boolean = false;
 
     private dataChanged: boolean = false;
@@ -236,6 +260,9 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         return this.gridApi ? this.gridApi.isAnyFilterPresent() : false;
     }
 
+    private get gridValid(): boolean {
+        return this.gridApi ? this.gridApi.formGroup.valid : false;
+    }
 
     constructor(private dialogRef: MatDialogRef<BrowseDictionaryComponent>,
                 @Inject(MAT_DIALOG_DATA) private data: any,
@@ -262,7 +289,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         this.entryForm.markAsPristine();
         this.primaryDisable = (action) => {
             if(this.selectedDictionary) {
-                return !this.dicGridEditable || !this.gridDataDirty;
+                return !this.dicGridEditable || !this.gridDataDirty || !this.gridValid;
             } else {
                 return this.entryForm.invalid || !this.selectedEntry || !this.entryForm.dirty;
             }
@@ -548,6 +575,8 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                 } else if(field.dataType === "text") {
                     colDef.cellRendererFramework = TextAlignLeftMiddleRenderer;
                     colDef.cellEditorFramework = TextAlignLeftMiddleEditor;
+                    colDef.validators = [Validators.maxLength(Number(field.dataSize))];
+                    colDef.errorNameErrorMessageMap = [{ errorName: "maxlength",  errorMessage: "Maximum of " + field.dataSize + " characters" }];
                 } else if(field.dataType === "isActive" || field.dataType === "YN") {
                     if (this.dicGridEditable) {
                         colDef.cellRendererFramework = SelectRenderer;
@@ -568,6 +597,16 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
                     colDef.filter = NumberFilter;
                     colDef.filterValueGetter = this.numberFilterValueGetter;
                 }
+                if(field.isNullable && field.isNullable === "N") {
+                    if(colDef.validators && colDef.validators.length > 0) {
+                        colDef.validators.push(Validators.required);
+                        colDef.errorNameErrorMessageMap.push({ errorName: "required",  errorMessage: field.dataField + " is required" });
+                    } else {
+                        colDef.validators = [Validators.required];
+                        colDef.errorNameErrorMessageMap = [{ errorName: "required",  errorMessage: field.dataField + " is required" }];
+                    }
+                }
+
                 colDefs.push(colDef);
             }
         }
@@ -624,10 +663,14 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         for (let field of this.cachedMetaDataFields) {
             let entryField: any = {
                 dataField: field.dataField, dataType: field.dataType, caption: field.caption, isIdentifier: field.isIdentifier,
-                value: BrowseDictionaryComponent.getFieldAsString(this.selectedEntry, field.dataField), visible: field.visible
+                value: BrowseDictionaryComponent.getFieldAsString(this.selectedEntry, field.dataField), visible: field.visible,
+                dataSize: field.dataSize
             };
             if (field.dataType === "text" && field.length >= 50) {
                 entryField.dataType = "textArea";
+            }
+            if(field.dataType === "intNumber") {
+                entryField.dataType = "number";
             }
             if (field.dataType === "comboBox") {
                 entryField.options = this.dictionaryService.getEntriesExcludeBlank(field.className);
@@ -643,12 +686,30 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             } else {
                 this.entryForm.addControl(entryField.dataField, new FormControl(entryField.value));
             }
-            if(field.visible === "Y" && field.datatype === "intNumber") {
-                this.entryForm.get(entryField.dataField).setValidators(Validators.pattern(/^\d{0,10}$/));
-            }
             if (field.visible !== 'Y' || (field.isIdentifier && field.isIdentifier === "Y" && !isInsertMode)) {
                 this.entryForm.get(entryField.dataField).disable();
             }
+
+            if(field.visible === "Y") {
+                if(field.dataType === "text") {
+                    if(field.isNullable && field.isNullable === "N") {
+                        this.entryForm.get(entryField.dataField).setValidators([Validators.required, Validators.maxLength(Number(field.dataSize))]);
+                    } else {
+                        this.entryForm.get(entryField.dataField).setValidators([Validators.maxLength(Number(field.dataSize))]);
+                    }
+                } else if(field.dataType === "intNumber") {
+                    if(field.isNullable && field.isNullable === "N") {
+                        this.entryForm.get(entryField.dataField).setValidators([Validators.required, Validators.pattern(/^\d{0,10}$/)]);
+                    } else {
+                        this.entryForm.get(entryField.dataField).setValidators([Validators.pattern(/^\d{0,10}$/)]);
+                    }
+                } else {
+                    if(field.isNullable && field.isNullable === "N") {
+                        this.entryForm.get(entryField.dataField).setValidators([Validators.required]);
+                    }
+                }
+            }
+
             this.entryFields.push(entryField);
             if (field.visible === 'Y') {
                 this.visibleEntryFields.push(entryField);
