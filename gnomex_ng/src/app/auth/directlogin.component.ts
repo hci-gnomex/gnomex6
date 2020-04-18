@@ -23,10 +23,10 @@ import {DictionaryService} from "../services/dictionary.service";
                             <img [src]="this.gnomexService.logoOrMaint" alt="GNomEx">
                         </div>
                         <div class="full-width major-vertical-spacer flex-container-row align-center">
-                            <div *ngIf="_errorMsg" class="horizontal-centered small-font {{ errorClasses }}">
-                                <div>
+                            <div *ngIf="_errorMsg" class="horizontal-centered small-font full-width {{ errorClasses }}">
+                                <div class="full-width">
                                     <div class="error">Authentication Failed{{ numberOfAttempts > 1 ? ' (' + numberOfAttempts + ')' : '' }}</div>
-                                    <div class="alert-text">{{_errorMsg}}</div>
+                                    <div class="alert-text full-width">{{_errorMsg}}</div>
                                 </div>
                             </div>
                         </div>
@@ -180,7 +180,7 @@ import {DictionaryService} from "../services/dictionary.service";
         .vertical-spacer   { height: 10px; }
         .horizontal-spacer { width:  10px; }
 
-        .major-vertical-spacer { height: 3em; }
+        .major-vertical-spacer { min-height: 3em; }
         
         
         .major-padding { padding: 15px; }
@@ -442,13 +442,27 @@ export class DirectLoginComponent implements OnInit {
                     if (('' + this._loginForm.value.username).match(/^[uU]\d{7,8}$/) ) {
                         this._authenticationService.findAppUserByUsername(this._loginForm.value.username).subscribe((result: any) => {
                             if (result && result.hasUserAccount && ('' + result.hasUserAccount).toLowerCase() === 'y') {
-                                this._authenticationService.requestAccessToken(true);
+                                if (result.isActive && ('' + result.isActive).toLowerCase() === 'y') {
+                                    this._authenticationService.requestAccessToken(true);
+                                } else {
+                                    this._errorMsg = "UID recognized, but account has been inactivated. Please continue with \"Guest Login\" and contact your lab's Core Administrator or GNomEx Support";
+                                }
                             } else {
                                 this._errorMsg = "That UID, while valid, does not belong to any labs. Please create an account or click \"Guest Login\"";
                             }
                         });
                     } else {
-                        this._authenticationService.requestAccessToken(true);
+                        this._authenticationService.findAppUserByUsername(this._loginForm.value.username).subscribe((result: any) => {
+                            if (result && result.hasUserAccount && ('' + result.hasUserAccount).toLowerCase() === 'y') {
+                                if (result.isActive && ('' + result.isActive).toLowerCase() === 'y') {
+                                    this._authenticationService.requestAccessToken(true);
+                                } else {
+                                    this._errorMsg = "Your account has been inactivated. Please continue with \"Guest Login\" and contact your lab's Core Administrator or GNomEx Support";
+                                }
+                            } else {
+                                this._errorMsg = "Please check your credentials, create a new account or click \"Guest Login\"";
+                            }
+                        });
                     }
                 } else {
                     this._errorMsg = "Please check your credentials.";

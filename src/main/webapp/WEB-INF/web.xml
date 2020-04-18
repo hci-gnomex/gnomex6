@@ -657,6 +657,19 @@
 	</servlet-mapping>
 
 	<filter>
+		<filter-name>LoggingFilter</filter-name>
+		<filter-class>hci.gnomex.filters.LoggingFilter</filter-class>
+		<init-param>
+			<param-name>shouldSkipLog</param-name>
+			<param-value>skipLogging</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>LoggingFilter</filter-name>
+		<url-pattern>/CheckSessionStatus.gx</url-pattern>
+	</filter-mapping>
+
+	<filter>
 		<filter-name>CorsFilter</filter-name>
 		<filter-class>hci.servlet.filter.CorsFilter</filter-class>
 		<init-param>

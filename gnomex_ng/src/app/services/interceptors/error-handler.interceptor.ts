@@ -20,7 +20,9 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
 
     private errHandler = (error:IGnomexErrorResponse) : Observable<never>  => {
         let errorMessage= '';
-        if(error.error instanceof ErrorEvent){
+        if (error.url && error.url.includes("CheckSessionStatus")) {
+            // Always skip CheckSessionStatus errors
+        } else if(error.error instanceof ErrorEvent){
             errorMessage  ="Client side Error: " +  error.error.message;
             error.gError = {message: errorMessage};
             console.error(error);
@@ -52,8 +54,7 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
         return next.handle(request).pipe(map((event:HttpEvent<any>) =>{
             if(event instanceof HttpResponse){
                 let body = event.body;
-                if(body && (body.result === 'ERROR' || body.result === 'INVALID')
-                    && body.message){
+                if(body && (body.result === 'ERROR' || body.result === 'INVALID') && body.message) {
                     let error:any  = new HttpErrorResponse({});
                     error.gError = {
                         message : body.message,
@@ -61,7 +62,10 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
                         status: event.status,
                         url: event.url
                     };
-                    throw error;
+
+                    if (!request.url || !request.url.includes("CheckSessionStatus")) {
+                        throw error;
+                    }
                 }
             }
             return event;

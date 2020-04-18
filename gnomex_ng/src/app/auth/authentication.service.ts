@@ -12,6 +12,9 @@ import {catchError, first, map} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {DictionaryService} from "../services/dictionary.service";
 import {CookieUtilService} from "../services/cookie-util.service";
+import {DialogsService} from "../util/popup/dialogs.service";
+import {GnomexService} from "../services/gnomex.service";
+import {ProgressService} from "../home/progress.service";
 
 /**
  * The token used for injection of the server side endpoint for the currently authenticated subject.
@@ -70,6 +73,15 @@ export class AuthenticationService {
     private baseUrl: string;
     private contextRoot: string = "";
 
+    private checkSessionStatusInterval: any;
+    private checkSessionStatusDialogIsOpen: boolean = false;
+
+    private _hasLoggedOut: boolean = true;
+
+    public get hasLoggedOut() {
+        return this._hasLoggedOut;
+    }
+
     constructor(private _http: HttpClient,
                 private _router: Router,
                 private _localStorageService: CoolLocalStorage,
@@ -77,6 +89,8 @@ export class AuthenticationService {
                 private authenticationProvider: AuthenticationProvider,
                 private dictionaryService: DictionaryService,
                 private cookieUtilService: CookieUtilService,
+                private dialogService: DialogsService,
+                private progressService: ProgressService,
                 @Inject(AUTHENTICATION_ROUTE) private _authenticationRoute: string,
                 @Inject(AUTHENTICATION_LOGOUT_PATH) private _logoutPath: string,
                 @Inject(AUTHENTICATION_TOKEN_ENDPOINT) private _tokenEndpoint: string,
@@ -200,14 +214,13 @@ export class AuthenticationService {
 
     public findAppUserByUsername(username: string): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
-        let params: HttpParams = new HttpParams()
-            .set("UID", username);
+        let params: HttpParams = new HttpParams().set("UID", username);
         return this._http.get("/gnomex/CheckIsGNomExAccount.gx", {params: params})
-        // return this._http.post("/gnomex/CheckIsGNomExAccount.gx", {"UID": username}, {observe: "response"});
     }
 
-    requestAccessToken(redirectOnSuccess: boolean): void {
+    public requestAccessToken(redirectOnSuccess: boolean): void {
         this.unsubscribeFromTokenActivity();
+        this._hasLoggedOut = false;
 
         this._http.get(this.tokenLocation(), {withCredentials: true})
             .subscribe(
@@ -217,12 +230,39 @@ export class AuthenticationService {
                         this.proceedIfAuthenticated();
                     }
                     this.subscribeToTokenActivity();
+
+                    if (!this.checkSessionStatusInterval) {
+                        this.checkSessionStatusInterval = setInterval(() => { this.checkSessionStatus(); }, 10000);
+                    }
                 },
                 (err: IGnomexErrorResponse) => {
                     //Token refresh failed.
                     this.logout(true);
                 }
             );
+    }
+
+    private checkSessionStatus(): void {
+        this.cookieUtilService.formatXSRFCookie();
+        this._http.post("/gnomex/CheckSessionStatus.gx", {}).subscribe((response: any) => {
+            // Do nothing.
+        }, (error: any) => {
+            if (!this.checkSessionStatusDialogIsOpen) {
+                this.checkSessionStatusDialogIsOpen = true;
+
+                this.dialogService.confirm("Your session has expired, and you have lost connection to the server.  Would you like to return to the login screen now?", "Disconnected...").pipe(first()).subscribe((result: boolean) => {
+                    if(result) {
+                        this.logout();
+                        this.progressService.hideLoaderStatus(false);
+                        this.progressService.loaderStatus = new BehaviorSubject<number> (0);
+                        this._router.navigate(["/logout-loader"]);
+                    }
+
+                    this.checkSessionStatusDialogIsOpen = false;
+                });
+            }
+
+        });
     }
 
     /**
@@ -294,12 +334,14 @@ export class AuthenticationService {
 
     guestLogin(): void {
         this._isGuestMode = true;
+        this._hasLoggedOut = false;
     }
 
 
     clearLogin(): Observable<Response> {
         //Front-end logout
         try {
+            this._hasLoggedOut = true;
             this._localStorageService.removeItem(this.authenticationProvider.authenticationTokenKey);
             this.unsubscribeFromTokenRefresh();
             this.unsubscribeFromTimout();
@@ -321,6 +363,10 @@ export class AuthenticationService {
     logout(keepCurrentRoute: boolean = false): void {
         //Prevent logout if already on authentication route. Doing otherwise screws up SAML
         if (!this._router.routerState || this._router.routerState.snapshot.url !== this._authenticationRoute) {
+            clearInterval(this.checkSessionStatusInterval);
+            this.checkSessionStatusInterval = null;
+            this._hasLoggedOut = true;
+
             this._redirectUrl = (keepCurrentRoute && this._router.routerState != null && this._router.routerState.snapshot != null) ? this._router.routerState.snapshot.url : "";
 
             if (this._redirectUrl.startsWith("/")) {

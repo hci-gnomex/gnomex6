@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import hci.gnomex.constants.Constants;
+import hci.gnomex.model.AppUser;
 import hci.gnomex.utility.HibernateSession;
 
 /**
@@ -59,29 +60,30 @@ public class CheckIsGNomExAccount extends HttpServlet {
 			if (request != null && request.getParameter("UID") != null && !request.getParameter("UID").equals("")) {
 				String username = request.getParameter("UID");
 
-				if (username.matches("^[uU]\\d{7,8}$")) {
+				List accounts = sess.createQuery(""
+						+ " SELECT au "
+						+ "   FROM AppUser AS au "
+						+ "  WHERE au.uNID = :username "
+						+ "     OR au.userNameExternal = :username "
+				).setParameter("username", username).list();
 
-					List accounts = sess.createQuery(""
-							+ " SELECT au "
-							+ "   FROM AppUser AS au "
-							+ "  WHERE au.uNID = '" + username + "' "
-					).list();
-
-					if (accounts.size() == 1) {
-						value = Json.createObjectBuilder()
-												.add("result", "SUCCESS")
-												.add("hasUserAccount", "Y");
-					} else if (accounts.size() == 0) {
-						value = Json.createObjectBuilder()
-												.add("result", "SUCCESS")
-												.add("hasUserAccount", "N");
-					} else {
-						value = Json.createObjectBuilder()
-												.add("result", "SUCCESS")
-												.add("hasUserAccount", "N");
+				if (accounts.size() == 1) {
+					value = Json.createObjectBuilder()
+											.add("result", "SUCCESS")
+											.add("hasUserAccount", "Y");
+					if (((AppUser) accounts.get(0)).getIsActive() == null || !((AppUser) accounts.get(0)).getIsActive().equals("N")) {
+						value.add("isActive", "Y");
 					}
+				} else if (accounts.size() == 0) {
+					value = Json.createObjectBuilder()
+											.add("result", "SUCCESS")
+											.add("hasUserAccount", "N")
+											.add("isActive", "N");
 				} else {
-					throw new Exception("Unexpected university format. Please contact GNomEx Support for assistance.");
+					value = Json.createObjectBuilder()
+											.add("result", "SUCCESS")
+											.add("hasUserAccount", "N")
+											.add("isActive", "N");
 				}
 			} else {
 				throw new Exception("No username received. Please contact GNomEx Support for assistance.");
