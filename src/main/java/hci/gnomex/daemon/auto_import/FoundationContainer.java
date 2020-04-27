@@ -115,43 +115,6 @@ public class FoundationContainer {
 
 
 
-	private String executeCommands(String command) {
-
-		File tempScript = null;
-		StringBuilder strBuild = new StringBuilder();
-		ProcessBuilder pb = new ProcessBuilder();
-		pb.redirectErrorStream(true);
-		pb.command("bash", "-c", command);
-		try {
-			System.out.println("started executing command");
-			//tempScript = createTempScript(commands);
-
-			Process process	= pb.start();
-
-			InputStreamReader inputSR = new InputStreamReader(process.getInputStream());
-			BufferedReader br = new BufferedReader(inputSR);
-			String lineRead;
-			while ((lineRead = br.readLine()) != null) {
-				strBuild.append(lineRead);
-			}
-
-			process.waitFor();
-			process.destroy();
-			System.out.println("finished executing command");
-		}
-
-		catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		finally{
-			//tempScript.delete();
-		}
-		return strBuild.toString();
-	}
 
 	public void makeLocalCheckSums( List<String> filterOutList, List<String> fileList) {
 		StringBuilder strBuild = new StringBuilder();
@@ -174,8 +137,9 @@ public class FoundationContainer {
 			strBuild.append(";");
 			System.out.println(strBuild.toString());
 
-			String localChecksumWithBam = this.executeCommands(strBuild.toString());
-			String localChecksum = localChecksumWithBam.split(" ")[0];
+			String localChecksumWithBam = XMLParser.executeCommands(new ArrayList(Arrays.asList(strBuild.toString())),null)[0];
+			System.out.println("This is the local checksum: " + localChecksumWithBam);
+			String localChecksum = localChecksumWithBam != null ?  localChecksumWithBam.split(" ")[0] : "";
 			strBuild.setLength(0);
 
 			
@@ -187,7 +151,7 @@ public class FoundationContainer {
 				//moveCorruptedFile(bamFile + ".md5", filterOutList);
 			}else{
 				// we finally know its safe to add md5 and its bam
-				String samtoolsError = this.executeCommands("/usr/local/bin/samtools quickcheck " + bamFile);
+				String samtoolsError = XMLParser.executeCommands(new ArrayList(Arrays.asList("/usr/local/bin/samtools quickcheck " + bamFile)),null)[0];
 				if(!bamFile.endsWith("bai")){ // don't check bai since it is not valid check for samtools
 					System.out.println("samtools Test for " + bamFile);
 					if(samtoolsError == null || samtoolsError.equals("")){

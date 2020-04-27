@@ -7,6 +7,9 @@ import hci.gnomex.utility.*;
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
 import java.io.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,7 +17,7 @@ import java.util.regex.Pattern;
 public class DirectoryBuilder {
 
 
-
+	private String stagePath;
 	private String inFileName;
 	private String root;
 	private String currentDownloadLocation;
@@ -97,7 +100,10 @@ public class DirectoryBuilder {
 			}else if(args[i].equals("-regex")){
 				// this regex is to help match sample id so you can determine it's request and get the HCI Person ID off it
 				sampleIdRegex = args[++i];
-			}  else if (args[i].equals("-help")) {
+			}else if(args[i].equals("-stagepath")){
+				// optional
+				stagePath = args[++i];
+			} else if (args[i].equals("-help")) {
 				//printUsage();
 				System.exit(0);
 			}
@@ -184,7 +190,7 @@ public class DirectoryBuilder {
 			System.out.println("This is the out file " + outputAccountFile);
 		}else{
 			if(root.exists() && root.isDirectory()){
-				localFileTypeMap = this.findAllFiles(root,regex);
+				localFileTypeMap = this.findAllFiles(root,localFileMap,regex);
 			}else{
 				System.out.println("Path " + accountForFilesMoved +  " is invalid for accounting");
 				System.exit(1);
@@ -206,11 +212,10 @@ public class DirectoryBuilder {
 
 		if(this.remotePath != null ){
 			System.out.println("Files still missing after checking what is stored remotely");
-			Map<String, Set<String>> remoteFileTypeMap = this.findAllFiles(new File(this.remotePath), regex);
-			System.out.println("This the remote key TRF097883_DNA:  " + remoteFileTypeMap.get("TRF103536_DNA").toString());
-			System.out.println("This the local key TRF097883:  " + localFileTypeMap.get("TRF103536").toString());
+			this.findAllFiles(localFileTypeMap, new File(this.remotePath),localFileMap, regex);
+
 			// we want a full picture(remote and local) if the file is on the disk or not
-			addRemoteFromLocalFiles(localFileTypeMap,remoteFileTypeMap);
+			//addRemoteFromLocalFiles(localFileTypeMap,remoteFileTypeMap);
 			findMissingFiles(localFileTypeMap,missingMap, foundFileIDList);
 			printAccoutedForFiles(missingMap,foundFileIDList,localFileMap);
 		}
@@ -254,12 +259,12 @@ public class DirectoryBuilder {
 		for(String rKey : remoteFileTypeMap.keySet()){
 			String subID = "";
 			// temp code
-			int i = rKey.indexOf("_");
-			if(i != -1 ){
-				subID = rKey.substring(0, i);
-			}
+//			int i = rKey.indexOf("_");
+//			if(i != -1 ){
+//				subID = rKey.substring(0, i);
+//			}
 
-			if(!localFileTypeMap.containsKey(rKey) && !localFileTypeMap.containsKey(subID)){
+			if(!localFileTypeMap.containsKey(rKey)){
 				Set<String> remoteExtensionSet = remoteFileTypeMap.get(rKey);
 				localFileTypeMap.put(rKey, remoteExtensionSet);
 			}
@@ -271,7 +276,7 @@ public class DirectoryBuilder {
 	private Map<String, Set<String>> loadFilesToAccount(String accountFileName, Map<String, List<String>> fileMap,String regex) {
 		BufferedReader bf = null;
 		Map<String, Set<String>> fileTypeMap = new HashMap<>();
-		List<String> deferredFileList = new ArrayList<>();
+		List<File> deferredFileList = new ArrayList<>();
 
 
 		try {
@@ -290,8 +295,8 @@ public class DirectoryBuilder {
 					id = m.group(1);
 					extension = m.group(2);
 					// these files need to be represented in both file sets, so need to put in both sets even though only one file
-					if(extension.equals(".deident.xml") && extension.equals(".xml") || extension.equals(".pdf")){
-						deferredFileList.add(id);
+					if(extension.equals(".deident.xml") || extension.equals(".xml") || extension.equals(".pdf")){
+						deferredFileList.add(new File(line));
 						continue;
 					}
 
@@ -311,7 +316,7 @@ public class DirectoryBuilder {
 				}
 			}
 			//todo need to add ids and full path to file to fileMap
-			addDeferredFiles(deferredFileList,fileTypeMap,regex);
+			addDeferredFiles(deferredFileList,fileTypeMap,fileMap,regex);
 
 
 		}
@@ -331,40 +336,40 @@ public class DirectoryBuilder {
 		return fileTypeMap;
 	}
 
-	private Map<String, Set<String>> findAllFiles(File root,String regex){
+	private Map<String, Set<String>> findAllFiles(File root, Map<String, List<String>> fileMap, String regex){
 		Map<String, Set<String>> fileTypeMap = new TreeMap<String, Set<String> >();
-		List<String> deferredFilesList = new ArrayList<>();
-		findAllFilesRecursively(root, fileTypeMap,deferredFilesList,regex);
-		addDeferredFiles(deferredFilesList,fileTypeMap,regex);
+		List<File> deferredFilesList = new ArrayList<>();
+		findAllFilesRecursively(root, fileTypeMap,deferredFilesList,fileMap,regex);
+		addDeferredFiles(deferredFilesList,fileTypeMap,fileMap,regex);
 		return fileTypeMap;
 	}
 
-	private void addDeferredFiles(List<String> deferredFilesList, Map<String, Set<String>> fileTypeMap, String regex) {
+
+	private void findAllFiles(Map<String, Set<String>> fileTypeMap, File root,Map<String, List<String>> fileMap,String regex){
+		List<File> deferredFilesList = new ArrayList<>();
+		findAllFilesRecursively(root, fileTypeMap,deferredFilesList,fileMap,regex);
+		addDeferredFiles(deferredFilesList,fileTypeMap,fileMap,regex);
+	}
+
+
+
+	private void addDeferredFiles(List<File> deferredFilesList, Map<String, Set<String>> fileTypeMap, Map<String, List<String>> fileMap, String regex) {
 		Pattern r = Pattern.compile(regex);
 
 
-		for(String dFileName : deferredFilesList){
-			Matcher m = r.matcher(dFileName);
+		for(File dFile : deferredFilesList){
+			String fullPathFileName = dFile.getAbsolutePath();
+			Matcher m = r.matcher(fullPathFileName);
 			String id ="";
 			String extension ="";
 
 			if(m.matches()) {
 				id = m.group(1);
 				extension = m.group(2);
-				if(dFileName.contains("TRF103536")){
-					System.out.println("fullName: " + dFileName);
-					System.out.println("id: " + id);
-					System.out.println("extension: " + extension);
-				}
 
 				if(fileTypeMap.containsKey(id)){
 					fileTypeMap.get(id).add(extension);
-					if(dFileName.contains("TRF103536")){
-						System.out.println("this is extension that will be without DNA/RNA"  );
-					}
 				}else {
-
-
 					String idDNA = id + "_DNA";
 					String idRNA = id + "_RNA";
 					Set<String> valDNA = fileTypeMap.get(idDNA);
@@ -372,17 +377,15 @@ public class DirectoryBuilder {
 
 					if(valDNA != null){
 						valDNA.add(extension);
+						fileMap.get(idDNA).add(fullPathFileName);
 					}else{
 						fileTypeMap.put(idDNA, new HashSet<String>(Arrays.asList(extension)));
+						fileMap.put(idDNA, new ArrayList<String>(Arrays.asList(fullPathFileName)));
 					}
 					if(valRNA != null){ // not adding if not found because rna is optional for foundation, may need to reevaluate
 						valRNA.add(extension);
+						fileMap.get(idRNA).add(fullPathFileName);
 					}
-
-					if(dFileName.contains("TRF103536")){
-						System.out.println("this is the extension add to DNA"  );
-					}
-
 
 				}
 
@@ -391,12 +394,11 @@ public class DirectoryBuilder {
 		}
 	}
 
-	private void findAllFilesRecursively(File file, Map<String, Set<String>> fileTypeMap, List<String> deferredFilesList, String regex){
+	private void findAllFilesRecursively(File file, Map<String, Set<String>> fileTypeMap,
+										 List<File> deferredFilesList, Map<String, List<String>> fileMap,String regex){
 
 		if(!file.isDirectory()){
 			String name  = file.getName();
-
-
 
 			//int startIndx = name.indexOf(".");
 			//String extension =  name.substring(startIndx + 1 , name.length());
@@ -411,22 +413,19 @@ public class DirectoryBuilder {
 				id = m.group(1);
 				extension= m.group(2);
 				if(extension.equals(".deident.xml") || extension.equals(".xml") || extension.equals(".pdf")){
-					deferredFilesList.add(name);
+					deferredFilesList.add(file);
 					return;
 				}
 
-				if(name.contains("TRF103536")){
-					System.out.println("fullName of bam: " + name);
-					System.out.println("id of bam: " + id);
-					System.out.println("extension of bam: " + extension);
-				}
 
 				if (fileTypeMap.get(id) != null) {
 					fileTypeMap.get(id).add(extension);
+					fileMap.get(id).add(file.getAbsolutePath());
 				} else {
 					HashSet<String> extensionList = new HashSet<String>();
 					extensionList.add(extension);
 					fileTypeMap.put(id, extensionList);
+					fileMap.put(id,new ArrayList<>(Arrays.asList(file.getAbsolutePath())));
 				}
 
 			}else{
@@ -437,7 +436,7 @@ public class DirectoryBuilder {
 		}else{
 			File[] fileList =  file.listFiles();
 			for(File f : fileList){
-				findAllFilesRecursively(f,fileTypeMap, deferredFilesList,regex);
+				findAllFilesRecursively(f,fileTypeMap, deferredFilesList,fileMap,regex);
 			}
 		}
 
@@ -508,23 +507,29 @@ public class DirectoryBuilder {
 
 
 	public void preparePath() {
+		String logFileName = logPath != null ? logPath + File.separator + "moveDetails.log" : currentDownloadLocation +File.separator + "moveDetails.log";
 		List<String> localFiles = new ArrayList<String>();
 		Map<String,String> fromToMap = new TreeMap<>();
 		Map<String,String> fromToFilteredMap = new TreeMap<>();
+		Map<String, String> startStageMap = new HashMap<>();
 		List<String> flaggedIDList = readSampleIDs(flaggedIDFileName);
+
 
 		try {
 
 			localFiles = this.readFile(this.inFileName);
 			File flaggedDir = new File(this.currentDownloadLocation + "Flagged");
+
 			if(!flaggedDir.exists()){
 				flaggedDir.mkdir();
 			}
 
-			preparePath(flaggedIDList,fromToFilteredMap, localFiles,fromToMap );
-			this.moveTheFiles(fromToFilteredMap, new ArrayList<>()); // These files we want to move into the flagged folder
-
-			this.moveTheFiles(fromToMap,makeFileImmutableCmd(fromToMap));
+			preparePath(flaggedIDList,fromToFilteredMap, localFiles,fromToMap,startStageMap);
+			moveTheFiles(fromToFilteredMap, new ArrayList<>(),logFileName); // These files we want to move into the flagged folder
+			if(stagePath != null) {
+				rsyncFiles(startStageMap, logFileName);
+			}
+			moveTheFiles(fromToMap,makeFileImmutableCmd(fromToMap),logFileName);
 
 
 
@@ -565,7 +570,8 @@ public class DirectoryBuilder {
 	}
 
 
-	private void preparePath(List<String> flaggedFiles,Map<String,String> fromToFilteredMap, List<String> paths, Map<String,String> fromToMap) throws Exception{
+	private void preparePath(List<String> flaggedFiles,Map<String,String> fromToFilteredMap,
+							 List<String> paths, Map<String,String> fromToMap, Map<String, String> startStageMap) throws Exception{
 		File finalDestinationPath = new File(this.root);
 		Map<String,String> dirMap = new HashMap<>();
 		dirMap.put("xml","Reports");
@@ -587,7 +593,7 @@ public class DirectoryBuilder {
 
 
 			//todo verify this approach works for tempus. I think that tempus hands file of real relative paths not s3 path
-			File stageFile =  new File(this.currentDownloadLocation + File.separator + p);
+			File startFile =  new File(this.currentDownloadLocation + File.separator + p);
 
 
 			String pattern = Pattern.quote(System.getProperty("file.separator"));
@@ -603,13 +609,13 @@ public class DirectoryBuilder {
 				fileName = Differ.getNameByExistingCaptureGroup(captureGroupIndexes,m);
 			}
 
-			String staged = "";
-			//sometimes the file in read in has the relative path on the stage folder others it is the remote path
-			// need to determine if path is sudo or real but just relative to stage directory
-			if(stageFile.exists()){
-				staged = stageFile.getCanonicalPath();
+			String start = "";
+			//sometimes the file in read in has the relative path on the start folder others it is the remote path
+			// need to determine if path is sudo or real but just relative to start directory
+			if(startFile.exists()){
+				start = startFile.getCanonicalPath();
 			}else{
-				staged = currentDownloadLocation +File.separator + file;
+				start = currentDownloadLocation +File.separator + file;
 			}
 
 
@@ -624,7 +630,7 @@ public class DirectoryBuilder {
 				strBuild.append("Flagged");
 				strBuild.append(File.separator);
 				strBuild.append(file);
-				fromToFilteredMap.put(staged, strBuild.toString());
+				fromToFilteredMap.put(start, strBuild.toString());
 				System.out.println("Flagged " + strBuild.toString());
 				continue;
 			}
@@ -633,9 +639,23 @@ public class DirectoryBuilder {
 
 			if(new File(finalPath).exists() && !finalPath.equals(root)) {
 				if(addWrapperFolder &&  appendDirPersonID(fileName,strBuild)){
-					fromToMap.put(staged, strBuild.append(File.separator).append(file).toString());
+					if(this.stagePath != null){
+						String stagePathFile = this.stagePath + File.separator + file;
+						startStageMap.put(start, stagePathFile);
+						fromToMap.put(stagePathFile, strBuild.append(File.separator).append(file).toString());
+					}else{
+						fromToMap.put(start, strBuild.append(File.separator).append(file).toString());
+					}
+
 				}else if(!addWrapperFolder){
-					fromToMap.put(staged, strBuild.append(File.separator).append(file).toString());
+					if(this.stagePath != null){
+						String stagePathFile = this.stagePath + File.separator + file;
+						startStageMap.put(start, stagePathFile);
+						fromToMap.put(stagePathFile, strBuild.append(File.separator).append(file).toString());
+					}else{
+						fromToMap.put(start, strBuild.append(File.separator).append(file).toString());
+					}
+
 				}
 			}else {
 				throw new Exception("The path does not exist: " + finalPath +  "\n your directory structure isn't correct");
@@ -745,56 +765,64 @@ public class DirectoryBuilder {
 
 	}
 
+	public void rsyncFiles(Map<String,String> filesMap,String logFileName) throws Exception{
+		CollectingProcessOutput output = null;
 
-	public void moveTheFiles(Map<String,String> filesMap, List<String> extraCommands) throws Exception {
+			for (String fileKey : filesMap.keySet()) {
+				try {
+					RSync rsync = new RSync()
+							.source(fileKey)
+							.destination(filesMap.get(fileKey))
+							.recursive(true);
+					output = rsync.execute();
+					logMoveDetails(output, filesMap, fileKey,logFileName);
+				} catch (Exception e) {
+					logMoveDetails(output, filesMap, fileKey,logFileName);
+				}
+			}
+
+	}
+
+
+
+	public void moveTheFiles(Map<String,String> filesMap, List<String> extraCommands, String logFileName) throws Exception {
 		StringBuilder strBuild = new StringBuilder();
 		List<String> commands = new ArrayList<String>();
-		//			strBuild.append("mv -vn");
-//			strBuild.append(" ");
-//			strBuild.append(fileKey);
-//			strBuild.append(" ");
-//			strBuild.append(filesMap.get(fileKey));
-//			commands.add(strBuild.toString());
-//			System.out.println(strBuild.toString());
-//			strBuild = new StringBuilder();
+
 
 
 		for(String fileKey: filesMap.keySet()) {
-			CollectingProcessOutput output = null;
-			try {
-
-				RSync rsync = new RSync()
-						.source(fileKey)
-						.destination(filesMap.get(fileKey))
-						.recursive(true);
-				output = rsync.execute();
-				logMoveDetails(output,filesMap,fileKey);
-			} catch(Exception e){
-				logMoveDetails(output,filesMap,fileKey);
-			}
+			strBuild.append("mv -vn");
+			strBuild.append(" ");
+			strBuild.append(fileKey);
+			strBuild.append(" ");
+			strBuild.append(filesMap.get(fileKey));
+			commands.add(strBuild.toString());
+			System.out.println(strBuild.toString());
+			strBuild = new StringBuilder();
 		}
 
 		for(String c : extraCommands){
 			commands.add(c);
 		}
-		if(this.logPath != null){
-			XMLParser.executeCommands(commands,logPath+ File.separator + "subProccesError.log");
-		}else{
-			XMLParser.executeCommands(commands,currentDownloadLocation+"subProccesError.log");
+
+		String[] stdOutArray  = XMLParser.executeCommands(commands,logFileName);
+		System.out.println("Here is the length of stdoutArray:  " + stdOutArray.length);
+		System.out.println("This is the output  ");
+		for(int i = 0; i < stdOutArray.length; i++){
+			System.out.println(stdOutArray[i]);
 		}
-
-
 	}
 
-	private void logMoveDetails(CollectingProcessOutput output, Map<String, String> filesMap, String fileKey) throws Exception {
-		String logDetailsName = "moveDetails.log";
+	private void logMoveDetails(CollectingProcessOutput output, Map<String, String> filesMap, String fileKey,String logFile) throws Exception {
 		String errorMessage = "";
+		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 
 		if(logPath != null){
-			try(PrintWriter pw  = new PrintWriter(new FileWriter(logPath + File.separator + logDetailsName, true));) {
+			try(PrintWriter pw  = new PrintWriter(new FileWriter(logFile, true));) {
 				if(output != null){
 					if(output.getExitCode() == 0 ){
-						pw.println(fileKey + "\t" + filesMap.get(fileKey));
+						pw.println(fileKey + "\t" + filesMap.get(fileKey) + "\t" + dateFormat.format(new Date()));
 					}else{
 						errorMessage= "Error: sync failed  for " + fileKey + "  to  " + filesMap.get(fileKey);
 						pw.println(output.getStdErr());

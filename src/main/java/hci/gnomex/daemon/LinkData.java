@@ -511,10 +511,11 @@ public class LinkData extends TimerTask {
         try {
 //			String[] cmd1 = { "rm", "-f", link.toString() };
 //			Runtime.getRuntime().exec(cmd1);
-            String realFile1 = "'" + realFile.getAbsolutePath() + "'";
-            String link1 = "'" + link.toString() + "'";
-            String[] cmd = {"ln", subCommand, realFile1, link1};
+            String[] cmd = {"ln", subCommand, realFile.getAbsolutePath(), link.toString()};
             Runtime.getRuntime().exec(cmd);
+//            if(exitCode != 0){
+//                return false;
+//            }
             return true;
         } catch (IOException e) {
 
