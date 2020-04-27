@@ -1,20 +1,22 @@
 <form [formGroup]="formGroup" class="flex-container-col full-width full-height double-padded-left-right">
 	<div class="full-width padded">
 		<div style="position:relative; width:calc(100% - 1.6em); margin:0.4em 0.8em;">
-			<div class="t full-width">
-				<div class="tr full-width">
-					<div class="td cell-label">
+			<div class="flex-container-col full-width">
+				<div class="flex-container-row align-center">
+					<div class="label">
 						Lab
 					</div>
-					<div class="td">
-						<custom-combo-box style="width: 100%; font-size: small;" placeholder="Select a lab..." (optionSelected)="onLabListSelection($event)"
+					<div class="flex-grow">
+						<custom-combo-box style="width: 100%; font-size: small;"
+										  placeholder="Select a lab..."
+										  formControlName="lab"
 										  [displayField]="this.prefService.labDisplayField" [options]="labList"
-										  formControlName="lab" >
+										  (optionSelected)="onLabListSelection($event)">
 						</custom-combo-box>
 					</div>
 				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
+				<div class="flex-container-row align-center">
+					<div class="label">
 						<div>
 							Core Facility
 						</div>
@@ -22,10 +24,11 @@
 									  [hasEditPermission]="this.createSecurityAdvisorService.isSuperAdmin"
 									  tooltipPosition="left"></context-help>
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<div class="full-width" style="font-size: small">
 							<custom-multi-combo-box placeholder="Select Core Facilities"
 													[options]="coreFacilityReducedList"
+													[disabled]="disableCoreFacilitiesSelector"
 													displayField="display"
 													[(ngModel)]="selectedCoreFacilities"
 													[ngModelOptions]="{standalone: true}"
@@ -34,30 +37,29 @@
 						</div>
 					</div>
 				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
+				<div class="flex-container-row align-center">
+					<div class="label">
 						Account Type
 					</div>
-					<div class="td center-vertical-align">
+					<div class="flex-grow">
 						<mat-radio-group  [(ngModel)]="showField"
 										  (ngModelChange)="onAccountTypeChange($event)"
 										  [ngModelOptions]="{standalone: true}">
 							<mat-radio-button class="radio-button" [value]="CHARTFIELD">Chartfield</mat-radio-button>
 							<mat-radio-button class="radio-button" [value]="PO">PO</mat-radio-button>
-							<mat-radio-button class="radio-button" [value]="CREDIT_CARD">Credit Card</mat-radio-button>
+							<mat-radio-button *ngIf="showCreditCard" class="radio-button" [value]="CREDIT_CARD">Credit Card</mat-radio-button>
 						</mat-radio-group>
-					</div>
+                    </div>
 				</div>
 			</div>
 		</div>
 	</div>
 	<div class="full-width background" style="width: calc(100% - 8px); margin: 3px 4px;">
 		<div style="position:relative; width:calc(100% - 1.6em); margin:0.4em 0.8em;">
-
-			<div *ngIf="showField === CHARTFIELD" class="t full-width">
-				<div class="tr full-width">
-					<div class="td cell-label"> Account Name </div>
-					<div class="td">
+			<div *ngIf="showField === CHARTFIELD" class="flex-container-col full-width">
+				<div class="flex-container-row align-center">
+					<div class="label"> Account Name </div>
+					<div class="flex-grow">
 						<mat-form-field class="full-width">
 							<input  matInput placeholder="Account Name" formControlName="accountName">
 							<mat-error *ngIf="formGroup.get('accountName').hasError('required')">
@@ -66,9 +68,9 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<div *ngIf="!usesCustomChartfields || includeInCustomField_shortAccount" class="tr full-width">
-					<div class="td cell-label"> Short Account Name </div>
-					<div class="td">
+				<div *ngIf="!usesCustomChartfields || includeInCustomField_shortAccount" class="flex-container-row align-center">
+					<div class="label"> Short Account Name </div>
+					<div class="flex-grow">
 						<mat-form-field class="full-width">
 							<input matInput  placeholder="Short Account Name" formControlName="shortAccountName">
 							<mat-error *ngIf="formGroup.get('shortAccountName').hasError('required')">
@@ -80,11 +82,11 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<div *ngIf="!usesCustomChartfields" class="tr full-width">
-					<div class="td cell-label">
+				<div *ngIf="!usesCustomChartfields" class="flex-container-row align-center">
+					<div class="label">
 						Chartfield to be charged
 					</div>
-					<div class="td" style="font-size: small;">
+					<div class="flex-grow" style="font-size: small;">
 						<div class="inline-block" style="vertical-align: top; font-size: small;">
 							<mat-form-field style="width: 3rem;">
 								<input matInput placeholder="Bus" formControlName="chartfieldBus">
@@ -148,7 +150,7 @@
 									<strong>5</strong> digits
 								</mat-error>
 								<mat-error *ngIf="formGroup.get('chartfieldActivity').hasError('thisOrThat')">
-									{{this.formGroup.get('chartfieldActivity')?.errors['thisOrThat'] }}
+									{{ formGroup.get('chartfieldActivity')?.errors['thisOrThat'] }}
 								</mat-error>
 							</mat-form-field>
 						</div>
@@ -174,7 +176,7 @@
 									<strong>8</strong> digits
 								</mat-error>
 								<mat-error *ngIf="formGroup.get('chartfieldProject').hasError('thisOrThat')">
-									{{this.formGroup.get('chartfieldProject')?.errors['thisOrThat'] }}
+									{{ this.formGroup.get('chartfieldProject')?.errors['thisOrThat'] }}
 								</mat-error>
 							</mat-form-field>
 						</div>
@@ -203,11 +205,11 @@
 						</div>
 					</div>
 				</div>
-				<div *ngIf="usesCustomChartfields"  class="tr full-width">
-					<div class="td cell-label">
+				<div *ngIf="usesCustomChartfields"  class="flex-container-row align-center">
+					<div class="label">
 						Chartfield to be charged
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<div *ngIf="internalAccountFieldsConfiguration[0]" class="inline-block" style="vertical-align: top; width: 15%;">
 							<mat-form-field style="width: 100%;">
 								<input
@@ -347,24 +349,24 @@
 						</div>
 					</div>
 				</div>
-				<div *ngIf="showFundingAgencies && (!usesCustomChartfields || includeInCustomField_fundingAgency)" class="tr full-width">
-					<div class="td cell-label">
+				<div *ngIf="showFundingAgencies && (!usesCustomChartfields || includeInCustomField_fundingAgency)" class="flex-container-row align-center">
+					<div class="label">
 						Funding Agency
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<custom-combo-box style="width: 100%; font-size: small;" placeholder="Funding Agency" displayField="display"
 										  [options]="fundingAgencies" formControlName="idFundingAgency"
 										  valueField="value">
 						</custom-combo-box>
 					</div>
 				</div>
-				<div class="tr full-width row-spacer">
+				<div class="full-width row-spacer">
 				</div>
-				<div *ngIf="!usesCustomChartfields || includeInCustomField_startDate" class="tr full-width">
-					<div class="td cell-label">
+				<div *ngIf="!usesCustomChartfields || includeInCustomField_startDate" class="flex-container-row align-center">
+					<div class="label">
 						Start Date
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<div style="display:inline-block; overflow:visible; font-size:small;">
 							<date-picker
 									formControlName="startDate"
@@ -373,7 +375,7 @@
 						</div>
 						<div class="inline-block" style="width:7em;">
 						</div>
-						<div *ngIf="!usesCustomChartfields || includeInCustomField_expirationDate" class="inline-block cell-label" style="height: 100%;">
+						<div *ngIf="!usesCustomChartfields || includeInCustomField_expirationDate" class="inline-block label" style="height: 100%;">
 							Effective Until
 						</div>
 						<div *ngIf="!usesCustomChartfields || includeInCustomField_expirationDate" style="display:inline-block; overflow:visible; font-size:small;">
@@ -384,11 +386,11 @@
 						</div>
 					</div>
 				</div>
-				<div *ngIf="(usesCustomChartfields && (!includeInCustomField_startDate)) && includeInCustomField_expirationDate" class="tr full-width">
-					<div class="td cell-label">
+				<div *ngIf="(usesCustomChartfields && (!includeInCustomField_startDate)) && includeInCustomField_expirationDate" class="flex-container-row align-center">
+					<div class="label">
 						Effective Until
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<div style="display:inline-block; overflow:visible; font-size:small;">
 							<date-picker
 									formControlName="expirationDate"
@@ -398,11 +400,11 @@
 					</div>
 				</div>
 				<!-- hiding this field as the only core that does billing doesn't want it -->
-				<div *ngIf="(!usesCustomChartfields && showTotalDollarAmount ) || includeInCustomField_totalDollarAmount" class="tr full-width">
-					<div class="td cell-label">
+				<div *ngIf="(!usesCustomChartfields && showTotalDollarAmount ) || includeInCustomField_totalDollarAmount" class="flex-container-row align-center">
+					<div class="label">
 						Total Dollar Amount
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<mat-form-field style="width: 18em;">
 							<span matPrefix>$ &nbsp;</span>
 							<input matInput placeholder="Total Dollar Amount"
@@ -413,11 +415,25 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
+				<div *ngIf="isEditAccountMode" class="flex-container-row align-center">
+					<div class="label">
+						Approved Users
+					</div>
+					<div class="flex-grow" (click)="onClickApprovedUsers()">
+						<mat-form-field class="full-width">
+							<input matInput
+								   placeholder="Approved Users"
+								   formControlName="approvedUsersDisplayFC"
+								   class="full-width"
+								   [disabled]="true">
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="flex-container-row align-center">
+					<div class="label">
 						Your email address
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<mat-form-field style="width: 100%;">
 							<input matInput placeholder="Your Email Address" formControlName="email">
 							<mat-error *ngIf="formGroup.get('email').hasError('required')">
@@ -429,11 +445,11 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
+				<div class="flex-container-row align-center">
+					<div class="label">
 						Active
 					</div>
-					<div class="td center-vertical-align">
+					<div class="flex-grow">
 						<div class="checkbox-container">
 							<mat-checkbox formControlName="active">
 							</mat-checkbox>
@@ -443,11 +459,11 @@
 			</div>
 			<!-- PO START -->
 			<div *ngIf="showField === PO" class="t full-width">
-				<div class="tr full-width">
-					<div class="td cell-label">
+				<div class="flex-container-row align-center">
+					<div class="label">
 						Account Name
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<mat-form-field class="full-width">
 							<input matInput placeholder="Account Name" formControlName="accountName">
 							<mat-error *ngIf="formGroup.get('accountName').hasError('required')">
@@ -456,11 +472,11 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
+				<div class="flex-container-row align-center">
+					<div class="label">
 						Short Account Name
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<mat-form-field class="full-width">
 							<input matInput placeholder="Short Account Name" formControlName="shortAccountName">
 							<mat-error *ngIf="formGroup.get('shortAccountName').hasError('required')">
@@ -472,22 +488,22 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<div *ngIf="showFundingAgencies" class="tr full-width">
-					<div class="td cell-label">
+				<div *ngIf="showFundingAgencies" class="flex-container-row align-center">
+					<div class="label">
 						Funding Agency
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<custom-combo-box style="width: 100%; font-size: small;" placeholder="Funding Agency" displayField="display"
 										  [options]="fundingAgencies" formControlName="idFundingAgency"
 										  valueField="value" >
 						</custom-combo-box>
 					</div>
 				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
+				<div class="flex-container-row align-center">
+					<div class="label">
 						Start Date
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<div style="display:inline-block; overflow:visible; font-size:small;">
 
 							<date-picker
@@ -498,7 +514,7 @@
 						</div>
 						<div class="inline-block" style="width:7em;">
 						</div>
-						<div class="inline-block cell-label" style="height: 100%;">
+						<div class="inline-block label" style="height: 100%;">
 							Effective Until
 						</div>
 						<div style="display:inline-block; overflow:visible; font-size:small;">
@@ -510,11 +526,11 @@
 					</div>
 				</div>
 				<!-- hiding this field as the only core  that does billing doesn't want it -->
-				<div *ngIf="showTotalDollarAmount" class="tr full-width">
-					<div class="td cell-label">
+				<div *ngIf="showTotalDollarAmount" class="flex-container-row align-center">
+					<div class="label">
 						Total Dollar Amount
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<mat-form-field style="width: 18em;">
 							<span matPrefix>$ &nbsp;</span>
 							<input matInput placeholder="Total Dollar Amount"
@@ -525,11 +541,25 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
+				<div *ngIf="isEditAccountMode" class="flex-container-row align-center">
+					<div class="label">
+						Approved Users
+					</div>
+					<div class="flex-grow full-width" (click)="onClickApprovedUsers()">
+						<mat-form-field class="full-width">
+							<input matInput
+								   placeholder="Approved Users"
+								   formControlName="approvedUsersDisplayFC"
+								   class="full-width"
+								   [disabled]="true">
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="flex-container-row align-center">
+					<div class="label">
 						Your email address
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<mat-form-field style="width: 100%;">
 							<input matInput placeholder="Your Email Address" formControlName="email">
 							<mat-error *ngIf="formGroup.get('email').hasError('required')">
@@ -541,11 +571,11 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
+				<div class="flex-container-row align-center">
+					<div class="label">
 						Active
 					</div>
-					<div class="td center-vertical-align">
+					<div class="flex-grow">
 						<div class="checkbox-container">
 							<mat-checkbox  formControlName="active"></mat-checkbox>
 						</div>
@@ -554,11 +584,11 @@
 			</div>
 			<!-- Credit Card Start -->
 			<div *ngIf="showField === CREDIT_CARD" class="t full-width">
-				<div class="tr full-width">
-					<div class="td cell-label">
+				<div class="flex-container-row align-center">
+					<div class="label">
 						Last four digits of <br/> Credit Card Number
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<mat-form-field class="full-width">
 							<input  matInput
 									placeholder="Last four"
@@ -569,22 +599,22 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<div *ngIf="showFundingAgencies" class="tr full-width">
-					<div class="td cell-label">
+				<div *ngIf="showFundingAgencies" class="flex-container-row align-center">
+					<div class="label">
 						Funding Agency
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<custom-combo-box style="width: 100%; font-size: small;" placeholder="Funding Agency" displayField="display"
 										  [options]="fundingAgencies" formControlName="idFundingAgency"
 										  valueField="value">
 						</custom-combo-box>
 					</div>
 				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
+				<div class="flex-container-row align-center">
+					<div class="label">
 						Start Date
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<div style="display:inline-block; overflow:visible; font-size:small;">
 							<date-picker
 									formControlName="startDate"
@@ -593,7 +623,7 @@
 						</div>
 						<div class="inline-block" style="width:7em;">
 						</div>
-						<div class="inline-block cell-label" style="height: 100%;">
+						<div class="inline-block label" style="height: 100%;">
 							Expiration Date
 						</div>
 						<div style="display:inline-block; overflow:visible; font-size:small;">
@@ -604,11 +634,11 @@
 						</div>
 					</div>
 				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
+				<div class="flex-container-row align-center">
+					<div class="label">
 						Zip Code
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<mat-form-field style="width: 10em;">
 							<input
 									matInput
@@ -623,11 +653,11 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
+				<div class="flex-container-row align-center">
+					<div class="label">
 						Credit Card Company
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<custom-combo-box style="width: 40%;" placeholder="Credit Card Company" displayField="display"
 										  [options]="creditCardCompanies"
 										  formControlName="idCreditCardCompany"
@@ -636,11 +666,11 @@
 					</div>
 				</div>
 				<!-- hiding this field as the only core that does billing doesn't want it -->
-				<div *ngIf="showTotalDollarAmount" class="tr full-width">
-					<div class="td cell-label">
+				<div *ngIf="showTotalDollarAmount" class="flex-container-row align-center">
+					<div class="label">
 						Total Dollar Amount
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<mat-form-field style="width: 18em;">
 							<span matPrefix>$ &nbsp;</span>
 							<input matInput placeholder="Total Dollar Amount"
@@ -651,11 +681,25 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
+				<div *ngIf="isEditAccountMode" class="flex-container-row align-center">
+					<div class="label">
+						Approved Users
+					</div>
+					<div class="flex-grow" (click)="onClickApprovedUsers()">
+						<mat-form-field class="full-width">
+							<input matInput
+								   placeholder="Approved Users"
+								   formControlName="approvedUsersDisplayFC"
+								   class="full-width"
+								   [disabled]="true">
+						</mat-form-field>
+					</div>
+				</div>
+				<div class="flex-container-row align-center">
+					<div class="label">
 						Your email address
 					</div>
-					<div class="td">
+					<div class="flex-grow">
 						<mat-form-field style="width: 100%;">
 							<input matInput placeholder="Your Email Address" formControlName="email">
 							<mat-error *ngIf="formGroup.get('email').hasError('required')">
@@ -667,11 +711,11 @@
 						</mat-form-field>
 					</div>
 				</div>
-				<div class="tr full-width">
-					<div class="td cell-label">
+				<div class="flex-container-row align-center">
+					<div class="label">
 						Active
 					</div>
-					<div class="td center-vertical-align">
+					<div class="flex-grow">
 						<mat-checkbox formControlName="active">
 						</mat-checkbox>
 					</div>
@@ -695,6 +739,4 @@
 			</div>
 		</div>
 	</div>
-
-
 </form>

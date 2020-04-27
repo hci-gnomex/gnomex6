@@ -5,6 +5,7 @@ import hci.dictionary.model.NullDictionaryEntry;
 import hci.framework.security.SecurityAdvisor;
 import hci.framework.security.UnknownPermissionException;
 import hci.framework.utilities.XMLReflectException;
+import hci.gnomex.utility.HibernateUtil;
 import hci.gnomex.utility.Util;
 import hci.hibernate5utils.HibernateDetailObject;
 
@@ -14,6 +15,10 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -575,6 +580,7 @@ public void executeCommand(DictionaryCommand command, Session sess, SecurityAdvi
 		else if (LOAD_METADATA.equals(command.action)) {
 			if (command.className != null && !command.className.equals("")) {
 				Dictionary dict = dictionaries.get(command.className);
+				dict.addDictSqlMetadata(sess, command.className, dict);
 				command.xmlResult = dict.createEditorMetaData(sess);
 			}
 		}
@@ -718,6 +724,7 @@ private String displayName;
 private String className;
 private TreeMap<Object, Object> dictionaryEntries;
 private HashMap<String, Filter> filters;
+private HashMap<String, SqlMetadata> classSqlMetadata;
 private ArrayList<Filter> filterList;
 private HashMap<?, ?> maxLengths;
 private boolean canWrite = false;
@@ -800,7 +807,12 @@ public void setFilters(HashMap<String, Filter> filters) {
 	this.filters = filters;
 }
 
-public String getCanWrite() {
+public HashMap<String, SqlMetadata> getClassSqlMetadata() {
+	return classSqlMetadata;
+}
+public void setClassSqlMetadata(HashMap<String, SqlMetadata> classSqlMetadata) { this.classSqlMetadata = classSqlMetadata; }
+
+	public String getCanWrite() {
 	String str = "Y";
 	if (!canWrite) {
 		str = "N";
@@ -1046,6 +1058,42 @@ public String toDictionaryXML() throws XMLReflectException {
 	return result;
 }
 
+	private void addDictSqlMetadata(Session sess, String className, Dictionary dict) {
+		String name = className.substring(className.lastIndexOf(".") + 1);
+		dict.classSqlMetadata = new HashMap<>();
+
+		try {
+			StringBuffer buf = new StringBuffer("SELECT dict.* FROM " + name + " dict");
+			Connection con = HibernateUtil.getConnection(sess);
+			PreparedStatement statement = con.prepareStatement(buf.toString());
+			ResultSet rs = statement.executeQuery();
+
+			while (rs.next()) {
+				ResultSetMetaData metaData = rs.getMetaData();
+				for(int i = 1; i <= metaData.getColumnCount(); i++) {
+					String columnName = metaData.getColumnName(i);
+					String columnType = metaData.getColumnTypeName(i);
+					String columnSize = "" + metaData.getColumnDisplaySize(i);
+					String columnClassName = metaData.getColumnClassName(i);
+					String tableName = metaData.getTableName(i);
+					String columnPrecision = "" + metaData.getPrecision(i);
+					String columnScale = "" + metaData.getScale(i);
+					String columnNullable = (metaData.isNullable(i) == 1 ? "Y" : "N");
+					SqlMetadata sqlMeta = new SqlMetadata(tableName, columnName, columnType, columnSize, columnClassName,columnPrecision, columnScale, columnNullable);
+					dict.classSqlMetadata.put(columnName, sqlMeta);
+				}
+				break;
+			}
+			rs.close();
+			statement.close();
+
+		} catch (Exception e) {
+			LOG.error("[HibernateSession:addDictSqlMetadata] Failed to get dictionary SQL metaData, dictionary: " + name, e);
+		}
+
+	}
+
+
 private String createEditorMetaData(Session sess) {
 
 	Element dictionary = new Element("Dictionary");
@@ -1075,6 +1123,7 @@ private String createEditorMetaData(Session sess) {
 				field.setAttribute("className", f.getFilterClass());
 				field.setAttribute("dataField", f.getFilterField());
 				field.setAttribute("dataType", "comboBox");
+				field.setAttribute("isNullable", this.classSqlMetadata.get(f.getFilterField()).columnNullable);
 				field.setAttribute(
 						"caption",
 						parseFilterDisplay((dict != null) ? dict.getDisplayName() : this.parseDisplay(f
@@ -1137,6 +1186,7 @@ private String createEditorMetaData(Session sess) {
 								field.setAttribute("className", f.getFilterClass());
 								field.setAttribute("dataField", f.getFilterField());
 								field.setAttribute("dataType", "YN");
+								field.setAttribute("isNullable", this.classSqlMetadata.get(fieldName).columnNullable);
 								field.setAttribute("caption", parseDisplay(f.getFilterField()));
 								field.setAttribute("visible", "Y");
 								dictionary.addContent(field);
@@ -1153,6 +1203,7 @@ private String createEditorMetaData(Session sess) {
 								field.setAttribute("className", this.getClassName());
 								field.setAttribute("dataField", fieldName);
 								field.setAttribute("dataType", "isActive");
+								field.setAttribute("isNullable", this.classSqlMetadata.get(fieldName).columnNullable);
 								field.setAttribute("caption", "Active ?");
 								field.setAttribute("visible", "Y");
 								dictionary.addContent(field);
@@ -1171,6 +1222,7 @@ private String createEditorMetaData(Session sess) {
 									field.setAttribute("caption", parseDisplay(fieldName));
 									if (propertyNames.contains(fieldName)) {
 										field.setAttribute("visible", "Y");
+										field.setAttribute("isNullable", this.classSqlMetadata.get(fieldName).columnNullable);
 									} else {
 										field.setAttribute("visible", "N");
 									}
@@ -1184,19 +1236,28 @@ private String createEditorMetaData(Session sess) {
 									field.setAttribute("id", fieldName);
 									field.setAttribute("className", this.getClassName());
 									field.setAttribute("dataField", fieldName);
-									field.setAttribute("dataType", "text");
 									field.setAttribute("caption", parseDisplay(fieldName));
+
+									if (m.getReturnType().equals(java.lang.Integer.class)) {
+										field.setAttribute("dataType", "intNumber");
+									} else {
+										field.setAttribute("dataType", "text");
+									}
 
 									// Hibernate mapped fields and identifiers (non-integers)
 									// are visible
 									if (propertyNames.contains(fieldName)) {
 										field.setAttribute("visible", "Y");
 										field.setAttribute("isIdentifier", "N");
+										field.setAttribute("dataSize", this.classSqlMetadata.get(fieldName).columnSize);
+										field.setAttribute("isNullable", this.classSqlMetadata.get(fieldName).columnNullable);
 									} else {
 										if (isKeyColumn(meta, fieldName)
 												&& ((AbstractEntityPersister) meta).getIdentifierGenerator() instanceof Assigned) {
 											field.setAttribute("visible", "Y");
 											field.setAttribute("isIdentifier", "Y");
+											field.setAttribute("dataSize", this.classSqlMetadata.get(fieldName).columnSize);
+											field.setAttribute("isNullable", this.classSqlMetadata.get(fieldName).columnNullable);
 										} else {
 											field.setAttribute("visible", "N");
 											field.setAttribute("isIdentifier", "Y");
@@ -1269,4 +1330,95 @@ public void setFilterField(String filterField) {
 	this.filterField = filterField;
 }
 }
+
+	/**
+	 * This SqlMetadata class is to get the SQL metaData information of the the dictionary besides its java class metaData information
+	 * @author sharoldsen
+	 */
+	private class SqlMetadata implements Serializable {
+		private String tableName;
+		private String columnName;
+		private String columnType;
+		private String columnSize;
+		private String columnClassName;
+		private String columnPrecision;
+		private String columnScale;
+		private String columnNullable;
+
+		public SqlMetadata(String tableName, String columnName, String columnType, String columnSize,
+											 String columnClassName, String columnPrecision, String columnScale, String columnNullable) {
+			this.tableName = tableName;
+			this.columnName = columnName;
+			this.columnType = columnType;
+			this.columnSize = columnSize;
+			this.columnClassName = columnClassName;
+			this.columnPrecision = columnPrecision;
+			this.columnScale = columnScale;
+			this.columnNullable = columnNullable;
+		}
+
+		public String getTableName() {
+			return tableName;
+		}
+
+		public void setTableName(String tableName) {
+			this.tableName = tableName;
+		}
+
+		public String getColumnName() {
+			return columnName;
+		}
+
+		public void setColumnName(String columnName) {
+			this.columnName = columnName;
+		}
+
+		public String getColumnType() {
+			return columnType;
+		}
+
+		public void setColumnType(String columnType) {
+			this.columnType = columnType;
+		}
+
+		public String getColumnSize() {
+			return columnSize;
+		}
+
+		public void setColumnSize(String columnSize) {
+			this.columnSize = columnSize;
+		}
+
+		public String getColumnClassName() {
+			return columnClassName;
+		}
+
+		public void setColumnClassName(String columnClassName) {
+			this.columnClassName = columnClassName;
+		}
+
+		public String getColumnPrecision() {
+			return columnPrecision;
+		}
+
+		public void setColumnPrecision(String columnPrecision) {
+			this.columnPrecision = columnPrecision;
+		}
+
+		public String getColumnScale() {
+			return columnScale;
+		}
+
+		public void setColumnScale(String columnScale) {
+			this.columnScale = columnScale;
+		}
+
+		public String getColumnNullable() {
+			return columnNullable;
+		}
+
+		public void setColumnNullable(String columnNullable) {
+			this.columnNullable = columnNullable;
+		}
+	}
 }

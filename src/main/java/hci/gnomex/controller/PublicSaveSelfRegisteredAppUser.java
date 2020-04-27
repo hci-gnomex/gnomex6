@@ -210,10 +210,6 @@ public class PublicSaveSelfRegisteredAppUser extends GNomExCommand implements Se
         }
       }
 
-      if (emailAlreadyExists(sess, appUserScreen)) {
-        this.addInvalidField("Email", "This email already exists in the system.  Please verify you do not have an existing account.");
-      }
-
       if (existingLab) {
         requestedLab = sess.load(Lab.class, requestedLabId);
         requestedLabName = requestedLab.getName(false, false);
@@ -552,19 +548,4 @@ public class PublicSaveSelfRegisteredAppUser extends GNomExCommand implements Se
     return users.size() > 0;
   }
 
-  private static boolean emailAlreadyExists(Session sess, AppUser appUser) {
-    if (appUser.getEmail() == null) {
-      return false;
-    }
-
-    StringBuffer buf = new StringBuffer();
-    buf.append("SELECT a.idAppUser from AppUser as a where a.email = :email");
-
-    Query usersQuery = sess.createQuery(buf.toString());
-
-    usersQuery.setParameter("email", appUser.getEmail());
-
-    List users = usersQuery.list();
-    return users.size() > 0;
-  }
 }

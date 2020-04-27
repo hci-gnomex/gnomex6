@@ -1,60 +1,54 @@
-<div class="full-width full-height flex-container-col padded-not-bottom">
-	<div class="full-width flex-container-row align-center">
-		<div class="medium-width padded">
-			<custom-combo-box placeholder="Select Core Facility"
-							  [(ngModel)]="selectedCoreFacility"
-							  (optionSelected)="onCoreFacilitySelected()"
-							  [options]="coreFacilities"
-							  displayField="display">
-			</custom-combo-box>
-		</div>
-		<div class="padded">
-			<button mat-raised-button *ngIf="!showAddAccountBox" (click)="onAddAccountBeginClicked()">Add account</button>
-		</div>
-		<div class="padded">
-			<button mat-raised-button (click)="onCopyAccountsClicked()">Copy Accounts From Other Cores</button>
-		</div>
-	</div>
-	<div *ngIf="showAddAccountBox" class="full-width small-font">
-		<div class="border">
-			<div class="t full-width">
-				<div class="tr">
-					<div class="td">
-						<div style="margin-right: 4em;">
+<div class="full-width full-height flex-container-col padded-left-right-top">
+	<div class="full-width flex-container-row">
+		<div class="flex-container-col">
+			<div class="full-width flex-container-row align-center">
+				<div class="medium-width padded-left-right-top">
+					<custom-combo-box placeholder="Select Core Facility"
+									  [(ngModel)]="selectedCoreFacility"
+									  (optionSelected)="onCoreFacilitySelected()"
+									  [options]="coreFacilities"
+									  displayField="display">
+					</custom-combo-box>
+				</div>
+				<div class="padded-left">
+					<button mat-raised-button *ngIf="!showAddAccountBox" class="same-size-button" (click)="onAddAccountBeginClicked()">Add account</button>
+					<button mat-raised-button *ngIf="showAddAccountBox" class="same-size-button" (click)="onHideClicked()">Hide Add Account</button>
+				</div>
+				<div class="padded-left">
+					<button mat-raised-button (click)="onCopyAccountsClicked()">Copy Accounts From Other Cores</button>
+				</div>
+			</div>
+			<div *ngIf="showAddAccountBox" class="full-width small-font">
+				<div class="flex-container-col border full-width">
+					<div class="flex-container-row align-center">
+						<div class="label">
 							Account Name
 						</div>
+						<div class="flex-grow padded-left-right">
+							<mat-form-field class="full-width">
+								<input matInput placeholder="Account Name" [(ngModel)]="newAccountName">
+							</mat-form-field>
+						</div>
 					</div>
-					<div class="td">
-						<mat-form-field class="full-width">
-							<input matInput placeholder="Account Name" [(ngModel)]="newAccountName">
-						</mat-form-field>
-					</div>
-					<div class="td">
-					</div>
-				</div>
-				<div class="tr">
-					<div class="td">
-						<div style="margin-right: 4em;">
+					<div class="flex-container-row align-center">
+						<div class="label">
 							Payment Method
 						</div>
-					</div>
-					<div class="td">
-						<div class="inline-block" style="width: 65%;">
+						<div class="inline-block flex-grow">
 							<mat-radio-group [(ngModel)]="accountType">
-								<mat-radio-button class="radio-button" [value]="CHARTFIELD">Chartfield</mat-radio-button>
-								<mat-radio-button class="radio-button" [value]="PO">PO</mat-radio-button>
-								<mat-radio-button class="radio-button" [value]="CREDIT_CARD">Credit Card</mat-radio-button>
+								<mat-radio-button class="radio-button padded" [value]="CHARTFIELD">Chartfield</mat-radio-button>
+								<mat-radio-button class="radio-button padded" [value]="PO">PO</mat-radio-button>
+								<mat-radio-button *ngIf="showCreditCard" class="radio-button padded" [value]="CREDIT_CARD">Credit Card</mat-radio-button>
 							</mat-radio-group>
 						</div>
-						<div class="inline-block" style="width: 34%; text-align: right;">
-							<button mat-raised-button (click)="onAddAccountConfirmClicked()">Add account</button>
+						<div class="padded">
+							<button mat-raised-button class="minimize" (click)="onAddAccountConfirmClicked()">Add account</button>
 						</div>
-					</div>
-					<div class="td" style="text-align: center;">
-						<button mat-raised-button (click)="onHideClicked()">Hide</button>
 					</div>
 				</div>
 			</div>
+		</div>
+		<div class="flex-grow">
 		</div>
 	</div>
 	<div class="vertical-spacer full-width">
@@ -89,9 +83,9 @@
 						(gridReady)="onPoGridReady($event)">
 				</ag-grid-angular>
 			</div>
-			<div class="vertical-spacer full-width">
+			<div *ngIf="showCreditCard" class="vertical-spacer full-width">
 			</div>
-			<div class="full-width flex-grow small-font">
+			<div *ngIf="showCreditCard" class="full-width flex-grow small-font">
 				<ag-grid-angular
 						class="ag-theme-fresh small-font full-width full-height"
 						[context]="context"

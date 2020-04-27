@@ -77,6 +77,8 @@ export class PropertyService {
     public static readonly PROPERTY_OFFSET_BILLING_PERIOD:string = "property_offset_billing_period";
     public static readonly PROPERTY_SHOW_TOTAL_DOLLAR_AMOUNT:string = "property_show_total_dollar_amount";
 
+    public static readonly PROPERTY_SHOW_CREDIT_CARD:string = "show_credit_card";
+
     constructor(private dictionaryService: DictionaryService,
                 private httpClient: HttpClient,
                 private cookieUtilService: CookieUtilService) {}
