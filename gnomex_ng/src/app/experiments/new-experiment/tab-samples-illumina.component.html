@@ -1,9 +1,5 @@
 <div class="full-height full-width small-font">
     <form [formGroup]="form" class="full-height full-width flex-container-col">
-        <div *ngIf="showIlluminaInstructions" class="full-width padded">
-            <div class="sample-instructions allow-line-breaks padded">{{ BASIC_INSTRUCTIONS }}
-            </div>
-        </div>
         <div class="full-width flex-grow flex-container-col">
             <div class="full-width flex-container-row align-center padded">
                 <context-help *ngIf="(_state === this.STATE_NEW || _state === this.STATE_EDIT) && experiment?.isExternal !== 'Y'"
