@@ -199,7 +199,7 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
             unitPriceExternalCommercial:'0.00',
             codeIsolationPrepType:'',
             idPrice:'',
-            isolationPrepType:'enter prep type here...',
+            isolationPrepType:'',
             type:'DNA',
             codeRequestCategory: this.expPlatfromNode.codeRequestCategory
         };

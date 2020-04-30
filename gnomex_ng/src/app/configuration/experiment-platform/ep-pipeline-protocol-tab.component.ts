@@ -39,10 +39,13 @@ import {DictionaryService} from "../../services/dictionary.service";
                 </ag-grid-angular>
 
             </div>
-            <div style="flex:5" class="full-width flex-container-col">
-                <mat-form-field  class="medium-form-input">
-                    <input matInput (change)="updateGridForProtocol($event)"  [(ngModel)]="protocol" [disabled]="this.disableControl" placeholder="Protocol" >
-                </mat-form-field>
+            <div style="flex:5; margin-top: 1em;" class="full-width flex-container-col">
+                <div>
+                    <mat-form-field  class="medium-form-input">
+                        <input id="protocolInput" matInput (change)="updateGridForProtocol($event)" [(ngModel)]="protocol" [disabled]="this.disableControl" placeholder="Protocol" maxlength="50">
+                    </mat-form-field>
+                    <label class="label"> (Maximum of 50 characters)</label>
+                </div>
                 <mat-form-field >
                     <textarea matInput (change)="updateGridForDescription($event)"
                               placeholder="Description"
@@ -60,7 +63,7 @@ import {DictionaryService} from "../../services/dictionary.service";
     `,
     styles:[`
         mat-form-field.medium-form-input{
-            width: 30em;
+            width: 40em;
         }
     `]
 })
@@ -178,13 +181,16 @@ export class EpPipelineProtocolTabComponent implements OnInit, OnDestroy{
     }
     addProtocol(){
         let rowObj ={
-            protocol:'new protocol...', description:'',
+            protocol:'', description:'',
             idCoreFacility:this.expPlatfromNode.idCoreFacility,
             isNew:'Y', isDefault:'N'
         };
         this.pipelineRowData.splice(0,0,rowObj);
         this.gridApi.setRowData(this.pipelineRowData);
         this.formGroup.markAsDirty();
+        let rowIndex = this.pipelineRowData.indexOf(rowObj);
+        this.gridApi.getRowNode("" + rowIndex).setSelected(true);
+        document.getElementById("protocolInput").focus();
     }
     removeProtocol(){
         this.dialogService.confirm("Are you sure you want to remove pipeline protocol "

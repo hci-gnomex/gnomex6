@@ -12,6 +12,10 @@ import {first, take} from "rxjs/operators";
 import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "./interfaces/gnomex-error.response.model";
+import {SelectRenderer} from "./grid-renderers/select.renderer";
+import {SelectEditor} from "./grid-editors/select.editor";
+import {TextAlignLeftMiddleRenderer} from "./grid-renderers/text-align-left-middle.renderer";
+import {TextAlignLeftMiddleEditor} from "./grid-editors/text-align-left-middle.editor";
 
 @Component({
     selector: 'configure-annotations',
@@ -55,7 +59,6 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
     public canUpdateSelectedProperty: boolean = false;
     public appUserList: any[] = [];
     public selectedTabIndex: number = 0;
-    public showSpinner: boolean = false;
 
     public annotGridColumnDefs: any[];
     public annotGridRowData: any[];
@@ -104,6 +107,22 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
     public mageOntologyDefFC: FormControl;
     public canAccessAnyObject: boolean = false;
     public gridSplitSize: number = 28;
+    private optionsYN = [
+        {value: "", display: ""},
+        {value: "Y", display: "Y"},
+        {value: "N", display: "N"},
+    ];
+
+    public get gridsValid(): boolean {
+        if(this.propertyTypeFC.value === this.TYPE_OPTION || this.propertyTypeFC.value === this.TYPE_MULTI_OPTION) {
+            if(this.optionGridApi.getDisplayedRowCount() > 0) {
+                return this.optionGridApi.formGroup ? this.optionGridApi.formGroup.valid : false;
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
 
 
     constructor(private dictionaryService: DictionaryService,
@@ -135,9 +154,20 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
         };
 
         this.optionGridColumnDefs = [
-            {headerName: "Option", field: "option", width: 30, editable: this.determineEditable},
-            {headerName: "Order", field: "sortOrder", width: 10, editable: this.determineEditable},
-            {headerName: "Active", field: "isActive", width: 10, editable: this.determineEditable, valueParser: this.activeValueParser},
+            {headerName: "Option", field: "option", width: 30, editable: this.determineEditable,
+                cellRendererFramework: TextAlignLeftMiddleRenderer, cellEditorFramework: TextAlignLeftMiddleEditor,
+                validators: [Validators.maxLength(this.constantsService.MAX_LENGTH_200)],
+                errorNameErrorMessageMap: [{errorName: "maxlength", errorMessage: "Maximum of 200 characters"}]},
+            {headerName: "Order", field: "sortOrder", width: 10, editable: this.determineEditable,
+                cellRendererFramework: TextAlignLeftMiddleRenderer, cellEditorFramework: TextAlignLeftMiddleEditor,
+                validators: [Validators.pattern(/^\d{0,2}$/)],
+                errorNameErrorMessageMap: [{errorName: "pattern", errorMessage: "Requires a number of 0-99"}]},
+            {headerName: "Active", field: "isActive", width: 10, editable: this.determineEditable,
+                cellRendererFramework: SelectRenderer, cellEditorFramework: SelectEditor,
+                selectOptions: this.optionsYN,
+                selectOptionsDisplayField: "display",
+                selectOptionsValueField: "value",
+            },
         ];
         this.platformGridColumnDefs = [
             {headerName: "Platform", field: "display", width: 10},
@@ -207,7 +237,7 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
         });
 
         this.formGroup.markAsPristine();
-        this.primaryDisable = (action) => this.formGroup.invalid || !this.selectedProperty || !this.formGroup.dirty;
+        this.primaryDisable = (action) => this.formGroup.invalid || !this.selectedProperty || !this.formGroup.dirty || !this.gridsValid;
         this.dirty = () => this.formGroup.dirty;
         this.canAccessAnyObject = this.createSecurityAdvisorService.hasPermission(CreateSecurityAdvisorService.CAN_ACCESS_ANY_OBJECT);
     }
@@ -314,13 +344,16 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
     public addOption(): void {
         let opt: any = {};
         opt.idPropertyOption = "PropertyOption" + this.currentOptions.length;
-        opt.option = "enter option here...";
+        opt.option = "";
         opt.isActive = "Y";
         opt.sortOrder = (this.currentOptions.length + 1).toString();
         opt.canUpdate = "Y";
         this.currentOptions.push(opt);
         this.optionGridApi.setRowData(this.currentOptions);
         this.formGroup.markAsDirty();
+        let rowIndex = this.currentOptions.indexOf(opt);
+        this.optionGridApi.getRowNode("" + rowIndex).setSelected(true);
+        this.optionGridApi.setFocusedCell(rowIndex, "option");
     }
 
     public deleteOption(): void {
@@ -602,7 +635,7 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
             }
         }
 
-        this.showSpinner = true;
+        this.dialogsService.startDefaultSpinnerDialog();
         let params: HttpParams = new HttpParams()
             .set("idProperty", this.selectedProperty.idProperty)
             .set("name", this.nameFC.value)
@@ -641,9 +674,9 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
                 let message: string = response && response.message ? " " + response.message : "";
                 this.dialogsService.error("An error occurred while saving the annotation." + message);
             }
-            this.showSpinner = false;
+            this.dialogsService.stopAllSpinnerDialogs();
         }, (err: IGnomexErrorResponse) => {
-            this.showSpinner = false;
+            this.dialogsService.stopAllSpinnerDialogs();
         });
     }
 

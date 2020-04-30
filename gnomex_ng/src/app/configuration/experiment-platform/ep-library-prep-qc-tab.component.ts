@@ -1,7 +1,7 @@
 
 //assets/page_add.png
 import {Component, OnDestroy, OnInit} from "@angular/core";
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ConstantsService} from "../../services/constants.service";
@@ -62,6 +62,11 @@ export class EpLibraryPrepQCTabComponent implements OnInit, OnDestroy{
             headerName: "Lib Prep QC Protocol",
             field: "protocolDisplay",
             editable: true,
+            validators: [Validators.required, Validators.maxLength(this.constService.MAX_LENGTH_50)],
+            errorNameErrorMessageMap: [
+                {errorName: "required", errorMessage: "Field is required"},
+                {errorName: "maxlength", errorMessage: "Maximum of " + this.constService.MAX_LENGTH_50 + " characters"}
+                ],
             width: 100
         }
     ];
@@ -110,14 +115,17 @@ export class EpLibraryPrepQCTabComponent implements OnInit, OnDestroy{
     }
 
     addLibPrepQC(){
-        this.rowData.splice(0,0,
-            {
-                protocolDisplay:'Enter Lib Prep QC Protocol here...',
-                codeRequestCategory: this.expPlatformNode.codeRequestCategory,
-                isNew: 'Y',
-            });
+        let newLibPrepQC = {
+            protocolDisplay:'',
+            codeRequestCategory: this.expPlatformNode.codeRequestCategory,
+            isNew: 'Y',
+        };
+        this.rowData.splice(0, 0, newLibPrepQC);
         this.gridApi.setRowData(this.rowData);
         this.formGroup.markAsDirty();
+        let rowIndex = this.rowData.indexOf(newLibPrepQC);
+        this.gridApi.getRowNode("" + rowIndex).setSelected(true);
+        this.gridApi.setFocusedCell(rowIndex, "protocolDisplay");
 
     }
     removeLibPrepQC(){
@@ -134,7 +142,7 @@ export class EpLibraryPrepQCTabComponent implements OnInit, OnDestroy{
                         this.selectedRow = null;
                     }
                 }
-            })
+            });
 
     }
 

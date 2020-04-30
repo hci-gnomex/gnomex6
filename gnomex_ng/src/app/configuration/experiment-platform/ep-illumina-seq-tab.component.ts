@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from "@angular/core";
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {Subscription} from "rxjs";
 import {CellValueChangedEvent, GridApi} from "ag-grid-community";
@@ -137,13 +137,16 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
         {
             headerName: "Sort Order",
             field: "sortOrder",
-            valueParser: this.parseSortOrder,
+            validators: [Validators.min(0), Validators.max(99), Validators.pattern(/^\d{0,2}$/)],
+            errorNameErrorMessageMap: [{errorName: "numberRange", errorMessage: "Requires a number of 0-99"}],
             editable:true,
             width: 100
         },
         {
             headerName: "Name",
             field: "name",
+            validators: [Validators.maxLength(this.constService.MAX_LENGTH_100)],
+            errorNameErrorMessageMap: [{errorName: "maxlength", errorMessage: "Maximum of " + this.constService.MAX_LENGTH_100 + " characters"}],
             editable:true,
             width: 250
         }
