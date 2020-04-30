@@ -47,7 +47,7 @@ export class IlluminaSeqDialogComponent extends BaseGenericContainerDialog imple
     ngOnInit(){
 
         this.formGroup =  this.fb.group({
-            name: this.rowData.name,
+            name: [this.rowData.name, Validators.maxLength(this.constService.MAX_LENGTH_100)],
             isActive: this.rowData.isActive === 'Y',
             sortOrder: [this.rowData.sortOrder,numberRange(0,99)],
             idNumberSequencingCycles: [this.rowData.idNumberSequencingCycles, Validators.required],

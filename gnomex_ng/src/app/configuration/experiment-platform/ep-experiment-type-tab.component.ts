@@ -291,7 +291,7 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
         let newLibPrep = {
             isSelected: "Y",
             codeApplication: "Application" + this.newAppNumber,
-            display:'enter experiment type here...',
+            display:'',
             idSeqLibProtocols:'',
             idLabelingProtocolDefault:'',
             idHybProtocolDefault:'',

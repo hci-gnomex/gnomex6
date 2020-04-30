@@ -71,7 +71,7 @@ export class LibraryPrepDialogComponent extends BaseGenericContainerDialog imple
         this.uncomittedRowData = _.cloneDeep(this.rowData);
 
         this.formGroup = this.fb.group({
-            application: [this.uncomittedRowData.application ? this.uncomittedRowData.application : '' , Validators.required] ,
+            application: [this.uncomittedRowData.application ? this.uncomittedRowData.application : '' , [Validators.required, Validators.maxLength(this.constService.MAX_LENGTH_100)]] ,
             sortOrder: [this.uncomittedRowData.sortOrder ? this.uncomittedRowData.sortOrder : '', numberRange(0,99)],
             idApplicationTheme: this.uncomittedRowData.idApplicationTheme ? this.uncomittedRowData.idApplicationTheme : '',
             idBarcodeSchemeA: this.uncomittedRowData.idBarcodeSchemeA ? this.uncomittedRowData.idBarcodeSchemeA  : '',
@@ -165,7 +165,7 @@ export class LibraryPrepDialogComponent extends BaseGenericContainerDialog imple
             applyStepsFn: this.applySteps,
             rowData: this.uncomittedRowData
         };
-        config.width = '65em';
+        config.width = '65.5em';
 
         this.dialogService.genericDialogContainer(LibraryPrepStepsDialogComponent, "Lib Prep Steps", null, config,
             {actions: [

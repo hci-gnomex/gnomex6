@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from "@angular/core";
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ConstantsService} from "../../services/constants.service";
 import {GridApi} from "ag-grid-community";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
@@ -12,6 +12,8 @@ import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {Subscription} from "rxjs";
 import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";
 
 //assets/page_add.png
 
@@ -56,9 +58,6 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                 </ag-grid-angular>
 
             </div>
-            
-
-
         </div>
     `,
     styles:[`
@@ -161,6 +160,13 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
             headerName: "Sample Type",
             field: "display",
             editable: true,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            validators: [Validators.required, Validators.maxLength(50)],
+            errorNameErrorMessageMap: [
+                {errorName: "required", errorMessage: "Sample Type required"},
+                {errorName: "maxlength", errorMessage: "Maximum of 50 characters"}
+            ],
             width: 300
         },
         {
@@ -254,10 +260,10 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
             let newSampleType = {
                 isSelected:'Y',
                 idSampleType:'SampleType',
-                display:'enter sample type here...',
+                display:'',
                 isActive: 'Y',
                 codeNucleotideType: 'DNA',
-                sortOrder: '99',
+                sortOrder: '0',
                 notes:'',
                 idCoreFacility: this.expPlatformNode.idCoreFacility
             };
@@ -292,7 +298,7 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
         };
         config.width = "60em";
 
-        this.dialogsService.genericDialogContainer(SampleTypeDetailDialogComponent, null, null, config,
+        this.dialogsService.genericDialogContainer(SampleTypeDetailDialogComponent, "Edit Sample Type Notes", null, config,
             {actions: [
                     {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Apply", internalAction: "applyChanges"},
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}

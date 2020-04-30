@@ -20,8 +20,12 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
                     <div class="flex-container-row spaced-children-margin" style="align-items:center;">
                         <mat-form-field  class="medium-form-input">
                             <input matInput placeholder="Name" formControlName="name">
-                            <mat-error *ngIf="this.formGroup?.controls['name']?.hasError('required')">
-                                This field is required
+                            <mat-error *ngIf="this.formGroup.get('name').hasError('required')">
+                                Name is required
+                            </mat-error>
+                            <mat-error *ngIf="this.formGroup.get('name').hasError('maxlength')">
+                                Name can be at maximum of {{this.constService.MAX_LENGTH_200}} characters.
+                                Character count: {{this.formGroup.get('name').value.toString().length}}
                             </mat-error>
                         </mat-form-field>
                         <mat-checkbox  formControlName="isActive">
@@ -31,6 +35,10 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
                     <div matTooltip="If the site you want to reach is https please include in url" class="flex-container-row spaced-children-margin" style="align-items:center;">
                         <mat-form-field  class="medium-form-input">
                             <input matInput placeholder="URL" formControlName="url">
+                            <mat-error *ngIf="this.formGroup.get('url')?.hasError('maxlength')">
+                                URL can be at maximum of {{this.constService.MAX_LENGTH_500}} characters.
+                                Character count: {{this.formGroup.get('url').value.toString().length}}
+                            </mat-error>
                         </mat-form-field>
                         <button mat-button class="link-button minimize" [disabled]="!formGroup.get('url').value" (click)="navToURL()" >
                             <img [src]="this.constService.PAGE_GO">
@@ -43,9 +51,17 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
                     <div class="flex-container-row spaced-children-margin">
                         <mat-form-field  class="medium-form-input">
                             <input matInput placeholder="Read 1 Adapter Sequence" formControlName="adapterSequenceThreePrime">
+                            <mat-error *ngIf="this.formGroup.get('adapterSequenceThreePrime')?.hasError('maxlength')">
+                                Read 1 Adapter Sequence can be at maximum of {{this.constService.MAX_LENGTH_500}} characters.
+                                Character count: {{this.formGroup.get('adapterSequenceThreePrime').value.toString().length}}
+                            </mat-error>
                         </mat-form-field>
                         <mat-form-field  class="medium-form-input">
                             <input matInput placeholder="Read 2 Adapter Sequence" formControlName="adapterSequenceFivePrime">
+                            <mat-error *ngIf="this.formGroup.get('adapterSequenceFivePrime')?.hasError('maxlength')">
+                                Read 2 Adapter Sequence can be at maximum of {{this.constService.MAX_LENGTH_500}} characters.
+                                Character count: {{this.formGroup.get('adapterSequenceFivePrime').value.toString().length}}
+                            </mat-error>
                         </mat-form-field>
                     </div>
                 </div>
@@ -63,7 +79,7 @@ export class LibraryPrepProtocolDialogComponent extends BaseGenericContainerDial
     saveProtocolFn:any;
     protocolParams:any;
     protocol:any;
-    formGroup:FormGroup;
+    public formGroup:FormGroup;
 
     constructor(private dialogRef: MatDialogRef<LibraryPrepProtocolDialogComponent>,
                 public constService:ConstantsService, private fb: FormBuilder,
@@ -82,12 +98,12 @@ export class LibraryPrepProtocolDialogComponent extends BaseGenericContainerDial
     ngOnInit(){
         this.formGroup = this.fb.group({
                 idProtocol:'',
-                name: ['',Validators.required],
+                name: ['', [Validators.required, Validators.maxLength(this.constService.MAX_LENGTH_200)]],
                 isActive: true,
-                url:'',
-                description:'',
-                adapterSequenceThreePrime:'',
-                adapterSequenceFivePrime:''
+                url: ['', [Validators.maxLength(this.constService.MAX_LENGTH_500)]],
+                description: '',
+                adapterSequenceThreePrime: ['', [Validators.maxLength(this.constService.MAX_LENGTH_500)]],
+                adapterSequenceFivePrime: ['', [Validators.maxLength(this.constService.MAX_LENGTH_500)]]
 
             }
         );
@@ -110,7 +126,7 @@ export class LibraryPrepProtocolDialogComponent extends BaseGenericContainerDial
                 });
         }
 
-        this.primaryDisable = (action) => {return this.formGroup.invalid; };
+        this.primaryDisable = (action) => {return this.formGroup.invalid || !this.formGroup.dirty; };
         this.dirty = () => {return this.formGroup.dirty; };
 
     }
@@ -126,6 +142,7 @@ export class LibraryPrepProtocolDialogComponent extends BaseGenericContainerDial
     }
     navToURL(){
         let url: string = this.formGroup.get('url').value;
+        //TODO: need to add url pattern check
         if (!url.match(/^https?:\/\//i)) {
             url = 'http://' + url;
         }
