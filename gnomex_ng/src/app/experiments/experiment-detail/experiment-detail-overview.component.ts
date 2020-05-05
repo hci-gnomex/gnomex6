@@ -232,6 +232,10 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
         }
 
         this.experimentService.addExperimentOverviewFormMember(this.visibilityDetailTab.form, "VisibilityDetailTabComponent");
+
+        setTimeout(() => {
+            this.dialogsService.stopAllSpinnerDialogs();
+        });
     }
 
     ngOnDestroy() {

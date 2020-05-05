@@ -560,6 +560,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             navExtras.relativeTo = this.route;
             navExtras.queryParamsHandling = 'merge';
 
+            this.dialogsService.startDefaultSpinnerDialog();
             this.router.navigate(navArray,navExtras);
         }else{
             this.navService.emitResetNavModeSubject("detail");
