@@ -1,6 +1,7 @@
 import {Component} from "@angular/core";
 import {SelectEditor} from "./select.editor";
 import {DictionaryService} from "../../services/dictionary.service";
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
     templateUrl: "./select.editor.html",
@@ -23,8 +24,8 @@ import {DictionaryService} from "../../services/dictionary.service";
 }) export class SeqlaneSelectEditor extends SelectEditor {
     selectedRequestCategory: string;
 
-    constructor(public dictionaryService: DictionaryService) {
-        super();
+    constructor(public dictionaryService: DictionaryService, protected dialog: MatDialog) {
+        super(dialog);
     }
 
     agInit(params: any): void {
