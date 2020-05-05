@@ -138,6 +138,9 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
     }
     ngAfterViewInit(): void {
         this.analysisService.addAnalysisOverviewFormMember(this.annotTab.form, "AnnotationTabComponent");
+        setTimeout(() => {
+            this.dialogsService.stopAllSpinnerDialogs();
+        });
     }
 
 

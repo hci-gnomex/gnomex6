@@ -12,6 +12,7 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
 import {HttpParams} from "@angular/common/http";
 import {map} from "rxjs/operators";
 import {NavigationService} from "../../services/navigation.service";
+import {DialogsService} from "../../util/popup/dialogs.service";
 
 
 @Component({
@@ -80,7 +81,7 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
 
     constructor(private appConstants: ConstantsService, private route: ActivatedRoute,
                 public experimentsService: ExperimentsService,
-                public dictionary: DictionaryService,
+                public dictionary: DictionaryService, private dialogsService: DialogsService,
                 public createSecurityAdvisorService: CreateSecurityAdvisorService,
                 public prefService: UserPreferencesService,
                 public navService:NavigationService) {
@@ -134,7 +135,12 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
                 if(data && !data.idRequest) {
                     this.nodeTitle = data.label;
                 }
+
+                setTimeout(() => {
+                    this.dialogsService.stopAllSpinnerDialogs();
+                });
             });
+
     }
 
 

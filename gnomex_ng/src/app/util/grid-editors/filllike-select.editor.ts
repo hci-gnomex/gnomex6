@@ -1,6 +1,7 @@
 import {Component} from "@angular/core";
 import {SelectEditor} from "./select.editor";
 import {DictionaryService} from "../../services/dictionary.service";
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
     templateUrl: "./select.editor.html",
@@ -26,8 +27,8 @@ import {DictionaryService} from "../../services/dictionary.service";
     gridValueField: string;
 
 
-    constructor(public dictionaryService: DictionaryService) {
-        super();
+    constructor(protected dialog: MatDialog, public dictionaryService: DictionaryService) {
+        super(dialog);
     }
 
     agInit(params: any): void {

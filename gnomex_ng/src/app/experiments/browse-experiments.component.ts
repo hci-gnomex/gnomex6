@@ -672,6 +672,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
             navExtras.relativeTo = this.route;
             navExtras.queryParamsHandling = 'merge';
+            this.dialogsService.startDefaultSpinnerDialog();
             this.router.navigate(navArray,navExtras);
 
         }else{
