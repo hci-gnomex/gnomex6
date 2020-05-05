@@ -7,6 +7,7 @@ import {Subscription} from "rxjs";
 import {AnalysisService} from "../../services/analysis.service";
 import {MatTabChangeEvent, MatTabGroup} from "@angular/material";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
+import {DialogsService} from "../../util/popup/dialogs.service";
 
 
 @Component({
@@ -93,7 +94,7 @@ export class AnalysisOverviewComponent implements OnInit, OnDestroy {
 
     constructor(private appConstants: ConstantsService, private route: ActivatedRoute,
                 public analysisService: AnalysisService, private router: Router,
-                public dictionary: DictionaryService,
+                public dictionary: DictionaryService, private dialogsService: DialogsService,
                 public createSecurityAdvisorService: CreateSecurityAdvisorService) {
     }
 
@@ -135,7 +136,12 @@ export class AnalysisOverviewComponent implements OnInit, OnDestroy {
                 if(data && !data.idAnalysis) {
                     this.nodeTitle = data.label;
                 }
+
+                setTimeout(() => {
+                    this.dialogsService.stopAllSpinnerDialogs();
+                });
             });
+
     }
 
 
