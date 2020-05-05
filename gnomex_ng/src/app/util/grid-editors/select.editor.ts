@@ -1,5 +1,7 @@
 import {Component, OnDestroy} from "@angular/core";
 import {ICellEditorAngularComp} from "ag-grid-angular";
+import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material/dialog";
+import {SpinnerDialogComponent} from "../popup/spinner-dialog.component";
 
 @Component({
     templateUrl: "./select.editor.html",
@@ -63,6 +65,11 @@ export class SelectEditor implements ICellEditorAngularComp, OnDestroy {
                                             // to the corresponding cells in rows of the same group.
     public fillAll: boolean;                // If fillAll is set, all data will automatically be grouped together
 
+    private _spinnerDialogIsOpen: boolean = false;
+    private spinnerDialogRefs: MatDialogRef<SpinnerDialogComponent>[] = [];
+
+    constructor(protected dialog: MatDialog) {
+    }
 
     agInit(params: any): void {
         this.params = params;
@@ -164,6 +171,7 @@ export class SelectEditor implements ICellEditorAngularComp, OnDestroy {
         if (this.params && this.params.column && this.params.column.gridApi && this.params.node && (this.fillAll || (this.fillGroupAttribute && this.fillGroupAttribute !== ''))) {
             let thisRowNode = this.params.node;
 
+            this.startSpinnerDialog();
             this.params.column.gridApi.forEachNode((rowNode) => {
                 if (rowNode && rowNode.data && thisRowNode && thisRowNode.data && (this.fillAll || rowNode.data[this.fillGroupAttribute] === thisRowNode.data[this.fillGroupAttribute])) {
                     let spoofedEvent: any = {
@@ -190,6 +198,41 @@ export class SelectEditor implements ICellEditorAngularComp, OnDestroy {
             });
 
             this.params.column.gridApi.refreshCells();
+            setTimeout(() => {
+                this.stopSpinnerDialogs();
+            });
         }
+    }
+
+    startSpinnerDialog(): MatDialogRef<SpinnerDialogComponent> {
+        if (this._spinnerDialogIsOpen) {
+            return null;
+        }
+
+        this._spinnerDialogIsOpen = true;
+
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.data = {
+            message: "Please wait...",
+            strokeWidth: 3,
+            diameter: 30
+        };
+        configuration.width = "13em";
+        configuration.disableClose = true;
+
+        let dialogRef: MatDialogRef<SpinnerDialogComponent> = this.dialog.open(SpinnerDialogComponent, configuration);
+        dialogRef.afterClosed().subscribe(() => { this._spinnerDialogIsOpen = false; });
+        this.spinnerDialogRefs.push(dialogRef);
+
+        return dialogRef;
+    }
+
+    stopSpinnerDialogs(): void {
+        for (let dialogRef of this.spinnerDialogRefs) {
+            setTimeout(() => {
+                dialogRef.close();
+            });
+        }
+        this.spinnerDialogRefs = [];
     }
 }

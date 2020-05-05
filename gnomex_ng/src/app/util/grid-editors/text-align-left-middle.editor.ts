@@ -1,5 +1,7 @@
 import {Component, ElementRef, ViewChild} from "@angular/core";
 import {ICellEditorAngularComp} from "ag-grid-angular";
+import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material/dialog";
+import {SpinnerDialogComponent} from "../popup/spinner-dialog.component";
 
 @Component({
     template: `
@@ -54,6 +56,10 @@ export class TextAlignLeftMiddleEditor implements ICellEditorAngularComp {
                                     // When clicked, the fill button will copy the data in that cell
                                     // to the corresponding cells in rows of the same group.
 
+    private _spinnerDialogIsOpen: boolean = false;
+    private spinnerDialogRefs: MatDialogRef<SpinnerDialogComponent>[] = [];
+    constructor(private dialog: MatDialog) { }
+
     agInit(params: any): void {
         this.params = params;
 
@@ -88,6 +94,7 @@ export class TextAlignLeftMiddleEditor implements ICellEditorAngularComp {
 
         if (this.params && this.params.column && this.params.column.gridApi && this.params.node && this.fillGroupAttribute && this.fillGroupAttribute !== '') {
             let thisRowNode = this.params.node;
+            this.startSpinnerDialog();
 
             this.params.column.gridApi.forEachNode((rowNode, index) => {
                 if (rowNode && rowNode.data && thisRowNode && thisRowNode.data
@@ -98,6 +105,41 @@ export class TextAlignLeftMiddleEditor implements ICellEditorAngularComp {
             });
 
             this.params.column.gridApi.refreshCells();
+            setTimeout(() => {
+                this.stopSpinnerDialogs();
+            });
         }
+    }
+
+    startSpinnerDialog(): MatDialogRef<SpinnerDialogComponent> {
+        if (this._spinnerDialogIsOpen) {
+            return null;
+        }
+
+        this._spinnerDialogIsOpen = true;
+
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.data = {
+            message: "Please wait...",
+            strokeWidth: 3,
+            diameter: 30
+        };
+        configuration.width = "13em";
+        configuration.disableClose = true;
+
+        let dialogRef: MatDialogRef<SpinnerDialogComponent> = this.dialog.open(SpinnerDialogComponent, configuration);
+        dialogRef.afterClosed().subscribe(() => { this._spinnerDialogIsOpen = false; });
+        this.spinnerDialogRefs.push(dialogRef);
+
+        return dialogRef;
+    }
+
+    stopSpinnerDialogs(): void {
+        for (let dialogRef of this.spinnerDialogRefs) {
+            setTimeout(() => {
+                dialogRef.close();
+            });
+        }
+        this.spinnerDialogRefs = [];
     }
 }
