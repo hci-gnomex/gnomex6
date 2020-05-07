@@ -104,8 +104,8 @@ import {CellRendererValidation} from "../util/grid-renderers/cell-renderer-valid
                                      [stopEditingWhenGridLosesFocus]="true"
                                      (cellValueChanged)="onCellValueChanged($event)"
                                      (cellFocused)="onCellFocused($event)"
-                                     (cellDoubleClicked)="onDellDoubleClicked($event)"
-                                     (cellClicked)="onDellClicked($event)"
+                                     (cellDoubleClicked)="onCellDoubleClicked($event)"
+                                     (cellClicked)="onCellClicked($event)"
                                      [singleClickEdit]="isEditMode ? true : false"
                                      [enableSorting]="true"
                                      [enableColResize]="true">
@@ -363,13 +363,13 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         }
     }
 
-    public onDellClicked(event: any): void {
+    public onCellClicked(event: any): void {
         if(!this.isEditMode) {
             return;
         }
     }
 
-    public onDellDoubleClicked(event: any): void {
+    public onCellDoubleClicked(event: any): void {
         if(!this.isEditMode) {
             let node: ITreeNode;
             node = this.findNodeByIdAndClassName(this.selectedDictionary.className, event.data.datakey);
