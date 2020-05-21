@@ -630,6 +630,7 @@ export class Experiment {
     public files:                   any[] = [];
     public collaborators:           any[] = [];
     public workItems:               any[] = [];
+    public workflowStatus:          any[] = [];
     public billingItems:            any[] = [];
     public SeqLibTreatmentEntries:  any[] = [];
     public protocols:               any[] = [];
@@ -962,6 +963,7 @@ export class Experiment {
         experiment.cloneProperty("files", value);
         experiment.cloneProperty("collaborators", value);
         experiment.cloneProperty("workItems", value);
+        experiment.cloneProperty("workflowStatus", value);
         experiment.cloneProperty("billingItems", value);
         experiment.cloneProperty("SeqLibTreatmentEntries", value);
         experiment.cloneProperty("protocols", value);
@@ -1271,6 +1273,7 @@ export class Experiment {
             seqLibTreatments:         this.seqLibTreatments,
             sequenceLanes:            this.sequenceLanes,
             workItems:                this.workItems,
+            workflowStatus:           this.workflowStatus,
             topics:                   this.topics,
         };
 
