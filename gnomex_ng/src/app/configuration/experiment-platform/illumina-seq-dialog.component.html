@@ -4,6 +4,10 @@
         <div class="flex-container-row">
             <mat-form-field class="full-width">
                 <input matInput placeholder="Name" formControlName="name">
+                <mat-error *ngIf="this.formGroup?.controls['name'].hasError('maxlength')">
+                    Maximum of {{this.constService.MAX_LENGTH_100}} characters.
+                    Character count: {{this.formGroup?.controls['name'].value.toString().length}}
+                </mat-error>
             </mat-form-field>
             <div style="align-items: center;margin-left:1em;" class="flex-container-row flex-grow">
                 <mat-checkbox  formControlName="isActive" > Active </mat-checkbox>
@@ -13,7 +17,7 @@
                           [options]="this.runOptions" valueField="value" displayField="display"
                           [formControlName]="'isCustom'">
         </custom-combo-box>
-        <context-help *ngIf="!this.canEnterPrice || this.secAdvisor.isSuperAdmin"
+        <context-help *ngIf="!this.canEnterPrices || this.secAdvisor.isSuperAdmin"
                       name="ExperimentPlatformPricingHelp"
                       [hasEditPermission]="this.secAdvisor.isSuperAdmin"
                       label="Why can't I edit prices?" popupTitle="Pricing Help"
@@ -38,7 +42,7 @@
                 </mat-error>
             </mat-form-field>
         </div>
-        <mat-form-field class="short-input">
+        <mat-form-field class="short-input" style="margin-right: 1em" >
             <input matInput placeholder="Sort Order" formControlName="sortOrder">
             <mat-error  *ngIf="this.formGroup?.controls['sortOrder']?.hasError('numberRange')">
                 {{this.formGroup.get('sortOrder').errors.numberRange }}

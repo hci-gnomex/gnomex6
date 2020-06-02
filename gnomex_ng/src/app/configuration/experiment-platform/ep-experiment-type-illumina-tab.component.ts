@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from "@angular/core";
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {Subscription} from "rxjs";
 import {CellValueChangedEvent, GridApi} from "ag-grid-community";
@@ -13,6 +13,8 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {LibraryPrepDialogComponent} from "./library-prep-dialog.component";
 import {GnomexService} from "../../services/gnomex.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";
 
 //assets/page_add.png
 
@@ -141,6 +143,13 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
         {
             headerName: "Sequencing Experiment Type",
             field: "display",
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            validators: [Validators.required, Validators.maxLength(100)],
+            errorNameErrorMessageMap: [
+                {errorName: "required", errorMessage: "Sample Type required"},
+                {errorName: "maxlength", errorMessage: "Maximum of 100 characters"}
+            ],
             editable:true,
             width: 300
         }
@@ -265,7 +274,7 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
                 this.gridApi.setRowData(this.rowData);
             }
             if(event.column.getColId() === "display"){
-                this.selectedApp[0].application = this.selectedApp[0].display
+                this.selectedApp[0].application = this.selectedApp[0].display;
             }
         }
 
@@ -342,7 +351,7 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
         let newApp = {
             isSelected: "Y",
             codeApplication: 'Application'+ this.nextAppNumb,
-            display:'enter experiment type here...',
+            display:'',
             idSeqLibProtocols:'',
             idLabelingProtocolDefault:'',
             idHybProtocolDefault:'',

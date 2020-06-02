@@ -185,7 +185,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
     private isLoggedInSubscription: Subscription;
 
     public get showHeader(): boolean {
-        return this.gnomexService.isLoggedIn && !this.authenticationService.hasLoggedOut;
+        return this.gnomexService.isLoggedIn;
     }
 
     ngOnInit() {

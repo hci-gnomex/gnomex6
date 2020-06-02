@@ -45,7 +45,6 @@
                         </div>
                         <save-footer *ngIf="!removeSave && selectedPlatformList.length > 0" style="width: 100%"
                                      [disableSave]="this.expPlatformService.expPlatformOverviewForm.invalid"
-                                     [showSpinner]="showSpinner"
                                      (saveClicked)="save()"
                                      [dirty]="this.expPlatformService.expPlatformOverviewForm.dirty">
                         </save-footer>

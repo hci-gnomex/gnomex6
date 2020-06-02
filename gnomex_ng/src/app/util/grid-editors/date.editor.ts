@@ -5,6 +5,7 @@ import { MatDatepicker } from "@angular/material";
 
 import {DateRenderer} from "../grid-renderers/date.renderer";
 import { DateParserComponent } from "../parsers/date-parser.component";
+import {DialogsService} from "../popup/dialogs.service";
 
 @Component({
 	template: `
@@ -33,24 +34,24 @@ import { DateParserComponent } from "../parsers/date-parser.component";
         </div>
 	`,
 	styles: [`
-		.t  { display: table;      }  
-		.tr { display: table-row;  }  
+		.t  { display: table;      }
+		.tr { display: table-row;  }
 		.td { display: table-cell; }
-			
-		.full-width  { width:  100%; }  
+		
+		.full-width  { width:  100%; }
 		.full-height { height: 100%; }
-			
+		
 		.vertical-center { vertical-align: middle; }
-			
-		.invisible { 
+		
+		.invisible {
 			visibility: hidden;
 			width: 0;
 			height: 0;
 		}
-			
+		
 		.right-align { text-align: right; }
         
-        .flex-row-container { 
+        .flex-row-container {
             display: flex;
             flex-direction: row;
         }
@@ -89,6 +90,8 @@ export class DateEditor implements AfterViewInit, ICellEditorAngularComp {
 		this.display = DateEditor.getDisplayStringFromDate(this._date);
 		this.value = this.dateParser_displayToValue.parseDateString(this.display);
 	}
+
+	constructor(private dialog: DialogsService) {}
 
 	agInit(params: any): void {
 		this.params = params;
@@ -169,6 +172,7 @@ export class DateEditor implements AfterViewInit, ICellEditorAngularComp {
 
         if (this.params && this.params.column && this.params.column.gridApi && this.params.node && this.fillGroupAttribute && this.fillGroupAttribute !== '') {
             let thisRowNode = this.params.node;
+            this.dialog.startDefaultSpinnerDialog();
 
             this.params.column.gridApi.forEachNode((rowNode, index) => {
                 if (rowNode && rowNode.data && thisRowNode && thisRowNode.data
@@ -178,6 +182,9 @@ export class DateEditor implements AfterViewInit, ICellEditorAngularComp {
             });
 
             this.params.column.gridApi.refreshCells();
+            setTimeout(() => {
+            	this.dialog.stopAllSpinnerDialogs();
+			});
         }
     }
 }

@@ -44,15 +44,7 @@ import {NewExperimentService} from "../../services/new-experiment.service";
             width: 2px;
             background-color: lightgrey;
         }
-        
-        .allow-line-breaks {
-            white-space: pre-line;
-        }
-        .sample-instructions {
-            background-color: lightyellow;
-            min-width:  45%;
-            max-width: 100%;
-        }
+
         /*For achieving wrap around column header*/
         ::ng-deep .ag-header-cell-text {
             text-overflow: clip !important;
@@ -330,12 +322,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
         return false;
     }
 
-    public get showIlluminaInstructions(): boolean {
-        return this.usingMultiplexGroupGroups
-            && !this.hideMultiplexGroupColumn
-            && (this._state === this.STATE_NEW || this._state === this.STATE_EDIT);
-    }
-
     public get requestCategoryType(): string {
         if(this._experiment
             && this._experiment.requestCategory
@@ -487,23 +473,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
     private onChange_codeRequestCategorySubscription: Subscription;
 
     public static readonly ANNOTATION_ATTRIBUTE_NAME_PREFIX :string = "ANNOT";
-
-    public readonly BASIC_INSTRUCTIONS: string = ''
-        + '1.  Assign a multiplex group number for each sample in the table below. Samples that are to be sequenced in the same lane should be assigned the same multiplex group number.\n'
-        + '2.  Provide a name for each sample.\n'
-        + '3.  Provide the concentration for each sample if available.\n'
-        + '4.  Type the volume (ul) that will be provided for each sample.\n'
-        + '5.  Specify the number of sequence lanes required for each multiplex group.\n'
-        + '6.  Optional: Annotate the samples using the characteristics that you selected from the Annotations tab.\n'
-        + '7.  Optional: Edit other fields as appropriate.';
-
-    public readonly TOOLTIP_TEXT: string = ''
-        + 'Instructions\n'
-        + '1. Mandatory: Fill in the following highlighted fields: Multiplex Group #, Sample Name(Max 30 characters)\n'
-        + '2. Optional: Any annotation characteristic that you selected from the previous screen appears on this screen'
-        + 'as a highlighted column. Please type desired information under the highlighted field with the annotation header.\n'
-        + '3. After completing all line items, click the \'Next\' button at the bottom of the the page to proceed.'
-        + 'You may also upload a sample sheet. Please see the \'Sample sheet help\' for more help.';
 
     public sampleTypes: any[] = [];
     public organisms: any[] = [];

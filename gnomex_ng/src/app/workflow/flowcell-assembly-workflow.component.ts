@@ -60,6 +60,9 @@ import {UtilService} from "../services/util.service";
             min-width: 3em;
         }
 
+        :host ::ng-deep .ag-theme-fresh .ag-row-selected {
+            background-color: deepskyblue !important;
+        }
 
     `]
 })
@@ -470,10 +473,8 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
                     return proto.codeRequestCategory === event.data.codeRequestCategory && proto.isActive === 'Y';
                 });
 
-                event.data.selected = true;
                 this.selectedSeqlanes.push(event.data);
             } else {
-                event.data.selected = false;
                 this.selectedSeqlanes.forEach( (item, index) => {
                     if(item === event.data) {
                         this.selectedSeqlanes.splice(index, 1);
@@ -482,7 +483,6 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             }
         }
 
-        this.allRequestGridApi.redrawRows();
     }
 
     public onNotifyGridRowDataChanged(event): void {

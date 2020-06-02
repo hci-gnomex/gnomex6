@@ -7,6 +7,10 @@
                     <mat-error *ngIf="this.formGroup?.controls['application']?.hasError('required')">
                         This field is required
                     </mat-error>
+                    <mat-error *ngIf="this.formGroup?.controls['application'].hasError('maxlength')">
+                        This field can be at maximum of {{this.constService.MAX_LENGTH_100}} characters.
+                        Character count: {{this.formGroup?.controls['application'].value.toString().length}}
+                    </mat-error>
                 </mat-form-field>
                 <mat-form-field  class="short-input">
                     <input matInput placeholder="Sort Order" formControlName="sortOrder">
@@ -16,7 +20,7 @@
                 </mat-form-field>
             </div>
             <custom-combo-box class="medium-form-input" placeholder="Sequencing Experiment Type Theme"
-                              [options]="this.appThemeList"
+                              [options]="this.appThemeList" [allowNone]="false"
                               valueField="value" displayField="display"
                               [formControlName]="'idApplicationTheme'">
             </custom-combo-box>
@@ -31,12 +35,12 @@
 
             <div class="flex-container-row spaced-children-margin">
                 <custom-combo-box class="medium-form-input" placeholder="Index Family A"
-                                  [options]="this.indexFamily"
+                                  [options]="this.indexFamily" [allowNone]="false"
                                   valueField="value" displayField="display"
                                   [formControlName]="'idBarcodeSchemeA'">
                 </custom-combo-box>
                 <custom-combo-box class="medium-form-input" placeholder="Index Family B"
-                                  [options]="this.indexFamily"
+                                  [options]="this.indexFamily" [allowNone]="false"
                                   valueField="value" displayField="display"
                                   [formControlName]="'idBarcodeSchemeB'">
                 </custom-combo-box>

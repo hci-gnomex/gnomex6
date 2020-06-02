@@ -132,6 +132,7 @@
                                                              (rowSelected)="this.onOptionGridRowSelected($event)"
                                                              (gridSizeChanged)="this.sizeColumnsToFit(this.optionGridApi)"
                                                              (cellEditingStarted)="this.cellEditingStarted()"
+                                                             [stopEditingWhenGridLosesFocus]="true"
                                                              [rowData]="this.currentOptions"
                                                              [columnDefs]="this.optionGridColumnDefs"
                                                              [enableColResize]="true"
@@ -261,11 +262,11 @@
     <div class="full-width flex-container-row padded justify-space-between align-baseline foreground">
         <label>* Denotes annotations that apply to specific organisms, analysis types, experiment platforms, and/or users</label>
         <div *ngIf="!isDialog">
-            <div style="display: flex; flex-direction: row;" *ngIf="this.selectedProperty">
-                <span *ngIf="this.formGroup.dirty && !this.showSpinner" class="dirtyNote">Changes Have Not Been Saved</span>
-                <button mat-button *ngIf="!this.showSpinner" [disabled]="!this.formGroup.valid || !this.formGroup.dirty" (click)="this.save()"><img class="icon" [src]="'./assets/action_save.gif'">Save</button>
-                <mat-spinner *ngIf="this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
-            </div>
+            <save-footer *ngIf="this.selectedProperty" style="width: 100%"
+                         [disableSave]="!this.formGroup.valid || !this.formGroup.dirty || !this.gridsValid"
+                         (saveClicked)="this.save()"
+                         [dirty]="this.formGroup.dirty">
+            </save-footer>
         </div>
     </div>
 </div>

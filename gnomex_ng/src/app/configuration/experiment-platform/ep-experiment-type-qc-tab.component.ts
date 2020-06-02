@@ -290,7 +290,7 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
         let newApp = {
             isSelected: "Y",
             codeApplication: 'Application'+ this.nextAppNumb,
-            display:'enter experiment type here...',
+            display:'',
             idSeqLibProtocols:'',
             idLabelingProtocolDefault:'',
             idHybProtocolDefault:'',
