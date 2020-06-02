@@ -498,7 +498,7 @@ public class LinkFastqData extends TimerTask {
         String analysisGroupName = "unknown";
         String analysisType = "";
 
-        String[] theAGTypes = {"Avatar", "Foundation", "Tempest"};
+        String[] theAGTypes = {"Avatar", "Foundation", "Tempus"};
         if (idAnalysis == null) {
             System.out.println("[getAnalysisType] WARNING: idAnalysis is null!");
             return null;

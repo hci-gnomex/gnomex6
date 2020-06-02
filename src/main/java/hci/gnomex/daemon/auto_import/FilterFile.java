@@ -109,17 +109,14 @@ public class FilterFile {
 
 			if(extension.equals("xml")){
 				//todo issue if no path is just filename. tried to have way fix but currentline is pass by value, its a rare case
-				boolean processed  = hasXMLBeenProcessed(fullFileName,query, currentLine,dataPath);
-				if(!processed){
-					// unprocessed list
-					filterOutList.add(currentLine);
-					continue;
-				}else{
-					// this creates a new de-identified file based off the given xml file
-					DeIdentifier.removePHI(currentLine);
-					fileList.add(currentLine);
-					fileList.add( path + fileName + ".deident.xml");
-				}
+				//todo currently deprecating  this code may revist, now just copying the xml not moving
+				//boolean processed  = hasXMLBeenProcessed(fullFileName,query, currentLine,dataPath);
+
+				// this creates a new de-identified file based off the given xml file
+				DeIdentifier.removePHI(currentLine);
+				fileList.add(currentLine);
+				fileList.add( path + fileName + ".deident.xml");
+
 			}else if(extension.equals("pdf")){
 				fileList.add(currentLine);
 			}else if (extList.contains("bam")) {

@@ -68,7 +68,7 @@ public class DirectoryBuilder {
 			}else if(args[i].equals("-skipfirst")){
 				this.skip = true;
 			}else if(args[i].equals("-mode")) {
-				this.mode = args[++i];
+				this.mode = args[++i].toLowerCase();
 			}else if(args[i].equals("-linkfolder")){
 				addWrapperFolder = true;
 			}else if(args[i].equals("-log")){
@@ -604,6 +604,7 @@ public class DirectoryBuilder {
 			String[] fileChunks = file.split("\\.");
 			String fileName = fileChunks[0].split("_")[0];
 			if(sampleIdRegex != null){ // if regex override default split by '_'
+				System.out.println("Segment of text regex is matching against: " + fileChunks[0]);
 				Pattern samplePattern = Pattern.compile(sampleIdRegex);
 				Matcher m = samplePattern.matcher(fileChunks[0]);
 				fileName = Differ.getNameByExistingCaptureGroup(captureGroupIndexes,m);
@@ -638,25 +639,31 @@ public class DirectoryBuilder {
 			String finalPath = strBuild.toString();
 
 			if(new File(finalPath).exists() && !finalPath.equals(root)) {
+				String pathWithFile = "";
 				if(addWrapperFolder &&  appendDirPersonID(fileName,strBuild)){
 					if(this.stagePath != null){
 						String stagePathFile = this.stagePath + File.separator + file;
 						startStageMap.put(start, stagePathFile);
-						fromToMap.put(stagePathFile, strBuild.append(File.separator).append(file).toString());
+						pathWithFile = strBuild.append(File.separator).append(file).toString();
+						fromToMap.put(stagePathFile, pathWithFile);
 					}else{
-						fromToMap.put(start, strBuild.append(File.separator).append(file).toString());
+						pathWithFile = strBuild.append(File.separator).append(file).toString();
+						fromToMap.put(start, pathWithFile);
 					}
 
 				}else if(!addWrapperFolder){
 					if(this.stagePath != null){
 						String stagePathFile = this.stagePath + File.separator + file;
 						startStageMap.put(start, stagePathFile);
-						fromToMap.put(stagePathFile, strBuild.append(File.separator).append(file).toString());
+						pathWithFile = strBuild.append(File.separator).append(file).toString();
+						fromToMap.put(stagePathFile, pathWithFile);
 					}else{
-						fromToMap.put(start, strBuild.append(File.separator).append(file).toString());
+						pathWithFile = strBuild.append(File.separator).append(file).toString();
+						fromToMap.put(start, pathWithFile);
 					}
 
 				}
+				System.out.println(pathWithFile);
 			}else {
 				throw new Exception("The path does not exist: " + finalPath +  "\n your directory structure isn't correct");
 			}
@@ -673,6 +680,10 @@ public class DirectoryBuilder {
 		try{
 			String path = XMLParser.getPathWithoutName(this.inFileName);
 			q =  new Query(path+"gnomex-creds.properties");
+			//todo this is last resort to avoid id collision need generic way
+			if(mode.equals("tempus") && !fileName.startsWith("TL-")){
+				fileName = "TL-%"+ fileName;
+			}
 			String personID = q.getPersonIDFromSample(fileName);
 			strBuild.append(File.separator);
 			strBuild.append(personID);
@@ -710,7 +721,7 @@ public class DirectoryBuilder {
 
 	private boolean filterOutFlaggedIDs(String idToCheck, List<String> flaggedIDList) {
 		boolean filterID = false;
-
+		// this assumes that flagged ID will be a subset of the full filename
 		for(int i=0; i < flaggedIDList.size(); i++) {
 			String flaggedID = flaggedIDList.get(i);
 			int index = idToCheck.indexOf(flaggedID);
@@ -767,19 +778,34 @@ public class DirectoryBuilder {
 
 	public void rsyncFiles(Map<String,String> filesMap,String logFileName) throws Exception{
 		CollectingProcessOutput output = null;
+		System.out.println("Starting rsync");
 
-			for (String fileKey : filesMap.keySet()) {
-				try {
+		for (String fileKey : filesMap.keySet()) {
+			try {
+				// this is not generic very foundation specific
+				if(!fileKey.endsWith(".xml") && !fileKey.endsWith(".pdf")){
+					System.out.println("Moving file " +  fileKey);
+					RSync rsync = new RSync()
+							.source(fileKey)
+							.destination(filesMap.get(fileKey))
+							.recursive(true)
+							.removeSourceFiles(true);
+					output = rsync.execute();
+
+				}else{ // xml or pdf need to be copied not moved
+					System.out.println("Copying file " +  fileKey);
 					RSync rsync = new RSync()
 							.source(fileKey)
 							.destination(filesMap.get(fileKey))
 							.recursive(true);
 					output = rsync.execute();
-					logMoveDetails(output, filesMap, fileKey,logFileName);
-				} catch (Exception e) {
-					logMoveDetails(output, filesMap, fileKey,logFileName);
 				}
+				logMoveDetails(output, filesMap, fileKey,logFileName);
+			} catch (Exception e) {
+				logMoveDetails(output, filesMap, fileKey,logFileName);
 			}
+		}
+		System.out.println("Ending rsync");
 
 	}
 
@@ -806,12 +832,7 @@ public class DirectoryBuilder {
 			commands.add(c);
 		}
 
-		String[] stdOutArray  = XMLParser.executeCommands(commands,logFileName);
-		System.out.println("Here is the length of stdoutArray:  " + stdOutArray.length);
-		System.out.println("This is the output  ");
-		for(int i = 0; i < stdOutArray.length; i++){
-			System.out.println(stdOutArray[i]);
-		}
+		XMLParser.executeCommands(commands,logFileName,true);
 	}
 
 	private void logMoveDetails(CollectingProcessOutput output, Map<String, String> filesMap, String fileKey,String logFile) throws Exception {

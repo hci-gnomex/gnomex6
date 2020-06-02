@@ -134,10 +134,10 @@ public class FoundationContainer {
 
 			strBuild.append("md5sum ");
 			strBuild.append(bamFile);
-			strBuild.append(";");
 			System.out.println(strBuild.toString());
 
-			String localChecksumWithBam = XMLParser.executeCommands(new ArrayList(Arrays.asList(strBuild.toString())),null)[0];
+			List<String> localChecksumOutput = XMLParser.executeCommands(new ArrayList(Arrays.asList(strBuild.toString())),null,true);
+			String localChecksumWithBam =  localChecksumOutput.size() > 0 ? localChecksumOutput.get(0) : null;
 			System.out.println("This is the local checksum: " + localChecksumWithBam);
 			String localChecksum = localChecksumWithBam != null ?  localChecksumWithBam.split(" ")[0] : "";
 			strBuild.setLength(0);
@@ -151,8 +151,9 @@ public class FoundationContainer {
 				//moveCorruptedFile(bamFile + ".md5", filterOutList);
 			}else{
 				// we finally know its safe to add md5 and its bam
-				String samtoolsError = XMLParser.executeCommands(new ArrayList(Arrays.asList("/usr/local/bin/samtools quickcheck " + bamFile)),null)[0];
 				if(!bamFile.endsWith("bai")){ // don't check bai since it is not valid check for samtools
+					List<String> samtoolsOutput = XMLParser.executeCommands(new ArrayList(Arrays.asList("/usr/local/bin/samtools quickcheck " + bamFile)),null,true);
+					String samtoolsError =  samtoolsOutput.size() > 0 ? samtoolsOutput.get(0) : null;
 					System.out.println("samtools Test for " + bamFile);
 					if(samtoolsError == null || samtoolsError.equals("")){
 						fileList.add(bamFile);

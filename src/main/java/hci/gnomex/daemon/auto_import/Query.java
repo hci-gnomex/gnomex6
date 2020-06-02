@@ -569,14 +569,19 @@ public class Query {
     public String getPersonIDFromSample(String fileName) throws Exception {
         Statement stmnt = null;
         String personID = "";
+        List<String> countList = new ArrayList<>();
 
-        String query = "Select r.name as personID FROM Request r JOIN Sample s ON s.idRequest = r.idRequest WHERE s.name LIKE \'%"
+        String query = "Select DISTINCT r.name as personID FROM Request r JOIN Sample s ON s.idRequest = r.idRequest WHERE s.name LIKE \'%"
                 + fileName + "%'";
         stmnt = this.conn.createStatement();
         ResultSet rs = stmnt.executeQuery(query);
         while (rs.next()) {
             personID = rs.getString("personID");
-            break;
+            countList.add(personID);
+        }
+        if(countList.size() > 1){
+            throw new Exception("In trying to retrieve Person ID there has been id collision for  "
+                    + fileName +  ". Here are the Person IDs: " + String.join(", ",countList));
         }
         if (personID.equals("")) {
             throw new Exception("Person ID can't be found from filename: " + fileName);

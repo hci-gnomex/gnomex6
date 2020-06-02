@@ -1,5 +1,7 @@
 package hci.gnomex.daemon.auto_import;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
@@ -564,84 +566,129 @@ public class XMLParser {
 		return tempScript;
 	}
 
-	public static String[] executeCommands(List<String> commands, String logDetails) {
+	public static List<String> readFileToList(String fileName){
+		List<String> fileContentList = new ArrayList<>();
+		try (BufferedReader bf = new BufferedReader(new FileReader(fileName))) {
+			String line = "";
+			while((line= bf.readLine()) != null){
+				fileContentList.add(line);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			System.exit(1); //
+		}catch (IOException e){
+			e.printStackTrace();
+		}
+		return fileContentList;
+	}
+
+	public static List<String> executeCommands(List<String> commands, String logDetails, boolean useRedirectFile) {
 		StringBuilder strBuild = new StringBuilder();
 		File tempScript = null;
-		PrintWriter pw = null;
 		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		List<String> fileContents = new ArrayList<>();
+		if(useRedirectFile){
+			for(int i = 0; i < commands.size(); i++){
+				commands.set(i, commands.get(i) + " >> ./temp.txt 2>&1");
+				//System.out.println( "adding redirect file to command: " + commands.get(i));
+			}
+		}
 
 		try {
 			System.out.println("started executing command");
-			if(logDetails != null && !logDetails.equals("")){
-				pw = new PrintWriter(new FileOutputStream(new File(logDetails), true));
-			}
-
 			tempScript = createTempScript(commands);
-			ProcessBuilder pb = new ProcessBuilder("bash", tempScript.toString());
+			ProcessBuilder pb =  new ProcessBuilder("bash", tempScript.toString());
 			pb.inheritIO();
-			pb.redirectErrorStream(true);
-			//pb.command("bash", "-c", commands);
-			//tempScript = createTempScript(commands);
-
 			Process process	= pb.start();
 
-			InputStreamReader inputSR = new InputStreamReader(process.getInputStream());
-			BufferedReader br = new BufferedReader(inputSR);
-			String lineRead;
-			while ((lineRead = br.readLine()) != null) {
-				strBuild.append(lineRead);
-				strBuild.append("\n");
+			process.waitFor();
+			if(process.exitValue() != 0){
+				System.out.println("The subprocess throw an exception");
+				process.destroy();
+				System.exit(1);
+			}else{
+				process.destroy();
 			}
 
-			process.waitFor();
-			process.destroy();
-			System.out.println("finished executing command");
-		}
 
-		catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			if(useRedirectFile){
+				fileContents = readFileToList("./temp.txt");
+				Files.delete(Paths.get("./temp.txt"));
+				if(logDetails != null){
+					try(PrintWriter pw  = new PrintWriter(new FileWriter(logDetails, true))) {
+						for(String fc : fileContents){
+							pw.println(fc);
+							pw.println(fc);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+						throw e;
+					}
+				}
+
+			}
+
+
+			System.out.println("finished executing command");
+		}catch(NoSuchFileException e){
 			e.printStackTrace();
+			System.exit(1);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			System.exit(1);
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			if(pw != null ){pw.close();}
 			e1.printStackTrace();
+			System.exit(1);
 		}
 		finally{
-			if(pw != null){pw.close();}
-			if(tempScript != null){tempScript.delete();}
+			if(tempScript != null){
+				tempScript.delete();
+			}
 		}
-		String[] stdOutArray = strBuild.toString().split("\n");
 
-		return stdOutArray;
+
+		return fileContents;
 	}
 
 
-//	public static void executeCommands(List<String> commands,String outError) throws Exception {
-//
+
+
+
+//	public static String[] executeCommands(List<String> commands, String logDetails) {
+//		StringBuilder strBuild = new StringBuilder();
 //		File tempScript = null;
+//		PrintWriter pw = null;
+//		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 //
 //		try {
 //			System.out.println("started executing command");
-//			tempScript = createTempScript(commands);
-//			System.out.println("from this temp file " + tempScript.getCanonicalPath() );
-//			ProcessBuilder pb = new ProcessBuilder("bash", tempScript.toString());
-//			pb.inheritIO();
-//			Process process;
-//			File errorFile = null;
 //
-//			if(outError != null){
-//				errorFile = new File(outError);
-//				pb.redirectError(errorFile);
+//
+//			tempScript = createTempScript(commands);
+//			ProcessBuilder pb =  new ProcessBuilder("bash", tempScript.toString());
+//			pb.inheritIO();
+//			pb.redirectErrorStream(true);
+//			//pb.redirectOutput(new File(logDetails));
+//			//pb.command("bash", "-c", commands);
+//			//tempScript = createTempScript(commands);
+//
+//			Process process	= pb.start();
+//			InputStreamReader inputSR = new InputStreamReader(process.getInputStream());
+//			BufferedReader br = new BufferedReader(inputSR);
+//			String lineRead;
+//			while ((lineRead = br.readLine()) != null) {
+//				strBuild.append(lineRead);
+//				strBuild.append("\n");
 //			}
 //
-//			process = pb.start();
 //			process.waitFor();
 //
-//			if(outError != null){
-//				if(hasSubProccessErrors(errorFile,process.exitValue())){
-//					System.out.println("Error detected exiting script");
-//					throw new Exception("Error detected in executing subprocess");
-//				}
+//			if(process.exitValue() != 0){
+//				System.out.println("sub process threw an exception");
+//				process.destroy();
+//				System.exit(1);
+//			}else{
+//				process.destroy();
 //			}
 //
 //			System.out.println("finished executing command");
@@ -649,15 +696,62 @@ public class XMLParser {
 //
 //		catch (InterruptedException e) {
 //			// TODO Auto-generated catch block
-//			throw new Exception(e);
+//			e.printStackTrace();
 //		} catch (IOException e1) {
 //			// TODO Auto-generated catch block
-//			throw new Exception(e1);
+//			if(pw != null ){pw.close();}
+//			e1.printStackTrace();
 //		}
-//		finally {
-//			tempScript.delete();
+//		finally{
+//			if(pw != null){pw.close();}
+//			if(tempScript != null){tempScript.delete();}
 //		}
+//		return strBuild.toString().split("\n");
 //	}
+
+
+	public static void executeCommands(List<String> commands,String outError) throws Exception {
+
+		File tempScript = null;
+
+		try {
+			System.out.println("started executing command");
+			tempScript = createTempScript(commands);
+			System.out.println("from this temp file " + tempScript.getCanonicalPath() );
+			ProcessBuilder pb = new ProcessBuilder("bash", tempScript.toString());
+			pb.inheritIO();
+			Process process;
+			File errorFile = null;
+
+			if(outError != null){
+				errorFile = new File(outError);
+				pb.redirectError(errorFile);
+			}
+
+			process = pb.start();
+			process.waitFor();
+
+			if(outError != null){
+				if(hasSubProccessErrors(errorFile,process.exitValue())){
+					System.out.println("Error detected exiting script");
+					throw new Exception("Error detected in executing subprocess");
+				}
+			}
+
+			System.out.println("finished executing command");
+		}
+
+		catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			throw new Exception(e);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			throw new Exception(e1);
+		}
+		finally {
+			tempScript.delete();
+		}
+	}
 
 	private static boolean hasSubProccessErrors(File errorFile, int exitCode) {
 		Scanner scan = null;
@@ -752,10 +846,9 @@ public class XMLParser {
 				List<String> slIDs = flaggedIDs.get(i);
 				if(slIDs.get(1) != null && !slIDs.get(1).equals("")){
 					// only true for tempus else no split and index 0 will be the original string
-					String sampleID =  importMode.equals("tempus") && !slIDs.get(1).startsWith("result") ?  slIDs.get(1).split("_")[0] : slIDs.get(1);
+					String sampleID =  slIDs.get(1); // importMode.equals("tempus") && !slIDs.get(1).startsWith("result") ?  slIDs.get(1).split("_")[0] : slIDs.get(1);
 					if(dupIDSet.add(sampleID)) {
 						if (i < flaggedIDs.size() - 1) {
-
 							pw.write(sampleID + "\n");
 						} else {
 							pw.write(sampleID);
@@ -782,7 +875,7 @@ public class XMLParser {
 				Map<String, List<PersonEntry>> personInfo = this.avEntriesMap.get(experimentID);
 				for(String sampleName : personInfo.keySet()){
 					if(sampleName != null && !sampleName.equals("")){
-						String sampleID = importMode.equals("tempus") ?  sampleName.split("_")[0] : sampleName;
+						String sampleID =  sampleName; //importMode.equals("tempus") ?  sampleName.split("_")[0] : sampleName;
 						if(dupIDSet.add(sampleID)){
 							pw.write(sampleID + "\n");
 						}

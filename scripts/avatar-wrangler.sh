@@ -5,7 +5,7 @@ pDataPath="/home/u0566434/parser_data/"
 downloadPath="/Repository/tempdownloads/"
 dnaNexusPath="/home/u0566434/dnaNexus/"
 avatarLocalDataPath="/Repository/PersonData/2017/4R/Avatar/"
-regex=".*/(SL[a-zA-Z0-9]+).*|.*_(SL[a-zA-Z0-9]+).*|([0-9]{2}-[A-Za-z0-9\.]+.*)\.fastq.gz" # The SL can be at the first of filename OR come after the '_'
+regex=".*/(SL[a-zA-Z0-9]+).*|.*_(SL[a-zA-Z0-9]+).*|.*([0-9]{2}-[A-Za-z0-9\.]+.*)\.fastq.gz" # The SL can be at the first of filename OR come after the '_'
 
 
 TOMCAT_HOME=../../../
@@ -23,7 +23,7 @@ done
 
 for JAR in $GNOMEX_LIB/*.jar
 do
-    CLASSPATH="./gnomex1.jar:$CLASSPATH:$JAR"
+    CLASSPATH="$CLASSPATH:$JAR"
 done
 
 export CLASSPATH
@@ -49,7 +49,6 @@ tokenVal=`cat "$pDataPath"token.properties`
 
 echo This is the start: $startPath
 echo This is the path : $scriptsPath
-
 source "$dnaNexusPath"dx-toolkit/environment
 dx login --token $tokenVal
 dx cd /
@@ -66,7 +65,7 @@ if [ "$flaggedIDParam" = "normal"  ]; then
 
 
         echo I am about to download files
-        java hci.gnomex.daemon.auto_import.DownloadMain -fileList "$pDataPath"uniqueFilesToDownload.out -downloadPath "$downloadPath"  #outputs download.log  reads in uniqueFilesToDownload.out
+        java hci.gnomex.daemon.auto_import.DownloadMain -fileList "$pDataPath"uniqueFilesToDownload.out -downloadPath "$downloadPath" -remotePath  #outputs download.log  reads in uniqueFilesToDownload.out
 
         #$? # Saves the exit status of the last script
         downloadCode=0
@@ -75,20 +74,19 @@ else
         java hci.gnomex.daemon.auto_import.DiffParser  -local "$pDataPath"localPath.out  -remote "$pDataPath"remotePath.out > "$pDataPath"uniqueFilesToVerify.out
         sed -i '/FASTq/!d' "$pDataPath"uniqueFilesToVerify.out
 
-
         bash "$scriptsPath"makeVerifiedList.sh $flaggedIDParam  "$pDataPath"uniqueFilesToVerify.out "$pDataPath"verifiedAvatarList.out $idColumn $downloadPath"/Flagged/"
         fileList="$pDataPath"verifiedAvatarList.out
 
         #echo this is the verfied file list name $fileList
         #cat $fileList
 
-
 fi
+
 
 
 echo the fileListName : $fileList
 echo download Status: $downloadCode
-#downloadCode=0
+
 echo download Status: $downloadCode
 if [ $downloadCode -eq 0 ]; then
         idStr=""
@@ -109,7 +107,6 @@ if [ $downloadCode -eq 0 ]; then
 
                 fi
         done < $fileList
-
         echo this is idStr: $idStr
         echo $idStr | java  hci.gnomex.daemon.auto_import.StringModder > "$pDataPath"tempStr.out
 
@@ -138,4 +135,5 @@ if [ $downloadCode -eq 0 ]; then
 else
         echo $downloaderStatus
 fi
+
 echo ------------------------------------------------------------------------------------------------------------

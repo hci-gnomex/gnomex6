@@ -1,16 +1,8 @@
 package hci.gnomex.daemon.auto_import;
 
 import javax.persistence.criteria.CriteriaBuilder;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.*;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,17 +13,18 @@ public class Differ {
 	private String local;
 	private String outputPath;
 	private String matchByName;
-	private Map<String,String> fileMap;
+	private Map<String, Set<String>> fileMap;
 	private List<String> uniqueByName;
 	private List<String> uniqueByChecksum;
 	private String onlyMatchOn; // for regex to match on either local or remote or both
 	private Integer startCaptureGroup;
 	private Integer endCaptureGroup;
+	private Map<String, String> aliasMap;
 
 
 	public Differ(String[] args) {
 		this.outputPath = outputPath;
-		this.fileMap = new TreeMap<String, String>();
+		this.fileMap = new TreeMap<String, Set<String>>();
 		this.uniqueByName = new ArrayList<String>();
 		this.uniqueByChecksum = new ArrayList<String>();
 		this.onlyMatchOn = "all";
@@ -66,7 +59,20 @@ public class Differ {
 					}
 				}
 
-			}else if (args[i].equals("-help")) {
+			}else if (args[i].equals("-alias")){ // allow list of for your capture groups items aka DNA -> DSQ1
+				aliasMap = new HashMap<String, String>();
+				++i;
+				while(true){
+					int nextI = i + 1;
+					if(nextI >= args.length || (args[i].startsWith("-") || args[nextI].startsWith("-") )){
+						break;
+					}
+					aliasMap.put(args[i], args[nextI]);
+					i = i + 2;
+
+				}
+				i--;
+			} else if (args[i].equals("-help")) {
 				//printUsage();
 				System.exit(0);
 			}
@@ -76,7 +82,6 @@ public class Differ {
 
 
 	public void findDifference(){
-		Map<String,String> fileMap = new TreeMap<String,String>();
 		List<String> uniqueFiles = new ArrayList<String>();
 		BufferedReader buffReader = null;
 		boolean simpleDiff = true;
@@ -93,14 +98,7 @@ public class Differ {
 			simpleDiff = deterimineFileType(sampleLine);
 			diffFile(buffReader,simpleDiff);
 
-			if(!simpleDiff) {
-				List<String> inclusionList = getInclusionList();
-				writeDiffToFile(inclusionList,"inclusion.out" );
-				writeDiffToFile(this.uniqueByChecksum,"uniqueByChecksum.out");
-			}else {
-				writeDiffToFile(this.uniqueByName);
-			}
-
+			writeDiffToFile(this.uniqueByName);
 
 
 		} catch (IOException e) {
@@ -138,7 +136,13 @@ public class Differ {
 
 
 	}
-
+	private void addToIDMap(String aliasKey, String fullPathFileVal, Map<String, Set<String>> idMap){
+		if(idMap.get(aliasKey) != null){
+			idMap.get(aliasKey).add(fullPathFileVal);
+		}else{
+			idMap.put(aliasKey, new HashSet<>(Arrays.asList(fullPathFileVal)));
+		}
+	}
 
 	private void diffFile(BufferedReader buff, boolean simpleFileType) throws IOException {
 		String[]  filePath = null;
@@ -156,25 +160,29 @@ public class Differ {
 
 		while((line = buff.readLine()) != null) { // 1st file local 'put' into map
 
-			if(!simpleFileType) {
-				fileAndChecksum = line.split("  ");
-				String checkSum = fileAndChecksum[0];
+			if(matchByName != null && !onlyMatchOn.equals("-r")){
+				Matcher m = p.matcher(line);
+				if(m.matches()){
+					//this gets either the string id or the ascii depending if compare by id is on
+					String id = constructMatchedFileName(startCaptureGroup, endCaptureGroup, m,renameBuildStr, aliasMap);
+					addToIDMap(id,  line, fileMap);
+				}else{ // doesn't have to match name so get file plus extension
 
-				filePath = fileAndChecksum[1].split("/");
-				String fileName = filePath[filePath.length - 1];
-				fileMap.put(fileName, checkSum);
-			}else {
-				if(matchByName != null && !onlyMatchOn.equals("-r")){
-					Matcher m = p.matcher(line);
-					if(m.matches()){
-						fileMap.put(constructMatchedFileName(startCaptureGroup, endCaptureGroup, m,renameBuildStr), line );
-					}else{ // doesn't have to match name so get file plus extension
-						this.addToLocalMap(line);
-					}
-				}else{
-					this.addToLocalMap(line);
+					//System.out.println("Warning: Can't match " + line + " with this regex " + p.pattern());
+//					System.out.println("This will result in  a re-download since it can't be filtered out. Do you want to continue? ");
+//					BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+//
+//					String response = (reader.readLine()).toLowerCase().trim();
+//					if(!response.equals("y") || !response.equals("yes")){
+//						reader.close();
+//						System.out.println("GoodBye");
+//						System.exit(1);
+//					}
+//					reader.close();
+
 				}
-
+			}else{
+				this.addToLocalMap(line);
 			}
 
 		}
@@ -188,45 +196,27 @@ public class Differ {
 			String fileName = "";
 			String remoteCheckSum = "";
 
-			if(!simpleFileType) {
-				fileAndChecksum = line1.split("  ");
-				remoteCheckSum = fileAndChecksum[0];
-
-				filePath = fileAndChecksum[1].split("/");
-				fileName = filePath[filePath.length - 1];
-
-				String localChecksum = fileMap.get(fileName);
-				if(localChecksum != null){
-					// not recording unique by name only by checksum.
-					// I don't care about extra files in remoteList if there are any
-					if(!localChecksum.equals(remoteCheckSum)) {
-						uniqueByChecksum.add(fileName);
-					}
-				}
-
-			}else {
-				if(matchByName != null && !onlyMatchOn.equals("-l")){
-					Matcher m = p.matcher(line1);
-					if(m.matches()){
-						fileName = constructMatchedFileName(startCaptureGroup, endCaptureGroup, m,renameBuildStr);
-						if(fileMap.get(fileName) == null ){
-							uniqueByName.add(line1);
-						}
-					}else{
-						addUniqueName(line1);
+			if(matchByName != null && !onlyMatchOn.equals("-l")){
+				Matcher m = p.matcher(line1);
+				if(m.matches()){
+					fileName = constructMatchedFileName(startCaptureGroup, endCaptureGroup, m,renameBuildStr, aliasMap);
+					if(fileMap.get(fileName) == null ){
+						uniqueByName.add(line1);
 					}
 				}else{
 					addUniqueName(line1);
 				}
-
+			}else{
+				addUniqueName(line1);
 			}
+
 		}
 	}
 
 	private void  addToLocalMap(String line){
 		String[] pathWithFile = line.split("/");
 		String fileName = pathWithFile[pathWithFile.length -1];
-		fileMap.put(fileName, line);
+		fileMap.put(fileName, new HashSet<String>(Arrays.asList(line)));
 	}
 
 	private void addUniqueName(String line){
@@ -253,7 +243,7 @@ public class Differ {
 		}
 
 
-		for(String key: this.fileMap.keySet()) {
+		for( String key: this.fileMap.keySet()) {
 			inclusionList.add(key);
 		}
 		return inclusionList;
@@ -262,6 +252,62 @@ public class Differ {
 	}
 
 
+
+	public static String  constructMatchedFileName(Integer startCaptureGroup, Integer endCaptureGroup, Matcher m, StringBuilder renameBuildStr,
+												   Map<String,String> aliasMap){
+		int endRange =  0;
+		//TL-19-015AFE
+		// don't allow duplicates to appear in name
+		Set<String> sortID = new TreeSet<>();
+
+		if(startCaptureGroup == null ){ // if cp wasn't specified in args default to capture all groups
+			startCaptureGroup = 0;
+			endCaptureGroup = m.groupCount();
+		}
+
+		if ( m.groupCount() < endCaptureGroup){
+			System.out.println("End Capture Group  cannot greater than actual capture groups length: " +  m.groupCount());
+			System.exit(1);
+		}
+
+
+		for(int i = startCaptureGroup ; i <= endCaptureGroup; i++ ){
+			if (m.group(i) == null) {
+				continue;
+			}
+
+			if(aliasMap != null){
+				String alias = aliasMap.get(m.group(i));
+				if(alias != null){
+					renameBuildStr.append(alias);
+					sortID.add(alias);
+				}else{
+					renameBuildStr.append(m.group(i));
+					sortID.add(m.group(i));
+				}
+			}else{
+				renameBuildStr.append(m.group(i));
+				sortID.add(m.group(i));
+			}
+
+			if(i < m.groupCount()){
+				renameBuildStr.append("-");
+			}
+
+		}
+
+
+		String rename = renameBuildStr.toString();
+		if(rename.endsWith("-")){
+			renameBuildStr.deleteCharAt(renameBuildStr.length() - 1);
+			rename = renameBuildStr.toString();
+		}
+
+		//System.out.println(String.join(",",sortID));
+		renameBuildStr.setLength(0);
+		return String.join(",",sortID);
+
+	}
 
 	public static String  constructMatchedFileName(Integer startCaptureGroup, Integer endCaptureGroup, Matcher m, StringBuilder renameBuildStr){
 		int endRange =  0;
@@ -287,9 +333,9 @@ public class Differ {
 			}
 		}
 
+
 		String rename = renameBuildStr.toString();
 		renameBuildStr.setLength(0);
-
 		return rename;
 	}
 
