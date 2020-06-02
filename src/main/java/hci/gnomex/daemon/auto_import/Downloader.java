@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.sql.Timestamp;
 import java.util.regex.Matcher;
@@ -18,6 +20,8 @@ import java.util.regex.Pattern;
 public class Downloader {
 
 
+	private boolean useRemoteFile;
+	private HashMap<String, String> aliasMap;
 	private String mode;
 	private Map<String,List<String>> fileNameMap;
 	private String dependentDataPath;
@@ -30,6 +34,7 @@ public class Downloader {
 	private String filterRegex;
 
 	Downloader(String[] args ){
+		this.useRemoteFile = false;
 		this.mode = "avatar";
 		for (int i = 0; i < args.length; i++) {
 			args[i] =  args[i].toLowerCase();
@@ -53,6 +58,21 @@ public class Downloader {
 				this.allowClearFile = true;
 			}else if(args[i].equals("-filterregex")){
 				filterRegex = args[++i];
+			}else if(args[i].equals("-remotepath")) { // helps to determine which path to use remote or local in flagged filtered outlist
+				                                      // default is is the flagged(local) path and filename
+				useRemoteFile = true;
+			}else if (args[i].equals("-alias")){ // allow list of for your capture groups items aka DNA -> DSQ1
+				aliasMap = new HashMap<String, String>();
+				++i;
+				while(true){
+					int nextI = i + 1;
+					if(nextI >= args.length || (args[i].startsWith("-") || args[nextI].startsWith("-") )){
+						break;
+					}
+					aliasMap.put(args[i], args[nextI]);
+					i = i + 2;
+				}
+				i--;
 			} else if (args[i].equals("-help")) {
 				//printUsage();
 				System.exit(0);
@@ -206,13 +226,23 @@ public class Downloader {
 
 		List<String> status = Arrays.asList("Downloading in progress...");
 		writeToFile(this.dependentDataPath + "download.log",status); // /home/u0566434/parser_data/download.log
-		writeToFile(fileOfPaths,this.fileNameMap);
+		String tempFile = writeToTempusFile(fileOfPaths,this.fileNameMap);
 
-		String downloadCommand = "cat " + this.fileOfPaths + " | xargs -P10 -I {} aws --profile tempus s3 cp {} " + this.downloadPath;
+		// this is reading in tempFile line by line delimiting that line by space hence ' ' allowing only 2 arguments at a time
+		// it is making  shell script for just that one line and running it and substituting where $ is shown arguments
+		String downloadCommand = "cat " + tempFile + " |  xargs -n2 sh -c 'aws --profile tempus s3 cp $1 $2' sh" ;
+		// old approach
+		//xargs -P10 -I {} aws --profile tempus s3 cp {} " + this.downloadPath;
+
 		System.out.println(downloadCommand);
 		commands.add(downloadCommand);
 		commands.add("mv -t " + this.downloadPath + " " + this.downloadPath + File.separator +  "Flagged" +File.separator +  "*" );
 		executeCommands(commands);
+		try {
+			Files.deleteIfExists(Paths.get(tempFile));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
 		ArrayList<String> downloadedList = new ArrayList<String>();
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -235,7 +265,6 @@ public class Downloader {
 
 	public void loadFileNames(){
 
-
 		FileReader reader = null;
 		try {
 			reader = new FileReader(new File(this.fileOfPaths));
@@ -244,11 +273,9 @@ public class Downloader {
 			Set<String> removedFlaggedSet = new TreeSet<String>();
 			Map<String,List<String>> flaggedIDMap = new HashMap<>();
 
-
 			if(filterRegex != null){
 				pattern = Pattern.compile(filterRegex);
 			}
-
 
 
 			String line = "";
@@ -258,9 +285,9 @@ public class Downloader {
 					String fileName = fullPath[fullPath.length - 1];
 
 					if(filterRegex != null){
-						Matcher m = pattern.matcher(fileName);
+						Matcher m = pattern.matcher(line);
 						if(m.matches()){
-							String matchedFileName = Differ.constructMatchedFileName(1,3,m, new StringBuilder() );
+							String matchedFileName = Differ.constructMatchedFileName(1,5,m, new StringBuilder(), aliasMap );
 							addToIDMap(matchedFileName, line, fileNameMap);
 						}else{
 							System.out.println("Could not match pattern " + pattern.pattern() + " ON text " + fileName );
@@ -285,13 +312,20 @@ public class Downloader {
 				if(!removedFlaggedSet.add(flaggedIDName)){
 					continue;
 				}
+				List<String> fileNames = null;
+				List removedIDs = this.fileNameMap.remove(flaggedIDName);
+				if(useRemoteFile){
+					fileNames = removedIDs;
+				}else{
+					fileNames = flaggedIDMap.get(flaggedIDName);
+				}
 
-				this.fileNameMap.remove(flaggedIDName);
-				List<String> fileNames = flaggedIDMap.get(flaggedIDName);
 
 				if(fileNames != null){
 					for(String fileName : fileNames){
-						System.out.println("Filtering out: " + fileName);
+						if(removedIDs != null ){
+							System.out.println("Filtering out: " + fileName);
+						}
 						this.flaggedFileList.add(fileName);
 					}
 				}
@@ -331,19 +365,15 @@ public class Downloader {
 				if (filterRegex != null) {
 					Matcher m = pattern.matcher(file.getName());
 					if (m.matches()) {
-						flaggedFileName = Differ.constructMatchedFileName(1, 3, m, new StringBuilder());
-						if (!mode.equals("avatar")) {
-							addToIDMap(flaggedFileName, file.getName(), flaggedIDMap);
-						}
+						flaggedFileName = Differ.constructMatchedFileName(1, 5, m, new StringBuilder(), aliasMap);
+						addToIDMap(flaggedFileName, file.getName(), flaggedIDMap);
 					} else {
 						System.out.println("Could not match pattern " + pattern.pattern() + " ON text " + file.getName());
 					}
 
 				} else {
 					flaggedFileName = file.getName();
-					if (!mode.equals("avatar")) {
-						addToIDMap(flaggedFileName, file.getName(), flaggedIDMap);
-					}
+					addToIDMap(flaggedFileName, file.getName(), flaggedIDMap);
 				}
 
 				if(mode.equals("avatar")){
@@ -449,6 +479,7 @@ public class Downloader {
 		// flagged files added now, even though they weren't downloaded this attempt. Since they were in the past
 		// The flagged files need to be check in db everytime to see if person data was updated  and can now be imported
 		if(afterDownload){
+			Collections.sort(this.flaggedFileList);
 			for( int i = 0; i <  this.flaggedFileList.size(); i++){
 				String flaggedFileName =  this.flaggedFileList.get(i);
 				String safeFileName = flaggedFileName.replaceAll(" ", "\\\\ ");
@@ -494,14 +525,31 @@ public class Downloader {
 		}
 		return dataFromFileList;
 	}
-	public void writeToFile(String fileName, Map<String, List<String>> dataToWrite) {
+	public String writeToTempusFile(String fileName, Map<String, List<String>> dataToWrite) {
 		PrintWriter writer = null;
+		String pattern = Pattern.quote(System.getProperty("file.separator"));
+		String[] chunks = fileName.split(pattern);
+		String tempFile = String.join(System.getProperty("file.separator"), Arrays.copyOfRange(chunks,0, chunks.length - 1))
+				+ System.getProperty("file.separator") + "tempDownload.txt";
+
+
 		try {
-			writer = new PrintWriter(fileName);
+			writer = new PrintWriter(tempFile);
 			for (Map.Entry<String,List<String>> entry : dataToWrite.entrySet()) {
-				for(String val : entry.getValue()){
-					writer.println(val);
+				String[] keyChunks = entry.getKey().split(",");
+
+				if(keyChunks.length == 3){
+					String destPath = downloadPath +  keyChunks[0];
+					for(String val : entry.getValue()){
+						writer.println(val + " " + destPath);
+					}
+				}else{
+					for(String val : entry.getValue()){
+						writer.println(val + " " + downloadPath);
+					}
 				}
+
+
 			}
 
 
@@ -510,7 +558,7 @@ public class Downloader {
 		}finally {
 			writer.close();
 		}
-
+		return tempFile;
 	}
 
 	public void writeToFile(String fileName, List<String> dataToWrite) {

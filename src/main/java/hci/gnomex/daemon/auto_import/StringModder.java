@@ -8,8 +8,8 @@ import java.util.Scanner;
 public class StringModder {
 
 	public static void main(String[] args) {
-		List<String> stringList = new ArrayList<String>(); 
-		
+		List<String> stringList = new ArrayList<String>();
+
 		Scanner scan = new Scanner(System.in);
 		String str = "";
 		

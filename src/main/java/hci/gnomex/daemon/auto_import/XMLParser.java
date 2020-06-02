@@ -1,17 +1,13 @@
 package hci.gnomex.daemon.auto_import;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Writer;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
@@ -474,7 +470,7 @@ public class XMLParser {
 		System.out.println(importRequestCommands.get(0));
 
 		String osName = System.getProperty("os.name");
-		if(osName.equals("Windows 7")) { //osName.equals("Windows 7")
+		if(osName.equals("Windows 10")) { //osName.equals("Windows 7")
 			//executeCMDCommands(cmdCommands);
 		}else {
 			executeCommands(importRequestCommands, appendedPathOnly + IMPORT_EXPERIMENT_ERROR);
@@ -485,7 +481,7 @@ public class XMLParser {
 			Integer analysisID = q.getAnalysisID(name,folderName);
 			if(analysisID == -1) { // new Analysis
 				String experimentNumber = getCurrentRequestId(pathOnly + "tempRequestList.out") + "R";
-				importAnalysisCommands.add("bash httpclient_create_analysis.sh " + "-lab Bioinformatics "+  "-name " + name +  " -organism human -genomeBuild hg19 -analysisType Alignment -isBatchMode Y "
+				importAnalysisCommands.add("bash create-analysis.sh " + "-lab Bioinformatics "+  "-name " + name +  " -organism human -genomeBuild hg19 -analysisType Alignment -isBatchMode Y "
 						+ "-folderName " + "\""+ folderName +"\" " + "-experiment " + experimentNumber + " -server localhost -linkBySample -analysisIDFile " + pathOnly + "tempAnalysisList.out" );
 
 				System.out.println(importAnalysisCommands.get(0));
@@ -570,6 +566,149 @@ public class XMLParser {
 		return tempScript;
 	}
 
+	public static List<String> readFileToList(String fileName){
+		List<String> fileContentList = new ArrayList<>();
+		try (BufferedReader bf = new BufferedReader(new FileReader(fileName))) {
+			String line = "";
+			while((line= bf.readLine()) != null){
+				fileContentList.add(line);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			System.exit(1); //
+		}catch (IOException e){
+			e.printStackTrace();
+		}
+		return fileContentList;
+	}
+
+	public static List<String> executeCommands(List<String> commands, String logDetails, boolean useRedirectFile) {
+		StringBuilder strBuild = new StringBuilder();
+		File tempScript = null;
+		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+		List<String> fileContents = new ArrayList<>();
+		if(useRedirectFile){
+			for(int i = 0; i < commands.size(); i++){
+				commands.set(i, commands.get(i) + " >> ./temp.txt 2>&1");
+				//System.out.println( "adding redirect file to command: " + commands.get(i));
+			}
+		}
+
+		try {
+			System.out.println("started executing command");
+			tempScript = createTempScript(commands);
+			ProcessBuilder pb =  new ProcessBuilder("bash", tempScript.toString());
+			pb.inheritIO();
+			Process process	= pb.start();
+
+			process.waitFor();
+			if(process.exitValue() != 0){
+				System.out.println("The subprocess throw an exception");
+				process.destroy();
+				System.exit(1);
+			}else{
+				process.destroy();
+			}
+
+
+			if(useRedirectFile){
+				fileContents = readFileToList("./temp.txt");
+				Files.delete(Paths.get("./temp.txt"));
+				if(logDetails != null){
+					try(PrintWriter pw  = new PrintWriter(new FileWriter(logDetails, true))) {
+						for(String fc : fileContents){
+							pw.println(fc);
+							pw.println(fc);
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+						throw e;
+					}
+				}
+
+			}
+
+
+			System.out.println("finished executing command");
+		}catch(NoSuchFileException e){
+			e.printStackTrace();
+			System.exit(1);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+			System.exit(1);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+			System.exit(1);
+		}
+		finally{
+			if(tempScript != null){
+				tempScript.delete();
+			}
+		}
+
+
+		return fileContents;
+	}
+
+
+
+
+
+//	public static String[] executeCommands(List<String> commands, String logDetails) {
+//		StringBuilder strBuild = new StringBuilder();
+//		File tempScript = null;
+//		PrintWriter pw = null;
+//		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+//
+//		try {
+//			System.out.println("started executing command");
+//
+//
+//			tempScript = createTempScript(commands);
+//			ProcessBuilder pb =  new ProcessBuilder("bash", tempScript.toString());
+//			pb.inheritIO();
+//			pb.redirectErrorStream(true);
+//			//pb.redirectOutput(new File(logDetails));
+//			//pb.command("bash", "-c", commands);
+//			//tempScript = createTempScript(commands);
+//
+//			Process process	= pb.start();
+//			InputStreamReader inputSR = new InputStreamReader(process.getInputStream());
+//			BufferedReader br = new BufferedReader(inputSR);
+//			String lineRead;
+//			while ((lineRead = br.readLine()) != null) {
+//				strBuild.append(lineRead);
+//				strBuild.append("\n");
+//			}
+//
+//			process.waitFor();
+//
+//			if(process.exitValue() != 0){
+//				System.out.println("sub process threw an exception");
+//				process.destroy();
+//				System.exit(1);
+//			}else{
+//				process.destroy();
+//			}
+//
+//			System.out.println("finished executing command");
+//		}
+//
+//		catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			if(pw != null ){pw.close();}
+//			e1.printStackTrace();
+//		}
+//		finally{
+//			if(pw != null){pw.close();}
+//			if(tempScript != null){tempScript.delete();}
+//		}
+//		return strBuild.toString().split("\n");
+//	}
+
 
 	public static void executeCommands(List<String> commands,String outError) throws Exception {
 
@@ -591,8 +730,9 @@ public class XMLParser {
 
 			process = pb.start();
 			process.waitFor();
+
 			if(outError != null){
-				if(hasSubProccessErrors(errorFile)){
+				if(hasSubProccessErrors(errorFile,process.exitValue())){
 					System.out.println("Error detected exiting script");
 					throw new Exception("Error detected in executing subprocess");
 				}
@@ -613,7 +753,7 @@ public class XMLParser {
 		}
 	}
 
-	private static boolean hasSubProccessErrors(File errorFile) {
+	private static boolean hasSubProccessErrors(File errorFile, int exitCode) {
 		Scanner scan = null;
 		boolean hasError = false;
 		try{
@@ -622,13 +762,16 @@ public class XMLParser {
 			System.out.println("Errors will appear below if found, in this file, " + errorFile.getName());
 			while(scan.hasNext()){
 				String line = scan.nextLine();
-				if(line != null && !line.equals("")){
+				if((line != null && !line.equals(""))){
 					hasError = true;
 					System.out.println(line);
 				}
 
 			}
 			System.out.println("************************************************************");
+			if(exitCode != 0){
+				hasError = true;
+			}
 		}catch(FileNotFoundException e){
 			if(scan != null){ scan.close(); }
 			hasError = false;
@@ -703,10 +846,9 @@ public class XMLParser {
 				List<String> slIDs = flaggedIDs.get(i);
 				if(slIDs.get(1) != null && !slIDs.get(1).equals("")){
 					// only true for tempus else no split and index 0 will be the original string
-					String sampleID =  importMode.equals("tempus") && !slIDs.get(1).startsWith("result") ?  slIDs.get(1).split("_")[0] : slIDs.get(1);
+					String sampleID =  slIDs.get(1); // importMode.equals("tempus") && !slIDs.get(1).startsWith("result") ?  slIDs.get(1).split("_")[0] : slIDs.get(1);
 					if(dupIDSet.add(sampleID)) {
 						if (i < flaggedIDs.size() - 1) {
-
 							pw.write(sampleID + "\n");
 						} else {
 							pw.write(sampleID);
@@ -733,7 +875,7 @@ public class XMLParser {
 				Map<String, List<PersonEntry>> personInfo = this.avEntriesMap.get(experimentID);
 				for(String sampleName : personInfo.keySet()){
 					if(sampleName != null && !sampleName.equals("")){
-						String sampleID = importMode.equals("tempus") ?  sampleName.split("_")[0] : sampleName;
+						String sampleID =  sampleName; //importMode.equals("tempus") ?  sampleName.split("_")[0] : sampleName;
 						if(dupIDSet.add(sampleID)){
 							pw.write(sampleID + "\n");
 						}

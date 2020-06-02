@@ -5,7 +5,7 @@ pDataPath="/home/u0566434/parser_data/"
 downloadPath="/Repository/tempdownloads/"
 dnaNexusPath="/home/u0566434/dnaNexus/"
 avatarLocalDataPath="/Repository/PersonData/2017/4R/Avatar/"
-regex=".*/(SL[a-zA-Z0-9]+).*|.*_(SL[a-zA-Z0-9]+).*" # The SL can be at the first of filename OR come after the '_'
+regex=".*/(SL[a-zA-Z0-9]+).*|.*_(SL[a-zA-Z0-9]+).*|.*([0-9]{2}-[A-Za-z0-9\.]+.*)\.fastq.gz" # The SL can be at the first of filename OR come after the '_'
 
 
 TOMCAT_HOME=../../../
@@ -23,7 +23,7 @@ done
 
 for JAR in $GNOMEX_LIB/*.jar
 do
-    CLASSPATH="./gnomex1.jar:$CLASSPATH:$JAR"
+    CLASSPATH="$CLASSPATH:$JAR"
 done
 
 export CLASSPATH
@@ -49,33 +49,30 @@ tokenVal=`cat "$pDataPath"token.properties`
 
 echo This is the start: $startPath
 echo This is the path : $scriptsPath
-
 source "$dnaNexusPath"dx-toolkit/environment
 dx login --token $tokenVal
 dx cd /
 
 tree "$avatarLocalDataPath" --noreport > "$pDataPath"localTree.out
-dx tree ./ > "$pDataPath"remoteTree.out
+dx tree / > "$pDataPath"remoteTree.out
 
 java hci.gnomex.daemon.auto_import.PathMaker "$pDataPath"remoteTree.out "$pDataPath"remotePath.out
 java hci.gnomex.daemon.auto_import.PathMaker "$pDataPath"localTree.out  "$pDataPath"localPath.out
 
 if [ "$flaggedIDParam" = "normal"  ]; then
-
-        java hci.gnomex.daemon.auto_import.DiffParser  -local "$pDataPath"localPath.out -remote "$pDataPath"remotePath.out >> "$pDataPath"uniqueFilesToDownload.out
+        java hci.gnomex.daemon.auto_import.DiffParser  -local "$pDataPath"localPath.out -remote "$pDataPath"remotePath.out -cp 1 2 3 -matchbyname $regex > "$pDataPath"uniqueFilesToDownload.out
         sed -i '/FASTq/!d' "$pDataPath"uniqueFilesToDownload.out
 
 
         echo I am about to download files
-        java hci.gnomex.daemon.auto_import.DownloadMain "$pDataPath" "$downloadPath" #outputs download.log  reads in uniqueFilesToDownload.out
+        java hci.gnomex.daemon.auto_import.DownloadMain -fileList "$pDataPath"uniqueFilesToDownload.out -downloadPath "$downloadPath" -remotePath  #outputs download.log  reads in uniqueFilesToDownload.out
 
-        # the line above executes
-        downloadCode=$? # Saves the exit status of the last script
+        #$? # Saves the exit status of the last script
+        downloadCode=0
         fileList="$pDataPath"download.log
 else
         java hci.gnomex.daemon.auto_import.DiffParser  -local "$pDataPath"localPath.out  -remote "$pDataPath"remotePath.out > "$pDataPath"uniqueFilesToVerify.out
         sed -i '/FASTq/!d' "$pDataPath"uniqueFilesToVerify.out
-
 
         bash "$scriptsPath"makeVerifiedList.sh $flaggedIDParam  "$pDataPath"uniqueFilesToVerify.out "$pDataPath"verifiedAvatarList.out $idColumn $downloadPath"/Flagged/"
         fileList="$pDataPath"verifiedAvatarList.out
@@ -83,42 +80,40 @@ else
         #echo this is the verfied file list name $fileList
         #cat $fileList
 
-
 fi
+
 
 
 echo the fileListName : $fileList
 echo download Status: $downloadCode
 
-
-#downloadCode=0
 echo download Status: $downloadCode
 if [ $downloadCode -eq 0 ]; then
         idStr=""
-
-         while read fileName; do
+        while read fileName; do
                 if [[ $fileName =~ $regex ]]; then
                         fullMatch=$BASH_REMATCH
-                        id="${BASH_REMATCH[1]}"
-                        id1="${BASH_REMATCH[2]}"
+                        hudAlphaID="${BASH_REMATCH[1]}"
+                        hudAlphaID1="${BASH_REMATCH[2]}"
+                        tGenID="${BASH_REMATCH[3]}"
 
-                        if [ ! -z "$id" ]; then #If var is not empty
-                                idStr+=$id$","
-                        else
-                                idStr+=$id1$","
+                        if [ ! -z "$hudAlphaID" ]; then #If var is not empty
+                                idStr+=$hudAlphaID","
+                        elif [ ! -z "$hudAlphaID1" ]; then
+                                idStr+=$hudAlphaID1","
+                        elif [ ! -z "$tGenID" ]; then
+                                idStr+=$tGenID","
                         fi
-
 
                 fi
         done < $fileList
         echo this is idStr: $idStr
         echo $idStr | java  hci.gnomex.daemon.auto_import.StringModder > "$pDataPath"tempStr.out
 
-
         if [ "$flaggedIDParam" = "normal"  ]; then
               java  hci.gnomex.daemon.auto_import.Linker  "$pDataPath"tempStr.out "$pDataPath"hci-creds.properties  "$pDataPath"slInfo.out avatar
-               verifiedSlInfo="$pDataPath"slInfo.out
-       else
+              verifiedSlInfo="$pDataPath"slInfo.out
+        else
                 verifiedSlInfo=$flaggedIDParam
                 echo $verifiedSlInfo
         fi
@@ -127,15 +122,18 @@ if [ $downloadCode -eq 0 ]; then
 
         echo `pwd`
 
-
         # Note avatarImporter outputs two implicit files
         java hci.gnomex.daemon.auto_import.XMLParserMain -file $verifiedSlInfo -initXML "$pDataPath"clinRequest.xml -annotationXML "$pDataPath"clinGetPropertyList.xml -importScript import_experiment.sh -outFile "$pDataPath"tempRequest.xml -importMode avatar
-        java hci.gnomex.daemon.auto_import.FileMover -file $fileList  -root $avatarLocalDataPath -downloadPath $downloadPath -flaggedFile "$pDataPath"flaggedIDs.out -mode avatar
+        # checking last script ran(XMLParserMain) has an exit status of 0
+        if [ $? -eq 0 ]; then
+            java hci.gnomex.daemon.auto_import.FileMover -file $fileList -skipfirst  -root $avatarLocalDataPath -downloadPath $downloadPath -flaggedFile "$pDataPath"flaggedIDs.out -mode avatar -linkFolder
+        fi
 
 
-       #Need to import experiments then and register/link/index
+        #Need to import experiments then and register/link/index
 
 else
         echo $downloaderStatus
 fi
+
 echo ------------------------------------------------------------------------------------------------------------
