@@ -30,11 +30,24 @@ import {MatDialog} from "@angular/material/dialog";
 
     agInit(params: any): void {
         super.agInit(params);
-        this.selectedRequestCategory = params.node.data.codeRequestCategory;
+        if(params.node.data.codeRequestCategory === "ILLSEQ") {
+            let seqProtocol = this.dictionaryService.getEntry('hci.gnomex.model.NumberSequencingCyclesAllowed', params.node.data.idNumberSequencingCyclesAllowed);
+            if(seqProtocol) {
+                let name = (<string>seqProtocol.name).split(' ')[0].toUpperCase();
+                if(name === "NOVASEQ") {
+                    this.selectedRequestCategory = "NOSEQ";
+                } else {
+                    this.selectedRequestCategory = name;
+                }
+            }
+        } else {
+            this.selectedRequestCategory = params.node.data.codeRequestCategory;
+        }
+
 
 
         let requestCategory: any = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', this.selectedRequestCategory);
-        let solexaFlowCellChannels: number = requestCategory.numberOfChannels;
+        let solexaFlowCellChannels: number = requestCategory ? requestCategory.numberOfChannels : 0;
         let rLanes: any[] = [];
 
         let emptyChoice: any = {
@@ -44,9 +57,11 @@ import {MatDialog} from "@angular/material/dialog";
 
         rLanes.push(emptyChoice);
 
-        for (var i = 1; i <= solexaFlowCellChannels; i++) {
-            let obj = {display: i.toString(), value: i};
-            rLanes.push(obj);
+        if(solexaFlowCellChannels) {
+            for (var i = 1; i <= solexaFlowCellChannels; i++) {
+                let obj = {display: i.toString(), value: i};
+                rLanes.push(obj);
+            }
         }
 
         this.options = rLanes;
