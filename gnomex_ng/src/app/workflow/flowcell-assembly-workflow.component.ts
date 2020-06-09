@@ -555,7 +555,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             let seqProtocol = this.sequenceProtocolsList.find(seqProto => {
                 return seqProto.idNumberSequencingCyclesAllowed === event.data.idNumberSequencingCyclesAllowed;
             });
-            if (!seqProtocol) { //Do not assemble if the Sequencing protocol is inactive
+            if (!seqProtocol) { // Do not assemble if the Sequencing protocol is inactive
                 if (event && event.node && event.node.data && event.node.data.flowCellChannelNumber) {
                     this.seqProtocolInactiveWarningIsOpen = true;
                     let message = "Only active sequencing protocols can be assembled on a flow cell.";
@@ -716,7 +716,6 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
     }
 
     private validateNumberOfLanes(): any {
-        // TODO: need to check per request?
         let tmp: any[] = [];
         tmp = tmp.concat(this.lanes);
         let warningMessage: string = "";
