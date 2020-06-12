@@ -131,13 +131,7 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy {
     }
 
     save() {
-
-        let idLab = this.route.snapshot.paramMap.get("idLab");
-        let idProject = this.route.snapshot.paramMap.get("idProject");
-        let getParams: HttpParams = new HttpParams()
-            .set("idLab", idLab)
-            .set("idProject", idProject);
-
+        this.dialogsService.startDefaultSpinnerDialog();
 
         this.project.name = this.projectBrowseForm.controls["projectName"].value;
         this.project.description = this.projectBrowseForm.controls["description"].value;
@@ -150,14 +144,10 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy {
             this.experimentsService.refreshProjectRequestList_fromBackend();
             this.saveSuccess.emit(true);
             this.formInit = false;
-
-            this.experimentsService.getProject(getParams).pipe(first()).subscribe(response => {
-                this.projectBrowseForm.get("projectName").setValue( response["Project"].name);
-                this.projectBrowseForm.get("description").setValue( response["Project"].description);
-            }, (err: IGnomexErrorResponse) => {
-            });
+            this.dialogsService.stopAllSpinnerDialogs();
         }, (err: IGnomexErrorResponse) => {
             this.saveSuccess.emit(false);
+            this.dialogsService.stopAllSpinnerDialogs();
         });
 
     }
