@@ -86,6 +86,13 @@ export class ExperimentBillingTabComponent implements OnInit {
                 }
             },
             {
+                headerName: "Client",
+                field: "submitter",
+                tooltipField: "submitter",
+                minWidth: 10 * this.emToPxConversionRate,
+                width:    5 * this.emToPxConversionRate,
+            },
+            {
                 headerName: "Acct",
                 field: "accountName",
                 tooltipField: "accountName",
@@ -189,6 +196,7 @@ export class ExperimentBillingTabComponent implements OnInit {
                 if (request.billingItems && Array.isArray(request.billingItems)) {
                     let billingLabs: any[] = UtilService.getJsonArray(request.billingItems[1], request.billingItems[1].BillingLab);
                     for (let lab of billingLabs) {
+                        lab.submitter = request.submitterName;
                         lab.BillingItem = UtilService.getJsonArray(lab.BillingItem, lab.BillingItem);
                         for (let bi of lab.BillingItem) {
                             bi.labName = ""; // Necessary for group cell renderer, otherwise icon will not display
