@@ -187,6 +187,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
             if (this.experimentsService.browsePanelParams && this.experimentsService.browsePanelParams["refreshParams"]) {
                 this.experimentsService.emitExperimentOverviewList(response.Lab);
+                this.experimentsService.browsePanelParams["refreshParams"] = false;
 
                 if (this.treeModel && this.treeModel.getActiveNode()) {// Refresh to initial state when search button clicked
                     this.treeModel.getActiveNode().setIsActive(false);
@@ -653,27 +654,29 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 this.disableDeleteExperiment = true;
 
                 navArray = ["/experiments",  "overview"];
+                navExtras = {queryParams: { idLab: idLab, idProject: null}};
                 //Project
             } else if (this.selectedItem.level === 2) {
                 this.parentProject = event.node.parent;
                 this.disableNewProject = !this.gnomexService.canSubmitRequests(idLab);
                 this.disableDeleteExperiment = true;
 
-                navArray = ["/experiments", "overview" ]; //["/experiments" , {outlets: {"browsePanel": ["overview", {"idLab": idLab, "idProject": idProject}]}}];
-                navExtras = {queryParams: { idProject:idProject}};
+                navArray = ["/experiments", "overview"]; //["/experiments" , {outlets: {"browsePanel": ["overview", {"idLab": idLab, "idProject": idProject}]}}];
+                navExtras = {queryParams: { idLab: idLab, idProject: idProject}};
 
                 //Experiment
             } else {
                 navArray = ["/experiments", "detail" , idRequest]; //["/experiments",  {outlets: {"browsePanel": [idRequest]}}];
                 this.parentProject = event.node.parent;
                 this.disableNewProject = true;
+                navExtras = {queryParams: { idLab: idLab, idProject: this.parentProject.data.idProject}};
 
             }
 
             navExtras.relativeTo = this.route;
             navExtras.queryParamsHandling = 'merge';
             this.dialogsService.startDefaultSpinnerDialog();
-            this.router.navigate(navArray,navExtras);
+            this.router.navigate(navArray, navExtras);
 
         }else{
             this.navService.emitResetNavModeSubject("detail");

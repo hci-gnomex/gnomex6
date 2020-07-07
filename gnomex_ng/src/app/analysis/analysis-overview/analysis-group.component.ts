@@ -39,6 +39,7 @@ export class AnalysisGroupComponent implements OnInit, OnDestroy {
 
     constructor(protected fb: FormBuilder,
                 private analysisService: AnalysisService,
+                private dialogsService: DialogsService,
                 private route: ActivatedRoute) {
     }
 
@@ -83,14 +84,11 @@ export class AnalysisGroupComponent implements OnInit, OnDestroy {
     }
 
     save() {
-
+        this.dialogsService.startDefaultSpinnerDialog();
         let saveParams: HttpParams = new HttpParams();
-        let getParams: HttpParams = new HttpParams();
 
-        let idLab = this.route.snapshot.paramMap.get("idLab");
-        let idAnalysisGroup = this.route.snapshot.paramMap.get("idAnalysisGroup");
-        getParams = getParams.set("idLab", idLab);
-        getParams = getParams.set("idAnalysisGroup", idAnalysisGroup);
+        let idLab = this.route.snapshot.queryParamMap.get("idLab");
+        let idAnalysisGroup = this.route.snapshot.queryParamMap.get("idAnalysisGroup");
 
 
         this.project.name = this.projectBrowseForm.controls["name"].value;
@@ -106,9 +104,11 @@ export class AnalysisGroupComponent implements OnInit, OnDestroy {
             this.saveSuccess.emit(true);
             this.formInit = false;
             this.analysisService.setActiveNodeId = "p" + idAnalysisGroup;
-            this.analysisService.getAnalysisGroupList_fromBackend(this.analysisService.analysisPanelParams, true);
+            this.analysisService.refreshAnalysisGroupList_fromBackend();
+            this.dialogsService.stopAllSpinnerDialogs();
         }, (err: IGnomexErrorResponse) => {
             this.saveSuccess.emit(false);
+            this.dialogsService.stopAllSpinnerDialogs();
         });
 
     }
