@@ -40,11 +40,12 @@ RUN bash ./fixproperties.sh
 
 RUN yum install -y java-1.8.0-openjdk-headless
 
-RUN yum install -y wget
-RUN wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
-RUN rpm -ivh mysql-community-release-el7-5.noarch.rpm
-RUN yum update -y
-RUN yum install -y mysql-server
+# mysql
+#RUN yum install -y wget
+#RUN wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
+#RUN rpm -ivh mysql-community-release-el7-5.noarch.rpm
+#RUN yum update -y
+#RUN yum install -y mysql-server
 
 RUN mkdir -p /home/u0974549/tomcat8523/webapps/gnomex
 WORKDIR /home/u0974549/tomcat8523/webapps/gnomex
@@ -58,10 +59,13 @@ RUN chmod 777 *
 ENV JRE_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.252.b09-2.el7_8.x86_64/jre
 ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.252.b09-2.el7_8.x86_64/jre
 
-EXPOSE 8084
+EXPOSE 8081
+EXPOSE 8082 
+EXPOSE 443
 
-WORKDIR /home/u0974549/tomcat8523/bin
+#WORKDIR /home/u0974549/tomcat8523/bin
 #RUN bash ./startup.sh
-CMD ["bash","./startup.sh"]
+CMD ["bash","-c","/home/u0974549/tomcat8523/bin/startup.sh"]
+#ENTRYPOINT ["/bin/bash", "/home/u0974549/tomcat8523/bin/startup.sh"]
 
 			  
