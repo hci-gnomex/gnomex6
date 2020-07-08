@@ -31,7 +31,7 @@ const TYPE_CAP_SEQ:string = "CAPSEQ";
 const TYPE_MIT_SEQ:string = "MITSEQ";
 const TYPE_FRAG_ANAL:string = "FRAGANAL";
 const TYPE_MICROARRAY: string = 'MICROARRAY';
-const PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE: string = "hci.gnomex.model.Institution";
+const PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE: string = "experiment_submission_default_mode";
 
 @Injectable()
 export class GnomexService {
@@ -99,6 +99,8 @@ export class GnomexService {
     public disableUserSignup: boolean = false;
     public noGuestAccess: boolean = true;
     public maintenanceSplash: string;
+
+    public showUsageOnStartUp: string = 'N';
 
 
     constructor(
@@ -251,6 +253,7 @@ export class GnomexService {
      all we need is one rc that allows external so break as soon as we find it
      */
     setAllowExternal(): void {
+        this.allowExternal = true;
         if(this.myCoreFacilities) {
             for (let rc of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
                 for (let cf2 of this.myCoreFacilities) {
@@ -376,7 +379,7 @@ export class GnomexService {
         } else {
             this.isExternalDataSharingSite = false;
         }
-
+        console.log("external data sharing: " + this.isExternalDataSharingSite);
     }
 
     /**
@@ -446,6 +449,7 @@ export class GnomexService {
      * Set the default submission state.
      */
     setDefaultSubmissionState(): void {
+        console.log("submission mode: " + this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE));
         if (this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) != null &&
             this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) === "INTERNAL") {
             // Default is "submit request" (internal), but if this is an external data sharing
@@ -457,6 +461,11 @@ export class GnomexService {
         } else {
             this.isInternalExperimentSubmission = true;
         }
+
+        if (this.isExternalDataSharingSite) {
+            this.isInternalExperimentSubmission = false;
+        }
+        console.log("isInternalExperimentSubmission: " + this.isInternalExperimentSubmission);
     }
 
     /**
