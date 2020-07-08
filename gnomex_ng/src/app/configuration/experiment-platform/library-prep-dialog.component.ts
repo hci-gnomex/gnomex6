@@ -89,7 +89,11 @@ export class LibraryPrepDialogComponent extends BaseGenericContainerDialog imple
         this.reqCategoryAppList = Array.isArray(this.uncomittedRowData.RequestCategoryApplication) ? this.uncomittedRowData.RequestCategoryApplication
             : [this.uncomittedRowData.RequestCategoryApplication];
         for(let app of this.reqCategoryAppList){
-            this.formGroup.addControl(app.value, new FormControl(app.isSelected === 'Y'))
+            if(app.value === this.expPlatformNode.codeRequestCategory) {
+                this.formGroup.addControl(app.value, new FormControl(this.uncomittedRowData.isSelected === 'Y'));
+            } else {
+                this.formGroup.addControl(app.value, new FormControl(app.isSelected === 'Y'));
+            }
         }
 
         this.primaryDisable = (action) => {return this.formGroup.invalid; };
