@@ -50,22 +50,14 @@ export class LogoutLoaderComponent implements OnInit,OnDestroy {
     ngOnInit() {
         this.site_logo = "./assets/gnomex_logo.png";
 
+        this.authenticationService.logout();
+
         setTimeout(()=>{
             this.router.navigate(['authenticate']);
             this.ngZone.runOutsideAngular(() => BootController.getbootControl().restart());
-
         });
-
-
-
-
-
     }
 
 
-
-
-    ngOnDestroy(): void {
-    }
-
+    ngOnDestroy(): void { }
 }
