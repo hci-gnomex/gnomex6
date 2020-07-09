@@ -265,12 +265,6 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
     public get workingWorkItemList(): any[] {
 
         let results: any[] = this.workItemList;
-
-        if (this.selectedLab && this.selectedLab.value) {
-            results = results.filter((workItem) => {
-                return workItem.idLab === this.selectedLab.value;
-            });
-        }
         if (this.protocolFilterFc && this.protocolFilterFc.value) {
             results = results.filter((workItem) => {
                 return workItem.idNumberSequencingCyclesAllowed === this.protocolFilterFc.value.idNumberSequencingCyclesAllowed;
@@ -282,7 +276,11 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             });
         }
         if (this.allRequestGridApi) {
-            this.allRequestGridApi.setQuickFilter(this.searchText);
+            if (this.endingFilter && this.endingFilter.value) {
+                this.allRequestGridApi.setQuickFilter((this.searchText ? this.searchText + ' ' : '') + this.endingFilter.value);
+            } else {
+                this.allRequestGridApi.setQuickFilter(this.searchText);
+            }
         }
 
         this.workflowService.assignBackgroundColor(results, "idRequest");
@@ -294,7 +292,6 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
     public experimentTypesInList: any[];
     public filteredProtocolsList: any[] = [];
     public instrumentList: any[] = [];
-    public labList: any[] = [];
 
     private barCodes: any[] = [];
     private sequenceProtocolsList: any[] = [];
@@ -319,12 +316,23 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
     public protocolFC:             FormControl;
     public runFC:                  FormControl;
     public selectedExperimentType: FormControl;
-    public selectedLab:            FormControl;
+    public endingFilter:           FormControl;
     public protocolFilterFc:       FormControl;
 
     private allRequestGridApi: GridApi;
     private assmGridApi: GridApi;
 
+
+    public suffixList: any[] = [
+        { value: '_1', display: '_1' },
+        { value: '_2', display: '_2' },
+        { value: '_3', display: '_3' },
+        { value: '_4', display: '_4' },
+        { value: '_5', display: '_5' },
+        { value: '_6', display: '_6' },
+        { value: '_7', display: '_7' },
+        { value: '_8', display: '_8' }
+    ];
 
     constructor(public prefService: UserPreferencesService,
                 public workflowService: WorkflowService,
@@ -355,7 +363,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
 
         this.protocolFilterFc       = new FormControl('');
         this.selectedExperimentType = new FormControl('');
-        this.selectedLab            = new FormControl('');
+        this.endingFilter           = new FormControl('');
     }
 
     ngOnInit() {
@@ -377,8 +385,6 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             code.idOligoBarcodeB = code.idOligoBarcode;
             this.barCodes.push(code);
         }
-
-        this.labList = this.labList.concat(this.gnomexService.labList);
     }
 
     private initialize(): void {

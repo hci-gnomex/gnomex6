@@ -172,7 +172,7 @@ export class SelectEditor implements ICellEditorAngularComp, OnDestroy {
             let thisRowNode = this.params.node;
 
             this.startSpinnerDialog();
-            this.params.column.gridApi.forEachNode((rowNode) => {
+            this.params.column.gridApi.forEachNodeAfterFilter((rowNode) => {
                 if (rowNode && rowNode.data && thisRowNode && thisRowNode.data && (this.fillAll || rowNode.data[this.fillGroupAttribute] === thisRowNode.data[this.fillGroupAttribute])) {
                     let spoofedEvent: any = {
                         api: this.params.column.gridApi,
