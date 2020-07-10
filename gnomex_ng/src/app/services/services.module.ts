@@ -34,6 +34,7 @@ import {PasswordUtilService} from "./password-util.service";
 import {AppUserPublicService} from "./app-user-public.service";
 import {LabMembershipRequestService} from "./lab-membership-request.service";
 import {UserService} from "./user.service";
+import {CheckSessionStatusService} from "./check-session-status.service";
 import {ConfigurationService} from "./configuration.service";
 import {SubRouteGuardService} from "./route-guards/sub-route-guard.service";
 import {AuthRouteGuardService} from "./route-guards/auth-route-guard.service";
@@ -95,6 +96,7 @@ import {NavigationService} from "./navigation.service";
         AppUserPublicService,
 	    UserService,
         LabMembershipRequestService,
+        CheckSessionStatusService,
         ConfigurationService,
         SubRouteGuardService,
         WorkflowService,
