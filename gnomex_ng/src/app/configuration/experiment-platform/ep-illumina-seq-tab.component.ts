@@ -256,6 +256,11 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
     }
 
     filterSeqOptions(event?: any){
+        if(event) {
+            this.selectedSeqOpt = [];
+            this.gridApi.clearFocusedCell();
+        }
+
         if(this.showInactive){
             this.rowData = this.seqOptionsList.sort(this.sortSeqOptions);
             this.gridApi.setRowData(this.rowData);
@@ -327,15 +332,14 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
             if(this.expPlatfromService.isHiSeq) {
                 seqOpt.isCustom = dialogFormGroup.get('isCustom').value;
             }
-            this.gridApi.setRowData(this.rowData);
+            this.gridApi.setRowData(this.rowData.sort(this.sortSeqOptions));
             this.formGroup.markAsDirty();
 
             this.gridApi.clearFocusedCell();
+            this.selectedSeqOpt = [];
             let rowIndex: number = this.rowData.indexOf(seqOpt);
             if(rowIndex >= 0) {
                 this.gridApi.getRowNode("" + rowIndex).setSelected(true);
-            } else {
-                this.selectedSeqOpt = [];
             }
         }
 
