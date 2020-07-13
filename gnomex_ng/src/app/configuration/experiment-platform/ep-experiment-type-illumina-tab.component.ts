@@ -125,6 +125,9 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
         {
             headerName: "Sort Order",
             field: "sortOrder",
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            validators: [Validators.pattern(/^\d{0,2}$/)],
             valueParser: this.parseSortOrder,
             editable:true,
             width: 100
@@ -272,20 +275,37 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
             if(event.column.getColId() === "sortOrder"){
                 this.rowData.sort(this.compareApplications);
                 this.gridApi.setRowData(this.rowData);
+                let rowIndex  = "" + this.rowData.indexOf(event.data);
+                this.gridApi.getRowNode(rowIndex).setSelected(true);
+                this.gridApi.setFocusedCell(this.gridApi.getRowNode(rowIndex).rowIndex, "sortOrder");
             }
             if(event.column.getColId() === "display"){
                 this.selectedApp[0].application = this.selectedApp[0].display;
+            }
+            if(event.column.getColId() === "isSelected") {
+                let reqCategoryAppList: any[] = Array.isArray(this.selectedApp[0].RequestCategoryApplication) ? this.selectedApp[0].RequestCategoryApplication
+                    : [this.selectedApp[0].RequestCategoryApplication];
+                this.selectedApp[0].RequestCategoryApplication = reqCategoryAppList;
+
+                let rca = reqCategoryAppList.find(reqCatApp => reqCatApp.codeRequestCategory === this.expPlatfromNode.codeRequestCategory );
+                if(rca) {
+                    rca.isSelected = event.newValue;
+                }
             }
         }
 
     }
 
     filterAppOptions(event?: any) {
+        if(event) {
+            this.selectedApp = [];
+            this.gridApi.clearFocusedCell();
+        }
         // This is to filter the data that is executive(selected), but not to filter the data that is active in database.
         if(this.showInactive) {
-            this.rowData = this.appList;
+            this.rowData = this.appList.sort(this.compareApplications);
         } else {
-            this.rowData = this.appList.filter(app => app.isSelected === "Y");
+            this.rowData = this.appList.filter(app => app.isSelected === "Y").sort(this.compareApplications);
         }
     }
 
@@ -317,14 +337,24 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
                     let rca = reqCategoryAppList.find(reqCatApp => reqCatApp.value === key );
                     if(rca){
                         rca.isSelected = libPrepDialogForm.controls[key].value ? 'Y' : 'N';
+                        if(rca.codeRequestCategory === this.expPlatfromNode.codeRequestCategory) {
+                            app.isSelected = rca.isSelected;
+                        }
                     }
                 }
             });
-            this.filterAppOptions();
-            this.gridApi.setRowData(this.rowData);
+
+            this.gridApi.setRowData(this.rowData.sort(this.compareApplications));
             this.formGroup.markAsDirty();
+
+            this.gridApi.clearFocusedCell();
+            this.selectedApp = [];
+            let rowIndex: number = this.rowData.indexOf(app);
+            if(rowIndex >= 0) {
+                this.gridApi.getRowNode("" + rowIndex).setSelected(true);
+            }
         }
-    };
+    }
 
     openLibPrepEditor(){
         if(this.selectedApp.length > 0){
@@ -379,6 +409,7 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
         this.filterAppOptions();
         this.gridApi.setRowData(this.rowData);
         this.formGroup.markAsDirty();
+        this.gridApi.clearFocusedCell();
         this.gridApi.forEachNode(node => node.rowIndex ? 0 : node.setSelected(true, true));
         this.selectedApp = [newApp];
         this.openLibPrepEditor();
