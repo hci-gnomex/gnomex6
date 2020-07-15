@@ -2665,6 +2665,13 @@
         <property name="toolTipText" column="toolTipText" type="string"/>
     </class>
 
+    <sql-query name="getLatestBillingAccountChange">
+        <return-scalar column="AuditOperationDate" type="timestamp"/>
+        SELECT MAX(baa.AuditOperationDate) AS [AuditOperationDate]
+          FROM BillingAccount_Audit baa
+    </sql-query>
+
+
     <!--                        -->
     <!-- Named Queries (Unused) -->
     <!--                        -->
