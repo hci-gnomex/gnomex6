@@ -12,6 +12,8 @@ import {MatDialogConfig} from "@angular/material";
 import {IlluminaSeqDialogComponent} from "./illumina-seq-dialog.component";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";
 
 //assets/page_add.png
 
@@ -118,7 +120,8 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
         selectOptions: this._runOptions,
         selectOptionsDisplayField: "display",
         selectOptionsValueField: "value",
-
+        validators: [Validators.required],
+        errorNameErrorMessageMap: [{errorName: "required", errorMessage: "Run Mode required"}],
         editable:true,
         width: 200
     };
@@ -137,6 +140,8 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
         {
             headerName: "Sort Order",
             field: "sortOrder",
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
             validators: [Validators.min(0), Validators.max(99), Validators.pattern(/^\d{0,2}$/)],
             errorNameErrorMessageMap: [{errorName: "numberRange", errorMessage: "Requires a number of 0-99"}],
             editable:true,
@@ -145,12 +150,16 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
         {
             headerName: "Name",
             field: "name",
-            validators: [Validators.maxLength(this.constService.MAX_LENGTH_100)],
-            errorNameErrorMessageMap: [{errorName: "maxlength", errorMessage: "Maximum of " + this.constService.MAX_LENGTH_100 + " characters"}],
-            editable:true,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            validators: [Validators.required, Validators.maxLength(this.constService.MAX_LENGTH_100)],
+            errorNameErrorMessageMap: [
+                { errorName: 'required', errorMessage: 'Name required' },
+                { errorName: 'maxlength',  errorMessage: "Maximum of " + this.constService.MAX_LENGTH_100 + " characters"}
+            ],
+            editable: true,
             width: 250
-        }
-/*
+        },
         {
             headerName: "Cycles",
             field: "idNumberSequencingCycles",
@@ -159,6 +168,8 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
             selectOptions: this.seqCycleList,
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "value",
+            validators: [Validators.required],
+            errorNameErrorMessageMap: [{errorName: "required", errorMessage: "Cycles required"}],
             editable:true,
             width: 200
         },
@@ -170,10 +181,11 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
             selectOptions: this.seqTypeRunList,
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "value",
+            validators: [Validators.required],
+            errorNameErrorMessageMap: [{errorName: "required", errorMessage: "Type required"}],
             editable:true,
             width: 200
         }
-*/
     ];
 
     private sortSeqOptions(obj1:any, obj2:any) {
@@ -232,6 +244,7 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
                     this.expPlatfromNode = data;
                     this.seqOptionsList = Array.isArray(data.sequencingOptions) ? data.sequencingOptions :
                         [data.sequencingOptions.NumberSequencingCyclesAllowed];
+                    this.seqOptionsList.sort(this.sortSeqOptions);
                     this.showInactive = false;
                     this.selectedSeqOpt = [];
                     this.formGroup.get('sequencingOptions').setValue(this.seqOptionsList);
@@ -242,7 +255,12 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
 
     }
 
-    filterSeqOptions(event){
+    filterSeqOptions(event?: any){
+        if(event) {
+            this.selectedSeqOpt = [];
+            this.gridApi.clearFocusedCell();
+        }
+
         if(this.showInactive){
             this.rowData = this.seqOptionsList.sort(this.sortSeqOptions);
             this.gridApi.setRowData(this.rowData);
@@ -257,6 +275,7 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
     onSeqOptionsRowSelected(event){
         if(event.node.selected){
             this.selectedSeqOptIndex = event.rowIndex;
+            this.gridApi.selectIndex(this.selectedSeqOptIndex, false, null);
         }
         this.selectedSeqOpt = this.gridApi.getSelectedRows();
     }
@@ -266,7 +285,7 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
         //if hiseq, extra column is added for it
         this.expPlatform2Subscription = this.expPlatfromService.getExperimentPlatformObservable().subscribe(data =>{
             let tempColDefs:any[] =[];
-            this.filterSeqOptions(null);
+            this.filterSeqOptions();
             if(this.expPlatfromService.isHiSeq){
                 tempColDefs = this.columnDefs.slice();
                 tempColDefs.splice(1,0, this.runModeColumn);
@@ -289,6 +308,9 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
             if(event.column.getColId() === "sortOrder"){
                 this.rowData.sort(this.sortSeqOptions);
                 this.gridApi.setRowData(this.rowData);
+                let rowIndex  = "" + this.rowData.indexOf(event.data);
+                this.gridApi.getRowNode(rowIndex).setSelected(true);
+                this.gridApi.setFocusedCell(this.gridApi.getRowNode(rowIndex).rowIndex, "sortOrder");
             }
         }
 
@@ -300,15 +322,25 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
         if(dialogFormGroup.dirty){
             seqOpt.name = dialogFormGroup.get('name').value;
             seqOpt.isActive = dialogFormGroup.get('isActive').value ? 'Y': 'N';
-            seqOpt.sortOrder= dialogFormGroup.get('sortOrder').value;
-//            seqOpt.idNumberSequencingCycles = dialogFormGroup.get('idNumberSequencingCycles').value;
-//            seqOpt.idSeqRunType = dialogFormGroup.get('idSeqRunType').value;
+            seqOpt.sortOrder = dialogFormGroup.get('sortOrder').value;
+            seqOpt.idNumberSequencingCycles = dialogFormGroup.get('idNumberSequencingCycles').value;
+            seqOpt.idSeqRunType = dialogFormGroup.get('idSeqRunType').value;
             seqOpt.protocolDescription = dialogFormGroup.get('protocolDescription').value;
             seqOpt.unitPriceInternal = dialogFormGroup.get('unitPriceInternal').value;
             seqOpt.unitPriceExternalAcademic = dialogFormGroup.get('unitPriceExternalAcademic').value;
             seqOpt.unitPriceExternalCommercial = dialogFormGroup.get('unitPriceExternalCommercial').value;
-            this.filterSeqOptions(null);
+            if(this.expPlatfromService.isHiSeq) {
+                seqOpt.isCustom = dialogFormGroup.get('isCustom').value;
+            }
+            this.gridApi.setRowData(this.rowData.sort(this.sortSeqOptions));
             this.formGroup.markAsDirty();
+
+            this.gridApi.clearFocusedCell();
+            this.selectedSeqOpt = [];
+            let rowIndex: number = this.rowData.indexOf(seqOpt);
+            if(rowIndex >= 0) {
+                this.gridApi.getRowNode("" + rowIndex).setSelected(true);
+            }
         }
 
     };
@@ -337,16 +369,18 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
         let newSeqOpt = {
             idNumberSequencingCyclesAllowed: "NumberSequencingCyclesAllowed",
             codeRequestCategory: this.expPlatfromNode.codeRequestCategory,
-//            idNumberSequencingCycles:'',
-//            idSeqRunType:'',
+            idNumberSequencingCycles:'',
+            idSeqRunType:'',
             isCustom:'N',
             name:'',
             isActive:'Y',
             sortOrder:'0',
         };
-        this.seqOptionsList.splice(0,0,newSeqOpt);
+        this.seqOptionsList.splice(0, 0, newSeqOpt);
+        this.filterSeqOptions();
         this.selectedSeqOpt = [newSeqOpt];
-        this.gridApi.setRowData(this.seqOptionsList);
+        this.gridApi.clearFocusedCell();
+        this.gridApi.forEachNode(node => node.rowIndex ? 0 : node.setSelected(true, true));
         this.openSeqEditor();
 
     }
@@ -357,7 +391,7 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
             if(result){
                 let i:number = this.seqOptionsList.indexOf(seqOpt);
                 this.seqOptionsList.splice(i,1);
-                this.filterSeqOptions(null);
+                this.filterSeqOptions();
                 this.formGroup.markAsDirty();
                 this.selectedSeqOpt = [];
             }

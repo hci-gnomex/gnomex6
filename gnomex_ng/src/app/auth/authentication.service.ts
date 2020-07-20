@@ -3,7 +3,7 @@ import {LocationStrategy} from "@angular/common";
 import {Router} from "@angular/router";
 import {HttpClient, HttpHeaders, HttpParams, HttpRequest, HttpResponse} from "@angular/common/http";
 
-import {Observable, BehaviorSubject, Subscription, interval, of, throwError} from "rxjs";
+import {Observable, BehaviorSubject, Subscription, interval, throwError} from "rxjs";
 import {CoolLocalStorage} from "angular2-cool-storage";
 import {JwtHelperService} from "@auth0/angular-jwt";
 
@@ -13,8 +13,8 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 import {DictionaryService} from "../services/dictionary.service";
 import {CookieUtilService} from "../services/cookie-util.service";
 import {DialogsService} from "../util/popup/dialogs.service";
-import {GnomexService} from "../services/gnomex.service";
 import {ProgressService} from "../home/progress.service";
+import {CheckSessionStatusService} from "../services/check-session-status.service";
 
 /**
  * The token used for injection of the server side endpoint for the currently authenticated subject.
@@ -73,9 +73,6 @@ export class AuthenticationService {
     private baseUrl: string;
     private contextRoot: string = "";
 
-    private checkSessionStatusInterval: any;
-    private checkSessionStatusDialogIsOpen: boolean = false;
-
     private _hasLoggedOut: boolean = true;
 
     public get hasLoggedOut() {
@@ -87,6 +84,7 @@ export class AuthenticationService {
                 private _localStorageService: CoolLocalStorage,
                 private _jwtHelper: JwtHelperService,
                 private authenticationProvider: AuthenticationProvider,
+                private checkSessionStatusService: CheckSessionStatusService,
                 private dictionaryService: DictionaryService,
                 private cookieUtilService: CookieUtilService,
                 private dialogService: DialogsService,
@@ -231,38 +229,13 @@ export class AuthenticationService {
                     }
                     this.subscribeToTokenActivity();
 
-                    if (!this.checkSessionStatusInterval) {
-                        this.checkSessionStatusInterval = setInterval(() => { this.checkSessionStatus(); }, 10000);
-                    }
+                    this.checkSessionStatusService.startSessionStatusInterval();
                 },
                 (err: IGnomexErrorResponse) => {
                     //Token refresh failed.
                     this.logout(true);
                 }
             );
-    }
-
-    private checkSessionStatus(): void {
-        this.cookieUtilService.formatXSRFCookie();
-        this._http.post("/gnomex/CheckSessionStatus.gx", {}).subscribe((response: any) => {
-            // Do nothing.
-        }, (error: any) => {
-            if (!this.checkSessionStatusDialogIsOpen) {
-                this.checkSessionStatusDialogIsOpen = true;
-
-                this.dialogService.confirm("Your session has expired, and you have lost connection to the server.  Would you like to return to the login screen now?", "Disconnected...").pipe(first()).subscribe((result: boolean) => {
-                    if(result) {
-                        this.logout();
-                        this.progressService.hideLoaderStatus(false);
-                        this.progressService.loaderStatus = new BehaviorSubject<number> (0);
-                        this._router.navigate(["/logout-loader"]);
-                    }
-
-                    this.checkSessionStatusDialogIsOpen = false;
-                });
-            }
-
-        });
     }
 
     /**
@@ -316,7 +289,7 @@ export class AuthenticationService {
      */
     login(_username: string, _password: string): Observable<boolean> {
         this._isGuestMode = false;
-        let username = _username;
+
         return this._http.post(
             this.directLoginLocation(),
             {username: _username, password: _password},
@@ -360,11 +333,11 @@ export class AuthenticationService {
      * A function to signal the termination of the current session. Invoking this function will clean up any relevant state
      * related to the last active session.
      */
-    logout(keepCurrentRoute: boolean = false): void {
+    public logout(keepCurrentRoute: boolean = false): void {
         //Prevent logout if already on authentication route. Doing otherwise screws up SAML
         if (!this._router.routerState || this._router.routerState.snapshot.url !== this._authenticationRoute) {
-            clearInterval(this.checkSessionStatusInterval);
-            this.checkSessionStatusInterval = null;
+            this.checkSessionStatusService.clearSessionStatusInterval();
+
             this._hasLoggedOut = true;
 
             this._redirectUrl = (keepCurrentRoute && this._router.routerState != null && this._router.routerState.snapshot != null) ? this._router.routerState.snapshot.url : "";

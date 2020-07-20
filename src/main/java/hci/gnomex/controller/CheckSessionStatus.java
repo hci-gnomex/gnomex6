@@ -9,19 +9,21 @@ package hci.gnomex.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Date;
 
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.Util;
-import org.apache.log4j.Logger;
+
 public class CheckSessionStatus extends HttpServlet {
-//  private static Logger LOG = Logger.getLogger(CheckSessionStatus.class);
 
   /**
    * Initialize global variables
@@ -73,8 +75,8 @@ public class CheckSessionStatus extends HttpServlet {
       HttpSession session = request.getSession();
       if (session == null || session.isNew()) {
         xmlResult = "<data><sa exists='false' lastAccessedTime='-1' inactiveTime='-1' currentTime='-1' "
-            + "sessionMaxInActiveTime='0' /></data>";
-//        LOG.debug("Session is new or not exist");
+            + "sessionMaxInActiveTime='0' />"
+            + "</data>";
       } else {
         Long slac = (Long) session.getAttribute("lastGNomExAccessTime");
         long lastTime;
@@ -82,12 +84,24 @@ public class CheckSessionStatus extends HttpServlet {
           lastTime = session.getLastAccessedTime();
         else
           lastTime = slac.longValue();
-        // LOG.debug("Session last accessed time: " + new Date(lastTime));
-        xmlResult = "<data><sa exists='true' lastAccessedTime='" + lastTime + "' " + "currentTime='"
-            + new Date().getTime() + "' sessionMaxInActiveTime='" + request.getSession().getMaxInactiveInterval()
-            + "' " + " /></data>";
+
+        xmlResult = "<data>"
+            + "<sa exists='true' "
+            + "lastAccessedTime='" + lastTime + "' "
+            + "currentTime='" + new Date().getTime() + "' "
+            + "sessionMaxInActiveTime='" + request.getSession().getMaxInactiveInterval() + "' ";
+
+        try {
+          xmlResult += "billingAccountsLatestChange='"
+              + ((Timestamp) HibernateSession.currentSession("guest").getNamedQuery("getLatestBillingAccountChange").uniqueResult())
+              + "' ";
+        } catch (NamingException | SQLException e) {
+          System.out.print("");
+        }
+
+        xmlResult += "/>"
+            + "</data>";
       }
-//      LOG.debug(xmlResult);
     }
 
     String jsonResult = Util.xmlToJson(xmlResult);
