@@ -310,8 +310,8 @@ export class AuthenticationService {
      * A function to authenticated the user with the provided credentials. Failure results in an error that describes the
      * server response (status and status message) and should be actionable by the client application.
      *
-     * @param username of the authenticating user to verify
-     * @param password of the authenticating user to verify
+     * @param _username of the authenticating user to verify
+     * @param _password of the authenticating user to verify
      * @returns {Observable<R>} describing the result of the login action, true or an error
      */
     login(_username: string, _password: string): Observable<boolean> {

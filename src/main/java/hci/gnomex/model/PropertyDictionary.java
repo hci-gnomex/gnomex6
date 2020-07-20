@@ -88,6 +88,7 @@ public class PropertyDictionary extends DictionaryEntry implements Serializable 
 	public static final String SITE_SPLASH = "site_splash";
 	public static final String MAINTENANCE_SPLASH = "maintenance_splash";
 	public static final String HTGONLY = "htgonly";
+	public static final String SHOW_CORE_INFO = "show_core_info_box";
 
 	public static final String CONFIGURABLE_BILLING_ACCOUNTS = "configurable_billing_accounts";
 	public static final String INVOICE_NOTE_1 = "invoice_note_1";
