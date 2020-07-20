@@ -8,37 +8,28 @@ package hci.gnomex.controller;
  */
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.*;
+import net.sf.json.JSON;
+import net.sf.json.xml.XMLSerializer;
+import org.apache.log4j.Logger;
 
-import java.io.*;
-import java.net.InetAddress;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.*;
-
-import javax.ejb.EJBException;
 import javax.mail.Session;
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
-import net.sf.json.JSON;
-import net.sf.json.xml.XMLSerializer;
-
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
 
 public class GNomExFrontController extends HttpServlet {
 private static Logger LOG = Logger.getLogger(GNomExFrontController.class);
@@ -478,7 +469,7 @@ private void sendRedirect(HttpServletResponse response, String url) {
           // yes convert it
           String hintKey = requestName + "." + paramName;
 
-          System.out.println("[convertJSONRequesttoXML] **** found a parameterValue to convert **** " + hintKey + " paramName: " + paramName + " parameterValue:\n " + parameterValue);
+//          System.out.println("[convertJSONRequesttoXML] **** found a parameterValue to convert **** " + hintKey + " paramName: " + paramName + " parameterValue:\n " + parameterValue);
 
           JSONtoXML jsonTOxml = new JSONtoXML();
 
@@ -507,7 +498,7 @@ private void sendRedirect(HttpServletResponse response, String url) {
 		  }
 
           // debug ******
-          System.out.println("[convertJSONRequesttoXML]  *** AFTER *** paramName: " + paramName + " xmlParameterValue:\n" + xmlParameterValue);
+//          System.out.println("[convertJSONRequesttoXML]  *** AFTER *** paramName: " + paramName + " xmlParameterValue:\n" + xmlParameterValue);
 
         // Modify the value...
         if (xmlParameterValue != null) {

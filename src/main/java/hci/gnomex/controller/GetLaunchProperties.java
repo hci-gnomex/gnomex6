@@ -35,6 +35,7 @@ private boolean isSecure = false;
 private int serverPort;
 private Integer idCoreFacility;
 private boolean htgonly;
+private boolean show_core_info_box;
 
 public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 	try {
@@ -72,10 +73,21 @@ public Command execute() throws RollBackCommandException {
 		// Pragmatic programming...
 		htgonly = false;
 		PropertyDictionary htgonlyProp = (PropertyDictionary) sess.createQuery("from PropertyDictionary p where p.propertyName='" + PropertyDictionary.HTGONLY + "'").uniqueResult();
-		if (htgonlyProp != null || htgonlyProp.getPropertyValue().equals("Y")) {
+		if (htgonlyProp != null && htgonlyProp.getPropertyValue().equals("Y")) {
 			htgonly = true;
 		}
 
+		show_core_info_box = false;
+		PropertyDictionary show_core_info_boxProp = (PropertyDictionary) sess.createQuery("from PropertyDictionary p where p.propertyName='" + PropertyDictionary.SHOW_CORE_INFO + "'").uniqueResult();
+		if (show_core_info_boxProp != null && show_core_info_boxProp.getPropertyValue().equals("Y")) {
+			show_core_info_box = true;
+		}
+
+		String show_usage_on_startup = "N";
+		PropertyDictionary show_usage_on_startupProp = (PropertyDictionary) sess.createQuery("from PropertyDictionary p where p.propertyName='" + PropertyDictionary.SHOW_USAGE_ON_STARTUP + "'").uniqueResult();
+		if (show_usage_on_startupProp != null) {
+			show_usage_on_startup = show_usage_on_startupProp.getPropertyValue();
+		}
 
 		String baseURL = "";
 		if (serverPort == 80 || (serverPort == 443 && isSecure)) {
@@ -109,6 +121,20 @@ public Command execute() throws RollBackCommandException {
 		node = new Element("Property");
 		node.setAttribute("name", "experiment_alias");
 		node.setAttribute("value", experimentAlias);
+		doc.getRootElement().addContent(node);
+
+		String show_core = "N";
+		if (show_core_info_box) {
+			show_core = "Y";
+		}
+		node = new Element("Property");
+		node.setAttribute("name", "show_core_info_box");
+		node.setAttribute("value", show_core);
+		doc.getRootElement().addContent(node);
+
+		node = new Element("Property");
+		node.setAttribute("name", "show_usage_on_startup");
+		node.setAttribute("value", show_usage_on_startup);
 		doc.getRootElement().addContent(node);
 
 		getCoreFacilities(sess, doc);

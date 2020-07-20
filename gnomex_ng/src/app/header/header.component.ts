@@ -798,11 +798,19 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         iconName: './assets/flask.png',
                         route: '/experiments',
                     },
+/*
                     {
                         displayName: 'Create New Experiments and Upload Files',
                         context: 'newExperimentOrder',
                         iconName: './assets/flask_add.png',
                         route: ''
+                    },
+*/
+                    {
+                        displayName: 'Upload Experiment data generated at third party facility',
+                        context: 'newExternalExperiment',
+                        iconName: './assets/experiment_register.png',
+                        route: '/new-external-experiment'
                     },
                     {
                         displayName: 'New Project',
@@ -1778,12 +1786,21 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         iconName: './assets/flask.png',
                         route: '/experiments',
                     },
+/*
                     {
                         displayName: 'Create New Experiments and Upload Files',
                         context: 'newExperimentOrder',
                         iconName: './assets/flask_add.png',
                         route: ''
                     },
+*/
+                    {
+                        displayName: 'Upload Experiment data generated at third party facility',
+                        context: 'newExternalExperiment',
+                        iconName: './assets/experiment_register.png',
+                        route: '/new-external-experiment'
+                    },
+
                     {
                         displayName: 'New Project',
                         iconName: './assets/folder_add.png',

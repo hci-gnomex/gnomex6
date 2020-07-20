@@ -92,7 +92,7 @@ public class AESEncryption {
         aes = new AESEncryption(secretKey);             
       }             
       String encryptedString = aes.encrypt(plainText);             
-      System.out.println(plainText + ":" + encryptedString);         
+//      System.out.println(plainText + ":" + encryptedString);
     } else {             
       System.out.println("USAGE: java AES string-to-encrypt [secretKey]");         
     }   

@@ -471,12 +471,16 @@ public class GetExperimentPlatformList extends GNomExCommand implements Serializ
       apps.add(a);
     }
 
+    try {
     if (rct.getIsIllumina() != null && rct.getIsIllumina().equals("Y")) {
       Collections.sort(apps, new illuminaAppComparator(selectedThemes, applicationMap.get(rc.getCodeRequestCategory())));
     } else {
       Collections.sort(apps, new appComparator(applicationMap.get(rc.getCodeRequestCategory())));
     }
-
+} catch (Exception ss)
+    {
+      System.out.println ("[GetExperimentPlatformList] Error: " + ss);
+    }
     return apps;
   }
 
