@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from "@angular/core";
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {Subscription} from "rxjs";
 import {CellValueChangedEvent, GridApi} from "ag-grid-community";
@@ -12,6 +12,8 @@ import {MatDialogConfig} from "@angular/material";
 import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {PrepTypePricingDialogComponent} from "./prep-type-pricing-dialog.component";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";
 
 //assets/page_add.png
 
@@ -87,6 +89,13 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
         {
             headerName: "Prep Type",
             field: "isolationPrepType",
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            validators: [Validators.required, Validators.maxLength(100)],
+            errorNameErrorMessageMap: [
+                {errorName: "required", errorMessage: "Prep Type required"},
+                {errorName: "maxlength", errorMessage: "Maximum of 100 characters"}
+            ],
             editable:true,
             width: 250
         },
@@ -122,8 +131,8 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
                     this.expPlatfromNode = data;
                     this.prepTypeList = Array.isArray(data.prepTypes) ? data.prepTypes : [data.prepTypes.IsolationPrepType];
                     this.showInactive = false;
-                    this.filterOptions();
                     this.selectedPrepTypeRow = [];
+                    this.filterOptions();
                     this.formGroup.get('prepTypes').setValue(this.prepTypeList);
                     this.formGroup.markAsPristine()
                 }
@@ -131,11 +140,27 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
 
     }
 
-    filterOptions() {
+    filterOptions(event?: any) {
+        if(this.gridApi && this.gridApi.getSortModel() && this.gridApi.getSortModel().length > 0) {
+            this.gridApi.setSortModel(null);
+        }
+
         if(this.showInactive) {
             this.rowData = this.prepTypeList;
         } else {
             this.rowData = this.prepTypeList.filter(seqOpt => seqOpt.isActive === "Y" );
+        }
+
+        if(event && this.selectedPrepTypeRow.length > 0) {
+            this.gridApi.setRowData(this.rowData);
+            this.gridApi.clearFocusedCell();
+            let rowIndex = this.rowData.indexOf(this.selectedPrepTypeRow[0]);
+            if(rowIndex >= 0) {
+                this.gridApi.getRowNode("" + rowIndex).setSelected(true);
+            } else {
+                this.gridApi.deselectAll();
+                this.selectedPrepTypeRow = [];
+            }
         }
     }
 
@@ -206,6 +231,7 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
         this.prepTypeList.splice(0, 0, newPrepType);
         this.filterOptions();
         this.gridApi.setRowData(this.rowData);
+        this.gridApi.clearFocusedCell();
         this.gridApi.forEachNode(node => node.rowIndex ? 0 : node.setSelected(true, true));
         this.formGroup.markAsDirty();
 

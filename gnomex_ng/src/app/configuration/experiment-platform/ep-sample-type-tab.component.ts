@@ -44,15 +44,17 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
 
             </div>
             <div style="flex:9" class="full-width">
-                <ag-grid-angular class="full-height full-width ag-theme-fresh"
+                <ag-grid-angular class="full-height full-width ag-theme-balham"
                                  [context]="context"
                                  [columnDefs]="columnDefs"
                                  (cellValueChanged)="onCellValueChanged($event)"
                                  [rowData]="this.sampleTypeRowData"
                                  (gridReady)="onGridReady($event)"
                                  (gridSizeChanged)="onGridSizeChanged($event)"
+                                 [enableSorting]="true"
                                  [rowDeselection]="true"
                                  [rowSelection]="'single'"
+                                 [singleClickEdit]="true"
                                  (rowSelected)="this.onSampleTypeRowSelected($event)"
                                  [stopEditingWhenGridLosesFocus]="true">
                 </ag-grid-angular>
@@ -183,6 +185,13 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
             headerName: "Sort Order",
             field: "sortOrder",
             valueParser: this.parseSortOrder,
+            comparator: this.expPlatfromService.gridNumberComparator,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            validators: [Validators.pattern(/^\d{0,2}$/)],
+            errorNameErrorMessageMap: [
+                {errorName: "pattern", errorMessage: "Expects a number of 0-99"},
+            ],
             editable:true,
             width: 100
         }
@@ -218,11 +227,27 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
     }
 
     filterOptions(event?: any) {
+        if(this.gridApi && this.gridApi.getSortModel() && this.gridApi.getSortModel().length > 0) {
+            this.gridApi.setSortModel(null);
+        }
+
         // This is to filter the data that is executive(selected), but not to filter the data that is active in database.
         if(this.showInactive) {
-            this.sampleTypeRowData = this.sampleTypeList;
+            this.sampleTypeRowData = this.sampleTypeList.sort(this.sortSampleTypefn);
         } else {
-            this.sampleTypeRowData = this.sampleTypeList.filter((samType: any) => (samType.isSelected === "Y"));
+            this.sampleTypeRowData = this.sampleTypeList.filter((samType: any) => (samType.isSelected === "Y")).sort(this.sortSampleTypefn);
+        }
+
+        if(event && this.selectedSampleTypeRows.length > 0) {
+            this.gridApi.setRowData(this.sampleTypeRowData);
+            this.gridApi.clearFocusedCell();
+            let rowIndex = this.sampleTypeRowData.indexOf(this.selectedSampleTypeRows[0]);
+            if(rowIndex >= 0) {
+                this.gridApi.getRowNode("" + rowIndex).setSelected(true);
+            } else {
+                this.gridApi.deselectAll();
+                this.selectedSampleTypeRows = [];
+            }
         }
     }
 
@@ -270,6 +295,7 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
             this.sampleTypeList.splice(0, 0, newSampleType);
             this.filterOptions();
             this.gridApi.setRowData(this.sampleTypeRowData);
+            this.gridApi.clearFocusedCell();
             this.gridApi.forEachNode(node => node.rowIndex ? 0 : node.setSelected(true, true));
             this.expPlatfromService.findExpPlatformFormMember(this.constructor.name).markAsDirty();
 
@@ -319,9 +345,17 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
         }
     }
     onCellValueChanged(event):void {
-            if(event.oldValue !== event.newValue){
-                this.formGroup.markAsDirty();
+        if(event.oldValue !== event.newValue){
+            this.formGroup.markAsDirty();
+            if(event.column.getColId() === "sortOrder" && !Number.isNaN(+event.newValue)) {
+                this.gridApi.clearFocusedCell();
+                this.gridApi.setSortModel(null);
+                this.sampleTypeRowData.sort(this.sortSampleTypefn);
+                this.gridApi.setRowData(this.sampleTypeRowData);
+                let rowIndex  = "" + this.sampleTypeRowData.indexOf(event.data);
+                this.gridApi.getRowNode(rowIndex).setSelected(true);
             }
+        }
 
     }
 

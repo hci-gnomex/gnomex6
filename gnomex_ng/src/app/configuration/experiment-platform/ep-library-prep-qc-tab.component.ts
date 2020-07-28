@@ -33,6 +33,8 @@ import {GridApi, RowSelectedEvent} from "ag-grid-community";
                                  (gridSizeChanged)="onGridSizeChanged($event)"
                                  (cellValueChanged)="onCellValueChanged($event)"
                                  [rowDeselection]="true"
+                                 [enableSorting]="true"
+                                 [singleClickEdit]="true"
                                  [rowSelection]="'single'"
                                  (rowSelected)="this.onRowSelected($event)"
                                  [stopEditingWhenGridLosesFocus]="true">

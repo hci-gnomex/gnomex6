@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from "@angular/core";
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {Subscription} from "rxjs";
 import {CellValueChangedEvent, GridApi} from "ag-grid-community";
@@ -10,6 +10,8 @@ import {MatDialogConfig} from "@angular/material";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {QcAssayDialogComponent} from "./qc-assay-dialog.component";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";
 
 @Component({
     template: `
@@ -102,12 +104,26 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
             headerName: "Sort Order",
             field: "sortOrder",
             valueParser: this.parseSortOrder,
+            comparator: this.expPlatfromService.gridNumberComparator,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            validators: [Validators.pattern(/^\d{0,2}$/)],
+            errorNameErrorMessageMap: [
+                {errorName: "pattern", errorMessage: "Expects a number of 0-99"},
+            ],
             editable:true,
             width: 100
         },
         {
             headerName: "Experiment Type",
             field: "display",
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            validators: [Validators.required, Validators.maxLength(100)],
+            errorNameErrorMessageMap: [
+                {errorName: "required", errorMessage: "Experiment Type required"},
+                {errorName: "maxlength", errorMessage: "Maximum of 100 characters"}
+            ],
             editable:true,
             width: 250
         },
@@ -211,11 +227,16 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
     onCellValueChanged(event:CellValueChangedEvent):void {
         if(event.oldValue !== event.newValue){
             this.formGroup.markAsDirty();
-            if(event.column.getColId() === "sortOrder"){
+            if(event.column.getColId() === "sortOrder" && !Number.isNaN(+event.newValue)){
+                this.gridApi.setSortModel(null);
+                this.gridApi.clearFocusedCell();
+                this.rowData.sort(this.compareApplications);
                 this.gridApi.setRowData(this.rowData);
+                let rowIndex  = "" + this.rowData.indexOf(event.data);
+                this.gridApi.getRowNode(rowIndex).setSelected(true);
             }
             if(event.column.getColId() === "display"){
-                this.selectedApp[0].application = this.selectedApp[0].display
+                this.selectedApp[0].application = this.selectedApp[0].display;
             }
         }
 
@@ -231,10 +252,26 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
     }
 
     filterAppOptions(event?: any) {
+        if(this.gridApi && this.gridApi.getSortModel() && this.gridApi.getSortModel().length > 0) {
+            this.gridApi.setSortModel(null);
+        }
+
         if(this.showInactive) {
-            this.rowData = this.refinedAllApps;
+            this.rowData = this.refinedAllApps.sort(this.compareApplications);
         } else {
-            this.rowData = this.refinedAllApps.filter(app => app.isSelected === "Y");
+            this.rowData = this.refinedAllApps.filter(app => app.isSelected === "Y").sort(this.compareApplications);
+        }
+
+        if(event && this.selectedApp.length > 0) {
+            this.gridApi.setRowData(this.rowData);
+            this.gridApi.clearFocusedCell();
+            let rowIndex  = this.rowData.indexOf(this.selectedApp[0]);
+            if(rowIndex >= 0) {
+                this.gridApi.getRowNode("" + rowIndex).setSelected(true);
+            } else {
+                this.gridApi.deselectAll();
+                this.selectedApp = [];
+            }
         }
     }
 
@@ -260,8 +297,11 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
 
             }
             this.formGroup.markAsDirty();
-            this.filterAppOptions();
-            this.gridApi.setRowData(this.rowData);
+            this.gridApi.setRowData(this.rowData.sort(this.compareApplications));
+            this.gridApi.clearFocusedCell();
+            this.gridApi.setSortModel(null);
+            let rowIndex  = "" + this.rowData.indexOf(this.selectedApp[0]);
+            this.gridApi.getRowNode(rowIndex).setSelected(true);
         }
 
     };
@@ -305,6 +345,7 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
         this.refinedAllApps.splice(0, 0, newApp);
         this.filterAppOptions();
         this.gridApi.setRowData(this.rowData);
+        this.gridApi.clearFocusedCell();
         this.gridApi.forEachNode(node => node.rowIndex ? 0 : node.setSelected(true, true, true));
         this.selectedApp = [newApp];
         this.openQCEditor();
