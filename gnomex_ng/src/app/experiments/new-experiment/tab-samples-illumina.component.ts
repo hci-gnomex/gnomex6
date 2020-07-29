@@ -823,15 +823,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
             });
 
             if (!this.isAmendState) {
-                temp.push({
-                    headerName: "Index Tag Sequence A",
-                    field: "barcodeSequence",
-                    width:    7.5 * this.emToPxConversionRate,
-                    minWidth: 6.5 * this.emToPxConversionRate,
-                    suppressSizeToFit: true,
-                    editable: false,
-                    sortOrder: 305
-                });
+                // temp.push({
+                //     headerName: "Index Tag Sequence A",
+                //     field: "barcodeSequence",
+                //     width:    7.5 * this.emToPxConversionRate,
+                //     minWidth: 6.5 * this.emToPxConversionRate,
+                //     suppressSizeToFit: true,
+                //     editable: false,
+                //     sortOrder: 305
+                // });
 
                 let permittedBarcodes: any[] = [];
 
@@ -875,15 +875,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     });
                 }
 
-                temp.push({
-                    headerName: "Index Tag Sequence B",
-                    field: "barcodeSequenceB",
-                    width:    7 * this.emToPxConversionRate,
-                    minWidth: 6.5 * this.emToPxConversionRate,
-                    suppressSizeToFit: true,
-                    editable: false,
-                    sortOrder: 315
-                });
+                // temp.push({
+                //     headerName: "Index Tag Sequence B",
+                //     field: "barcodeSequenceB",
+                //     width:    7 * this.emToPxConversionRate,
+                //     minWidth: 6.5 * this.emToPxConversionRate,
+                //     suppressSizeToFit: true,
+                //     editable: false,
+                //     sortOrder: 315
+                // });
 
                 temp.push({
                     headerName: "Lib QC Conc.",
@@ -1165,15 +1165,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 ],
                 sortOrder: 300
             });
-            temp.push({
-                headerName: "Index Tag Sequence A",
-                field: "barcodeSequence",
-                width:    8.5 * this.emToPxConversionRate,
-                minWidth: 8.5 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: false,
-                sortOrder: 301
-            });
+            // temp.push({
+            //     headerName: "Index Tag Sequence A",
+            //     field: "barcodeSequence",
+            //     width:    8.5 * this.emToPxConversionRate,
+            //     minWidth: 8.5 * this.emToPxConversionRate,
+            //     suppressSizeToFit: true,
+            //     editable: false,
+            //     sortOrder: 301
+            // });
 
             let permittedBarcodes: any[] = [];
 
@@ -1217,15 +1217,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 });
             }
 
-            temp.push({
-                headerName: "Index Tag Sequence B",
-                field: "barcodeSequenceB",
-                width:    8.5 * this.emToPxConversionRate,
-                minWidth: 8.5 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: false,
-                sortOrder: 303
-            });
+            // temp.push({
+            //     headerName: "Index Tag Sequence B",
+            //     field: "barcodeSequenceB",
+            //     width:    8.5 * this.emToPxConversionRate,
+            //     minWidth: 8.5 * this.emToPxConversionRate,
+            //     suppressSizeToFit: true,
+            //     editable: false,
+            //     sortOrder: 303
+            // });
 
             temp.push({
                 headerName: "Lib QC Conc.",
@@ -1467,13 +1467,13 @@ export class TabSamplesIlluminaComponent implements OnInit {
             temp.push({
                 headerName: "Index Tag A",
                 editable: false,
-                width:    12 * this.emToPxConversionRate,
-                minWidth: 12 * this.emToPxConversionRate,
+                width:    7 * this.emToPxConversionRate,
+                minWidth: 7 * this.emToPxConversionRate,
                 field: "idOligoBarcode",
                 cellRendererFramework: SelectRenderer,
                 cellEditorFramework: BarcodeSelectEditor,
                 selectOptions: this._barCodes,
-                selectOptionsDisplayField: "display",
+                selectOptionsDisplayField: "name",
                 selectOptionsValueField: "idOligoBarcode",
                 indexTagLetter: 'A',
                 sortOrder: 300
@@ -1498,13 +1498,13 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 temp.push({
                     headerName: "Index Tag B",
                     editable: false,
-                    width:    12 * this.emToPxConversionRate,
-                    minWidth: 12 * this.emToPxConversionRate,
+                    width:    7 * this.emToPxConversionRate,
+                    minWidth: 7 * this.emToPxConversionRate,
                     field: "idOligoBarcodeB",
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: BarcodeSelectEditor,
                     selectOptions: this._barCodes,
-                    selectOptionsDisplayField: "display",
+                    selectOptionsDisplayField: "name",
                     selectOptionsValueField: "idOligoBarcodeB",
                     indexTagLetter: 'B',
                     sortOrder: 302
