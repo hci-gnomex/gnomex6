@@ -73,7 +73,7 @@ export class LibraryPrepDialogComponent extends BaseGenericContainerDialog imple
         this.formGroup = this.fb.group({
             application: [this.uncomittedRowData.application ? this.uncomittedRowData.application : '' , [Validators.required, Validators.maxLength(this.constService.MAX_LENGTH_100)]] ,
             sortOrder: [this.uncomittedRowData.sortOrder ? this.uncomittedRowData.sortOrder : '', numberRange(0,99)],
-            idApplicationTheme: this.uncomittedRowData.idApplicationTheme ? this.uncomittedRowData.idApplicationTheme : '',
+            idApplicationTheme: [this.uncomittedRowData.idApplicationTheme ? this.uncomittedRowData.idApplicationTheme : '', Validators.required],
             idBarcodeSchemeA: this.uncomittedRowData.idBarcodeSchemeA ? this.uncomittedRowData.idBarcodeSchemeA  : '',
             idBarcodeSchemeB: this.uncomittedRowData.idBarcodeSchemeB ? this.uncomittedRowData.idBarcodeSchemeB  : '',
             onlyForLabPrepped: this.uncomittedRowData.onlyForLabPrepped === 'Y' ? 'Y' : 'N',

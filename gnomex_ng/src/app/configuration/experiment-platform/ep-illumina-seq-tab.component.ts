@@ -140,10 +140,12 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
         {
             headerName: "Sort Order",
             field: "sortOrder",
+            valueParser: this.parseSortOrder,
+            comparator: this.expPlatfromService.gridNumberComparator,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
-            validators: [Validators.min(0), Validators.max(99), Validators.pattern(/^\d{0,2}$/)],
-            errorNameErrorMessageMap: [{errorName: "numberRange", errorMessage: "Requires a number of 0-99"}],
+            validators: [Validators.pattern(/^\d{0,2}$/)],
+            errorNameErrorMessageMap: [{errorName: "pattern", errorMessage: "Requires a number of 0-99"}],
             editable:true,
             width: 100
         },
@@ -168,6 +170,7 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
             selectOptions: this.seqCycleList,
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "value",
+            comparator: this.expPlatfromService.gridNumberComparator,
             validators: [Validators.required],
             errorNameErrorMessageMap: [{errorName: "required", errorMessage: "Cycles required"}],
             editable:true,
@@ -256,9 +259,8 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
     }
 
     filterSeqOptions(event?: any){
-        if(event) {
-            this.selectedSeqOpt = [];
-            this.gridApi.clearFocusedCell();
+        if(this.gridApi && this.gridApi.getSortModel() && this.gridApi.getSortModel().length > 0) {
+            this.gridApi.setSortModel(null);
         }
 
         if(this.showInactive){
@@ -268,6 +270,17 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
             let activeSeqOptList = this.seqOptionsList.filter(seqOpt => seqOpt.isActive === 'Y' );
             this.rowData = activeSeqOptList.sort(this.sortSeqOptions);
             this.gridApi.setRowData(this.rowData);
+        }
+
+        if(event && this.selectedSeqOpt.length > 0) {
+            this.gridApi.clearFocusedCell();
+            let rowIndex = this.rowData.indexOf(this.selectedSeqOpt[0]);
+            if(rowIndex >= 0) {
+                this.gridApi.getRowNode("" + rowIndex).setSelected(true);
+            } else {
+                this.gridApi.deselectAll();
+                this.selectedSeqOpt = [];
+            }
         }
     }
 
@@ -305,12 +318,13 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
     onCellValueChanged(event:CellValueChangedEvent):void {
         if(event.oldValue !== event.newValue){
             this.formGroup.markAsDirty();
-            if(event.column.getColId() === "sortOrder"){
+            if(event.column.getColId() === "sortOrder" && !Number.isNaN(+event.newValue)){
+                this.gridApi.clearFocusedCell();
+                this.gridApi.setSortModel(null);
                 this.rowData.sort(this.sortSeqOptions);
                 this.gridApi.setRowData(this.rowData);
                 let rowIndex  = "" + this.rowData.indexOf(event.data);
                 this.gridApi.getRowNode(rowIndex).setSelected(true);
-                this.gridApi.setFocusedCell(this.gridApi.getRowNode(rowIndex).rowIndex, "sortOrder");
             }
         }
 
@@ -336,11 +350,9 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
             this.formGroup.markAsDirty();
 
             this.gridApi.clearFocusedCell();
-            this.selectedSeqOpt = [];
-            let rowIndex: number = this.rowData.indexOf(seqOpt);
-            if(rowIndex >= 0) {
-                this.gridApi.getRowNode("" + rowIndex).setSelected(true);
-            }
+            this.gridApi.setSortModel(null);
+            let rowIndex = "" + this.rowData.indexOf(this.selectedSeqOpt[0]);
+            this.gridApi.getRowNode(rowIndex).setSelected(true);
         }
 
     };

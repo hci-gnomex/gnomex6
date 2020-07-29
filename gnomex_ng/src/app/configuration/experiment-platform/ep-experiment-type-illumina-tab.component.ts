@@ -128,7 +128,11 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
             validators: [Validators.pattern(/^\d{0,2}$/)],
+            errorNameErrorMessageMap: [
+                {errorName: "pattern", errorMessage: "Expects a number of 0-99"},
+            ],
             valueParser: this.parseSortOrder,
+            comparator: this.expPlatfromService.gridNumberComparator,
             editable:true,
             width: 100
         },
@@ -140,6 +144,10 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
             selectOptions: this.appThemeCol,
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "value",
+            validators: [Validators.required],
+            errorNameErrorMessageMap: [
+                {errorName: "required", errorMessage: "Experiment Type Theme required"},
+            ],
             editable:true,
             width: 250
         },
@@ -150,7 +158,7 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
             cellEditorFramework: TextAlignLeftMiddleEditor,
             validators: [Validators.required, Validators.maxLength(100)],
             errorNameErrorMessageMap: [
-                {errorName: "required", errorMessage: "Sample Type required"},
+                {errorName: "required", errorMessage: "Experiment Type required"},
                 {errorName: "maxlength", errorMessage: "Maximum of 100 characters"}
             ],
             editable:true,
@@ -272,12 +280,13 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
     onCellValueChanged(event:CellValueChangedEvent):void {
         if(event.oldValue !== event.newValue){
             this.formGroup.markAsDirty();
-            if(event.column.getColId() === "sortOrder"){
+            if(event.column.getColId() === "sortOrder" && !Number.isNaN(+event.newValue)){
+                this.gridApi.setSortModel(null);
+                this.gridApi.clearFocusedCell();
                 this.rowData.sort(this.compareApplications);
                 this.gridApi.setRowData(this.rowData);
                 let rowIndex  = "" + this.rowData.indexOf(event.data);
                 this.gridApi.getRowNode(rowIndex).setSelected(true);
-                this.gridApi.setFocusedCell(this.gridApi.getRowNode(rowIndex).rowIndex, "sortOrder");
             }
             if(event.column.getColId() === "display"){
                 this.selectedApp[0].application = this.selectedApp[0].display;
@@ -297,15 +306,27 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
     }
 
     filterAppOptions(event?: any) {
-        if(event) {
-            this.selectedApp = [];
-            this.gridApi.clearFocusedCell();
+        if(this.gridApi && this.gridApi.getSortModel() && this.gridApi.getSortModel().length > 0) {
+            this.gridApi.setSortModel(null);
         }
+
         // This is to filter the data that is executive(selected), but not to filter the data that is active in database.
         if(this.showInactive) {
             this.rowData = this.appList.sort(this.compareApplications);
         } else {
             this.rowData = this.appList.filter(app => app.isSelected === "Y").sort(this.compareApplications);
+        }
+
+        if(event && this.selectedApp.length > 0) {
+            this.gridApi.setRowData(this.rowData);
+            this.gridApi.clearFocusedCell();
+            let rowIndex = this.rowData.indexOf(this.selectedApp[0]);
+            if(rowIndex >= 0) {
+                this.gridApi.getRowNode("" + rowIndex).setSelected(true);
+            } else {
+                this.gridApi.deselectAll();
+                this.selectedApp = [];
+            }
         }
     }
 
@@ -348,6 +369,7 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
             this.formGroup.markAsDirty();
 
             this.gridApi.clearFocusedCell();
+            this.gridApi.setSortModel(null);
             this.selectedApp = [];
             let rowIndex: number = this.rowData.indexOf(app);
             if(rowIndex >= 0) {
@@ -382,12 +404,14 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
             isSelected: "Y",
             codeApplication: 'Application'+ this.nextAppNumb,
             display:'',
+            idApplicationTheme: '',
             idSeqLibProtocols:'',
             idLabelingProtocolDefault:'',
             idHybProtocolDefault:'',
             idScanProtocolDefault:'',
             idFeatureExtractionProtocolDefault: '',
             isActive:'Y',
+            sortOrder: '0',
             canUpdate:'Y',
             RequestCategoryApplication: []
         };
@@ -410,7 +434,8 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
         this.gridApi.setRowData(this.rowData);
         this.formGroup.markAsDirty();
         this.gridApi.clearFocusedCell();
-        this.gridApi.forEachNode(node => node.rowIndex ? 0 : node.setSelected(true, true));
+        let rowIndex  = "" + this.rowData.indexOf(newApp);
+        this.gridApi.getRowNode(rowIndex).setSelected(true);
         this.selectedApp = [newApp];
         this.openLibPrepEditor();
 
@@ -427,6 +452,7 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
                     this.filterAppOptions();
                     this.gridApi.setRowData(this.rowData);
                     this.formGroup.markAsDirty();
+                    this.selectedApp = [];
                 }
 
             }

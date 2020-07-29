@@ -215,4 +215,16 @@ export class ExperimentPlatformService implements OnDestroy {
         this.cookieUtilService.formatXSRFCookie();
         return this.httpClient.post("/gnomex/DeleteExperimentPlatform.gx", null, {params: params});
     }
+
+    gridNumberComparator = (obj1, obj2) => {
+        let s1: number = +obj1;
+        let s2: number = +obj2;
+        if (s1 < s2) {
+            return -1;
+        } else if (s1 > s2) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
 }

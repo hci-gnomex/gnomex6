@@ -28,12 +28,15 @@ import {DictionaryService} from "../../services/dictionary.service";
                 </button>
             </div>
             <div style="flex:7" class="full-width">
-                <ag-grid-angular class="full-height full-width ag-theme-fresh"
+                <ag-grid-angular class="full-height full-width ag-theme-balham"
                                  [columnDefs]="columnDefs"
                                  [rowData]="this.pipelineRowData"
                                  (gridReady)="onGridReady($event)"
                                  (gridSizeChanged)="onGridSizeChanged($event)"
+                                 [rowDeselection]="true"
                                  [rowSelection]="'single'"
+                                 [enableSorting]="true"
+                                 [singleClickEdit]="true"
                                  (rowSelected)="this.onProtocolRowSelected($event)"
                                  [stopEditingWhenGridLosesFocus]="true">
                 </ag-grid-angular>
@@ -188,6 +191,7 @@ export class EpPipelineProtocolTabComponent implements OnInit, OnDestroy{
         this.pipelineRowData.splice(0,0,rowObj);
         this.gridApi.setRowData(this.pipelineRowData);
         this.formGroup.markAsDirty();
+        this.gridApi.clearFocusedCell();
         let rowIndex = this.pipelineRowData.indexOf(rowObj);
         this.gridApi.getRowNode("" + rowIndex).setSelected(true);
         document.getElementById("protocolInput").focus();
@@ -200,6 +204,7 @@ export class EpPipelineProtocolTabComponent implements OnInit, OnDestroy{
                     this.pipelineRowData.splice(removeIndex,1);
                     this.gridApi.setRowData(this.pipelineRowData);
                     this.disableControl = true;
+                    this.selectedProtocolRow = [];
                     this.clearProtocolInfo();
                     this.formGroup.markAsDirty();
                 }
