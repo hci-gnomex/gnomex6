@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {Subscription} from "rxjs";
-import {CellValueChangedEvent, GridApi} from "ag-grid-community";
+import {CellValueChangedEvent, GridApi, NumberFilter} from "ag-grid-community";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {ConstantsService} from "../../services/constants.service";
@@ -21,27 +21,34 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
 @Component({
     template: `
         <div class="full-height full-width flex-container-col">
-            <div class="flex-grow flex-container-row" style="align-items:center;"  >
-                <button mat-button color="primary"
-                        type="button"
-                        (click)="addApplication()">
-                    <img [src]="this.constService.ICON_ADD"> Add
-                </button>
-                <button [disabled]="selectedApp.length === 0"
-                        (click)="removeApplication()"
-                        mat-button color="primary"
-                        type="button">
-                    <img [src]="this.constService.ICON_DELETE"> Remove
-                </button>
-                <button mat-button
-                        color="primary"
-                        (click)="openLibPrepEditor()"
-                        [disabled]="selectedApp.length === 0"
-                        type="button"> Edit Library Prep </button>
-
-                <mat-checkbox (change)="filterAppOptions($event)" [(ngModel)]="showInactive">Show Inactive</mat-checkbox>
+            <div class="flex-grow flex-container-row align-center justify-space-between">
+                <div>
+                    <button mat-button color="primary"
+                            type="button"
+                            (click)="addApplication()">
+                        <img [src]="this.constService.ICON_ADD"> Add
+                    </button>
+                    <button [disabled]="selectedApp.length === 0"
+                            (click)="removeApplication()"
+                            mat-button color="primary"
+                            type="button">
+                        <img [src]="this.constService.ICON_DELETE"> Remove
+                    </button>
+                    <button mat-button style="margin-left: 3em;"
+                                color="primary"
+                                (click)="openLibPrepEditor()"
+                                [disabled]="selectedApp.length === 0"
+                                type="button">
+                            <img [src]="this.constService.ICON_TAG_BLUE_EDIT"> Edit Library Prep Protocol
+                    </button>
+                    <mat-checkbox style="margin-left: 3em;" (change)="filterAppOptions($event)" [(ngModel)]="showInactive">Show Inactive</mat-checkbox>
+                </div>
+                <div>
+                    <button mat-button [hidden]="!this.isAnyFilterPresent" (click)="clearFilterModel()">Clear Filter</button>
+                </div>
 
             </div>
+            <label style="padding: 0.5em;"> * Gird data is sortable and filterable. To sort, click the column header(sortable for asc/desc/default). To filter or search, hover the column header right side and click the filter icon.</label>
             <div style="flex:9" class="full-width">
                 <ag-grid-angular class="full-height full-width ag-theme-balham"
                                  [columnDefs]="columnDefs"
@@ -52,6 +59,7 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
                                  (gridSizeChanged)="onGridSizeChanged($event)"
                                  [rowDeselection]="true"
                                  [enableSorting]="true"
+                                 [enableFilter]="true"
                                  [rowSelection]="'single'"
                                  (rowSelected)="this.onRowSelected($event)"
                                  [singleClickEdit]="true"
@@ -98,7 +106,16 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
         }
         return this._seqTypeRunList;
     }
+    get isAnyFilterPresent(): boolean {
+        return this.gridApi ? this.gridApi.isAnyFilterPresent() : false;
+    }
 
+    clearFilterModel(): void {
+        if(this.gridApi && this.gridApi.isAnyFilterPresent()) {
+            this.gridApi.setFilterModel(null);
+            this.gridApi.setSortModel(null);
+        }
+    }
 
     private parseSortOrder(params){
         if(Number.isNaN(Number.parseInt(params.newValue))){
@@ -111,20 +128,22 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
         return params.newValue;
     }
 
-
-
     public columnDefs: any[] = [
         {
             headerName: "Active",
             field: "isSelected",
             cellRendererFramework: CheckboxRenderer,
             checkboxEditable: true,
+            suppressFilter: true,
             editable: false,
-            width: 100
+            width: 50
         },
         {
             headerName: "Sort Order",
             field: "sortOrder",
+            filter: NumberFilter,
+            filterValueGetter: this.expPlatfromService.gridNumberFilterValueGetter,
+            filterParams: {clearButton: true},
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
             validators: [Validators.pattern(/^\d{0,2}$/)],
@@ -134,11 +153,13 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
             valueParser: this.parseSortOrder,
             comparator: this.expPlatfromService.gridNumberComparator,
             editable:true,
-            width: 100
+            width: 50
         },
         {
-            headerName: "Sequencing Experiment Type Theme",
+            headerName: "Library Prep Theme",
             field: "idApplicationTheme",
+            filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+            filterParams: {clearButton: true},
             cellRendererFramework: SelectRenderer,
             cellEditorFramework: SelectEditor,
             selectOptions: this.appThemeCol,
@@ -146,19 +167,20 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
             selectOptionsValueField: "value",
             validators: [Validators.required],
             errorNameErrorMessageMap: [
-                {errorName: "required", errorMessage: "Experiment Type Theme required"},
+                {errorName: "required", errorMessage: "Library Prep Theme required"},
             ],
             editable:true,
             width: 250
         },
         {
-            headerName: "Sequencing Experiment Type",
+            headerName: "Library Prep Protocol",
             field: "display",
+            filterParams: {clearButton: true},
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
             validators: [Validators.required, Validators.maxLength(100)],
             errorNameErrorMessageMap: [
-                {errorName: "required", errorMessage: "Experiment Type required"},
+                {errorName: "required", errorMessage: "Library Prep Protocol required"},
                 {errorName: "maxlength", errorMessage: "Maximum of 100 characters"}
             ],
             editable:true,
@@ -336,6 +358,7 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
             app.application =  libPrepDialogForm.get('application').value;
             app.display =  libPrepDialogForm.get('application').value;
             app.sortOrder =  libPrepDialogForm.get('sortOrder').value;
+            app.isActive =  libPrepDialogForm.get('isActive').value ? "Y" : "N";
             app.idApplicationTheme =  libPrepDialogForm.get('idApplicationTheme').value;
             app.idBarcodeSchemeA =  libPrepDialogForm.get('idBarcodeSchemeA').value;
             app.idBarcodeSchemeB =  libPrepDialogForm.get('idBarcodeSchemeB').value;
@@ -359,7 +382,11 @@ export class EpExperimentTypeIlluminaTabComponent implements OnInit, OnDestroy{
                     if(rca){
                         rca.isSelected = libPrepDialogForm.controls[key].value ? 'Y' : 'N';
                         if(rca.codeRequestCategory === this.expPlatfromNode.codeRequestCategory) {
-                            app.isSelected = rca.isSelected;
+                            if(!libPrepDialogForm.get('isActive').value || app.isActive !== 'Y') {
+                                app.isSelected = 'N';
+                            } else {
+                                app.isSelected = rca.isSelected;
+                            }
                         }
                     }
                 }

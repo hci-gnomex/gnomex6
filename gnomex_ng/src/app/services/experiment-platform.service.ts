@@ -8,6 +8,8 @@ import {DictionaryService} from "./dictionary.service";
 import {AbstractControl, FormGroup} from "@angular/forms";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {ValueGetterParams} from "ag-grid-community/src/ts/entities/colDef";
+import {DictionaryEntry} from "../configuration/dictionary-entry.type";
 
 @Injectable()
 export class ExperimentPlatformService implements OnDestroy {
@@ -227,4 +229,31 @@ export class ExperimentPlatformService implements OnDestroy {
             return 0;
         }
     }
+
+    gridComboFilterValueGetter(params: ValueGetterParams): any {
+        let value = params.data[params.colDef.field];
+        if(value) {
+            let option: DictionaryEntry = ((params.colDef as any).selectOptions as DictionaryEntry[]).find((entry: DictionaryEntry) => (entry.value === value));
+            return option ? option.display : "";
+        }
+        return "";
+    }
+
+    gridNumberFilterValueGetter(params: ValueGetterParams): any {
+        let number: number = +(params.data[params.colDef.field]);
+        return number;
+    }
+
+    gridComboNumberFilterValueGetter(params: ValueGetterParams): any {
+        let value = params.data[params.colDef.field];
+        if(value) {
+            let option: DictionaryEntry = ((params.colDef as any).selectOptions as DictionaryEntry[]).find((entry: DictionaryEntry) => (entry.value === value));
+            if(option && option.display && !Number.isNaN(+option.display)) {
+                let numberValue: number = +option.display;
+                return numberValue;
+            }
+        }
+        return "";
+    }
+
 }

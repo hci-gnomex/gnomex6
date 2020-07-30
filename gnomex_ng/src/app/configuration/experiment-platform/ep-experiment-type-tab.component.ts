@@ -86,6 +86,16 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
         }
         return this._feProtocolCol;
     }
+    get isAnyFilterPresent(): boolean {
+        return this.gridApi ? this.gridApi.isAnyFilterPresent() : false;
+    }
+
+    clearFilterModel(): void {
+        if(this.gridApi && this.gridApi.isAnyFilterPresent()) {
+            this.gridApi.setFilterModel(null);
+            this.gridApi.setSortModel(null);
+        }
+    }
 
     public columnDefs: any[] = [];
 
@@ -105,12 +115,14 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                 field: "isSelected",
                 cellRendererFramework: CheckboxRenderer,
                 checkboxEditable: true,
+                suppressFilter: true,
                 editable: false,
                 width: 100
             },
             {
                 headerName: "Experiment Type",
                 field: "display",
+                filterParams: {clearButton: true},
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
                 validators: [Validators.required, Validators.maxLength(100)],
@@ -128,6 +140,8 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                 {
                     headerName: "Theme",
                     field: "idApplicationTheme",
+                    filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+                    filterParams: {clearButton: true},
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
                     selectOptions: this.applicationTheme,
@@ -143,6 +157,8 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                 {
                     headerName: "Seq Lib Protocols",
                     field: "idSeqLibProtocols",
+                    filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+                    filterParams: {clearButton: true},
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
                     selectOptions: this.seqLibProtocolCol,
@@ -156,6 +172,7 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                     field: "hasCaptureLibDesign",
                     cellRendererFramework: CheckboxRenderer,
                     checkboxEditable: true,
+                    suppressFilter: true,
                     editable: false,
                     width: 100
                 },
@@ -167,6 +184,8 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                 {
                     headerName: "Labeling Protocol",
                     field: "idLabelingProtocol",
+                    filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+                    filterParams: {clearButton: true},
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
                     selectOptions: this.labelingProtocolCol,
@@ -178,6 +197,8 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                 {
                     headerName: "Hyb Protocol",
                     field: "idHybProtocol",
+                    filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+                    filterParams: {clearButton: true},
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
                     selectOptions: this.hybProtocolCol,
@@ -189,6 +210,8 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                 {
                     headerName: "Scan Protocol",
                     field: "idScanProtocol",
+                    filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+                    filterParams: {clearButton: true},
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
                     selectOptions: this.scanProtocolCol,
@@ -200,6 +223,8 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                 {
                     headerName: "FE Protocol",
                     field: "idFeatureExtractionProtocol",
+                    filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+                    filterParams: {clearButton: true},
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
                     selectOptions: this.feProtocolCol,
@@ -215,6 +240,7 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
             dynamicColDef.push({
                 headerName: "FE Protocol",
                 field: "samplesPerBatch",
+                filterParams: {clearButton: true},
                 comparator: this.expPlatfromService.gridNumberComparator,
                 cellRendererFramework: TextAlignLeftMiddleRenderer,
                 cellEditorFramework: TextAlignLeftMiddleEditor,
@@ -232,6 +258,7 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
             field: "isActive",
             cellRendererFramework: CheckboxRenderer,
             checkboxEditable: true,
+            suppressFilter: true,
             editable: false,
             width: 100
         });

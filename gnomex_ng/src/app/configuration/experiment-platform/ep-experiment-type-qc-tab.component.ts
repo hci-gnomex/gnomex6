@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {Subscription} from "rxjs";
-import {CellValueChangedEvent, GridApi} from "ag-grid-community";
+import {CellValueChangedEvent, GridApi, NumberFilter} from "ag-grid-community";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {ConstantsService} from "../../services/constants.service";
 import {DictionaryService} from "../../services/dictionary.service";
@@ -16,26 +16,33 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
 @Component({
     template: `
         <div class="full-height full-width flex-container-col">
-            <div class="flex-grow flex-container-row" style="align-items:center;"  >
-                <button mat-button color="primary"
-                        type="button"
-                        (click)="addApplication()">
-                    <img [src]="this.constService.ICON_ADD"> Add
-                </button>
-                <button [disabled]="selectedApp.length === 0"
-                        (click)="removeApplication()"
-                        mat-button color="primary"
-                        type="button">
-                    <img [src]="this.constService.ICON_DELETE"> Remove
-                </button>
-                <button mat-button
-                        color="primary"
-                        (click)="openQCEditor()"
-                        [disabled]="selectedApp.length === 0"
-                        type="button"> Edit QC Assay </button>
-                <mat-checkbox (change)="filterAppOptions($event)" [(ngModel)]="showInactive"> Show Inactive </mat-checkbox>
+            <div class="flex-grow flex-container-row align-center justify-space-between">
+                <div>
+                    <button mat-button color="primary"
+                            type="button"
+                            (click)="addApplication()">
+                        <img [src]="this.constService.ICON_ADD"> Add
+                    </button>
+                    <button [disabled]="selectedApp.length === 0"
+                            (click)="removeApplication()"
+                            mat-button color="primary"
+                            type="button">
+                        <img [src]="this.constService.ICON_DELETE"> Remove
+                    </button>
+                    <button mat-button style="margin-left: 3em;"
+                            color="primary"
+                            (click)="openQCEditor()"
+                            [disabled]="selectedApp.length === 0"
+                            type="button">
+                        <img [src]="this.constService.ICON_TAG_BLUE_EDIT"> Edit QC Assay </button>
+                    <mat-checkbox style="margin-left: 3em;" (change)="filterAppOptions($event)" [(ngModel)]="showInactive"> Show Inactive </mat-checkbox>
+                </div>
+                <div>
+                    <button mat-button [hidden]="!this.isAnyFilterPresent" (click)="clearFilterModel()">Clear Filter</button>
+                </div>
 
             </div>
+            <label style="padding: 0.5em;"> * Gird data is sortable and filterable. To sort, click the column header(sortable for asc/desc/default). To filter or search, hover the column header right side and click the filter icon.</label>
             <div style="flex:9" class="full-width">
                 <ag-grid-angular class="full-height full-width ag-theme-balham"
                                  [columnDefs]="columnDefs"
@@ -46,6 +53,7 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
                                  (gridSizeChanged)="onGridSizeChanged($event)"
                                  [rowDeselection]="true"
                                  [enableSorting]="true"
+                                 [enableFilter]="true"
                                  [rowSelection]="'single'"
                                  (rowSelected)="this.onRowSelected($event)"
                                  [singleClickEdit]="true"
@@ -77,6 +85,16 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
     public rowData:any[]= [];
     private refinedAllApps: any[] = [];
 
+    get isAnyFilterPresent(): boolean {
+        return this.gridApi ? this.gridApi.isAnyFilterPresent() : false;
+    }
+
+    clearFilterModel(): void {
+        if(this.gridApi && this.gridApi.isAnyFilterPresent()) {
+            this.gridApi.setFilterModel(null);
+            this.gridApi.setSortModel(null);
+        }
+    }
 
     private parseSortOrder(params){
         if(Number.isNaN(Number.parseInt(params.newValue))){
@@ -97,12 +115,16 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
             field: "isSelected",
             cellRendererFramework: CheckboxRenderer,
             checkboxEditable: true,
+            suppressFilter: true,
             editable: false,
             width: 75
         },
         {
             headerName: "Sort Order",
             field: "sortOrder",
+            filter: NumberFilter,
+            filterValueGetter: this.expPlatfromService.gridNumberFilterValueGetter,
+            filterParams: {clearButton: true},
             valueParser: this.parseSortOrder,
             comparator: this.expPlatfromService.gridNumberComparator,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
@@ -117,6 +139,7 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
         {
             headerName: "Experiment Type",
             field: "display",
+            filterParams: {clearButton: true},
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
             validators: [Validators.required, Validators.maxLength(100)],
@@ -130,6 +153,7 @@ export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{
         {
             headerName: "Has Assays",
             field: "hasChipTypes",
+            suppressFilter: true,
             cellRendererFramework: CheckboxRenderer,
             checkboxEditable: true,
             editable:false,

@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ConstantsService} from "../../services/constants.service";
-import {GridApi} from "ag-grid-community";
+import {GridApi, NumberFilter} from "ag-grid-community";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {GnomexService} from "../../services/gnomex.service";
@@ -20,29 +20,36 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
 @Component({
     template: `
         <div class="full-height full-width flex-container-col">
-            <div class="flex-grow flex-container-row align-center">
-                <button type="button" mat-button color="primary" (click)="select()" [disabled]="sampleTypeRowData.length === 0">
-                    {{selectedState}}
-                </button>
-                <button mat-button color="primary"
-                        type="button"
-                        (click)="addSampleType()">
-                    <img [src]="this.constService.ICON_ADD"> Add
-                </button>
-                <button [disabled]="selectedSampleTypeRows.length === 0"
-                        (click)="removeSampleType()"
-                        mat-button color="primary"
-                        type="button">
-                    <img [src]="this.constService.ICON_DELETE"> Remove
-                </button>
-                <button mat-button
-                        color="primary"
-                        (click)="openSampleTypeEditor()"
-                        [disabled]="selectedSampleTypeRows.length === 0"
-                        type="button"> Edit Notes </button>
-                <mat-checkbox (change)="filterOptions($event)" [(ngModel)]="showInactive">Show Inactive</mat-checkbox>
+            <div class="flex-grow flex-container-row align-center justify-space-between">
+                <div>
+                    <button type="button" mat-button color="primary" (click)="select()" [disabled]="sampleTypeRowData.length === 0">
+                        {{selectedState}}
+                    </button>
+                    <button mat-button color="primary"
+                            type="button"
+                            (click)="addSampleType()">
+                        <img [src]="this.constService.ICON_ADD"> Add
+                    </button>
+                    <button [disabled]="selectedSampleTypeRows.length === 0"
+                            (click)="removeSampleType()"
+                            mat-button color="primary"
+                            type="button">
+                        <img [src]="this.constService.ICON_DELETE"> Remove
+                    </button>
+                    <button mat-button style="margin-left: 3em;"
+                            color="primary"
+                            (click)="openSampleTypeEditor()"
+                            [disabled]="selectedSampleTypeRows.length === 0"
+                            type="button">
+                        <img [src]="this.constService.ICON_TAG_BLUE_EDIT"> Edit Notes </button>
+                    <mat-checkbox style="margin-left: 3em;" (change)="filterOptions($event)" [(ngModel)]="showInactive">Show Inactive</mat-checkbox>
+                </div>
+                <div>
+                    <button mat-button [hidden]="!this.isAnyFilterPresent" (click)="clearFilterModel()">Clear Filter</button>
+                </div>
 
             </div>
+            <label style="padding: 0.5em;"> * Gird data is sortable and filterable. To sort, click the column header(sortable for asc/desc/default). To filter or search, hover the column header right side and click the filter icon.</label>
             <div style="flex:9" class="full-width">
                 <ag-grid-angular class="full-height full-width ag-theme-balham"
                                  [context]="context"
@@ -52,6 +59,7 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
                                  (gridReady)="onGridReady($event)"
                                  (gridSizeChanged)="onGridSizeChanged($event)"
                                  [enableSorting]="true"
+                                 [enableFilter]="true"
                                  [rowDeselection]="true"
                                  [rowSelection]="'single'"
                                  [singleClickEdit]="true"
@@ -155,6 +163,7 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
             field: "isSelected",
             cellRendererFramework: CheckboxRenderer,
             checkboxEditable: true,
+            suppressFilter: true,
             editable: false,
             width: 100
         },
@@ -169,6 +178,7 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
                 {errorName: "required", errorMessage: "Sample Type required"},
                 {errorName: "maxlength", errorMessage: "Maximum of 50 characters"}
             ],
+            filterParams: {clearButton: true},
             width: 300
         },
         {
@@ -178,12 +188,17 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
             selectOptions: this.nucleotideTypeDataProvider,
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "codeNucleotideType",
+            filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+            filterParams: {clearButton: true},
             editable: true,
             width:300
         },
         {
             headerName: "Sort Order",
             field: "sortOrder",
+            filter: NumberFilter,
+            filterValueGetter: this.expPlatfromService.gridNumberFilterValueGetter,
+            filterParams: {clearButton: true},
             valueParser: this.parseSortOrder,
             comparator: this.expPlatfromService.gridNumberComparator,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
@@ -197,6 +212,17 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
         }
 
     ];
+
+    get isAnyFilterPresent(): boolean {
+        return this.gridApi ? this.gridApi.isAnyFilterPresent() : false;
+    }
+
+    clearFilterModel(): void {
+        if(this.gridApi && this.gridApi.isAnyFilterPresent()) {
+            this.gridApi.setFilterModel(null);
+            this.gridApi.setSortModel(null);
+        }
+    }
 
     constructor(private fb: FormBuilder,
                 private constService: ConstantsService,

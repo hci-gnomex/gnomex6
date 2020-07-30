@@ -13,20 +13,25 @@ import {DictionaryService} from "../../services/dictionary.service";
 
         <div class="flex-container-col" style="height: calc(100% - 1em); width: calc(100% - 1em); padding: 0.5em;">
             <div class="flex-grow" >Pipeline protocols for core facility: {{coreFacilityHeader}} </div>
-            
-            <div class="flex-grow flex-container-row"  >
-                <button mat-button color="primary"
-                        type="button"
-                        (click)="addProtocol()">
-                    <img [src]="this.constService.ICON_ADD"> Add
-                </button>
-                <button [disabled]="selectedProtocolRow.length === 0"
-                        (click)="removeProtocol()"
-                        mat-button color="primary"
-                        type="button">
-                    <img [src]="this.constService.ICON_DELETE"> Remove
-                </button>
+            <div class="flex-grow flex-container-row justify-space-between">
+                <div class="flex-container-row">
+                    <button mat-button color="primary"
+                            type="button"
+                            (click)="addProtocol()">
+                        <img [src]="this.constService.ICON_ADD"> Add
+                    </button>
+                    <button [disabled]="selectedProtocolRow.length === 0"
+                            (click)="removeProtocol()"
+                            mat-button color="primary"
+                            type="button">
+                        <img [src]="this.constService.ICON_DELETE"> Remove
+                    </button>
+                </div>
+                <div>
+                    <button mat-button [hidden]="!this.isAnyFilterPresent" (click)="clearFilterModel()">Clear Filter</button>
+                </div>
             </div>
+            <label style="padding: 0.5em;"> * Gird data is sortable and filterable. To sort, click the column header(sortable for asc/desc/default). To filter or search, hover the column header right side and click the filter icon.</label>
             <div style="flex:7" class="full-width">
                 <ag-grid-angular class="full-height full-width ag-theme-balham"
                                  [columnDefs]="columnDefs"
@@ -36,6 +41,7 @@ import {DictionaryService} from "../../services/dictionary.service";
                                  [rowDeselection]="true"
                                  [rowSelection]="'single'"
                                  [enableSorting]="true"
+                                 [enableFilter]="true"
                                  [singleClickEdit]="true"
                                  (rowSelected)="this.onProtocolRowSelected($event)"
                                  [stopEditingWhenGridLosesFocus]="true">
@@ -92,17 +98,30 @@ export class EpPipelineProtocolTabComponent implements OnInit, OnDestroy{
             field: "isDefault",
             cellRendererFramework: CheckboxRenderer,
             checkboxEditable: false,
+            suppressFilter: true,
             editable: false,
             width: 50
         },
         {
             headerName: "Pipeline Protocol",
             field: "protocol",
+            filterParams: {clearButton: true},
             editable: false,
             width: 400
         },
 
     ];
+
+    get isAnyFilterPresent(): boolean {
+        return this.gridApi ? this.gridApi.isAnyFilterPresent() : false;
+    }
+
+    clearFilterModel(): void {
+        if(this.gridApi && this.gridApi.isAnyFilterPresent()) {
+            this.gridApi.setFilterModel(null);
+            this.gridApi.setSortModel(null);
+        }
+    }
 
     constructor(private fb:FormBuilder,private expPlatformService:ExperimentPlatformService,
                 public constService:ConstantsService,private dialogService:DialogsService,
