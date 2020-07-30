@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {Subscription} from "rxjs";
-import {CellValueChangedEvent, GridApi} from "ag-grid-community";
+import {CellValueChangedEvent, GridApi, NumberFilter} from "ag-grid-community";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {ConstantsService} from "../../services/constants.service";
@@ -20,27 +20,33 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
 @Component({
     template: `
         <div class="full-height full-width flex-container-col">
-            <div class="flex-grow flex-container-row" style="align-items:center;"  >
-                <button mat-button color="primary"
-                        type="button"
-                        (click)="addSeqOption()">
-                    <img [src]="this.constService.ICON_ADD"> Add
-                </button>
-                <button [disabled]="selectedSeqOpt.length === 0"
-                        (click)="removeSeqOption()"
-                        mat-button color="primary"
-                        type="button">
-                    <img [src]="this.constService.ICON_DELETE"> Remove
-                </button>
-                <button mat-button
-                        color="primary"
-                        (click)="openSeqEditor()"
-                        [disabled]="selectedSeqOpt.length === 0"
-                        type="button"> Edit Sequencing Options </button>
+            <div class="flex-grow flex-container-row align-center justify-space-between">
+                <div>
+                    <button mat-button color="primary"
+                            type="button"
+                            (click)="addSeqOption()">
+                        <img [src]="this.constService.ICON_ADD"> Add
+                    </button>
+                    <button [disabled]="selectedSeqOpt.length === 0"
+                            (click)="removeSeqOption()"
+                            mat-button color="primary"
+                            type="button">
+                        <img [src]="this.constService.ICON_DELETE"> Remove
+                    </button>
+                    <button mat-button style="margin-left: 3em;"
+                            color="primary"
+                            (click)="openSeqEditor()"
+                            [disabled]="selectedSeqOpt.length === 0"
+                            type="button">
+                        <img [src]="this.constService.ICON_TAG_BLUE_EDIT"> Edit Sequencing Options </button>
 
-                <mat-checkbox (change)="filterSeqOptions($event)" [(ngModel)]="showInactive"> Show Inactive </mat-checkbox>
-
+                    <mat-checkbox style="margin-left: 3em;" (change)="filterSeqOptions($event)" [(ngModel)]="showInactive"> Show Inactive </mat-checkbox>
+                </div>
+                <div>
+                    <button mat-button [hidden]="!this.isAnyFilterPresent" (click)="clearFilterModel()">Clear Filter</button>
+                </div>
             </div>
+            <label style="padding: 0.5em;"> * Gird data is sortable and filterable. To sort, click the column header(sortable for asc/desc/default). To filter or search, hover the column header right side and click the filter icon.</label>
             <div style="flex:9" class="full-width">
                 <ag-grid-angular class="full-height full-width ag-theme-balham"
                                  [columnDefs]="columnDefs"
@@ -50,6 +56,7 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
                                  (gridSizeChanged)="onGridSizeChanged($event)"
                                  [rowDeselection]="true"
                                  [enableSorting]="true"
+                                 [enableFilter]="true"
                                  [rowSelection]="'single'"
                                  (rowSelected)="this.onSeqOptionsRowSelected($event)"
                                  [singleClickEdit]="true"
@@ -98,6 +105,16 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
         }
         return this._seqTypeRunList;
     }
+    get isAnyFilterPresent(): boolean {
+        return this.gridApi ? this.gridApi.isAnyFilterPresent() : false;
+    }
+
+    clearFilterModel(): void {
+        if(this.gridApi && this.gridApi.isAnyFilterPresent()) {
+            this.gridApi.setFilterModel(null);
+            this.gridApi.setSortModel(null);
+        }
+    }
 
 
     private parseSortOrder(params){
@@ -115,6 +132,8 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
     private readonly runModeColumn = {
         headerName: "Run Mode",
         field: "isCustom",
+        filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+        filterParams: {clearButton: true},
         cellRendererFramework: SelectRenderer,
         cellEditorFramework: SelectEditor,
         selectOptions: this._runOptions,
@@ -134,12 +153,16 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
             field: "isActive",
             cellRendererFramework: CheckboxRenderer,
             checkboxEditable: true,
+            suppressFilter: true,
             editable: false,
-            width: 100
+            width: 75
         },
         {
             headerName: "Sort Order",
             field: "sortOrder",
+            filter: NumberFilter,
+            filterValueGetter: this.expPlatfromService.gridNumberFilterValueGetter,
+            filterParams: {clearButton: true},
             valueParser: this.parseSortOrder,
             comparator: this.expPlatfromService.gridNumberComparator,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
@@ -147,11 +170,12 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
             validators: [Validators.pattern(/^\d{0,2}$/)],
             errorNameErrorMessageMap: [{errorName: "pattern", errorMessage: "Requires a number of 0-99"}],
             editable:true,
-            width: 100
+            width: 75
         },
         {
             headerName: "Name",
             field: "name",
+            filterParams: {clearButton: true},
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
             validators: [Validators.required, Validators.maxLength(this.constService.MAX_LENGTH_100)],
@@ -165,11 +189,15 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
         {
             headerName: "Cycles",
             field: "idNumberSequencingCycles",
+            filter: NumberFilter,
+            filterValueGetter: this.expPlatfromService.gridComboNumberFilterValueGetter,
+            filterParams: {clearButton: true},
             cellRendererFramework: SelectRenderer,
             cellEditorFramework: SelectEditor,
             selectOptions: this.seqCycleList,
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "value",
+            valueGetter: this.expPlatfromService.gridComboNumberFilterValueGetter,
             comparator: this.expPlatfromService.gridNumberComparator,
             validators: [Validators.required],
             errorNameErrorMessageMap: [{errorName: "required", errorMessage: "Cycles required"}],
@@ -179,6 +207,8 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
         {
             headerName: "Type",
             field: "idSeqRunType",
+            filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+            filterParams: {clearButton: true},
             cellRendererFramework: SelectRenderer,
             cellEditorFramework: SelectEditor,
             selectOptions: this.seqTypeRunList,

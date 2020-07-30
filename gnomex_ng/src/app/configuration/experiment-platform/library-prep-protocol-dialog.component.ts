@@ -19,7 +19,7 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
                 <div style="margin: 0.5em;">
                     <div class="flex-container-row spaced-children-margin" style="align-items:center;">
                         <mat-form-field  class="medium-form-input">
-                            <input matInput placeholder="Name" formControlName="name">
+                            <input matInput placeholder="Library Prep Protocol" formControlName="name">
                             <mat-error *ngIf="this.formGroup.get('name').hasError('required')">
                                 Name is required
                             </mat-error>
@@ -28,7 +28,7 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
                                 Character count: {{this.formGroup.get('name').value.toString().length}}
                             </mat-error>
                         </mat-form-field>
-                        <mat-checkbox  formControlName="isActive">
+                        <mat-checkbox formControlName="isActive">
                             Active
                         </mat-checkbox>
                     </div>
@@ -112,8 +112,8 @@ export class LibraryPrepProtocolDialogComponent extends BaseGenericContainerDial
             this.protocolService.getProtocolObservable().pipe(first()).subscribe(resp =>{
                 if(resp){
                     this.protocol = resp;
-                    this.formGroup.get('idProtocol').setValue(resp.idSeqLibProtocol ? resp.idSeqLibProtocol : '');
-                    this.formGroup.get('name').setValue(resp.name? resp.name : '');
+                    this.formGroup.get('idProtocol').setValue(resp.id ? resp.id : '');
+                    this.formGroup.get('name').setValue(resp.name ? resp.name : '');
                     this.formGroup.get('isActive').setValue(resp.isActive ? resp.isActive === 'Y': false);
                     this.formGroup.get('url').setValue(resp.url ? resp.url : '');
                     this.formGroup.get('description').setValue(this.formatDescription(resp.description));
