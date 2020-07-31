@@ -91,15 +91,17 @@ public class CheckSessionStatus extends HttpServlet {
             + "currentTime='" + new Date().getTime() + "' "
             + "sessionMaxInActiveTime='" + request.getSession().getMaxInactiveInterval() + "' ";
 
+        String temp = "";
+
         try {
-          xmlResult += "billingAccountsLatestChange='"
+          temp = "billingAccountsLatestChange='"
               + ((Timestamp) HibernateSession.currentSession("guest").getNamedQuery("getLatestBillingAccountChange").uniqueResult())
               + "' ";
-        } catch (NamingException | SQLException e) {
+        } catch (Exception e) {
           System.out.print("");
         }
 
-        xmlResult += "/>"
+        xmlResult += temp + "/>"
             + "</data>";
       }
     }
