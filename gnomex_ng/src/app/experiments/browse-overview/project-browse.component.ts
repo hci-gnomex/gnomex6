@@ -10,6 +10,7 @@ import {ConstantsService} from "../../services/constants.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {AngularEditorConfig} from "@kolkov/angular-editor";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 
 @Component({
@@ -135,7 +136,7 @@ export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy {
 
         this.project.name = this.projectBrowseForm.controls["projectName"].value;
         this.project.description = this.projectBrowseForm.controls["description"].value;
-        let saveParams: HttpParams = new HttpParams()
+        let saveParams: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("projectJSONString", JSON.stringify(this.project))
             .set("noJSONToXMLConversionNeeded", "Y")
             .set("parseEntries", "Y");

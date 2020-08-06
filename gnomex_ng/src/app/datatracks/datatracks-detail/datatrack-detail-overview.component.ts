@@ -20,6 +20,7 @@ import {DatatracksFilesTabComponent} from "./datatracks-files-tab.component";
 import {UtilService} from "../../services/util.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     templateUrl: "./datatrack-detail-overview.component.html",
@@ -333,7 +334,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
             idAppUser = this.datatrack ? this.datatrack.idAppUser : "";
         }
 
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idDataTrack", this.datatrack.idDataTrack)
             .set("name", name)
             .set("summary", summary)

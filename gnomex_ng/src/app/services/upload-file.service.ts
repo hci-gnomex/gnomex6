@@ -4,6 +4,7 @@ import {concat, Observable, ObservableInput, of, throwError} from "rxjs";
 import {catchError, flatMap, map} from "rxjs/operators";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "./interceptors/http-uri-encoding-codec";
 
 
 @Injectable()
@@ -46,7 +47,7 @@ export class UploadFileService {
 
     public startFDTUpload(idObj: any): Observable<any> {
         let key: string = (Object.keys(idObj))[0];
-        let params: HttpParams = new HttpParams().set(key, idObj[key]);
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()}).set(key, idObj[key]);
         return this.httpClient.get("/gnomex/FastDataTransferUploadStart.gx", {params: params})
             .pipe(flatMap((resp: any) => {
                 if (resp && resp.uuid) {

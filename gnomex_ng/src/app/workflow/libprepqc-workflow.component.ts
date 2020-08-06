@@ -11,6 +11,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {UtilService} from "../services/util.service";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'libprepqc-workflow',
@@ -236,7 +237,7 @@ export class LibprepQcWorkflowComponent {
     save() {
         this.gridApi.stopEditing();
         setTimeout(() => {
-            let params: HttpParams = new HttpParams();
+            let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
             let workItems: any[] = [];
             for(let value of Array.from( this.changedRowMap.values()) ) {
                 workItems.push(value);

@@ -12,6 +12,7 @@ import {debounceTime, distinctUntilChanged, first} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 import {GDAction} from "../../util/interfaces/generic-dialog-action.model";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 
 @Component({
@@ -105,11 +106,11 @@ export class LinkToExperimentDialogComponent extends BaseGenericContainerDialog 
 
         this.labControl.valueChanges.pipe(distinctUntilChanged()).subscribe(value =>{
             console.log("This is the a test: " + value);
-            let params = new HttpParams();
+            let params = new HttpParams({encoder: new HttpUriEncodingCodec()});
             this.showSpinner = true;
 
             if(init){
-                params = new HttpParams()
+                params = new HttpParams({encoder: new HttpUriEncodingCodec()})
                     .set("includePlateInfo", "N")
                     .set("linkToAnalysisExpsOnly", "N")
                     .set("idLab", value)
@@ -156,7 +157,7 @@ export class LinkToExperimentDialogComponent extends BaseGenericContainerDialog 
     }
 
     filterResults():HttpParams{
-        let params:HttpParams = new HttpParams();
+        let params:HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
         if(this.labControl.value){
             params = params.set("idLab", this.labControl.value)
                 .set("includePlateInfo", "N")
@@ -188,7 +189,7 @@ export class LinkToExperimentDialogComponent extends BaseGenericContainerDialog 
 
     linkAnalysis(){
         if(this.idAnalysis && this.selectedAnalysisToLink.length > 0){
-            let params:HttpParams =  new HttpParams().set("idAnalysis", this.idAnalysis,)
+            let params:HttpParams =  new HttpParams({encoder: new HttpUriEncodingCodec()}).set("idAnalysis", this.idAnalysis,)
                 .set("idRequest", this.selectedAnalysisToLink[0].idRequest);
 
             this.analysisService.linkExpToAnalysis(params).pipe(first())

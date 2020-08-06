@@ -9,6 +9,7 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
 import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
 import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
 import {DictionaryService} from "../services/dictionary.service";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: "context-help-popup",
@@ -21,17 +22,17 @@ import {DictionaryService} from "../services/dictionary.service";
             </div>
             <div class="flex-container-row align-center">
                 <mat-form-field class="flex-grow">
-                    <textarea matInput 
-                              placeholder="Tooltip" 
+                    <textarea matInput
+                              placeholder="Tooltip"
                               [formControl]="this.tooltipControl"
-                              matTextareaAutosize 
+                              matTextareaAutosize
                               matAutosizeMinRows="3"
                               matAutosizeMaxRows="3">
                     </textarea>
                 </mat-form-field>
                 <div *ngIf="hasEditPermission" class="padded">
-                    <button mat-raised-button 
-                            class="minimize" 
+                    <button mat-raised-button
+                            class="minimize"
                             [disabled]="!hasEditPermission"
                             (click)="onClickEdit()">
                         {{ editorConfig.editable ? 'View' : 'Edit' }}
@@ -118,7 +119,7 @@ export class ContextHelpPopupComponent extends BaseGenericContainerDialog implem
         if (this.dictionary) {
             this.showSpinner = true;
             this.cookieUtilService.formatXSRFCookie();
-            let params: HttpParams = new HttpParams()
+            let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
                 .set("idContextSensitiveHelp", this.dictionary.idContextSensitiveHelp ? this.dictionary.idContextSensitiveHelp : "")
                 .set("context1", this.dictionary.context1)
                 .set("context2", this.dictionary.context2)

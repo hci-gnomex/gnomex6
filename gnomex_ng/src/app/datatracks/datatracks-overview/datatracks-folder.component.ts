@@ -9,6 +9,7 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
 import {GnomexService} from "../../services/gnomex.service";
 import {Subscription} from "rxjs";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 
 @Component({
@@ -84,7 +85,7 @@ export class DatatracksFolderComponent implements OnInit, OnDestroy {
         let name = this.folderFormGroup.get("folderName").value;
         let description = this.folderFormGroup.get("description").value;
 
-        let params:HttpParams = new HttpParams()
+        let params:HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set('idDataTrackFolder', idDataTrackFolder)
             .set('description', description)
             .set('name', name)

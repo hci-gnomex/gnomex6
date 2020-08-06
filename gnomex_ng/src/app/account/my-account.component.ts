@@ -9,6 +9,7 @@ import {LabMembershipRequestComponent} from "./lab-membership-request.component"
 import {DialogsService} from "../util/popup/dialogs.service";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'my-account',
@@ -191,7 +192,7 @@ export class MyAccountComponent {
 
     public save(): void {
         this.showSpinner = true;
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idAppUser", this.createSecurityAdvisorService.idAppUser.toString())
             .set("firstName", this.firstNameFC.value)
             .set("lastName", this.lastNameFC.value)

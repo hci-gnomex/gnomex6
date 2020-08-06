@@ -5,6 +5,7 @@ import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: "new-group-dialog",
@@ -91,7 +92,7 @@ export class NewGroupDialogComponent extends BaseGenericContainerDialog implemen
 
     public save(): void {
         this.showSpinner = true;
-        let params: HttpParams = new HttpParams();
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
         params = params.set("accountsJSONString", "");
         params = params.set("collaboratorsJSONString", "");
         params = params.set("contactPhone", this.addGroupFG.controls['phone'].value);

@@ -10,6 +10,7 @@ import {MatDialogRef} from "@angular/material";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 import {ConstantsService} from "../../services/constants.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     template: `
@@ -150,7 +151,7 @@ export class ManageLinksComponent extends BaseGenericContainerDialog implements 
                 return;
             }
         }
-        let params: HttpParams = new HttpParams();
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
         let stringifiedFaqCollection = JSON.stringify(this.rowData);
 
 

@@ -8,6 +8,7 @@ import {Subscription} from "rxjs";
 import {CookieUtilService} from "../../services/cookie-util.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../../util/popup/dialogs.service";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 @Injectable()
 export class AdvancedSearchService implements OnDestroy {
@@ -316,7 +317,7 @@ export class AdvancedSearchService implements OnDestroy {
         }
 
         if (isValidRequest && (anyFieldHasSearchableValue || constructingParams.text1 !== '')) {
-            let finalParams: HttpParams = new HttpParams()
+            let finalParams: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
                 .set('text1',                  "" + constructingParams.text1)
                 .set('searchPublicProjects',   "" + constructingParams.searchPublicProjects)
                 .set('listKind',               "" + constructingParams.listKind)

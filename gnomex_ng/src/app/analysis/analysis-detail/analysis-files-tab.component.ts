@@ -23,6 +23,7 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 import {PropertyService} from "../../services/property.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {UtilService} from "../../services/util.service";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'analysis-files-tab',
@@ -262,7 +263,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     }
 
     private makeURLLink: (data: any) => void = (data: any) => {
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("pathName", data.fileName);
         this.dataTrackService.makeURLLink(params).subscribe((result: any) => {
             if (result && result.urlsToLink) {
@@ -274,7 +275,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     }
 
     private makeUCSCLink: (data: any) => void = (data:any) => {
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idAnalysis", this.analysisService.analysis.idAnalysis)
             .set("pathName", data.fileName);
         this.dataTrackService.makeUCSCLinks(params).subscribe((result: any) => {
@@ -298,7 +299,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     }
 
     private makeIOBIOLink: (data: any) => void = (data: any) => {
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("requestType", "IOBIO")
             .set("pathName", data.fileName);
         this.dataTrackService.makeIOBIOLink(params).subscribe((result: any) => {
@@ -311,7 +312,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     }
 
     private makeGENELink: (data: any) => void = (data: any) => {
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idAnalysis", this.analysisService.analysis.idAnalysis)
             .set("fileName", data.fileName)
             .set("VCFInfo", JSON.stringify(this.getAnalysisDownloadListResult.VCFInfo))

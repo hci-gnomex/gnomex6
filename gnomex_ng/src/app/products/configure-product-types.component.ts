@@ -12,6 +12,7 @@ import {MatSnackBar} from "@angular/material";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {UtilService} from "../services/util.service";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'configure-product-types',
@@ -259,7 +260,7 @@ export class ConfigureProductTypesComponent extends BaseGenericContainerDialog i
     }
 
     private collectFields(): HttpParams {
-        return new HttpParams()
+        return new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("value", this.form.controls['description'].value)
             .set("display", this.form.controls['description'].value)
             .set("idCoreFacility", this.form.controls['coreFacility'].value)

@@ -16,6 +16,7 @@ import {SelectRenderer} from "./grid-renderers/select.renderer";
 import {SelectEditor} from "./grid-editors/select.editor";
 import {TextAlignLeftMiddleRenderer} from "./grid-renderers/text-align-left-middle.renderer";
 import {TextAlignLeftMiddleEditor} from "./grid-editors/text-align-left-middle.editor";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'configure-annotations',
@@ -636,7 +637,7 @@ export class ConfigureAnnotationsComponent extends BaseGenericContainerDialog im
         }
 
         this.dialogsService.startDefaultSpinnerDialog();
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idProperty", this.selectedProperty.idProperty)
             .set("name", this.nameFC.value)
             .set("isActive", this.activeFC.value ? "Y" : "N")

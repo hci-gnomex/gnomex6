@@ -13,6 +13,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
 import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
 import {ActionType} from "./interfaces/generic-dialog-action.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     template: `
@@ -413,7 +414,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
         let files: any[] = this.gatherFilesToDownload();
         this.cacheDownloadListFn(files).subscribe((result: any) => {
             if (result && result.result === 'SUCCESS') {
-                let downloadParams: HttpParams = new HttpParams()
+                let downloadParams: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
                     .set("mode", "zip")
                     .set("emailAddress", this.email);
                 let progressWindowConfig: MatDialogConfig = new MatDialogConfig();

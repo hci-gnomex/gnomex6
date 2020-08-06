@@ -40,6 +40,7 @@ import {EditInstitutionsComponent} from "../util/edit-institutions.component";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 import {TabSeqSetupViewComponent} from "../experiments/new-experiment/tab-seq-setup-view.component";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 /**
  * @title Basic tabs
@@ -1005,7 +1006,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         let stringifiedMF: string = "";
         this.showSpinner = true;
 
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idAppUser", this.idAppUser)
             .set("codeUserPermissionKind", this.codeUserPermissionKind)
             .set("idAppUser", this.selectedUser.idAppUser.toString())
@@ -1241,7 +1242,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     }
 
     saveGroup() {
-        let params: HttpParams = new HttpParams();
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
         let cores: any[] = [];
 
         let accountsJSONString: string;

@@ -12,6 +12,7 @@ import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog"
 import {GDAction} from "./interfaces/generic-dialog-action.model";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {IGnomexErrorResponse} from "./interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: "new-topic",
@@ -78,7 +79,7 @@ export class NewTopicComponent extends BaseGenericContainerDialog {
 
     public save(): void {
         this.showSpinner = true;
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idParentTopic", this.selectedItem.data.idTopic ? this.selectedItem.data.idTopic : "")
             .set("name", this.form.get("name").value)
             .set("description", "")

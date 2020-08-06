@@ -11,6 +11,7 @@ import {GDAction} from "./interfaces/generic-dialog-action.model";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {DataTrackService} from "../services/data-track.service";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: "new-organism",
@@ -95,7 +96,7 @@ export class NewOrganismComponent extends BaseGenericContainerDialog implements 
 
     public save(): void {
         this.dialogsService.addSpinnerWorkItem();
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("organism", this.organismForm.get("commonName").value)
             .set("binomialName", this.organismForm.get("binomialName").value)
             .set("das2Name", this.organismForm.get("das2Name").value)

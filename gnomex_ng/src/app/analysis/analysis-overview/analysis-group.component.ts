@@ -14,6 +14,7 @@ import {distinctUntilChanged, first} from "rxjs/operators";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../../util/popup/dialogs.service";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 
 @Component({
@@ -85,7 +86,7 @@ export class AnalysisGroupComponent implements OnInit, OnDestroy {
 
     save() {
         this.dialogsService.startDefaultSpinnerDialog();
-        let saveParams: HttpParams = new HttpParams();
+        let saveParams: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
 
         let idLab = this.route.snapshot.queryParamMap.get("idLab");
         let idAnalysisGroup = this.route.snapshot.queryParamMap.get("idAnalysisGroup");
