@@ -122,6 +122,10 @@ import {TabSeqSetupViewComponent} from "./tab-seq-setup-view.component";
         .minwidth {
             min-width: 5em;
         }
+
+        textarea.mat-input-element:disabled {
+            color: rgba(88,88,88,1);
+        }
         
         
         /************************/
@@ -406,7 +410,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 hasIsolationTypes:                 [''],
                 selectedIsolationExtractionMethod: [''],
                 selectedIsolationType:             [''],
-                sampleTypeNotes:                   [''],
+                sampleTypeNotes:                   [{value: '', disabled: true}],
                 addQubit:                          [''],
                 notifyBMP:                         [''],
                 organism:                          [''],
@@ -928,6 +932,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
 
         this.setState();
         this.showSampleNotes = !!(this.form.get("selectedDna").value.notes);
+        this.form.get("sampleTypeNotes").setValue(this.form.get("selectedDna").value.notes);
         this.sampleType = this.form.get("selectedDna").value;
         this._experiment.sampleType = this.sampleType;
         this.pickSampleType();
@@ -982,6 +987,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
 
         this.setState();
         this.showSampleNotes = !!(this.form.get("selectedRna").value.notes);
+        this.form.get("sampleTypeNotes").setValue(this.form.get("selectedRna").value.notes);
         this.sampleType = this.form.get("selectedRna").value;
         this._experiment.sampleType = this.sampleType;
         this.pickSampleType();
