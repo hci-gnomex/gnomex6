@@ -137,16 +137,22 @@
                         </div>
                     </div>
                 </li>
-                <li *ngIf="showSampleNotes" >
-                    <mat-form-field class="long-width">
-                        <textarea matInput
-                                  matTextareaAutosize
-                                  formControlName="notes"
-                                  formControlName="sampleTypeNotes"
-                                  matAutosizeMinRows="1"
-                                  matAutosizeMaxRows="5">
-                        </textarea>
-                    </mat-form-field>
+                <li *ngIf="showSampleNotes" class="full-width align-baseline">
+                    <div class="full-width">
+                        <div class="full-width flex-container-row align-baseline">
+                            <div class="heading">
+                                Sample Type Note
+                            </div>
+                        </div>
+                        <mat-form-field class="long-width">
+                            <textarea matInput
+                                      matTextareaAutosize
+                                      formControlName="sampleTypeNotes"
+                                      matAutosizeMinRows="1"
+                                      matAutosizeMaxRows="5">
+                            </textarea>
+                        </mat-form-field>
+                    </div>
                 </li>
                 <li *ngIf="showSequenomExperimentType" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline double-left-padded">
