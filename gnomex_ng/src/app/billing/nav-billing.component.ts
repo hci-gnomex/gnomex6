@@ -48,6 +48,7 @@ import {TextAlignLeftMiddleEditor} from "../util/grid-editors/text-align-left-mi
 import {TextAlignRightMiddleRenderer} from "../util/grid-renderers/text-align-right-middle.renderer";
 import {TextAlignRightMiddleEditor} from "../util/grid-editors/text-align-right-middle.editor";
 import {BillingPeriod} from "../util/billing-period-selector.component";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'nav-billing',
@@ -73,7 +74,7 @@ import {BillingPeriod} from "../util/billing-period-selector.component";
         .vertical-spacer {
             height: 0.3em;
         }
-                
+        
         button.price-sheet-link {
             margin: 0 1em;
             padding: 0;
@@ -1167,7 +1168,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         paramObject.removeList = this.billingItemsToDelete;
         paramObject.invoiceList = invoiceListArray;
 
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("billingItemJSONString", JSON.stringify(paramObject))
             .set("noJSONToXMLConversionNeeded", "Y");
         this.billingService.saveBillingItemList(params).subscribe((result: any) => {

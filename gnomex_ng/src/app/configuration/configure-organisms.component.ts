@@ -17,6 +17,7 @@ import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-lef
 import {TextAlignLeftMiddleEditor} from "../util/grid-editors/text-align-left-middle.editor";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {GDAction} from "../util/interfaces/generic-dialog-action.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'configure-organisms',
@@ -266,7 +267,7 @@ export class ConfigureOrganismsComponent extends BaseGenericContainerDialog impl
     public saveOrganism(): void {
         this.showSpinner = true;
         let name: string = this.nameFC.value;
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idOrganism", this.selectedOrganism.idOrganism)
             .set("organism", name)
             .set("isActive", this.activeFC.value ? "Y" : "N")

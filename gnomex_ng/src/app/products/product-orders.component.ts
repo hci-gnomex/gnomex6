@@ -13,6 +13,7 @@ import {ITreeOptions, TreeComponent} from "angular-tree-component";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'product-orders',
@@ -166,7 +167,7 @@ export class ProductOrdersComponent implements OnInit {
         this.productOrderLineItems = [];
         this.selectedTreeNode = null;
 
-        let params: HttpParams = new HttpParams();
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
         if (this.filterForm.controls['lab'].value) {
             params = params.set("idLab", this.filterForm.controls['lab'].value);
         }
@@ -254,7 +255,7 @@ export class ProductOrdersComponent implements OnInit {
         this.showSpinner = true;
         let lab: string;
         let idProductOrder: string;
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("noJSONToXMLConversionNeeded", "Y")
             .set("codeProductOrderStatus", this.changeStatus)
             .set("selectedLineItems", JSON.stringify(this.changeProductOrders));
@@ -321,7 +322,7 @@ export class ProductOrdersComponent implements OnInit {
     }
 
     private deleteLineItems(): void {
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("noJSONToXMLConversionNeeded", "Y")
             .set("productLineItemsToDeleteJSONString", JSON.stringify(this.changeProductOrders));
         this.productsService.deleteProductLineItems(params).subscribe((response: any) => {

@@ -18,6 +18,7 @@ import {WorkAuthorizationTypeSelectorDialogComponent} from "./work-authorization
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'order-products',
@@ -248,7 +249,7 @@ export class OrderProductsComponent implements OnInit {
     public submitOrder(): void {
         if (this.userConsent && this.enableSubmit) {
             this.enableSubmit = false;
-            let params: HttpParams = new HttpParams()
+            let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
                 .set("noJSONToXMLConversionNeeded", "Y")
                 .set("productListJSONString", JSON.stringify(this.productList.filter((item: ProductOrderItem) => { return item.isSelected })))
                 .set("idAppUser", this.idAppUser)

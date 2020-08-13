@@ -23,6 +23,7 @@ import {
 } from "@angular/common/http";
 import {saveAs} from "file-saver";
 import {UtilService} from "../services/util.service";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 
 @Injectable()
@@ -134,7 +135,7 @@ export class SampleUploadService {
             });
         }
 
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set('sampleSheetHeaderXMLString', JSON.stringify(processedHeaders))
             .set('sampleSheetRowXMLString',    JSON.stringify(rows));
 
@@ -189,7 +190,7 @@ export class SampleUploadService {
             }
         }
 
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("names", JSON.stringify(nameList))
             .set("requestJSONString", JSON.stringify(experiment.getJSONObjectRepresentation()));
 

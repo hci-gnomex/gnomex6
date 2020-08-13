@@ -12,6 +12,7 @@ import {UtilService} from "./util.service";
 import {ConstantsService} from "./constants.service";
 import {TreeModel, TreeNode} from "angular-tree-component";
 import * as _ from "lodash";
+import {HttpUriEncodingCodec} from "./interceptors/http-uri-encoding-codec";
 
 @Injectable()
 export class FileService {
@@ -281,7 +282,7 @@ export class FileService {
     public cacheAnalysisFileDownloadList: (files: any[]) => Observable<any> = (files: any[]) => {
         let headers: HttpHeaders = new HttpHeaders()
             .set("Content-Type", "application/x-www-form-urlencoded");
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("fileDescriptorJSONString", JSON.stringify(files))
             .set("noJSONToXMLConversionNeeded", "Y");
         return this.httpClient.post("/gnomex/CacheAnalysisFileDownloadList.gx", params.toString(), {headers: headers});
@@ -312,7 +313,7 @@ export class FileService {
     public cacheExperimentFileDownloadList: (files: any[]) => Observable<any> = (files: any[]) => {
         let headers: HttpHeaders = new HttpHeaders()
             .set("Content-Type", "application/x-www-form-urlencoded");
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("fileDescriptorJSONString", JSON.stringify(files))
             .set("noJSONToXMLConversionNeeded", "Y");
         return this.httpClient.post("/gnomex/CacheFileDownloadList.gx", params.toString(), {headers: headers});
@@ -369,7 +370,7 @@ export class FileService {
     public makeSoftLinks: (files: any[]) => Observable<any> = (files: any[]) => {
         let headers: HttpHeaders = new HttpHeaders()
             .set("Content-Type", "application/x-www-form-urlencoded");
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("fileDescriptorJSONString", JSON.stringify(files))
             .set("noJSONToXMLConversionNeeded", "Y");
         return this.httpClient.post("/gnomex/MakeSoftLinks.gx", params.toString(), {headers: headers});

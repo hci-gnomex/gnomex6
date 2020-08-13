@@ -10,6 +10,7 @@ import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {first} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 
 @Component({
@@ -151,7 +152,7 @@ export class LibraryPrepProtocolDialogComponent extends BaseGenericContainerDial
 
     saveChanges(){
         this.showSpinner = true;
-        let params:HttpParams = new HttpParams()
+        let params:HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set('idProtocol', this.formGroup.get('idProtocol').value)
             .set('protocolName',this.formGroup.get('name').value)
             .set('protocolDescription',this.formGroup.get('description').value)

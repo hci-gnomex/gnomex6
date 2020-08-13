@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {Observable} from "rxjs";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {AbstractControl, FormGroup} from "@angular/forms";
+import {HttpUriEncodingCodec} from "./interceptors/http-uri-encoding-codec";
 
 
 @Injectable()
@@ -71,7 +72,7 @@ export class PasswordUtilService {
     }
 
     public resetPassword(checkByUsername: boolean, value: string): Observable<any> {
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("action", "requestPasswordReset")
             .set(checkByUsername ? "userName" : "email", value);
         let headers: HttpHeaders = new HttpHeaders()
@@ -80,7 +81,7 @@ export class PasswordUtilService {
     }
 
     public changePassword(username: string, newPassword: string, newPasswordConfirm: string, guid: string): Observable<any> {
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("action", "finalizePasswordReset")
             .set("userName", username)
             .set("newPassword", newPassword)

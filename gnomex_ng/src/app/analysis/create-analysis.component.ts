@@ -18,6 +18,7 @@ import {ActionType, GDAction} from "../util/interfaces/generic-dialog-action.mod
 import {ConfigureOrganismsComponent} from "../configuration/configure-organisms.component";
 import {UtilService} from "../services/util.service";
 import {Experiment} from "../util/models/experiment.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: "create-analysis-dialog",
@@ -304,7 +305,7 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     saveAnalysis() {
         this.dialogsService.startDefaultSpinnerDialog();
         let idAnalysis: any = 0;
-        let params: HttpParams = new HttpParams();
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
         let stringifiedGenomBuild = "";
         if (this.createAnalysisForm.get("genomeBuilds").value.length > 0) {
             stringifiedGenomBuild = JSON.stringify(this.createAnalysisForm.get("genomeBuilds").value);

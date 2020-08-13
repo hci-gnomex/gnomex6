@@ -26,6 +26,7 @@ import {first} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 import {UtilService} from "../../services/util.service";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     templateUrl: './experiment-platform-overview.component.html',
@@ -350,7 +351,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         let pipelineProtocolsForm: FormGroup = null;
         let prepTypesForm: FormGroup = null;
 
-        let params:HttpParams = new HttpParams();
+        let params:HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
         params = params.set('isClinicalResearch',this.selectedPlatformList[0].isClinicalResearch)
             .set("codeRequestCategory", this.selectedPlatformList[0].codeRequestCategory)
             .set("isOwnerOnly", this.selectedPlatformList[0].isOwnerOnly);

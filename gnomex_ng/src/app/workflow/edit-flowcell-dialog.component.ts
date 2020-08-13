@@ -15,6 +15,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 import {UtilService} from "../services/util.service";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {ConstantsService} from "../services/constants.service";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: "edit-flowcell-dialog",
@@ -250,7 +251,7 @@ export class EditFlowcellDialogComponent extends BaseGenericContainerDialog impl
     }
 
     public save(): void {
-        let params: HttpParams = new HttpParams().set("barcode" ,this.barcodeFC.value)
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()}).set("barcode" ,this.barcodeFC.value)
             .set("codeSequencingPlatform", this.codeSequencingPlatform)
             .set("createDate", this.flowCell.createDate)
             .set("lastCycleDate", this.flowCell.lastCycleDate)

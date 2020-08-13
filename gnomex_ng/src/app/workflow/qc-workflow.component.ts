@@ -19,6 +19,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {UtilService} from "../services/util.service";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: "qc-workflow",
@@ -431,7 +432,7 @@ export class QcWorkflowComponent implements OnInit, OnChanges {
                 workItems.push(value);
             }
 
-            let params: HttpParams = new HttpParams().set("workItemXMLString", JSON.stringify(workItems));
+            let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()}).set("workItemXMLString", JSON.stringify(workItems));
 
             this.showSpinner = true;
 

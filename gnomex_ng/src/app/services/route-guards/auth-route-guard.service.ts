@@ -14,6 +14,7 @@ import {catchError, flatMap, map} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {PropertyService} from "../property.service";
 import {NavigationService} from "../navigation.service";
+import {HttpUriEncodingCodec} from "../interceptors/http-uri-encoding-codec";
 
 /**
  * A {@code CanActivate} implementation which makes its calculation based on the current authentication state.
@@ -116,7 +117,7 @@ export class AuthRouteGuardService implements CanActivate {
                 numberObj["type"] = "requestNumber";
                 numberObj["value"] = queryParam["requestNumber"];
                 numberObj["urlSegList"] = ["experiments"];
-                let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
+                let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()}).set(numberObj.type, numberObj.value);
                 return this.redirectByURL(params, noPublicVis, isAuthed, numberObj);
 
 
@@ -124,21 +125,21 @@ export class AuthRouteGuardService implements CanActivate {
                 numberObj["type"] = "analysisNumber";
                 numberObj["value"] = queryParam["analysisNumber"];
                 numberObj["urlSegList"] = ["analysis"];
-                let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
+                let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()}).set(numberObj.type, numberObj.value);
                 return this.redirectByURL(params, noPublicVis, isAuthed, numberObj);
 
             } else if (queryParam["dataTrackNumber"]) {
                 numberObj["type"] = "dataTrackNumber";
                 numberObj["value"] = queryParam["dataTrackNumber"];
                 numberObj["urlSegList"] = ["datatracks"];
-                let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
+                let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()}).set(numberObj.type, numberObj.value);
                 return this.redirectByURL(params, noPublicVis, isAuthed, numberObj);
 
             } else if (queryParam["topicNumber"]) {
                 numberObj["type"] = "topicNumber";
                 numberObj["value"] = queryParam["topicNumber"];
                 numberObj["urlSegList"] = ["topics"];
-                let params: HttpParams = new HttpParams().set(numberObj.type, numberObj.value);
+                let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()}).set(numberObj.type, numberObj.value);
                 return this.redirectByURL(params, noPublicVis, isAuthed, numberObj);
 
 

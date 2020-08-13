@@ -18,6 +18,7 @@ import {AngularEditorConfig} from "@kolkov/angular-editor";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 import {UtilService} from "../services/util.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     templateUrl: "./topics-detail.component.html",
@@ -164,7 +165,7 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     save() {
         this.showSpinner = true;
 
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("description", this.topicForm.get("description").value)
             .set("name", this.topicForm.get("name").value)
             .set("idTopic", this.topicForm.get("idTopic").value)
@@ -232,7 +233,7 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
             data.format =  "text";
             data.idAppUser = idAppUser;
 
-            let params: HttpParams = new HttpParams()
+            let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
                 .set("body", data.body)
                 .set("format", data.format)
                 .set("fromAddress", data.fromAddress)
