@@ -1288,10 +1288,17 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                     params.idCoreFacility = this.lastFilterEvent.idCoreFacility;
                     params.billingTemplate = template;
 
+                    let totalAmount: number = 0;
+                    if(this.selectedBillingRequest.totalPrice) {
+                        let amount: number = Number(this.selectedBillingRequest.totalPrice.replace("$", "").replace(",", ""));
+                        totalAmount = !isNaN(amount) ? amount : 0;
+                    }
+
                     let config: MatDialogConfig = new MatDialogConfig();
                     config.autoFocus = false;
                     config.data = {
-                        params: params
+                        params: params,
+                        totalAmount: totalAmount
                     };
 
                     this.dialogsService.genericDialogContainer(BillingTemplateWindowComponent, "Billing Template", null, config,
