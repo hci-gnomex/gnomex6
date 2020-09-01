@@ -247,7 +247,7 @@ export class ExperimentBillingTabComponent implements OnInit {
         let params: BillingTemplateWindowParams = new BillingTemplateWindowParams();
         params.idCoreFacility = this.request.idCoreFacility;
         params.codeRequestCategory = this.request.codeRequestCategory;
-        params.billingTemplate = this.currentBillingTemplate;
+        params.billingTemplate = JSON.parse(JSON.stringify(this.currentBillingTemplate));
 
         let totalAmount: number = 0;
         for(let billingAccount of this.gridData) {

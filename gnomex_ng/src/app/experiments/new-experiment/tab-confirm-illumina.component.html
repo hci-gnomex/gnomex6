@@ -47,8 +47,8 @@
                     {{ labName }}
                 </div>
             </div>
-            <div *ngIf="billingAccountName && billingAccountNumber" class="padded">
-                {{ billingAccountName }}({{ billingAccountNumber }})
+            <div *ngIf="billingAccount" class="padded">
+                {{ billingAccount }}
             </div>
             <div *ngIf="experiment && experiment.requestCategory && experiment.requestCategory.display" class="padded">
                 {{ experiment?.requestCategory?.display }}
@@ -72,6 +72,9 @@
         <div class="padded heavily-left-padded">
             <div class="t">
                 <div *ngFor="let billingItem of billingItems" class="tr">
+                    <div class="td padded heavily-right-padded">
+                        {{ billingItem.accountName ? '' + billingItem.accountName : '' }}
+                    </div>
                     <div class="td padded heavily-right-padded">
                         {{ billingItem.category ? '' + billingItem.category : '' }}
                     </div>

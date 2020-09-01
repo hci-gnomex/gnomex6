@@ -297,7 +297,7 @@ export class OrderProductsComponent implements OnInit {
         let params: BillingTemplateWindowParams = new BillingTemplateWindowParams();
         params.idCoreFacility = this.currentCoreFacility.idCoreFacility;
         if (this.billingTemplate) {
-            params.billingTemplate = this.billingTemplate;
+            params.billingTemplate = JSON.parse(JSON.stringify(this.billingTemplate));
         }
         let config: MatDialogConfig = new MatDialogConfig();
         config.autoFocus = false;

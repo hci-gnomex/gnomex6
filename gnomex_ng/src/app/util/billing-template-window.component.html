@@ -11,7 +11,7 @@
     <button mat-button (click)="this.addAccount()" [disabled]="!this.selectedAccount"><img [src]="'./assets/add.png'" class="icon">Add</button>
     <button mat-button (click)="this.removeAccount()" [disabled]="this.selectedRowIndex === null"><img [src]="'./assets/delete.png'" class="icon">Remove</button>
 </div>
-<div class="flex-container-row align-center justify-space-between small-font double-padded-left double-padded-right" *ngIf="showSplitBy">
+<div class="flex-container-row align-center justify-space-between small-font double-padded-left double-padded-right">
     <div>
         <label *ngIf="totalAmount > 0" class="leadingLabel label-width padded-right">Total Invoice Price: </label>{{totalAmount > 0 ? (this.totalAmount | currency:"USN":"$": "1.2-2") : " "}}
     </div>

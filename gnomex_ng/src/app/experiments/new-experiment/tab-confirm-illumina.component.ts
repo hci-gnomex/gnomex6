@@ -187,7 +187,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
     private experimentAnnotationsSubscription: Subscription;
 
-
+    public billingAccount: string = "";
     public totalEstimatedCharges: string = '$-.--';
     private _estimatedChargesWarning: string = '';
     private emailInvoicePriceAmount: string = '';
@@ -829,6 +829,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     private getEstimatedBilling(): void {
         this.disable_agreeCheckbox = true;
         this.isCheckboxChecked = false;
+        this.billingAccount = "";
 
         if (this._experiment) {
             this._experiment.invoicePrice = "";
@@ -837,19 +838,25 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 this.totalEstimatedCharges = '$-.--';
                 this.billingItems = [];
             } else {
-                let accountName:String = "";
+                let accountName: string = "";
 
                 if (this.experiment.billingTemplate != null && this.experiment.billingTemplate.items != null) {
                     for (let templateItem of this.experiment.billingTemplate.items) {
                         if (accountName) {
                             accountName += ", ";
                         }
+                        if (this.billingAccount) {
+                            this.billingAccount += ", ";
+                        }
                         accountName += templateItem.accountNumberDisplay;
+                        this.billingAccount += templateItem.accountName + "(" + templateItem.accountNumber + ")";
                     }
                 } else if (this._experiment.billingAccount != null) {
                     accountName = this._experiment.billingAccount.accountNumberDisplay;
+                    this.billingAccount = this._experiment.billingAccount.accountName + "(" + this._experiment.billingAccount.accountNumber + ")";
                 } else if (this.experiment.accountNumberDisplay) {
                     accountName = this.experiment.accountNumberDisplay;
+                    this.billingAccount = this.experiment.accountNumberDisplay;
                 }
 
                 this.agreeCheckboxLabel_subject.next("I authorize all charges to be billed to account(s): " + accountName);
@@ -878,7 +885,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
                     if (response.Request.BillingItem){
                         if (Array.isArray(response.Request.BillingItem)) {
-                            this.billingItems = response.Request.BillingItem
+                            this.billingItems = response.Request.BillingItem;
                         } else {
                             this.billingItems = [response.Request.BillingItem];
                         }

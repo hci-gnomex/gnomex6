@@ -52,7 +52,6 @@ export class BillingTemplateWindowComponent extends BaseGenericContainerDialog i
     private gridApi: GridApi;
     public selectedRowIndex: any = null;
 
-    public showSplitBy: boolean = true;
     public splitBy: string = "";
     private defaultBillingSplitBy: string = "";
     private usingPercentSplit: string = "";
@@ -83,14 +82,13 @@ export class BillingTemplateWindowComponent extends BaseGenericContainerDialog i
                 this.usingPercentSplit = params.billingTemplate.usingPercentSplit;
             }
 
-            let defaultBillingSplitType = this.propertyService.getProperty(PropertyService.PROPERTY_DEFAULT_BILLING_SPLIT_TYPE, this.idCoreFacility, this.codeRequestCategory);
+            let defaultBillingSplitType = this.propertyService.getProperty(PropertyService.PROPERTY_BILLING_ACCOUNT_SPLIT_TYPE, this.idCoreFacility, this.codeRequestCategory);
             this.defaultBillingSplitBy = defaultBillingSplitType && defaultBillingSplitType.propertyValue ? defaultBillingSplitType.propertyValue : "";
 
-            if(this.usingPercentSplit) {
-                this.splitBy = this.usingPercentSplit === "true" ? this.SPLIT_BY_PERCENT : this.SPLIT_BY_DOLLAR;
-            } else {
-                this.splitBy = this.defaultBillingSplitBy ? this.defaultBillingSplitBy : this.SPLIT_BY_PERCENT;
+            if(!this.usingPercentSplit) {
+                this.usingPercentSplit = this.defaultBillingSplitBy ? ((this.defaultBillingSplitBy === this.SPLIT_BY_PERCENT || this.defaultBillingSplitBy === "%") ? "true" : "false") : "true";
             }
+            this.splitBy = this.usingPercentSplit === "true" ? this.SPLIT_BY_PERCENT : this.SPLIT_BY_DOLLAR;
 
             if(data.totalAmount) {
                 this.totalAmount = data.totalAmount;
@@ -129,7 +127,7 @@ export class BillingTemplateWindowComponent extends BaseGenericContainerDialog i
         if(!isNaN(Number(params.value)) && Number(params.value) >= 0) {
             return formatCurrency(Number(params.value), "en", "$", "USN", "1.2-2");
         } else {
-            return "0";
+            return formatCurrency(0, "en", "$", "USN", "1.2-2");
         }
     }
 
@@ -282,6 +280,9 @@ export class BillingTemplateWindowComponent extends BaseGenericContainerDialog i
 
             this.currentAccountsList.push(accountToAdd);
             this.gridApi.setRowData(this.currentAccountsList);
+
+            this.selectedLab = null;
+            this.selectedAccount = null;
         }
     }
 
@@ -357,7 +358,7 @@ export class BillingTemplateWindowComponent extends BaseGenericContainerDialog i
             return;
         }
         let acceptBalanceFound: boolean = false;
-        let inValidValueFound: boolean = false;
+        let invalidValueFound: boolean = false;
         let total: number = 0;
         let totalAmount: number = 0;
         for (let account of this.currentAccountsList) {
@@ -371,7 +372,7 @@ export class BillingTemplateWindowComponent extends BaseGenericContainerDialog i
             if(this.usingPercentSplit === "true") {
                 if (account.acceptBalance !== "Y") {
                     if(Number(account.percentSplit) <= 0) {
-                        inValidValueFound = true;
+                        invalidValueFound = true;
                     } else {
                         total += Number(account.percentSplit);
                     }
@@ -385,7 +386,7 @@ export class BillingTemplateWindowComponent extends BaseGenericContainerDialog i
                 if(!isNaN(Number(account.dollarAmount))) {
                     if (account.acceptBalance !== "Y") {
                         if(Number(account.dollarAmount) <= 0) {
-                            inValidValueFound = true;
+                            invalidValueFound = true;
                         } else {
                             totalAmount += Number(account.dollarAmount);
                         }
@@ -402,13 +403,13 @@ export class BillingTemplateWindowComponent extends BaseGenericContainerDialog i
             this.dialogsService.alert("No account is designated to accept remaining balance", null, DialogType.VALIDATION);
             return;
         }
-        if(inValidValueFound) {
-            this.dialogsService.alert("All account(s) must have a positive percentage or dollar amount, except the account that accepts balance", null, DialogType.VALIDATION);
+        if(invalidValueFound) {
+            this.dialogsService.alert("All accounts that don't accept balance must have a positive percentage or dollar amount.", null, DialogType.VALIDATION);
             return;
         }
         if(this.usingPercentSplit === "true") {
-            if (total > 100) {
-                this.dialogsService.alert("Percentage total exceeds 100%", null, DialogType.VALIDATION);
+            if (total >= 100) {
+                this.dialogsService.alert("Total percentage of all billing accounts cannot exceed 100%.", null, DialogType.VALIDATION);
                 return;
             } else if(total < 100) {
                 if(this.currentAccountsList.length === 1) {
