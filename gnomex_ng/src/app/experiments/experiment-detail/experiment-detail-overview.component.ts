@@ -342,6 +342,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
     saveRequest(): void {
         this._experiment.idBillingAccount = "";
         this._experiment.billingItems = [];
+        this._experiment.billingTemplate = null;
 
         //TODO: Remove sequence lanes from the experiment that is not illumina type. Need to confirm, so comment this temporary.
         // if(!this._experiment.requestCategory.isIlluminaType ||

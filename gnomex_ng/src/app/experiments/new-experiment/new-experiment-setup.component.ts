@@ -24,7 +24,7 @@ import {CreateProjectComponent} from "../create-project.component";
 import {ConstantsService} from "../../services/constants.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {
-    BillingTemplate,
+    BillingTemplate, BillingTemplateItem,
     BillingTemplateWindowComponent,
     BillingTemplateWindowParams
 } from "../../util/billing-template-window.component";
@@ -797,7 +797,21 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
         let params: BillingTemplateWindowParams = new BillingTemplateWindowParams();
         params.idCoreFacility = this._experiment.idCoreFacility;
         if (this._experiment.billingTemplate) {
-            params.billingTemplate = this._experiment.billingTemplate;
+            params.billingTemplate = JSON.parse(JSON.stringify(this._experiment.billingTemplate));
+        } else if(this._experiment.billingAccount && this._experiment.idLab) {
+            let selectedBillingAccount: BillingTemplateItem = JSON.parse(JSON.stringify(this._experiment.billingAccount));
+            selectedBillingAccount.labName = this._experiment.lab.name;
+            selectedBillingAccount.percentSplit = 100;
+            selectedBillingAccount.dollarAmount = "";
+            selectedBillingAccount.acceptBalance = "Y";
+            let billingTemplate: BillingTemplate = {
+                idBillingTemplate: "0",
+                usingPercentSplit: "",
+                items: [selectedBillingAccount],
+                targetClassName: "",
+                targetClassIdentifier: ""
+            };
+            params.billingTemplate = billingTemplate;
         }
         let config: MatDialogConfig = new MatDialogConfig();
         config.autoFocus = false;
