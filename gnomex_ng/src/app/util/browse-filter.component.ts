@@ -22,6 +22,7 @@ import {ActivatedRoute, ParamMap, Router} from "@angular/router";
 import {NavigationService} from "../services/navigation.service";
 import {INavigationDefinition, IRequiredParam} from "./interfaces/navigation-definition.model";
 import {IGnomexErrorResponse} from "./interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'browse-filter',
@@ -710,7 +711,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     }
 
     getExperimentBrowseParameters(): HttpParams {
-        let params: HttpParams = new HttpParams();
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
 
         if (this.showCoreFacilityComboBox && !(this.selectedCoreFacility === "")) {
             params = params.set("idCoreFacility", this.selectedCoreFacility);
@@ -797,7 +798,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     }
 
     getOrderBrowseParameters(): HttpParams {
-        let params: HttpParams = new HttpParams();
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
 
         params = params.set("includeSampleInfo", "Y");
 
@@ -845,7 +846,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     }
 
     getAnalysisBrowseParameters(): HttpParams {
-        let params: HttpParams = new HttpParams();
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
 
 //        params = params.set('getdatatrackdata','N');
 

@@ -34,6 +34,7 @@ import {ExperimentBillingTabComponent} from "./experiment-billing-tab.component"
 import {BrowseOrderValidateService} from "../../services/browse-order-validate.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 import {NavigationService} from "../../services/navigation.service";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 export const TOOLTIPS = Object.freeze({
     PRINT_EXPERIMENT_ORDER: "Create PDF form for this experiment order",
@@ -341,6 +342,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
     saveRequest(): void {
         this._experiment.idBillingAccount = "";
         this._experiment.billingItems = [];
+        this._experiment.billingTemplate = null;
 
         //TODO: Remove sequence lanes from the experiment that is not illumina type. Need to confirm, so comment this temporary.
         // if(!this._experiment.requestCategory.isIlluminaType ||
@@ -565,7 +567,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                     data.toAddress = coreFacility.contactEmail;
                 }
 
-                let params: HttpParams = new HttpParams()
+                let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
                     .set("body", data.body)
                     .set("format", data.format)
                     .set("senderAddress", data.fromAddress)

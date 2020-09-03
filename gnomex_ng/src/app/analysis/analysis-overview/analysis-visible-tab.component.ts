@@ -9,6 +9,7 @@ import {GridOptions} from "ag-grid-community/main";
 import {AnalysisService} from "../../services/analysis.service";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 
 @Component({
@@ -236,7 +237,7 @@ export class AnalysisVisibleTabComponent implements OnInit {
             }
         }
 
-        let params: HttpParams = new HttpParams();
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
         let strBody: string = JSON.stringify(dirtyRequests);
         params = params.set("visibilityXMLString", strBody );
 

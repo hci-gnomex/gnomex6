@@ -12,6 +12,7 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {GDAction} from "../util/interfaces/generic-dialog-action.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'new-datatrack-folder',
@@ -89,7 +90,7 @@ export class NewDataTrackComponent extends BaseGenericContainerDialog implements
 
     public save(): void {
         this.dialogsService.addSpinnerWorkItem();
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idLab", this.form.get("idLab").value)
             .set("idGenomeBuild", this.selectedItem.data.idGenomeBuild)
             .set("name", this.form.get("name").value)

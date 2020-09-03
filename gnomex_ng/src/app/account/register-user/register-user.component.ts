@@ -8,6 +8,7 @@ import {PasswordUtilService} from "../../services/password-util.service";
 import {UserService} from "../../services/user.service";
 import {HttpParams} from "@angular/common/http";
 import {invalidExternalUsrName} from "../../util/validators/invalid-external-username.validator";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 @Component({
 
@@ -320,7 +321,7 @@ export class RegisterUserComponent  implements OnInit, OnDestroy{
     }
 
     submit(formGroup: FormGroup) {
-        let params = new HttpParams();
+        let params = new HttpParams({encoder: new HttpUriEncodingCodec()});
         Object.keys(formGroup.controls).forEach(key => {
             let control: any = formGroup.get(key).value;
             let keyList: any[] = Object.keys(control);

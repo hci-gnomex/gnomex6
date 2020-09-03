@@ -9,6 +9,7 @@ import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode, SelectionChanged
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'price-category-view',
@@ -131,7 +132,7 @@ export class PriceCategoryViewComponent extends BaseGenericContainerDialog imple
     }
 
     public save(): void {
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("name", this.form.controls['name'].value)
             .set("description", this.form.controls['notes'].value)
             .set("idPriceCategory", this.idPriceCategory)

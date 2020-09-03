@@ -9,6 +9,7 @@ import {Subscription} from "rxjs";
 import {DictionaryService} from "../services/dictionary.service";
 import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 
 @Component({
@@ -112,7 +113,7 @@ export class ConfigCoreFacilityEditComponent implements OnInit, OnDestroy {
 
     save(): void {
         this.showSpinner = true;
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idCoreFacility", this.idCoreFacility)
             .set("contactName", this.coreFacilityForm.get("contactName").value )
             .set("contactEmail", this.coreFacilityForm.get("contactEmail").value)

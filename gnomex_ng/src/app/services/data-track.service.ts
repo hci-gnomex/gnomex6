@@ -6,6 +6,7 @@ import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {catchError, map} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {HttpUriEncodingCodec} from "./interceptors/http-uri-encoding-codec";
 
 @Injectable()
 export class DataTrackService {
@@ -250,7 +251,7 @@ export class DataTrackService {
     }
 
     public getDownloadEstimatedSize(keys: string): Observable<any> {
-        let params: HttpParams = new HttpParams().set("keys", keys);
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()}).set("keys", keys);
         return this.httpClient.get("/gnomex/GetEstimatedDownloadDataTrackSize.gx", {params: params});
     }
 

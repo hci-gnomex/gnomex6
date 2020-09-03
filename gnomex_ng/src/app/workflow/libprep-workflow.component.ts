@@ -12,6 +12,7 @@ import {UtilService} from "../services/util.service";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {first} from "rxjs/operators";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'libprep-workflow',
@@ -482,7 +483,7 @@ export class LibprepWorkflowComponent {
                 workItems.push(value);
             }
 
-            let params: HttpParams = new HttpParams();
+            let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
             params = params.set("workItemXMLString", JSON.stringify(workItems));
 
             this.showSpinner = true;

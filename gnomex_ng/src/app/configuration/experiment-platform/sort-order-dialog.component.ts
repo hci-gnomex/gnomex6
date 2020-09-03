@@ -10,6 +10,7 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../../services/constants.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     template: `
@@ -191,7 +192,7 @@ export class SortOrderDialogComponent extends BaseGenericContainerDialog impleme
         this.showSpinner = true;
         let reqCategoriesJSONStr: string = JSON.stringify( this.rowData);
 
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("requestCategoriesJSONString", reqCategoriesJSONStr)
             .set("noJSONToXMLConversionNeeded", "Y");
         this.expPlatformService.saveExperimentPlatformSortOrderList(params)

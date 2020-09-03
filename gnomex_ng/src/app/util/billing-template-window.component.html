@@ -11,6 +11,18 @@
     <button mat-button (click)="this.addAccount()" [disabled]="!this.selectedAccount"><img [src]="'./assets/add.png'" class="icon">Add</button>
     <button mat-button (click)="this.removeAccount()" [disabled]="this.selectedRowIndex === null"><img [src]="'./assets/delete.png'" class="icon">Remove</button>
 </div>
+<div class="flex-container-row align-center justify-space-between small-font double-padded-left double-padded-right">
+    <div>
+        <label *ngIf="totalAmount > 0" class="leadingLabel label-width padded-right">Total Invoice Price: </label>{{totalAmount > 0 ? (this.totalAmount | currency:"USN":"$": "1.2-2") : " "}}
+    </div>
+    <div class="justify-flex-end">
+    <label class="leadingLabel label-width padded-right">Split By: </label>
+    <mat-radio-group class="custom-mat-radio padded-right" [(ngModel)]="this.splitBy" (change)="this.onSplitByChange()" style="font-size: small;">
+        <mat-radio-button class="double-padded-left" [value]="SPLIT_BY_PERCENT">%</mat-radio-button>
+        <mat-radio-button class="double-padded-left" [value]="SPLIT_BY_DOLLAR">$</mat-radio-button>
+    </mat-radio-group>
+    </div>
+</div>
 <div class="accounts-grid-div full-width padded">
     <ag-grid-angular class="ag-theme-fresh full-height full-width"
                      (gridReady)="this.onGridReady($event)"
@@ -18,6 +30,8 @@
                      [rowSelection]="'single'"
                      [singleClickEdit]="true"
                      (rowSelected)="this.onGridRowSelected($event)"
+                     (cellValueChanged)="this.onCellValueChanged($event)"
+                     [stopEditingWhenGridLosesFocus]="true"
                      [rowData]="this.currentAccountsList">
     </ag-grid-angular>
 </div>

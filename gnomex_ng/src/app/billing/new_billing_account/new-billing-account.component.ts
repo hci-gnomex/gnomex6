@@ -23,6 +23,7 @@ import {thisOrThat} from "../../util/validators/this-or-that.validator";
 import {UtilService} from "../../services/util.service";
 import {DateParserComponent} from "../../util/parsers/date-parser.component";
 import {BillingUsersSelectorComponent} from "../../usersGroups/billingAccountTab/billingUsersSelector/billing-users-selector.component";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 @Component({
 	selector: "new-billing-account-launcher",
@@ -972,7 +973,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		}
 
 
-		let parameters: HttpParams = new HttpParams()
+		let parameters: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
 			.set('idLab', idLab)
 			.set('coreFacilitiesXMLString', coreFacilitiesXMLString)
 			.set('coreFacilitiesJSONString', coreFacilitiesXMLString)
@@ -1064,7 +1065,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		}
 
 
-		let parameters: HttpParams = new HttpParams()
+		let parameters: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
 			.set('idLab', idLab)
 			.set('coreFacilitiesXMLString', coreFacilitiesXMLString)
 			.set('coreFacilitiesJSONString', coreFacilitiesXMLString)
@@ -1154,7 +1155,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		}
 
 
-		let parameters: HttpParams = new HttpParams()
+		let parameters: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
 			.set('idLab', idLab)
 			.set('coreFacilitiesXMLString', coreFacilitiesXMLString)
 			.set('coreFacilitiesJSONString', coreFacilitiesXMLString)

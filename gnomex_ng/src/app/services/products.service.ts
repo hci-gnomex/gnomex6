@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {HttpClient, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "./cookie-util.service";
 import {Observable} from "rxjs";
+import {HttpUriEncodingCodec} from "./interceptors/http-uri-encoding-codec";
 
 @Injectable()
 export class ProductsService {
@@ -27,7 +28,7 @@ export class ProductsService {
     }
 
     public getPriceCategories(requireIsActive: boolean, priceSheetName: string): Observable<any> {
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("requireIsActive", requireIsActive ? "Y" : "N")
             .set("priceSheetName", priceSheetName);
         return this.httpClient.get("/gnomex/GetPriceCategories.gx", {params: params});
@@ -51,7 +52,7 @@ export class ProductsService {
 
     public saveNewProductPriceCategory(name: string): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("name", name.trim())
             .set("isActive", "Y")
             .set("isNewProductPriceCategory", "Y")

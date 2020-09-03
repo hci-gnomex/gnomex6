@@ -9,6 +9,7 @@ import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {Subscription} from "rxjs";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 
 @Component({
@@ -143,7 +144,7 @@ export class DatatracksOrganismComponent implements OnInit, OnDestroy {
         let isActiveStr = this.orgFormGroup.get("isActive").value ? 'Y': 'N';
         let idOrganism = this.dtService.datatrackListTreeNode.idOrganism;
 
-        let params:HttpParams = new HttpParams()
+        let params:HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set('das2Name',this.orgFormGroup.get("name").value)
             .set('isActive',isActiveStr)
             .set('binomialName',this.orgFormGroup.get("binomialName").value)

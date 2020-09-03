@@ -7,6 +7,7 @@ import {ConstantsService} from "../services/constants.service";
 import {HttpParams} from "@angular/common/http";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {GDAction} from "../util/interfaces/generic-dialog-action.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'invoice-email-window',
@@ -90,7 +91,7 @@ export class InvoiceEmailWindowComponent extends BaseGenericContainerDialog impl
                 }
             }
 
-            let params: HttpParams = new HttpParams()
+            let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
                 .set("idBillingPeriod", this.idBillingPeriod)
                 .set("idLab", this.labNode.data.idLab)
                 .set("idBillingAccount", this.labNode.data.idBillingAccount)

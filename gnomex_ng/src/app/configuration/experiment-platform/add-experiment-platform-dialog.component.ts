@@ -10,6 +10,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {first} from "rxjs/operators";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 
 
@@ -85,7 +86,7 @@ export class AddExperimentPlatformDialogComponent extends BaseGenericContainerDi
 
     private makeRequest():void {
         let idAppUser:string = this.secAdvisor.hasPermission(CreateSecurityAdvisorService.CAN_WRITE_DICTIONARIES) ? '' : '' +this.secAdvisor.idAppUser;
-        let params = new HttpParams()
+        let params = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set('idCoreFacility',this.formGroup.get('idCoreFacility').value)
             .set("isActive", 'Y')
             .set("isInternal",'Y')

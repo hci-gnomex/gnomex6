@@ -7,6 +7,7 @@ import {IGnomexErrorResponse} from "../../../util/interfaces/gnomex-error.respon
 import {HttpParams} from "@angular/common/http";
 import {BaseGenericContainerDialog} from "../../../util/popup/base-generic-container-dialog";
 import {GDAction} from "../../../util/interfaces/generic-dialog-action.model";
+import {HttpUriEncodingCodec} from "../../../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     template: `
@@ -70,7 +71,7 @@ export class ImportSegmentsDialog extends BaseGenericContainerDialog implements 
         let valueStr: string = this.importSegDialogForm.get("segTextArea").value;
         let splitValue: Array<string> = valueStr.split("\n");
         let formattedValue:string = splitValue.join(" ");
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idGenomeBuild", this.idGenomeBuild)
             .set("chromosomeInfo", valueStr );
 

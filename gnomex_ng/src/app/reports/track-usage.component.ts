@@ -11,6 +11,7 @@ import * as chartJS from "chart.js";
 import {MatDialogConfig} from "@angular/material";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {TrackUsageDetailComponent} from "./track-usage-detail.component";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'track-usage',
@@ -30,7 +31,7 @@ import {TrackUsageDetailComponent} from "./track-usage-detail.component";
                     </div>
                     <div class="flex-container-col full-width children-margin-bottom">
                         <div class="full-width flex-container-col align-center">
-                            <custom-combo-box class="three-quarters-width" placeholder="Core facility" [(ngModel)]="this.idCoreFacility" 
+                            <custom-combo-box class="three-quarters-width" placeholder="Core facility" [(ngModel)]="this.idCoreFacility"
                                           valueField="idCoreFacility" [options]="this.coreFacilities" displayField="display" (optionSelected)="this.onCoreFacilityChange()">
                             </custom-combo-box>
                         </div>
@@ -284,7 +285,7 @@ export class TrackUsageComponent implements OnInit, OnDestroy {
     public lineChart2Legend: boolean = false;
     public lineChart2Data: any[] = [];
 
-    private lastParams: HttpParams = new HttpParams();
+    private lastParams: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
     public data: any = null;
     private lastCalledGraphFn: (...args: any[]) => void;
     private lastCalledGraphFnParams: any[];
@@ -331,7 +332,7 @@ export class TrackUsageComponent implements OnInit, OnDestroy {
     }
 
     private refreshData(forceRefresh: boolean = false): Observable<any> {
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idCoreFacility", this.idCoreFacility ? this.idCoreFacility : "")
             .set("endRank", this.interval)
             .set("currentView", this.usageType)

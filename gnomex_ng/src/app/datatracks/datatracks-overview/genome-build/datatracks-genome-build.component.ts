@@ -7,6 +7,7 @@ import {MatTabChangeEvent} from "@angular/material";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../../../util/interfaces/gnomex-error.response.model";
 import {Subscription} from "rxjs";
+import {HttpUriEncodingCodec} from "../../../services/interceptors/http-uri-encoding-codec";
 
 
 @Component({
@@ -80,7 +81,7 @@ export class DatatracksGenomeBuildComponent implements OnInit {
     }
 
     save(): void {
-        let params: HttpParams = new HttpParams();
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
 
         this.gbValidateService.emitValidateGenomeBuild();
 

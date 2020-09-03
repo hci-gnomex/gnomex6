@@ -8,6 +8,7 @@ import {BillingFilterEvent} from "../billing/billing-filter.component";
 import {map} from "rxjs/operators";
 import {UtilService} from "./util.service";
 import {Experiment} from "../util/models/experiment.model";
+import {HttpUriEncodingCodec} from "./interceptors/http-uri-encoding-codec";
 
 @Injectable()
 export class BillingService {
@@ -41,7 +42,7 @@ export class BillingService {
 
         let stringifiedRequest: string = JSON.stringify(experiment.getJSONObjectRepresentation());
 
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("propertiesXML", experimentAnnotations)
             .set("requestXMLString", stringifiedRequest)
             .set("noJSONToXMLConversionNeeded", "Y");
@@ -75,7 +76,7 @@ export class BillingService {
     }
 
     public getBillingTemplate(targetClassIdentifier: string, targetClassName: string): Observable<BillingTemplate> {
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("targetClassIdentifier", targetClassIdentifier)
             .set("targetClassName", targetClassName);
 
@@ -109,7 +110,7 @@ export class BillingService {
     }
 
     public saveBillingTemplate(template: BillingTemplate): Observable<any> {
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("billingTemplateJSONString", JSON.stringify(template))
             .set("noJSONToXMLConversionNeeded", "Y");
         return this.httpClient.get("/gnomex/SaveBillingTemplate.gx", {params: params});

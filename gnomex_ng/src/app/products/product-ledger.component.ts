@@ -16,6 +16,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../services/constants.service";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'product-ledger',
@@ -328,7 +329,7 @@ export class ProductLedgerComponent implements OnInit {
         if (this.selectedProduct && this.gridRowData && this.gridRowData.length > 0) {
             this.gridApi.stopEditing();
             this.showSpinner = true;
-            let params: HttpParams = new HttpParams()
+            let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
                 .set("productLedgerEntryListJSONString", JSON.stringify(this.gridRowData))
                 .set("noJSONToXMLConversionNeeded", "Y");
             this.productsService.saveProductLedgerEntryList(params).subscribe((response: any) => {

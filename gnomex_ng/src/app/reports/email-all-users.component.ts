@@ -8,6 +8,7 @@ import {AngularEditorConfig} from "@kolkov/angular-editor";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'email-all-users',
@@ -157,7 +158,7 @@ export class EmailAllUsersComponent extends BaseGenericContainerDialog implement
                 this.showSpinner = false;
             });
         } else {
-            let params: HttpParams = new HttpParams()
+            let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
                 .set("subject", this.subjectFormControl.value)
                 .set("format", "html")
                 .set("fromAddress", this.fromFormControl.value)

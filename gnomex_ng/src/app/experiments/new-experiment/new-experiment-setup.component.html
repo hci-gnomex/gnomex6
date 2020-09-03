@@ -92,8 +92,11 @@
                                 </mat-error>
                             </mat-form-field>
                         </div>
-                        <div class="flex-container-col" *ngIf="this.form.get('selectBillingTemplate').value">
-                            <span *ngFor="let item of this.form.get('selectBillingTemplate').value.items" class="margin-left">{{item.accountNameDisplay}}</span>
+                        <div class="flex-container-col" *ngIf="this.form.get('selectBillingTemplate').value && this.form.get('selectBillingTemplate').value.usingPercentSplit === 'true'">
+                            <span *ngFor="let item of this.form.get('selectBillingTemplate').value.items" class="margin-left">{{item.accountNameDisplay}} ({{item.percentSplit}}%)</span>
+                        </div>
+                        <div class="flex-container-col" *ngIf="this.form.get('selectBillingTemplate').value && this.form.get('selectBillingTemplate').value.usingPercentSplit !== 'true'">
+                            <span *ngFor="let item of this.form.get('selectBillingTemplate').value.items" class="margin-left">{{item.accountNameDisplay}} ({{item.dollarAmount | currency:"USN":"$": "1.2-2"}})</span>
                         </div>
                     </div>
                     <div class="flex-column-container moderate-width major-padding-left">

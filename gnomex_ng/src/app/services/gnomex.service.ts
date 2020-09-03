@@ -449,14 +449,14 @@ export class GnomexService {
      * Set the default submission state.
      */
     setDefaultSubmissionState(): void {
-        console.log("submission mode: " + this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE));
-        if (this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) != null &&
-            this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) === "INTERNAL") {
+        console.log("submission mode: " + this.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE));
+        if (this.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) != null &&
+            this.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) === "INTERNAL") {
             // Default is "submit request" (internal), but if this is an external data sharing
             // hub, make default "register external" experiment.
             this.isInternalExperimentSubmission = !this.isExternalDataSharingSite;
-        } else if (this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) != null &&
-            this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) === "EXTERNAL") {
+        } else if (this.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) != null &&
+            this.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) === "EXTERNAL") {
             this.isInternalExperimentSubmission = false;
         } else {
             this.isInternalExperimentSubmission = true;

@@ -6,6 +6,7 @@ import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'add-ledger-entry',
@@ -58,7 +59,7 @@ export class AddLedgerEntryComponent extends BaseGenericContainerDialog implemen
     public save(): void {
         if (this.form.valid) {
             this.showSpinner = true;
-            let params: HttpParams = new HttpParams()
+            let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
                 .set("idProduct", this.selectedProduct.idProduct)
                 .set("idLab", this.selectedProduct.idLab)
                 .set("qty", this.form.controls["quantity"].value)
