@@ -19,7 +19,6 @@ import {
     CellValueChangedEvent,
     GridApi,
     GridReadyEvent,
-    GridSizeChangedEvent,
     RowClickedEvent,
     RowDoubleClickedEvent,
     RowDragEvent,
@@ -151,7 +150,6 @@ export class NavBillingComponent implements OnInit, OnDestroy {
 
     public priceTreeGridData: any[] = [];
     public priceTreeGridApi: GridApi;
-    public getPriceNodeChildDetails;
     public selectedPriceTreeGridItem: RowNode;
     public showPricesCheckbox: boolean = true;
     public showPriceCriteriaCheckbox: boolean = false;
@@ -465,36 +463,34 @@ export class NavBillingComponent implements OnInit, OnDestroy {
 
         // NOTE - the "Type" column that shows SERVICE, PRODUCT, etc. is commented out to free up grid space
         // When products are fully re-implemented and in actual use, this column can be uncommented
-
-        this.billingItemGridRowClassRules =
-
-        this.getPriceNodeChildDetails = function getPriceNodeChildDetails(rowItem) {
-            if (rowItem.idPriceSheet) {
-                return {
-                    group: true,
-                    expanded: true,
-                    children: rowItem.PriceCategory,
-                    key: rowItem.display
-                };
-            } else if (rowItem.idPriceCategory && !rowItem.idPrice) {
-                return {
-                    group: true,
-                    expanded: false,
-                    children: rowItem.Price,
-                    key: rowItem.display
-                };
-            } else if (rowItem.idPrice && !rowItem.idPriceCriteria && rowItem.PriceCriteria) {
-                return {
-                    group: true,
-                    expanded: false,
-                    children: rowItem.PriceCriteria,
-                    key: rowItem.display
-                };
-            } else {
-                return null;
-            }
-        };
     }
+
+    public getPriceNodeChildDetails(rowItem: any) {
+        if (rowItem.idPriceSheet) {
+            return {
+                group: true,
+                expanded: true,
+                children: rowItem.PriceCategory,
+                key: rowItem.display
+            };
+        } else if (rowItem.idPriceCategory && !rowItem.idPrice) {
+            return {
+                group: true,
+                expanded: false,
+                children: rowItem.Price,
+                key: rowItem.display
+            };
+        } else if (rowItem.idPrice && !rowItem.idPriceCriteria && rowItem.PriceCriteria) {
+            return {
+                group: true,
+                expanded: false,
+                children: rowItem.PriceCriteria,
+                key: rowItem.display
+            };
+        } else {
+            return null;
+        }
+    };
 
     ngOnInit() {
         this.utilService.registerChangeDetectorRef(this.changeDetector);
@@ -525,8 +521,10 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     }
 
     public onBillingItemGridReady(event: GridReadyEvent): void {
-        event.api.setColumnDefs(this.billingItemGridColumnDefs);
-        this.billingItemGridApi = event.api;
+        if (event && event.api) {
+            this.billingItemGridApi = event.api;
+            this.billingItemGridApi.setColumnDefs(this.billingItemGridColumnDefs);
+        }
 
         this.registerPixelWidths();
     }
@@ -552,12 +550,20 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     }
 
     public onBillingItemGridRowSelection(event: RowClickedEvent): void {
-        if (event.node.data.requestNumber) {
+        if (event
+            && event.node
+            && event.node.data
+            && event.node.data.requestNumber) {
+
             event.node.setSelected(true, true);
             this.selectedBillingItems = event.node.childrenAfterGroup;
             this.selectedBillingRequest = event.node.data;
             this.disableSplitButton = false;
-            if (this.selectedPriceTreeGridItem && this.selectedPriceTreeGridItem.data.idPrice && !this.selectedPriceTreeGridItem.data.idPriceCriteria) {
+
+            if (this.selectedPriceTreeGridItem
+                && this.selectedPriceTreeGridItem.data.idPrice
+                && !this.selectedPriceTreeGridItem.data.idPriceCriteria) {
+
                 this.disableAddBillingItemButton = false;
             }
         } else {
@@ -882,6 +888,8 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     }
 
     public onBillingItemsTreeActivate(event: any): void {
+        this.billingItemGridData = [];
+
         let node: ITreeNode = event.node;
         this.billingItemsTreeSelectedNode = node;
         if (node.hasChildren) {
@@ -925,7 +933,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         for (let r of billingItems) {
             if (r.totalPrice) {
                 // split billing totalPrice on BillingItem is duplicated. only add it up once then
-                if(!billingItemsMap.has(r.requestNumber)){
+                if (!billingItemsMap.has(r.requestNumber)) {
                     billingItemsMap.set(r.requestNumber,r.BillingItem);
                     let price: string = r.totalPrice;
                     price = price
@@ -934,9 +942,9 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                         .replace("(", "-")
                         .replace(")", "");
                     this.totalPrice += Number(price);
-                }else{
+                } else {
                     splitKeyList.push(r.requestNumber);
-                    billingItemsMap.get(r.requestNumber).push(...r.BillingItem);
+                    billingItemsMap.set(r.requestNumber, r.BillingItem);
                 }
             }
         }
@@ -1205,6 +1213,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     public onChangeStatus(): void {
         if (this.changeStatusValue) {
             this.updateBillingItemsWithNewValue("codeBillingStatus", this.changeStatusValue);
+
             setTimeout(() => {
                 this.changeStatusValue = '';
             });
@@ -1254,6 +1263,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
             }
 
             let isBillingItemApproved: boolean = false;
+
             breakLabel:
             for (let gridData of this.billingItemGridData) {
                 if (gridData.requestNumber === this.selectedBillingRequest.requestNumber
@@ -1266,6 +1276,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                     }
                 }
             }
+
             if(isBillingItemApproved) {
                 this.dialogsService.alert("Approved billing items cannot be reassigned.", null, DialogType.WARNING);
                 return;
