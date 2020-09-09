@@ -201,6 +201,8 @@ public class PropertyDictionary extends DictionaryEntry implements Serializable 
 
 	public static final String FORMAT_NAMES_LAST_FIRST = "format_names_last_first";
 
+	public static final String AUTOUPDATE_ACCOUNTS = "autoupdate_accounts";
+
 	private Integer idPropertyDictionary;
 	private String propertyName;
 	private String propertyValue;
