@@ -319,6 +319,8 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                         } else {
                             this._experiment[k] = experimentTabForm.get(k).value;
                         }
+                    } else {
+                        this._experiment[k] = "";
                     }
                 }
 
