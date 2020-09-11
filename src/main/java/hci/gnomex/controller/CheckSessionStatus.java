@@ -11,11 +11,9 @@ import org.hibernate.Session;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -108,7 +106,7 @@ public class CheckSessionStatus extends HttpServlet {
                 + "' ";
           }
         } catch (Exception e) {
-          System.out.print("");
+          // Logging disabled due to high number of calls
         }
 
         xmlResult += temp + "/>"
