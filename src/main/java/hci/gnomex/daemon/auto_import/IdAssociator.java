@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/* The goal of this script is to associate ids from one file with another generically.
+/* The goal of this script is to associate ids from one file with another 'generically' aka with regexs.
   The Flagged ID File will be added with the newly found associated IDs.
 */
 public class IdAssociator {
