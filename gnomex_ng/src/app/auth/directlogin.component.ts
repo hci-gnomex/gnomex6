@@ -400,10 +400,6 @@ export class DirectLoginComponent implements OnInit {
 
     public errorClasses: string = '';
 
-//    public ikey: string = 'DI5LIPNVUJKO2H54HTRH';
-//    public skey: string = 'KVqJO3bXO9Fud8tNvrjc4bAhwZqDd2oclvyEuT3W';
-//    public akey: string = '0d44447dc355f26fb7311719a3366f75ee6da74c';
-//    public duohost: string = 'api-aba4bf07.duosecurity.com';
     public sig_request: string = "not sig_request";
     public duo_sig: string = "not duo_sig";
     public duo_src: string = "not duo_src";
