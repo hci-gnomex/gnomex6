@@ -124,8 +124,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 && this.experiment.isExternal !== 'Y';
 
             this.showRowNumberColumn = requestCategory
-                && requestCategory.isQCType
-                && requestCategory.isQCType !== 'Y';
+                && requestCategory.type
+                && requestCategory.type !== this.experimentService.TYPE_QC;
 
             let temp = this.propertyService.getProperty(PropertyService.PROPERTY_ESTIMATED_PRICE_WARNING, this._experiment.idCoreFacility, this._experiment.codeRequestCategory);
             this._estimatedChargesWarning = temp && temp.propertyValue ? temp.propertyValue : '';
