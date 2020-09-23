@@ -59,7 +59,7 @@
             <div *ngIf="experiment && experiment.selectedProtocol && experiment.selectedProtocol.display" class="padded">
                 {{ experiment?.selectedProtocol?.display }}
             </div>
-            <div *ngIf="experiment?.seqPrepByCore_forSamples === 'Y'" class="padded">
+            <div *ngIf="experiment?.seqPrepByCore_forSamples !== 'Y'" class="padded">
                 Library Prepared By Client
             </div>
         </div>
