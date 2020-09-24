@@ -24,7 +24,7 @@ import * as Duo2 from '../services/duo';
                         <div class="horizontal-centered login-heading">
                             <img [src]="this.gnomexService.logoOrMaint" alt="GNomEx">
                         </div>
-                        <div class="full-width major-vertical-spacer flex-container-row align-center">
+                        <div *ngIf="!this.doDuo" class="full-width major-vertical-spacer flex-container-row align-center">
                             <div *ngIf="_errorMsg" class="horizontal-centered small-font full-width {{ errorClasses }}">
                                 <div class="full-width">
                                     <div class="error">Authentication Failed{{ numberOfAttempts > 1 ? ' (' + numberOfAttempts + ')' : '' }}</div>
@@ -60,10 +60,10 @@ import * as Duo2 from '../services/duo';
                                 </div>
                                 <div class="full-width vertical-spacer">
                                 </div>
-                                <button class="full-width bold primary-button padded"
+                                <button  class="full-width bold primary-button padded"
                                         (click)="this.login()">Login
                                 </button>
-                                <div class="full-width vertical-spacer">
+                                <div   class="full-width vertical-spacer">
                                 </div>
                                 <div *ngIf="!this.gnomexService.noGuestAccess && !this.doDuo" class="full-width flex-container-row">
                                     <button class="flex-grow secondary-button padded" (click)="this.onResetPassword()">
@@ -83,13 +83,14 @@ import * as Duo2 from '../services/duo';
                                     </button>
                                 </div>
                             </form>
+                    
                                  <div *ngIf="this.doDuo" class="full-width flex-grow">
-                                   <iframe id="duo_iframe"
+                                   <iframe id="duo_iframe" height="384px"
                                         >
                                     </iframe>"                                
                                 </div>
                                            
-                        </div>
+                     </div>    
                     </div>
                     <div class="flex-grow">
                     </div>
@@ -197,7 +198,7 @@ import * as Duo2 from '../services/duo';
     width: 100%;
     min-width: 304px;
     max-width: 620px;
-    height: 330px;
+    height: 440px;
 }
         input.username {
             color: black;
