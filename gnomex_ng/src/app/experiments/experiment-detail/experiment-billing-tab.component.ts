@@ -2,7 +2,7 @@ import {Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {ConstantsService} from "../../services/constants.service";
 import {GridReadyEvent, GridSizeChangedEvent} from "ag-grid-community";
 import {ActivatedRoute} from "@angular/router";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {MatDialogConfig} from "@angular/material";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {DictionaryService} from "../../services/dictionary.service";
@@ -250,10 +250,25 @@ export class ExperimentBillingTabComponent implements OnInit {
         params.billingTemplate = JSON.parse(JSON.stringify(this.currentBillingTemplate));
 
         let totalAmount: number = 0;
+        let hasApproved: boolean = false;
+        breakLabel:
         for(let billingAccount of this.gridData) {
+            if(billingAccount.BillingItem && billingAccount.BillingItem.length > 0) {
+                for (let bi of billingAccount.BillingItem) {
+                    if (bi.codeBillingStatus.substr(0, 8) === "APPROVED") {
+                        hasApproved = true;
+                        break breakLabel;
+                    }
+                }
+            }
             if(billingAccount.invoicePrice && !isNaN(Number(billingAccount.invoicePrice.replace("$", "").replace(",", "")))) {
                 totalAmount += Number(billingAccount.invoicePrice.replace("$", "").replace(",", ""));
             }
+        }
+
+        if(hasApproved) {
+            this.dialogsService.alert("Approved billing items cannot be reassigned.", null, DialogType.WARNING);
+            return;
         }
 
         let config: MatDialogConfig = new MatDialogConfig();

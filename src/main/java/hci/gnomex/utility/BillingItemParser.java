@@ -141,7 +141,7 @@ public class BillingItemParser extends DetailObject implements Serializable {
             billingItem.setPercentagePrice(percentageDisplay.length() != 0 ? new BigDecimal(percentageDisplay).movePointLeft(2) : null);
 
             if (billingItem.getQty() != null && billingItem.getUnitPrice() != null) {
-                if (billingItem.getSplitType() == null) {
+                if (billingItem.getSplitType() == null || billingItem.getSplitType().equals("")) {
                     billingItem.setSplitType(Constants.BILLING_SPLIT_TYPE_PERCENT_CODE);
                 }
                 if (billingItem.getSplitType().equals(Constants.BILLING_SPLIT_TYPE_PERCENT_CODE)) {

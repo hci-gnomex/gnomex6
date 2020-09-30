@@ -163,7 +163,7 @@ export class BillingTemplateWindowComponent extends BaseGenericContainerDialog i
                     cellEditorFramework: TextAlignLeftMiddleEditor,
                     valueParser: this.dollarParser,
                     valueFormatter: this.currencyValueFormatter,
-                    validators: [Validators.pattern(/^\d{1,10}(\.\d{0})?$/)],
+                    validators: [Validators.pattern(/^\$\d{1,10}(\.\d{0,2})?$/)],
                     errorNameErrorMessageMap: [{ errorName: 'pattern',  errorMessage: 'Expects a currency number' }]},
             );
         }
@@ -259,6 +259,10 @@ export class BillingTemplateWindowComponent extends BaseGenericContainerDialog i
                 this.checkAcceptBalance();
             }
         }
+        if(this.gridApi) {
+            this.gridApi.redrawRows();
+            this.gridApi.sizeColumnsToFit();
+        }
     }
 
     public addAccount(): void {
@@ -307,9 +311,11 @@ export class BillingTemplateWindowComponent extends BaseGenericContainerDialog i
             this.usingPercentSplit = "false";
 
         }
-        this.gridColumnDefs = this.getGridColumnDefs();
-        this.gridApi.setColumnDefs(this.gridColumnDefs);
-        this.gridApi.sizeColumnsToFit();
+        if(this.gridApi) {
+            this.gridColumnDefs = this.getGridColumnDefs();
+            this.gridApi.setColumnDefs(this.gridColumnDefs);
+            this.gridApi.sizeColumnsToFit();
+        }
     }
 
     private  updatePercentTotal(): void {
@@ -319,9 +325,16 @@ export class BillingTemplateWindowComponent extends BaseGenericContainerDialog i
                 total += Number(account.percentSplit);
             }
         }
-        if (total > 100) {
+        if (total >= 100) {
             this.dialogsService.alert("Percentage total exceeds 100%", null, DialogType.VALIDATION);
             return;
+        } else {
+            for (let account of this.currentAccountsList) {
+                if(account.acceptBalance === "Y") {
+                    account.percentSplit = 100 - total;
+                    break;
+                }
+            }
         }
 
     }
@@ -335,6 +348,13 @@ export class BillingTemplateWindowComponent extends BaseGenericContainerDialog i
         if(this.data.totalAmount && totalAmount > this.totalAmount) {
             this.dialogsService.alert("Amount total exceeds the total amount", null, DialogType.VALIDATION);
             return;
+        } else if (this.data.totalAmount) {
+            for(let account of this.currentAccountsList ) {
+                if (account.acceptBalance === "Y") {
+                    account.dollarAmount = "" + (this.data.totalAmount - totalAmount);
+                    break;
+                }
+            }
         }
     }
     private checkAcceptBalance(): void {
