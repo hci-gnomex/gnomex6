@@ -33,11 +33,6 @@
                         formControlName="projectDescription"
                         [config]="projectDescEditorConfig">
         </angular-editor>
-        <mat-error *ngIf="descriptionForm.get('projectDescription').hasError('maxlength')">
-            Project Description can be at most {{this.constantsService.MAX_LENGTH_4000}} characters
-            including HTML code formatting and styles. Character count: {{descriptionForm.get(
-            'projectDescription').value.toString().length}}
-        </mat-error>
     </div>
 
     <div class="full-width flex-container-col padded" *ngIf="showCorePrepInstructions">
