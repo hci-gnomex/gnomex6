@@ -675,7 +675,7 @@ export class Experiment {
         this.onChange_PropertyEntries.next(this.PropertyEntries);
     }
 
-    private _PropertyEntries_original: any[];
+    private _PropertyEntries_original: any[] = [];
 
 
     private _RequestProperties:       any[] = [];
@@ -693,7 +693,7 @@ export class Experiment {
     }
     public onChange_RequestProperties: BehaviorSubject<any[]> = new BehaviorSubject<any[]>(this.RequestProperties);
 
-    private _organism: any = {};
+    private _organism: any;
     public get organism(): any {
         return this._organism;
     }
