@@ -3,12 +3,12 @@ package hci.gnomex.utility;
 public class PasswordUtil {
 
     public static final String REQUIREMENTS_TEXT =
-            "Passwords must be 8-25 characters long, contain no spaces\n" +
+            "Passwords must be 10-25 characters long, contain no spaces\n" +
                     "or slashes, and contain three or more of the following:\n" +
                     "lowercase letter, uppercase letter, digit, or symbol.";
 
     public static final String REQUIREMENTS_TEXT_HTML =
-            "Passwords must be 8-25 characters long, contain no spaces<br/>" +
+            "Passwords must be 10-25 characters long, contain no spaces<br/>" +
                     "or slashes, and contain three or more of the following:<br/>" +
                     "lowercase letter, uppercase letter, digit, or symbol.";
 
@@ -19,7 +19,7 @@ public class PasswordUtil {
 
     /**
      * Checks to see if the supplied password meets the following requirements:
-     *   Must be between 8 and 25 characters long
+     *   Must be between 10 and 25 characters long
      *   Contains no whitespace
      *   Contains no slashes "/" "\"
      *   Contains at least three of the following:
@@ -35,7 +35,7 @@ public class PasswordUtil {
         if (password == null) {
             return false;
         }
-        if (password.length() < 8 || password.length() > 25) {
+        if (password.length() < 10 || password.length() > 25) {
             return false;
         }
         boolean containsLowerCase = false;

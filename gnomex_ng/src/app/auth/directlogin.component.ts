@@ -3,9 +3,13 @@ import {AuthenticationService} from "./authentication.service";
 import {AbstractControl, FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {Router} from "@angular/router";
 import {GnomexService} from "../services/gnomex.service";
-import {DictionaryService} from "../services/dictionary.service";
 import * as Duo from '../services/Duo-Web-v2';
 import * as Duo2 from '../services/duo';
+import {MatDialogConfig} from "@angular/material";
+import {ChangeyourPasswordComponent} from "../auth/changeyour-password.component";
+import {DialogsService} from "../util/popup/dialogs.service";
+import {ActionType} from "../util/interfaces/generic-dialog-action.model";
+
 
 @Component({
     selector: "hci-login-form",
@@ -396,7 +400,7 @@ import * as Duo2 from '../services/duo';
 export class DirectLoginComponent implements OnInit {
     public _loginForm: FormGroup;
     public _errorMsg: string;
-
+    public username: string;
     public numberOfAttempts: number = 0;
 
     public errorClasses: string = '';
@@ -411,6 +415,7 @@ export class DirectLoginComponent implements OnInit {
                 private _formBuilder: FormBuilder,
                 public gnomexService: GnomexService,
                 private changeDetectorRef: ChangeDetectorRef,
+                private dialogsService: DialogsService,
                 private router: Router) {
     }
 
@@ -430,8 +435,7 @@ export class DirectLoginComponent implements OnInit {
                     return { message: 'Grid is not populated yet' };
                 }
             }),
-            // username: ["", Validators.required],
-            // password: ["", Validators.required]
+
         });
 
         this.gnomexService.getLoginProperties();
@@ -456,7 +460,7 @@ export class DirectLoginComponent implements OnInit {
         if (this.gnomexService.useduo) {
             if (('' + this._loginForm.value.username).match(/^[uU]\d{7,8}$/)) {
                 this.sig_request = Duo2.sign_request(this.gnomexService.ikey, this.gnomexService.skey, this.gnomexService.akey, this._loginForm.value.username);
-                console.log(this.sig_request);
+//                console.log(this.sig_request);
             }
         }
         if (this.gnomexService.maintenanceMode && !(this._loginForm.value.username === "adminBatch" ) ) {
@@ -499,6 +503,13 @@ export class DirectLoginComponent implements OnInit {
                             if (result && result.hasUserAccount && ('' + result.hasUserAccount).toLowerCase() === 'y') {
                                 if (result.isActive && ('' + result.isActive).toLowerCase() === 'y') {
                                     this._authenticationService.requestAccessToken(true);
+
+                                    if (result.passwordExpired && ('' + result.passwordExpired).toLowerCase() === 'y') {
+                                        // force them to change their password
+                                        this.gnomexService.theUsername = this._loginForm.value.username;
+                                        this.changePassword();
+                                    }
+
                                 } else {
                                     this._errorMsg = "Your account has been inactivated. Please continue with \"Guest Login\" and contact your lab's Core Administrator or GNomEx Support";
                                 }
@@ -528,12 +539,22 @@ export class DirectLoginComponent implements OnInit {
     twoFactorVerify(response: any) {
         console.log(response.elements.sig_response.value);
         var vuser = Duo2.verify_response(this.gnomexService.ikey, this.gnomexService.skey, this.gnomexService.akey, response.elements.sig_response.value);
-        console.log(vuser);
+//        console.log(vuser);
         if (vuser) {
             this._authenticationService.requestAccessToken(true);
         }
    }
 
+    public changePassword() {
+
+        let configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = "40em";
+        configuration.height = "20em";
+        configuration.autoFocus = true;
+        configuration.data = {};
+
+        this.dialogsService.genericDialogContainer(ChangeyourPasswordComponent, "Change your password", null, configuration);
+    }
 
     public onResetPassword(): void {
         this.router.navigateByUrl("reset-password");

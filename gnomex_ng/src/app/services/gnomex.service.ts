@@ -107,6 +107,7 @@ export class GnomexService {
     private useduostr: string;
 
     public showUsageOnStartUp: string = 'N';
+    public theUsername: string = '';
 
 
     constructor(

@@ -1,10 +1,10 @@
 package hci.gnomex.controller;
 
+import hci.gnomex.constants.Constants;
+import hci.gnomex.model.AppUser;
+import hci.gnomex.utility.HibernateSession;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
-
-import java.io.IOException;
-import java.util.List;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -15,15 +15,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import hci.gnomex.constants.Constants;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.utility.HibernateSession;
+import java.io.IOException;
+import java.util.List;
 
 /**
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and
- * Proprietary
- *
  * Created by u0556399 on 3/25/2020.
  */
 public class CheckIsGNomExAccount extends HttpServlet {
@@ -73,17 +68,28 @@ public class CheckIsGNomExAccount extends HttpServlet {
 											.add("hasUserAccount", "Y");
 					if (((AppUser) accounts.get(0)).getIsActive() == null || !((AppUser) accounts.get(0)).getIsActive().equals("N")) {
 						value.add("isActive", "Y");
+					} else {
+						value.add("isActive", "N");
 					}
+
+					if (((AppUser) accounts.get(0)).getPasswordExpired() != null && ((AppUser) accounts.get(0)).getPasswordExpired().equals("Y")) {
+						value.add("passwordExpired", "Y");
+					} else {
+						value.add("passwordExpired", "N");
+					}
+
 				} else if (accounts.size() == 0) {
 					value = Json.createObjectBuilder()
 											.add("result", "SUCCESS")
 											.add("hasUserAccount", "N")
-											.add("isActive", "N");
+											.add("isActive", "N")
+											.add("passwordExpired", "N");
 				} else {
 					value = Json.createObjectBuilder()
 											.add("result", "SUCCESS")
 											.add("hasUserAccount", "N")
-											.add("isActive", "N");
+											.add("isActive", "N")
+											.add("passwordExpired", "N");
 				}
 			} else {
 				throw new Exception("No username received. Please contact GNomEx Support for assistance.");

@@ -9,13 +9,13 @@ import {HttpUriEncodingCodec} from "./interceptors/http-uri-encoding-codec";
 export class PasswordUtilService {
     public readonly PASSWORD_MATCH_ERROR: string = "Passwords Must Match";
     public readonly PASSWORD_COMPLEXITY_ERROR: string = "Password Does Not Meet Requirements";
-    public readonly PASSWORD_COMPLEXITY_REQUIREMENTS: string = "Passwords must be 8-25 characters long, contain no spaces or slashes, and contain three or more of the following: lowercase letter, uppercase letter, digit, or symbol";
+    public readonly PASSWORD_COMPLEXITY_REQUIREMENTS: string = "Passwords must be 10-25 characters long, contain no spaces or slashes, and contain each of the following: lowercase letter, uppercase letter, digit, or symbol";
 
     constructor(private httpClient: HttpClient) {
     }
 
     public static passwordMeetsRequirements(password: string): boolean {
-        if (password && password.length >= 8 && password.length <= 25) {
+        if (password && password.length >= 10 && password.length <= 25) {
             let containsLowerCase: boolean = false;
             let containsUpperCase: boolean = false;
             let containsDigit: boolean = false;
@@ -46,7 +46,7 @@ export class PasswordUtilService {
             varietyCount += containsUpperCase ? 1 : 0;
             varietyCount += containsDigit ? 1 : 0;
             varietyCount += containsOther ? 1 : 0;
-            return (varietyCount >= 3);
+            return (varietyCount >= 4);
         } else {
             return false;
         }
@@ -91,4 +91,16 @@ export class PasswordUtilService {
             .set("Content-Type", "application/x-www-form-urlencoded");
         return this.httpClient.post("/gnomex/ChangePassword.gx", params.toString(), {headers: headers});
     }
+
+    public forceChangePassword(username: string, newPassword: string, newPasswordConfirm: string): Observable<any> {
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
+            .set("action", "forceChangePassword")
+            .set("userName", username)
+            .set("newPassword", newPassword)
+            .set("newPasswordConfirm", newPasswordConfirm);
+        let headers: HttpHeaders = new HttpHeaders()
+            .set("Content-Type", "application/x-www-form-urlencoded");
+        return this.httpClient.post("/gnomex/ChangePassword.gx", params.toString(), {headers: headers});
+    }
+
 }

@@ -68,7 +68,7 @@ export class AuthenticationService {
     private _timeoutSubscription: Subscription;
     private _tokenActivitySubscription: Subscription;
     private _lastUserInteraction: Date;
-    private _maxInactivityMinutes: number = 120;
+    private _maxInactivityMinutes: number = 240;
 
     private baseUrl: string;
     private contextRoot: string = "";
@@ -189,6 +189,9 @@ export class AuthenticationService {
         this.unsubscribeFromTimout();
 
         //Only taking the first value of the subscription. A new subscription will be created when a new token is stored.
+        var timeoutsub = interval(((this._maxInactivityMinutes * 60) - this.userCountdownSeconds) * 1000);
+//        console.log("timeoutsub: " + timeoutsub + " maxinactivityminutes: " + this._maxInactivityMinutes + " userCountdownSeconds " + this.userCountdownSeconds )
+
         this._timeoutSubscription = interval(((this._maxInactivityMinutes * 60) - this.userCountdownSeconds) * 1000)
             .pipe(first())
             .subscribe((value) => {
@@ -209,7 +212,7 @@ export class AuthenticationService {
     get redirectUrl() {
         return this._redirectUrl;
     }
-
+    
     public findAppUserByUsername(username: string): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
         let params: HttpParams = new HttpParams().set("UID", username);
@@ -405,6 +408,7 @@ export class AuthenticationService {
         //Refresh 60 seconds before expiry
         let exp = this._jwtHelper.getTokenExpirationDate(token);
         let msToExpiry = (exp.valueOf() - new Date().valueOf());
+//       console.log ("exp: " + exp + " msToExpiry" + msToExpiry);
 
         //Only taking the first value of the subscription. A new subscription will be created when a new token is stored.
         this._refreshSubscription = interval((msToExpiry > 60000) ? msToExpiry - 60000 : 0)
