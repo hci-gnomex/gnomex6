@@ -126,7 +126,13 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
             {value: this.constantsService.STATUS_ON_HOLD, display: "On Hold"},
             {value: this.constantsService.STATUS_TERMINATED, display: "Terminate"},
         ];
-        const sequencingProtocolList: any[] = this.dictionaryService.getEntries(DictionaryService.NUMBER_SEQUENCING_CYCLES_ALLOWED);
+        let sequencingProtocolList: any[] = this.dictionaryService.getEntries(DictionaryService.NUMBER_SEQUENCING_CYCLES_ALLOWED)
+            .filter(seqProtocol => {
+                return seqProtocol.value
+                    && seqProtocol.codeRequestCategory === this.experiment.requestCategory.codeRequestCategory
+                    && seqProtocol.isActive === 'Y';
+            });
+        sequencingProtocolList.unshift("");
 
         this.samplesGridColDefs = [
             {
@@ -235,6 +241,10 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
         }
         if (this.lanesGrid.columnApi.getColumn("pipelineStatus")) {
             this.lanesGrid.columnApi.getColumn("pipelineStatus").getColDef().editable = this.canEdit && this.editMode;
+        }
+        if(this.lanesGridApi) {
+            this.lanesGridApi.redrawRows();
+            this.lanesGridApi.sizeColumnsToFit();
         }
     }
     
