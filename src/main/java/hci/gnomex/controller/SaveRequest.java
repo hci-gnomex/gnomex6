@@ -1188,13 +1188,14 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					this.addInvalidField("Institution", "You must choose an institution when visibility is set to Institute");
 				}
 
-				// The following code makes sure any ccNumbers that have been entered
-				// actually exist
 				PropertyDictionaryHelper propertyHelper = PropertyDictionaryHelper.getInstance(sess);
-				if (propertyHelper.getProperty(PropertyDictionary.BST_LINKAGE_SUPPORTED) != null
-						&& propertyHelper.getProperty(PropertyDictionary.BST_LINKAGE_SUPPORTED).equals("Y")) {
-					status = validateCCNumbers();
-				}
+
+//				// The following code makes sure any ccNumbers that have been entered
+//				// actually exist
+//				if (propertyHelper.getProperty(PropertyDictionary.CORE_LINKAGE_SUPPORTED) != null
+//						&& propertyHelper.getProperty(PropertyDictionary.CORE_LINKAGE_SUPPORTED).equals("Y")) {
+//					status = validateCCNumbers();
+//				}
 
 				if (requestParser.isNewRequest()) {
 					Lab l = sess.load(Lab.class, requestParser.getRequest().getIdLab());
@@ -2012,74 +2013,75 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 
 	}
 
-	private String validateCCNumbers() {
-		String status = null;
-		Session sessGuest = null;
-		Connection con = null;
-
-		boolean hasCCNumbers = false;
-		List<String> ccNumberList = requestParser.getCcNumberList();
-		StringBuffer buf = new StringBuffer("select ccNumber from BST.dbo.Sample WHERE ccNumber in (");
-		Iterator<String> itStr = ccNumberList.iterator();
-		boolean firstTime = true;
-		while (itStr.hasNext()) {
-			hasCCNumbers = true;
-			String thisKey = itStr.next();
-			if (!firstTime)
-				buf.append(",");
-			else
-				firstTime = false;
-			buf.append("'" + thisKey + "'");
-		}
-		buf.append(")");
-
-		if (hasCCNumbers) {
-			try {
-				Statement stmt = null;
-				ResultSet rs = null;
-
-				// Use guest session for validating ccNumbers because it has read permissions on BST
-				sessGuest = this.getSecAdvisor().getReadOnlyHibernateSession(this.getUsername());
-
-				SessionImpl sessionImpl = (SessionImpl) sessGuest;
-				con = sessionImpl.connection();
-
-				stmt = con.createStatement();
-				rs = stmt.executeQuery(buf.toString());
-				List<String> ccNumbersRetreivedList = new ArrayList<String>();
-				while (rs.next()) {
-					ccNumbersRetreivedList.add(rs.getString("ccNumber"));
-				}
-				rs.close();
-				stmt.close();
-
-				buf = new StringBuffer();
-				// Now check to see if any ccNumbers weren't found
-				itStr = ccNumberList.iterator();
-				firstTime = true;
-				while (itStr.hasNext()) {
-					String thisKey = itStr.next();
-					if (!ccNumbersRetreivedList.contains(thisKey)) {
-						if (!firstTime)
-							buf.append(", ");
-						else
-							firstTime = false;
-						buf.append("'" + thisKey + "'");
-					}
-				}
-				if (buf.toString().length() > 0) {
-					status = "The following CC Numbers do not exist in BST: " + buf.toString()
-							+ ".\n\nPlease correct on the Samples tab.";
-				}
-
-			} catch (Exception e) {
-				LOG.error("An exception has occurred in SaveRequest ", e);
-			}
-
-		}
-
-		return status;
-	}
+	// This function was for performing backend validation of samples being linked to itBioPath.
+	// This functionality has changed with the new linkage to CORE - notably, the linking is now primarily
+	// performed on the front end, so this is disabled for now.
+//	private String validateCCNumbers() {
+//		String status = null;
+//		Session sessGuest = null;
+//		Connection con = null;
+//
+//		boolean hasCCNumbers = false;
+//		List<String> ccNumberList = requestParser.getCcNumberList();
+//		StringBuffer buf = new StringBuffer("select ccNumber from BST.dbo.Sample WHERE ccNumber in (");
+//		Iterator<String> itStr = ccNumberList.iterator();
+//		boolean firstTime = true;
+//		while (itStr.hasNext()) {
+//			hasCCNumbers = true;
+//			String thisKey = itStr.next();
+//			if (!firstTime)
+//				buf.append(",");
+//			else
+//				firstTime = false;
+//			buf.append("'" + thisKey + "'");
+//		}
+//		buf.append(")");
+//
+//		if (hasCCNumbers) {
+//			try {
+//				Statement stmt = null;
+//				ResultSet rs = null;
+//
+//				// Use guest session for validating ccNumbers because it has read permissions on BST
+//				sessGuest = this.getSecAdvisor().getReadOnlyHibernateSession(this.getUsername());
+//
+//				SessionImpl sessionImpl = (SessionImpl) sessGuest;
+//				con = sessionImpl.connection();
+//
+//				stmt = con.createStatement();
+//				rs = stmt.executeQuery(buf.toString());
+//				List<String> ccNumbersRetreivedList = new ArrayList<String>();
+//				while (rs.next()) {
+//					ccNumbersRetreivedList.add(rs.getString("ccNumber"));
+//				}
+//				rs.close();
+//				stmt.close();
+//
+//				buf = new StringBuffer();
+//				// Now check to see if any ccNumbers weren't found
+//				itStr = ccNumberList.iterator();
+//				firstTime = true;
+//				while (itStr.hasNext()) {
+//					String thisKey = itStr.next();
+//					if (!ccNumbersRetreivedList.contains(thisKey)) {
+//						if (!firstTime)
+//							buf.append(", ");
+//						else
+//							firstTime = false;
+//						buf.append("'" + thisKey + "'");
+//					}
+//				}
+//				if (buf.toString().length() > 0) {
+//					status = "The following CC Numbers do not exist in BST: " + buf.toString()
+//							+ ".\n\nPlease correct on the Samples tab.";
+//				}
+//			} catch (Exception e) {
+//				LOG.error("An exception has occurred in SaveRequest ", e);
+//			}
+//		}
+//
+//		return status;
+//	}
 
 	private void saveSamples(Session sess) throws Exception {
 		nextSampleNumber = getStartingNextSampleNumber(requestParser);

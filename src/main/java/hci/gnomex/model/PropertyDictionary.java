@@ -48,8 +48,11 @@ public class PropertyDictionary extends DictionaryEntry implements Serializable 
 	public static final String EXPERIMENT_SUBMISSION_DEFAULT_MODE = "experiment_submission_default_mode";
 	public static final String TEMP_DIRECTORY = "temp_directory";
 	public static final String BST_LINKAGE_SUPPORTED = "bst_linkage_supported";
+	public static final String CORE_LINKAGE_SUPPORTED = "CORE_linkage_supported";
 	public static final String BST_LINKAGE_GNOMEX_URL = "bst_linkage_gnomex_url";
 	public static final String GNOMEX_LINKAGE_BST_URL = "gnomex_linkage_bst_url";
+	public static final String GNOMEX_LINKAGE_CORE_URL = "GNomEx_linkage_CORE_url";
+	public static final String GNOMEX_LINKAGE_CORE_lOOKUP_URL = "GNomEx_linkage_CORE_lookup_url";
 	public static final String FDT_SUPPORTED = "fdt_supported";
 	public static final String SFTP_SUPPORTED = "fdt_supported";
 	public static final String HTTP_PORT = "http_port";

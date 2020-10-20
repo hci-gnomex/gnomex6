@@ -67,7 +67,7 @@ export class LinkButtonRenderer implements ICellRendererAngularComp {
 
     public invokeParentMethod(): void {
         if (this.onClickButtonFunctionName && this.params && this.params.context && this.params.context) {
-            this.params.context[this.onClickButtonFunctionName](this.params.node.rowIndex);
+            this.params.context[this.onClickButtonFunctionName](this.params.node);
         }
     }
 }

@@ -56,6 +56,7 @@ import {UserPreferencesService} from "./user-preferences.service";
 import {NewExternalExperimentService} from "./new-external-experiment.service";
 import {AmendExperimentService} from "./amend-experiment.service";
 import {NavigationService} from "./navigation.service";
+import {CORELinkageService} from "./CORE-linkage.service";
 
 @NgModule({
     imports: [CommonModule],
@@ -121,7 +122,8 @@ import {NavigationService} from "./navigation.service";
         UserPreferencesService,
         NewExternalExperimentService,
         AmendExperimentService,
-        NavigationService
+        NavigationService,
+        CORELinkageService
     ]})
 export class ServicesModule {
 }

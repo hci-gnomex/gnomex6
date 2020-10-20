@@ -1201,7 +1201,7 @@ public class RequestParser implements Serializable {
       sample.setMeanLibSizeActual(null);
     }
 
-    if (propertyHelper.getProperty(PropertyDictionary.BST_LINKAGE_SUPPORTED) != null && propertyHelper.getProperty(PropertyDictionary.BST_LINKAGE_SUPPORTED).equals("Y")) {
+    if (propertyHelper.getProperty(PropertyDictionary.CORE_LINKAGE_SUPPORTED) != null && propertyHelper.getProperty(PropertyDictionary.CORE_LINKAGE_SUPPORTED).equals("Y")) {
       if (n.get("ccNumber") != null && !n.getString("ccNumber").equals("")) {
         String ccNumber = n.getString("ccNumber");
         sample.setCcNumber(ccNumber);
@@ -1210,6 +1210,20 @@ public class RequestParser implements Serializable {
         }
       } else {
         sample.setCcNumber(null);
+      }
+
+      if (n.get("idSample_CORE") != null && !n.getString("idSample_CORE").equals("")) {
+        String idSample_CORE = n.getString("idSample_CORE");
+        sample.setIdSample_CORE(idSample_CORE);
+      } else {
+        sample.setIdSample_CORE(null);
+      }
+
+      if (n.get("sampleAlias_CORE") != null && !n.getString("sampleAlias_CORE").equals("")) {
+        String sampleAlias_CORE = n.getString("sampleAlias_CORE");
+        sample.setSampleAlias_CORE(sampleAlias_CORE);
+      } else {
+        sample.setSampleAlias_CORE(null);
       }
     }
 
@@ -1561,7 +1575,7 @@ public class RequestParser implements Serializable {
       sample.setMeanLibSizeActual(null);
     }
 
-    if (propertyHelper.getProperty(PropertyDictionary.BST_LINKAGE_SUPPORTED) != null && propertyHelper.getProperty(PropertyDictionary.BST_LINKAGE_SUPPORTED).equals("Y")) {
+    if (propertyHelper.getProperty(PropertyDictionary.CORE_LINKAGE_SUPPORTED) != null && propertyHelper.getProperty(PropertyDictionary.CORE_LINKAGE_SUPPORTED).equals("Y")) {
       if (n.getAttributeValue("ccNumber") != null && !n.getAttributeValue("ccNumber").equals("")) {
         String ccNumber = n.getAttributeValue("ccNumber");
         sample.setCcNumber(ccNumber);

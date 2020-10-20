@@ -74,6 +74,7 @@ import {TabExternalDescriptionComponent} from "./new-experiment/tab-external-des
 import {AmendExperimentOverviewComponent} from "./amend-experiment-overview.component";
 import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.component";
 import {AddAdditionalAccountsComponent} from "./new-experiment/add-additional-accounts.component";
+import {CoreSampleSelectorComponent} from "./new-experiment/core-sample-selector.component";
 
 @NgModule({
     imports: [
@@ -157,6 +158,7 @@ import {AddAdditionalAccountsComponent} from "./new-experiment/add-additional-ac
         TabExternalDescriptionComponent,
         AmendExperimentOverviewComponent,
         TabAmendExperimentSetupComponent,
+        CoreSampleSelectorComponent
     ],
     entryComponents: [
         CreateProjectComponent,
@@ -182,6 +184,7 @@ import {AddAdditionalAccountsComponent} from "./new-experiment/add-additional-ac
         TabExternalSetupComponent,
         TabExternalDescriptionComponent,
         TabAmendExperimentSetupComponent,
+        CoreSampleSelectorComponent
     ],
     exports:[
         CreateProjectComponent,
@@ -205,6 +208,7 @@ import {AddAdditionalAccountsComponent} from "./new-experiment/add-additional-ac
         TabExternalDescriptionComponent,
         AmendExperimentOverviewComponent,
         TabAmendExperimentSetupComponent,
+        CoreSampleSelectorComponent
     ]
 })
 export class ExperimentsModule { }

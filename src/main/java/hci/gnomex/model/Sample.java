@@ -82,6 +82,8 @@ public class Sample extends HibernateDetailObject {
   private BigDecimal  qubitConcentration;
   private String      groupName;
   private String      qcCodeApplication;
+  private String      sampleAlias_CORE;
+  private String      idSample_CORE;
   private BigDecimal  qcLibConcentration;
   private Integer     idLibPrepQCProtocol;
   private BigDecimal  sampleVolume;
@@ -992,6 +994,19 @@ public class Sample extends HibernateDetailObject {
   }
   public void setQcCodeApplication(String qcCodeApplication) {
     this.qcCodeApplication = qcCodeApplication;
+  }
+
+  public String getSampleAlias_CORE() {
+    return sampleAlias_CORE;
+  }
+  public void setSampleAlias_CORE(String sampleAlias_CORE) {
+    this.sampleAlias_CORE = sampleAlias_CORE;
+  }
+  public String getIdSample_CORE() {
+    return idSample_CORE;
+  }
+  public void setIdSample_CORE(String idSample_CORE) {
+    this.idSample_CORE = idSample_CORE;
   }
 
   public String getBarcodeA() {
