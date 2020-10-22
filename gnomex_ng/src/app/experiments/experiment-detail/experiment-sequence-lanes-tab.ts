@@ -235,12 +235,18 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
         this.sampleGridSplitSize = this.editMode ? 25 : 0;
         if (this.lanesGrid.columnApi.getColumn("idNumberSequencingCyclesAllowed")) {
             this.lanesGrid.columnApi.getColumn("idNumberSequencingCyclesAllowed").getColDef().editable = this.canEdit && this.editMode;
+        } else if(this.lanesGrid.columnApi.getColumn("idNumberSequencingCyclesAllowed_1")) {
+            this.lanesGrid.columnApi.getColumn("idNumberSequencingCyclesAllowed_1").getColDef().editable = this.canEdit && this.editMode;
         }
         if (this.lanesGrid.columnApi.getColumn("lastCycleStatus")) {
             this.lanesGrid.columnApi.getColumn("lastCycleStatus").getColDef().editable = this.canEdit && this.editMode;
+        } else if(this.lanesGrid.columnApi.getColumn("lastCycleStatus_1")) {
+            this.lanesGrid.columnApi.getColumn("lastCycleStatus_1").getColDef().editable = this.canEdit && this.editMode;
         }
         if (this.lanesGrid.columnApi.getColumn("pipelineStatus")) {
             this.lanesGrid.columnApi.getColumn("pipelineStatus").getColDef().editable = this.canEdit && this.editMode;
+        } else if(this.lanesGrid.columnApi.getColumn("pipelineStatus_1")) {
+            this.lanesGrid.columnApi.getColumn("pipelineStatus_1").getColDef().editable = this.canEdit && this.editMode;
         }
         if(this.lanesGridApi) {
             this.lanesGridApi.redrawRows();
