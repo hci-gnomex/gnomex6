@@ -137,7 +137,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 	public readonly PO:          string = 'po';
 	public readonly CREDIT_CARD: string = 'creditCard';
 
-	public showField: string = this.CHARTFIELD;
+	public showField: string = ""
 
 	public usesCustomChartfields: boolean;
 
@@ -314,6 +314,15 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		super();
 
 		this._data = data;
+
+		this.showField = this.CHARTFIELD;
+		if (this._data && this._data.rowData) {
+			if(this._data.rowData.isPO === 'Y') {
+				this.showField = this.PO;
+			} else if(this._data.rowData.isCreditCard === 'Y') {
+				this.showField = this.CREDIT_CARD;
+			}
+		}
 	}
 
 	ngOnInit(): void {
@@ -413,13 +422,13 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 				this.accountFieldsConfigurationService.getInternalAccountFieldsConfigurationObservable().subscribe((response) => {
 					this.addInternalAccountFieldsConfigurationControls(response);
 					customChartfieldValidators = this.addInternalAccountFieldsConfigurationValidators();
-					this.handleConditionalValidators(customChartfieldValidators)
+					this.handleConditionalValidators(customChartfieldValidators);
 				});
 
 			this.otherAccountFieldsConfigurationSubscription =
 				this.accountFieldsConfigurationService.getOtherAccountFieldsConfigurationObservable().subscribe((response) => {
 					this.processOtherAccountFieldsConfigurations(response);
-					this.handleConditionalValidators(customChartfieldValidators)
+					this.handleConditionalValidators(customChartfieldValidators);
 				});
 
 			this.accountFieldsConfigurationService.publishAccountFieldConfigurations();
