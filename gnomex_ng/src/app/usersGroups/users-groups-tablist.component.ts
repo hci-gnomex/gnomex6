@@ -124,7 +124,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
 
     private readonly DUMMY_UNID: string = "u0000000";
     private readonly DUMMY_USERNAME: string = "_";
-    private readonly DUMMY_PASSWORD: string = "aaAA11$$";
+    private readonly DUMMY_PASSWORD: string = "aaAA11$$bb";
     private readonly PASSWORD_MASKED: string = "XXXX";
 
     public readonly USER_TYPE_UNIVERSITY: string = "uu";
