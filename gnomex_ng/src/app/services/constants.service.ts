@@ -180,6 +180,7 @@ export class ConstantsService {
 
     public readonly MAX_LENGTH_5000: number = 5000;
     public readonly MAX_LENGTH_4000: number = 4000;
+    public readonly MAX_LENGTH_2000: number = 2000;
     public readonly MAX_LENGTH_500: number = 500;
     public readonly MAX_LENGTH_200: number = 200;
     public readonly MAX_LENGTH_100: number = 100;

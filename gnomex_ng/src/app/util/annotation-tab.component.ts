@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit} from "@angular/core";
+import {Component, Input, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {IAnnotation} from "./interfaces/annotation.model";
 import {selectRequired} from "./validators/select-required.validator";
@@ -33,9 +33,17 @@ export enum OrderType {
             margin: 0.25em;
             font-size: small;
         }
+        .annot-control-editor {
+            width: 50%;
+            margin: 0.25em;
+            font-size: small;
+        }
 
         .mat-tab-group-border {
             border: 1px solid #e8e8e8;
+        }
+        .enable-bordered  {
+            border: 1px solid #A0A0A0;
         }
 
 
@@ -121,11 +129,15 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
 
                 if (annot.isRequired === 'Y') {
                     if (annot.codePropertyType === this.TEXT) {
-                        this.form.controls[annot.name].setValidators([Validators.required]);
+                        this.form.controls[annot.name].setValidators([Validators.required, Validators.maxLength(this.constService.MAX_LENGTH_2000)]);
                     } else if (annot.codePropertyType === this.CHECK) {
                         // this.form.controls[annot.name].setValidators([Validators.requiredTrue]);
                     } else if (annot.codePropertyType === this.MOPTION || annot.codePropertyType === this.OPTION) {
                         this.form.controls[annot.name].setValidators(selectRequired());
+                    }
+                } else {
+                    if (annot.codePropertyType === this.TEXT) {
+                        this.form.controls[annot.name].setValidators([Validators.maxLength(this.constService.MAX_LENGTH_2000)]);
                     }
                 }
             });
@@ -137,6 +149,7 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
             this.form.enable();
         }
 
+        this.form.markAsUntouched();
         this.form.markAsPristine();
     }
 
@@ -202,7 +215,7 @@ export class AnnotationTabComponent implements OnInit, OnDestroy {
 
 
     constructor(private dialogsService: DialogsService,
-                private constService: ConstantsService,
+                public constService: ConstantsService,
                 private orderValidateService: BrowseOrderValidateService) {
     }
 

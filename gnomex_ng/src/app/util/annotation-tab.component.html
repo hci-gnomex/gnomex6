@@ -1,7 +1,7 @@
 <div class="double-padded overflow-auto" style="display:flex">
     <form [formGroup]="form" style=" height:100%;width:100%; display:flex; flex-direction:column;">
         <div [ngSwitch]="annot.codePropertyType" *ngFor="let annot of annotations" class="full-width full-height small-font padded">
-            <div class="display-white-space">{{ annot && annot.description ? annot.description : '' }}</div>
+            <div class="display-white-space" innerHTML="{{ annot && annot.description ? annot.description : '' }}"></div>
             <div *ngSwitchCase="'CHECK'" class="annot-control">
                 <mat-checkbox  [formControl]="this.form.controls[annot.name]" >
                     {{ annot && annot.name ? annot.name : "" }}
@@ -10,12 +10,27 @@
                     This field is required
                 </mat-error>
             </div>
-            <mat-form-field *ngSwitchCase="'TEXT'" class="annot-control" >
-                <input matInput placeholder="{{annot.name}}" [formControl]="this.form.controls[annot.name]">
-                <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('required')">
-                    This field is required
-                </mat-error>
-            </mat-form-field>
+            <div *ngSwitchCase="'TEXT'" class="annot-control-editor" >
+                <label class="padded-bottom">{{annot.name}}</label>
+                <div class="full-width padded enable-bordered">
+                    <textarea style="white-space: pre-line"
+                              matInput
+                              matTextareaAutosize
+                              matAutosizeMinRows="8"
+                              matAutosizeMaxRows="8"
+                              [formControl]="this.form.controls[annot.name]"
+                              [disabled]="this.disabled">
+                    </textarea>
+                </div>
+                <div  style="color:red" *ngIf="this.form?.controls[annot.name]?.hasError('required')
+                                        && this.form?.controls[annot.name]?.touched">
+                    Field is required
+                </div>
+                <div  style="color:red" *ngIf="this.form?.controls[annot.name]?.hasError('maxlength')
+                                        && this.form?.controls[annot.name]?.touched">
+                    Field exceeded the {{this.constService.MAX_LENGTH_2000}} character limit
+                </div>
+            </div>
             <div *ngSwitchCase="'MOPTION'" class="annot-control">
                 <custom-multi-combo-box [placeholder]="annot.name"
                                         [formControl]="this.form.controls[annot.name]"
