@@ -20,6 +20,7 @@ import {UrlAnnotEditor} from "./url-annot-editor";
 import {UrlAnnotDialogComponent} from "./popups/url-annot-dialog.component";
 import {UtilModule} from "../util.module";
 import {AgGridRendererModule} from "../grid-renderers";
+import {ImprovedSelectEditor} from "./improved-select.editor";
 
 
 @NgModule({
@@ -42,6 +43,7 @@ import {AgGridRendererModule} from "../grid-renderers";
         DateEditor,
         FillLikeEditor,
         MultipleSelectDialogComponent,
+        ImprovedSelectEditor,
         SelectEditor,
         SeqlaneSelectEditor,
         TextAlignLeftMiddleEditor,
