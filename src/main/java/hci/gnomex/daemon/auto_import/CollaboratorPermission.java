@@ -1,10 +1,14 @@
 package hci.gnomex.daemon.auto_import;
 
+import hci.gnomex.model.Visibility;
+
 import java.sql.SQLException;
 import java.util.*;
 import java.util.Map.Entry;
 
 public class CollaboratorPermission {
+    //there is only one server clingen1 that should every run this job
+    private static final String BASE_URL = "https://hci-clingen1.hci.utah.edu/gnomex/";
     private Map<String, List<PersonEntry>> newSampleList;
     private Integer analysisID;
     private static Map<String, List<String>> diseaseAliasMap = new TreeMap();
@@ -159,15 +163,20 @@ public class CollaboratorPermission {
         try {
             cp = new CollaboratorPermission(args);
             List<Integer> analysisList = cp.getAnalysesWithCriteria();
-            String query = "SELECT * from AnalysisCollaborator ac WHERE ac.idAnalysis = ? AND ac.idAppUser = ?";
-            Map<Integer, List<Integer>> analysisForCollabs = cp.query.getCollaboratorsForIRB(cp.IRBs, analysisList, query);
-            cp.assignAnalysisToCollabs(analysisForCollabs, true);
-            if(cp.isRequestAuthed()){
-                query = "SELECT * from RequestCollaborator rc WHERE rc.idRequest = ? AND rc.idAppUser = ?";
-                Map<Integer, List<Integer>> requestForCollabs = cp.query.getCollaboratorsForIRB(cp.IRBs, cp.requestIDList, query);
-                cp.assignAnalysisToCollabs(requestForCollabs,false);
-            }
+            IRBContainer irbAnalysisContainer = new IRBContainer();
+            IRBContainer irbRequestContainer = new IRBContainer();
 
+            String query = "SELECT * from AnalysisCollaborator ac  WHERE ac.idAnalysis = ? AND ac.idAppUser = ?";
+            Map<Integer, List<Integer>> analysisForCollabs = cp.query.getCollaboratorsForIRB(cp.IRBs, analysisList, irbAnalysisContainer, query, "idAnalysis");
+            cp.assignAnalysisToCollabs(analysisForCollabs, true);
+            cp.sendNotificationToIRB(irbAnalysisContainer);
+
+            if(cp.isRequestAuthed()){
+                query = "SELECT * from RequestCollaborator rc  WHERE rc.idRequest = ? AND rc.idAppUser = ?";
+                Map<Integer, List<Integer>> requestForCollabs = cp.query.getCollaboratorsForIRB(cp.IRBs, cp.requestIDList, irbRequestContainer, query, "idRequest");
+                cp.assignAnalysisToCollabs(requestForCollabs,false);
+                cp.sendNotificationToIRB(irbAnalysisContainer);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -179,6 +188,67 @@ public class CollaboratorPermission {
             }
 
         }
+
+    }
+
+    private void sendNotificationToIRB(IRBContainer irbContainer) {
+        StringBuilder body = new StringBuilder();
+        Map<String,List<Integer>> personOrderMap = irbContainer.getIrbOrders();
+        String subject = "New Analyses in Translation GNomEx PHI";
+
+        body.append("<html><head>");
+        body.append("<meta http-equiv='content-style-type' content='text/css'></head>");
+        body.append("<body leftmargin='0' marginwidth='0' topmargin='0' marginheight='0' offset='0' bgcolor='#FFFFFF'>");
+        body.append("<style>.fontClass{font-size:11px;color:#000000;font-family:verdana;text-decoration:none;}");
+        body.append(" .fontClassBold{font-size:11px;font-weight:bold;color:#000000;font-family:verdana;text-decoration:none;}");
+        body.append(" .fontClassLgeBold{font-size:12px;line-height:22px;font-weight:bold;color:#000000;font-family:verdana;text-decoration:none;}</style>");
+        body.append("<div style=\"display: flex; flex-direction: column; padding: 0.5em; \">");
+        body.append("<h2 style=\"text-align: center;\"> New Raw Fastq files assigned for the following IRB: " );
+        body.append(irbContainer.getIrbName());
+        body.append("</h2>");
+
+        for(Entry<String, List<Integer>> entry : personOrderMap.entrySet()){
+            String personId = entry.getKey();
+            List<Integer> orders = entry.getValue();
+
+            body.append("<div style=\"text-align: center;\">");
+            body.append("For ");
+            body.append("<strong> HCI Person ID " );
+            body.append("" + personId);
+            body.append("</strong> new fastq files assigned, find here: ");
+            body.append(" ( ");
+            for(int i = 0; i < orders.size(); i++){
+                body.append("<a href=\"");
+                body.append(BASE_URL);
+                body.append("?analysisNumber=");
+                body.append("A");
+                body.append(orders.get(i));
+                body.append("\" >");
+                if(i == (orders.size() - 1)){
+                    body.append("A");
+                    body.append(orders.get(i));
+                    body.append("</a>");
+                    body.append(" )</div>");
+                } else {
+                    body.append("A");
+                    body.append(orders.get(i));
+                    body.append("</a>");
+                    body.append(", ");
+                }
+
+            }
+        }
+        body.append("</div>");
+        body.append("</body></html>");
+        System.out.println("to: " + irbContainer.getIrbEmail());
+        System.out.println(body.toString());
+        if(irbContainer.getIrbOrders().size() > 0){
+            DirectoryBuilder.sendImportedIDReport("DoNotReply@hci.utah.edu",
+                    irbContainer.getIrbEmail(), subject, body.toString(), "", true);
+        } else {
+            System.out.println("No new analyses for this IRB " + irbContainer.getIrbName() + ". Email not sent");
+        }
+
 
     }
 
@@ -274,14 +344,14 @@ public class CollaboratorPermission {
 
         for(int i = 0; i < this.dataVendors.size(); i++){
             StringBuilder strBuilder = new StringBuilder();
-            strBuilder.append("SELECT a.name as personID \n ");
-            strBuilder.append("FROM Analysis a JOIN Request r ON r.name = a.name \n");
+            strBuilder.append("SELECT a.name as personID ");
+            strBuilder.append("FROM Analysis a JOIN Request r ON r.name = a.name ");
             strBuilder.append(this.makeAnalysisGroupINstatement(this.dataVendors.get(i)));
-            strBuilder.append("\n ");
-
-            strBuilder.append("WHERE ");
+            strBuilder.append(" WHERE ");
             strBuilder.append(makePersonIdINstatement(personIDList, "a.name"));
             personIDList.clear();
+            System.out.println("determine if hci person ids are found within db");
+            System.out.println(strBuilder.toString());
 
             this.query.executeAnalysisWithCriteriaQuery(strBuilder.toString(), personIDList);
 
@@ -311,9 +381,13 @@ public class CollaboratorPermission {
     private String makeQueryStatement(String dataVendor) {
         StringBuilder strBuild = new StringBuilder("WHERE ");
 
+  //.*A[A-Za-z0-9]{6}
 
+        //m2gen looks like this SL423827 tgen looks like this '16-0063480a_C046_0018_010951_LN_Whole_T1_K1ID2_A61708_R1'
+        // which we've simplified to A61708
         if (dataVendor.equals("avatar")) {
-            strBuild.append(" s.name LIKE \'SL%\' OR s.name REGEXP \'^[0-9]{2}-[A-Za-z0-9\\.]+.*$\' ");
+            strBuild.append(" s.name LIKE \'SL%\' OR s.name REGEXP \'^[0-9]{2}-[A-Za-z0-9\\.]+.*$\'" +
+                    " OR s.name REGEXP \'.*A[0-9]{5,6}\' ");
         } else if (dataVendor.equals("foundation")) {
             strBuild.append(" ( s.name  REGEXP \'^T?C?Q?RF[0-9]+\' ");
             strBuild.append(" OR s.name LIKE \'ORD%\' ) ");

@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 public class DirectoryBuilder {
 
 
+
 	private String stagePath;
 	private String inFileName;
 	private String root;
@@ -25,11 +26,11 @@ public class DirectoryBuilder {
 	private String flaggedIDFileName;
 	private String mode;
 	private String accountForFilesMoved;
+	private boolean accountFilesFlag = false;
 	private Set<String> fileTypeCategorySet;
 	private Set<String> optionalFileTypeCategorySet;
 	private boolean addWrapperFolder = false;
 	private String remotePath;
-	private boolean loadAccountFile = false;
 	private String outputAccountFile;
 
 
@@ -57,6 +58,7 @@ public class DirectoryBuilder {
 
 			if(args[i].equals("-accountfilesmoved")) // this switches the FileMover to a mode to reports about files moved
 				accountForFilesMoved = args[++i];
+
 			if (args[i].equals("-file")) {
 				this.inFileName = args[++i];
 			} else if (args[i].equals("-root")) {
@@ -74,18 +76,12 @@ public class DirectoryBuilder {
 			}else if(args[i].equals("-log")){
 				this.logPath = args[++i];
 			}else if(args[i].equals("-remotepath")){ // accountfilesmoved is considered path to local files
-				// need remote if you want to compare
-				if(accountForFilesMoved != null){
-					this.remotePath = args[++i];
-				}
-			} else if(args[i].equals("-accountload")){ // load file for accounting don't look at disk
-				if(accountForFilesMoved != null){     // the loaded file will follow accountForFilesMoved param
-					this.loadAccountFile = true;
-				}
+				// need remote if you want to compare for account files mode
+				this.remotePath = args[++i];
+			}else if(args[i].equals("-accountfilesflag")){ // only care for found full set "accountfiles"
+				this.accountFilesFlag = true;
 			}else if(args[i].equals("-accountoutfile")){
-				if(accountForFilesMoved != null){
-					this.outputAccountFile = args[++i];
-				}
+				this.outputAccountFile = args[++i];
 			} else if(args[i].equals("-cp")){
 				i++;
 				while(i < args.length && args[i].charAt(0) != '-' ){
@@ -168,6 +164,16 @@ public class DirectoryBuilder {
 
 	}
 
+	public Map<String, List<String>> copyFoundFileMap(Map<String, List<String>> fileMap ){
+		Map cpFileMap = new HashMap();
+		for(Map.Entry<String,List<String>> entry : fileMap.entrySet()){
+			String key = entry.getKey();
+			List<String> val = entry.getValue();
+			cpFileMap.put(key, new ArrayList(val));
+		}
+		return cpFileMap;
+	}
+
 	public void makeAccountingForFiles(){
 		this.fileTypeCategorySet = new HashSet<String>();
 		String regex = ".*((?:TRF|CRF|QRF|ORD)[A-Za-z0-9-]+_?[A-Za-z]*)(\\..+)";
@@ -179,18 +185,19 @@ public class DirectoryBuilder {
 
 
 		File root = new File(this.accountForFilesMoved);
-		Map<String, Set<String>> localFileTypeMap= null;
-		Map<String, List<String>> localFileMap = new HashMap<>(); // keeps track of all files and their paths with the key being the ID
+		Map<String, Set<String>> fileTypeMap= null;
+		Map<String, List<String>> fileMap = new HashMap<>(); // keeps track of all files and their paths with the key being the ID
 		List<String> foundFileIDList = new ArrayList<>();
+		Map<String,List<String>> localOnlyFileMap = new HashMap<>();
 
 
-		if(this.loadAccountFile){
-			localFileTypeMap = this.loadFilesToAccount(accountForFilesMoved ,localFileMap, regex);
-			System.out.println("file map size: " + localFileMap.size());
+		if(root.isFile()){
+			fileTypeMap = this.loadFilesToAccount(accountForFilesMoved ,fileMap, regex);
+			System.out.println("file map size: " + fileMap.size());
 			System.out.println("This is the out file " + outputAccountFile);
 		}else{
 			if(root.exists() && root.isDirectory()){
-				localFileTypeMap = this.findAllFiles(root,localFileMap,regex);
+				fileTypeMap = this.findAllFiles(root,fileMap,regex);
 			}else{
 				System.out.println("Path " + accountForFilesMoved +  " is invalid for accounting");
 				System.exit(1);
@@ -199,25 +206,31 @@ public class DirectoryBuilder {
 		}
 
 		// prints out the missing file type sets like for example ID has except missing its xml
-		findMissingFiles(localFileTypeMap,missingMap,foundFileIDList);
+		findMissingFiles(fileTypeMap,missingMap,foundFileIDList);
 		System.out.println("found File ID List size: " + foundFileIDList.size());
 		if(remotePath != null ){
 			// we don't want to report files yet if checking remote drive
+			localOnlyFileMap = copyFoundFileMap(fileMap);
 			foundFileIDList.clear();
 		}
-		printAccoutedForFiles(missingMap,foundFileIDList,localFileMap);
+		printAccoutedForFiles(missingMap,foundFileIDList,fileMap);
 
 		missingMap.clear();
 
 
 		if(this.remotePath != null ){
 			System.out.println("Files still missing after checking what is stored remotely");
-			this.findAllFiles(localFileTypeMap, new File(this.remotePath),localFileMap, regex);
+			this.findAllFiles(fileTypeMap, new File(this.remotePath),fileMap, regex);
 
 			// we want a full picture(remote and local) if the file is on the disk or not
 			//addRemoteFromLocalFiles(localFileTypeMap,remoteFileTypeMap);
-			findMissingFiles(localFileTypeMap,missingMap, foundFileIDList);
-			printAccoutedForFiles(missingMap,foundFileIDList,localFileMap);
+			findMissingFiles(fileTypeMap,missingMap, foundFileIDList);
+			if(accountFilesFlag){
+				printAccoutedForFiles(missingMap,foundFileIDList,localOnlyFileMap);
+			}else{
+				printAccoutedForFiles(missingMap,foundFileIDList,fileMap);
+			}
+
 		}
 
 
@@ -936,7 +949,7 @@ public class DirectoryBuilder {
 
 		if(reportIDList.size() > 0 ){
 			try{
-				sendImportedIDReport(from,to,subject,strBuild.toString(),"");
+				sendImportedIDReport(from,to,subject,strBuild.toString(),"",false);
 			}
 			catch(Exception e){
 				e.printStackTrace();
@@ -946,7 +959,7 @@ public class DirectoryBuilder {
 		}
 
 	}
-	public static void sendImportedIDReport(String from,String to, String subject,String body, String testEmail) {
+	public static void sendImportedIDReport(String from,String to, String subject,String body, String testEmail, boolean formatHTML) {
 		//PropertyDictionaryHelper ph = PropertyDictionaryHelper.getInstance(sess);
 		//String gnomexSupportEmail = ph.getProperty(PropertyDictionary.GNOMEX_SUPPORT_EMAIL);
 
@@ -971,7 +984,7 @@ public class DirectoryBuilder {
 					subject,
 					body,
 					null,
-					false,
+					formatHTML,
 					sendTestEmail,
 					testEmail
 			);
