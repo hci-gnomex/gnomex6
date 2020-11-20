@@ -20,12 +20,18 @@ public class PersonEntry {
 
 	private String sampleSubtype;  // sampleSubtype;
 	private String submittedDiagnosis; // submittedDiagnosis;
+	private String captureDesign;
+	private String captureTestName;
+	private String captureTestDescription;
 
-	
+
 	PersonEntry(){
 	
 	}
-	PersonEntry(String mrn, String fullName, String gender,String ccNumber,String testType, String tissueType,String sampleSubtype, String submittedDiagnosis,String slNumber,String shadowId,String personId ){
+	PersonEntry(String mrn, String fullName, String gender,String ccNumber,String testType,
+				String tissueType,String sampleSubtype, String submittedDiagnosis,
+				String slNumber,String shadowId,String personId, String captureDesign,
+				String captureTestName, String captureTestDescription  ){
 		this.mrn = mrn;
 		this.shadowId = shadowId;
 		this.personId = personId;
@@ -37,6 +43,9 @@ public class PersonEntry {
 		this.tissueType = tissueType;
 		this.sampleSubtype = sampleSubtype;
 		this.submittedDiagnosis = submittedDiagnosis;
+		this.captureTestName = captureTestName;
+		this.captureDesign = captureDesign;
+		this.captureTestDescription = captureTestDescription;
 	}
 	
 
@@ -113,13 +122,23 @@ public class PersonEntry {
 	public void setSampleSubtype(String sampleSubtype) {
 		this.sampleSubtype = sampleSubtype;
 	}
+
 	public String getSubmittedDiagnosis() {
 		return submittedDiagnosis;
 	}
-
 	public void setSubmittedDiagnosis(String submittedDiagnosis) {
 		this.submittedDiagnosis = submittedDiagnosis;
 	}
+
+	public String getCaptureDesign(){  return captureDesign; }
+	public void setCaptureDesign(String cd) { this.captureDesign = cd; }
+
+	public String getCaptureTestName() { return captureTestName; }
+	public void setCaptureTestName(String captureTestName) { this.captureTestName = captureTestName; }
+
+	public String getCaptureTestDescription() { return captureTestDescription; }
+	public void setCaptureTestDescription(String captureTestDescription) { this.captureTestDescription = captureTestDescription; }
+
 
 
 	public String setEmptyToNull(String val){
@@ -128,7 +147,7 @@ public class PersonEntry {
 		}
 		return val;
 	}
-
+    //please remember order matters
 	public String toString(String personType){
 		StringBuilder strBuild = new StringBuilder();
 		//order matters
@@ -143,7 +162,10 @@ public class PersonEntry {
 			strBuild.append(setEmptyToNull(this.slNumber) +"\t");
 			strBuild.append(setEmptyToNull(this.tissueType) +"\t");
 			strBuild.append(setEmptyToNull(this.sampleSubtype) +"\t");
-			strBuild.append(setEmptyToNull(this.submittedDiagnosis) +"\n");
+			strBuild.append(setEmptyToNull(this.submittedDiagnosis) +"\t");
+			strBuild.append(setEmptyToNull(this.captureTestName) +"\t");
+			strBuild.append(setEmptyToNull(this.captureDesign) +"\t");
+			strBuild.append(setEmptyToNull(this.captureTestDescription)+"\n");
 		}
 		else if (PersonEntry.FOUNDATION.equals(personType)
 		|| PersonEntry.TEMPUS.equals(personType)){
@@ -156,14 +178,16 @@ public class PersonEntry {
 			strBuild.append(setEmptyToNull(this.slNumber) +"\t");
 			strBuild.append(setEmptyToNull(this.sampleSubtype) +"\t");
 			strBuild.append(setEmptyToNull(this.tissueType) +"\t");
-			strBuild.append(setEmptyToNull(this.submittedDiagnosis) +"\n");
+			strBuild.append(setEmptyToNull(this.submittedDiagnosis) +"\t");
+			strBuild.append(setEmptyToNull(this.captureTestName) +"\t");
+			strBuild.append(setEmptyToNull(this.captureDesign) +"\t");
+			strBuild.append(setEmptyToNull(this.captureTestDescription)+"\n");
 		}
 
 		return strBuild.toString();
 
 	}
-	
-	
-	
+
+
 
 }

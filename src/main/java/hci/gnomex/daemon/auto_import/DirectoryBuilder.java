@@ -949,7 +949,7 @@ public class DirectoryBuilder {
 
 		if(reportIDList.size() > 0 ){
 			try{
-				sendImportedIDReport(from,to,subject,strBuild.toString(),"");
+				sendImportedIDReport(from,to,subject,strBuild.toString(),"",false);
 			}
 			catch(Exception e){
 				e.printStackTrace();
@@ -959,7 +959,7 @@ public class DirectoryBuilder {
 		}
 
 	}
-	public static void sendImportedIDReport(String from,String to, String subject,String body, String testEmail) {
+	public static void sendImportedIDReport(String from,String to, String subject,String body, String testEmail, boolean formatHTML) {
 		//PropertyDictionaryHelper ph = PropertyDictionaryHelper.getInstance(sess);
 		//String gnomexSupportEmail = ph.getProperty(PropertyDictionary.GNOMEX_SUPPORT_EMAIL);
 
@@ -984,7 +984,7 @@ public class DirectoryBuilder {
 					subject,
 					body,
 					null,
-					false,
+					formatHTML,
 					sendTestEmail,
 					testEmail
 			);
