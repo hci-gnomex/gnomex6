@@ -31,6 +31,8 @@ import {GridApi, SelectionChangedEvent} from "ag-grid-community";
 import {SampleUploadService} from "../../upload/sample-upload.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
+import {ImprovedSelectRenderer} from "../../util/grid-renderers/improved-select.renderer";
+import {ImprovedSelectEditor} from "../../util/grid-editors/improved-select.editor";
 
 @Component({
     selector: "tab-samples-illumina",
@@ -277,6 +279,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
     public static readonly TEXT: string = 'text';
     public static readonly TEXT_RIGHT: string = 'text-right';
     public static readonly OPTION: string = 'option';
+    public static readonly IMP_OPTION: string = 'IMPROVED_OPTION';
     public static readonly MULTIOPTION: string = 'multioption';
 
     private _lab: any;
@@ -720,6 +723,26 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     // case TabSamplesIlluminaComponent.MULTIOPTION:
                     //     break;
 
+                    case TabSamplesIlluminaComponent.IMP_OPTION:
+                        newColumn.cellRendererFramework = ImprovedSelectRenderer;
+                        newColumn.cellEditorFramework   = ImprovedSelectEditor;
+
+                        if (columnProperty.nameFrontEndDictionaryToUse) {
+                            newColumn.selectOptions = this['' + columnProperty.nameFrontEndDictionaryToUse];
+                        } else if (columnProperty.fullDictionaryModelPathToLoad) {
+                            let fullDictionaryModelPathToLoad: any[] = this.dictionaryService.getEntriesExcludeBlank('' + columnProperty.fullDictionaryModelPathToLoad);
+                            fullDictionaryModelPathToLoad.unshift("");
+                            newColumn.selectOptions = fullDictionaryModelPathToLoad;
+                        } else {
+                            newColumn.selectOptions = [];
+                        }
+
+                        newColumn.selectOptionsDisplayField = columnProperty.nameField ? columnProperty.nameField : "display";
+                        newColumn.selectOptionsValueField   = columnProperty.valueField ? columnProperty.valueField : "value";
+                        break;
+                    // case TabSamplesIlluminaComponent.MULTIOPTION:
+                    //     break;
+
                     case TabSamplesIlluminaComponent.TEXT:
                         newColumn.cellRendererFramework = TextAlignLeftMiddleRenderer;
                         newColumn.cellEditorFramework   = TextAlignLeftMiddleEditor;
@@ -1106,6 +1129,23 @@ export class TabSamplesIlluminaComponent implements OnInit {
                         newColumn.selectOptionsDisplayField = columnProperty.nameField ? columnProperty.nameField : "display";
                         newColumn.selectOptionsValueField   = columnProperty.valueField ? columnProperty.valueField : "value";
                         break;
+                    case TabSamplesIlluminaComponent.IMP_OPTION:
+                        newColumn.cellRendererFramework = ImprovedSelectRenderer;
+                        newColumn.cellEditorFramework   = ImprovedSelectEditor;
+
+                        if (columnProperty.nameFrontEndDictionaryToUse) {
+                            newColumn.selectOptions = this['' + columnProperty.nameFrontEndDictionaryToUse];
+                        } else if (columnProperty.fullDictionaryModelPathToLoad) {
+                            let fullDictionaryModelPathToLoad: any[] = this.dictionaryService.getEntriesExcludeBlank('' + columnProperty.fullDictionaryModelPathToLoad);
+                            fullDictionaryModelPathToLoad.unshift("");
+                            newColumn.selectOptions = fullDictionaryModelPathToLoad;
+                        } else {
+                            newColumn.selectOptions = [];
+                        }
+
+                        newColumn.selectOptionsDisplayField = columnProperty.nameField ? columnProperty.nameField : "display";
+                        newColumn.selectOptionsValueField   = columnProperty.valueField ? columnProperty.valueField : "value";
+                        break;
                     // case TabSamplesIlluminaComponent.MULTIOPTION:
                     //     break;
 
@@ -1427,6 +1467,23 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     case TabSamplesIlluminaComponent.OPTION:
                         newColumn.cellRendererFramework = SelectRenderer;
                         newColumn.cellEditorFramework   = SelectEditor;
+
+                        if (columnProperty.nameFrontEndDictionaryToUse) {
+                            newColumn.selectOptions = this['' + columnProperty.nameFrontEndDictionaryToUse];
+                        } else if (columnProperty.fullDictionaryModelPathToLoad) {
+                            let fullDictionaryModelPathToLoad: any[] = this.dictionaryService.getEntriesExcludeBlank('' + columnProperty.fullDictionaryModelPathToLoad);
+                            fullDictionaryModelPathToLoad.unshift("");
+                            newColumn.selectOptions = fullDictionaryModelPathToLoad;
+                        } else {
+                            newColumn.selectOptions = [];
+                        }
+
+                        newColumn.selectOptionsDisplayField = columnProperty.nameField ? columnProperty.nameField : "display";
+                        newColumn.selectOptionsValueField   = columnProperty.valueField ? columnProperty.valueField : "value";
+                        break;
+                    case TabSamplesIlluminaComponent.IMP_OPTION:
+                        newColumn.cellRendererFramework = ImprovedSelectRenderer;
+                        newColumn.cellEditorFramework   = ImprovedSelectEditor;
 
                         if (columnProperty.nameFrontEndDictionaryToUse) {
                             newColumn.selectOptions = this['' + columnProperty.nameFrontEndDictionaryToUse];
@@ -2480,6 +2537,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
             case annotType.OPTION :
                 column = TabSamplesIlluminaComponent.createOptionColumn(annot, emToPxConversionRate, editable);
                 break;
+            case annotType.IMP_OPTION :
+                column = TabSamplesIlluminaComponent.createImprovedOptionColumn(annot, emToPxConversionRate, editable);
+                break;
             case annotType.URL :
                 column = TabSamplesIlluminaComponent.createUrlColumn(annot, emToPxConversionRate);
                 break;
@@ -2559,6 +2619,25 @@ export class TabSamplesIlluminaComponent implements OnInit {
             field: TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX + annot.idProperty,
             cellRendererFramework: SelectRenderer,
             cellEditorFramework: SelectEditor,
+            selectOptions: annot.options,
+            selectOptionsDisplayField: "option",
+            selectOptionsValueField: "idPropertyOption",
+            showFillButton: true,
+            fillGroupAttribute: 'frontEndGridGroup'
+        };
+    }
+
+    public static createImprovedOptionColumn(annot: any, emToPxConversionRate: number, editable: boolean): any {
+        return {
+            headerName: annot.display,
+            editable: editable,
+            width:    10 * emToPxConversionRate,
+            minWidth: 7 * emToPxConversionRate,
+            suppressSizeToFit: true,
+            idProperty: annot.idProperty,
+            field: TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX + annot.idProperty,
+            cellRendererFramework: ImprovedSelectRenderer,
+            cellEditorFramework: ImprovedSelectEditor,
             selectOptions: annot.options,
             selectOptionsDisplayField: "option",
             selectOptionsValueField: "idPropertyOption",

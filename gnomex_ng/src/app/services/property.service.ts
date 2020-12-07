@@ -11,6 +11,7 @@ export enum annotType
     CHECK = "CHECK",
     URL = "URL",
     OPTION = "OPTION",
+    IMP_OPTION = "IMPROVED_OPTION",
     MOPTION = "MOPTION",
     TEXT = "TEXT"
 }
