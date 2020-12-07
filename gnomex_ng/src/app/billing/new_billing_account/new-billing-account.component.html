@@ -20,7 +20,7 @@
 						<div>
 							Core Facility
 						</div>
-						<context-help class="small-font" name="coreFacilityHelp" label="Help me choose" popupTitle="Core Facility Information"
+						<context-help *ngIf="!this.disableCoreFacilitiesSelector" class="small-font" name="coreFacilityHelp" label="Help me choose" popupTitle="Core Facility Information"
 									  [hasEditPermission]="this.createSecurityAdvisorService.isSuperAdmin"
 									  tooltipPosition="left"></context-help>
 					</div>

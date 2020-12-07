@@ -235,7 +235,9 @@ public class Downloader {
 		//xargs -P10 -I {} aws --profile tempus s3 cp {} " + this.downloadPath;
 
 		System.out.println(downloadCommand);
-		commands.add(downloadCommand);
+		if(fileNameMap.size() > 0){
+			commands.add(downloadCommand);
+		}
 		commands.add("mv -t " + this.downloadPath + " " + this.downloadPath + File.separator +  "Flagged" +File.separator +  "*" );
 		executeCommands(commands);
 		try {

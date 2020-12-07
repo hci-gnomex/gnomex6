@@ -48,18 +48,14 @@ public class Linker {
 			q = new Query(inCreds);
 			String storedProc = determineProc(importType);
 			conn = q.getConnection();
-			
+
 			String idString = readIDs(inIDsFileName);
-			
+
 
 			// need to obtain store procedure in db(a sql script stored in our sql server db)
 			cstmt = conn.prepareCall(storedProc);
 			cstmt.setString (1,idString);
 
-			
-		
-
-			
 			int rowsAffected = 0;
 			boolean isResults = cstmt.execute();
 
@@ -74,16 +70,16 @@ public class Linker {
 			}
 
 			while(rs.next()) {
-				
-				
+
+
 				if(importType.equals("avatar")) {
-					saveResult(rs,slInfo, 11); 
-					
+					saveResult(rs,slInfo, 11);
+
 				}else if(importType.equals("foundation")) {
-					saveResult(rs,slInfo, 10); 
-					
+					saveResult(rs,slInfo, 13);
+
 				}
-				
+
 			}
 
 			writeToFile(outFileName, slInfo);
