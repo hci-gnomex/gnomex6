@@ -14,14 +14,15 @@ import org.jdom2.xpath.XPathFactory;
 import java.io.*;
 
 public class DeIdentifier {
-    public  static void removePHI(String fullFileNamePath){
+    public  static boolean removePHI(String fullFileNamePath){
+        boolean createdFile = false;
         Document jdomDocument =  readXML(fullFileNamePath);
         // has full path with file name
         String[] splitExtension = fullFileNamePath.split("\\.");
         String fileNameNoExtension = splitExtension[0];
         File f = new File(fileNameNoExtension + ".deident.xml");
-        if(f.exists()){ // need to create it again if it exists
-            return;
+        if(f.exists()){ // no need to create it again if it exists
+            return createdFile;
         }
 
         XPathFactory xFactory = XPathFactory.instance();
@@ -54,7 +55,6 @@ public class DeIdentifier {
             expr = xFactory.compile("//rr:ResultsReport/rr:ResultsPayload", Filters.element(),null,defaultNs);
             Element parentResultPayload = expr.evaluateFirst(jdomDocument);
             parentResultPayload.removeChild("ReportPDF");
-
 
 
             for(Element node : parentPMI.getChildren()) {
@@ -93,7 +93,8 @@ public class DeIdentifier {
 
 
         writeXML(jdomDocument,fileNameNoExtension + ".deident.xml");
-
+        createdFile = true;
+        return createdFile;
 
     }
 

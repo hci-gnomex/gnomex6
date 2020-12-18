@@ -452,8 +452,6 @@ public class Query {
                 }
 
 
-
-
                 System.out.println("-------------------------------------------------------------------");
             }
         } catch (SQLException e) {
