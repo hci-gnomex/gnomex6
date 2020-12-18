@@ -12,20 +12,26 @@ import {GridApi, RowSelectedEvent} from "ag-grid-community";
     template: `
         <div class="full-height full-width flex-container-col">
 
-            <div class="flex-grow flex-container-row"  >
-                <button mat-button color="primary"
-                        type="button"
-                        (click)="addLibPrepQC()">
-                    <img [src]="this.constService.ICON_ADD"> Add
-                </button>
-                <button [disabled]="!selectedRow"
-                        (click)="removeLibPrepQC()"
-                        mat-button color="primary"
-                        type="button">
-                    <img [src]="this.constService.ICON_DELETE"> Remove
-                </button>
+            <div class="flex-grow flex-container-row align-center justify-space-between">
+                <div>
+                    <button mat-button color="primary"
+                            type="button"
+                            (click)="addLibPrepQC()">
+                        <img [src]="this.constService.ICON_ADD"> Add
+                    </button>
+                    <button [disabled]="!selectedRow"
+                            (click)="removeLibPrepQC()"
+                            mat-button color="primary"
+                            type="button">
+                        <img [src]="this.constService.ICON_DELETE"> Remove
+                    </button>
+                </div>
+                <div>
+                    <button mat-button [hidden]="!this.isAnyFilterPresent" (click)="clearFilterModel()">Clear Filter</button>
+                </div>
             </div>
-            <div style="flex:7" class="full-width">
+            <label style="padding: 0.5em;"> * Gird data is sortable and filterable. To sort, click the column header(sortable for asc/desc/default). To filter or search, hover the column header right side and click the filter icon.</label>
+            <div style="flex:9" class="full-width">
                 <ag-grid-angular class="full-height full-width ag-theme-balham"
                                  [columnDefs]="columnDefs"
                                  [rowData]="this.rowData"
@@ -33,6 +39,9 @@ import {GridApi, RowSelectedEvent} from "ag-grid-community";
                                  (gridSizeChanged)="onGridSizeChanged($event)"
                                  (cellValueChanged)="onCellValueChanged($event)"
                                  [rowDeselection]="true"
+                                 [enableSorting]="true"
+                                 [enableFilter]="true"
+                                 [singleClickEdit]="true"
                                  [rowSelection]="'single'"
                                  (rowSelected)="this.onRowSelected($event)"
                                  [stopEditingWhenGridLosesFocus]="true">
@@ -57,10 +66,22 @@ export class EpLibraryPrepQCTabComponent implements OnInit, OnDestroy{
     private gridApi:GridApi;
     public rowData:any[] =[];
 
+    get isAnyFilterPresent(): boolean {
+        return this.gridApi ? this.gridApi.isAnyFilterPresent() : false;
+    }
+
+    clearFilterModel(): void {
+        if(this.gridApi && this.gridApi.isAnyFilterPresent()) {
+            this.gridApi.setFilterModel(null);
+            this.gridApi.setSortModel(null);
+        }
+    }
+
     public columnDefs:any[] = [
         {
             headerName: "Lib Prep QC Protocol",
             field: "protocolDisplay",
+            filterParams: {clearButton: true},
             editable: true,
             validators: [Validators.required, Validators.maxLength(this.constService.MAX_LENGTH_50)],
             errorNameErrorMessageMap: [

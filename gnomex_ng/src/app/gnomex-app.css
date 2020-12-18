@@ -88,6 +88,10 @@ input.mat-input-element:disabled {
     color: rgba(88,88,88,1);
 }
 
+textarea.mat-input-element:disabled {
+    color: rgba(88,88,88,1);
+}
+
 .mat-form-field {
     line-height: inherit;
     font: inherit;

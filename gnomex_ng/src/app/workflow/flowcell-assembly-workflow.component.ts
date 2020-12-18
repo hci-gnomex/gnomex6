@@ -147,7 +147,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             cellStyle: UtilService.shrinkCellText
         });
         result.push({
-            headerName: "Library Protocol",
+            headerName: "Sequencing Protocol",
             editable: false,
             width:    800,
             minWidth: 8 * this.emToPxConversionRate1,
@@ -221,7 +221,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             cellStyle: UtilService.shrinkCellText
         });
         result.push({
-            headerName: "Library Protocol",
+            headerName: "Sequencing Protocol",
             editable: false,
             width:    800,
             minWidth: 7 * this.emToPxConversionRate2,
@@ -265,12 +265,6 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
     public get workingWorkItemList(): any[] {
 
         let results: any[] = this.workItemList;
-
-        if (this.selectedLab && this.selectedLab.value) {
-            results = results.filter((workItem) => {
-                return workItem.idLab === this.selectedLab.value;
-            });
-        }
         if (this.protocolFilterFc && this.protocolFilterFc.value) {
             results = results.filter((workItem) => {
                 return workItem.idNumberSequencingCyclesAllowed === this.protocolFilterFc.value.idNumberSequencingCyclesAllowed;
@@ -282,7 +276,11 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             });
         }
         if (this.allRequestGridApi) {
-            this.allRequestGridApi.setQuickFilter(this.searchText);
+            if (this.endingFilter && this.endingFilter.value) {
+                this.allRequestGridApi.setQuickFilter((this.searchText ? this.searchText + ' ' : '') + this.endingFilter.value);
+            } else {
+                this.allRequestGridApi.setQuickFilter(this.searchText);
+            }
         }
 
         this.workflowService.assignBackgroundColor(results, "idRequest");
@@ -294,7 +292,6 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
     public experimentTypesInList: any[];
     public filteredProtocolsList: any[] = [];
     public instrumentList: any[] = [];
-    public labList: any[] = [];
 
     private barCodes: any[] = [];
     private sequenceProtocolsList: any[] = [];
@@ -306,7 +303,8 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
     private searchText: string;
 
     private multiExperimentTypeWarningIsOpen: boolean = false;
-    private redrawRequested: boolean = true;
+    private seqProtocolInactiveWarningIsOpen: boolean = false;
+    private redrawRequested: boolean = false;
     private showSpinner: boolean = false;
 
     public allFG: FormGroup;
@@ -318,12 +316,23 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
     public protocolFC:             FormControl;
     public runFC:                  FormControl;
     public selectedExperimentType: FormControl;
-    public selectedLab:            FormControl;
+    public endingFilter:           FormControl;
     public protocolFilterFc:       FormControl;
 
     private allRequestGridApi: GridApi;
     private assmGridApi: GridApi;
 
+
+    public suffixList: any[] = [
+        { value: '_1', display: '_1' },
+        { value: '_2', display: '_2' },
+        { value: '_3', display: '_3' },
+        { value: '_4', display: '_4' },
+        { value: '_5', display: '_5' },
+        { value: '_6', display: '_6' },
+        { value: '_7', display: '_7' },
+        { value: '_8', display: '_8' }
+    ];
 
     constructor(public prefService: UserPreferencesService,
                 public workflowService: WorkflowService,
@@ -354,7 +363,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
 
         this.protocolFilterFc       = new FormControl('');
         this.selectedExperimentType = new FormControl('');
-        this.selectedLab            = new FormControl('');
+        this.endingFilter           = new FormControl('');
     }
 
     ngOnInit() {
@@ -376,8 +385,6 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             code.idOligoBarcodeB = code.idOligoBarcode;
             this.barCodes.push(code);
         }
-
-        this.labList = this.labList.concat(this.gnomexService.labList);
     }
 
     private initialize(): void {
@@ -495,12 +502,33 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
         let rLanes: any[] = [];
 
         if (this.assmItemList && Array.isArray(this.assmItemList) && this.assmItemList.length > 0) {
-            let requestCategory: any = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', this.assmItemList[0].codeRequestCategory);
-            let solexaFlowCellChannels: number = requestCategory.numberOfChannels;
+            let codeRequestCategory = "";
+            if(this.assmItemList[0].codeRequestCategory === "ILLSEQ") {
+                let seqProtocol = this.sequenceProtocolsList.find(seqProto => {
+                    return seqProto.idNumberSequencingCyclesAllowed === this.assmItemList[0].idNumberSequencingCyclesAllowed;
+                });
+                if(seqProtocol) {
+                    let name = (<string>seqProtocol.name).split(' ')[0].toUpperCase();
+                    if(name === "NOVASEQ") {
+                        codeRequestCategory = "NOSEQ";
+                    } else {
+                        codeRequestCategory = name;
+                    }
+                }
+            } else {
+                codeRequestCategory = this.assmItemList[0].codeRequestCategory;
+            }
 
-            for (var i = 1; i <= solexaFlowCellChannels; i++) {
-                let obj = {display: i.toString(), value: i};
-                rLanes.push(obj);
+            if(codeRequestCategory) {
+                let requestCategory: any = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', codeRequestCategory);
+                let solexaFlowCellChannels: number = requestCategory ? requestCategory.numberOfChannels : 0;
+
+                if(solexaFlowCellChannels >= 1) {
+                    for (var i = 1; i <= solexaFlowCellChannels; i++) {
+                        let obj = {display: i.toString(), value: i};
+                        rLanes.push(obj);
+                    }
+                }
             }
         }
 
@@ -508,7 +536,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
     }
 
     //todo this is fix not a PERMANENT SOLUTION!!
-    isSeqProtocolSame(event:any):boolean{
+    private isSeqProtocolSame(event: any): boolean {
         let firstFC : any  = this.assmItemList[0];
         let seqProtocol = this.sequenceProtocolsList.find(seqProto => {
             return seqProto.idNumberSequencingCyclesAllowed === event.data.idNumberSequencingCyclesAllowed
@@ -521,7 +549,7 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
             let filteredName = (<string>filteredSeqProtocol.name).split(' ')[0];
             let name = (<string>seqProtocol.name).split(' ')[0];
             // logic is unless we explicitly know we don't stop user from be able to add to assembleList
-            if(name && filteredName && name.toUpperCase() != filteredName.toUpperCase()){
+            if(name && filteredName && name.toUpperCase() !== filteredName.toUpperCase()){
                 return false;
             }
         }
@@ -529,76 +557,105 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
     }
 
     public onCellValueChanged_allRequestsGrid(event): void {
-        if (!this.multiExperimentTypeWarningIsOpen) {
-            if (this.assmItemList
-                && this.assmItemList.length
-                && this.assmItemList.length > 0
-                && !this.isSeqProtocolSame(event)) {
-                this.multiExperimentTypeWarningIsOpen = true;
-                let alertMessage = "Only one type of experiment can be assembled on a flow cell";
-                this.dialogsService.alert(alertMessage, null, DialogType.WARNING).subscribe(() => {
-                    this.multiExperimentTypeWarningIsOpen = false;
-                });
+        if(!this.seqProtocolInactiveWarningIsOpen) {
+            let seqProtocol = this.sequenceProtocolsList.find(seqProto => {
+                return seqProto.idNumberSequencingCyclesAllowed === event.data.idNumberSequencingCyclesAllowed;
+            });
+            if (!seqProtocol) { // Do not assemble if the Sequencing protocol is inactive
+                if (event && event.node && event.node.data && event.node.data.flowCellChannelNumber) {
+                    this.seqProtocolInactiveWarningIsOpen = true;
+                    let message = "Only active sequencing protocols can be assembled on a flow cell.";
+                    this.dialogsService.alert(message, null, DialogType.WARNING).subscribe(() => {
+                        this.seqProtocolInactiveWarningIsOpen = false;
+                    });
+                }
             } else {
-                for (let proto of this.filteredProtocolsList) {
-                    if (proto.idNumberSequencingCyclesAllowed === event.data.idNumberSequencingCyclesAllowed) {
-                        this.protocolFC.setValue(proto);
-                        break;
-                    }
-                }
+                if (!this.multiExperimentTypeWarningIsOpen) {
+                    if (this.assmItemList
+                        && this.assmItemList.length
+                        && this.assmItemList.length > 0
+                        && !this.isSeqProtocolSame(event)) {
+                        this.multiExperimentTypeWarningIsOpen = true;
+                        let alertMessage = "Only one type of experiment can be assembled on a flow cell";
+                        this.dialogsService.alert(alertMessage, null, DialogType.WARNING).subscribe(() => {
+                            this.multiExperimentTypeWarningIsOpen = false;
+                        });
+                    } else {
+                        for (let proto of this.filteredProtocolsList) {
+                            if (proto.idNumberSequencingCyclesAllowed === event.data.idNumberSequencingCyclesAllowed) {
+                                this.protocolFC.setValue(proto);
+                                break;
+                            }
+                        }
 
-                this.assmItemList = this.workItemList
-                    .filter((a) => { return !!a.flowCellChannelNumber; })
-                    .sort(this.workflowService.sortSampleNumber);
+                        if (this.assmItemList.length === 0) {
+                            this.lanes = [];
+                        }
 
-                if (this.lanes.length === 0) {
-                    this.buildLanes();
-                }
+                        this.assmItemList = this.workItemList
+                            .filter((a) => {
+                                return !!a.flowCellChannelNumber;
+                            })
+                            .sort(this.workflowService.sortSampleNumber);
 
-                if(this.assmItemList.length > 0 ){
-                    let firstFC : any  = this.assmItemList[0];
-                    let reqCat:string = firstFC.codeRequestCategory;
-                    let seqProtocolId = firstFC.idNumberSequencingCyclesAllowed;
+                        if (this.lanes.length === 0) {
+                            this.buildLanes();
+                        }
 
-                    let foundProtocol = this.filteredProtocolsList.find(p => (p.idNumberSequencingCyclesAllowed === seqProtocolId  ));
-                    let foundProtocolName:string = foundProtocol && foundProtocol.name ?  (<string>foundProtocol.name).toUpperCase() : '';
+                        if (this.assmItemList.length > 0) {
+                            let firstFC: any = this.assmItemList[0];
+                            let reqCat: string = firstFC.codeRequestCategory;
+                            let seqProtocolId = firstFC.idNumberSequencingCyclesAllowed;
 
-                    if(reqCat === 'MISEQ' || foundProtocolName.indexOf("MISEQ") != -1 ){
-                        this.sideFC.disable();
-                        this.sideFC.setValue(null);
-                        this.sideFC.clearValidators();
-                    }
-                    else{
+                            let foundProtocol = this.filteredProtocolsList.find(p => (p.idNumberSequencingCyclesAllowed === seqProtocolId));
+                            let foundProtocolName: string = foundProtocol && foundProtocol.name ? (<string>foundProtocol.name).toUpperCase() : '';
+
+                            if (reqCat === 'MISEQ' || foundProtocolName.indexOf("MISEQ") !== -1) {
+                                this.sideFC.disable();
+                                this.sideFC.setValue(null);
+                                this.sideFC.clearValidators();
+                            } else {
 //                        this.sideFC.setValidators(Validators.required);
 //                      this.sideFC.updateValueAndValidity();
-                        this.sideFC.enable();
+                                this.sideFC.enable();
+
+                            }
+
+                        } else {
+                            this.sideFC.disable();
+                            this.sideFC.setValue(null);
+                            this.sideFC.clearValidators();
+                            this.sideFC.updateValueAndValidity();
+                        }
+
+                        this.allFG.markAsDirty();
 
                     }
-
-                }else{
-                    this.sideFC.disable();
-                    this.sideFC.setValue(null);
-                    this.sideFC.clearValidators();
-                    this.sideFC.updateValueAndValidity();
                 }
 
-                this.allFG.markAsDirty();
+                if (this.multiExperimentTypeWarningIsOpen && event && event.node && event.node.data) {
+                    event.node.data.flowCellChannelNumber = "";
 
-
+                    this.allRequestGridApi_redrawRows();
+                }
             }
         }
 
-        if (this.multiExperimentTypeWarningIsOpen && event && event.node && event.node.data) {
+        if (this.seqProtocolInactiveWarningIsOpen && event && event.node && event.node.data) {
             event.node.data.flowCellChannelNumber = "";
 
-            if (!this.redrawRequested) {
-                this.redrawRequested = true;
+            this.allRequestGridApi_redrawRows();
+        }
 
-                setTimeout(() => {
-                    this.allRequestGridApi.redrawRows();
-                    this.redrawRequested = false;
-                });
-            }
+    }
+
+    private allRequestGridApi_redrawRows(): void {
+        if (!this.redrawRequested) {
+            this.redrawRequested = true;
+            setTimeout(() => {
+                this.allRequestGridApi.redrawRows();
+                this.redrawRequested = false;
+            });
         }
     }
 
@@ -656,8 +713,8 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
     }
 
 
-    private lanesHasFlowcellChannel(channelNumber: number): boolean {
-        if (this.lanes.filter((lane) => { return lane === channelNumber; }).length === 0) {
+    private lanesHasFlowcellChannel(channelNumber: string): boolean {
+        if (this.lanes.filter((lane) => { return lane.display === channelNumber; }).length === 0) {
             return false;
         } else {
             return true;
@@ -665,13 +722,14 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
     }
 
     private validateNumberOfLanes(): any {
-        let tmp: any[] = this.lanes;
+        let tmp: any[] = [];
+        tmp = tmp.concat(this.lanes);
         let warningMessage: string = "";
         let errorMessage: string = "";
         this.assmItemList.forEach((item => {
             if (item.flowCellChannelNumber && this.lanesHasFlowcellChannel(item.flowCellChannelNumber)) {
-                tmp.forEach((lane, index) => {
-                    if (lane === item.flowCellChannelNumber) {
+                tmp.forEach((tmpLane, index) => {
+                    if (tmpLane.display === item.flowCellChannelNumber) {
                         tmp.splice(index, 1);
                     }
                 });

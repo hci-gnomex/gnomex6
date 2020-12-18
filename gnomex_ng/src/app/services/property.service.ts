@@ -11,6 +11,7 @@ export enum annotType
     CHECK = "CHECK",
     URL = "URL",
     OPTION = "OPTION",
+    IMP_OPTION = "IMPROVED_OPTION",
     MOPTION = "MOPTION",
     TEXT = "TEXT"
 }
@@ -50,6 +51,7 @@ export class PropertyService {
     public static readonly PROPERTY_ACCESS_AUTH_ACCOUNT_LINK_TEXT: string = "access_auth_account_link_text";
     public static readonly PROPERTY_ACCOUNT_NUMBER_ACCOUNT_DEFAULT: string = "account_number_account_default";
     public static readonly PROPERTY_CONFIGURABLE_BILLING_ACCOUNTS: string = "configurable_billing_accounts";
+    public static readonly PROPERTY_ENABLE_SELECT_BILLING_LAB_CORE_FACILITIES: string = "enable_select_billing_lab_core_facilities";
     public static readonly PROPERTY_EXPERIMENT_DEFAULT_VIEW: string = "experiment_default_view";
     public static readonly PROPERTY_EXCLUDE_NEW_REQUESTS: string = "exclude_new_requests";
     public static readonly PROPERTY_BULLETIN: string = "bulletin";
@@ -61,6 +63,7 @@ export class PropertyService {
     public static readonly PROPERTY_DEFAULT_VALUE_MULTIPLEX_LANE_COLUMN: string = "default_value_multiplex_lane_column";
     public static readonly PROPERTY_ESTIMATED_PRICE_WARNING: string = "estimated_price_warning";
     public static readonly PROPERTY_EMAIL_INVOICE_PRICE_AMOUNT: string = "email_invoice_price_amount";
+    public static readonly PROPERTY_BILLING_ACCOUNT_SPLIT_TYPE: string = "billing_account_split_type";
 
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_GROUP: string  = "analysis_assistance_group";
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_HEADER: string = "analysis_assistance_header";

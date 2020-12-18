@@ -8,6 +8,8 @@ import {DictionaryService} from "./dictionary.service";
 import {AbstractControl, FormGroup} from "@angular/forms";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {ValueGetterParams} from "ag-grid-community/src/ts/entities/colDef";
+import {DictionaryEntry} from "../configuration/dictionary-entry.type";
 
 @Injectable()
 export class ExperimentPlatformService implements OnDestroy {
@@ -215,4 +217,43 @@ export class ExperimentPlatformService implements OnDestroy {
         this.cookieUtilService.formatXSRFCookie();
         return this.httpClient.post("/gnomex/DeleteExperimentPlatform.gx", null, {params: params});
     }
+
+    gridNumberComparator = (obj1, obj2) => {
+        let s1: number = +obj1;
+        let s2: number = +obj2;
+        if (s1 < s2) {
+            return -1;
+        } else if (s1 > s2) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    gridComboFilterValueGetter(params: ValueGetterParams): any {
+        let value = params.data[params.colDef.field];
+        if(value) {
+            let option: DictionaryEntry = ((params.colDef as any).selectOptions as DictionaryEntry[]).find((entry: DictionaryEntry) => (entry.value === value));
+            return option ? option.display : "";
+        }
+        return "";
+    }
+
+    gridNumberFilterValueGetter(params: ValueGetterParams): any {
+        let number: number = +(params.data[params.colDef.field]);
+        return number;
+    }
+
+    gridComboNumberFilterValueGetter(params: ValueGetterParams): any {
+        let value = params.data[params.colDef.field];
+        if(value) {
+            let option: DictionaryEntry = ((params.colDef as any).selectOptions as DictionaryEntry[]).find((entry: DictionaryEntry) => (entry.value === value));
+            if(option && option.display && !Number.isNaN(+option.display)) {
+                let numberValue: number = +option.display;
+                return numberValue;
+            }
+        }
+        return "";
+    }
+
 }

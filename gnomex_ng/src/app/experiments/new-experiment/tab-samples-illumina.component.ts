@@ -31,6 +31,8 @@ import {GridApi, SelectionChangedEvent} from "ag-grid-community";
 import {SampleUploadService} from "../../upload/sample-upload.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
+import {ImprovedSelectRenderer} from "../../util/grid-renderers/improved-select.renderer";
+import {ImprovedSelectEditor} from "../../util/grid-editors/improved-select.editor";
 
 @Component({
     selector: "tab-samples-illumina",
@@ -277,6 +279,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
     public static readonly TEXT: string = 'text';
     public static readonly TEXT_RIGHT: string = 'text-right';
     public static readonly OPTION: string = 'option';
+    public static readonly IMP_OPTION: string = 'IMPROVED_OPTION';
     public static readonly MULTIOPTION: string = 'multioption';
 
     private _lab: any;
@@ -720,6 +723,26 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     // case TabSamplesIlluminaComponent.MULTIOPTION:
                     //     break;
 
+                    case TabSamplesIlluminaComponent.IMP_OPTION:
+                        newColumn.cellRendererFramework = ImprovedSelectRenderer;
+                        newColumn.cellEditorFramework   = ImprovedSelectEditor;
+
+                        if (columnProperty.nameFrontEndDictionaryToUse) {
+                            newColumn.selectOptions = this['' + columnProperty.nameFrontEndDictionaryToUse];
+                        } else if (columnProperty.fullDictionaryModelPathToLoad) {
+                            let fullDictionaryModelPathToLoad: any[] = this.dictionaryService.getEntriesExcludeBlank('' + columnProperty.fullDictionaryModelPathToLoad);
+                            fullDictionaryModelPathToLoad.unshift("");
+                            newColumn.selectOptions = fullDictionaryModelPathToLoad;
+                        } else {
+                            newColumn.selectOptions = [];
+                        }
+
+                        newColumn.selectOptionsDisplayField = columnProperty.nameField ? columnProperty.nameField : "display";
+                        newColumn.selectOptionsValueField   = columnProperty.valueField ? columnProperty.valueField : "value";
+                        break;
+                    // case TabSamplesIlluminaComponent.MULTIOPTION:
+                    //     break;
+
                     case TabSamplesIlluminaComponent.TEXT:
                         newColumn.cellRendererFramework = TextAlignLeftMiddleRenderer;
                         newColumn.cellEditorFramework   = TextAlignLeftMiddleEditor;
@@ -825,15 +848,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
             });
 
             if (!this.isAmendState) {
-                temp.push({
-                    headerName: "Index Tag Sequence A",
-                    field: "barcodeSequence",
-                    width:    7.5 * this.emToPxConversionRate,
-                    minWidth: 6.5 * this.emToPxConversionRate,
-                    suppressSizeToFit: true,
-                    editable: false,
-                    sortOrder: 305
-                });
+                // temp.push({
+                //     headerName: "Index Tag Sequence A",
+                //     field: "barcodeSequence",
+                //     width:    7.5 * this.emToPxConversionRate,
+                //     minWidth: 6.5 * this.emToPxConversionRate,
+                //     suppressSizeToFit: true,
+                //     editable: false,
+                //     sortOrder: 305
+                // });
 
                 let permittedBarcodes: any[] = [];
 
@@ -877,15 +900,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     });
                 }
 
-                temp.push({
-                    headerName: "Index Tag Sequence B",
-                    field: "barcodeSequenceB",
-                    width:    7 * this.emToPxConversionRate,
-                    minWidth: 6.5 * this.emToPxConversionRate,
-                    suppressSizeToFit: true,
-                    editable: false,
-                    sortOrder: 315
-                });
+                // temp.push({
+                //     headerName: "Index Tag Sequence B",
+                //     field: "barcodeSequenceB",
+                //     width:    7 * this.emToPxConversionRate,
+                //     minWidth: 6.5 * this.emToPxConversionRate,
+                //     suppressSizeToFit: true,
+                //     editable: false,
+                //     sortOrder: 315
+                // });
 
                 temp.push({
                     headerName: "Lib QC Conc.",
@@ -1106,6 +1129,23 @@ export class TabSamplesIlluminaComponent implements OnInit {
                         newColumn.selectOptionsDisplayField = columnProperty.nameField ? columnProperty.nameField : "display";
                         newColumn.selectOptionsValueField   = columnProperty.valueField ? columnProperty.valueField : "value";
                         break;
+                    case TabSamplesIlluminaComponent.IMP_OPTION:
+                        newColumn.cellRendererFramework = ImprovedSelectRenderer;
+                        newColumn.cellEditorFramework   = ImprovedSelectEditor;
+
+                        if (columnProperty.nameFrontEndDictionaryToUse) {
+                            newColumn.selectOptions = this['' + columnProperty.nameFrontEndDictionaryToUse];
+                        } else if (columnProperty.fullDictionaryModelPathToLoad) {
+                            let fullDictionaryModelPathToLoad: any[] = this.dictionaryService.getEntriesExcludeBlank('' + columnProperty.fullDictionaryModelPathToLoad);
+                            fullDictionaryModelPathToLoad.unshift("");
+                            newColumn.selectOptions = fullDictionaryModelPathToLoad;
+                        } else {
+                            newColumn.selectOptions = [];
+                        }
+
+                        newColumn.selectOptionsDisplayField = columnProperty.nameField ? columnProperty.nameField : "display";
+                        newColumn.selectOptionsValueField   = columnProperty.valueField ? columnProperty.valueField : "value";
+                        break;
                     // case TabSamplesIlluminaComponent.MULTIOPTION:
                     //     break;
 
@@ -1167,15 +1207,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 ],
                 sortOrder: 300
             });
-            temp.push({
-                headerName: "Index Tag Sequence A",
-                field: "barcodeSequence",
-                width:    8.5 * this.emToPxConversionRate,
-                minWidth: 8.5 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: false,
-                sortOrder: 301
-            });
+            // temp.push({
+            //     headerName: "Index Tag Sequence A",
+            //     field: "barcodeSequence",
+            //     width:    8.5 * this.emToPxConversionRate,
+            //     minWidth: 8.5 * this.emToPxConversionRate,
+            //     suppressSizeToFit: true,
+            //     editable: false,
+            //     sortOrder: 301
+            // });
 
             let permittedBarcodes: any[] = [];
 
@@ -1219,15 +1259,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 });
             }
 
-            temp.push({
-                headerName: "Index Tag Sequence B",
-                field: "barcodeSequenceB",
-                width:    8.5 * this.emToPxConversionRate,
-                minWidth: 8.5 * this.emToPxConversionRate,
-                suppressSizeToFit: true,
-                editable: false,
-                sortOrder: 303
-            });
+            // temp.push({
+            //     headerName: "Index Tag Sequence B",
+            //     field: "barcodeSequenceB",
+            //     width:    8.5 * this.emToPxConversionRate,
+            //     minWidth: 8.5 * this.emToPxConversionRate,
+            //     suppressSizeToFit: true,
+            //     editable: false,
+            //     sortOrder: 303
+            // });
 
             temp.push({
                 headerName: "Lib QC Conc.",
@@ -1252,15 +1292,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "qualStatus",
                 width:    8.5 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor,
-                selectOptions: this.workflowStatus,
-                selectOptionsDisplayField: "display",
-                selectOptionsValueField: "value",
+                // cellRendererFramework: SelectRenderer,
+                // cellEditorFramework: SelectEditor,
+                // selectOptions: this.workflowStatus,
+                // selectOptionsDisplayField: "display",
+                // selectOptionsValueField: "value",
                 suppressSizeToFit: true,
-                editable: true,
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup',
+                editable: false,
+                // showFillButton: true,
+                // fillGroupAttribute: 'frontEndGridGroup',
                 sortOrder: 500
             });
             temp.push({
@@ -1268,15 +1308,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 field: "seqPrepStatus",
                 width:    8.5 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
-                cellRendererFramework: SelectRenderer,
-                cellEditorFramework: SelectEditor,
-                selectOptions: this.workflowStatus,
-                selectOptionsDisplayField: "display",
-                selectOptionsValueField: "value",
+                // cellRendererFramework: SelectRenderer,
+                // cellEditorFramework: SelectEditor,
+                // selectOptions: this.workflowStatus,
+                // selectOptionsDisplayField: "display",
+                // selectOptionsValueField: "value",
                 suppressSizeToFit: true,
-                editable: true,
-                showFillButton: true,
-                fillGroupAttribute: 'frontEndGridGroup',
+                editable: false,
+                // showFillButton: true,
+                // fillGroupAttribute: 'frontEndGridGroup',
                 sortOrder: 505
             });
         } else if (!isExternal) {
@@ -1291,15 +1331,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
                             field: "qualStatus",
                             width: 8.5 * this.emToPxConversionRate,
                             minWidth: 8.5 * this.emToPxConversionRate,
-                            cellRendererFramework: SelectRenderer,
-                            cellEditorFramework: SelectEditor,
-                            selectOptions: this.workflowStatus,
-                            selectOptionsDisplayField: "display",
-                            selectOptionsValueField: "value",
+                            // cellRendererFramework: SelectRenderer,
+                            // cellEditorFramework: SelectEditor,
+                            // selectOptions: this.workflowStatus,
+                            // selectOptionsDisplayField: "display",
+                            // selectOptionsValueField: "value",
                             suppressSizeToFit: true,
-                            editable: true,
-                            showFillButton: true,
-                            fillGroupAttribute: 'frontEndGridGroup',
+                            editable: false,
+                            // showFillButton: true,
+                            // fillGroupAttribute: 'frontEndGridGroup',
                             sortOrder: 500
                         });
                     }
@@ -1441,6 +1481,23 @@ export class TabSamplesIlluminaComponent implements OnInit {
                         newColumn.selectOptionsDisplayField = columnProperty.nameField ? columnProperty.nameField : "display";
                         newColumn.selectOptionsValueField   = columnProperty.valueField ? columnProperty.valueField : "value";
                         break;
+                    case TabSamplesIlluminaComponent.IMP_OPTION:
+                        newColumn.cellRendererFramework = ImprovedSelectRenderer;
+                        newColumn.cellEditorFramework   = ImprovedSelectEditor;
+
+                        if (columnProperty.nameFrontEndDictionaryToUse) {
+                            newColumn.selectOptions = this['' + columnProperty.nameFrontEndDictionaryToUse];
+                        } else if (columnProperty.fullDictionaryModelPathToLoad) {
+                            let fullDictionaryModelPathToLoad: any[] = this.dictionaryService.getEntriesExcludeBlank('' + columnProperty.fullDictionaryModelPathToLoad);
+                            fullDictionaryModelPathToLoad.unshift("");
+                            newColumn.selectOptions = fullDictionaryModelPathToLoad;
+                        } else {
+                            newColumn.selectOptions = [];
+                        }
+
+                        newColumn.selectOptionsDisplayField = columnProperty.nameField ? columnProperty.nameField : "display";
+                        newColumn.selectOptionsValueField   = columnProperty.valueField ? columnProperty.valueField : "value";
+                        break;
                     // case TabSamplesIlluminaComponent.MULTIOPTION:
                     //     break;
 
@@ -1469,13 +1526,13 @@ export class TabSamplesIlluminaComponent implements OnInit {
             temp.push({
                 headerName: "Index Tag A",
                 editable: false,
-                width:    12 * this.emToPxConversionRate,
-                minWidth: 12 * this.emToPxConversionRate,
+                width:    7 * this.emToPxConversionRate,
+                minWidth: 7 * this.emToPxConversionRate,
                 field: "idOligoBarcode",
                 cellRendererFramework: SelectRenderer,
                 cellEditorFramework: BarcodeSelectEditor,
                 selectOptions: this._barCodes,
-                selectOptionsDisplayField: "display",
+                selectOptionsDisplayField: "name",
                 selectOptionsValueField: "idOligoBarcode",
                 indexTagLetter: 'A',
                 sortOrder: 300
@@ -1500,13 +1557,13 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 temp.push({
                     headerName: "Index Tag B",
                     editable: false,
-                    width:    12 * this.emToPxConversionRate,
-                    minWidth: 12 * this.emToPxConversionRate,
+                    width:    7 * this.emToPxConversionRate,
+                    minWidth: 7 * this.emToPxConversionRate,
                     field: "idOligoBarcodeB",
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: BarcodeSelectEditor,
                     selectOptions: this._barCodes,
-                    selectOptionsDisplayField: "display",
+                    selectOptionsDisplayField: "name",
                     selectOptionsValueField: "idOligoBarcodeB",
                     indexTagLetter: 'B',
                     sortOrder: 302
@@ -2480,6 +2537,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
             case annotType.OPTION :
                 column = TabSamplesIlluminaComponent.createOptionColumn(annot, emToPxConversionRate, editable);
                 break;
+            case annotType.IMP_OPTION :
+                column = TabSamplesIlluminaComponent.createImprovedOptionColumn(annot, emToPxConversionRate, editable);
+                break;
             case annotType.URL :
                 column = TabSamplesIlluminaComponent.createUrlColumn(annot, emToPxConversionRate);
                 break;
@@ -2559,6 +2619,25 @@ export class TabSamplesIlluminaComponent implements OnInit {
             field: TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX + annot.idProperty,
             cellRendererFramework: SelectRenderer,
             cellEditorFramework: SelectEditor,
+            selectOptions: annot.options,
+            selectOptionsDisplayField: "option",
+            selectOptionsValueField: "idPropertyOption",
+            showFillButton: true,
+            fillGroupAttribute: 'frontEndGridGroup'
+        };
+    }
+
+    public static createImprovedOptionColumn(annot: any, emToPxConversionRate: number, editable: boolean): any {
+        return {
+            headerName: annot.display,
+            editable: editable,
+            width:    10 * emToPxConversionRate,
+            minWidth: 7 * emToPxConversionRate,
+            suppressSizeToFit: true,
+            idProperty: annot.idProperty,
+            field: TabSamplesIlluminaComponent.ANNOTATION_ATTRIBUTE_NAME_PREFIX + annot.idProperty,
+            cellRendererFramework: ImprovedSelectRenderer,
+            cellEditorFramework: ImprovedSelectEditor,
             selectOptions: annot.options,
             selectOptionsDisplayField: "option",
             selectOptionsValueField: "idPropertyOption",

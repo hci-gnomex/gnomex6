@@ -15,6 +15,7 @@ import {CookieUtilService} from "../services/cookie-util.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {AbstractControl, FormGroup} from "@angular/forms";
 import {saveAs} from "file-saver";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 
 export let BROWSE_EXPERIMENTS_ENDPOINT = new InjectionToken("browse_experiments_url");
@@ -252,7 +253,7 @@ export class ExperimentsService {
             propertiesXML = JSON.stringify(experiment.RequestProperties);
         }
 
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("requestJSONString", JSON.stringify(experiment.getJSONObjectRepresentation()))
             .set("description", experiment.description)
             .set("idProject", experiment.idProject)
@@ -284,7 +285,7 @@ export class ExperimentsService {
 
     saveVisibility(body: any, idProject?: string): Observable<any> {
 
-        let parameters: HttpParams = new HttpParams();
+        let parameters: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
         let strBody: string = JSON.stringify(body);
 
         if(idProject) {
@@ -480,7 +481,7 @@ export class ExperimentsService {
             return;
         }
 
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("requestJSONString", JSON.stringify(experiment.getJSONObjectRepresentation()))
             .set("noJSONToXMLConversionNeeded", "Y");
 

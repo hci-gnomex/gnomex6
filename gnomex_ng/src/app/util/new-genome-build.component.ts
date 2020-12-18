@@ -10,6 +10,7 @@ import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog"
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {GDAction} from "./interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../services/constants.service";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'new-genome-build',
@@ -106,7 +107,7 @@ export class NewGenomeBuildComponent extends BaseGenericContainerDialog {
 
     public save(): void {
         this.dialogsService.addSpinnerWorkItem();
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("das2Name", this.genomeBuildForm.get("name").value)
             .set("genomeBuildName", this.genomeBuildForm.get("name").value)
             .set("buildDate", this.buildDate)

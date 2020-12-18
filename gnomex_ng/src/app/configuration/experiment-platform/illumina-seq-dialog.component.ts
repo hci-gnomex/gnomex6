@@ -47,19 +47,19 @@ export class IlluminaSeqDialogComponent extends BaseGenericContainerDialog imple
     ngOnInit(){
 
         this.formGroup =  this.fb.group({
-            name: [this.rowData.name, Validators.maxLength(this.constService.MAX_LENGTH_100)],
+            name: [this.rowData.name ? this.rowData.name : '', [Validators.required, Validators.maxLength(this.constService.MAX_LENGTH_100)]],
             isActive: this.rowData.isActive === 'Y',
-            sortOrder: [this.rowData.sortOrder,numberRange(0,99)],
-            idNumberSequencingCycles: [this.rowData.idNumberSequencingCycles, Validators.required],
-            idSeqRunType: [this.rowData.idSeqRunType, Validators.required],
-            protocolDescription: this.rowData.protocolDescription,
-            unitPriceInternal: [this.rowData.unitPriceInternal, Validators.pattern(this.currencyRegex)],
-            unitPriceExternalAcademic: [this.rowData.unitPriceExternalAcademic, Validators.pattern(this.currencyRegex)],
-            unitPriceExternalCommercial: [this.rowData.unitPriceExternalCommercial, Validators.pattern(this.currencyRegex)],
+            sortOrder: [this.rowData.sortOrder ? this.rowData.sortOrder : '', numberRange(0,99)],
+            idNumberSequencingCycles: [this.rowData.idNumberSequencingCycles ? this.rowData.idNumberSequencingCycles : '', Validators.required],
+            idSeqRunType: [this.rowData.idSeqRunType ? this.rowData.idSeqRunType : '', Validators.required],
+            protocolDescription: this.rowData.protocolDescription ? this.rowData.protocolDescription : '',
+            unitPriceInternal: [this.rowData.unitPriceInternal ? this.rowData.unitPriceInternal : '0.00', Validators.pattern(this.currencyRegex)],
+            unitPriceExternalAcademic: [this.rowData.unitPriceExternalAcademic ? this.rowData.unitPriceExternalAcademic : '0.00', Validators.pattern(this.currencyRegex)],
+            unitPriceExternalCommercial: [this.rowData.unitPriceExternalCommercial ? this.rowData.unitPriceExternalCommercial : '0.00', Validators.pattern(this.currencyRegex)],
         });
         if(this.runOptions.length > 0){
             this.showRunOptions = true;
-            this.formGroup.addControl("isCustom",new FormControl(this.rowData.isCustom,Validators.required));
+            this.formGroup.addControl("isCustom",new FormControl(this.rowData.isCustom ? this.rowData.isCustom : '', Validators.required));
         }
         this.primaryDisable = (action) => {return this.formGroup.invalid; };
 

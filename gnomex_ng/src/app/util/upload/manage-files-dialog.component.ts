@@ -14,6 +14,7 @@ import {DialogsService, DialogType} from "../popup/dialogs.service";
 import {UploadFileComponent} from "./upload-file.component";
 import {IGnomexErrorResponse} from "../interfaces/gnomex-error.response.model";
 import {BaseGenericContainerDialog} from "../popup/base-generic-container-dialog";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 
 @Component({
@@ -205,7 +206,7 @@ export class ManageFilesDialogComponent extends BaseGenericContainerDialog imple
 
         let group = this.fileService.getManageFilesForm().controls;
         let paramsObj =  null;
-        let params:HttpParams = new HttpParams();
+        let params:HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
 
         for(let g in group){
             let control = (<FormGroup>group[g]).controls;

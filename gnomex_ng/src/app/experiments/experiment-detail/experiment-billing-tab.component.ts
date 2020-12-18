@@ -2,7 +2,7 @@ import {Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {ConstantsService} from "../../services/constants.service";
 import {GridReadyEvent, GridSizeChangedEvent} from "ag-grid-community";
 import {ActivatedRoute} from "@angular/router";
-import {DialogsService} from "../../util/popup/dialogs.service";
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {MatDialogConfig} from "@angular/material";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {DictionaryService} from "../../services/dictionary.service";
@@ -84,6 +84,13 @@ export class ExperimentBillingTabComponent implements OnInit {
                     innerRenderer: getGroupRenderer(),
                     suppressCount: true
                 }
+            },
+            {
+                headerName: "Client",
+                field: "submitter",
+                tooltipField: "submitter",
+                minWidth: 10 * this.emToPxConversionRate,
+                width:    5 * this.emToPxConversionRate,
             },
             {
                 headerName: "Acct",
@@ -189,6 +196,7 @@ export class ExperimentBillingTabComponent implements OnInit {
                 if (request.billingItems && Array.isArray(request.billingItems)) {
                     let billingLabs: any[] = UtilService.getJsonArray(request.billingItems[1], request.billingItems[1].BillingLab);
                     for (let lab of billingLabs) {
+                        lab.submitter = request.submitterName;
                         lab.BillingItem = UtilService.getJsonArray(lab.BillingItem, lab.BillingItem);
                         for (let bi of lab.BillingItem) {
                             bi.labName = ""; // Necessary for group cell renderer, otherwise icon will not display
@@ -239,12 +247,35 @@ export class ExperimentBillingTabComponent implements OnInit {
         let params: BillingTemplateWindowParams = new BillingTemplateWindowParams();
         params.idCoreFacility = this.request.idCoreFacility;
         params.codeRequestCategory = this.request.codeRequestCategory;
-        params.billingTemplate = this.currentBillingTemplate;
+        params.billingTemplate = JSON.parse(JSON.stringify(this.currentBillingTemplate));
+
+        let totalAmount: number = 0;
+        let hasApproved: boolean = false;
+        breakLabel:
+        for(let billingAccount of this.gridData) {
+            if(billingAccount.BillingItem && billingAccount.BillingItem.length > 0) {
+                for (let bi of billingAccount.BillingItem) {
+                    if (bi.codeBillingStatus.substr(0, 8) === "APPROVED") {
+                        hasApproved = true;
+                        break breakLabel;
+                    }
+                }
+            }
+            if(billingAccount.invoicePrice && !isNaN(Number(billingAccount.invoicePrice.replace("$", "").replace(",", "")))) {
+                totalAmount += Number(billingAccount.invoicePrice.replace("$", "").replace(",", ""));
+            }
+        }
+
+        if(hasApproved) {
+            this.dialogsService.alert("Approved billing items cannot be reassigned.", null, DialogType.WARNING);
+            return;
+        }
 
         let config: MatDialogConfig = new MatDialogConfig();
         config.autoFocus = false;
         config.data = {
-            params: params
+            params: params,
+            totalAmount: totalAmount
         };
 
         this.dialogsService.genericDialogContainer(BillingTemplateWindowComponent, "Billing Template", null, config,

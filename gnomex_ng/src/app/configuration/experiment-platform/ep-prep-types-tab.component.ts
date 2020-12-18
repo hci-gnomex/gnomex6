@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit} from "@angular/core";
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {Subscription} from "rxjs";
 import {CellValueChangedEvent, GridApi} from "ag-grid-community";
@@ -12,35 +12,43 @@ import {MatDialogConfig} from "@angular/material";
 import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {PrepTypePricingDialogComponent} from "./prep-type-pricing-dialog.component";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";
 
 //assets/page_add.png
 
 @Component({
     template: `
         <div class="full-height full-width flex-container-col">
-            <div class="flex-grow flex-container-row" style="align-items:center;"  >
-                <button [disabled]="rowData.length === 0" type="button" mat-button color="primary" (click)="select()" >
-                    {{selectedState}}
-                </button>
-                <button mat-button color="primary"
-                        type="button"
-                        (click)="addPrepType()">
-                    <img [src]="this.constService.ICON_ADD"> Add
-                </button>
-                <button [disabled]="selectedPrepTypeRow.length === 0"
-                        (click)="removePrepType()"
-                        mat-button color="primary"
-                        type="button">
-                    <img [src]="this.constService.ICON_DELETE"> Remove
-                </button>
-                <button mat-button
-                        color="primary"
-                        (click)="openPricingEditor()"
-                        [disabled]="selectedPrepTypeRow.length === 0"
-                        type="button"> Edit Pricing </button>
-                <mat-checkbox (change)="filterOptions($event)" [(ngModel)]="showInactive">Show Inactive</mat-checkbox>
-
+            <div class="flex-grow flex-container-row align-center justify-space-between">
+                <div>
+                    <button [disabled]="rowData.length === 0" type="button" mat-button color="primary" (click)="select()" >
+                        {{selectedState}}
+                    </button>
+                    <button mat-button color="primary"
+                            type="button"
+                            (click)="addPrepType()">
+                        <img [src]="this.constService.ICON_ADD"> Add
+                    </button>
+                    <button [disabled]="selectedPrepTypeRow.length === 0"
+                            (click)="removePrepType()"
+                            mat-button color="primary"
+                            type="button">
+                        <img [src]="this.constService.ICON_DELETE"> Remove
+                    </button>
+                    <button mat-button style="margin-left: 3em;"
+                            color="primary"
+                            (click)="openPricingEditor()"
+                            [disabled]="selectedPrepTypeRow.length === 0"
+                            type="button">
+                        <img [src]="this.constService.ICON_TAG_BLUE_EDIT"> Edit Pricing </button>
+                    <mat-checkbox style="margin-left: 3em;" (change)="filterOptions($event)" [(ngModel)]="showInactive">Show Inactive</mat-checkbox>
+                </div>
+                <div>
+                    <button mat-button [hidden]="!this.isAnyFilterPresent" (click)="clearFilterModel()">Clear Filter</button>
+                </div>
             </div>
+            <label style="padding: 0.5em;"> * Gird data is sortable and filterable. To sort, click the column header(sortable for asc/desc/default). To filter or search, hover the column header right side and click the filter icon.</label>
             <div style="flex:9" class="full-width">
                 <ag-grid-angular class="full-height full-width ag-theme-balham"
                                  [columnDefs]="columnDefs"
@@ -51,6 +59,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                                  (gridSizeChanged)="onGridSizeChanged($event)"
                                  [rowDeselection]="true"
                                  [enableSorting]="true"
+                                 [enableFilter]="true"
                                  [rowSelection]="'single'"
                                  (rowSelected)="this.onPrepTypeRowSelected($event)"
                                  [singleClickEdit]="true"
@@ -81,12 +90,21 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
             field: "isActive",
             cellRendererFramework: CheckboxRenderer,
             checkboxEditable: true,
+            suppressFilter: true,
             editable: false,
             width: 100
         },
         {
             headerName: "Prep Type",
             field: "isolationPrepType",
+            filterParams: {clearButton: true},
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            validators: [Validators.required, Validators.maxLength(100)],
+            errorNameErrorMessageMap: [
+                {errorName: "required", errorMessage: "Prep Type required"},
+                {errorName: "maxlength", errorMessage: "Maximum of 100 characters"}
+            ],
             editable:true,
             width: 250
         },
@@ -94,6 +112,8 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
         {
             headerName: "Type",
             field: "type",
+            filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+            filterParams: {clearButton: true},
             cellRendererFramework: SelectRenderer,
             cellEditorFramework: SelectEditor,
             selectOptions: this.extractionTypeList,
@@ -105,6 +125,16 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
 
     ];
 
+    get isAnyFilterPresent(): boolean {
+        return this.gridApi ? this.gridApi.isAnyFilterPresent() : false;
+    }
+
+    clearFilterModel(): void {
+        if(this.gridApi && this.gridApi.isAnyFilterPresent()) {
+            this.gridApi.setFilterModel(null);
+            this.gridApi.setSortModel(null);
+        }
+    }
 
 
     constructor(private fb: FormBuilder,
@@ -122,8 +152,8 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
                     this.expPlatfromNode = data;
                     this.prepTypeList = Array.isArray(data.prepTypes) ? data.prepTypes : [data.prepTypes.IsolationPrepType];
                     this.showInactive = false;
-                    this.filterOptions();
                     this.selectedPrepTypeRow = [];
+                    this.filterOptions();
                     this.formGroup.get('prepTypes').setValue(this.prepTypeList);
                     this.formGroup.markAsPristine()
                 }
@@ -131,11 +161,27 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
 
     }
 
-    filterOptions() {
+    filterOptions(event?: any) {
+        if(this.gridApi && this.gridApi.getSortModel() && this.gridApi.getSortModel().length > 0) {
+            this.gridApi.setSortModel(null);
+        }
+
         if(this.showInactive) {
             this.rowData = this.prepTypeList;
         } else {
             this.rowData = this.prepTypeList.filter(seqOpt => seqOpt.isActive === "Y" );
+        }
+
+        if(event && this.selectedPrepTypeRow.length > 0) {
+            this.gridApi.setRowData(this.rowData);
+            this.gridApi.clearFocusedCell();
+            let rowIndex = this.rowData.indexOf(this.selectedPrepTypeRow[0]);
+            if(rowIndex >= 0) {
+                this.gridApi.getRowNode("" + rowIndex).setSelected(true);
+            } else {
+                this.gridApi.deselectAll();
+                this.selectedPrepTypeRow = [];
+            }
         }
     }
 
@@ -206,6 +252,7 @@ export class EpPrepTypesTabComponent implements OnInit, OnDestroy{
         this.prepTypeList.splice(0, 0, newPrepType);
         this.filterOptions();
         this.gridApi.setRowData(this.rowData);
+        this.gridApi.clearFocusedCell();
         this.gridApi.forEachNode(node => node.rowIndex ? 0 : node.setSelected(true, true));
         this.formGroup.markAsDirty();
 

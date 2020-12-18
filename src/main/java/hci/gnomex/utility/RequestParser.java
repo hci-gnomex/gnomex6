@@ -526,9 +526,7 @@ public class RequestParser implements Serializable {
       billingTemplate.setOrder(request);
     }
 
-    if (n.getAttributeValue("description") != null && !n.getAttributeValue("description").equals("")) {
       request.setDescription(n.getAttributeValue("description"));
-    }
 
     if (n.getAttributeValue("reagent") != null && !n.getAttributeValue("reagent").equals("")) {
       request.setReagent(n.getAttributeValue("reagent"));
@@ -556,10 +554,8 @@ public class RequestParser implements Serializable {
     if (n.getAttributeValue("analysisInstructions") != null && !n.getAttributeValue("analysisInstructions").equals(""))
       request.setAnalysisInstructions(n.getAttributeValue("analysisInstructions"));
 
-    if (n.getAttributeValue("corePrepInstructions") != null && !n.getAttributeValue("corePrepInstructions").equals(""))
       request.setCorePrepInstructions(n.getAttributeValue("corePrepInstructions"));
 
-    if (n.getAttributeValue("adminNotes") != null && !n.getAttributeValue("adminNotes").equals(""))
       request.setAdminNotes(n.getAttributeValue("adminNotes"));
 
     if (n.getAttributeValue("codeProtocolType") != null && !n.getAttributeValue("codeProtocolType").equals("")) {
@@ -810,9 +806,7 @@ public class RequestParser implements Serializable {
       billingTemplate.setOrder(request);
     }
 
-    if (n.get("description") != null && !n.getString("description").equals("")) {
       request.setDescription(n.getString("description"));
-    }
 
     if (n.get("reagent") != null && !n.getString("reagent").equals("")) {
       request.setReagent(n.getString("reagent"));
@@ -840,10 +834,8 @@ public class RequestParser implements Serializable {
     if (n.get("analysisInstructions") != null && !n.getString("analysisInstructions").equals(""))
       request.setAnalysisInstructions(n.getString("analysisInstructions"));
 
-    if (n.get("corePrepInstructions") != null && !n.getString("corePrepInstructions").equals(""))
       request.setCorePrepInstructions(n.getString("corePrepInstructions"));
 
-    if (n.get("adminNotes") != null && !n.getString("adminNotes").equals(""))
       request.setAdminNotes(n.getString("adminNotes"));
 
     if (n.get("codeProtocolType") != null && !n.getString("codeProtocolType").equals("")) {

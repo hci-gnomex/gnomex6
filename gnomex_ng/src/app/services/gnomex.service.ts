@@ -31,7 +31,7 @@ const TYPE_CAP_SEQ:string = "CAPSEQ";
 const TYPE_MIT_SEQ:string = "MITSEQ";
 const TYPE_FRAG_ANAL:string = "FRAGANAL";
 const TYPE_MICROARRAY: string = 'MICROARRAY';
-const PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE: string = "hci.gnomex.model.Institution";
+const PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE: string = "experiment_submission_default_mode";
 
 @Injectable()
 export class GnomexService {
@@ -99,6 +99,14 @@ export class GnomexService {
     public disableUserSignup: boolean = false;
     public noGuestAccess: boolean = true;
     public maintenanceSplash: string;
+    public duo_host: string;
+    public ikey: string;
+    public skey: string;
+    public akey: string;
+    public useduo: boolean;
+    private useduostr: string;
+
+    public showUsageOnStartUp: string = 'N';
 
 
     constructor(
@@ -251,6 +259,7 @@ export class GnomexService {
      all we need is one rc that allows external so break as soon as we find it
      */
     setAllowExternal(): void {
+        this.allowExternal = true;
         if(this.myCoreFacilities) {
             for (let rc of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.RequestCategory")) {
                 for (let cf2 of this.myCoreFacilities) {
@@ -376,7 +385,7 @@ export class GnomexService {
         } else {
             this.isExternalDataSharingSite = false;
         }
-
+        console.log("external data sharing: " + this.isExternalDataSharingSite);
     }
 
     /**
@@ -446,17 +455,23 @@ export class GnomexService {
      * Set the default submission state.
      */
     setDefaultSubmissionState(): void {
-        if (this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) != null &&
-            this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) === "INTERNAL") {
+        console.log("submission mode: " + this.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE));
+        if (this.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) != null &&
+            this.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) === "INTERNAL") {
             // Default is "submit request" (internal), but if this is an external data sharing
             // hub, make default "register external" experiment.
             this.isInternalExperimentSubmission = !this.isExternalDataSharingSite;
-        } else if (this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) != null &&
-            this.propertyService.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) === "EXTERNAL") {
+        } else if (this.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) != null &&
+            this.getProperty(PROPERTY_EXPERIMENT_SUBMISSION_DEFAULT_MODE) === "EXTERNAL") {
             this.isInternalExperimentSubmission = false;
         } else {
             this.isInternalExperimentSubmission = true;
         }
+
+        if (this.isExternalDataSharingSite) {
+            this.isInternalExperimentSubmission = false;
+        }
+        console.log("isInternalExperimentSubmission: " + this.isInternalExperimentSubmission);
     }
 
     /**
@@ -994,6 +1009,16 @@ export class GnomexService {
             if (response && response.result === "SUCCESS") {
                 this.disableUserSignup = response[PropertyService.PROPERTY_DISABLE_USER_SIGNUP];
                 this.noGuestAccess = response[PropertyService.PROPERTY_NO_GUEST_ACCESS];
+                this.useduo =false;
+                this.useduostr = response["useduo"];
+                if (this.useduostr === "yes")
+                {
+                    this.useduo = true;
+                }
+                this.ikey = response["ikey"];
+                this.skey = response["skey"];
+                this.akey = response["akey"];
+                this.duo_host = response["duohost"];
                 this.maintenanceMode = response[PropertyService.PROPERTY_MAINTENANCEMODE];
                 this.maintenanceSplash = response[PropertyService.PROPERTY_MAINTENANCE_SPLASH];
                 if (this.maintenanceMode) {

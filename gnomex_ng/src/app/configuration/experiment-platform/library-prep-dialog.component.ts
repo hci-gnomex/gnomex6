@@ -20,6 +20,9 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
         .medium-form-input{
             width: 30em
         }
+        .short-input {
+            width: 8em
+        }
     `]
 })
 export class LibraryPrepDialogComponent extends BaseGenericContainerDialog implements OnInit{
@@ -33,6 +36,7 @@ export class LibraryPrepDialogComponent extends BaseGenericContainerDialog imple
     formGroup: FormGroup;
     reqCategoryAppList:any[];
     protocolParam: any;
+    isActive: boolean;
     private expPlatformNode:any;
     private _indexFamily:any[];
     readonly currencyRegex = /^[0-9]+\.\d{2}$/;
@@ -69,11 +73,13 @@ export class LibraryPrepDialogComponent extends BaseGenericContainerDialog imple
         this.initSeqLibProtocol(this.rowData.idSeqLibProtocols); // don't see any case where there should be more than one idSeqLibProtocol
         this.rowData.application = this.rowData.display;
         this.uncomittedRowData = _.cloneDeep(this.rowData);
+        this.isActive = this.uncomittedRowData.isActive ? this.uncomittedRowData.isActive === 'Y' : false;
 
         this.formGroup = this.fb.group({
             application: [this.uncomittedRowData.application ? this.uncomittedRowData.application : '' , [Validators.required, Validators.maxLength(this.constService.MAX_LENGTH_100)]] ,
             sortOrder: [this.uncomittedRowData.sortOrder ? this.uncomittedRowData.sortOrder : '', numberRange(0,99)],
-            idApplicationTheme: this.uncomittedRowData.idApplicationTheme ? this.uncomittedRowData.idApplicationTheme : '',
+            isActive: this.uncomittedRowData.isActive ? this.uncomittedRowData.isActive === 'Y' : false,
+            idApplicationTheme: [this.uncomittedRowData.idApplicationTheme ? this.uncomittedRowData.idApplicationTheme : '', Validators.required],
             idBarcodeSchemeA: this.uncomittedRowData.idBarcodeSchemeA ? this.uncomittedRowData.idBarcodeSchemeA  : '',
             idBarcodeSchemeB: this.uncomittedRowData.idBarcodeSchemeB ? this.uncomittedRowData.idBarcodeSchemeB  : '',
             onlyForLabPrepped: this.uncomittedRowData.onlyForLabPrepped === 'Y' ? 'Y' : 'N',
@@ -89,7 +95,11 @@ export class LibraryPrepDialogComponent extends BaseGenericContainerDialog imple
         this.reqCategoryAppList = Array.isArray(this.uncomittedRowData.RequestCategoryApplication) ? this.uncomittedRowData.RequestCategoryApplication
             : [this.uncomittedRowData.RequestCategoryApplication];
         for(let app of this.reqCategoryAppList){
-            this.formGroup.addControl(app.value, new FormControl(app.isSelected === 'Y'))
+            if(app.value === this.expPlatformNode.codeRequestCategory) {
+                this.formGroup.addControl(app.value, new FormControl(this.uncomittedRowData.isSelected === 'Y'));
+            } else {
+                this.formGroup.addControl(app.value, new FormControl(app.isSelected === 'Y'));
+            }
         }
 
         this.primaryDisable = (action) => {return this.formGroup.invalid; };
@@ -124,9 +134,14 @@ export class LibraryPrepDialogComponent extends BaseGenericContainerDialog imple
 
     private saveProtocolFn = (protocol:any)=> {
         this.formGroup.get('idSeqLibProtocols').setValue(protocol.idProtocolSaved);
-        this.protocolParam = {idSeqLibProtocol : protocol.idProtocolSaved}
+        this.protocolParam = {idSeqLibProtocol : protocol.idProtocolSaved};
 
-    };
+        if(this.formGroup.get('application').value !== protocol.protocolName) {
+            this.formGroup.get('application').setValue(protocol.protocolName);
+            this.formGroup.markAsDirty();
+        }
+
+    }
 
 
     openProtocolEditor(){
@@ -142,7 +157,7 @@ export class LibraryPrepDialogComponent extends BaseGenericContainerDialog imple
             };
         }
 
-        this.dialogService.genericDialogContainer(LibraryPrepProtocolDialogComponent, "Edit Sequence Lib Protocol", null, config,
+        this.dialogService.genericDialogContainer(LibraryPrepProtocolDialogComponent, "Edit Library Prep Materials and Methods", null, config,
             {actions: [
                     {type: ActionType.PRIMARY, icon: this.constService.ICON_SAVE, name: "Save", internalAction: "saveChanges"},
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
@@ -173,6 +188,17 @@ export class LibraryPrepDialogComponent extends BaseGenericContainerDialog imple
                     {type: ActionType.SECONDARY, name: "Cancel", internalAction: "onClose"}
                 ]});
 
+    }
+
+    onActiveChange(event?: any) {
+        if(!this.isActive) {
+            let message: string = "Inactive Library Prep Protocol will not be able to apply to any Experiment Platform.<br>Continue anyway?";
+            this.dialogService.confirm(message).subscribe((result: any) => {
+                if(!result) {
+                    this.isActive = true;
+                }
+            });
+        }
     }
 
     applyLibPrepChanges(){

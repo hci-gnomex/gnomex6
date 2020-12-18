@@ -30,18 +30,6 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
                                 [displayField]="this.prefService.userDisplayField"
                                 [formControl]="this.form.get('appUser')">
             </custom-combo-box>
-            <div class="flex-container-row align-center">
-                <custom-combo-box placeholder="Project folder for organizing experiments" [options]="this.projectList" class="half-width"
-                                    [displayField]="'name'"
-                                    [formControl]="this.form.get('project')">
-                </custom-combo-box>
-                <div>
-                    <button mat-button class="link-button minimize" [disabled]="!this.form.get('project').value" (click)="this.editProject()">Edit</button>
-                </div>
-                <div>
-                    <button mat-button class="link-button minimize" (click)="this.newProject()">New</button>
-                </div>
-            </div>
             <div class="flex-container-row full-width align-center">
                 <div [hidden]="!this.showLinkToTopic" class="half-width">
                     <custom-multi-combo-box placeholder="Topic(s)"
@@ -73,6 +61,19 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
                                 [displayField]="'display'"
                                 [formControl]="this.form.get('application')">
             </custom-combo-box>
+            <div class="flex-container-row align-center">
+                <custom-combo-box placeholder="Project folder for organizing experiments" [options]="this.projectList" class="half-width"
+                                    [displayField]="'name'"
+                                    [formControl]="this.form.get('project')">
+                </custom-combo-box>
+                <div>
+                    <button mat-button class="link-button minimize" [disabled]="!this.form.get('project').value" (click)="this.editProject()">Edit</button>
+                </div>
+                <div>
+                    <button mat-button class="link-button minimize" (click)="this.newProject()">New</button>
+                </div>
+            </div>
+            
         </div>
     `,
     styles: [`

@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {Subscription} from "rxjs";
-import {CellValueChangedEvent, GridApi} from "ag-grid-community";
+import {CellValueChangedEvent, GridApi, NumberFilter} from "ag-grid-community";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {ConstantsService} from "../../services/constants.service";
@@ -12,33 +12,41 @@ import {MatDialogConfig} from "@angular/material";
 import {IlluminaSeqDialogComponent} from "./illumina-seq-dialog.component";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
+import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";
 
 //assets/page_add.png
 
 @Component({
     template: `
         <div class="full-height full-width flex-container-col">
-            <div class="flex-grow flex-container-row" style="align-items:center;"  >
-                <button mat-button color="primary"
-                        type="button"
-                        (click)="addSeqOption()">
-                    <img [src]="this.constService.ICON_ADD"> Add
-                </button>
-                <button [disabled]="selectedSeqOpt.length === 0"
-                        (click)="removeSeqOption()"
-                        mat-button color="primary"
-                        type="button">
-                    <img [src]="this.constService.ICON_DELETE"> Remove
-                </button>
-                <button mat-button
-                        color="primary"
-                        (click)="openSeqEditor()"
-                        [disabled]="selectedSeqOpt.length === 0"
-                        type="button"> Edit Sequencing Options </button>
+            <div class="flex-grow flex-container-row align-center justify-space-between">
+                <div>
+                    <button mat-button color="primary"
+                            type="button"
+                            (click)="addSeqOption()">
+                        <img [src]="this.constService.ICON_ADD"> Add
+                    </button>
+                    <button [disabled]="selectedSeqOpt.length === 0"
+                            (click)="removeSeqOption()"
+                            mat-button color="primary"
+                            type="button">
+                        <img [src]="this.constService.ICON_DELETE"> Remove
+                    </button>
+                    <button mat-button style="margin-left: 3em;"
+                            color="primary"
+                            (click)="openSeqEditor()"
+                            [disabled]="selectedSeqOpt.length === 0"
+                            type="button">
+                        <img [src]="this.constService.ICON_TAG_BLUE_EDIT"> Edit Sequencing Options </button>
 
-                <mat-checkbox (change)="filterSeqOptions($event)" [(ngModel)]="showInactive"> Show Inactive </mat-checkbox>
-
+                    <mat-checkbox style="margin-left: 3em;" (change)="filterSeqOptions($event)" [(ngModel)]="showInactive"> Show Inactive </mat-checkbox>
+                </div>
+                <div>
+                    <button mat-button [hidden]="!this.isAnyFilterPresent" (click)="clearFilterModel()">Clear Filter</button>
+                </div>
             </div>
+            <label style="padding: 0.5em;"> * Gird data is sortable and filterable. To sort, click the column header(sortable for asc/desc/default). To filter or search, hover the column header right side and click the filter icon.</label>
             <div style="flex:9" class="full-width">
                 <ag-grid-angular class="full-height full-width ag-theme-balham"
                                  [columnDefs]="columnDefs"
@@ -48,6 +56,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                                  (gridSizeChanged)="onGridSizeChanged($event)"
                                  [rowDeselection]="true"
                                  [enableSorting]="true"
+                                 [enableFilter]="true"
                                  [rowSelection]="'single'"
                                  (rowSelected)="this.onSeqOptionsRowSelected($event)"
                                  [singleClickEdit]="true"
@@ -96,6 +105,16 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
         }
         return this._seqTypeRunList;
     }
+    get isAnyFilterPresent(): boolean {
+        return this.gridApi ? this.gridApi.isAnyFilterPresent() : false;
+    }
+
+    clearFilterModel(): void {
+        if(this.gridApi && this.gridApi.isAnyFilterPresent()) {
+            this.gridApi.setFilterModel(null);
+            this.gridApi.setSortModel(null);
+        }
+    }
 
 
     private parseSortOrder(params){
@@ -113,12 +132,15 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
     private readonly runModeColumn = {
         headerName: "Run Mode",
         field: "isCustom",
+        filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+        filterParams: {clearButton: true},
         cellRendererFramework: SelectRenderer,
         cellEditorFramework: SelectEditor,
         selectOptions: this._runOptions,
         selectOptionsDisplayField: "display",
         selectOptionsValueField: "value",
-
+        validators: [Validators.required],
+        errorNameErrorMessageMap: [{errorName: "required", errorMessage: "Run Mode required"}],
         editable:true,
         width: 200
     };
@@ -131,49 +153,72 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
             field: "isActive",
             cellRendererFramework: CheckboxRenderer,
             checkboxEditable: true,
+            suppressFilter: true,
             editable: false,
-            width: 100
+            width: 75
         },
         {
             headerName: "Sort Order",
             field: "sortOrder",
-            validators: [Validators.min(0), Validators.max(99), Validators.pattern(/^\d{0,2}$/)],
-            errorNameErrorMessageMap: [{errorName: "numberRange", errorMessage: "Requires a number of 0-99"}],
+            filter: NumberFilter,
+            filterValueGetter: this.expPlatfromService.gridNumberFilterValueGetter,
+            filterParams: {clearButton: true},
+            valueParser: this.parseSortOrder,
+            comparator: this.expPlatfromService.gridNumberComparator,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            validators: [Validators.pattern(/^\d{0,2}$/)],
+            errorNameErrorMessageMap: [{errorName: "pattern", errorMessage: "Requires a number of 0-99"}],
             editable:true,
-            width: 100
+            width: 75
         },
         {
             headerName: "Name",
             field: "name",
-            validators: [Validators.maxLength(this.constService.MAX_LENGTH_100)],
-            errorNameErrorMessageMap: [{errorName: "maxlength", errorMessage: "Maximum of " + this.constService.MAX_LENGTH_100 + " characters"}],
-            editable:true,
+            filterParams: {clearButton: true},
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            validators: [Validators.required, Validators.maxLength(this.constService.MAX_LENGTH_100)],
+            errorNameErrorMessageMap: [
+                { errorName: 'required', errorMessage: 'Name required' },
+                { errorName: 'maxlength',  errorMessage: "Maximum of " + this.constService.MAX_LENGTH_100 + " characters"}
+            ],
+            editable: true,
             width: 250
-        }
-/*
+        },
         {
             headerName: "Cycles",
             field: "idNumberSequencingCycles",
+            filter: NumberFilter,
+            filterValueGetter: this.expPlatfromService.gridComboNumberFilterValueGetter,
+            filterParams: {clearButton: true},
             cellRendererFramework: SelectRenderer,
             cellEditorFramework: SelectEditor,
             selectOptions: this.seqCycleList,
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "value",
+            valueGetter: this.expPlatfromService.gridComboNumberFilterValueGetter,
+            comparator: this.expPlatfromService.gridNumberComparator,
+            validators: [Validators.required],
+            errorNameErrorMessageMap: [{errorName: "required", errorMessage: "Cycles required"}],
             editable:true,
             width: 200
         },
         {
             headerName: "Type",
             field: "idSeqRunType",
+            filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+            filterParams: {clearButton: true},
             cellRendererFramework: SelectRenderer,
             cellEditorFramework: SelectEditor,
             selectOptions: this.seqTypeRunList,
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "value",
+            validators: [Validators.required],
+            errorNameErrorMessageMap: [{errorName: "required", errorMessage: "Type required"}],
             editable:true,
             width: 200
         }
-*/
     ];
 
     private sortSeqOptions(obj1:any, obj2:any) {
@@ -232,6 +277,7 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
                     this.expPlatfromNode = data;
                     this.seqOptionsList = Array.isArray(data.sequencingOptions) ? data.sequencingOptions :
                         [data.sequencingOptions.NumberSequencingCyclesAllowed];
+                    this.seqOptionsList.sort(this.sortSeqOptions);
                     this.showInactive = false;
                     this.selectedSeqOpt = [];
                     this.formGroup.get('sequencingOptions').setValue(this.seqOptionsList);
@@ -242,7 +288,11 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
 
     }
 
-    filterSeqOptions(event){
+    filterSeqOptions(event?: any){
+        if(this.gridApi && this.gridApi.getSortModel() && this.gridApi.getSortModel().length > 0) {
+            this.gridApi.setSortModel(null);
+        }
+
         if(this.showInactive){
             this.rowData = this.seqOptionsList.sort(this.sortSeqOptions);
             this.gridApi.setRowData(this.rowData);
@@ -251,12 +301,24 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
             this.rowData = activeSeqOptList.sort(this.sortSeqOptions);
             this.gridApi.setRowData(this.rowData);
         }
+
+        if(event && this.selectedSeqOpt.length > 0) {
+            this.gridApi.clearFocusedCell();
+            let rowIndex = this.rowData.indexOf(this.selectedSeqOpt[0]);
+            if(rowIndex >= 0) {
+                this.gridApi.getRowNode("" + rowIndex).setSelected(true);
+            } else {
+                this.gridApi.deselectAll();
+                this.selectedSeqOpt = [];
+            }
+        }
     }
 
 
     onSeqOptionsRowSelected(event){
         if(event.node.selected){
             this.selectedSeqOptIndex = event.rowIndex;
+            this.gridApi.selectIndex(this.selectedSeqOptIndex, false, null);
         }
         this.selectedSeqOpt = this.gridApi.getSelectedRows();
     }
@@ -266,7 +328,7 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
         //if hiseq, extra column is added for it
         this.expPlatform2Subscription = this.expPlatfromService.getExperimentPlatformObservable().subscribe(data =>{
             let tempColDefs:any[] =[];
-            this.filterSeqOptions(null);
+            this.filterSeqOptions();
             if(this.expPlatfromService.isHiSeq){
                 tempColDefs = this.columnDefs.slice();
                 tempColDefs.splice(1,0, this.runModeColumn);
@@ -286,9 +348,13 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
     onCellValueChanged(event:CellValueChangedEvent):void {
         if(event.oldValue !== event.newValue){
             this.formGroup.markAsDirty();
-            if(event.column.getColId() === "sortOrder"){
+            if(event.column.getColId() === "sortOrder" && !Number.isNaN(+event.newValue)){
+                this.gridApi.clearFocusedCell();
+                this.gridApi.setSortModel(null);
                 this.rowData.sort(this.sortSeqOptions);
                 this.gridApi.setRowData(this.rowData);
+                let rowIndex  = "" + this.rowData.indexOf(event.data);
+                this.gridApi.getRowNode(rowIndex).setSelected(true);
             }
         }
 
@@ -300,15 +366,23 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
         if(dialogFormGroup.dirty){
             seqOpt.name = dialogFormGroup.get('name').value;
             seqOpt.isActive = dialogFormGroup.get('isActive').value ? 'Y': 'N';
-            seqOpt.sortOrder= dialogFormGroup.get('sortOrder').value;
-//            seqOpt.idNumberSequencingCycles = dialogFormGroup.get('idNumberSequencingCycles').value;
-//            seqOpt.idSeqRunType = dialogFormGroup.get('idSeqRunType').value;
+            seqOpt.sortOrder = dialogFormGroup.get('sortOrder').value;
+            seqOpt.idNumberSequencingCycles = dialogFormGroup.get('idNumberSequencingCycles').value;
+            seqOpt.idSeqRunType = dialogFormGroup.get('idSeqRunType').value;
             seqOpt.protocolDescription = dialogFormGroup.get('protocolDescription').value;
             seqOpt.unitPriceInternal = dialogFormGroup.get('unitPriceInternal').value;
             seqOpt.unitPriceExternalAcademic = dialogFormGroup.get('unitPriceExternalAcademic').value;
             seqOpt.unitPriceExternalCommercial = dialogFormGroup.get('unitPriceExternalCommercial').value;
-            this.filterSeqOptions(null);
+            if(this.expPlatfromService.isHiSeq) {
+                seqOpt.isCustom = dialogFormGroup.get('isCustom').value;
+            }
+            this.gridApi.setRowData(this.rowData.sort(this.sortSeqOptions));
             this.formGroup.markAsDirty();
+
+            this.gridApi.clearFocusedCell();
+            this.gridApi.setSortModel(null);
+            let rowIndex = "" + this.rowData.indexOf(this.selectedSeqOpt[0]);
+            this.gridApi.getRowNode(rowIndex).setSelected(true);
         }
 
     };
@@ -337,16 +411,18 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
         let newSeqOpt = {
             idNumberSequencingCyclesAllowed: "NumberSequencingCyclesAllowed",
             codeRequestCategory: this.expPlatfromNode.codeRequestCategory,
-//            idNumberSequencingCycles:'',
-//            idSeqRunType:'',
+            idNumberSequencingCycles:'',
+            idSeqRunType:'',
             isCustom:'N',
             name:'',
             isActive:'Y',
             sortOrder:'0',
         };
-        this.seqOptionsList.splice(0,0,newSeqOpt);
+        this.seqOptionsList.splice(0, 0, newSeqOpt);
+        this.filterSeqOptions();
         this.selectedSeqOpt = [newSeqOpt];
-        this.gridApi.setRowData(this.seqOptionsList);
+        this.gridApi.clearFocusedCell();
+        this.gridApi.forEachNode(node => node.rowIndex ? 0 : node.setSelected(true, true));
         this.openSeqEditor();
 
     }
@@ -357,7 +433,7 @@ export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{
             if(result){
                 let i:number = this.seqOptionsList.indexOf(seqOpt);
                 this.seqOptionsList.splice(i,1);
-                this.filterSeqOptions(null);
+                this.filterSeqOptions();
                 this.formGroup.markAsDirty();
                 this.selectedSeqOpt = [];
             }

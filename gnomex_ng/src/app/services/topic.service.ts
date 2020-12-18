@@ -8,6 +8,7 @@ import {map} from "rxjs/operators";
 import {UtilService} from "./util.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {HttpUriEncodingCodec} from "./interceptors/http-uri-encoding-codec";
 
 @Injectable()
 export class TopicService {
@@ -63,7 +64,7 @@ export class TopicService {
     }
 
     public addItemToTopicNew(idTopic: string, attribute: string, attributeValue: string): Observable<any> {
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idTopic", idTopic)
             .set(attribute, attributeValue);
         let headers: HttpHeaders = new HttpHeaders()

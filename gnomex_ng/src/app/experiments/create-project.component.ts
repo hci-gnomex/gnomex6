@@ -12,6 +12,7 @@ import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-d
 import {GDAction} from "../util/interfaces/generic-dialog-action.model";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: "create-project-component",
@@ -182,7 +183,7 @@ export class CreateProjectComponent extends BaseGenericContainerDialog implement
 
         this.project.name = this.form.get("name").value;
         this.project.description = this.form.get("description").value;
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("projectJSONString", JSON.stringify(this.project))
             .set("noJSONToXMLConversionNeeded", "Y")
             .set("parseEntries", "Y");

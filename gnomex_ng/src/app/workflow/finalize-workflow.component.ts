@@ -17,6 +17,7 @@ import {UtilService} from "../services/util.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {DateRenderer} from "../util/grid-renderers/date.renderer";
 import {DateParserComponent} from "../util/parsers/date-parser.component";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'finalize-workflow',
@@ -633,7 +634,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     }
 
     private saveWorkItems(): void {
-        let params: HttpParams = new HttpParams().set("barcode" ,this.barcodeFC.value)
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()}).set("barcode" ,this.barcodeFC.value)
             .set("codeSequencingPlatform", this.codeSequencingPlatform)
             .set("createDate", WorkflowService.convertDate(this.createDateFC.value))
             .set("idCoreFacility", this.flowCell.idCoreFacility)

@@ -1,4 +1,4 @@
-import {Component, Inject} from "@angular/core";
+import {AfterViewInit, ChangeDetectorRef, Component, Inject, OnInit} from "@angular/core";
 import {GnomexService} from "../services/gnomex.service";
 import {PropertyService} from "../services/property.service";
 import {Router} from "@angular/router";
@@ -31,7 +31,7 @@ import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-d
         
     `]
 })
-export class WorkAuthorizationTypeSelectorDialogComponent extends BaseGenericContainerDialog {
+export class WorkAuthorizationTypeSelectorDialogComponent extends BaseGenericContainerDialog implements OnInit, AfterViewInit {
 
     public get showInternalButton(): boolean {
         return this.gnomexService && this.gnomexService.isCoreGenomics === true;
@@ -54,6 +54,7 @@ export class WorkAuthorizationTypeSelectorDialogComponent extends BaseGenericCon
                 private propertyService: PropertyService,
                 private router:Router,
                 private constService: ConstantsService,
+                private changeDetectorRef: ChangeDetectorRef,
                 @Inject(MAT_DIALOG_DATA) private data) {
         super();
 
@@ -61,6 +62,9 @@ export class WorkAuthorizationTypeSelectorDialogComponent extends BaseGenericCon
             this.idLab = this.data.idLab;
         }
 
+    }
+
+    ngOnInit(): void {
         this.gnomexButtonProperty    = this.propertyService.getProperty(PropertyService.PROPERTY_WORK_AUTHORIZATION_MAIN_GNOMEX_NAME);
         this.gnomexButtonUrlProperty = this.propertyService.getProperty(PropertyService.PROPERTY_WORK_AUTHORIZATION_MAIN_GNOMEX_URL);
 
@@ -88,16 +92,21 @@ export class WorkAuthorizationTypeSelectorDialogComponent extends BaseGenericCon
         }
 
         // If there is only one option, then automatically choose that option.
-        if (this.coreOptions.length === 0) {
-            this.onClickInternalButton();
-        } else if (this.coreOptions.length === 1
-            && !this.gnomexService.isUniversityUserAuthentication
-            && !this.propertyService.getProperty(PropertyService.PROPERTY_WORK_AUTHORIZATION_MAIN_GNOMEX_URL)) {
-
-            this.goToUrl(this.coreOptions[0].url);
-        }
+        setTimeout(() => {
+            if (this.coreOptions.length === 0) {
+                this.onClickInternalButton();
+                this.changeDetectorRef.detectChanges();
+            } else if (this.coreOptions.length === 1
+                && !this.gnomexService.isUniversityUserAuthentication
+                && !this.propertyService.getProperty(PropertyService.PROPERTY_WORK_AUTHORIZATION_MAIN_GNOMEX_URL)) {
+                this.goToUrl(this.coreOptions[0].url);
+            }
+        });
     }
 
+    ngAfterViewInit(): void {
+        this.changeDetectorRef.detectChanges();
+    }
     public onClickInternalButton(): void {
         // If this gnomex installation supports university user authentication,
         // show window that allows user to enter work auth form directly; otherwise,

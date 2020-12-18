@@ -12,6 +12,7 @@ import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-lef
 import {GridColumnValidateService} from "../services/grid-column-validate.service";
 import {UtilService} from "../services/util.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'pipeline-workflow',
@@ -231,7 +232,7 @@ export class PipelineWorkflowComponent implements OnInit {
 
             this.showSpinner = true;
 
-            let params: HttpParams = new HttpParams().set("workItemXMLString", JSON.stringify(workItems));
+            let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()}).set("workItemXMLString", JSON.stringify(workItems));
 
             this.workflowService.SaveWorkItemSolexaPipeline(params).subscribe((response: any) => {
                 if (response && response.result && response.result === 'SUCCESS') {

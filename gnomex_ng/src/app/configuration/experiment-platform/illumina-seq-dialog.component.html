@@ -24,18 +24,21 @@
                       tooltipPosition="right"></context-help>
         <div style="align-items: center" class="flex-container-row">
             <mat-form-field class="medium-form-input">
+                <span matPrefix>$ &nbsp;</span>
                 <input matInput placeholder="Internal Pricing" formControlName="unitPriceInternal">
                 <mat-error *ngIf="this.formGroup?.controls['unitPriceInternal']?.hasError('pattern')">
                     Enter a valid currency
                 </mat-error>
             </mat-form-field>
             <mat-form-field  class="medium-form-input">
+                <span matPrefix>$ &nbsp;</span>
                 <input matInput placeholder="External Academic Pricing" formControlName="unitPriceExternalAcademic">
                 <mat-error *ngIf="this.formGroup?.controls['unitPriceInternal']?.hasError('pattern')">
                     Enter a valid currency
                 </mat-error>
             </mat-form-field>
             <mat-form-field  class="medium-form-input">
+                <span matPrefix>$ &nbsp;</span>
                 <input matInput placeholder="External Commercial Pricing" formControlName="unitPriceExternalCommercial">
                 <mat-error *ngIf="this.formGroup?.controls['unitPriceInternal']?.hasError('pattern')">
                     Enter a valid currency
@@ -48,7 +51,6 @@
                 {{this.formGroup.get('sortOrder').errors.numberRange }}
             </mat-error>
         </mat-form-field>
-<!--
         <custom-combo-box class="medium-form-input" placeholder="Cycles"
                           [options]="this.cycleList" valueField="value" displayField="display"
                           [formControlName]="'idNumberSequencingCycles'">
@@ -57,7 +59,6 @@
                           [options]="this.seqTypeRunList" valueField="value" displayField="display"
                           [formControlName]="'idSeqRunType'">
         </custom-combo-box>
--->
         <mat-form-field class="propFormField full-width">
             <textarea matInput placeholder="Protocol Description" formControlName="protocolDescription"
                       matTextareaAutosize matAutosizeMinRows="5" matAutosizeMaxRows="10">

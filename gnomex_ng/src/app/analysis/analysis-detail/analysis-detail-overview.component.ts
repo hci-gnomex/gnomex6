@@ -26,6 +26,7 @@ import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.
 import {FileService} from "../../services/file.service";
 import {UtilService} from "../../services/util.service";
 import {DistributeDatatrackDialogComponent} from "./distribute-datatrack-dialog.component";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 
 @Component({
@@ -278,7 +279,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
         let analysisOverviewForm: FormGroup = this.analysisService.analysisOverviewForm;
         this.dialogsService.startDefaultSpinnerDialog();
 
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idAnalysis", this.analysis.idAnalysis)
             .set("idLab", this.analysis.idLab);
 

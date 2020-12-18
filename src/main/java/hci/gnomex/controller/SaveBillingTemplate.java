@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSession;
 import org.hibernate.Session;
 
 import hci.framework.control.Command;
+import hci.gnomex.constants.Constants;
 import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
@@ -227,6 +228,12 @@ public class SaveBillingTemplate extends GNomExCommand implements Serializable {
                     billingItem.setInvoicePrice(dollarAmountBalance);
                     templateItem.setDollarAmountBalance(new BigDecimal(0));
                 }
+            }
+
+            if (percentSplit != null) {
+                billingItem.setSplitType(Constants.BILLING_SPLIT_TYPE_PERCENT_CODE);
+            } else {
+                billingItem.setSplitType(Constants.BILLING_SPLIT_TYPE_AMOUNT_CODE);
             }
 
             masterBillingItem.getBillingItems().add(billingItem);

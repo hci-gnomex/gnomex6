@@ -37,8 +37,11 @@
             <button mat-button (click)="this.showSplitBilling()">Change Split Billing</button>
             <button mat-button (click)="this.cancelSplitBilling()">Cancel Split Billing</button>
         </div>
-        <ul>
+        <ul *ngIf="this.billingTemplate.usingPercentSplit === 'true'">
             <li *ngFor="let item of this.billingTemplate.items">{{item.accountNumberDisplay}} ({{item.percentSplit}}%)</li>
+        </ul>
+        <ul *ngIf="this.billingTemplate.usingPercentSplit !== 'true'">
+            <li *ngFor="let item of this.billingTemplate.items">{{item.accountNumberDisplay}} ({{item.dollarAmount | currency:"USN":"$": "1.2-2"}})</li>
         </ul>
     </div>
     <table [hidden]="!this.idLab || !this.idAppUser || (!this.idBillingAccount && !this.billingTemplate)" class="full-width">

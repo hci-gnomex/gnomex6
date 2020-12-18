@@ -1,9 +1,9 @@
 <form [formGroup]="formGroup">
     <div class="flex-container-col full-height full-width">
         <div style="margin: 0.5em;">
-            <div class="flex-container-row spaced-children-margin">
+            <div class="flex-container-row spaced-children-margin align-center">
                 <mat-form-field  class="medium-form-input">
-                    <input matInput placeholder="Sequencing Experiment Type" formControlName="application">
+                    <input matInput placeholder="Library Prep Protocol" formControlName="application">
                     <mat-error *ngIf="this.formGroup?.controls['application']?.hasError('required')">
                         This field is required
                     </mat-error>
@@ -18,8 +18,11 @@
                         {{this.formGroup.get('sortOrder').errors.numberRange }}
                     </mat-error>
                 </mat-form-field>
+                <mat-checkbox [(ngModel)]="isActive" (change)="onActiveChange($event)" formControlName="isActive">
+                    Active
+                </mat-checkbox>
             </div>
-            <custom-combo-box class="medium-form-input" placeholder="Sequencing Experiment Type Theme"
+            <custom-combo-box class="medium-form-input" placeholder="Library Prep Theme"
                               [options]="this.appThemeList" [allowNone]="false"
                               valueField="value" displayField="display"
                               [formControlName]="'idApplicationTheme'">
@@ -46,7 +49,7 @@
                 </custom-combo-box>
             </div>
             <div class="flex-container-row spaced-children-margin" style="font-size: small">
-                <div class="flex-container-col" style="flex:2">
+                <div class="flex-container-col " style="flex:2">
                     <label class="gx-label"> Availability </label>
                     <mat-radio-group class="flex-container-col"  formControlName="onlyForLabPrepped">
                         <mat-radio-button  value="N">
@@ -56,6 +59,10 @@
                             Only Available when Client performs library prep
                         </mat-radio-button>
                     </mat-radio-group>
+                    <span class="flex-grow"></span>
+
+                    <button mat-button class="link-button minimize" style="text-align: left"
+                            (click)="openProtocolEditor()"> Edit Library Prep Materials and Methods </button>
                 </div>
                 <div class="flex-container-col" style="flex:2">
                     <div *ngIf="this.canEnterPrices" class="flex-container-col">
@@ -88,11 +95,13 @@
                                   tooltipPosition="right"></context-help>
                 </div>
                 <div class="flex-container-col" style="align-items:start; flex:1">
+<!--
                     <button mat-button class="link-button minimize" (click)="openProtocolEditor()"> Edit Protocol </button>
                     <button mat-button class="link-button minimize" (click)="openStepsEditor()" > Configure Lib Prep Steps </button>
                     <mat-checkbox formControlName="hasCaptureLibDesign">
                         Custom Design Id
                     </mat-checkbox>
+-->
                 </div>
 
             </div>

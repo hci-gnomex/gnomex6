@@ -10,6 +10,7 @@ import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {first} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 
 @Component({
@@ -19,7 +20,7 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
                 <div style="margin: 0.5em;">
                     <div class="flex-container-row spaced-children-margin" style="align-items:center;">
                         <mat-form-field  class="medium-form-input">
-                            <input matInput placeholder="Name" formControlName="name">
+                            <input matInput placeholder="Library Prep Protocol" formControlName="name">
                             <mat-error *ngIf="this.formGroup.get('name').hasError('required')">
                                 Name is required
                             </mat-error>
@@ -28,7 +29,7 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
                                 Character count: {{this.formGroup.get('name').value.toString().length}}
                             </mat-error>
                         </mat-form-field>
-                        <mat-checkbox  formControlName="isActive">
+                        <mat-checkbox formControlName="isActive">
                             Active
                         </mat-checkbox>
                     </div>
@@ -112,8 +113,8 @@ export class LibraryPrepProtocolDialogComponent extends BaseGenericContainerDial
             this.protocolService.getProtocolObservable().pipe(first()).subscribe(resp =>{
                 if(resp){
                     this.protocol = resp;
-                    this.formGroup.get('idProtocol').setValue(resp.idSeqLibProtocol ? resp.idSeqLibProtocol : '');
-                    this.formGroup.get('name').setValue(resp.name? resp.name : '');
+                    this.formGroup.get('idProtocol').setValue(resp.id ? resp.id : '');
+                    this.formGroup.get('name').setValue(resp.name ? resp.name : '');
                     this.formGroup.get('isActive').setValue(resp.isActive ? resp.isActive === 'Y': false);
                     this.formGroup.get('url').setValue(resp.url ? resp.url : '');
                     this.formGroup.get('description').setValue(this.formatDescription(resp.description));
@@ -151,7 +152,7 @@ export class LibraryPrepProtocolDialogComponent extends BaseGenericContainerDial
 
     saveChanges(){
         this.showSpinner = true;
-        let params:HttpParams = new HttpParams()
+        let params:HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set('idProtocol', this.formGroup.get('idProtocol').value)
             .set('protocolName',this.formGroup.get('name').value)
             .set('protocolDescription',this.formGroup.get('description').value)

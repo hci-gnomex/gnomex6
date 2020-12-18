@@ -10,6 +10,7 @@ import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {DataTrackService} from "../../services/data-track.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     template: `
@@ -168,7 +169,7 @@ export class ManagePedFileWindowComponent extends BaseGenericContainerDialog imp
         }
         this.innerTitle = "Manage Ped File -- " + pedFilename;
 
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("noJSONToXMLConversionNeeded", "Y")
             .set("idAnalysis", this.data.idAnalysis)
             .set("action", "setup")
@@ -286,7 +287,7 @@ export class ManagePedFileWindowComponent extends BaseGenericContainerDialog imp
     }
 
     public launch(): void {
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("noJSONToXMLConversionNeeded", "Y")
             .set("idAnalysis", this.data.idAnalysis)
             .set("proband", JSON.stringify(this.selectedEntryNode.data))
@@ -303,7 +304,7 @@ export class ManagePedFileWindowComponent extends BaseGenericContainerDialog imp
     }
 
     public save(): void {
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("noJSONToXMLConversionNeeded", "Y")
             .set("idAnalysis", this.data.idAnalysis)
             .set("fileOffset", "" + this.currentPedFileIndex)

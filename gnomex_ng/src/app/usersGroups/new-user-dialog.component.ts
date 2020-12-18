@@ -5,6 +5,7 @@ import {UserService} from "../services/user.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: "new-user-dialog",
@@ -36,7 +37,7 @@ export class NewUserDialogComponent extends BaseGenericContainerDialog implement
 
     public save(): void {
         this.showSpinner = true;
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idAppUser", "0")
             .set("firstName", this.firstName)
             .set("lastName", this.lastName)

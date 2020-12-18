@@ -13,6 +13,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 import {UtilService} from "../services/util.service";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../services/constants.service";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: 'configure-products',
@@ -246,7 +247,7 @@ export class ConfigureProductsComponent implements OnInit {
     public saveProduct(): void {
         if (this.selectedProduct) {
             this.showSpinner = true;
-            let params: HttpParams = new HttpParams()
+            let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
                 .set("idProduct", this.selectedProduct.idProduct)
                 .set("name", this.productForm.controls['name'].value)
                 .set("isActive", this.productForm.controls['active'].value ? 'Y' : 'N')

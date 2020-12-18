@@ -11,6 +11,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {GDAction} from "../util/interfaces/generic-dialog-action.model";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: "create-analysis-group-dialog",
@@ -148,7 +149,7 @@ export class CreateAnalysisGroupComponent extends BaseGenericContainerDialog imp
 
         let idAnalysisGroup: any = 0;
         let analysisGroupDescription = this.createAnalysisGroupForm.get("description").value;
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idLab", this.idLabString)
             .set("idAnalysisGroup", idAnalysisGroup)
             .set("name", analysisGroupName)

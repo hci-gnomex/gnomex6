@@ -1,5 +1,5 @@
 import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
-import {FormBuilder, FormGroup} from "@angular/forms";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {Subscription} from "rxjs";
 import {CellValueChangedEvent, GridApi} from "ag-grid-community";
@@ -10,6 +10,8 @@ import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {DictionaryService} from "../../services/dictionary.service";
 import {MatDialog} from "@angular/material";
 import {DialogsService} from "../../util/popup/dialogs.service";
+import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
+import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";
 
 @Component({
     templateUrl:'./ep-experiment-type-tab.component.html',
@@ -84,6 +86,16 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
         }
         return this._feProtocolCol;
     }
+    get isAnyFilterPresent(): boolean {
+        return this.gridApi ? this.gridApi.isAnyFilterPresent() : false;
+    }
+
+    clearFilterModel(): void {
+        if(this.gridApi && this.gridApi.isAnyFilterPresent()) {
+            this.gridApi.setFilterModel(null);
+            this.gridApi.setSortModel(null);
+        }
+    }
 
     public columnDefs: any[] = [];
 
@@ -103,12 +115,21 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                 field: "isSelected",
                 cellRendererFramework: CheckboxRenderer,
                 checkboxEditable: true,
+                suppressFilter: true,
                 editable: false,
                 width: 100
             },
             {
                 headerName: "Experiment Type",
                 field: "display",
+                filterParams: {clearButton: true},
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                validators: [Validators.required, Validators.maxLength(100)],
+                errorNameErrorMessageMap: [
+                    {errorName: "required", errorMessage: "Experiment Type required"},
+                    {errorName: "maxlength", errorMessage: "Maximum of 100 characters"}
+                ],
                 editable:true,
                 width: 250
             },
@@ -119,17 +140,25 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                 {
                     headerName: "Theme",
                     field: "idApplicationTheme",
+                    filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+                    filterParams: {clearButton: true},
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
                     selectOptions: this.applicationTheme,
                     selectOptionsDisplayField: "display",
                     selectOptionsValueField: "value",
+                    validators: [Validators.required],
+                    errorNameErrorMessageMap: [
+                        {errorName: "required", errorMessage: "Theme required"},
+                    ],
                     editable:true,
                     width: 200
                 },
                 {
                     headerName: "Seq Lib Protocols",
                     field: "idSeqLibProtocols",
+                    filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+                    filterParams: {clearButton: true},
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
                     selectOptions: this.seqLibProtocolCol,
@@ -143,6 +172,7 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                     field: "hasCaptureLibDesign",
                     cellRendererFramework: CheckboxRenderer,
                     checkboxEditable: true,
+                    suppressFilter: true,
                     editable: false,
                     width: 100
                 },
@@ -154,6 +184,8 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                 {
                     headerName: "Labeling Protocol",
                     field: "idLabelingProtocol",
+                    filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+                    filterParams: {clearButton: true},
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
                     selectOptions: this.labelingProtocolCol,
@@ -165,6 +197,8 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                 {
                     headerName: "Hyb Protocol",
                     field: "idHybProtocol",
+                    filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+                    filterParams: {clearButton: true},
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
                     selectOptions: this.hybProtocolCol,
@@ -176,6 +210,8 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                 {
                     headerName: "Scan Protocol",
                     field: "idScanProtocol",
+                    filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+                    filterParams: {clearButton: true},
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
                     selectOptions: this.scanProtocolCol,
@@ -187,6 +223,8 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
                 {
                     headerName: "FE Protocol",
                     field: "idFeatureExtractionProtocol",
+                    filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+                    filterParams: {clearButton: true},
                     cellRendererFramework: SelectRenderer,
                     cellEditorFramework: SelectEditor,
                     selectOptions: this.feProtocolCol,
@@ -202,6 +240,14 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
             dynamicColDef.push({
                 headerName: "FE Protocol",
                 field: "samplesPerBatch",
+                filterParams: {clearButton: true},
+                comparator: this.expPlatfromService.gridNumberComparator,
+                cellRendererFramework: TextAlignLeftMiddleRenderer,
+                cellEditorFramework: TextAlignLeftMiddleEditor,
+                validators: [Validators.pattern(/^\d{0,10}$/)],
+                errorNameErrorMessageMap: [
+                    {errorName: "pattern", errorMessage: "Expects a number"},
+                ],
                 editable:true,
                 width: 200
 
@@ -212,6 +258,7 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
             field: "isActive",
             cellRendererFramework: CheckboxRenderer,
             checkboxEditable: true,
+            suppressFilter: true,
             editable: false,
             width: 100
         });
@@ -257,11 +304,27 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
     }
 
     filterAppOptions(event?: any) {
+        if(this.gridApi && this.gridApi.getSortModel() && this.gridApi.getSortModel().length > 0) {
+            this.gridApi.setSortModel(null);
+        }
+
         // This is to filter the data that is executive(selected), but not to filter the data that is active in database.
         if(this.showInactive) {
             this.rowData = this.applicationList;
         } else {
             this.rowData = this.applicationList.filter(app => app.isSelected === "Y");
+        }
+
+        if(event && this.selectedLibPrep.length > 0) {
+            this.gridApi.setRowData(this.rowData);
+            this.gridApi.clearFocusedCell();
+            let rowIndex = this.rowData.indexOf(this.selectedLibPrep[0]);
+            if (rowIndex >= 0) {
+                this.gridApi.getRowNode("" + rowIndex).setSelected(true);
+            } else {
+                this.gridApi.deselectAll();
+                this.selectedLibPrep = [];
+            }
         }
     }
 
@@ -303,6 +366,7 @@ export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{
         this.applicationList.splice(0, 0, newLibPrep);
         this.filterAppOptions();
         this.gridApi.setRowData(this.rowData);
+        this.gridApi.clearFocusedCell();
         this.gridApi.forEachNode(node => node.rowIndex ? 0 : node.setSelected(true, true));
         this.formGroup.markAsDirty();
 

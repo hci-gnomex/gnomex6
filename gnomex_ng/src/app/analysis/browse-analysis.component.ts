@@ -535,7 +535,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 this.disableNewAnalysisGroup = false;
                 this.disableDelete = true;
                 navArray = ["/analysis", "overview"];
-
+                navExtras = {queryParams: {idLab: idLab, idAnalysisGroup: null}};
 
                 //AnalysisGroup
             } else if (this.selectedItem.level === 2) {
@@ -546,16 +546,17 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 this.disableDelete = false;
                 this.disableNewAnalysisGroup = false;
                 navArray = ["/analysis", "overview"];
-                navExtras = {queryParams: {"idAnalysisGroup": idAnalysisGroup}}
+                navExtras = {queryParams: {idLab: idLab, idAnalysisGroup: idAnalysisGroup}};
 
                 //Analysis
             } else if (this.selectedItem.level === 3) {
-                navArray = ["/analysis","detail", idAnalysis];
+                navArray = ["/analysis", "detail", idAnalysis];
                 this.parentProject = event.node.parent;
                 this.selectedIdAnalysisGroup = this.parentProject.data.idAnalysisGroup;
                 this.disableNewAnalysis = false;
                 this.disableDelete = false;
                 this.disableNewAnalysisGroup = false;
+                navExtras = {queryParams: {idLab: idLab, idAnalysisGroup: this.selectedIdAnalysisGroup}};
             }
             navExtras.relativeTo = this.route;
             navExtras.queryParamsHandling = 'merge';

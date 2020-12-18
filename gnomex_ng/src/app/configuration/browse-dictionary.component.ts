@@ -22,6 +22,7 @@ import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
 import {ConstantsService} from "../services/constants.service";
 import {CellRendererValidation} from "../util/grid-renderers/cell-renderer-validation";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 @Component({
     selector: "browse-dictionary",
@@ -742,7 +743,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             let dataKeyField: string;
             let dataKeyValue: string;
 
-            let object: HttpParams = new HttpParams();
+            let object: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
             for (let field of this.entryFields) {
                 let value: string;
                 if (field.dataType === "YN") {
@@ -803,7 +804,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
             let className: string = this.selectedDictionary.className;
             let entryCount: number = 0;
             for(let entry of dictionaryEntries) {
-                let entryObject: HttpParams = new HttpParams();
+                let entryObject: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
                 // Get fields of the entry
                 if(entry && typeof entry === "object") {
                     Object.keys(entry).forEach(key => {
@@ -884,7 +885,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         }
 
         this.showSpinner = true;
-        let object: HttpParams = new HttpParams();
+        let object: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
         for (let field of this.entryFields) {
             let value: string = "";
             if (field.isIdentifier === "Y") {

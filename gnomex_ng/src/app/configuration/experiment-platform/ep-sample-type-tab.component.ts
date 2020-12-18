@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ConstantsService} from "../../services/constants.service";
-import {GridApi} from "ag-grid-community";
+import {GridApi, NumberFilter} from "ag-grid-community";
 import {ExperimentPlatformService} from "../../services/experiment-platform.service";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {GnomexService} from "../../services/gnomex.service";
@@ -20,39 +20,49 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
 @Component({
     template: `
         <div class="full-height full-width flex-container-col">
-            <div class="flex-grow flex-container-row align-center">
-                <button type="button" mat-button color="primary" (click)="select()" [disabled]="sampleTypeRowData.length === 0">
-                    {{selectedState}}
-                </button>
-                <button mat-button color="primary"
-                        type="button"
-                        (click)="addSampleType()">
-                    <img [src]="this.constService.ICON_ADD"> Add
-                </button>
-                <button [disabled]="selectedSampleTypeRows.length === 0"
-                        (click)="removeSampleType()"
-                        mat-button color="primary"
-                        type="button">
-                    <img [src]="this.constService.ICON_DELETE"> Remove
-                </button>
-                <button mat-button
-                        color="primary"
-                        (click)="openSampleTypeEditor()"
-                        [disabled]="selectedSampleTypeRows.length === 0"
-                        type="button"> Edit Notes </button>
-                <mat-checkbox (change)="filterOptions($event)" [(ngModel)]="showInactive">Show Inactive</mat-checkbox>
+            <div class="flex-grow flex-container-row align-center justify-space-between">
+                <div>
+                    <button type="button" mat-button color="primary" (click)="select()" [disabled]="sampleTypeRowData.length === 0">
+                        {{selectedState}}
+                    </button>
+                    <button mat-button color="primary"
+                            type="button"
+                            (click)="addSampleType()">
+                        <img [src]="this.constService.ICON_ADD"> Add
+                    </button>
+                    <button [disabled]="selectedSampleTypeRows.length === 0"
+                            (click)="removeSampleType()"
+                            mat-button color="primary"
+                            type="button">
+                        <img [src]="this.constService.ICON_DELETE"> Remove
+                    </button>
+                    <button mat-button style="margin-left: 3em;"
+                            color="primary"
+                            (click)="openSampleTypeEditor()"
+                            [disabled]="selectedSampleTypeRows.length === 0"
+                            type="button">
+                        <img [src]="this.constService.ICON_TAG_BLUE_EDIT"> Edit Notes </button>
+                    <mat-checkbox style="margin-left: 3em;" (change)="filterOptions($event)" [(ngModel)]="showInactive">Show Inactive</mat-checkbox>
+                </div>
+                <div>
+                    <button mat-button [hidden]="!this.isAnyFilterPresent" (click)="clearFilterModel()">Clear Filter</button>
+                </div>
 
             </div>
+            <label style="padding: 0.5em;"> * Gird data is sortable and filterable. To sort, click the column header(sortable for asc/desc/default). To filter or search, hover the column header right side and click the filter icon.</label>
             <div style="flex:9" class="full-width">
-                <ag-grid-angular class="full-height full-width ag-theme-fresh"
+                <ag-grid-angular class="full-height full-width ag-theme-balham"
                                  [context]="context"
                                  [columnDefs]="columnDefs"
                                  (cellValueChanged)="onCellValueChanged($event)"
                                  [rowData]="this.sampleTypeRowData"
                                  (gridReady)="onGridReady($event)"
                                  (gridSizeChanged)="onGridSizeChanged($event)"
+                                 [enableSorting]="true"
+                                 [enableFilter]="true"
                                  [rowDeselection]="true"
                                  [rowSelection]="'single'"
+                                 [singleClickEdit]="true"
                                  (rowSelected)="this.onSampleTypeRowSelected($event)"
                                  [stopEditingWhenGridLosesFocus]="true">
                 </ag-grid-angular>
@@ -153,6 +163,7 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
             field: "isSelected",
             cellRendererFramework: CheckboxRenderer,
             checkboxEditable: true,
+            suppressFilter: true,
             editable: false,
             width: 100
         },
@@ -167,6 +178,7 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
                 {errorName: "required", errorMessage: "Sample Type required"},
                 {errorName: "maxlength", errorMessage: "Maximum of 50 characters"}
             ],
+            filterParams: {clearButton: true},
             width: 300
         },
         {
@@ -176,18 +188,41 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
             selectOptions: this.nucleotideTypeDataProvider,
             selectOptionsDisplayField: "display",
             selectOptionsValueField: "codeNucleotideType",
+            filterValueGetter: this.expPlatfromService.gridComboFilterValueGetter,
+            filterParams: {clearButton: true},
             editable: true,
             width:300
         },
         {
             headerName: "Sort Order",
             field: "sortOrder",
+            filter: NumberFilter,
+            filterValueGetter: this.expPlatfromService.gridNumberFilterValueGetter,
+            filterParams: {clearButton: true},
             valueParser: this.parseSortOrder,
+            comparator: this.expPlatfromService.gridNumberComparator,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            cellEditorFramework: TextAlignLeftMiddleEditor,
+            validators: [Validators.pattern(/^\d{0,2}$/)],
+            errorNameErrorMessageMap: [
+                {errorName: "pattern", errorMessage: "Expects a number of 0-99"},
+            ],
             editable:true,
             width: 100
         }
 
     ];
+
+    get isAnyFilterPresent(): boolean {
+        return this.gridApi ? this.gridApi.isAnyFilterPresent() : false;
+    }
+
+    clearFilterModel(): void {
+        if(this.gridApi && this.gridApi.isAnyFilterPresent()) {
+            this.gridApi.setFilterModel(null);
+            this.gridApi.setSortModel(null);
+        }
+    }
 
     constructor(private fb: FormBuilder,
                 private constService: ConstantsService,
@@ -218,11 +253,27 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
     }
 
     filterOptions(event?: any) {
+        if(this.gridApi && this.gridApi.getSortModel() && this.gridApi.getSortModel().length > 0) {
+            this.gridApi.setSortModel(null);
+        }
+
         // This is to filter the data that is executive(selected), but not to filter the data that is active in database.
         if(this.showInactive) {
-            this.sampleTypeRowData = this.sampleTypeList;
+            this.sampleTypeRowData = this.sampleTypeList.sort(this.sortSampleTypefn);
         } else {
-            this.sampleTypeRowData = this.sampleTypeList.filter((samType: any) => (samType.isSelected === "Y"));
+            this.sampleTypeRowData = this.sampleTypeList.filter((samType: any) => (samType.isSelected === "Y")).sort(this.sortSampleTypefn);
+        }
+
+        if(event && this.selectedSampleTypeRows.length > 0) {
+            this.gridApi.setRowData(this.sampleTypeRowData);
+            this.gridApi.clearFocusedCell();
+            let rowIndex = this.sampleTypeRowData.indexOf(this.selectedSampleTypeRows[0]);
+            if(rowIndex >= 0) {
+                this.gridApi.getRowNode("" + rowIndex).setSelected(true);
+            } else {
+                this.gridApi.deselectAll();
+                this.selectedSampleTypeRows = [];
+            }
         }
     }
 
@@ -270,6 +321,7 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
             this.sampleTypeList.splice(0, 0, newSampleType);
             this.filterOptions();
             this.gridApi.setRowData(this.sampleTypeRowData);
+            this.gridApi.clearFocusedCell();
             this.gridApi.forEachNode(node => node.rowIndex ? 0 : node.setSelected(true, true));
             this.expPlatfromService.findExpPlatformFormMember(this.constructor.name).markAsDirty();
 
@@ -319,9 +371,17 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
         }
     }
     onCellValueChanged(event):void {
-            if(event.oldValue !== event.newValue){
-                this.formGroup.markAsDirty();
+        if(event.oldValue !== event.newValue){
+            this.formGroup.markAsDirty();
+            if(event.column.getColId() === "sortOrder" && !Number.isNaN(+event.newValue)) {
+                this.gridApi.clearFocusedCell();
+                this.gridApi.setSortModel(null);
+                this.sampleTypeRowData.sort(this.sortSampleTypefn);
+                this.gridApi.setRowData(this.sampleTypeRowData);
+                let rowIndex  = "" + this.sampleTypeRowData.indexOf(event.data);
+                this.gridApi.getRowNode(rowIndex).setSelected(true);
             }
+        }
 
     }
 

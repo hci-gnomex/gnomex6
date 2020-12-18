@@ -20,6 +20,7 @@ import {ConstantsService} from "../services/constants.service";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 import {DateRenderer} from "../util/grid-renderers/date.renderer";
 import {DateParserComponent} from "../util/parsers/date-parser.component";
+import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 
 
 @Component({
@@ -142,7 +143,7 @@ export class FlowcellWorkflowComponent implements OnInit {
     initialize() {
         this.dialogsService.startDefaultSpinnerDialog();
 
-        let params: HttpParams = new HttpParams();
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()});
         if (this.filterForm.controls['date'].value) {
             let dateRange: DateRange = this.filterForm.controls['date'].value;
             if (dateRange.from && dateRange.to) {

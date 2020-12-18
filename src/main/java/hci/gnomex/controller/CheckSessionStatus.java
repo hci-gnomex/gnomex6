@@ -7,8 +7,11 @@ package hci.gnomex.controller;
  *@created    August 17, 2002
  */
 
+import org.hibernate.Session;
+
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Timestamp;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -17,11 +20,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.model.PropertyDictionary;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.gnomex.utility.Util;
-import org.apache.log4j.Logger;
+
 public class CheckSessionStatus extends HttpServlet {
-//  private static Logger LOG = Logger.getLogger(CheckSessionStatus.class);
 
   /**
    * Initialize global variables
@@ -73,8 +77,8 @@ public class CheckSessionStatus extends HttpServlet {
       HttpSession session = request.getSession();
       if (session == null || session.isNew()) {
         xmlResult = "<data><sa exists='false' lastAccessedTime='-1' inactiveTime='-1' currentTime='-1' "
-            + "sessionMaxInActiveTime='0' /></data>";
-//        LOG.debug("Session is new or not exist");
+            + "sessionMaxInActiveTime='0' />"
+            + "</data>";
       } else {
         Long slac = (Long) session.getAttribute("lastGNomExAccessTime");
         long lastTime;
@@ -82,12 +86,32 @@ public class CheckSessionStatus extends HttpServlet {
           lastTime = session.getLastAccessedTime();
         else
           lastTime = slac.longValue();
-        // LOG.debug("Session last accessed time: " + new Date(lastTime));
-        xmlResult = "<data><sa exists='true' lastAccessedTime='" + lastTime + "' " + "currentTime='"
-            + new Date().getTime() + "' sessionMaxInActiveTime='" + request.getSession().getMaxInactiveInterval()
-            + "' " + " /></data>";
+
+        xmlResult = "<data>"
+            + "<sa exists='true' "
+            + "lastAccessedTime='" + lastTime + "' "
+            + "currentTime='" + new Date().getTime() + "' "
+            + "sessionMaxInActiveTime='" + request.getSession().getMaxInactiveInterval() + "' ";
+
+        String temp = "";
+
+        try {
+          Session hybSession = HibernateSession.currentSession("guest");
+
+          String updateAccounts = PropertyDictionaryHelper.getInstance(hybSession).getProperty(PropertyDictionary.AUTOUPDATE_ACCOUNTS);
+
+          if (updateAccounts != null && updateAccounts.toLowerCase().equals("y")) {
+            temp = "billingAccountsLatestChange='"
+                + ((Timestamp) hybSession.getNamedQuery("getLatestBillingAccountChange").uniqueResult())
+                + "' ";
+          }
+        } catch (Exception e) {
+          // Logging disabled due to high number of calls
+        }
+
+        xmlResult += temp + "/>"
+            + "</data>";
       }
-//      LOG.debug(xmlResult);
     }
 
     String jsonResult = Util.xmlToJson(xmlResult);

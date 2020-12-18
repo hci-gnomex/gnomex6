@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from "@angula
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {MatDialog, MatDialogConfig} from "@angular/material";
 
-import {BehaviorSubject, Subscription} from "rxjs/index";
+import {BehaviorSubject, Subscription} from "rxjs";
 import {first} from "rxjs/internal/operators";
 
 import {NewExperimentService} from "../../services/new-experiment.service";
@@ -24,12 +24,13 @@ import {CreateProjectComponent} from "../create-project.component";
 import {ConstantsService} from "../../services/constants.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {
-    BillingTemplate,
+    BillingTemplate, BillingTemplateItem,
     BillingTemplateWindowComponent,
     BillingTemplateWindowParams
 } from "../../util/billing-template-window.component";
 import {AddAdditionalAccountsComponent} from "./add-additional-accounts.component";
 import {thisOrThat} from "../../util/validators/this-or-that.validator";
+import {CheckSessionStatusService} from "../../services/check-session-status.service";
 
 @Component({
     selector: "new-experiment-setup",
@@ -309,6 +310,7 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
 
 
     constructor(private billingService: BillingService,
+                private checkSessionStatusService: CheckSessionStatusService,
                 public createSecurityAdvisor: CreateSecurityAdvisorService,
                 private dialog: MatDialog,
                 private dialogService: DialogsService,
@@ -325,6 +327,20 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.prepareForm();
+
+        this.checkSessionStatusService.getBillingAccountsLatestChangeObservable().subscribe((data: Date) => {
+            setTimeout(() => {
+                if (this.showBilling) {
+                    this.dialogService.startSpinnerDialog('Checking new billing accounts...', 3, 30);
+
+                    if (this.form && this.form.get("selectLab") && this.form.get("selectLab").value && this.form.get("selectLab").value.idLab) {
+                        this.getLabInformation(this.form.get("selectLab").value.idLab);
+                    }
+
+                    this.dialogService.stopAllSpinnerDialogs();
+                }
+            });
+        });
     }
 
     private prepareForm(): void {
@@ -395,6 +411,10 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
 
 
     refreshBillingAccounts() {
+        if (!this._experiment || !this._experiment.requestCategory) {
+            return;
+        }
+
         this.checkForOtherAccounts();
         this._experiment.idAppUser = this.createSecurityAdvisor.idAppUser.toString();
 
@@ -631,47 +651,74 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
                     this.getLabService.getSubmittersForLab(value.idLab, 'Y', 'N');
                 }
 
-                let params: HttpParams = new HttpParams()
-                    .set("idLab", value.idLab)
-                    .set("includeBillingAccounts", "Y")
-                    .set("includeProductCounts", "N");
-                this.getLabService.getLab(params).subscribe((response: any) => {
-                    if (response && response.Lab && response.Lab.activeSubmitters) {
-                        this.authorizedBillingAccounts = response.Lab.authorizedBillingAccounts;
-                    }
-                    this.filteredProjectList = this.filteredProjectList.filter(project =>
-                        project.idLab === value.idLab
-                    );
-
-                    this.refreshBillingAccounts();
-
-                    if (this.adminState !== "AdminState"
-                        && this.authorizedBillingAccounts
-                        && Array.isArray(this.authorizedBillingAccounts)
-                        && this.authorizedBillingAccounts.length === 1) {
-
-                        this.form.get("selectAccount").setValue(this.authorizedBillingAccounts[0]);
-                        this.onBillingAccountSelection(this.authorizedBillingAccounts[0]);
-                    }
-                    if (this.adminState !== "AdminState") {
-                        let temp: any[] = this.gnomexService.appUserList.filter((value: any) => {
-                            return value.idAppUser === '' + this.createSecurityAdvisor.idAppUser;
-                        });
-
-                        if (temp && temp.length === 1) {
-                            this._experiment.experimentOwner = temp[0];
-                            this._experiment.idOwner = '' + this.createSecurityAdvisor.idAppUser;
-
-                            this.selectDefaultUserProject();
-                        }
-                    }
-
-                });
+                this.getLabInformation(value.idLab);
             }
 
             this._experiment.lab = event;
         }
+    }
 
+    private getLabInformation(idLab: string): void {
+        let params: HttpParams = new HttpParams()
+            .set("idLab", idLab)
+            .set("includeBillingAccounts", "Y")
+            .set("includeProductCounts", "N");
+        this.getLabService.getLab(params).subscribe((response: any) => {
+            if (response && response.Lab && response.Lab.activeSubmitters) {
+                this.authorizedBillingAccounts = response.Lab.authorizedBillingAccounts;
+            }
+            this.filteredProjectList = this.filteredProjectList.filter(project =>
+                project.idLab === idLab
+            );
+
+            let oldBillingAccountValue: any = this.form.get("selectAccount").value;
+
+            this.refreshBillingAccounts();
+
+            if (this.adminState !== "AdminState"
+                && this.authorizedBillingAccounts
+                && Array.isArray(this.authorizedBillingAccounts)
+                && this.authorizedBillingAccounts.length === 1) {
+
+                this.form.get("selectAccount").setValue(this.authorizedBillingAccounts[0]);
+                this.onBillingAccountSelection(this.authorizedBillingAccounts[0]);
+            }
+            if (this.adminState !== "AdminState") {
+                let temp: any[] = this.gnomexService.appUserList.filter((value: any) => {
+                    return value.idAppUser === '' + this.createSecurityAdvisor.idAppUser;
+                });
+
+                if (temp && temp.length === 1) {
+                    this._experiment.experimentOwner = temp[0];
+                    this._experiment.idOwner = '' + this.createSecurityAdvisor.idAppUser;
+
+                    this.selectDefaultUserProject();
+                }
+            }
+
+            // If there is only one choice for billing account, automatically select it for the user.
+            if (this.authorizedBillingAccounts
+                && Array.isArray(this.authorizedBillingAccounts)
+                && this.authorizedBillingAccounts.length === 1
+                && this.form) {
+
+                this.updateBilling(this.authorizedBillingAccounts[0], null);
+            } else if (this.authorizedBillingAccounts
+                && Array.isArray(this.authorizedBillingAccounts)
+                && this.authorizedBillingAccounts.length > 1
+                && this.form
+                && oldBillingAccountValue
+                && oldBillingAccountValue.idBillingAccount) {
+
+                let temp: any[] = this.authorizedBillingAccounts.filter((value: any) => {
+                    return value && value.idBillingAccount === oldBillingAccountValue.idBillingAccount;
+                });
+
+                if (temp && temp.length > 0) {
+                    this.updateBilling(temp[0], null);
+                }
+            }
+        });
     }
 
     public onBillingAccountSelection(event: any): void {
@@ -750,7 +797,21 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
         let params: BillingTemplateWindowParams = new BillingTemplateWindowParams();
         params.idCoreFacility = this._experiment.idCoreFacility;
         if (this._experiment.billingTemplate) {
-            params.billingTemplate = this._experiment.billingTemplate;
+            params.billingTemplate = JSON.parse(JSON.stringify(this._experiment.billingTemplate));
+        } else if(this._experiment.billingAccount && this._experiment.idLab) {
+            let selectedBillingAccount: BillingTemplateItem = JSON.parse(JSON.stringify(this._experiment.billingAccount));
+            selectedBillingAccount.labName = this._experiment.lab.name;
+            selectedBillingAccount.percentSplit = 100;
+            selectedBillingAccount.dollarAmount = "";
+            selectedBillingAccount.acceptBalance = "Y";
+            let billingTemplate: BillingTemplate = {
+                idBillingTemplate: "0",
+                usingPercentSplit: "",
+                items: [selectedBillingAccount],
+                targetClassName: "",
+                targetClassIdentifier: ""
+            };
+            params.billingTemplate = billingTemplate;
         }
         let config: MatDialogConfig = new MatDialogConfig();
         config.autoFocus = false;

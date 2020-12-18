@@ -4,6 +4,7 @@ import { CookieUtilService } from "./cookie-util.service";
 import {Observable, Subject} from "rxjs";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../util/popup/dialogs.service";
+import {HttpUriEncodingCodec} from "./interceptors/http-uri-encoding-codec";
 
 @Injectable()
 export class ProtocolService {
@@ -94,13 +95,13 @@ export class ProtocolService {
         let params: HttpParams;
 
         if (idAnalysisType && idAnalysisType !== '') {
-            params = new HttpParams()
+            params = new HttpParams({encoder: new HttpUriEncodingCodec()})
                 .set('protocolName', protocolName)
                 .set('codeRequestCategory', '')
                 .set('protocolClassName', protocolClassName)
                 .set('idAnalysisType', idAnalysisType);
         } else {
-            params = new HttpParams()
+            params = new HttpParams({encoder: new HttpUriEncodingCodec()})
                 .set('protocolName', protocolName)
                 .set('codeRequestCategory', codeRequestCategory)
                 .set('protocolClassName', protocolClassName);
@@ -124,7 +125,7 @@ export class ProtocolService {
                                 protocolUrl: string): void {
         this.cookieUtilService.formatXSRFCookie();
 
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set('protocolName',        protocolName)
             .set('protocolDescription', protocolDescription)
             .set('idAnalysisType',      idAnalysisType)

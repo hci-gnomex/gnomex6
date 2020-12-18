@@ -19,6 +19,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../../services/constants.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
 
 
 @Component({
@@ -264,7 +265,7 @@ export class TabAnnotationViewComponent implements OnDestroy {
         this.currentUsers = [];
         let userObj = {idAppUser: this._experiment.idAppUser};
         this.currentUsers.push(userObj);
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idProperty", "")
             .set("name", this.form.get("customAnnot").value)
             .set("isActive", "Y")

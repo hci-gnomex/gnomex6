@@ -6,6 +6,7 @@ import {Dictionary} from "../configuration/dictionary.interface";
 import {DictionaryEntry} from "../configuration/dictionary-entry.type";
 import {CookieUtilService} from "./cookie-util.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
+import {HttpUriEncodingCodec} from "./interceptors/http-uri-encoding-codec";
 
 @Injectable()
 export class DictionaryService {
@@ -348,7 +349,7 @@ export class DictionaryService {
     public saveInstitutions(institutions: any[]): Observable<any> {
         let headers: HttpHeaders = new HttpHeaders()
             .set("Content-Type", "application/x-www-form-urlencoded");
-        let params: HttpParams = new HttpParams()
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("institutions", JSON.stringify(institutions))
             .set("noJSONToXMLConversionNeeded", "Y");
         return this.httpClient.post("/gnomex/SaveInstitution.gx", params.toString(), {headers: headers});
