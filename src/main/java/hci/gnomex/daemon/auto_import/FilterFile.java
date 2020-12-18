@@ -113,10 +113,14 @@ public class FilterFile {
 				//boolean processed  = hasXMLBeenProcessed(fullFileName,query, currentLine,dataPath);
 
 				// this creates a new de-identified file based off the given xml file
-				DeIdentifier.removePHI(currentLine);
+				boolean createdDeident = DeIdentifier.removePHI(currentLine);
 				fileList.add(currentLine);
-				fileList.add( path + fileName + ".deident.xml");
+				if(createdDeident){
+					fileList.add( path + fileName + ".deident.xml");
+				}
 
+			}else if(extension.equals("deident.xml")){
+				fileList.add( currentLine);
 			}else if(extension.equals("pdf")){
 				fileList.add(currentLine);
 			}else if (extList.contains("bam")) {
@@ -140,11 +144,6 @@ public class FilterFile {
 					md5File = new File(md5);
 					bamOrBiaFile = new File(currentLine);
 				}
-				if(currentLine.contains("ORD-0700198-01_DNA")){
-					System.out.print("found ");
-					System.out.println(currentLine);
-				}
-
 
 				if(bamOrBiaFile.exists() && md5File.exists()){
 					try {
@@ -161,9 +160,6 @@ public class FilterFile {
 		} // end of while
 
 		query.closeConnection();
-		System.out.print("key  /mnt/win/Results/ORD-0700198-01_DNA.bam  value:  ");
-		System.out.print(fContainer.getLargeFileValue("/mnt/win/Results/ORD-0700198-01_DNA.bam") );
-		System.out.println();
 
 		fContainer.makeLocalCheckSums(filterOutList,fileList);
 		fContainer.writeFilesList(remoteFileList, fileList );
