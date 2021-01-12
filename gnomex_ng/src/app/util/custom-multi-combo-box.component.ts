@@ -67,12 +67,14 @@ export class CustomMultiComboBoxComponent implements AfterViewInit, OnChanges, O
     @Input() private forceEmitObject: boolean = false;
     @Input() public displayField: string;
 
-    private outerControl: AbstractControl = new FormControl([]);
+    @Output() optionSelected: EventEmitter<any> = new EventEmitter<any>();
+
+    public outerControl: AbstractControl = new FormControl([]);
     public innerControl: FormControl = new FormControl("");
     private ignoreInnerControlChanges: boolean = false;
     private innerControlSubscription: Subscription;
     private noNgControl: boolean = false;
-    private selectedListItems: any[] = [];
+    public selectedListItems: any[] = [];
 
     private onChangeFn: (val: any) => void = () => {};
     private onTouchedFn: () => void = () => {};

@@ -1,0 +1,38 @@
+<div class="full-height full-width flex-container-col padded">
+    <div>
+        <img *ngIf="experiment?.requestCategory" [src]="experiment?.requestCategory.icon" alt="" class="icon">
+        Upload {{experiment?.requestCategory ? experiment?.requestCategory.display + ' ' : ' '}}experiment data from a third party facility
+    </div>
+    <div class="full-width flex-grow padded">
+        <mat-tab-group class="full-height full-width" [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="this.onTabChange()">
+            <mat-tab *ngFor="let tab of this.tabs; let i = index" class="full-height full-width overflow-auto" [label]="tab.label"
+                     [disabled]="this.checkTabDisabled(i)">
+                <ndc-dynamic class="full-height full-width" [ndcDynamicComponent]="tab.component" [ndcDynamicInputs]="inputs"></ndc-dynamic>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+    <div class="full-width flex-container-row justify-space-between">
+        <div class="flex-grow">
+        </div>
+        <div class="padded-left">
+            <button mat-raised-button (click)="promptToCancel()">Cancel</button>
+        </div>
+        <div class="padded-left">
+            <button mat-raised-button (click)="back()"
+                    [disabled]="selectedTabIndex === 0 || this.checkTabDisabled(selectedTabIndex - 1)">
+                <mat-icon>arrow_left</mat-icon> Back
+            </button>
+        </div>
+        <div class="padded-left">
+            <button *ngIf="!showSaveButton" mat-raised-button (click)="next()"
+                    [disabled]="selectedTabIndex === this.tabs.length - 1 || this.checkTabDisabled(selectedTabIndex + 1)">
+                <mat-icon>arrow_right</mat-icon> Next
+            </button>
+        </div>
+        <div class="padded-left">
+            <button *ngIf="showSaveButton" mat-raised-button (click)="save()" [disabled]="disableSave">
+                <img [src]="this.constantsService.ICON_SAVE" alt="" class="icon"> Save
+            </button>
+        </div>
+    </div>
+</div>
