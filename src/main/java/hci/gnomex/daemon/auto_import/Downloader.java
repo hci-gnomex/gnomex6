@@ -235,14 +235,16 @@ public class Downloader {
 		//xargs -P10 -I {} aws --profile tempus s3 cp {} " + this.downloadPath;
 
 		System.out.println(downloadCommand);
-		commands.add(downloadCommand);
+		if(fileNameMap.size() > 0){
+			commands.add(downloadCommand);
+		}
 		commands.add("mv -t " + this.downloadPath + " " + this.downloadPath + File.separator +  "Flagged" +File.separator +  "*" );
 		executeCommands(commands);
-		try {
-			Files.deleteIfExists(Paths.get(tempFile));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		try {
+//			Files.deleteIfExists(Paths.get(tempFile));
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
 		ArrayList<String> downloadedList = new ArrayList<String>();
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -331,7 +333,8 @@ public class Downloader {
 				}
 
 			}
-			System.out.println("Files to download after excluding already downloaded Flagged Files: " + fileNameMap.size() );
+			System.out.println("Files to download after excluding already downloaded Flagged Files: " + fileNameMap.size());
+
 
 			if(this.allowClearFile){
 				writeToFile(this.fileOfPaths, new ArrayList<String>());

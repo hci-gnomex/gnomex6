@@ -24,6 +24,7 @@ import {MultiSelectRenderer} from "./multi-select.renderer";
 import {UrlAnnotRenderer} from "./url-annot-renderer";
 import {ViewerLinkRenderer} from "./viewer-link.renderer";
 import {LinkButtonRenderer} from "./link-button.renderer";
+import {ImprovedSelectRenderer} from "./improved-select.renderer";
 
 @NgModule({
     imports: [
@@ -42,6 +43,7 @@ import {LinkButtonRenderer} from "./link-button.renderer";
         LinkButtonRenderer,
         MultipleLineTextRenderer,
 		RemoveLinkButtonRenderer,
+        ImprovedSelectRenderer,
 		SelectRenderer,
         SeqLibSelectRenderer,
         ShowErrorsShowSamplesRenderer,
@@ -65,6 +67,7 @@ import {LinkButtonRenderer} from "./link-button.renderer";
         LinkButtonRenderer,
         MultipleLineTextRenderer,
 		RemoveLinkButtonRenderer,
+        ImprovedSelectRenderer,
 		SelectRenderer,
         SeqLibSelectRenderer,
         ShowErrorsShowSamplesRenderer,

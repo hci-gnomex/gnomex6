@@ -126,8 +126,7 @@
                 <div class="wide-display">
                     {{ experimentAnnotation.name }}
                 </div>
-                <div class="flex-grow multiline-strings">
-                    {{ displayAnnotationValue(experimentAnnotation) }}
+                <div class="flex-grow multiline-strings" innerHTML="{{ displayAnnotationValue(experimentAnnotation) }}">
                 </div>
             </div>
         </div>

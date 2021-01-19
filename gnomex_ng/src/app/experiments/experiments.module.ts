@@ -74,6 +74,8 @@ import {TabExternalDescriptionComponent} from "./new-experiment/tab-external-des
 import {AmendExperimentOverviewComponent} from "./amend-experiment-overview.component";
 import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.component";
 import {AddAdditionalAccountsComponent} from "./new-experiment/add-additional-accounts.component";
+import {ImprovedSelectRenderer} from "../util/grid-renderers/improved-select.renderer";
+import {ImprovedSelectEditor} from "../util/grid-editors/improved-select.editor";
 
 @NgModule({
     imports: [
@@ -106,6 +108,8 @@ import {AddAdditionalAccountsComponent} from "./new-experiment/add-additional-ac
             IconRendererComponent,
             LinkButtonRenderer,
             MultipleLineTextRenderer,
+            ImprovedSelectEditor,
+            ImprovedSelectRenderer,
             SelectRenderer,
             TextAlignLeftMiddleRenderer,
             TextAlignRightMiddleRenderer,

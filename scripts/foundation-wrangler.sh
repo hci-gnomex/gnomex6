@@ -8,6 +8,8 @@ stagePath="/Repository/tempdownloads/foundation/Stage/"
 
 #The ? after the parens means it can optionally have the pattern
 regex=".*([TCQ]RF[0-9]+|ORD-[0-9]+-[0-9]{2})(.|_).*"
+diffRegex=".*((?:[TCQ]RF|ORD)-?[0-9]{6,7}-?(?:\d\d)?)_?(DNA|RNA)?\.(.*(?:pdf|xml|md5|bam|bai))\.?(?:S3.txt)?"
+
 
 filterRegex="(.*)([TCQ]RF[0-9]+|ORD-[0-9]+-[0-9]{2})([^\.]*)\.(.*)"
 
@@ -27,7 +29,8 @@ done
 
 for JAR in $GNOMEX_LIB/*.jar
 do
-    CLASSPATH="./processoutput4j-0.0.7.jar:./argparse4j-0.6.0.jar:./rsync4j-core-3.1.2-17.jar:./rsync4j-all-3.1.2-17.jar:$CLASSPATH:$JAR"
+    #CLASSPATH="./processoutput4j-0.0.7.jar:./argparse4j-0.6.0.jar:./rsync4j-core-3.1.2-17.jar:./rsync4j-all-3.1.2-17.jar:./gnomex1.jar:$CLASSPATH:$JAR"
+    CLASSPATH="$CLASSPATH:$JAR"
 done
 
 export CLASSPATH
@@ -41,6 +44,7 @@ fileList=""
 verifiedTrfInfo=""
 idStr=""
 
+
 #java hci.gnomex.daemon.auto_import.FileMover -accountFilesMoved $foundationPath -remotePath $remoteDataPath
 tree "$foundationPath" --noreport > "$pDataPath"localFoundationTree.out
 java hci.gnomex.daemon.auto_import.PathMaker "$pDataPath"localFoundationTree.out "$pDataPath"localFoundationPath.out
@@ -48,12 +52,13 @@ java hci.gnomex.daemon.auto_import.PathMaker "$pDataPath"localFoundationTree.out
 # exclude directory or file named Flagged only print out files
 find $remoteDataPath -name "Flagged" -prune -o -type f -print  > "$pDataPath"remoteFoundationPath.out
 
-java hci.gnomex.daemon.auto_import.DiffParser -local "$pDataPath"localFoundationPath.out -remote "$pDataPath"remoteFoundationPath.out > "$pDataPath"uniqueFilesToMove.out
+java hci.gnomex.daemon.auto_import.DiffParser -local "$pDataPath"localFoundationPath.out -remote "$pDataPath"remoteFoundationPath.out -matchByName $diffRegex -cp 1 3 > "$pDataPath"uniqueFilesToMove.out
 java hci.gnomex.daemon.auto_import.FilterFile "$pDataPath"uniqueFilesToMove.out "$pDataPath"fileList.out "$pDataPath"hci-creds.properties "$pDataPath"filteredOutList.out $filterRegex $remoteDataPath
-java hci.gnomex.daemon.auto_import.FileMover -accountFilesMoved "$pDataPath"fileList.out  -accountLoad -accountOutFile "$pDataPath"accountedUniqueFiles.out
+
+# notice remotePath is using the local foundation disk this is intentional in this case
+java hci.gnomex.daemon.auto_import.FileMover -accountFilesMoved "$pDataPath"fileList.out -remotePath $foundationPath  -accountOutFile "$pDataPath"accountedUniqueFiles.out -accountFilesFlag
 
 echo the diffing
-
 
 if [ "$flaggedIDParam" = "normal"  ]; then
 
@@ -84,10 +89,9 @@ while read fileName; do
                 if [ ! -z "$id" ]; then # If id variable is not empty
                         idStr+=$id","
                 fi
-                                #echo $id
         fi
 done < $fileList # has all new file names to import plus reattempts files
-echo $idStr | java  hci.gnomex.daemon.auto_import.StringModder > "$pDataPath"tempStr.out
+echo $idStr | java  hci.gnomex.daemon.auto_import.StringModder -strip "," > "$pDataPath"tempStr.out
 
 echo The temp str:
 cat "$pDataPath"tempStr.out
@@ -101,13 +105,19 @@ fi
 
 rm "$pDataPath"tempStr.out
 
-
 java hci.gnomex.daemon.auto_import.XMLParserMain -file $verifiedTrfInfo -initXML "$pDataPath"clinRequest.xml -annotationXML "$pDataPath"clinGetPropertyList.xml -importScript import_experiment.sh -outFile "$pDataPath"tempRequest.xml -importMode foundation
 java hci.gnomex.daemon.auto_import.FileMover -file $fileList  -root $foundationPath -downloadPath $remoteDataPath -flaggedFile "$pDataPath"flaggedIDs.out -mode foundation  -log "$pDataPath""log" -stagePath $stagePath -linkFolder
 
-#rm "$pDataPath"tempAnalysisList.out
+
+tempusRequestList=`cat "$pDataPath"tempRequestList.out`
+tempusAnalysisList=`cat "$pDataPath"tempAnalysisList.out`
+echo This is the sample regex $sampleIdRegex
+bash register_files.sh -doNotSendMail -onlyExperiment
+bash linkData.sh -dataSource 2R -linkFolder -debug  -requests $tempusRequestList
+bash register_files.sh -doNotSendMail -onlyExperiment
+bash linkFastqData.sh -debug -linkFolder -analysis $tempusAnalysisList
+bash index_gnomex.sh
+rm "$pDataPath"tempRequestList.out
+rm "$pDataPath"tempAnalysisList.out
+
 echo ------------------------------------------------------------------------------------------------------------
-#cat matched.txt | java -jar fileNavParser.jar
-#rm ../Data/matched.txt
-#rm catList.txt
-#java hci.gnomex.daemon.auto_import.DiffParser "$pDataPath"localChecksums.out  "$pDataPath"remoteChecksums.out "$pDataPath"

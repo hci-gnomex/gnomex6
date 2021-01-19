@@ -47,7 +47,9 @@ export class AnalysisDescriptionTabComponent implements OnInit, OnChanges {
 
         this.editorConfig = {
             spellcheck: true,
-            height: "25em",
+            minHeight: "20em",
+            height: "auto",
+            maxHeight: "auto",
             enableToolbar: true,
         };
 
