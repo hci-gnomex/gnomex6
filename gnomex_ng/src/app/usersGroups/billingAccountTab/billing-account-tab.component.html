@@ -1,7 +1,7 @@
 <div class="full-width full-height flex-container-col padded-left-right-top">
 	<div class="full-width flex-container-row">
-		<div class="flex-container-col">
-			<div class="full-width flex-container-row align-center">
+		<div class="flex-container-col full-width">
+			<div class="flex-container-row align-center">
 				<div class="medium-width padded-left-right-top">
 					<custom-combo-box placeholder="Select Core Facility"
 									  [(ngModel)]="selectedCoreFacility"
@@ -16,6 +16,15 @@
 				</div>
 				<div class="padded-left">
 					<button mat-raised-button (click)="onCopyAccountsClicked()">Copy Accounts From Other Cores</button>
+				</div>
+				<div class="flex-grow">
+				</div>
+				<div class="padded">
+					<mat-radio-group [(ngModel)]="gridFilterRadioValue" class="flex-container-col padded" (change)="onGridFilterChange($event)">
+						<mat-radio-button [value]="ALL" class="padded-left-right">All accounts</mat-radio-button>
+						<mat-radio-button [value]="ACTIVE" class="padded-left-right">Show active accounts only</mat-radio-button>
+						<mat-radio-button [value]="PENDING" class="padded-left-right">Show pending accounts only</mat-radio-button>
+					</mat-radio-group>
 				</div>
 			</div>
 			<div *ngIf="showAddAccountBox" class="full-width small-font">
