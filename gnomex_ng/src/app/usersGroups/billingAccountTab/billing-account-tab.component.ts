@@ -84,6 +84,10 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 	readonly PO:          string = 'PO';
 	readonly CREDIT_CARD: string = 'CREDIT_CARD';
 
+    public readonly ALL:     string = 'ALL';
+    public readonly ACTIVE:  string = 'ACTIVE';
+    public readonly PENDING: string = 'PENDING';
+
 	private _labInfo: any;
 
 	public tabFormGroup: FormGroup = new FormGroup({});
@@ -109,6 +113,8 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
     }
 
 	private _isDirty: boolean = false;
+
+	public gridFilterRadioValue: string = 'ALL';
 
 	public coreFacilities: any[];
 	selectedCoreFacility: any;
@@ -173,6 +179,10 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 
     private _showCreditCard: boolean = false;
 
+    private allChartfieldRowData: any[];
+    private allPORowData: any[];
+    private allCreditCardRowData: any[];
+
     public get showCreditCard(): boolean {
         return this._showCreditCard;
     }
@@ -185,6 +195,7 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
                 private idGenerator: UniqueIdGeneratorService,
                 private propertyService: PropertyService) {
 
+        this.gridFilterRadioValue = this.ALL;
 		this.context = { componentParent: this };
 	}
 
@@ -1126,8 +1137,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 				shownGridData = [];
 			}
 
-			this.chartfieldGridApi.setRowData(shownGridData);
-			this.chartfieldGridApi.setColumnDefs(this.getChartfieldColumnDefs(shownGridData));
+            this.allChartfieldRowData = shownGridData;
+			this.chartfieldGridApi.setRowData(this.allChartfieldRowData);
+			this.chartfieldGridApi.setColumnDefs(this.getChartfieldColumnDefs(this.allChartfieldRowData));
 			this.chartfieldGridApi.sizeColumnsToFit();
 
 			if (this.tabFormGroup && this.chartfieldGridApi && this.chartfieldGridApi.formGroup) {
@@ -1162,8 +1174,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 				shownGridData = [];
 			}
 
-			this.poGridApi.setRowData(shownGridData);
-			this.poGridApi.setColumnDefs(this.getPoColumnDefs(shownGridData));
+			this.allPORowData = shownGridData;
+			this.poGridApi.setRowData(this.allPORowData);
+			this.poGridApi.setColumnDefs(this.getPoColumnDefs(this.allPORowData));
 			this.poGridApi.sizeColumnsToFit();
 
             if (this.tabFormGroup && this.poGridApi && this.poGridApi.formGroup) {
@@ -1198,8 +1211,9 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
 				shownGridData = [];
 			}
 
-			this.creditCardGridApi.setColumnDefs(this.getCreditCardColumnDefs(shownGridData));
-			this.creditCardGridApi.setRowData(shownGridData);
+            this.allCreditCardRowData = shownGridData;
+			this.creditCardGridApi.setColumnDefs(this.getCreditCardColumnDefs(this.allCreditCardRowData));
+			this.creditCardGridApi.setRowData(this.allCreditCardRowData);
 			this.creditCardGridApi.sizeColumnsToFit();
 
             if (this.tabFormGroup && this.creditCardGridApi && this.creditCardGridApi.formGroup) {
@@ -1713,5 +1727,31 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
     }
     private markAsDirty(): void {
         this.isDirty = true;
+    }
+
+    public onGridFilterChange(event: any): void {
+        if (event && event.source && event.source.value) {
+            if (event.source.value === this.ALL) {
+                this.chartfieldGridApi.setRowData(this.allChartfieldRowData);
+                this.poGridApi.setRowData(this.allPORowData);
+                this.creditCardGridApi.setRowData(this.allCreditCardRowData);
+            } else if (event.source.value === this.ACTIVE) {
+                let filterFunction = (a: any) => {
+                    return a && a.isActive && a.isActive === "Y" && a.isApproved && a.isApproved === "Y";
+                };
+
+                this.chartfieldGridApi.setRowData(this.allChartfieldRowData.filter(filterFunction));
+                this.poGridApi.setRowData(this.allPORowData.filter(filterFunction));
+                this.creditCardGridApi.setRowData(this.allCreditCardRowData.filter(filterFunction));
+            } else if (event.source.value === this.PENDING) {
+                let filterFunction = (a: any) => {
+                    return a && (!a.isApproved || a.isApproved === "N");
+                };
+
+                this.chartfieldGridApi.setRowData(this.allChartfieldRowData.filter(filterFunction));
+                this.poGridApi.setRowData(this.allPORowData.filter(filterFunction));
+                this.creditCardGridApi.setRowData(this.allCreditCardRowData.filter(filterFunction));
+            }
+        }
     }
 }
