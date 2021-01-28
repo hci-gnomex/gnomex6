@@ -111,8 +111,9 @@ public class IdAssociator {
             List<String> queryValueList = entry.getValue();
             List<String> targetValueList = allIDMap.get(queryKey);
             if(targetValueList == null){
-                System.out.println("The flagged id "  + queryKey + "  considered to be a subset of the AllIDs but wasn't found. Something is wrong");
-                System.exit(1);
+//                System.out.println("The flagged id "  + queryKey + "  considered to be a subset of the AllIDs but wasn't found. Something is wrong");
+//                System.exit(1);
+                continue;
             }
 
             if(targetValueList.size() > queryValueList.size()){
