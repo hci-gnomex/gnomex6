@@ -230,6 +230,12 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
         } else if(data.Request) {
             flatRequestList = Array.isArray(data.Request) ? data.Request : [data.Request];
             flatRequestList.forEach(rObj => {
+                this.getExperimentKind(rObj);
+                rObj["ownerFullName"] = this.prefService.formatUserName(rObj.ownerFirstName, rObj.ownerLastName);
+                rObj["analysisChecked"] = rObj.analysisNames !== "" ? "Y" : "N";
+
+                flatRequestList.push(rObj);
+
                 this.experimentIdSet.add(rObj.requestNumber);
             });
         }
