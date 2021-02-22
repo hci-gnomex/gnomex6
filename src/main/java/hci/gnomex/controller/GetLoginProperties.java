@@ -59,6 +59,14 @@ public class GetLoginProperties extends HttpServlet {
                 useDuo = true;
             }
 
+            String duoExceptions = "none";
+            if (useDuo) {
+                PropertyDictionary duoExceptionsProp = (PropertyDictionary) sess.createQuery("from PropertyDictionary p where p.propertyName='" + PropertyDictionary.DUOEXCEPTIONS + "'").uniqueResult();
+                if (duoExceptionsProp != null) {
+                    duoExceptions = duoExceptionsProp.getPropertyValue();
+                }
+            }
+
             String useDuostr = "no";
             if (useDuo) {
                 useDuostr = "yes";
@@ -115,6 +123,7 @@ public class GetLoginProperties extends HttpServlet {
                     .add("skey", skey)
                     .add("akey", akey)
                     .add("duohost", duoHost)
+                    .add(PropertyDictionary.DUOEXCEPTIONS, duoExceptions)
                     .add(PropertyDictionary.NO_PUBLIC_VISIBILITY, noPublicAccess)
                     .add(PropertyDictionary.MAINTENANCEMODE, maintenanceMode)
                     .add(PropertyDictionary.MAINTENANCE_SPLASH, maintenanceSplash)

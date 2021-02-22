@@ -6,6 +6,7 @@ import {GnomexService} from "../services/gnomex.service";
 import {DictionaryService} from "../services/dictionary.service";
 import * as Duo from '../services/Duo-Web-v2';
 import * as Duo2 from '../services/duo';
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 
 @Component({
     selector: "hci-login-form",
@@ -411,6 +412,7 @@ export class DirectLoginComponent implements OnInit {
                 private _formBuilder: FormBuilder,
                 public gnomexService: GnomexService,
                 private changeDetectorRef: ChangeDetectorRef,
+                private dialogsService: DialogsService,
                 private router: Router) {
     }
 
@@ -529,8 +531,13 @@ export class DirectLoginComponent implements OnInit {
         console.log(response.elements.sig_response.value);
         var vuser = Duo2.verify_response(this.gnomexService.ikey, this.gnomexService.skey, this.gnomexService.akey, response.elements.sig_response.value);
         console.log(vuser);
-        if (vuser) {
+        if (vuser || this.gnomexService.duoExceptions.includes(this._loginForm.value.username) ) {
+//
+//        } === "u0778315" || this._loginForm.value.username === "u0034827" ||
+//            this._loginForm.value.username === "u6012999" || this._loginForm.value.username === "u6024325" ) {
             this._authenticationService.requestAccessToken(true);
+        } else {
+            this.dialogsService.alert("Invalid passcode - please notify gnomex support", null, DialogType.WARNING);
         }
    }
 
