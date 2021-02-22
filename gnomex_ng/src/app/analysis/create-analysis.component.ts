@@ -60,6 +60,7 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
     public genomeBuildList: any[] = [];
     public showOwnerComboBox: boolean = false;
     public ownerList: any[] = [];
+    public managerList: any[] = [];
     public newAnalysisGroup: boolean = false;
     public createAnalysisForm: FormGroup;
     public primaryDisable: (action?: GDAction) => boolean;
@@ -195,6 +196,8 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
         if (event) {
             this.analysisGroupList = [];
             this.ownerList = [];
+            this.managerList = [];
+
 
             this.dialogsService.startDefaultSpinnerDialog();
 
@@ -203,6 +206,11 @@ export class CreateAnalysisComponent extends BaseGenericContainerDialog implemen
                 this.getLabService.getLabByIdOnlyForHistoricalOwnersAndSubmitters(this.idLabString).subscribe((response: any) => {
                     if(response && response.Lab && response.Lab.members) {
                         this.ownerList = UtilService.getJsonArray(response.Lab.members, response.Lab.members.AppUser);
+                        this.managerList = UtilService.getJsonArray(response.Lab.managers, response.Lab.managers.AppUser);
+
+                        for (var ii = 0; ii < this.managerList.length; ii++) {
+                            this.ownerList.push(this.managerList[ii]);
+                        }
                     }
                 });
             }
