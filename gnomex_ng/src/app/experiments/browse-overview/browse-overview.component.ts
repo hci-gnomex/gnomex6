@@ -196,6 +196,7 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
 
     getExperiments(data: any): Array<any> {
         let flatRequestList: Array<any> = [];
+        let tflatRequestList: Array<any> = [];
         if(!data) {
             return flatRequestList;
         }
@@ -228,8 +229,8 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
                 }
             });
         } else if(data.Request) {
-            flatRequestList = Array.isArray(data.Request) ? data.Request : [data.Request];
-            flatRequestList.forEach(rObj => {
+            tflatRequestList = Array.isArray(data.Request) ? data.Request : [data.Request];
+            tflatRequestList.forEach(rObj => {
                 this.getExperimentKind(rObj);
                 rObj["ownerFullName"] = this.prefService.formatUserName(rObj.ownerFirstName, rObj.ownerLastName);
                 rObj["analysisChecked"] = rObj.analysisNames !== "" ? "Y" : "N";
