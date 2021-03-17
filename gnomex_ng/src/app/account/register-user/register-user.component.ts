@@ -9,6 +9,7 @@ import {UserService} from "../../services/user.service";
 import {HttpParams} from "@angular/common/http";
 import {invalidExternalUsrName} from "../../util/validators/invalid-external-username.validator";
 import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
+import {ConstantsService} from "../../services/constants.service";
 
 @Component({
 
@@ -225,7 +226,6 @@ export class RegisterUserComponent  implements OnInit, OnDestroy{
     public siteLogo: string;
     public formGroup: FormGroup;
     private newLabGroupTemplate: any;
-    private emailRegex: RegExp  = /^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/;
     private externalToGroupTemplate: any;
     public color: string = "primary";
     private idCoreFacility: string;
@@ -247,13 +247,13 @@ export class RegisterUserComponent  implements OnInit, OnDestroy{
             newLabFirstName: ['', Validators.required],
             newLabLastName: ['', Validators.required],
             department: [''],
-            contactEmail: ['', [Validators.required, Validators.pattern(this.emailRegex)]],
+            contactEmail: ['', [Validators.required, Validators.pattern(ConstantsService.emailRegex)]],
             contactPhone: ['', Validators.required],
         };
         this.formGroup = this.fb.group({
             firstName: ['', Validators.required],
             lastName: ['', Validators.required],
-            email: ['', [Validators.required, Validators.pattern(this.emailRegex)]],
+            email: ['', [Validators.required, Validators.pattern(ConstantsService.emailRegex)]],
             phone: ['', Validators.required],
             labToggler: false,
             labDropdown: ['', Validators.required],
