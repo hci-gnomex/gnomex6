@@ -57,8 +57,6 @@ java hci.gnomex.daemon.auto_import.DiffParser  -local "$pDataPath"localTempusPat
 cat "$pDataPath"uniqueTempusSmallFile.out "$pDataPath"uniqueTempusFastq.out > "$pDataPath"uniqueTempusFilesToDownload.out
 
 java hci.gnomex.daemon.auto_import.DownloadMain -fileList "$pDataPath"uniqueTempusFilesToDownload.out -downloadPath "$downloadPath" -mode tempus -filterRegex $filterRegex -alias $alias
-
-
 # need to filter out from uniqueTempusFilesToDownload reattempt flagged files here
 
 rm "$pDataPath"tempusJson.out
@@ -68,7 +66,8 @@ rm "$pDataPath"tempusFastq.out
 #cat "$pDataPath"uniqueTempusFilesToDownload.out |  parallel -j 10 aws s3 --profile tempus cp {} $downloadPath
 #cat "$pDataPath"uniqueTempusFilesToDownload.out |  xargs -P10 -I {}  aws --profile tempus s3 cp {} $downloadPath
 #convert all empty object to arrays so doesn't break json parser
-find "$downloadPath" -type f -name "*.json" -print0 | xargs -0 sed -i 's/{}/[]/g'
+#find "$downloadPath" -type f -name "*.json" -print0 | xargs -0 sed -i 's/{}/[]/g'
+
 fileArray=()
 while read line; do
         #echo show everytime $line
@@ -92,8 +91,7 @@ while read line; do
 
 
                 path=$(dirname -- "$line")
-                pathNucType=$([[ $path =~ ^.*(DNA|RNA)?.*$ ]] && echo "${BASH_REMATCH[1]}") #get from path, is DNA or RNA or neither
-
+                pathNucType=$([[ $path =~ .*/(DNA|RNA)?/.*|(\.) ]] && echo "${BASH_REMATCH[1]}") #get from path, is DNA or RNA or neither
                 #ternary like
                 #only doing this for fastq not checksum because we don't untar checksum
                 echo nuc type before and path correction $matchNucType
@@ -191,8 +189,8 @@ cat "$pDataPath"importableTempusFileList1.out > "$pDataPath"importableTempusFile
 
 #rm "$pDataPath"localTempus*
 #rm "$pDataPath"remoteTempus*
-java -jar "./tempus-persistence.jar"  -json "$pDataPath"importableTempusFileList.out -cred "$pDataPath"tempus-cred-prod.properties -deidentjson "$pDataPath"hello.txt -download "$downloadPath" -out "$pDataPath"tlInfo.out -log "$pDataPath""log/"tempus.log
-#java hci.ri.tempus.model.TempusPersistenceMain  -json "$pDataPath"importableTempusFileList.out -cred "$pDataPath"tempus-cred.properties -deidentjson "$pDataPath"hello.txt -download "$downloadPath" -out "$pDataPath"tlInfo.out
+java -jar "./tempus-persistence.jar"  -json "$pDataPath"importableTempusFileList.out -cred "$pDataPath"tempus-cred-prod.properties -download "$downloadPath" -out "$pDataPath"tlInfo.out -log "$pDataPath""log/"tempus.log -ld "$pDataPath"localTempusPath.out
+#java hci.ri.tempus.model.TempusPersistenceMain  -json "$pDataPath"importableTempusFileList.out -cred "$pDataPath"tempus-cred.properties -deidentjson "$pDataPath"hello.txt -download "$downloadPath" -out "$pDataPath"tlInfo.out -ld "$pDataPath"localTempusPath.out
 
 java hci.gnomex.daemon.auto_import.XMLParserMain -file "$pDataPath"tlInfo.out -initXML "$pDataPath"clinRequest.xml -annotationXML "$pDataPath"clinGetPropertyList.xml -importScript import_experiment.sh -outFile "$pDataPath"tempRequest.xml -importMode tempus
 java hci.gnomex.daemon.auto_import.IdAssociator -ids "$pDataPath"importableTempusFileList.out -flaggedIds "$pDataPath"flaggedIDs.out -pr 1 -regex $associateIDRegex -joinGroup  dna n-dsq dna t-dsq rna t-rsq > "$pDataPath"finalFlaggedIDs.out
