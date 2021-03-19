@@ -1,81 +1,75 @@
 import {Component, OnDestroy, OnInit, QueryList, Type, ViewChildren} from "@angular/core";
-import {NewExternalExperimentService} from "../../services/new-external-experiment.service";
-import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {Router} from "@angular/router";
+import {FormGroup} from "@angular/forms";
+import {DynamicComponent} from "ng-dynamic-component";
+
+import {BehaviorSubject, forkJoin, Observable, Subscription} from "rxjs";
+
+import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {Experiment} from "../../util/models/experiment.model";
 import {ExperimentsService} from "../experiments.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {PropertyService} from "../../services/property.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {forkJoin, Observable, Subscription} from "rxjs";
 import {UtilService} from "../../services/util.service";
 import {TabExternalDescriptionComponent} from "./tab-external-description.component";
 import {TabExternalSetupComponent} from "./tab-external-setup.component";
 import {TabAnnotationViewComponent} from "./tab-annotation-view.component";
 import {TabSamplesIlluminaComponent} from "./tab-samples-illumina.component";
 import {TabVisibilityComponent} from "./tab-visibility.component";
-import {DynamicComponent} from "ng-dynamic-component";
 import {TabConfirmIlluminaComponent} from "./tab-confirm-illumina.component";
 import {ConstantsService} from "../../services/constants.service";
 import {TopicService} from "../../services/topic.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 
+
 @Component({
     selector: 'new-external-experiment',
-    template: `
-        <div class="full-height full-width flex-container-col padded">
-            <div>
-                <img *ngIf="newEEService.experiment?.requestCategory" [src]="newEEService.experiment?.requestCategory.icon" class="icon">
-                Upload {{newEEService.experiment?.requestCategory ? newEEService.experiment?.requestCategory.display + ' ' : ''}}experiment data from a third party facility
-            </div>
-            <div class="full-width flex-grow padding-light">
-                <mat-tab-group class="full-height full-width" [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="this.onTabChange()">
-                    <mat-tab *ngFor="let tab of this.tabs; let i = index" class="full-height full-width overflow-auto" [label]="tab.label"
-                             [disabled]="this.checkTabDisabled(i)">
-                        <ndc-dynamic class="full-height full-width" [ndcDynamicComponent]="tab.component" [ndcDynamicInputs]="newEEService.inputs"></ndc-dynamic>
-                    </mat-tab>
-                </mat-tab-group>
-            </div>
-            <div class="full-width flex-container-row justify-space-between">
-                <div class="spaced-children-margin">
-                    <button mat-raised-button (click)="back()"
-                            [disabled]="selectedTabIndex === 0 || this.checkTabDisabled(selectedTabIndex - 1)">
-                        <mat-icon>arrow_left</mat-icon>Back
-                    </button>
-                    <button mat-raised-button (click)="next()"
-                            [disabled]="selectedTabIndex === this.tabs.length - 1 || this.checkTabDisabled(selectedTabIndex + 1)">
-                        <mat-icon>arrow_right</mat-icon>Next
-                    </button>
-                    <button mat-raised-button (click)="save()" [disabled]="this.newEEService.form.invalid || selectedTabIndex !== this.tabs.length - 1">
-                        <img [src]="this.constantsService.ICON_SAVE" class="icon">Save
-                    </button>
-                </div>
-                <div>
-                    <button mat-raised-button (click)="promptToCancel()">Cancel</button>
-                </div>
-            </div>
-        </div>
-    `,
-    styles: [`
-        .padding-light {
-            padding: 0.5em;
-        }
-    `]
+    templateUrl: "./new-external-experiment.component.html",
+    styles: [``]
 })
-
 export class NewExternalExperimentComponent implements OnInit, OnDestroy {
+
+    @ViewChildren(DynamicComponent) tabsRef: QueryList<DynamicComponent>;
 
     public selectedTabIndex: number = 0;
     public tabs: DynamicTab[] = [];
     private tabsRefArray: DynamicComponent[] = [];
 
+    public inputs: any = {};
+
+    public form: FormGroup = new FormGroup({});
+
+    public stateChangeSubject: BehaviorSubject<string> = new BehaviorSubject<string>("NEW");
+
     private requestCategorySubscription: Subscription;
 
-    @ViewChildren(DynamicComponent) tabsRef: QueryList<DynamicComponent>;
 
-    constructor(public newEEService: NewExternalExperimentService,
-                public constantsService: ConstantsService,
+    private _experiment: Experiment;
+
+    public get experiment(): Experiment {
+        return this._experiment;
+    }
+
+    public set experiment(experiment: Experiment) {
+        this._experiment = experiment;
+        this.inputs = {
+            experiment: this._experiment,
+            stateChangeSubject: this.stateChangeSubject,
+        };
+    }
+
+    public get disableSave(): boolean {
+        return this.form.invalid || this.selectedTabIndex !== this.tabs.length - 1;
+    }
+
+    public get showSaveButton(): boolean {
+        return !this.disableSave;
+    }
+
+
+    constructor(public constantsService: ConstantsService,
                 private dictionaryService: DictionaryService,
                 private gnomexService: GnomexService,
                 private propertyService: PropertyService,
@@ -83,48 +77,72 @@ export class NewExternalExperimentComponent implements OnInit, OnDestroy {
                 private dialogsService: DialogsService,
                 private router: Router,
                 private topicService: TopicService,
-                private experimentService: ExperimentsService) {
-    }
+                private experimentService: ExperimentsService) { }
 
     ngOnInit(): void {
-        this.newEEService.initialize();
-        this.tabs = [
-            {
-                label: "Setup",
-                component: TabExternalSetupComponent,
-                formField: "form",
-            }
-        ];
+        this.experiment = null;
+        this.inputs = {};
+
+        this.form = new FormGroup({
+            "Setup": new FormGroup({}),
+            "Description": new FormGroup({}),
+            "Annotations": new FormGroup({}),
+            "Samples": new FormGroup({}),
+            "Visibility": new FormGroup({}),
+            "Confirm": new FormGroup({}),
+        });
+
+        this.tabs = [{
+            label: "Setup",
+            component: TabExternalSetupComponent,
+            formField: "form",
+        }];
+
         setTimeout(() => {
+
             this.tabsRefArray = this.tabsRef.toArray();
-        });
 
-        this.experimentService.getNewRequest().subscribe((response: any) => {
-            if (!response) {
-                this.dialogsService.error("Unable to create new experiment. Please contact GNomEx Support");
-                return;
-            }
+            this.dialogsService.startDefaultSpinnerDialog();
 
-            this.newEEService.experiment = Experiment.createExperimentObjectFromAny(this.dictionaryService, this.gnomexService, this.propertyService, this.securityAdvisor, response.Request);
-            this.newEEService.experiment.isExternal = "Y";
-            this.requestCategorySubscription = this.newEEService.experiment.onChange_requestCategory.subscribe(() => {
-                this.refreshTabs();
-                setTimeout(() => {
-                    this.tabsRefArray = this.tabsRef.toArray();
-                    for (let index: number = 0; index < this.tabs.length; index++) {
-                        if (this.tabs[index].formField) {
-                            this.newEEService.setForm(this.tabs[index].label, this.tabsRefArray[index].componentRef.instance[this.tabs[index].formField]);
+            this.experimentService.getNewRequest().subscribe((response: any) => {
+                if (!response) {
+                    this.dialogsService.error("Unable to create new experiment. Please contact GNomEx Support");
+                    return;
+                }
+
+                this.experiment = Experiment.createExperimentObjectFromAny(this.dictionaryService, this.gnomexService, this.propertyService, this.securityAdvisor, response.Request);
+                this.experiment.isExternal = "Y";
+
+                this.requestCategorySubscription = this.experiment.onChange_requestCategory.subscribe(() => {
+                    this.refreshTabs();
+                    setTimeout(() => {
+                        this.tabsRefArray = this.tabsRef.toArray();
+                        for (let index: number = 0; index < this.tabs.length; index++) {
+                            if (this.tabs[index].formField) {
+                                this.form.setControl(this.tabs[index].label, this.tabsRefArray[index].componentRef.instance[this.tabs[index].formField]);
+                            }
                         }
-                    }
+                    });
                 });
+
+                this.dialogsService.stopAllSpinnerDialogs();
+            }, (err: IGnomexErrorResponse) => {
+                console.error(err);
+                this.dialogsService.stopAllSpinnerDialogs();
             });
-        }, (err: IGnomexErrorResponse) => {
         });
+
+
     }
+
+    ngOnDestroy(): void {
+        UtilService.safelyUnsubscribe(this.requestCategorySubscription);
+    }
+
 
     public checkTabDisabled(index: number): boolean {
         if (index > 0) {
-            return this.newEEService.form.get(this.tabs[index - 1].label).invalid || this.checkTabDisabled(index - 1);
+            return this.form.get(this.tabs[index - 1].label).invalid || this.checkTabDisabled(index - 1);
         } else {
             return false;
         }
@@ -133,7 +151,8 @@ export class NewExternalExperimentComponent implements OnInit, OnDestroy {
     private refreshTabs(): void {
         this.selectedTabIndex = 0;
         let newTabs: DynamicTab[] = this.tabs.slice(0, 1);
-        if (this.newEEService.experiment.requestCategory) {
+
+        if (this.experiment.requestCategory) {
             let descriptionTab: DynamicTab = {
                 label: "Description",
                 component: TabExternalDescriptionComponent,
@@ -160,7 +179,7 @@ export class NewExternalExperimentComponent implements OnInit, OnDestroy {
                 formField: "form",
             };
 
-            if (this.newEEService.experiment.requestCategory.isIlluminaType === "Y") {
+            if (this.experiment.requestCategory.isIlluminaType === "Y") {
                 newTabs.push(...[
                     descriptionTab,
                     annotationsTab,
@@ -170,33 +189,20 @@ export class NewExternalExperimentComponent implements OnInit, OnDestroy {
                 ]);
             }
         }
+
         this.tabs = newTabs;
-    }
-
-    public onTabChange(): void {
-        if (this.tabsRefArray[this.selectedTabIndex].componentRef.instance.tabDisplayed) {
-            this.tabsRefArray[this.selectedTabIndex].componentRef.instance.tabDisplayed();
-        }
-    }
-
-    public back(): void {
-        this.selectedTabIndex--;
-    }
-
-    public next(): void {
-        this.selectedTabIndex++;
     }
 
     public save(): void {
         let sequenceLanes: any[] = [];
-        for (let sample of this.newEEService.experiment.samples) {
+        for (let sample of this.experiment.samples) {
             sequenceLanes.push(sample.createSequenceLane());
         }
-        this.newEEService.experiment.sequenceLanes = sequenceLanes;
+        this.experiment.sequenceLanes = sequenceLanes;
 
-        this.experimentService.saveRequest(this.newEEService.experiment).subscribe((result: any) => {
+        this.experimentService.saveRequest(this.experiment).subscribe((result: any) => {
             if (result && result.idRequest) {
-                let topicsToLinkTo: any[] = this.newEEService.experiment.topics;
+                let topicsToLinkTo: any[] = this.experiment.topics;
                 if (topicsToLinkTo && topicsToLinkTo.length > 0) {
                     let linkingCalls: Observable<any>[] = [];
                     for (let topic of topicsToLinkTo) {
@@ -225,10 +231,20 @@ export class NewExternalExperimentComponent implements OnInit, OnDestroy {
         });
     }
 
-    ngOnDestroy(): void {
-        UtilService.safelyUnsubscribe(this.requestCategorySubscription);
+
+    public next(): void {
+        this.selectedTabIndex++;
     }
 
+    public back(): void {
+        this.selectedTabIndex--;
+    }
+
+    public onTabChange(): void {
+        if (this.tabsRefArray[this.selectedTabIndex].componentRef.instance.tabDisplayed) {
+            this.tabsRefArray[this.selectedTabIndex].componentRef.instance.tabDisplayed();
+        }
+    }
 }
 
 interface DynamicTab {
