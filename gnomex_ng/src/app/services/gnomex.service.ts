@@ -105,8 +105,10 @@ export class GnomexService {
     public akey: string;
     public useduo: boolean;
     private useduostr: string;
+    public duoExceptions: string;
 
     public showUsageOnStartUp: string = 'N';
+    public theUsername: string = '';
 
 
     constructor(
@@ -1019,6 +1021,7 @@ export class GnomexService {
                 this.skey = response["skey"];
                 this.akey = response["akey"];
                 this.duo_host = response["duohost"];
+                this.duoExceptions = response[PropertyService.PROPERTY_DUOEXCEPTIONS];
                 this.maintenanceMode = response[PropertyService.PROPERTY_MAINTENANCEMODE];
                 this.maintenanceSplash = response[PropertyService.PROPERTY_MAINTENANCE_SPLASH];
                 if (this.maintenanceMode) {

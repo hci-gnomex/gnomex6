@@ -5,10 +5,11 @@
 @import '~ag-grid-community/dist/styles/ag-theme-balham.css';
 @import './gnomex-app-color.css';
 
-:host ::ng-deep.mat-tab-label.mat-tab-label-active {
-    min-width: 0!important;
-    font-size: 12px!important;
-}
+
+/*:host ::ng-deep.mat-tab-label.mat-tab-label-active {*/
+    /*min-width: 0!important;*/
+    /*font-size: 12px!important;*/
+/*}*/
 
 
 html {

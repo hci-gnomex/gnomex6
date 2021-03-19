@@ -105,7 +105,7 @@ public class Constants {
 	    ".cram.crai",
         ".cram",".crai",
 		".bam", ".bai", ".useq", ".bb", ".bw", ".bed", ".bgr", ".brs", ".gff", ".gtf", ".vcf.gz", ".vcf.gz.tbi",
-		".narrowPeak", ".broadPeak", ".gappedPeak", ".ped" };
+		".narrowPeak", ".broadPeak", ".gappedPeak", ".ped", ".bed.gz", ".bed.gz.tbi" };
 
   public static final String[] DATATRACK_FILE_EXTENSIONS_NO_INDEX = new String[] { ".bam", ".cram",".useq", ".bb", ".bw", ".bed",
 		".bgr", ".brs", ".gff", ".gtf", ".vcf.gz", ".narrowPeak", ".broadPeak", ".gappedPeak", ".ped" };
@@ -113,12 +113,12 @@ public class Constants {
   public static final String[] FILE_EXTENSIONS_TO_CHECK_SIZE_BEFORE_UPLOADING = new String[] { ".bed", ".bgn", ".gff", ".gtf", ".psl", };
 
   /** xxx.ext for bigBed, bigWig, bam that can be accessed via http. */
-  public static final String[] FILE_EXTENSIONS_FOR_UCSC_LINKS                 = new String[] { ".bb", ".bw", ".bam", ".bai", ".cram", ".crai",".vcf.gz", ".vcf.gz.tbi", ".useq", ".narrowPeak", ".broadPeak", ".gappedPeak"};
+  public static final String[] FILE_EXTENSIONS_FOR_UCSC_LINKS                 = new String[] { ".bb", ".bw", ".bam", ".bai", ".cram", ".crai",".vcf.gz", ".vcf.gz.tbi", ".useq", ".narrowPeak", ".broadPeak", ".gappedPeak", ".bed.gz", ".bed.gz.tbi" };
 
   /** xxx.ext for bigBed, bigWig, bam that can be accessed via http. */
-  public static final String[] FILE_EXTENSIONS_FOR_UCSC_LINKS_NO_INDEX        = new String[] { ".bb", ".bw", ".bam", ".cram",".vcf.gz", ".useq", ".narrowPeak", ".broadPeak", ".gappedPeak" };
+  public static final String[] FILE_EXTENSIONS_FOR_UCSC_LINKS_NO_INDEX        = new String[] { ".bb", ".bw", ".bam", ".cram",".vcf.gz", ".useq", ".narrowPeak", ".broadPeak", ".gappedPeak", ".bed.gz" };
 
-  public static final String[] FILE_EXTENSIONS_FOR_IGV_LINKS                  = new String[] { ".bb", ".bw", ".bam", ".bai", ".cram", ".crai", ".vcf.gz", ".vcf.gz.tbi", };
+  public static final String[] FILE_EXTENSIONS_FOR_IGV_LINKS                  = new String[] { ".bb", ".bw", ".bam", ".bai", ".cram", ".crai", ".vcf.gz", ".vcf.gz.tbi",".bed.gz",",.bed.gz.tbi" };
 
   public static final String[] FILE_EXTENSIONS_FOR_IGV_LINKS_NO_INDEX         = new String[] { ".bb", ".bw", ".bam", ".cram", ".vcf.gz", };
 
@@ -133,7 +133,7 @@ public class Constants {
    *       the browser must be told what to do with them by the customer, as it is out of our domain at that point.
    */
   public static final String[] FILE_EXTENSIONS_FOR_VIEW = new String[] { ".pdf", ".jpg", ".png", ".gif", ".rtf", ".txt",
-		".html", ".htm", ".csv", ".ppt", ".pptx", ".xls", ".xlsx", ".xml", ".ped", ".Rmd", ".md" };
+		".html", ".htm", ".csv", ".ppt", ".pptx", ".xls", ".xlsx", ".xml", ".ped", ".Rmd", ".md", ".tiff", ".tif" };
 
   public static final String[] FILE_EXTENSIONS_FOR_VIEW_CUSTOM_TEXT_FILES = new String[] { ".Rmd", ".md" };
 

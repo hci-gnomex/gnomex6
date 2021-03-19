@@ -173,7 +173,7 @@ export class GetLabService {
     }
 
     public getLabByIdOnlyForHistoricalOwnersAndSubmitters(idLab: string): Observable<any> {
-        let params: HttpParams = this.makeParams(idLab, false, false, false, false, false, false, false, false);
+        let params: HttpParams = this.makeParams(idLab, false, false, false, false, true, false, true, false);
         return this.getLab(params);
     }
 

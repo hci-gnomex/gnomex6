@@ -10,10 +10,9 @@ public class DownloadMain {
 			d.loadFileNames();
 			if(d.getMode().equals("avatar")){
 				d.executeAvatarDownload();
-			}else if(d.getMode().equals("tempus")){
+			}else if(d.getMode().equals("tempus") || d.getMode().equals("caris")) {
 				d.executeTempusDownload();
 			}
-
 
 			//System.out.println(d.getFileNameList().toString());
 		} catch (Exception e) {

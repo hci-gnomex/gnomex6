@@ -44,6 +44,7 @@ public class DirectoryBuilder {
 	private static final Integer AVATAR_GROUP_ID = 11;
 	private static final Integer FOUNDATION_GROUP_ID = 14;
 	private static final Integer TEMPUS_GROUP_ID = 22;
+	private static final Integer CARIS_GROUP_ID = 30;
 	private static final int TEST_TYPE_PROPERTY_ID = 21;
 	private boolean isWindows;
 	private boolean debug = false;
@@ -942,9 +943,12 @@ public class DirectoryBuilder {
 		}else if(mode.equals("foundation")){
 			sampleIDList = readSampleIDs(path + "importedTRFList.out");
 			reportIDList =  q.getImportedIDReport(sampleIDList, DirectoryBuilder.FOUNDATION_GROUP_ID);
-		}else{
+		}else if(mode.equals("tempus")){
 			sampleIDList = readSampleIDs(path + "importedTLList.out");
 			reportIDList =  q.getImportedIDReport(sampleIDList, DirectoryBuilder.TEMPUS_GROUP_ID);
+		}else if(mode.equals("caris")){
+			sampleIDList = readSampleIDs(path + "importedTNList.out");
+			reportIDList =  q.getImportedIDReport(sampleIDList, DirectoryBuilder.CARIS_GROUP_ID);
 		}
 
 		//Map<String, HashMap<String,Long>> personMap = q.countPropertyByPerson(TEST_TYPE_PROPERTY_ID);

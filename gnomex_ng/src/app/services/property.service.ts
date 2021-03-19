@@ -57,6 +57,7 @@ export class PropertyService {
     public static readonly PROPERTY_BULLETIN: string = "bulletin";
     public static readonly PROPERTY_DISABLE_USER_SIGNUP: string = "disable_user_signup";
     public static readonly PROPERTY_NO_GUEST_ACCESS: string = "no_guest_access";
+    public static readonly PROPERTY_DUOEXCEPTIONS: string = "duoExceptions";
     public static readonly PROPERTY_GUEST_DOWNLOAD_TERMS: string = "guest_download_terms";
     public static readonly PROPERTY_ALLOW_PRICE_QUOTE: string = "allow_price_quote";
     public static readonly PROPERTY_HIDE_MULTIPLEX_LANE_OOLUMN: string = "hide_multiplex_lane_column";
@@ -64,6 +65,10 @@ export class PropertyService {
     public static readonly PROPERTY_ESTIMATED_PRICE_WARNING: string = "estimated_price_warning";
     public static readonly PROPERTY_EMAIL_INVOICE_PRICE_AMOUNT: string = "email_invoice_price_amount";
     public static readonly PROPERTY_BILLING_ACCOUNT_SPLIT_TYPE: string = "billing_account_split_type";
+    public static readonly PROPERTY_DESCRIPTION_NAME_MANDATORY: string = 'description_name_mandatory';
+    public static readonly PROPERTY_RNA_SAMPLES_DNASE: string = 'rna_samples_dnase';
+    public static readonly PROPERTY_DNA_SAMPLES_RNASE: string = 'dna_samples_rnase';
+    public static readonly PROPERTY_ASK_LEFTOVER_SAMPLES: string = 'ask_leftover_samples';
 
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_GROUP: string  = "analysis_assistance_group";
     public static readonly PROPERTY_ANALYSIS_ASSISTANCE_HEADER: string = "analysis_assistance_header";
