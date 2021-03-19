@@ -2,7 +2,7 @@
 tomcatScriptPath="/usr/share/apache-tomcat-7.0.79/webapps/gnomex/scripts/"
 scriptsPath="/home/u0566434/Scripts/"
 pDataPath="/home/u0566434/parser_data/"
-downloadPath="/Repository/tempdownloads/"
+downloadPath="/Repository/tempdownloads/avatar/"
 dnaNexusPath="/home/u0566434/dnaNexus/"
 avatarLocalDataPath="/Repository/PersonData/2017/4R/Avatar/"
 regex=".*/(SL[a-zA-Z0-9]+).*|.*_(SL[a-zA-Z0-9]+).*|.*([0-9]{2}-[A-Za-z0-9\.]+.*)\.fastq.gz" # The SL can be at the first of filename OR come after the '_'
@@ -86,6 +86,8 @@ fi
 
 echo the fileListName : $fileList
 echo download Status: $downloadCode
+#downloadCode=0
+
 
 echo download Status: $downloadCode
 if [ $downloadCode -eq 0 ]; then
@@ -107,15 +109,15 @@ if [ $downloadCode -eq 0 ]; then
 
                 fi
         done < $fileList
-        echo this is idStr: $idStr
-        echo $idStr | java  hci.gnomex.daemon.auto_import.StringModder > "$pDataPath"tempStr.out
 
+        echo this is idStr: $idStr
+        echo $idStr | java  hci.gnomex.daemon.auto_import.StringModder -strip "," > "$pDataPath"tempStr.out
         if [ "$flaggedIDParam" = "normal"  ]; then
               java  hci.gnomex.daemon.auto_import.Linker  "$pDataPath"tempStr.out "$pDataPath"hci-creds.properties  "$pDataPath"slInfo.out avatar
               verifiedSlInfo="$pDataPath"slInfo.out
         else
-                verifiedSlInfo=$flaggedIDParam
-                echo $verifiedSlInfo
+              verifiedSlInfo=$flaggedIDParam
+              echo $verifiedSlInfo
         fi
 
         rm  "$pDataPath"tempStr.out
@@ -135,5 +137,4 @@ if [ $downloadCode -eq 0 ]; then
 else
         echo $downloaderStatus
 fi
-
 echo ------------------------------------------------------------------------------------------------------------

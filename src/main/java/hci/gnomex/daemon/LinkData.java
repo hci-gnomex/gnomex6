@@ -375,7 +375,6 @@ public class LinkData extends TimerTask {
                         regexNames.add(capturedName);
                     }else{
                         regexNames.add(name);
-                        continue;
                     }
                 }
                 names = regexNames;
@@ -414,7 +413,7 @@ public class LinkData extends TimerTask {
 
                 String myStartPath = dirPath;
                 while (itp.hasNext()) {
-                    String thePath = (String) itp.next();        // for example: 4R/Whole_Exome/FASTq/SL278299_2.fastq.gz
+                    String thePath = (String) itp.next();  // for example: 4R/Whole_Exome/FASTq/SL278299_2.fastq.gz
 
                     int ipos = thePath.indexOf("/");
                     if (ipos == -1) {
@@ -433,23 +432,24 @@ public class LinkData extends TimerTask {
                     String parentFolder = "";
                     String subCommand = "";
 
-                    if(!linkFolder){
+                    if(!linkFolder){ // determines whether we make soft link to file or its parent directory
                         middleOfPath = thePath.substring(ipos + 1, epos);
-                        if (debug) System.out.println("middleOfPath: " + middleOfPath);
+                        if (debug) System.out.println("middleOfPath: " + middleOfPath); // for example : Whole_Exome/FASTq
 
-                        filename = thePath.substring(epos + 1);
+                        filename = thePath.substring(epos + 1); // for example : SL278299_2.fastq.gz
                         if (debug) System.out.println("filename or foldername : " + filename);
                         subCommand = "-s";
 
                     }else {
                         // length - 2 because I don't want filename want its parent folder
-                        File dummyFile = new File(startAvatarPath + "/" + thePath);
+                        File dummyFile = new File(startAvatarPath + "/" + thePath); //absolute path to file
                         if(debug) System.out.println("the absolute path: "  + startAvatarPath + "/" + thePath);
 
                         filename =  dummyFile.getParentFile().getName();
 
                         try{
-                            int personID = Integer.parseInt(filename); // always hci person id for folder name
+                            int personID = Integer.parseInt(filename); //parent folder convention is to be hci person id for folder name
+                                                                      // when using linkFolder argument
                         }catch(NumberFormatException nfe){
                             System.out.println("skipping... sample data doesn't have wrapping folder");
                             continue;

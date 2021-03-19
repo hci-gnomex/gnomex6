@@ -93,6 +93,7 @@ public class LinkFastqData extends TimerTask {
         fileExtensionMap.put("avatar", Arrays.asList("fastq") );
         fileExtensionMap.put("foundation", Arrays.asList("bam", "deident.xml") );
         fileExtensionMap.put("tempus", Arrays.asList("deident.json", "fastq"));
+        fileExtensionMap.put("caris", Arrays.asList("deident.xml", "fastq"));
 
     }
 
@@ -209,9 +210,9 @@ public class LinkFastqData extends TimerTask {
             }
 
             // now using the 'name' get the request
-            Iterator it = names.iterator();
+            Iterator it = names.iterator(); // technically should be only one name
 
-            while (it.hasNext()) {                                                                                      // names while
+            while (it.hasNext()) { // names while
                 String theName = (String) it.next();
 
                 if (debug) {
@@ -274,7 +275,7 @@ public class LinkFastqData extends TimerTask {
                 List<String> idRequests = getIdRequest(theName, sess);
                 if (debug) System.out.println("size of idRequests: " + idRequests.size());
 
-                // now using the idRequest see if we can find any experiment files for that request that contain %fastq%
+                // now using the idRequest see if we can find any experiment files for that request that contained in fileExtensionMap
                 List<String> fileNames = null;
 
                 Iterator itpr = idRequests.iterator();
@@ -304,7 +305,7 @@ public class LinkFastqData extends TimerTask {
                     // process the fastq files we found
                     Iterator itpn = fileNames.iterator();
 
-                    while (itpn.hasNext()) {                                                                            // fileNames while
+                    while (itpn.hasNext()) {   // fileNames while
                         String thePath = (String) itpn.next();        // for example: 129R/Avatar/DNA/Fastq/SL283716_2.fastq.gz
                         // 2R/Foundation/Reports/TRF218551.xml
 
@@ -337,7 +338,7 @@ public class LinkFastqData extends TimerTask {
                         String subCommand = "";
 
                         String pathToRealData = startRequestPath + "/" + createYear + "/" + thePath;
-                        middleOfPath = thePath.substring(ipos, epos);        // for example: DNA/Fastq
+                        middleOfPath = thePath.substring(ipos, epos);  // for example: DNA/Fastq
 
 
 
@@ -438,7 +439,6 @@ public class LinkFastqData extends TimerTask {
                     System.out.println("[getTopDirectory]  analysis_type: " + analysis_type + " theDirectories[1]: " + theDirectories[1]);
                 }
 
-
                 break;
 
             } catch (Exception ee) {
@@ -498,7 +498,7 @@ public class LinkFastqData extends TimerTask {
         String analysisGroupName = "unknown";
         String analysisType = "";
 
-        String[] theAGTypes = {"Avatar", "Foundation", "Tempus"};
+        String[] theAGTypes = {"Avatar", "Foundation", "Tempus", "Caris"};
         if (idAnalysis == null) {
             System.out.println("[getAnalysisType] WARNING: idAnalysis is null!");
             return null;

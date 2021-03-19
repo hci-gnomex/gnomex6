@@ -29,6 +29,7 @@ public class Downloader {
 
 	private String downloadPath;
 	private final String rootAvatar = "HCI_Molecular_Data:/";
+	private static final String DOWNLOAD_ERROR_PATH = "download-error.log";
 	private List<String> flaggedFileList;
 	private boolean allowClearFile = false;
 	private String filterRegex;
@@ -49,7 +50,7 @@ public class Downloader {
 				this.downloadPath = args[++i];
 			} else if (args[i].equals("-mode")) {
 				this.mode = args[++i];
-				if(!(this.mode.equals("tempus") || this.mode.equals("avatar")) ){
+				if(!(this.mode.equals("tempus") || this.mode.equals("avatar") || this.mode.equals("caris")) ){
 					System.out.println("If you specify mode it has to be either tempus or avatar");
 					System.exit(1);
 				}
@@ -226,11 +227,11 @@ public class Downloader {
 
 		List<String> status = Arrays.asList("Downloading in progress...");
 		writeToFile(this.dependentDataPath + "download.log",status); // /home/u0566434/parser_data/download.log
-		String tempFile = writeToTempusFile(fileOfPaths,this.fileNameMap);
+		String tempFile = writeToAWSFile(fileOfPaths,this.fileNameMap);
 
 		// this is reading in tempFile line by line delimiting that line by space hence ' ' allowing only 2 arguments at a time
 		// it is making  shell script for just that one line and running it and substituting where $ is shown arguments
-		String downloadCommand = "cat " + tempFile + " |  xargs -n2 sh -c 'aws --profile tempus s3 cp $1 $2' sh" ;
+		String downloadCommand = "cat " + tempFile + " |  xargs -n2 sh -c 'aws --profile " + mode + " s3 cp $1 $2' sh" ;
 		// old approach
 		//xargs -P10 -I {} aws --profile tempus s3 cp {} " + this.downloadPath;
 
@@ -238,6 +239,9 @@ public class Downloader {
 		if(fileNameMap.size() > 0){
 			commands.add(downloadCommand);
 		}
+		//sending mv  stderror to the abyss with the command  '2>/dev/null' or aka ignore errors for this  command
+		//why? because it might fail if there are no flagged files in the folder causing the script to crash
+		//commands.add("mv -t " + this.downloadPath + " " + this.downloadPath + File.separator +  "Flagged" +File.separator +  "*" + " 2>/dev/null");
 		commands.add("mv -t " + this.downloadPath + " " + this.downloadPath + File.separator +  "Flagged" +File.separator +  "*" );
 		executeCommands(commands);
 //		try {
@@ -289,6 +293,7 @@ public class Downloader {
 					if(filterRegex != null){
 						Matcher m = pattern.matcher(line);
 						if(m.matches()){
+							//todo should not have the start and end captureGroup hardcode for tempus
 							String matchedFileName = Differ.constructMatchedFileName(1,5,m, new StringBuilder(), aliasMap );
 							addToIDMap(matchedFileName, line, fileNameMap);
 						}else{
@@ -300,12 +305,12 @@ public class Downloader {
 				}
 
 			}
-			if(fileNameMap.size() < 1) {
-				throw new Exception("Appears to be no new files to download");
-			}
-			System.out.println("Total files to download: " + fileNameMap.size());
 
 			this.loadFlaggedFiles(pattern,flaggedIDMap);
+			System.out.println("Total files to download: " + fileNameMap.size());
+			if(fileNameMap.size() == 0 && flaggedIDMap.size() == 0 ) {
+				throw new Exception("Appears to be no new files to download or flagged files to reattempt");
+			}
 
 
 			for(Map.Entry<String,List<String>> e : flaggedIDMap.entrySet()){
@@ -488,6 +493,7 @@ public class Downloader {
 				String safeFileName = flaggedFileName.replaceAll(" ", "\\\\ ");
 
 				strBuild.append(safeFileName);
+				System.out.println(safeFileName);
 
 				if(i == (flaggedFileList.size() - 1) ){
 					continue;
@@ -528,7 +534,7 @@ public class Downloader {
 		}
 		return dataFromFileList;
 	}
-	public String writeToTempusFile(String fileName, Map<String, List<String>> dataToWrite) {
+	public String writeToAWSFile(String fileName, Map<String, List<String>> dataToWrite) {
 		PrintWriter writer = null;
 		String pattern = Pattern.quote(System.getProperty("file.separator"));
 		String[] chunks = fileName.split(pattern);
