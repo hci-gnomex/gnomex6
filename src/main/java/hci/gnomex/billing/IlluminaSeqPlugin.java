@@ -3,30 +3,11 @@ package hci.gnomex.billing;
 import hci.dictionary.model.DictionaryEntry;
 import hci.dictionary.model.NullDictionaryEntry;
 import hci.dictionary.utility.DictionaryManager;
-import hci.gnomex.model.BillingItem;
-import hci.gnomex.model.BillingPeriod;
-import hci.gnomex.model.BillingTemplate;
-import hci.gnomex.model.Hybridization;
-import hci.gnomex.model.LabeledSample;
-import hci.gnomex.model.NumberSequencingCyclesAllowed;
-import hci.gnomex.model.Price;
-import hci.gnomex.model.PriceCategory;
-import hci.gnomex.model.PriceCriteria;
-import hci.gnomex.model.PropertyEntry;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.RequestCategory;
-import hci.gnomex.model.Sample;
-import hci.gnomex.model.SequenceLane;
+import hci.gnomex.model.*;
 import hci.gnomex.utility.DictionaryHelper;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.hibernate.Session;
+
+import java.util.*;
 
 
 public class IlluminaSeqPlugin extends BillingPlugin {
@@ -60,12 +41,16 @@ public class IlluminaSeqPlugin extends BillingPlugin {
     }
     
     // Count up number of sequence lanes for number seq cycles / seq run type
-    for(Iterator i = lanes.iterator(); i.hasNext();) {
+     for(Iterator i = lanes.iterator(); i.hasNext();) {
       SequenceLane seqLane = (SequenceLane)i.next();
-      
-      
-      String key = seqLane.getIdNumberSequencingCyclesAllowed().toString();
-      
+      String key = "";
+
+      try {     // added by Tim on 08/11/2020 -- if we still have problems at least they'll be able save things
+        key = seqLane.getIdNumberSequencingCyclesAllowed().toString();
+      } catch (Exception e)
+      {
+        return billingItems;
+      }
       // Keep track of the lanes for # cycles/seq run type
       List theLanes = (List)seqLaneMap.get(key);
       if (theLanes == null) {
