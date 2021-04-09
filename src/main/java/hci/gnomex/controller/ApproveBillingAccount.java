@@ -3,10 +3,12 @@ package hci.gnomex.controller;
 import hci.gnomex.model.BillingAccount;
 import hci.gnomex.model.Lab;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.*;
-
-import java.io.IOException;
-import java.sql.Date;
+import hci.gnomex.utility.BillingAccountUtil;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.UserPreferences;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -14,13 +16,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
+import java.io.IOException;
+import java.sql.Date;
 
 public class ApproveBillingAccount extends HttpServlet {
 
-private static Logger LOG = Logger.getLogger(SaveLab.class);
+private static Logger LOG = Logger.getLogger(ApproveBillingAccount.class);
 private static String serverName = "";
 
 protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
@@ -52,6 +53,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 			Lab lab = (Lab) sess.load(Lab.class, ba.getIdLab());
 			ba.setApprovedDate(new Date(System.currentTimeMillis()));
 			ba.setIsApproved("Y");
+			ba.setActiveAccount("Y");
 			ba.setApproverEmail(approverEmail);
 			BillingAccountUtil.sendApprovedBillingAccountEmail(sess, new UserPreferences(), serverName, launchAppURL, ba, lab, approverEmail);
 
