@@ -1,25 +1,13 @@
 package hci.gnomex.controller;
 
+import com.oreilly.servlet.multipart.FilePart;
+import com.oreilly.servlet.multipart.MultipartParser;
+import com.oreilly.servlet.multipart.ParamPart;
+import com.oreilly.servlet.multipart.Part;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.*;
-
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import javax.imageio.ImageIO;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
@@ -27,10 +15,18 @@ import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.hibernate.Session;
 
-import com.oreilly.servlet.multipart.FilePart;
-import com.oreilly.servlet.multipart.MultipartParser;
-import com.oreilly.servlet.multipart.ParamPart;
-import com.oreilly.servlet.multipart.Part;
+import javax.imageio.ImageIO;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class ReportIssueFeedbackServlet extends HttpServlet {
     private static String serverName;
@@ -81,8 +77,9 @@ public class ReportIssueFeedbackServlet extends HttpServlet {
 
             if (secAdvisor == null) {
                 System.out.println("ReportIssueServlet: Error - Unable to find or create security advisor.");
-                throw new ServletException(
-                        "Unable to report issue.  Servlet unable to obtain security information. Please contact GNomEx support directly.");
+                // 04/05/2021 timM  Don't absolutely have to have the securityAdvisor alive at this point...
+//                throw new ServletException(
+//                        "Unable to report issue.  Servlet unable to obtain security information. Please contact GNomEx support directly.");
             }
             /*
              * // Only gnomex admins can send broadcast emails if (!secAdvisor .hasPermission(SecurityAdvisor.CAN_ACCESS_ANY_OBJECT)) { throw new
@@ -154,7 +151,7 @@ public class ReportIssueFeedbackServlet extends HttpServlet {
             }
             String emailRecipients = DictionaryHelper.getInstance(sess).getPropertyDictionary(
                     PropertyDictionary.CONTACT_EMAIL_SOFTWARE_BUGS);
-
+System.out.println ("[ReportIssueFeedbackServlet] emailRecipients: " + emailRecipients);
             // Email app user
             String emailBody;
             if (!MailUtil.isValidEmail(fromAddress)) {
@@ -192,6 +189,7 @@ public class ReportIssueFeedbackServlet extends HttpServlet {
                         + "\r" + body;
             }
 
+            System.out.println ("[ReportIssueFeedbackServlet] fromAddress: " + fromAddress);
             MailUtilHelper helper = new MailUtilHelper(emailRecipients, fromAddress, theSubject, emailBody, outputfile, format.equalsIgnoreCase("HTML"), dh, serverName);
             MailUtil.validateAndSendEmail(helper);
 
