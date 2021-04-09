@@ -289,11 +289,14 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     }
 
     private makeIGVLink: (data: any) => void = (data: any) => {
+        this.dialogsService.startDefaultSpinnerDialog();
         this.dataTrackService.makeIGVLink().subscribe((result: any) => {
             if (result && result.igvURL) {
+                this.dialogsService.stopAllSpinnerDialogs();
                 this.dialogsService.alert(result.igvURL, null, DialogType.SUCCESS);
             }
         }, (err: IGnomexErrorResponse) => {
+            this.dialogsService.stopAllSpinnerDialogs();
             this.handleBackendLinkError(err.gError);
         });
     }
