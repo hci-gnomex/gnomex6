@@ -53,6 +53,7 @@ import {FileService} from "./file.service";
 import {UploadFileService} from "./upload-file.service";
 import {UtilService} from "./util.service";
 import {UserPreferencesService} from "./user-preferences.service";
+import {NewExternalExperimentService} from "./new-external-experiment.service";
 import {AmendExperimentService} from "./amend-experiment.service";
 import {NavigationService} from "./navigation.service";
 
@@ -118,6 +119,7 @@ import {NavigationService} from "./navigation.service";
         UploadFileService,
         UtilService,
         UserPreferencesService,
+        NewExternalExperimentService,
         AmendExperimentService,
         NavigationService
     ]})
