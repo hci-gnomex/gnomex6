@@ -2,25 +2,23 @@ package hci.gnomex.controller;
 
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Chromatogram;
+import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.ServletUtil;
 import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.ServletUtil;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import hci.gnomex.utility.Util;
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class DownloadChromatogramFileServlet extends HttpServlet {
 
@@ -141,7 +139,10 @@ public class DownloadChromatogramFileServlet extends HttpServlet {
             StringBuilder requestDump = Util.printRequest(req);
             String serverName = req.getServerName();
 
-            Util.sendErrorReport(HibernateSession.currentSession(),"GNomEx.Support@hci.utah.edu", "DoNotReply@hci.utah.edu", userName, errorMessage, requestDump);
+            PropertyDictionaryHelper propertyHelper = PropertyDictionaryHelper.getInstance(HibernateSession.currentSession());
+            String gnomex_tester_email = propertyHelper.getProperty(PropertyDictionary.CONTACT_EMAIL_SOFTWARE_TESTER);
+
+            Util.sendErrorReport(HibernateSession.currentSession(),gnomex_tester_email, "DoNotReply@hci.utah.edu", userName, errorMessage, requestDump);
 
             HibernateSession.rollback();
             response.setContentType("text/html; charset=UTF-8");

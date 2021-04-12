@@ -3,38 +3,28 @@ package hci.gnomex.controller;
 import hci.dictionary.utility.DictionaryManager;
 import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
-import hci.framework.model.DetailObject;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.BillingAccount;
 import hci.gnomex.model.CoreFacility;
 import hci.gnomex.model.Lab;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.LabCoreFacilityParser;
-import hci.gnomex.utility.MailUtil;
-import hci.gnomex.utility.MailUtilHelper;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.Util;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
+import javax.mail.MessagingException;
+import javax.naming.NamingException;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Iterator;
-
-import javax.mail.MessagingException;
-import javax.naming.NamingException;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.apache.log4j.Logger;
 
 
 public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
@@ -64,14 +54,14 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 			String tda = request.getParameter("totalDollarAmountDisplay");
 			tda = tda.replaceAll("\\$", "");
 			tda = tda.replaceAll(",", "");
-			System.out.println ("[submitworkauthform] tda: " + tda);
+//			System.out.println ("[submitworkauthform] tda: " + tda);
 			billingAccountScreen.setTotalDollarAmount(new BigDecimal(tda));
 		}
 
 		String coreFacilitiesXMLString = "";
 		if (request.getParameter("coreFacilitiesXMLString") != null && !request.getParameter("coreFacilitiesXMLString").equals("")) {
 			coreFacilitiesXMLString = request.getParameter("coreFacilitiesXMLString");
-			System.out.println ("[SubmitWorkAuthForm] coreFacilitiesXMLString: " + coreFacilitiesXMLString);
+//			System.out.println ("[SubmitWorkAuthForm] coreFacilitiesXMLString: " + coreFacilitiesXMLString);
 
 			StringReader reader = new StringReader(coreFacilitiesXMLString);
 			try {
@@ -96,7 +86,7 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 		serverName = request.getServerName();
 		this.requestURL = request.getRequestURL();
 
-		System.out.println ("[SubmitWorkAuthForm] launchAppURL: " + launchAppURL);
+//		System.out.println ("[SubmitWorkAuthForm] launchAppURL: " + launchAppURL);
 
 	}
 
@@ -107,7 +97,7 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 			DictionaryHelper dh   = DictionaryHelper.getInstance(sess);
 
 			lab = (Lab) sess.load(Lab.class, billingAccountScreen.getIdLab());
-			System.out.println ("[SubmitWorkAuthForm] lab: " + lab);
+//			System.out.println ("[SubmitWorkAuthForm] lab work auth email: " + lab.getWorkAuthSubmitEmail());
 
 			PropertyDictionaryHelper pdh          = PropertyDictionaryHelper.getInstance(sess);
 			String                   configurable = pdh.getProperty(PropertyDictionary.CONFIGURABLE_BILLING_ACCOUNTS);
@@ -162,7 +152,7 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 
 					for (Iterator i = coreFacilityParser.getCoreFacilityMap().keySet().iterator(); i.hasNext(); ) {
 						Integer idCoreFacility = (Integer) i.next();
-						System.out.println ("[SubmitWorkAuthForm] idCoreFacility: " + idCoreFacility );
+//						System.out.println ("[SubmitWorkAuthForm] idCoreFacility: " + idCoreFacility );
 						facility = (CoreFacility) coreFacilityParser.getCoreFacilityMap().get(idCoreFacility);
 
 						billingAccount = new BillingAccount();
@@ -171,7 +161,7 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 						billingAccount.setIdBillingAccount(null);
 						billingAccount.setIdCoreFacility(idCoreFacility);
 
-						System.out.println ("[SubmitWorkAuthForm] right before sess.save" );
+//						System.out.println ("[SubmitWorkAuthForm] right before sess.save" );
 						sess.save(billingAccount);
 						sess.flush();
 
@@ -218,7 +208,7 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 
 		String submitterEmail  = billingAccount.getSubmitterEmail();
 		String emailRecipients = submitterEmail;
-
+//.out.println ("[submitworkauth] emailRecipients: " + emailRecipients);
 		if (!MailUtil.isValidEmail(emailRecipients)) {
 			LOG.error(emailRecipients);
 		}
@@ -294,6 +284,7 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 			}
 
 			for (int i = 0; i < emails.length; i++) {
+//				System.out.println ("[submitworkauth]  email address: " + emails[i]);
 				StringBuffer coreNote                 = new StringBuffer();
 				String       approveBillingAccountURL = requestURL.substring(0, requestURL.indexOf("SubmitWorkAuthForm.gx"));
 				approveBillingAccountURL += Constants.FILE_SEPARATOR + Constants.APPROVE_BILLING_ACCOUNT_SERVLET + "?idBillingAccount=" + billingAccount.getIdBillingAccount() + "&approverEmail=" + emails[i];

@@ -279,7 +279,10 @@ public class DownloadAnalysisSingleFileServlet extends HttpServlet {
             StringBuilder requestDump = Util.printRequest(req);
             String serverName = req.getServerName();
 
-            Util.sendErrorReport(HibernateSession.currentSession(),"GNomEx.Support@hci.utah.edu", "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
+            PropertyDictionaryHelper propertyHelper = PropertyDictionaryHelper.getInstance(HibernateSession.currentSession());
+            String gnomex_tester_email = propertyHelper.getProperty(PropertyDictionary.CONTACT_EMAIL_SOFTWARE_TESTER);
+
+            Util.sendErrorReport(HibernateSession.currentSession(),gnomex_tester_email, "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
 
             HibernateSession.rollback();
             response.setContentType("text/html; charset=UTF-8");

@@ -8,37 +8,29 @@ package hci.gnomex.controller;
  */
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
+import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.*;
+import net.sf.json.JSON;
+import net.sf.json.xml.XMLSerializer;
+import org.apache.log4j.Logger;
 
-import java.io.*;
-import java.net.InetAddress;
-import java.sql.SQLException;
-import java.util.Date;
-import java.util.*;
-
-import javax.ejb.EJBException;
 import javax.mail.Session;
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.web.servlet.ShiroHttpServletRequest;
-import net.sf.json.JSON;
-import net.sf.json.xml.XMLSerializer;
-
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
 
 public class GNomExFrontController extends HttpServlet {
 private static Logger LOG = Logger.getLogger(GNomExFrontController.class);
@@ -233,7 +225,10 @@ protected static void initLog4j() {
 			String errorMessage = (String) request.getAttribute("errorDetails");
 			username = commandInstance.getUsername();
 
-                Util.sendErrorReport(HibernateSession.currentSession(), "GNomEx.Support@hci.utah.edu", "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
+				PropertyDictionaryHelper propertyHelper = PropertyDictionaryHelper.getInstance(HibernateSession.currentSession());
+				String gnomex_tester_email = propertyHelper.getProperty(PropertyDictionary.CONTACT_EMAIL_SOFTWARE_TESTER);
+
+                Util.sendErrorReport(HibernateSession.currentSession(), gnomex_tester_email, "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
 
 
 			HibernateSession.rollback();
@@ -502,7 +497,10 @@ private void sendRedirect(HttpServletResponse response, String url) {
 			  	username = "Not Specified";
 			  }
 			  converted[0] = false;
-			  Util.sendErrorReport(HibernateSession.currentSession(), "GNomEx.Support@hci.utah.edu", "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
+			  PropertyDictionaryHelper propertyHelper = PropertyDictionaryHelper.getInstance(HibernateSession.currentSession());
+			  String gnomex_tester_email = propertyHelper.getProperty(PropertyDictionary.CONTACT_EMAIL_SOFTWARE_TESTER);
+
+			  Util.sendErrorReport(HibernateSession.currentSession(), gnomex_tester_email, "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
 			  xmlParameterValue = null;
 		  }
 

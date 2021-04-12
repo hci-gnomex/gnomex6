@@ -223,7 +223,10 @@ public class DownloadAnalysisFileServlet extends HttpServlet {
       String errorMessage = Util.GNLOG(LOG,"Error in DownloadAnalyisFileServlet ", e);
       StringBuilder requestDump = Util.printRequest(req);
 
-      Util.sendErrorReport(HibernateSession.currentSession(),"GNomEx.Support@hci.utah.edu", "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
+      PropertyDictionaryHelper propertyHelper = PropertyDictionaryHelper.getInstance(HibernateSession.currentSession());
+      String gnomex_tester_email = propertyHelper.getProperty(PropertyDictionary.CONTACT_EMAIL_SOFTWARE_TESTER);
+
+      Util.sendErrorReport(HibernateSession.currentSession(),gnomex_tester_email, "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
 
       HibernateSession.rollback();
       response.setStatus(999);
