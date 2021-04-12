@@ -474,6 +474,9 @@ export class DirectLoginComponent implements OnInit {
                         this._authenticationService.findAppUserByUsername(this._loginForm.value.username).subscribe((result: any) => {
                             if (result && result.hasUserAccount && ('' + result.hasUserAccount).toLowerCase() === 'y') {
                                 if (result.isActive && ('' + result.isActive).toLowerCase() === 'y') {
+                                    if (this.gnomexService.duoExceptions && this.gnomexService.duoExceptions.includes(this._loginForm.value.username) ) {
+                                        this.gnomexService.useduo = false;
+                                    }
                                     if (this.gnomexService.useduo) {
                                         this.doDuo = true;
 
@@ -531,7 +534,7 @@ export class DirectLoginComponent implements OnInit {
         console.log(response.elements.sig_response.value);
         var vuser = Duo2.verify_response(this.gnomexService.ikey, this.gnomexService.skey, this.gnomexService.akey, response.elements.sig_response.value);
         console.log(vuser);
-        if (vuser || this.gnomexService.duoExceptions.includes(this._loginForm.value.username) ) {
+        if (vuser) {   // || ( this.gnomexService.duoExceptions && this.gnomexService.duoExceptions.includes(this._loginForm.value.username) )) {
             this._authenticationService.requestAccessToken(true);
         } else {
             this.dialogsService.alert("Invalid passcode - please notify gnomex support", null, DialogType.WARNING);

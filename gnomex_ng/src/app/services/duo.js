@@ -4,8 +4,8 @@ var DUO_PREFIX = 'TX'
 var APP_PREFIX = 'APP'
 var AUTH_PREFIX = 'AUTH'
 
-var DUO_EXPIRE = 300
-var APP_EXPIRE = 3600
+var DUO_EXPIRE = 600
+var APP_EXPIRE = 7200
 var IKEY_LEN = 20
 var SKEY_LEN = 40
 var AKEY_LEN = 40
