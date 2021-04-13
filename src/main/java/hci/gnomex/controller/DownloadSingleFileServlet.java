@@ -1,38 +1,24 @@
 package hci.gnomex.controller;
 
 import hci.gnomex.constants.Constants;
-import hci.gnomex.utility.*;
-import org.apache.commons.codec.binary.Base64;
-
 import hci.gnomex.model.FlowCell;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.TransferLog;
 import hci.gnomex.security.SecurityAdvisor;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import hci.gnomex.utility.FileDescriptor;
+import hci.gnomex.utility.*;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
+import java.io.*;
+import java.math.BigDecimal;
+import java.util.*;
 
 
 public class DownloadSingleFileServlet extends HttpServlet {
@@ -338,9 +324,12 @@ public class DownloadSingleFileServlet extends HttpServlet {
         StringBuilder requestDump = Util.printRequest(req);
         String serverName = req.getServerName();
 
+        PropertyDictionaryHelper propertyHelper = PropertyDictionaryHelper.getInstance(HibernateSession.currentSession());
+        String gnomex_tester_email = propertyHelper.getProperty(PropertyDictionary.CONTACT_EMAIL_SOFTWARE_TESTER);
+
       Util.sendErrorReport(
               HibernateSession.currentSession(),
-              "GNomEx.Support@hci.utah.edu",
+              gnomex_tester_email,
               "DoNotReply@hci.utah.edu",
               username,
               errorMessage,

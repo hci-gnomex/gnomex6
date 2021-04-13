@@ -37,7 +37,7 @@ public class DeleteFlowCell extends GNomExCommand implements Serializable {
 
 
 	// the static field for logging in Log4J
-	private static Logger LOG = Logger.getLogger(SaveFlowCell.class);
+	private static Logger LOG = Logger.getLogger(DeleteFlowCell.class);
 
 	private String						channelsXMLString;
 	private Document					channelsDoc;

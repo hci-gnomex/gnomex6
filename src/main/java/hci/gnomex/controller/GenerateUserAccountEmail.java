@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 
 public class GenerateUserAccountEmail extends GNomExCommand implements Serializable {
 
-  private static Logger LOG = Logger.getLogger(GetAnalysisGroup.class);
+  private static Logger LOG = Logger.getLogger(GenerateUserAccountEmail.class);
 
   private Integer idLab;
   private String  serverName;
