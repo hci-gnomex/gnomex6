@@ -711,7 +711,7 @@
 
 	<!-- Session timeout set to 4 hours -->
 	<session-config>
-		<session-timeout>240</session-timeout>
+		<session-timeout>1440</session-timeout>
 		<cookie-config>
 			<path>/gnomex</path>
 			<secure>false</secure>

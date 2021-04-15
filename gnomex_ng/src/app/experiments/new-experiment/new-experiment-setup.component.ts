@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from "@angular/core";
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output,ChangeDetectorRef} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {MatDialog, MatDialogConfig} from "@angular/material";
 
@@ -169,9 +169,14 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
             });
 
             this.prepareForm();
-
+            this._optOrReq = 'Optional';
+            let nameDescRequired: string = this.propertyService.getPropertyValue(PropertyService.PROPERTY_DESCRIPTION_NAME_MANDATORY,this.coreFacility);
+            console.log('nameDescRequired ' + nameDescRequired);
+            if (nameDescRequired === 'Y') this._optOrReq = 'Required';
+            console.log('this._optOrReq ' + this._optOrReq);
             this.filteredProjectList = this.gnomexService.projectList;
             this.checkSecurity();
+            this.changeDetectorRef.detectChanges();
             this.newExperimentService.components.push(this);
         }
     }
@@ -213,7 +218,7 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
     public accessAuthorizedBillingAccountInstructions: string;
     public accessAuthorizedBillingAccountLinkText: string = "Show Other Billing Accounts";
 
-
+    public _optOrReq: string = 'optional';
     private possibleSubmitters_loaded: boolean = false;
 
     private _showBilling_previousValue: boolean = false;
@@ -322,6 +327,7 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
                 private newExperimentService: NewExperimentService,
                 private propertyService: PropertyService,
                 public prefService: UserPreferencesService,
+                private changeDetectorRef: ChangeDetectorRef,
                 private constService: ConstantsService) {
     }
 

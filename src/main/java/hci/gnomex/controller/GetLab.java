@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.gnomex.model.AppUser;
@@ -9,20 +9,8 @@ import hci.gnomex.model.InternalAccountFieldsConfiguration;
 import hci.gnomex.model.Lab;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.AppUserNameComparator;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
@@ -30,6 +18,11 @@ import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.*;
 
 public class GetLab extends GNomExCommand implements Serializable {
 
@@ -254,7 +247,8 @@ public Command execute() throws RollBackCommandException {
 			// For adding services to lab, lab member needs to be able to select
 			// from list of other lab members.
 			if (this.getSecAdvisor().isGroupIAmMemberOf(theLab.getIdLab())
-					|| this.getSecAdvisor().isLabICanSubmitTo(theLab)) {
+					|| this.getSecAdvisor().isLabICanSubmitTo(theLab)
+					|| this.getSecAdvisor().isGroupIAmMemberOrManagerOf(theLab.getIdLab()) ) {
 				Hibernate.initialize(theLab.getMembers());
 				Hibernate.initialize(theLab.getManagers());
 				blockAppUserContent(theLab.getMembers());
