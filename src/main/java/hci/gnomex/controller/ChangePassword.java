@@ -55,6 +55,7 @@ private String action;
 public final static String ACTION_REQUEST_PASSWORD_RESET = "requestPasswordReset";
 public final static String ACTION_FINALIZE_PASSWORD_RESET = "finalizePasswordReset";
 public final static String ACTION_CHANGE_EXPIRED_PASSWORD = "changeExpiredPassword";  // ChangePassword.mxml hard-codes this value
+public final static String FORCE_CHANGE_PASSWORD = "forceChangePassword";
 
 public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 	try {
@@ -62,9 +63,11 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 		this.appURL = this.getAppURL(request);
 
 		this.action = request.getParameter("action");
+		System.out.println ("[ChangePassword] action: " + this.action);
 
 		if (request.getParameter("userName") != null && !request.getParameter("userName").equals("")) {
 			this.userName = request.getParameter("userName");
+			System.out.println ("[ChangePassword] userName: " + this.userName);
 		}
 
 		if (request.getParameter("email") != null && !request.getParameter("email").equals("")) {
@@ -77,10 +80,13 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 
 		if (request.getParameter("guid") != null && !request.getParameter("guid").equals("")) {
 			this.guid = request.getParameter("guid");
+			System.out.println ("[ChangePassword] guid: " + this.guid);
 		}
 
 		if (request.getParameter("newPassword") != null && !request.getParameter("newPassword").equals("")) {
 			this.newPassword = request.getParameter("newPassword");
+			System.out.println ("[ChangePassword] newPassword: " + this.newPassword);
+
 		}
 
 		if (action.equals(ACTION_FINALIZE_PASSWORD_RESET) || action.equals(ACTION_CHANGE_EXPIRED_PASSWORD)) {
@@ -117,7 +123,7 @@ public Command execute() throws RollBackCommandException {
 		dictionaryHelper = DictionaryHelper.getInstance(sess);
 		appUser = lookupAndValidateAppUser(sess);
 		if (isValid()) {
-			if (action.equals(ACTION_FINALIZE_PASSWORD_RESET) || action.equals(ACTION_CHANGE_EXPIRED_PASSWORD)) {
+			if (action.equals(ACTION_FINALIZE_PASSWORD_RESET) || action.equals(ACTION_CHANGE_EXPIRED_PASSWORD) || action.equals(FORCE_CHANGE_PASSWORD)) {
 				changePassword(sess);
 				this.jsonResult = Json.createObjectBuilder().add("result", "SUCCESS").build().toString();
 			} else if (action.equals(ACTION_REQUEST_PASSWORD_RESET)) {

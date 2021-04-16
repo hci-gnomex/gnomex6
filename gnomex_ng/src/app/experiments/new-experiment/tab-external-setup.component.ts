@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from "@angular/core";
+import {Component, Input, OnChanges, OnDestroy, OnInit, SimpleChanges} from "@angular/core";
 import {LabListService} from "../../services/lab-list.service";
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";

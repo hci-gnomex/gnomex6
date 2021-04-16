@@ -156,7 +156,7 @@
             <li *ngIf="showExperimentName" class="full-width align-baseline">
                 <div class="full-width flex-container-row align-baseline">
                     <div class="heading word-wrap">
-                        {{ "Provide an experiment name \n for the data folder (optional)" }}
+                         Provide an experiment name for the data folder ({{this._optOrReq}})
                     </div>
                     <mat-form-field class="moderate-width">
                         <input matInput formControlName="experimentName" placeholder="Experiment Name for the data folder" (input)="onChangeExperimentName($event)">
@@ -167,7 +167,7 @@
                 <div class="full-width">
                     <div class="full-width flex-container-row align-baseline padding-bottom">
                         <div class="heading word-wrap">
-                            Document experimental details in the text field below (optional)
+                            Document experimental details in the text field below ({{this._optOrReq}})
                         </div>
                     </div>
                     <mat-form-field class="long-width">

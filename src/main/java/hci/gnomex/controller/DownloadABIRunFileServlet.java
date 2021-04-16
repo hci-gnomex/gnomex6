@@ -1,18 +1,17 @@
 package hci.gnomex.controller;
 
 import hci.framework.model.DetailObject;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.InstrumentRun;
-import hci.gnomex.model.InstrumentRunStatus;
-import hci.gnomex.model.Plate;
-import hci.gnomex.model.PlateWell;
-import hci.gnomex.model.ReactionType;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.RequestStatus;
-import hci.gnomex.model.SealType;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.jdom.Element;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -20,15 +19,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.jdom.Element;
 
 public class DownloadABIRunFileServlet extends HttpServlet {
 

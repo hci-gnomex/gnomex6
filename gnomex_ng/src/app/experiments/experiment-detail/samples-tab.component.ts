@@ -62,7 +62,7 @@ export class SamplesTabComponent extends PrimaryTab implements OnInit, OnDestroy
         {headerName: "Organism", field: "organismDisplay"},
         {headerName: "QC Conc.", field: "qcLibConcentration"},
         {headerName: "QC RIN", field: "qualRINNumber"},
-        {headerName: "Seq Lib Protocol", field: "seqLibProtocolDisplay"},
+        {headerName: "Library Protocol", field: "seqLibProtocolDisplay"},
         {headerName: "Prepped by Core", field: "seqPrepByCore"},
         // Try 12405R and 12465R
         {headerName: "Index Tag A", field: "barcodeA"},
