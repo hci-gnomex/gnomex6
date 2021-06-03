@@ -308,8 +308,8 @@ public class ShowBillingGLInterface extends ReportCommand implements Serializabl
           if (billingItemMap.size() > 0) {
             writeLabAccountDebit(prevLabName, prevBillingAccount, accountDescription, fiscalYear);
 
-            // Verify that grand total matches expected grand total
-            if (this.totalPrice.compareTo(this.expectedGrandTotalPrice) != 0) {
+            // Verify that grand total matches expected grand total (difference <= 1 cent)
+            if (this.totalPrice.subtract(this.expectedGrandTotalPrice).abs().doubleValue() >=0.01) {
               this.addInvalidField("UnexpectedTotal", "The GNomEx GL interface for " + 
                   billingPeriod.getBillingPeriod() + 
                   " could not be generated.  The total price $" + 

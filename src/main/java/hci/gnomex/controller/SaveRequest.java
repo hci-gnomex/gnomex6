@@ -1,83 +1,24 @@
 package hci.gnomex.controller;
 
+//import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.billing.BillingPlugin;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.BillingItem;
-import hci.gnomex.model.BillingPeriod;
-import hci.gnomex.model.BillingStatus;
-import hci.gnomex.model.BillingTemplate;
-import hci.gnomex.model.BillingTemplateItem;
-import hci.gnomex.model.CoreFacility;
-import hci.gnomex.model.ExperimentCollaborator;
-import hci.gnomex.model.FlowCellChannel;
-import hci.gnomex.model.Hybridization;
-import hci.gnomex.model.Institution;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.Label;
-import hci.gnomex.model.LabeledSample;
-import hci.gnomex.model.LabelingReactionSize;
-import hci.gnomex.model.MasterBillingItem;
-import hci.gnomex.model.Notification;
-import hci.gnomex.model.Plate;
-import hci.gnomex.model.PlateType;
-import hci.gnomex.model.PlateWell;
-import hci.gnomex.model.PriceCategory;
-import hci.gnomex.model.PriceSheet;
-import hci.gnomex.model.PriceSheetPriceCategory;
-import hci.gnomex.model.Property;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.PropertyEntry;
-import hci.gnomex.model.PropertyEntryValue;
-import hci.gnomex.model.PropertyOption;
-import hci.gnomex.model.PropertyPlatformApplication;
-import hci.gnomex.model.PropertyType;
-import hci.gnomex.model.ReactionType;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.RequestCategory;
-import hci.gnomex.model.RequestCategoryType;
-import hci.gnomex.model.Sample;
-import hci.gnomex.model.SeqLibTreatment;
-import hci.gnomex.model.SequenceLane;
-import hci.gnomex.model.Slide;
-import hci.gnomex.model.SlideDesign;
-import hci.gnomex.model.Step;
-import hci.gnomex.model.TransferLog;
-import hci.gnomex.model.TreatmentEntry;
-import hci.gnomex.model.Visibility;
-import hci.gnomex.model.WorkItem;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.*;
 import hci.gnomex.utility.RequestParser.HybInfo;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
-import java.math.BigDecimal;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.internal.SessionImpl;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -85,19 +26,15 @@ import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.persistence.PersistenceException;
-
-import org.hibernate.query.Query;
-import org.hibernate.query.NativeQuery;
-import org.hibernate.Session;
-import org.hibernate.internal.SessionImpl;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.apache.log4j.Logger;
+import javax.servlet.http.HttpSession;
+import java.io.*;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.*;
 
 import static hci.gnomex.constants.Constants.MAX_DESCRIPT_LIMIT;
 
@@ -1179,7 +1116,8 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			if (this.isValid()) {
 				// Get the current billing period
 				billingPeriod = dictionaryHelper.getCurrentBillingPeriod();
-				if (billingPeriod == null && requestXMLString.contains("isExternal=\"N\"")) {
+				String isExternal = requestParser.getRequest().getIsExternal();
+				if (billingPeriod == null && (isExternal == null || isExternal.equals("N"))) {
 					throw new Exception("Cannot find current billing period to create billing items");
 				}
 
@@ -2146,6 +2084,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					workItem.setIdCoreFacility(requestCategory.getIdCoreFacility());
 					if (RequestCategory.isIlluminaRequestCategory(requestParser.getRequest().getCodeRequestCategory())) {
 
+						// **************** should we change this ************************
 						if (requestParser.isQCAmendRequest() && !isNewSample) {
 							String codeStepNext = "";
 							if (requestCategory.getType().equals(RequestCategoryType.TYPE_HISEQ)) {
@@ -3184,8 +3123,8 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 		return emailBody;
 	}
 
-	private void sendInvoicePriceEmail(Session sess, String contactEmail, String ccEmail, String billedAccountName) throws NamingException, MessagingException,
-			IOException {
+	private void sendInvoicePriceEmail(Session sess, String contactEmail, String ccEmail, String billedAccountName) throws NamingException,
+			IOException, MessagingException {
 
 		DictionaryHelper dictionaryHelper = DictionaryHelper.getInstance(sess);
 		PropertyDictionaryHelper pdh = PropertyDictionaryHelper.getInstance(sess);

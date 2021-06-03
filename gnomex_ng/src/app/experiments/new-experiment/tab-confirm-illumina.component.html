@@ -10,7 +10,7 @@
                         Agree to estimated charges by clicking the "I authorize" checkbox.
                     </li>
                     <li>
-                        Submit the experiment information by clicking the "Submit" button.
+                        Submit the experiment information by clicking the {{ experiment?.isExternal !== 'Y' ? "\"Submit\"" : "\"Save\"" }} button.
                     </li>
                 </ol>
             </div>
@@ -59,7 +59,7 @@
             <div *ngIf="experiment && experiment.selectedProtocol && experiment.selectedProtocol.display" class="padded">
                 {{ experiment?.selectedProtocol?.display }}
             </div>
-            <div *ngIf="experiment?.seqPrepByCore_forSamples === 'Y'" class="padded">
+            <div *ngIf="experiment?.seqPrepByCore_forSamples !== 'Y'" class="padded">
                 Library Prepared By Client
             </div>
         </div>
@@ -126,8 +126,7 @@
                 <div class="wide-display">
                     {{ experimentAnnotation.name }}
                 </div>
-                <div class="flex-grow multiline-strings">
-                    {{ displayAnnotationValue(experimentAnnotation) }}
+                <div class="flex-grow multiline-strings" innerHTML="{{ displayAnnotationValue(experimentAnnotation) }}">
                 </div>
             </div>
         </div>

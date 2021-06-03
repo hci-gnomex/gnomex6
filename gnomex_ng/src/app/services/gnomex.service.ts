@@ -99,8 +99,16 @@ export class GnomexService {
     public disableUserSignup: boolean = false;
     public noGuestAccess: boolean = true;
     public maintenanceSplash: string;
+    public duo_host: string;
+    public ikey: string;
+    public skey: string;
+    public akey: string;
+    public useduo: boolean;
+    private useduostr: string;
+    public duoExceptions: string;
 
     public showUsageOnStartUp: string = 'N';
+    public theUsername: string = '';
 
 
     constructor(
@@ -1003,6 +1011,17 @@ export class GnomexService {
             if (response && response.result === "SUCCESS") {
                 this.disableUserSignup = response[PropertyService.PROPERTY_DISABLE_USER_SIGNUP];
                 this.noGuestAccess = response[PropertyService.PROPERTY_NO_GUEST_ACCESS];
+                this.useduo =false;
+                this.useduostr = response["useduo"];
+                if (this.useduostr === "yes")
+                {
+                    this.useduo = true;
+                }
+                this.ikey = response["ikey"];
+                this.skey = response["skey"];
+                this.akey = response["akey"];
+                this.duo_host = response["duohost"];
+                this.duoExceptions = response[PropertyService.PROPERTY_DUOEXCEPTIONS];
                 this.maintenanceMode = response[PropertyService.PROPERTY_MAINTENANCEMODE];
                 this.maintenanceSplash = response[PropertyService.PROPERTY_MAINTENANCE_SPLASH];
                 if (this.maintenanceMode) {

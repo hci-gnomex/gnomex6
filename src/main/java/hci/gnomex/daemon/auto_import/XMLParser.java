@@ -41,6 +41,7 @@ public class XMLParser {
 	private static final String FOUNDATION_FOLDER="Patients - Foundation - NO PHI";
 	private static final String AVATAR_FOLDER="Patients - Avatar - NO PHI";
 	private static final String TEMPUS_FOLDER="Patients - Tempus - NO PHI";
+	private static final String CARIS_FOLDER= "Patients - Caris - NO PHI";
 	private static final String IMPORT_EXPERIMENT_ERROR = "import_experiment_error.log";
 	private static final String IMPORT_ANALYSIS_ERROR = "import_analysis_error.log";
 	private static final String LINK_EXP_ANAL_ERROR = "link_exp_analysis_error.log";
@@ -126,7 +127,7 @@ public class XMLParser {
 			{
 
 				String key = entry.getKey();
-				TreeMap<String, List<PersonEntry>> AvatarList = entry.getValue(); // all SL number for that patient
+				TreeMap<String, List<PersonEntry>> personList = entry.getValue(); // all samples for that patient
 
 				//String query = "//book/author";//[@name='TRF89342']";
 				List<Element> sampleList = queryXML(query,doc);
@@ -134,8 +135,8 @@ public class XMLParser {
 				List<Element> propEntry = queryXML(personIDQuery, doc);
 
 
-				setSamples(sampleList,AvatarList);
-				setRequestProperties(rPropertiesList,AvatarList);
+				setSamples(sampleList,personList);
+				setRequestProperties(rPropertiesList,personList);
 				String personID = propEntry.get(0).getAttributeValue("value");
 
 				writeXML(doc);
@@ -145,8 +146,10 @@ public class XMLParser {
 				}
 				else if(importMode.toLowerCase().equals("foundation"))  {
 					callXMLImporter(this.FOUNDATION_FOLDER,personID);
-				}else{
+				}else if (importMode.toLowerCase().equals("tempus")) {
 					callXMLImporter(this.TEMPUS_FOLDER, personID);
+				}else if (importMode.toLowerCase().equals("caris")) {
+					callXMLImporter(this.CARIS_FOLDER, personID);
 				}
 
 				reader.close();
@@ -225,14 +228,13 @@ public class XMLParser {
 	public void setSamples(List<Element> sampleList, Map<String, List<PersonEntry>>sampleAnnotations) {
 		// You may have multiple  entries for one person
 
-
 		int i = 0;
 		for(Entry<String, List<PersonEntry>> entry : sampleAnnotations.entrySet()){
 			String key = entry.getKey(); //
-			List<PersonEntry> entries = entry.getValue();
+			List<PersonEntry> entries = entry.getValue(); // only care about first entry shouldn't be more than one
 
 			Element samples = sampleList.get(0).getParentElement();
-
+			//xml always has one sample(the first) defined as the template sample so you don't need to clone it
 			if(i == 0 ) {
 				sampleList.get(i).getAttribute("ccNumber").setValue(entries.get(0).getCcNumber());
 				sampleList.get(i).getAttribute("ANNOT21").setValue(entries.get(0).getTestType());
@@ -240,6 +242,9 @@ public class XMLParser {
 				sampleList.get(i).getAttribute("ANNOT27").setValue(entries.get(0).getSubmittedDiagnosis());
 				sampleList.get(i).getAttribute("ANNOT66").setValue(entries.get(0).getTissueType());
 				sampleList.get(i).getAttribute("ANNOT65").setValue(entries.get(0).getSampleSubtype());
+				sampleList.get(i).getAttribute("ANNOT72").setValue(entries.get(0).getCaptureDesign());
+				sampleList.get(i).getAttribute("ANNOT73").setValue(entries.get(0).getCaptureTestName());
+				sampleList.get(i).getAttribute("ANNOT74").setValue(entries.get(0).getCaptureTestDescription());
 
 
 			}else {
@@ -250,6 +255,9 @@ public class XMLParser {
 				newSample.getAttribute("ANNOT27").setValue(entries.get(0).getSubmittedDiagnosis());
 				newSample.getAttribute("ANNOT66").setValue(entries.get(0).getTissueType());
 				newSample.getAttribute("ANNOT65").setValue(entries.get(0).getSampleSubtype());
+				newSample.getAttribute("ANNOT72").setValue(entries.get(0).getCaptureDesign());
+				newSample.getAttribute("ANNOT73").setValue(entries.get(0).getCaptureTestName());
+				newSample.getAttribute("ANNOT74").setValue(entries.get(0).getCaptureTestDescription());
 
 				samples.addContent(newSample);
 			}
@@ -334,7 +342,7 @@ public class XMLParser {
 
 		try {
 			if(flaggedAvatarEntries.size() > 0  ) {
-				DirectoryBuilder.sendImportedIDReport(from, to, subject, strBuildBody.toString(), "");
+				DirectoryBuilder.sendImportedIDReport(from, to, subject, strBuildBody.toString(), "",false);
 			}else{
 				System.out.println("There are no flagged files. Email will not be sent.");
 			}
@@ -387,6 +395,10 @@ public class XMLParser {
 					entry.setTissueType(cleanData(aEntries[8]));
 					entry.setSampleSubtype(cleanData(aEntries[9]));
 					entry.setSubmittedDiagnosis(cleanData(aEntries[10]));
+					//todo avatar not bringing in these columns yet, making placholder
+					entry.setCaptureTestName(cleanData("null"));
+					entry.setCaptureDesign(cleanData("null"));
+					entry.setCaptureTestDescription(cleanData("null"));
 
 				}else if (importMode.toLowerCase().equals("foundation")) { // Foundation has less items per entry
 					entry.setMrn(cleanData(aEntries[0]));
@@ -399,6 +411,10 @@ public class XMLParser {
 					entry.setSampleSubtype(cleanData(aEntries[7]));
 					entry.setTissueType(cleanData(aEntries[8]));
 					entry.setSubmittedDiagnosis(cleanData(aEntries[9]));
+					entry.setCaptureTestName(cleanData(aEntries[10]));
+					entry.setCaptureDesign(cleanData(aEntries[11]));
+					entry.setCaptureTestDescription(cleanData(aEntries[12]));
+
 					entry.setCcNumber("");
 
 				}else if(importMode.toLowerCase().equals("tempus")){
@@ -412,7 +428,12 @@ public class XMLParser {
 					entry.setSampleSubtype(cleanData(aEntries[7]));
 					entry.setTissueType(cleanData(aEntries[8]));
 					entry.setSubmittedDiagnosis(cleanData(aEntries[9]));
+					entry.setCaptureTestName(cleanData(aEntries[10]));
+					entry.setCaptureDesign(cleanData(aEntries[11]));
+					entry.setCaptureTestDescription(cleanData(aEntries[12]));
 					entry.setCcNumber("");
+				} else if (importMode.toLowerCase().equals("caris")){ //order matters!!
+					//todo once we determine db output, import the file here
 				}
 
 
@@ -822,7 +843,6 @@ public class XMLParser {
 			pw.write(report.toString());
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			pw.close();
 			System.exit(1);
@@ -860,12 +880,15 @@ public class XMLParser {
 			pw.close();
 			// This the sl or trf list after flagged id's have been removed out
 			String name = "";
+			// this file is for the FileMover to make the email report of new samples
 			if(this.importMode.equals("avatar")){
 				name = "importedSLList.out";
 			}else if (importMode.equals("foundation")){
 				name = "importedTRFList.out";
-			}else{
+			}else if (importMode.equals("tempus")){
 				name = "importedTLList.out";
+			}else {
+				name = "importedTNList.out";
 			}
 			pw = new PrintWriter(new FileWriter(path + name));
 
@@ -885,7 +908,6 @@ public class XMLParser {
 			}
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			pw.close();
 			System.exit(1);
@@ -895,7 +917,6 @@ public class XMLParser {
 	}
 
 	public static String getPathWithoutName(String fullPathWithFile) {
-
 		File file = new File(fullPathWithFile);
 		String filePath  = file.getParent();
 		return filePath + File.separator;

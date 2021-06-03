@@ -2,7 +2,6 @@ package hci.gnomex.controller;
 
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.PropertyDictionaryHelper;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
@@ -11,12 +10,24 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Properties;
 
 public class GetLoginProperties extends HttpServlet {
 
     private static Logger LOG = Logger.getLogger(GetLoginProperties.class);
+
+    // Properties file keys
+    private static final String IKEY = "ikey";
+    private static final String SKEY = "skey";
+    private static final String HOST = "host";
+    private static final String AKEY = "akey";
+
+    private Properties duoProperties;
+
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
@@ -38,10 +49,28 @@ public class GetLoginProperties extends HttpServlet {
 
             boolean noPublicAccess = true;
             PropertyDictionary noPublicAccessProp = (PropertyDictionary) sess.createQuery("from PropertyDictionary p where p.propertyName='" + PropertyDictionary.NO_PUBLIC_VISIBILITY + "'").uniqueResult();
-            if(noPublicAccessProp == null || !noPublicAccessProp.getPropertyValue().equals("Y")){
+            if (noPublicAccessProp == null || !noPublicAccessProp.getPropertyValue().equals("Y")) {
                 noPublicAccess = false;
             }
 
+            boolean useDuo = false;
+            PropertyDictionary useDuoProp = (PropertyDictionary) sess.createQuery("from PropertyDictionary p where p.propertyName='" + PropertyDictionary.USEDUO + "'").uniqueResult();
+            if (useDuoProp != null && useDuoProp.getPropertyValue().equalsIgnoreCase("Y")) {
+                useDuo = true;
+            }
+
+            String duoExceptions = "none";
+            if (useDuo) {
+                PropertyDictionary duoExceptionsProp = (PropertyDictionary) sess.createQuery("from PropertyDictionary p where p.propertyName='" + PropertyDictionary.DUOEXCEPTIONS + "'").uniqueResult();
+                if (duoExceptionsProp != null) {
+                    duoExceptions = duoExceptionsProp.getPropertyValue();
+                }
+            }
+
+            String useDuostr = "no";
+            if (useDuo) {
+                useDuostr = "yes";
+            }
             boolean maintenanceMode = false;
             String maintenanceSplash = "";
             PropertyDictionary maintenanceModeProp = (PropertyDictionary) sess.createQuery("from PropertyDictionary p where p.propertyName='" + PropertyDictionary.MAINTENANCEMODE + "'").uniqueResult();
@@ -53,24 +82,51 @@ public class GetLoginProperties extends HttpServlet {
                 noGuestAccess = true;
 
                 PropertyDictionary maintenanceSplashProp = (PropertyDictionary)
-                sess.createQuery(
-                        "from PropertyDictionary p where p.propertyName='"
-                            + PropertyDictionary.MAINTENANCE_SPLASH
-                            + "'")
-                    .uniqueResult();
+                        sess.createQuery(
+                                "from PropertyDictionary p where p.propertyName='"
+                                        + PropertyDictionary.MAINTENANCE_SPLASH
+                                        + "'")
+                                .uniqueResult();
                 if (maintenanceSplashProp != null) {
                     maintenanceSplash = maintenanceSplashProp.getPropertyValue();
                 }
             }
+
+            String ikey = "";
+            String skey = "";
+            String akey = "";
+            String duoHost = "";
+
+            if (useDuo) {
+                try {
+                    duoProperties = getDuoProperties();
+                } catch (Exception e) {
+                    System.out.println("[GetLoginProperties TwoFactorAuth] ERROR: " + e);
+                    throw new ServletException(e);
+                }
+
+                ikey = duoProperties.getProperty(IKEY);
+                skey = duoProperties.getProperty(SKEY);
+                akey = duoProperties.getProperty(AKEY);
+                duoHost = duoProperties.getProperty(HOST);
+
+
+            } // end of useDuo if
 
 
             String jsonResult = Json.createObjectBuilder()
                     .add("result", "SUCCESS")
                     .add(PropertyDictionary.DISABLE_USER_SIGNUP, disableUserSignup)
                     .add(PropertyDictionary.NO_GUEST_ACCESS, noGuestAccess)
-                    .add(PropertyDictionary.NO_PUBLIC_VISIBILITY,noPublicAccess)
-                    .add(PropertyDictionary.MAINTENANCEMODE,maintenanceMode)
-                    .add(PropertyDictionary.MAINTENANCE_SPLASH,maintenanceSplash)
+                    .add("useduo",useDuostr)
+                    .add("ikey", ikey)
+                    .add("skey", skey)
+                    .add("akey", akey)
+                    .add("duohost", duoHost)
+                    .add(PropertyDictionary.DUOEXCEPTIONS, duoExceptions)
+                    .add(PropertyDictionary.NO_PUBLIC_VISIBILITY, noPublicAccess)
+                    .add(PropertyDictionary.MAINTENANCEMODE, maintenanceMode)
+                    .add(PropertyDictionary.MAINTENANCE_SPLASH, maintenanceSplash)
                     .build()
                     .toString();
 
@@ -90,4 +146,30 @@ public class GetLoginProperties extends HttpServlet {
         }
     }
 
+    private static Properties getDuoProperties() throws FileNotFoundException, IOException, DuoPropertyException {
+        Properties duoProperties = new Properties();
+        duoProperties.load(new FileInputStream("/properties/duo.properties"));
+
+        if (!duoProperties.containsKey(IKEY)) {
+            throw new DuoPropertyException("ikey is a required property");
+        }
+        if (!duoProperties.containsKey(SKEY)) {
+            throw new DuoPropertyException("skey is a required property");
+        }
+        if (!duoProperties.containsKey(AKEY)) {
+            throw new DuoPropertyException("akey is a required property");
+        }
+        if (!duoProperties.containsKey(HOST)) {
+            throw new DuoPropertyException("host is a required property");
+        }
+
+        return duoProperties;
+    }
 }
+    final class DuoPropertyException extends Exception {
+        public DuoPropertyException(String message) {
+            super(message);
+        }
+
+    }
+

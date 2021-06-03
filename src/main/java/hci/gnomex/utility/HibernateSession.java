@@ -1,16 +1,5 @@
 package hci.gnomex.utility;
 
-/**
- * <p>Title: </p>
- * <p>Description: </p>
- * <p>Copyright: Copyright (c) 2003</p>
- * <p>Company: HCI - Informatics</p>
- * @author Kirt Henrie
- * @version 2.0
- *
- * Modification:
- * 6/10/03    K. Henrie        Change for hibernate 2.0
- */
 
 import hci.gnomex.constants.Constants;
 

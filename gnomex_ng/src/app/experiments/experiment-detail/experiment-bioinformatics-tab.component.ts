@@ -76,6 +76,7 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
                 experiment);
         }
 
+        this.flag_isANewExperiment = false;
         if (this._experiment && this._experiment.sequenceLanes) {
             this._experiment.sequenceLanes = UtilService.getJsonArray(this._experiment.sequenceLanes, this._experiment.sequenceLanes["SequenceLane"]);
             if (this._experiment.sequenceLanes.length === 0) {
@@ -236,90 +237,108 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
         let consolidatedOrganismIds: Set<string> = new Set();
         this.consolidatedGenomeInformation = [];
 
-        if (this._experiment.sequenceLanes
-            && Array.isArray(this._experiment.sequenceLanes)
-            && !this.flag_isANewExperiment) {
-
-            for (let sequenceLane of this._experiment.sequenceLanes) {
-                let idGenomeBuildAlignTo: string = '';
-                let idOrganism: string = '';
-
-                if (sequenceLane && sequenceLane.idGenomeBuildAlignTo) {
-                    consolidatedGenomeBuildIds.add(sequenceLane.idGenomeBuildAlignTo);
-                    idGenomeBuildAlignTo = sequenceLane.idGenomeBuildAlignTo;
-                }
-                if (sequenceLane && sequenceLane.idOrganism) {
-                    consolidatedOrganismIds.add(sequenceLane.idOrganism);
-                    idOrganism = sequenceLane.idOrganism;
-                }
-
-                let temp: any = {
-                    idGenomeBuildAlignTo: idGenomeBuildAlignTo,
-                    idOrganism: idOrganism,
-                    organismName: '',
-                    alignToGenomeBuild: (!!idGenomeBuildAlignTo ? true : false),
-                    dictionary: [],
-                    sequenceLane: sequenceLane
-                };
-
-                for (let info of this.consolidatedGenomeInformation) {
-                    if (temp.idOrganism === info.idOrganism && !info.alignToGenomeBuild) {
-                        info.idGenomeBuildAlignTo = temp.idGenomeBuildAlignTo;
-                        info.idOrganism           = temp.idOrganism;
-                        info.organismName         = temp.organismName;
-                        info.alignToGenomeBuild   = temp.alignToGenomeBuild;
-                        info.dictionary           = temp.dictionary;
-                        info.sequenceLane         = temp.sequenceLane;
+        if(this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y' ) {
+    
+            if (this._experiment.sequenceLanes
+                && Array.isArray(this._experiment.sequenceLanes)
+                && !this.flag_isANewExperiment) {
+        
+                for (let sequenceLane of this._experiment.sequenceLanes) {
+                    let idGenomeBuildAlignTo: string = '';
+                    let idOrganism: string = '';
+            
+                    if (sequenceLane && sequenceLane.idGenomeBuildAlignTo) {
+                        consolidatedGenomeBuildIds.add(sequenceLane.idGenomeBuildAlignTo);
+                        idGenomeBuildAlignTo = sequenceLane.idGenomeBuildAlignTo;
                     }
-                }
-
-                let checkForExisting: any[] = this.consolidatedGenomeInformation.filter((a) => {
-                    return temp.idGenomeBuildAlignTo === a.idGenomeBuildAlignTo
-                        && temp.idOrganism           === a.idOrganism
-                        && temp.organismName         === a.organismName
-                        && temp.alignToGenomeBuild   === a.alignToGenomeBuild;
-                });
-
-                if (checkForExisting.length === 0) {
-                    let checkForOrganism: any[] = this.consolidatedGenomeInformation.filter((a) => {
-                        return temp.idOrganism === a.idOrganism
-                            && !temp.alignToGenomeBuild
-                            && a.alignToGenomeBuild;
+                    if (sequenceLane && sequenceLane.idOrganism) {
+                        consolidatedOrganismIds.add(sequenceLane.idOrganism);
+                        idOrganism = sequenceLane.idOrganism;
+                    }
+            
+                    let temp: any = {
+                        idGenomeBuildAlignTo: idGenomeBuildAlignTo,
+                        idOrganism: idOrganism,
+                        organismName: '',
+                        alignToGenomeBuild: (!!idGenomeBuildAlignTo ? true : false),
+                        dictionary: [],
+                        sequenceLane: sequenceLane
+                    };
+            
+                    for (let info of this.consolidatedGenomeInformation) {
+                        if (temp.idOrganism === info.idOrganism && !info.alignToGenomeBuild) {
+                            info.idGenomeBuildAlignTo = temp.idGenomeBuildAlignTo;
+                            info.idOrganism = temp.idOrganism;
+                            info.organismName = temp.organismName;
+                            info.alignToGenomeBuild = temp.alignToGenomeBuild;
+                            info.dictionary = temp.dictionary;
+                            info.sequenceLane = temp.sequenceLane;
+                        }
+                    }
+            
+                    let checkForExisting: any[] = this.consolidatedGenomeInformation.filter((a) => {
+                        return temp.idGenomeBuildAlignTo === a.idGenomeBuildAlignTo
+                            && temp.idOrganism === a.idOrganism
+                            && temp.organismName === a.organismName
+                            && temp.alignToGenomeBuild === a.alignToGenomeBuild;
                     });
-
-                    if (checkForOrganism.length === 0) {
-                        this.consolidatedGenomeInformation.push(temp);
+            
+                    if (checkForExisting.length === 0) {
+                        let checkForOrganism: any[] = this.consolidatedGenomeInformation.filter((a) => {
+                            return temp.idOrganism === a.idOrganism
+                                && !temp.alignToGenomeBuild
+                                && a.alignToGenomeBuild;
+                        });
+                
+                        if (checkForOrganism.length === 0) {
+                            this.consolidatedGenomeInformation.push(temp);
+                        }
                     }
                 }
-            }
-
-            for (let id of consolidatedGenomeBuildIds) {
-                if (this.genomeBuild) {
-                    this.genomeBuild = this.genomeBuild + ' --- ';
+        
+                for (let id of consolidatedGenomeBuildIds) {
+                    if (this.genomeBuild) {
+                        this.genomeBuild = this.genomeBuild + ' --- ';
+                    }
+            
+                    let entry: any = this.dictionaryService.getEntry('hci.gnomex.model.GenomeBuildLite', id);
+            
+                    if (entry) {
+                        this.genomeBuild = this.genomeBuild + entry.display;
+                    }
                 }
-
-                let entry: any = this.dictionaryService.getEntry('hci.gnomex.model.GenomeBuildLite', id);
-
-                if (entry) {
-                    this.genomeBuild = this.genomeBuild + entry.display;
-                }
-            }
-        } else {
-            this._experiment.sequenceLanes = [];
-
-            for (let sample of this._experiment.samples) {
-                let idOrganism: string = '';
-
-                if (sample.idOrganism) {
-                    consolidatedOrganismIds.add(sample.idOrganism);
-                    idOrganism = sample.idOrganism;
-                }
-
-                let lanePlus: number = parseInt(sample.multiplexGroupNumber) + 100000;
-                let laneStr: string = lanePlus.toString().substr(1);
-
-                if (sample.numberSequencingLanes) {
-                    for (let i: number = 0; i < sample.numberSequencingLanes; i++) {
+            } else {
+                this._experiment.sequenceLanes = [];
+        
+                for (let sample of this._experiment.samples) {
+                    let idOrganism: string = '';
+            
+                    if (sample.idOrganism) {
+                        consolidatedOrganismIds.add(sample.idOrganism);
+                        idOrganism = sample.idOrganism;
+                    }
+            
+                    let lanePlus: number = parseInt(sample.multiplexGroupNumber) + 100000;
+                    let laneStr: string = lanePlus.toString().substr(1);
+            
+                    if (sample.numberSequencingLanes) {
+                        for (let i: number = 0; i < sample.numberSequencingLanes; i++) {
+                            let laneObj = {
+                                idSequenceLane: 'SequenceLane' + laneStr,
+                                notes: '',
+                                idSeqRunType: sample.idSeqRunType,
+                                idNumberSequencingCycles: sample.idNumberSequencingCycles,
+                                idNumberSequencingCyclesAllowed: sample.idNumberSequencingCyclesAllowed,
+                                idSample: sample.idSample,
+                                idOrganism: sample.idOrganism,
+                                idGenomeBuildAlignTo: ''
+                            };
+                    
+                            this._experiment.sequenceLanes.push(laneObj);
+                        }
+                    } else {
                         let laneObj = {
                             idSequenceLane: 'SequenceLane' + laneStr,
                             notes: '',
@@ -330,61 +349,54 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
                             idOrganism: sample.idOrganism,
                             idGenomeBuildAlignTo: ''
                         };
-
+                
                         this._experiment.sequenceLanes.push(laneObj);
                     }
-                } else {
-                    let laneObj = {
-                        idSequenceLane: 'SequenceLane' + laneStr,
-                        notes: '',
-                        idSeqRunType: sample.idSeqRunType,
-                        idNumberSequencingCycles: sample.idNumberSequencingCycles,
-                        idNumberSequencingCyclesAllowed: sample.idNumberSequencingCyclesAllowed,
-                        idSample: sample.idSample,
-                        idOrganism: sample.idOrganism,
-                        idGenomeBuildAlignTo: ''
+            
+            
+                    let temp: any = {
+                        alignToGenomeBuild: false,
+                        dictionary: [],
+                        idGenomeBuildAlignTo: '',
+                        idOrganism: idOrganism,
+                        organismName: ''
                     };
-
-                    this._experiment.sequenceLanes.push(laneObj);
-                }
-
-
-                let temp: any = {
-                    alignToGenomeBuild: false,
-                    dictionary: [],
-                    idGenomeBuildAlignTo: '',
-                    idOrganism: idOrganism,
-                    organismName: ''
-                };
-
-                for (let info of this.consolidatedGenomeInformation) {
-                    if (temp.idOrganism === info.idOrganism && !info.alignToGenomeBuild) {
-                        info.idGenomeBuildAlignTo = temp.idGenomeBuildAlignTo;
-                        info.idOrganism           = temp.idOrganism;
-                        info.organismName         = temp.organismName;
-                        info.alignToGenomeBuild   = temp.alignToGenomeBuild;
-                        info.dictionary           = temp.dictionary;
-                        info.sequenceLane         = temp.sequenceLane;
+            
+                    for (let info of this.consolidatedGenomeInformation) {
+                        if (temp.idOrganism === info.idOrganism && !info.alignToGenomeBuild) {
+                            info.idGenomeBuildAlignTo = temp.idGenomeBuildAlignTo;
+                            info.idOrganism = temp.idOrganism;
+                            info.organismName = temp.organismName;
+                            info.alignToGenomeBuild = temp.alignToGenomeBuild;
+                            info.dictionary = temp.dictionary;
+                            info.sequenceLane = temp.sequenceLane;
+                        }
                     }
-                }
-
-                let checkForExisting: any[] = this.consolidatedGenomeInformation.filter((a) => {
-                    return temp.idGenomeBuildAlignTo === a.idGenomeBuildAlignTo
-                        && temp.idOrganism           === a.idOrganism
-                        && temp.organismName         === a.organismName
-                        && temp.alignToGenomeBuild   === a.alignToGenomeBuild;
-                });
-
-                if (checkForExisting.length === 0) {
-                    let checkForOrganism: any[] = this.consolidatedGenomeInformation.filter((a) => {
-                        return temp.idOrganism === a.idOrganism
-                            && !temp.alignToGenomeBuild
-                            && a.alignToGenomeBuild;
+            
+                    let checkForExisting: any[] = this.consolidatedGenomeInformation.filter((a) => {
+                        return temp.idGenomeBuildAlignTo === a.idGenomeBuildAlignTo
+                            && temp.idOrganism === a.idOrganism
+                            && temp.organismName === a.organismName
+                            && temp.alignToGenomeBuild === a.alignToGenomeBuild;
                     });
-
-                    if (checkForOrganism.length === 0) {
-                        this.consolidatedGenomeInformation.push(temp);
+            
+                    if (checkForExisting.length === 0) {
+                        let checkForOrganism: any[] = this.consolidatedGenomeInformation.filter((a) => {
+                            return temp.idOrganism === a.idOrganism
+                                && !temp.alignToGenomeBuild
+                                && a.alignToGenomeBuild;
+                        });
+                
+                        if (checkForOrganism.length === 0) {
+                            this.consolidatedGenomeInformation.push(temp);
+                        }
                     }
+                }
+            }
+        } else {
+            for (let sample of this._experiment.samples) {
+                if (sample.idOrganism) {
+                    consolidatedOrganismIds.add(sample.idOrganism);
                 }
             }
         }

@@ -250,7 +250,38 @@ public class Differ {
 
 
 	}
+	public static String  constructIDbySubGrouping(List<Integer> groupRange, Matcher m,Set<String> subGroups, int primaryGroupIndex ){
+		StringBuilder renameBuildStr = new StringBuilder();
 
+		for(int i = 0 ; i < groupRange.size(); i++ ){
+			int groupIndex = groupRange.get(i);
+			if (m.group(groupIndex) == null) {
+				continue;
+			}
+			if(groupIndex != primaryGroupIndex){
+				subGroups.add(m.group(groupIndex));
+			}
+
+			if(i < m.groupCount()){
+				renameBuildStr.append(m.group(groupIndex));
+				renameBuildStr.append("-");
+			}else {
+				renameBuildStr.append(m.group(groupIndex));
+			}
+
+		}
+
+
+		String rename = renameBuildStr.toString();
+		if(rename.endsWith("-")){
+			renameBuildStr.deleteCharAt(renameBuildStr.length() - 1);
+			rename = renameBuildStr.toString();
+		}
+
+		//System.out.println(String.join(",",sortID));
+		return rename;
+
+	}
 
 
 	public static String  constructMatchedFileName(Integer startCaptureGroup, Integer endCaptureGroup, Matcher m, StringBuilder renameBuildStr,
@@ -397,12 +428,12 @@ public class Differ {
 
 
 
-	public void writeDiffToFile(List<String> uniqueFiles){ // use if you want to do std.out
+	public void writeDiffToFile(List<String> uniqueFiles) throws FileNotFoundException { // use if you want to do std.out
 		PrintWriter writer = null;
 		writer = new PrintWriter(System.out);
 
 		for(String file: uniqueFiles) {
-			System.out.println(file);
+			writer.println(file);
 		}
 
 		writer.close();

@@ -137,7 +137,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 	public readonly PO:          string = 'po';
 	public readonly CREDIT_CARD: string = 'creditCard';
 
-	public showField: string = this.CHARTFIELD;
+	public showField: string = ""
 
 	public usesCustomChartfields: boolean;
 
@@ -147,7 +147,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 	// The definition of valid email addresses can be found at
 	//     https://en.wikipedia.org/wiki/Email_address#Domain
 	//   at the time of writing, which this does not fully support...
-	private emailPatternValidator = Validators.pattern(/^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/);
+//	private emailPatternValidator = Validators.pattern(/^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/);
 
 	public formGroup:FormGroup;
 
@@ -174,6 +174,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 
 	public isActivity: boolean = false;
 	public disableCoreFacilitiesSelector = true;
+	private enableLabCoreFacilitiesSelector = false;
 
 	private otherAccountFieldsConfiguration: any[] = [];
 	public internalAccountFieldsConfiguration: any = [
@@ -312,11 +313,16 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 				@Inject(MAT_DIALOG_DATA) private data) {
 		super();
 
-		this.primaryDisable = (action) => {
-			return this.formGroup.invalid;
-		};
-
 		this._data = data;
+
+		this.showField = this.CHARTFIELD;
+		if (this._data && this._data.rowData) {
+			if(this._data.rowData.isPO === 'Y') {
+				this.showField = this.PO;
+			} else if(this._data.rowData.isCreditCard === 'Y') {
+				this.showField = this.CREDIT_CARD;
+			}
+		}
 	}
 
 	ngOnInit(): void {
@@ -325,6 +331,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 				this._showCreditCard = true;
 			}
 		}
+		this.enableLabCoreFacilitiesSelector = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_ENABLE_SELECT_BILLING_LAB_CORE_FACILITIES);
 
 		this.formGroup = this.fb.group({
 			lab: ['', Validators.required],
@@ -335,7 +342,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			expirationDate:['',[Validators.required]],
 			totalDollarAmount:['',[ Validators.pattern(/^[0-9,]*(\.\d{2})?$/)]],
 			active: false,
-			email:['', [ this.emailPatternValidator, Validators.required ]],
+			email:['', [Validators.pattern(/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/), Validators.required ]],
 			agreement:[false, [Validators.requiredTrue] ],
 			creditLastFour:['',[Validators.pattern(/^\d{4}$/), Validators.required]],
 			creditZipCode: ['', [ Validators.required,  Validators.pattern(/^\d{5}((\s*|(\s*-\s*))(\d{4}))?$/) ]],
@@ -343,7 +350,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			approvedUsersDisplayFC: ["", []]
 		});
 
-		if (this.data && this.data.idLab) {
+		if (this._data && this._data.idLab) {
 			setTimeout(() => {
 				this.dialogService.startDefaultSpinnerDialog();
 			});
@@ -354,13 +361,18 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		this.labListSubscription = this.labListService.getLabList().subscribe((response: any[]) => {
 			this.labList = response;
 
-			if (this.data && this.data.idLab) {
+			if (this._data && this._data.idLab) {
 				let temp: any[] = this.labList.filter((a) => {
 					return a.idLab === this.data.idLab;
 				});
 
 				if (temp.length === 1) {
-					this.formGroup.get('lab').setValue(temp);
+					this.formGroup.get('lab').setValue(temp[0]);
+					if(this.enableLabCoreFacilitiesSelector) {
+						this.formGroup.get('lab').enable();
+					} else {
+						this.formGroup.get('lab').disable();
+					}
 
 					this.onLabListSelection( temp[0] );
 				}
@@ -410,13 +422,13 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 				this.accountFieldsConfigurationService.getInternalAccountFieldsConfigurationObservable().subscribe((response) => {
 					this.addInternalAccountFieldsConfigurationControls(response);
 					customChartfieldValidators = this.addInternalAccountFieldsConfigurationValidators();
-					this.handleConditionalValidators(customChartfieldValidators)
+					this.handleConditionalValidators(customChartfieldValidators);
 				});
 
 			this.otherAccountFieldsConfigurationSubscription =
 				this.accountFieldsConfigurationService.getOtherAccountFieldsConfigurationObservable().subscribe((response) => {
 					this.processOtherAccountFieldsConfigurations(response);
-					this.handleConditionalValidators(customChartfieldValidators)
+					this.handleConditionalValidators(customChartfieldValidators);
 				});
 
 			this.accountFieldsConfigurationService.publishAccountFieldConfigurations();
@@ -440,6 +452,18 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			this._rowData = this._data.rowData;
 			this.applyRowData();
 		}
+
+		if(this.isEditAccountMode) {
+			if(this.enableLabCoreFacilitiesSelector) {
+				this.formGroup.get("lab").enable();
+			} else {
+				this.formGroup.get("lab").disable();
+			}
+		}
+
+		this.primaryDisable = (action) => {
+			return this.formGroup.invalid;
+		};
 	}
 
 	private initializeCustomElements(): void {
@@ -689,9 +713,13 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		this.coreFacilityReducedList = coreFacilityApplicable;
 
 		if (coreFacilityApplicable.length > 0) {
-			this.disableCoreFacilitiesSelector = false;
+			if(this.isEditAccountMode) {
+				this.disableCoreFacilitiesSelector = this.enableLabCoreFacilitiesSelector ? false : true;
+			} else {
+				this.disableCoreFacilitiesSelector = false;
+			}
 
-			if (this.coreFacilityReducedList.length == 1) {
+			if (this.coreFacilityReducedList.length === 1) {
 				this.selectedCoreFacilities = this.coreFacilityReducedList;
 			}
 		} else {
@@ -1575,7 +1603,11 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		this.coreFacilityReducedList = coreFacilityApplicable;
 
 		if (coreFacilityApplicable.length > 0) {
-			this.disableCoreFacilitiesSelector = false;
+			if(this.isEditAccountMode) {
+				this.disableCoreFacilitiesSelector = this.enableLabCoreFacilitiesSelector ? false : true;
+			} else {
+				this.disableCoreFacilitiesSelector = false;
+			}
 
 			if (this.coreFacilityReducedList.length === 1) {
 				this.selectedCoreFacilities = this.coreFacilityReducedList;

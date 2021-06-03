@@ -8,12 +8,11 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 
-import javax.ejb.Stateless;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import java.net.URI;
+
+//import javax.ejb.Stateless;
 
 /**
  * A stateless session bean providing the REST API for creating, getting and deleting user sessions on the server

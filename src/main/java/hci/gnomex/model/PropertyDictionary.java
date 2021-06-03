@@ -149,6 +149,8 @@ public class PropertyDictionary extends DictionaryEntry implements Serializable 
 	public static final String SEQ_LANE_LETTER = "seq_lane_letter";
 	public static final String STATUS_TO_START_WORKFLOW = "status_to_start_workflow";
 	public static final String NO_GUEST_ACCESS = "no_guest_access";
+	public static final String USEDUO = "useduo";
+	public static final String DUOEXCEPTIONS = "duoExceptions";
 	public static final String NO_PUBLIC_VISIBILITY = "no_public_visibility";
 	public static final String ALLOW_CORE_GLOBAL_SUBMISSION = "allow_core_global_submission";
 	public static final String REQUEST_COMPLETE_CONFIRMATION_EMAIL_MESSAGE = "request_complete_confirmation_email_message";
@@ -203,6 +205,8 @@ public class PropertyDictionary extends DictionaryEntry implements Serializable 
 	public static final String MAINTENANCEMODE = "maintenancemode";
 
 	public static final String FORMAT_NAMES_LAST_FIRST = "format_names_last_first";
+
+	public static final String AUTOUPDATE_ACCOUNTS = "autoupdate_accounts";
 
 	private Integer idPropertyDictionary;
 	private String propertyName;

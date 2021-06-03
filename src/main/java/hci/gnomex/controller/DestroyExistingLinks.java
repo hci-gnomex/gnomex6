@@ -1,27 +1,24 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.PropertyDictionary;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
-
 public class DestroyExistingLinks extends GNomExCommand implements Serializable {
 
-private static Logger LOG = Logger.getLogger(MakeDataTrackUCSCLinks.class);
+private static Logger LOG = Logger.getLogger(DestroyExistingLinks.class);
 
 private String dataTrackFileServerWebContext;
 

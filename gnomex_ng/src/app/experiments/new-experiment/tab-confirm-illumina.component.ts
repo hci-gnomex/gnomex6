@@ -27,6 +27,8 @@ import {ConstantsService} from "../../services/constants.service";
 import {PropertyService} from "../../services/property.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
+import {ImprovedSelectRenderer} from "../../util/grid-renderers/improved-select.renderer";
+import {ImprovedSelectEditor} from "../../util/grid-editors/improved-select.editor";
 
 @Component({
     selector: "tabConfirmIllumina",
@@ -124,8 +126,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 && this.experiment.isExternal !== 'Y';
 
             this.showRowNumberColumn = requestCategory
-                && requestCategory.isQCType
-                && requestCategory.isQCType !== 'Y';
+                && requestCategory.type
+                && requestCategory.type !== this.experimentService.TYPE_QC;
 
             let temp = this.propertyService.getProperty(PropertyService.PROPERTY_ESTIMATED_PRICE_WARNING, this._experiment.idCoreFacility, this._experiment.codeRequestCategory);
             this._estimatedChargesWarning = temp && temp.propertyValue ? temp.propertyValue : '';
@@ -643,6 +645,25 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                     // case TabSamplesIlluminaComponent.MULTIOPTION:
                     //     break;
 
+                    case TabSamplesIlluminaComponent.IMP_OPTION:
+                        newColumn.cellRendererFramework = ImprovedSelectRenderer;
+                        newColumn.cellEditorFramework   = ImprovedSelectEditor;
+
+                        if (columnProperty.nameFrontEndDictionaryToUse) {
+                            newColumn.selectOptions = this['' + columnProperty.nameFrontEndDictionaryToUse];
+                        } else if (columnProperty.fullDictionaryModelPathToLoad) {
+                            let fullDictionaryModelPathToLoad: any[] = this.dictionaryService.getEntriesExcludeBlank('' + columnProperty.fullDictionaryModelPathToLoad);
+                            fullDictionaryModelPathToLoad.unshift("");
+                            newColumn.selectOptions = fullDictionaryModelPathToLoad;
+                        } else {
+                            newColumn.selectOptions = [];
+                        }
+
+                        newColumn.selectOptionsDisplayField = columnProperty.nameField ? columnProperty.nameField : "display";
+                        newColumn.selectOptionsValueField   = columnProperty.valueField ? columnProperty.valueField : "value";
+                        break;
+                    // case TabSamplesIlluminaComponent.MULTIOPTION:
+                    //     break;
                     case TabSamplesIlluminaComponent.TEXT:
                         newColumn.cellRendererFramework = TextAlignLeftMiddleRenderer;
                         newColumn.cellEditorFramework   = TextAlignLeftMiddleEditor;

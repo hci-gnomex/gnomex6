@@ -1,9 +1,12 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, OnInit, ChangeDetectorRef} from "@angular/core";
 import {AuthenticationService} from "./authentication.service";
 import {AbstractControl, FormBuilder, FormControl, FormGroup} from "@angular/forms";
 import {Router} from "@angular/router";
 import {GnomexService} from "../services/gnomex.service";
 import {DictionaryService} from "../services/dictionary.service";
+import * as Duo from '../services/Duo-Web-v2';
+import * as Duo2 from '../services/duo';
+import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 
 @Component({
     selector: "hci-login-form",
@@ -22,7 +25,7 @@ import {DictionaryService} from "../services/dictionary.service";
                         <div class="horizontal-centered login-heading">
                             <img [src]="this.gnomexService.logoOrMaint" alt="GNomEx">
                         </div>
-                        <div class="full-width major-vertical-spacer flex-container-row align-center">
+                        <div *ngIf="!this.doDuo" class="full-width major-vertical-spacer flex-container-row align-center">
                             <div *ngIf="_errorMsg" class="horizontal-centered small-font full-width {{ errorClasses }}">
                                 <div class="full-width">
                                     <div class="error">Authentication Failed{{ numberOfAttempts > 1 ? ' (' + numberOfAttempts + ')' : '' }}</div>
@@ -58,30 +61,37 @@ import {DictionaryService} from "../services/dictionary.service";
                                 </div>
                                 <div class="full-width vertical-spacer">
                                 </div>
-                                <button class="full-width bold primary-button padded"
+                                <button  class="full-width bold primary-button padded"
                                         (click)="this.login()">Login
                                 </button>
-                                <div class="full-width vertical-spacer">
+                                <div   class="full-width vertical-spacer">
                                 </div>
-                                <div *ngIf="!this.gnomexService.noGuestAccess" class="full-width flex-container-row">
+                                <div *ngIf="!this.gnomexService.noGuestAccess && !this.doDuo" class="full-width flex-container-row">
                                     <button class="flex-grow secondary-button padded" (click)="this.onResetPassword()">
                                         Reset Password
                                     </button>
-                                    <div *ngIf="!this.gnomexService.disableUserSignup" class="full-height horizontal-spacer">
+                                    <div *ngIf="!this.gnomexService.disableUserSignup && !this.doDuo" class="full-height horizontal-spacer">
                                     </div>
-                                    <button *ngIf="!this.gnomexService.disableUserSignup" class="flex-grow secondary-button padded" (click)="this.onNewAccount()">
+                                    <button *ngIf="!this.gnomexService.disableUserSignup && !this.doDuo" class="flex-grow secondary-button padded" (click)="this.onNewAccount()">
                                         New Account
                                     </button>
                                 </div>
-                                <div *ngIf="!this.gnomexService.noGuestAccess" class="full-width vertical-spacer">
+                                <div *ngIf="!this.gnomexService.noGuestAccess && !this.doDuo" class="full-width vertical-spacer">
                                 </div>
-                                <div *ngIf="!this.gnomexService.noGuestAccess" class="full-width flex-container-row">
+                                <div *ngIf="!this.gnomexService.noGuestAccess && !this.doDuo" class="full-width flex-container-row">
                                     <button class="full-width bold secondary-button padded" (click)="this.guestLogin()">
                                         Guest Login
                                     </button>
                                 </div>
                             </form>
-                        </div>
+                    
+                                 <div *ngIf="this.doDuo" class="full-width flex-grow">
+                                   <iframe id="duo_iframe" height="384px"
+                                        >
+                                    </iframe>"                                
+                                </div>
+                                           
+                     </div>    
                     </div>
                     <div class="flex-grow">
                     </div>
@@ -185,7 +195,12 @@ import {DictionaryService} from "../services/dictionary.service";
         
         .major-padding { padding: 15px; }
         
-
+.iframe {
+    width: 100%;
+    min-width: 304px;
+    max-width: 620px;
+    height: 440px;
+}
         input.username {
             color: black;
             background-color: #FFFFFF;
@@ -387,9 +402,17 @@ export class DirectLoginComponent implements OnInit {
 
     public errorClasses: string = '';
 
+    public sig_request: string = "not sig_request";
+    public duo_sig: string = "not duo_sig";
+    public duo_src: string = "not duo_src";
+    public authenticated_username: string = "";
+    public doDuo: boolean = false;
+
     constructor(private _authenticationService: AuthenticationService,
                 private _formBuilder: FormBuilder,
                 public gnomexService: GnomexService,
+                private changeDetectorRef: ChangeDetectorRef,
+                private dialogsService: DialogsService,
                 private router: Router) {
     }
 
@@ -421,6 +444,7 @@ export class DirectLoginComponent implements OnInit {
         // );
     }
 
+
     /**
      * A function to submit the login form the the {@link UserService}.
      */
@@ -430,6 +454,13 @@ export class DirectLoginComponent implements OnInit {
 
         let okToLogin: boolean = true;
         console.log("username: " + this._loginForm.value.username);
+
+        if (this.gnomexService.useduo) {
+            if (('' + this._loginForm.value.username).match(/^[uU]\d{7,8}$/)) {
+                this.sig_request = Duo2.sign_request(this.gnomexService.ikey, this.gnomexService.skey, this.gnomexService.akey, this._loginForm.value.username);
+                console.log(this.sig_request);
+            }
+        }
         if (this.gnomexService.maintenanceMode && !(this._loginForm.value.username === "adminBatch" ) ) {
             this._errorMsg = "GNomEx is undergoing maintenance.  Please try again later.";
             okToLogin = false;
@@ -443,7 +474,24 @@ export class DirectLoginComponent implements OnInit {
                         this._authenticationService.findAppUserByUsername(this._loginForm.value.username).subscribe((result: any) => {
                             if (result && result.hasUserAccount && ('' + result.hasUserAccount).toLowerCase() === 'y') {
                                 if (result.isActive && ('' + result.isActive).toLowerCase() === 'y') {
-                                    this._authenticationService.requestAccessToken(true);
+                                    if (this.gnomexService.duoExceptions && this.gnomexService.duoExceptions.includes(this._loginForm.value.username) ) {
+                                        this.gnomexService.useduo = false;
+                                    }
+                                    if (this.gnomexService.useduo) {
+                                        this.doDuo = true;
+
+                                        this.changeDetectorRef.detectChanges();
+
+                                        Duo.init({
+                                            iframe: "duo_iframe",
+                                            host: this.gnomexService.duo_host,
+                                            sig_request: this.sig_request,
+                                            submit_callback: this.twoFactorVerify.bind(this),
+                                        });
+                                    }
+                                    else {
+                                        this._authenticationService.requestAccessToken(true);
+                                    }
                                 } else {
                                     this._errorMsg = "UID recognized, but account has been inactivated. Please continue with \"Guest Login\" and contact your lab's Core Administrator or GNomEx Support";
                                 }
@@ -482,7 +530,20 @@ export class DirectLoginComponent implements OnInit {
         this.router.navigateByUrl("register-user");
     }
 
+    twoFactorVerify(response: any) {
+        console.log(response.elements.sig_response.value);
+        var vuser = Duo2.verify_response(this.gnomexService.ikey, this.gnomexService.skey, this.gnomexService.akey, response.elements.sig_response.value);
+        console.log(vuser);
+        if (vuser) {   // || ( this.gnomexService.duoExceptions && this.gnomexService.duoExceptions.includes(this._loginForm.value.username) )) {
+            this._authenticationService.requestAccessToken(true);
+        } else {
+            this.dialogsService.alert("Invalid passcode - please notify gnomex support", null, DialogType.WARNING);
+        }
+   }
+
+
     public onResetPassword(): void {
         this.router.navigateByUrl("reset-password");
     }
 }
+

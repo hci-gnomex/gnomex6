@@ -296,7 +296,11 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
                     flowCell.setIdSeqRunType(lane.getIdSeqRunType());
                   }
                   // if this lane has a higher number of cycles than the current max, update the max
-                  Integer seqCycles = new Integer(dh.getNumberSequencingCycles(lane.getIdNumberSequencingCycles()));
+                  String nseqcyc = dh.getNumberSequencingCycles(lane.getIdNumberSequencingCycles());
+                  if (nseqcyc.equals("") || nseqcyc == null) {
+                    nseqcyc = "0";
+                  }
+                  Integer seqCycles = new Integer(nseqcyc);
                   if (idNumberSequencingCycles == null ||
                       seqCycles.intValue() > maxCycles ) {
                     idNumberSequencingCycles = lane.getIdNumberSequencingCycles(); // set based on highest number of cycles among all <SequenceLane>s in <FlowCell>

@@ -357,34 +357,42 @@ public class Query {
         return hasLink;
     }
 
-    public Map<Integer, List<Integer>> getCollaboratorsForIRB(List<String> irbs, List<Integer> analysisRequestIDs, String collabToAnalysisRequestQuery ) {
+    public Map<Integer, List<Integer>> getCollaboratorsForIRB(List<String> irbNames, List<Integer> analysisRequestIDs, IRBContainer irbContainer, String collabToAnalysisRequestQuery, String orderType) {
         Statement statement = null;
         PreparedStatement pStatement = null;
         ArrayList<Integer> collabIDsInLab = new ArrayList();
-        HashMap collabsToAddForAnalysis = new HashMap();
+        Map<Integer, List<Integer>> collabsToAddForAnalysis = new HashMap();
+        String theIRB = irbNames.size() > 0 ? irbNames.get(0) : null;
+        irbContainer.setIrbName(theIRB);
+        irbContainer.setIrbOrders(new HashMap<>());
 
         try {
 
             String collabToAnalysisQuery = "SELECT * from Lab l JOIN LabUser lu ON lu.idLab = l.idLab WHERE l.lastName LIKE ?";
-
-            for (String irb : irbs) {
+            //todo having multiple irbs doesn't make sense because you can't tell which analysis goes with which IRB
+            //todo need to determine a way in which analyses can be associated with a IRB programmatically, right now its a manual process.
+            //todo this code below will need to be changed to something like a map to group the lab Members into irb groups.
+            //todo for now assume that only one IRB is for all analyses listed
+            if(theIRB != null && !theIRB.equals("")) {
 
                 pStatement = conn.prepareStatement(collabToAnalysisQuery);
-                pStatement.setString(1, "%" + irb + "%");
+                pStatement.setString(1, "%" + theIRB + "%");
                 ResultSet rs = pStatement.executeQuery();
 
                 int labID = -1;
+                String labContactEmail = "";
                 while (rs.next()) {
-
+                    labContactEmail = rs.getString("contactEmail");
                     collabIDsInLab.add(rs.getInt("idAppUser"));
                     Integer currentLabID = rs.getInt("idLab");
                     if (currentLabID != labID && labID != -1) {
-                        throw new Exception("More than one IRB found when only expecting only one for " + irb);
+                        throw new Exception("Error more than one IRB found Please be more specific with the IRB name, it should be unique " + theIRB);
                     }
                     labID = currentLabID;
                 }
                 labID = -1;
                 pStatement.clearParameters();
+                irbContainer.setIrbEmail(labContactEmail);
             }
 
 
@@ -407,14 +415,48 @@ public class Query {
                         System.out.println( " collab: "+ collabID + "  already added. skipping.... ");
                     }else{
                         ((List) collabsToAddForAnalysis.get(arID)).add(collabID);
+
                         System.out.println("   actual collabs added " + collabID);
                     }
                 }
+
+                // now get only new analyses and group them by HCI Person ID
+                pStatement.clearParameters();
+                List<Integer> newOrdersToAssign = new ArrayList();
+                List<Integer> collabs = collabsToAddForAnalysis.get(arID);
+                if(collabs != null && collabs.size() > 0){
+                    newOrdersToAssign.add(arID);
+                }
+                String queryPersonID = "";
+                if(orderType.equals("idAnalysis")){
+                    queryPersonID = "Select a.name from Analysis a WHERE a.idAnalysis = ?";
+                } else {
+                    queryPersonID = "Select a.name from Request r WHERE r.idRequest = ?";
+                }
+                for(Integer order : newOrdersToAssign) {
+                    pStatement = conn.prepareStatement(queryPersonID);
+                    pStatement.setInt(1, order);
+
+                    ResultSet rs = pStatement.executeQuery();
+
+                    if (rs.next()) {
+                        String personID = rs.getString("name");
+                        List<Integer> orders =  irbContainer.getIrbOrders().get(personID);
+                        if(orders != null){
+                            orders.add(order);
+                        }else {
+                            irbContainer.getIrbOrders().put(personID, new ArrayList<Integer>(Arrays.asList(order)));
+                        }
+
+                    }
+                }
+
 
                 System.out.println("-------------------------------------------------------------------");
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            System.exit(1);
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println(e.getMessage());

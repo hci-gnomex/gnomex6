@@ -2669,7 +2669,7 @@
 
     <sql-query name="getLatestBillingAccountChange">
         <return-scalar column="AuditOperationDate" type="timestamp"/>
-        SELECT MAX(baa.AuditOperationDate) AS [AuditOperationDate]
+        SELECT MAX(baa.AuditOperationDate) AS AuditOperationDate
           FROM BillingAccount_Audit baa
     </sql-query>
 

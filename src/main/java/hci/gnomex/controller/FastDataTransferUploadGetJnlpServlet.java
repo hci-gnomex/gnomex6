@@ -3,8 +3,9 @@ package hci.gnomex.controller;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.ServletUtil;
 import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.ServletUtil;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
 import javax.servlet.ServletException;
@@ -13,7 +14,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import org.apache.log4j.Logger;
 
 public class FastDataTransferUploadGetJnlpServlet extends HttpServlet {
 
@@ -81,31 +81,25 @@ public class FastDataTransferUploadGetJnlpServlet extends HttpServlet {
                 String softLinksPath = PropertyDictionaryHelper.getInstance(sess).GetFDTDirectory(serverName)+uuid;
                 if (fdtJarLoc == null || fdtJarLoc.equals("")) {
                     System.out.println ("[FDTUGJS] WARNING WARNING: fdtJarLoc is empty, servername: " + serverName);
-                    fdtJarLoc = "http://hci-bio-app.hci.utah.edu/FDT/";
+                    fdtJarLoc = "https://hci-bio-app.hci.utah.edu/gnomexdata/fdt/";
                 }
 
                 if(showCommandLineInstructions != null && showCommandLineInstructions.equals("Y")) {
-                    response.setContentType("text/html; charset=UTF-8");
 
-                    response.getOutputStream().println("<p>");
-                    response.getOutputStream().println("***** Please read THESE ARE NEW directions *****");
-                    response.getOutputStream().println("<br>");
-                    response.getOutputStream().println("Complete the following steps to run FDT from the command line:");
-                    response.getOutputStream().println("<br>");
-                    response.getOutputStream().println("1) Download the fdtCommandLine.jar app from " + fdtJarLoc);
-                    response.getOutputStream().println("<br>");
-                    response.getOutputStream().println("2) Open port 54321 in all firewalls surrounding your computer (this may occur automatically upon transfer).");
-                    response.getOutputStream().println("<br>");
-                    response.getOutputStream().println("3) Execute the following on the command line(Make sure paths reflect your environment):");
-                    response.getOutputStream().println("<br>");
-                    response.getOutputStream().println("4) There is a 24 hour timeout on this command.  After that time please generate a new command line using the FDT Upload Command Line link.");
-                    response.getOutputStream().println("<BR><BR>For a Windows system use this command line:");
-                    response.getOutputStream().println("java -jar fdtCommandLine.jar -noupdates -ka 999999 -r -c " + fdtServerName + " -d " + softLinksPath + " .");
-                    response.getOutputStream().println("<BR><BR>Otherwise use this command line:");
-                    response.getOutputStream().println("java -jar ./fdtCommandLine.jar -noupdates -ka 999999 -r -c " + fdtServerName + " -d " + softLinksPath + " ./");
-                    response.getOutputStream().println("</p>");
+                    response.setContentType("text/html");
+                    response.getOutputStream().println("<h1>Please read, the FDT upload directions have changed</h1>");
+                    response.getOutputStream().println("<br><p>1.  Download <a href=\""+ fdtJarLoc +"\">fdtCommandLine.jar</a> (right mouse click then save)</p>\n");
+                    response.getOutputStream().println("<p>2.  Open port 54321 in all firewalls surrounding your computer (this may occur automatically upon transfer).</p>");
+                    response.getOutputStream().println("<p>3.  Execute the following:</p>");
+                    response.getOutputStream().println("<p>    For a Windows system use this command line:</p>");
+                    response.getOutputStream().println("<p>    java -jar fdtCommandLine.jar -noupdates -ka 999999 -r -c " + fdtServerName + " -d " + softLinksPath + " . </p>");
+                    response.getOutputStream().println("<p>    Otherwise use this command line:</p>");
+                    response.getOutputStream().println("<p>    java -jar ./fdtCommandLine.jar -noupdates -ka 999999 -r -c " + fdtServerName + " -d " + softLinksPath + " ./ </p>");
                     response.getOutputStream().flush();
                     return;
+
+
+
                 }
 
                 response.setHeader("Content-Disposition","attachment;filename=\"gnomex.jnlp\"");

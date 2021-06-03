@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 public class DirectoryBuilder {
 
 
+
 	private String stagePath;
 	private String inFileName;
 	private String root;
@@ -25,11 +26,11 @@ public class DirectoryBuilder {
 	private String flaggedIDFileName;
 	private String mode;
 	private String accountForFilesMoved;
+	private boolean accountFilesFlag = false;
 	private Set<String> fileTypeCategorySet;
 	private Set<String> optionalFileTypeCategorySet;
 	private boolean addWrapperFolder = false;
 	private String remotePath;
-	private boolean loadAccountFile = false;
 	private String outputAccountFile;
 
 
@@ -43,8 +44,10 @@ public class DirectoryBuilder {
 	private static final Integer AVATAR_GROUP_ID = 11;
 	private static final Integer FOUNDATION_GROUP_ID = 14;
 	private static final Integer TEMPUS_GROUP_ID = 22;
+	private static final Integer CARIS_GROUP_ID = 30;
 	private static final int TEST_TYPE_PROPERTY_ID = 21;
 	private boolean isWindows;
+	private boolean debug = false;
 	private List<Integer> captureGroupIndexes;
 	private String sampleIdRegex;
 	private String logPath;
@@ -57,6 +60,7 @@ public class DirectoryBuilder {
 
 			if(args[i].equals("-accountfilesmoved")) // this switches the FileMover to a mode to reports about files moved
 				accountForFilesMoved = args[++i];
+
 			if (args[i].equals("-file")) {
 				this.inFileName = args[++i];
 			} else if (args[i].equals("-root")) {
@@ -74,18 +78,14 @@ public class DirectoryBuilder {
 			}else if(args[i].equals("-log")){
 				this.logPath = args[++i];
 			}else if(args[i].equals("-remotepath")){ // accountfilesmoved is considered path to local files
-				// need remote if you want to compare
-				if(accountForFilesMoved != null){
-					this.remotePath = args[++i];
-				}
-			} else if(args[i].equals("-accountload")){ // load file for accounting don't look at disk
-				if(accountForFilesMoved != null){     // the loaded file will follow accountForFilesMoved param
-					this.loadAccountFile = true;
-				}
+				// need remote if you want to compare for account files mode
+				this.remotePath = args[++i];
+			}else if(args[i].equals("-accountfilesflag")){ // only care for found full set "accountfiles"
+				this.accountFilesFlag = true;
 			}else if(args[i].equals("-accountoutfile")){
-				if(accountForFilesMoved != null){
-					this.outputAccountFile = args[++i];
-				}
+				this.outputAccountFile = args[++i];
+			} else if( args[i].equals("-debug") ){
+				debug = true;
 			} else if(args[i].equals("-cp")){
 				i++;
 				while(i < args.length && args[i].charAt(0) != '-' ){
@@ -134,7 +134,6 @@ public class DirectoryBuilder {
 				if(i == missingList.size() - 1) {
 					comma = "";
 				}
-
 				System.out.print(missingList.get(i) + comma);
 			}
 			System.out.println();
@@ -153,8 +152,14 @@ public class DirectoryBuilder {
 							}
 						}
 					}else{
-						System.out.print("Couldn't find  file ID that should have all its file extension set " + foundFileID + " from all files list " );
-						break;
+						if(!accountFilesFlag){
+							System.out.print("Couldn't find  file ID that should have all its file extension set " + foundFileID + " from all files list " );
+							break;
+						}else {
+							if(debug)
+							System.out.println("All files in this set can be accounted for but no files will be moved for " + foundFileID + " because they already reside here: " + remotePath );
+						}
+
 					}
 				}
 
@@ -168,29 +173,40 @@ public class DirectoryBuilder {
 
 	}
 
+	public Map<String, List<String>> copyFoundFileMap(Map<String, List<String>> fileMap ){
+		Map cpFileMap = new HashMap();
+		for(Map.Entry<String,List<String>> entry : fileMap.entrySet()){
+			String key = entry.getKey();
+			List<String> val = entry.getValue();
+			cpFileMap.put(key, new ArrayList(val));
+		}
+		return cpFileMap;
+	}
+
 	public void makeAccountingForFiles(){
 		this.fileTypeCategorySet = new HashSet<String>();
 		String regex = ".*((?:TRF|CRF|QRF|ORD)[A-Za-z0-9-]+_?[A-Za-z]*)(\\..+)";
 
 		Map<String,List<String>> missingMap = new TreeMap<String,List<String>>();
 		//deident.xml removed as it should be optional
-		fileTypeCategorySet = new HashSet<>(Arrays.asList(".pdf", ".xml", ".bam.bai",".bam",".bam.bai.md5",".bam.md5" ));
+		fileTypeCategorySet = new HashSet<>(Arrays.asList(".pdf", ".xml", ".bam" ));
 		optionalFileTypeCategorySet = new HashSet<String>(Arrays.asList(".bam.bai.S3.txt", ".bam.S3.txt" ));
 
 
 		File root = new File(this.accountForFilesMoved);
-		Map<String, Set<String>> localFileTypeMap= null;
-		Map<String, List<String>> localFileMap = new HashMap<>(); // keeps track of all files and their paths with the key being the ID
+		Map<String, Set<String>> fileTypeMap= null;
+		Map<String, List<String>> fileMap = new HashMap<>(); // keeps track of all files and their paths with the key being the ID
 		List<String> foundFileIDList = new ArrayList<>();
+		Map<String,List<String>> localOnlyFileMap = new HashMap<>();
 
 
-		if(this.loadAccountFile){
-			localFileTypeMap = this.loadFilesToAccount(accountForFilesMoved ,localFileMap, regex);
-			System.out.println("file map size: " + localFileMap.size());
+		if(root.isFile()){
+			fileTypeMap = this.loadFilesToAccount(accountForFilesMoved ,fileMap, regex);
+			System.out.println("file map size: " + fileMap.size());
 			System.out.println("This is the out file " + outputAccountFile);
 		}else{
 			if(root.exists() && root.isDirectory()){
-				localFileTypeMap = this.findAllFiles(root,localFileMap,regex);
+				fileTypeMap = this.findAllFiles(root,fileMap,regex);
 			}else{
 				System.out.println("Path " + accountForFilesMoved +  " is invalid for accounting");
 				System.exit(1);
@@ -199,25 +215,31 @@ public class DirectoryBuilder {
 		}
 
 		// prints out the missing file type sets like for example ID has except missing its xml
-		findMissingFiles(localFileTypeMap,missingMap,foundFileIDList);
+		findMissingFiles(fileTypeMap,missingMap,foundFileIDList);
 		System.out.println("found File ID List size: " + foundFileIDList.size());
 		if(remotePath != null ){
 			// we don't want to report files yet if checking remote drive
+			localOnlyFileMap = copyFoundFileMap(fileMap);
 			foundFileIDList.clear();
 		}
-		printAccoutedForFiles(missingMap,foundFileIDList,localFileMap);
+		printAccoutedForFiles(missingMap,foundFileIDList,fileMap);
 
 		missingMap.clear();
 
 
 		if(this.remotePath != null ){
 			System.out.println("Files still missing after checking what is stored remotely");
-			this.findAllFiles(localFileTypeMap, new File(this.remotePath),localFileMap, regex);
+			this.findAllFiles(fileTypeMap, new File(this.remotePath),fileMap, regex);
 
 			// we want a full picture(remote and local) if the file is on the disk or not
 			//addRemoteFromLocalFiles(localFileTypeMap,remoteFileTypeMap);
-			findMissingFiles(localFileTypeMap,missingMap, foundFileIDList);
-			printAccoutedForFiles(missingMap,foundFileIDList,localFileMap);
+			findMissingFiles(fileTypeMap,missingMap, foundFileIDList);
+			if(accountFilesFlag){
+				printAccoutedForFiles(missingMap,foundFileIDList,localOnlyFileMap);
+			}else{
+				printAccoutedForFiles(missingMap,foundFileIDList,fileMap);
+			}
+
 		}
 
 
@@ -396,7 +418,6 @@ public class DirectoryBuilder {
 
 	private void findAllFilesRecursively(File file, Map<String, Set<String>> fileTypeMap,
 										 List<File> deferredFilesList, Map<String, List<String>> fileMap,String regex){
-
 		if(!file.isDirectory()){
 			String name  = file.getName();
 
@@ -416,7 +437,6 @@ public class DirectoryBuilder {
 					deferredFilesList.add(file);
 					return;
 				}
-
 
 				if (fileTypeMap.get(id) != null) {
 					fileTypeMap.get(id).add(extension);
@@ -525,10 +545,12 @@ public class DirectoryBuilder {
 			}
 
 			preparePath(flaggedIDList,fromToFilteredMap, localFiles,fromToMap,startStageMap);
+			System.out.println("Files to be moved to flagged folder: " + fromToMap.size());
 			moveTheFiles(fromToFilteredMap, new ArrayList<>(),logFileName); // These files we want to move into the flagged folder
 			if(stagePath != null) {
 				rsyncFiles(startStageMap, logFileName);
 			}
+			System.out.println("Files to be moved to final destination: " + fromToMap.size());
 			moveTheFiles(fromToMap,makeFileImmutableCmd(fromToMap),logFileName);
 
 
@@ -606,6 +628,9 @@ public class DirectoryBuilder {
 			if(sampleIdRegex != null){ // if regex override default split by '_'
 				System.out.println("Segment of text regex is matching against: " + fileChunks[0]);
 				Pattern samplePattern = Pattern.compile(sampleIdRegex);
+				if(fileChunks[0].equals("")) { // ignore white space
+					continue;
+				}
 				Matcher m = samplePattern.matcher(fileChunks[0]);
 				fileName = Differ.getNameByExistingCaptureGroup(captureGroupIndexes,m);
 			}
@@ -648,6 +673,7 @@ public class DirectoryBuilder {
 						fromToMap.put(stagePathFile, pathWithFile);
 					}else{
 						pathWithFile = strBuild.append(File.separator).append(file).toString();
+						//System.out.println("look: " + start + " " + pathWithFile);
 						fromToMap.put(start, pathWithFile);
 					}
 
@@ -815,8 +841,6 @@ public class DirectoryBuilder {
 		StringBuilder strBuild = new StringBuilder();
 		List<String> commands = new ArrayList<String>();
 
-
-
 		for(String fileKey: filesMap.keySet()) {
 			strBuild.append("mv -vn");
 			strBuild.append(" ");
@@ -831,8 +855,9 @@ public class DirectoryBuilder {
 		for(String c : extraCommands){
 			commands.add(c);
 		}
-
-		XMLParser.executeCommands(commands,logFileName,true);
+		if(filesMap.size() > 0){
+			XMLParser.executeCommands(commands,logFileName,true);
+		}
 	}
 
 	private void logMoveDetails(CollectingProcessOutput output, Map<String, String> filesMap, String fileKey,String logFile) throws Exception {
@@ -918,9 +943,12 @@ public class DirectoryBuilder {
 		}else if(mode.equals("foundation")){
 			sampleIDList = readSampleIDs(path + "importedTRFList.out");
 			reportIDList =  q.getImportedIDReport(sampleIDList, DirectoryBuilder.FOUNDATION_GROUP_ID);
-		}else{
+		}else if(mode.equals("tempus")){
 			sampleIDList = readSampleIDs(path + "importedTLList.out");
 			reportIDList =  q.getImportedIDReport(sampleIDList, DirectoryBuilder.TEMPUS_GROUP_ID);
+		}else if(mode.equals("caris")){
+			sampleIDList = readSampleIDs(path + "importedTNList.out");
+			reportIDList =  q.getImportedIDReport(sampleIDList, DirectoryBuilder.CARIS_GROUP_ID);
 		}
 
 		//Map<String, HashMap<String,Long>> personMap = q.countPropertyByPerson(TEST_TYPE_PROPERTY_ID);
@@ -936,7 +964,7 @@ public class DirectoryBuilder {
 
 		if(reportIDList.size() > 0 ){
 			try{
-				sendImportedIDReport(from,to,subject,strBuild.toString(),"");
+				sendImportedIDReport(from,to,subject,strBuild.toString(),"",false);
 			}
 			catch(Exception e){
 				e.printStackTrace();
@@ -946,7 +974,7 @@ public class DirectoryBuilder {
 		}
 
 	}
-	public static void sendImportedIDReport(String from,String to, String subject,String body, String testEmail) {
+	public static void sendImportedIDReport(String from,String to, String subject,String body, String testEmail, boolean formatHTML) {
 		//PropertyDictionaryHelper ph = PropertyDictionaryHelper.getInstance(sess);
 		//String gnomexSupportEmail = ph.getProperty(PropertyDictionary.GNOMEX_SUPPORT_EMAIL);
 
@@ -971,7 +999,7 @@ public class DirectoryBuilder {
 					subject,
 					body,
 					null,
-					false,
+					formatHTML,
 					sendTestEmail,
 					testEmail
 			);

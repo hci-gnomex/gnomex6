@@ -5,24 +5,24 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
-import hci.gnomex.constants.Constants;
-import hci.gnomex.model.*;
-import hci.gnomex.utility.*;
+import hci.gnomex.model.Analysis;
+import hci.gnomex.model.AnalysisFile;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
 
-import javax.json.Json;
-import javax.json.JsonArray;
 import javax.servlet.http.HttpSession;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GetAnalysisFilesToDistribute extends GNomExCommand implements Serializable {
 
 
     // the static field for logging in Log4J
-    private static Logger LOG = Logger.getLogger(hci.gnomex.controller.CreateAllDataTracks.class);
+    private static Logger LOG = Logger.getLogger(GetAnalysisFilesToDistribute.class);
 
     private Integer idAnalysis;
     private Session sess;

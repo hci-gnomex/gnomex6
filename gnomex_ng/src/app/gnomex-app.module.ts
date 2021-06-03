@@ -51,6 +51,7 @@ import {RegisterUserModule} from "./account/register-user/register-user.module";
 import {HTTP_INTERCEPTORS} from "@angular/common/http";
 import {ErrorHandlerInterceptor} from "./services/interceptors/error-handler.interceptor";
 import {WINDOW_PROVIDERS} from "./services/window.service";
+import {MatDialogModule} from "@angular/material";
 
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
@@ -84,6 +85,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         DatatracksModule,
         TopicsModule,
         MatIconModule,
+        MatDialogModule,
         ReportsModule,
         TestPageModule,
         AccountModule,
@@ -103,8 +105,9 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         {provide: AUTHENTICATION_TOKEN_ENDPOINT, useValue: "/gnomex/api/token"},
         {provide: AUTHENTICATION_LOGOUT_PATH, useValue: "/gnomex/logout"},
         {provide: AUTHENTICATION_ROUTE, useValue: "/authenticate"},
-        {provide: AUTHENTICATION_TOKEN_KEY, useValue: "core-jwt"},
-        {provide: AUTHENTICATION_MAX_INACTIVITY_MINUTES, useValue: 240},
+        // {provide: AUTHENTICATION_TOKEN_KEY, useValue: "core-jwt"},
+        {provide: AUTHENTICATION_TOKEN_KEY, useValue: "gnomex-jwt"},
+        {provide: AUTHENTICATION_MAX_INACTIVITY_MINUTES, useValue: 1440},
         {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy},
         {provide: HTTP_INTERCEPTORS, useClass: ErrorHandlerInterceptor, multi: true },
         {provide: Window, useValue: window},
