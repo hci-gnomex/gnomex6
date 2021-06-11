@@ -1,36 +1,24 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.Analysis;
-import hci.gnomex.model.AnalysisFile;
-import hci.gnomex.model.DataTrack;
-import hci.gnomex.model.DataTrackFile;
-import hci.gnomex.model.GenomeBuild;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.UCSCLinkFiles;
+import hci.gnomex.model.*;
 import hci.gnomex.utility.DataTrackUtil;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.json.Json;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Pattern;
-
-import javax.json.Json;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
 
 public class MakeDataTrackUCSCLinks extends GNomExCommand implements Serializable {
 
@@ -50,7 +38,7 @@ private String pathName;
 
 public static final Pattern TO_STRIP = Pattern.compile("\\n");
 
-private static boolean autoConvertUSeqArchives = true;
+private static boolean autoConvertUSeqArchives = false;
 
 public void validate() {
 }
@@ -84,7 +72,7 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 		analysisNumber = request.getParameter("analysisNumber");
 	}
 
-	System.out.println ("[MakeDataTrackLinks] idAnalysis: " + idAnalysis + " pathName: " + pathName);
+	System.out.println ("[MakeDataTrackUCSCLinks] idAnalysis: " + idAnalysis + " pathName: " + pathName);
 	serverName = request.getServerName();
 }
 
@@ -233,10 +221,15 @@ private ArrayList<String> makeUCSCLink(Session sess) throws Exception {
 			thename = thename.substring(thename.lastIndexOf(Constants.FILE_SEPARATOR) + 1);
 		}
 
-		int ipos = thename.lastIndexOf(".");
-		int jpos = thename.lastIndexOf(".vcf.gz");
-		if (jpos != -1)
-			ipos = jpos;
+		int ipos = thename.toLowerCase().lastIndexOf(".");
+		String[] extentions = {".vcf.gz",".bed.gz"};
+		for (String extn : extentions) {
+			int jpos = thename.toLowerCase().lastIndexOf(extn);
+	 	    if (jpos != -1) {
+	    	    ipos = jpos;
+	    	    break;
+			}
+ 	    }
 
 		DTName = thename.substring(0, ipos);
 		DTNumber = "DTNone";
@@ -244,7 +237,9 @@ private ArrayList<String> makeUCSCLink(Session sess) throws Exception {
 		// add the correct index file
 		if (pathName.endsWith(".vcf.gz")) {
 			filesToLink[1] = new File(pathName + ".tbi");
-		} else {
+		} else if (pathName.endsWith(".bed.gz")) {
+			filesToLink[1] = new File(pathName + ".tbi");
+		} else if (pathName.endsWith(".bam")) {
 			// figure out whether the .bam.bai or the .bai file exists
 			File bambai = new File(pathName + ".bai");
 			if (bambai.exists()) {
@@ -254,8 +249,19 @@ private ArrayList<String> makeUCSCLink(Session sess) throws Exception {
 				// we don't check or complain if it doesn't because the user can't do anything anyway
 				filesToLink[1] = new File(pathName.substring(0, pathName.length() - 4) + ".bai");
 			}
+		} else if (pathName.endsWith(".cram")) {
+			// figure out whether the .cram.crai or the .crai file exists
+			File cramcrai= new File(pathName + ".crai");
+			if (cramcrai.exists()) {
+				filesToLink[1] = new File(pathName + ".crai");
+			} else {
+				// we will assume the index file ends in .crai (without the .cram)
+				// we don't check or complain if it doesn't because the user can't do anything anyway
+				filesToLink[1] = new File(pathName.substring(0, pathName.length() - 5) + ".crai");
+			}
 		}
 	}
+System.out.println ("[MakeDataTrackUCSCLinks] [2] filesToLink[0]: " + filesToLink[0] + " filesToLink[1]: " + filesToLink[1]);
 
 	// look and or make directory to hold softlinks to data, also removes old softlinks
 	File urlLinkDir = DataTrackUtil.checkUCSCLinkDirectory(baseURL, dataTrackFileServerWebContext);
@@ -273,12 +279,14 @@ private ArrayList<String> makeUCSCLink(Session sess) throws Exception {
 
 	// what data type (bam, bigBed, bigWig, vcfTabix)
 	String type = "type=" + DataTrackUtil.fetchUCSCDataType(filesToLink);
+	System.out.println ("[MakeDataTrackUCSCLinks] type: " + type);
 
 	// for each file, there might be two for xxx.bam and xxx.bai files, xxx.vcf.gz and xxx.vcf.gz.tbi, possibly two for converted useq files, plus/minus
 	// strands, otherwise just one.
 	String customHttpLink = null;
 	String toEncode = null;
 	for (File f : filesToLink) {
+		if (f == null) continue;
 		File annoFile = new File(dir, DataTrackUtil.stripBadURLChars(f.getName(), "_"));
 		String annoString = annoFile.toString().replace("\\", Constants.FILE_SEPARATOR);
 
@@ -286,7 +294,7 @@ private ArrayList<String> makeUCSCLink(Session sess) throws Exception {
 		DataTrackUtil.makeSoftLinkViaUNIXCommandLine(f, annoFile);
 
 		// is it a bam index xxx.bai or vcf index? If so then skip after making soft link.
-		if (annoString.endsWith(".bai") || annoString.endsWith(".vcf.gz.tbi"))
+		if (annoString.toLowerCase().endsWith(".bai") || annoString.toLowerCase().endsWith(".vcf.gz.tbi") || annoString.toLowerCase().endsWith(".crai") || annoString.toLowerCase().endsWith(".bed.gz.tbi"))
 			continue;
 
 		// stranded?

@@ -137,7 +137,8 @@ public class DataTrack extends DetailObject implements Serializable, Owned, Visi
         String ucscLink = ucscLinkFile;
         if (fileName.endsWith(".useq") && ucscLink.equals("none")) {
             ucscLink = "convert";
-        } else if (fileName.endsWith(".bb") || fileName.endsWith(".bw") || fileName.endsWith(".bam") || fileName.endsWith(".cram") || fileName.endsWith(".vcf.gz")) {
+        } else if (fileName.endsWith(".bb") || fileName.endsWith(".bw") || fileName.endsWith(".bam") || fileName.endsWith(".cram") || fileName.endsWith(".vcf.gz")
+                || fileName.endsWith(".bed") || fileName.endsWith(".bed.gz")) {
             ucscLink = "link";
         }
         return ucscLink;

@@ -964,12 +964,17 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                     // Only count the price that with the same status
                     if(nodeStatus === bi.codeBillingStatus && bi.other === "N") {
                         let price: string = bi.invoicePrice;
-                        price = price
-                            .replace('$', '')
-                            .replace(',', '')
-                            .replace("(", "-")
-                            .replace(")", "");
-                        this.totalPrice += Number(price);
+                        if (price) {
+                            price = price
+                                .replace('$', '')
+                                .replace(',', '')
+                                .replace("(", "-")
+                                .replace(")", "");
+                            this.totalPrice += Number(price);
+                        }
+                        else {
+                            price = "0.00";
+                        }
                     }
                 }
             }

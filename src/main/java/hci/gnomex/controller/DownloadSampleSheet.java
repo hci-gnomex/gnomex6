@@ -2,45 +2,33 @@ package hci.gnomex.controller;
 
 import hci.dictionary.utility.DictionaryManager;
 import hci.framework.control.Command;
-import hci.gnomex.utility.*;
 import hci.framework.control.RollBackCommandException;
-import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.model.Lab;
 import hci.gnomex.model.Property;
-import hci.gnomex.model.PropertyEntry;
 import hci.gnomex.model.Sample;
 import hci.gnomex.security.SecurityAdvisor;
+import hci.gnomex.utility.*;
 import hci.report.constants.ReportFormats;
 import hci.report.model.Column;
 import hci.report.model.ReportRow;
 import hci.report.model.ReportTray;
 import hci.report.utility.ReportCommand;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
+import javax.json.Json;
+import javax.json.JsonReader;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Pattern;
-
-import javax.json.Json;
-import javax.json.JsonReader;
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.apache.log4j.Logger;
+import java.util.*;
 
 public class DownloadSampleSheet extends ReportCommand implements Serializable {
   
@@ -97,9 +85,9 @@ public class DownloadSampleSheet extends ReportCommand implements Serializable {
       }
     } else {
       try (JsonReader jsonReader = Json.createReader(new StringReader(request.getParameter("requestJSONString")))) {
-        String rjstring = request.getParameter("requestJSONString");
-        System.out.println ("[downloadsamplesheet] rjstring: \n" + rjstring);
-        requestParser = new RequestParser(jsonReader, this.secAdvisor);
+//        String rjstring = request.getParameter("requestJSONString");
+//        System.out.println ("[downloadsamplesheet] rjstring: \n" + rjstring);
+        requestParser = new RequestParser(jsonReader, this.secAdvisor, true);
       } catch (Exception e) {
         this.addInvalidField( "requestJSONString", "Invalid request json");
         this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestJSONString", e);

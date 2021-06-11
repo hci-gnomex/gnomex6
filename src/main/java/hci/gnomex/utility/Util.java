@@ -9,7 +9,6 @@ import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.Lab;
-import hci.gnomex.model.PropertyDictionary;
 import net.sf.json.JSON;
 import net.sf.json.xml.XMLSerializer;
 import org.hibernate.Session;
@@ -18,21 +17,12 @@ import org.jdom.Document;
 import org.jdom.Element;
 
 import javax.json.*;
-import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.sql.SQLException;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.Reader;
-import java.io.InputStreamReader;
 import java.util.zip.GZIPInputStream;
-import java.io.*;
 
 import static java.lang.Integer.parseInt;
 
@@ -488,8 +478,8 @@ public class Util {
         return;
       }
 
-      PropertyDictionaryHelper propertyHelper = PropertyDictionaryHelper.getInstance(sess);
-      String toaddress = propertyHelper.getProperty(PropertyDictionary.GNOMEX_SUPPORT_EMAIL);
+//      PropertyDictionaryHelper propertyHelper = PropertyDictionaryHelper.getInstance(sess);
+      String toaddress = softwareTestEmail;   //propertyHelper.getProperty(PropertyDictionary.GNOMEX_SUPPORT_EMAIL);
       java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
       String serverName = localMachine.getHostName();
 

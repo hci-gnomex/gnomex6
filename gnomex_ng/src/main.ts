@@ -14,9 +14,9 @@ import {BootController} from "./boot-control";
  * @author jasonholmberg <jason.holmberg@hci.utah.edu>
  * @since 8/24/16
  */
-if (process.env.ENV === "production") {
+//if (process.env.ENV === "production") {
     enableProdMode();
-}
+//}
 
 //platformBrowserDynamic().bootstrapModule(GnomexAppModule);
 

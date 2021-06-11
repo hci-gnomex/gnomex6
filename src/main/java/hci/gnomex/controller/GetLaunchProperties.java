@@ -1,28 +1,21 @@
 package hci.gnomex.controller;
 
-import hci.dictionary.model.DictionaryEntry;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.CoreFacility;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 
 public class GetLaunchProperties extends GNomExCommand implements Serializable {
 
@@ -72,7 +65,7 @@ public Command execute() throws RollBackCommandException {
 		// Pragmatic programming...
 		htgonly = false;
 		PropertyDictionary htgonlyProp = (PropertyDictionary) sess.createQuery("from PropertyDictionary p where p.propertyName='" + PropertyDictionary.HTGONLY + "'").uniqueResult();
-		if (htgonlyProp != null || htgonlyProp.getPropertyValue().equals("Y")) {
+		if (htgonlyProp != null && htgonlyProp.getPropertyValue().equals("Y")) {
 			htgonly = true;
 		}
 
@@ -115,7 +108,7 @@ public Command execute() throws RollBackCommandException {
 
 		XMLOutputter out = new org.jdom.output.XMLOutputter();
 		this.xmlResult = out.outputString(doc);
-
+System.out.println ("[getLaunchProperties] this.xmlResult: " + this.xmlResult + " htgonly: " + htgonly);
 		validate();
 
 	} catch (Exception e) {
@@ -139,7 +132,7 @@ private void getCoreFacilities(Session sess, Document doc) {
 		if (cf.getIsActive() != null && cf.getIsActive().equals("Y")) {
 			String facilityName = cf.getFacilityName();
 			int idCoreFacility = cf.getIdCoreFacility();
-
+System.out.println ("[GetLaunchProperties] htgonly: " + htgonly + "idCoreFacility: " + idCoreFacility);
 			if (htgonly && idCoreFacility != 1) {
 				continue;
 			}
