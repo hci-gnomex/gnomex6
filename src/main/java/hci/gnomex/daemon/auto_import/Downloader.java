@@ -19,7 +19,8 @@ import java.util.regex.Pattern;
 
 public class Downloader {
 
-
+	private Integer startCaptureGroup;
+	private Integer endCaptureGroup;
 	private boolean useRemoteFile;
 	private HashMap<String, String> aliasMap;
 	private String mode;
@@ -59,8 +60,23 @@ public class Downloader {
 				this.allowClearFile = true;
 			}else if(args[i].equals("-filterregex")){
 				filterRegex = args[++i];
-			}else if(args[i].equals("-remotepath")) { // helps to determine which path to use remote or local in flagged filtered outlist
-				                                      // default is is the flagged(local) path and filename
+			}else if(args[i].equals("-cp")){
+				try {
+					this.startCaptureGroup =  Integer.parseInt(args[i + 1]);
+					i++;
+					this.endCaptureGroup = Integer.parseInt(args[i + 1]);
+					i++;
+				}catch(NumberFormatException e){
+					if(startCaptureGroup == null){
+						System.out.println("Please provide at least a starting a range for the capture group");
+						System.exit(1);
+					}if(startCaptureGroup != null && endCaptureGroup == null){
+						endCaptureGroup = startCaptureGroup;
+					}
+				}
+			}
+			else if(args[i].equals("-remotepath")) { // helps to determine which path to use remote or local in flagged filtered outlist
+				// default is is the flagged(local) path and filename
 				useRemoteFile = true;
 			}else if (args[i].equals("-alias")){ // allow list of for your capture groups items aka DNA -> DSQ1
 				aliasMap = new HashMap<String, String>();
@@ -229,12 +245,20 @@ public class Downloader {
 		writeToFile(this.dependentDataPath + "download.log",status); // /home/u0566434/parser_data/download.log
 		String tempFile = writeToAWSFile(fileOfPaths,this.fileNameMap);
 
+		String serialFileName = dependentDataPath + mode+ "-mfa-arn.txt";
+
+		String mfaProfile = null;
+		if(Files.exists(Paths.get(serialFileName))){
+			mfaProfile = mode + "_mfa";
+		}
+
+
 		// this is reading in tempFile line by line delimiting that line by space hence ' ' allowing only 2 arguments at a time
 		// it is making  shell script for just that one line and running it and substituting where $ is shown arguments
-		String downloadCommand = "cat " + tempFile + " |  xargs -n2 sh -c 'aws --profile " + mode + " s3 cp $1 $2' sh" ;
+		String downloadCommand = "cat " + tempFile + " |  xargs -n2 sh -c 'aws --profile " + mfaProfile != null ? mfaProfile : mode
+				+ " s3 cp $1 $2' sh" ;
 		// old approach
 		//xargs -P10 -I {} aws --profile tempus s3 cp {} " + this.downloadPath;
-
 		System.out.println(downloadCommand);
 		if(fileNameMap.size() > 0){
 			commands.add(downloadCommand);
@@ -293,8 +317,7 @@ public class Downloader {
 					if(filterRegex != null){
 						Matcher m = pattern.matcher(line);
 						if(m.matches()){
-							//todo should not have the start and end captureGroup hardcode for tempus
-							String matchedFileName = Differ.constructMatchedFileName(1,5,m, new StringBuilder(), aliasMap );
+							String matchedFileName = Differ.constructMatchedFileName(startCaptureGroup,endCaptureGroup,m, new StringBuilder(), aliasMap );
 							addToIDMap(matchedFileName, line, fileNameMap);
 						}else{
 							System.out.println("Could not match pattern " + pattern.pattern() + " ON text " + fileName );
@@ -325,6 +348,18 @@ public class Downloader {
 					fileNames = removedIDs;
 				}else{
 					fileNames = flaggedIDMap.get(flaggedIDName);
+				}
+
+				///todo probably remove since it's not generic only helpful for tempus
+				// this is here mitigate issues if proccess is aborted and files don't get renamed to
+				// proper format
+				if(removedIDs == null){
+					StringBuilder sb = new StringBuilder(flaggedIDName).insert(0,"DNA,");
+					removedIDs = this.fileNameMap.remove(sb.toString());
+
+					sb = new StringBuilder(flaggedIDName).insert(0,"RNA,");
+					this.fileNameMap.remove(sb.toString());
+
 				}
 
 
@@ -373,7 +408,7 @@ public class Downloader {
 				if (filterRegex != null) {
 					Matcher m = pattern.matcher(file.getName());
 					if (m.matches()) {
-						flaggedFileName = Differ.constructMatchedFileName(1, 5, m, new StringBuilder(), aliasMap);
+						flaggedFileName = Differ.constructMatchedFileName(startCaptureGroup, endCaptureGroup, m, new StringBuilder(), aliasMap);
 						addToIDMap(flaggedFileName, file.getName(), flaggedIDMap);
 					} else {
 						System.out.println("Could not match pattern " + pattern.pattern() + " ON text " + file.getName());
@@ -493,8 +528,6 @@ public class Downloader {
 				String safeFileName = flaggedFileName.replaceAll(" ", "\\\\ ");
 
 				strBuild.append(safeFileName);
-				System.out.println(safeFileName);
-
 				if(i == (flaggedFileList.size() - 1) ){
 					continue;
 				}
@@ -547,7 +580,7 @@ public class Downloader {
 			for (Map.Entry<String,List<String>> entry : dataToWrite.entrySet()) {
 				String[] keyChunks = entry.getKey().split(",");
 
-				if(keyChunks.length == 3){
+				if(keyChunks.length == 3 && mode.equals("tempus")){
 					String destPath = downloadPath +  keyChunks[0];
 					for(String val : entry.getValue()){
 						writer.println(val + " " + destPath);
