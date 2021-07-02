@@ -5,8 +5,8 @@ pDataPath="/home/u0566434/parser_data/"
 downloadPath="/Repository/tempdownloads/avatar/"
 dnaNexusPath="/home/u0566434/dnaNexus/"
 avatarLocalDataPath="/Repository/PersonData/2017/4R/Avatar/"
-regex=".*/(SL[a-zA-Z0-9]+).*|.*_(SL[a-zA-Z0-9]+).*|.*([0-9]{2}-[A-Za-z0-9\.]+.*)\.fastq.gz" # The SL can be at the first of filename OR come after the '_'
-
+regex=".*/(SL[a-zA-Z0-9]+).*(?:md5|gz).*(?:S3.txt)?|.*([0-9]{2}-[A-Za-z0-9\.]+.*)\.fastq.*(?:S3.txt)?" # The SL can be at the first of filename OR come after the '_'
+regex1=".*/(SL[a-zA-Z0-9]+).*|.*([0-9]{2}-[A-Za-z0-9\.]+.*)\.fastq.gz" #this one is for the bash regex doesn't support non-capturing groups
 
 TOMCAT_HOME=../../../
 COMMON_LIB=$TOMCAT_HOME/lib
@@ -52,6 +52,7 @@ echo This is the path : $scriptsPath
 source "$dnaNexusPath"dx-toolkit/environment
 dx login --token $tokenVal
 dx cd /
+dx select HCI_Molecular_Data
 
 tree "$avatarLocalDataPath" --noreport > "$pDataPath"localTree.out
 dx tree / > "$pDataPath"remoteTree.out
@@ -60,7 +61,7 @@ java hci.gnomex.daemon.auto_import.PathMaker "$pDataPath"remoteTree.out "$pDataP
 java hci.gnomex.daemon.auto_import.PathMaker "$pDataPath"localTree.out  "$pDataPath"localPath.out
 
 if [ "$flaggedIDParam" = "normal"  ]; then
-        java hci.gnomex.daemon.auto_import.DiffParser  -local "$pDataPath"localPath.out -remote "$pDataPath"remotePath.out -cp 1 2 3 -matchbyname $regex > "$pDataPath"uniqueFilesToDownload.out
+        java hci.gnomex.daemon.auto_import.DiffParser  -local "$pDataPath"localPath.out -remote "$pDataPath"remotePath.out -cp 1 2 -matchbyname $regex > "$pDataPath"uniqueFilesToDownload.out
         sed -i '/FASTq/!d' "$pDataPath"uniqueFilesToDownload.out
 
 
@@ -83,7 +84,6 @@ else
 fi
 
 
-
 echo the fileListName : $fileList
 echo download Status: $downloadCode
 #downloadCode=0
@@ -93,16 +93,14 @@ echo download Status: $downloadCode
 if [ $downloadCode -eq 0 ]; then
         idStr=""
         while read fileName; do
-                if [[ $fileName =~ $regex ]]; then
+                echo reading file $fileName
+                if [[ $fileName =~ $regex1 ]]; then
                         fullMatch=$BASH_REMATCH
                         hudAlphaID="${BASH_REMATCH[1]}"
-                        hudAlphaID1="${BASH_REMATCH[2]}"
-                        tGenID="${BASH_REMATCH[3]}"
+                        tGenID="${BASH_REMATCH[2]}"
 
                         if [ ! -z "$hudAlphaID" ]; then #If var is not empty
                                 idStr+=$hudAlphaID","
-                        elif [ ! -z "$hudAlphaID1" ]; then
-                                idStr+=$hudAlphaID1","
                         elif [ ! -z "$tGenID" ]; then
                                 idStr+=$tGenID","
                         fi
@@ -119,9 +117,7 @@ if [ $downloadCode -eq 0 ]; then
               verifiedSlInfo=$flaggedIDParam
               echo $verifiedSlInfo
         fi
-
         rm  "$pDataPath"tempStr.out
-
         echo `pwd`
 
         # Note avatarImporter outputs two implicit files
@@ -133,8 +129,19 @@ if [ $downloadCode -eq 0 ]; then
 
 
         #Need to import experiments then and register/link/index
-
 else
         echo $downloaderStatus
 fi
+
+avatarRequestList=`cat "$pDataPath"tempRequestList.out`
+avatarAnalysisList=`cat "$pDataPath"tempAnalysisList.out`
+
+bash register_files.sh -doNotSendMail -onlyExperiment
+bash linkData.sh -dataSource 4R -linkFolder -debug  -requests $avatarRequestList
+bash register_files.sh -doNotSendMail -onlyExperiment
+bash linkFastqData.sh -debug -linkFolder -analysis $avatarAnalysisList
+bash index_gnomex.sh
+
+rm "$pDataPath"tempRequestList.out
+rm "$pDataPath"tempAnalysisList.out
 echo ------------------------------------------------------------------------------------------------------------

@@ -1,9 +1,6 @@
 package hci.gnomex.daemon.auto_import;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -40,7 +37,11 @@ public class Query {
 
             while ((line = bf.readLine()) != null) {
                 String[] credArray = line.split(" ");
-                if (credArray[0].equals("username")) {
+                if(credArray.length == 1){
+                    break;
+                }
+
+                if (credArray[0].equals("username") ) {
                     this.username = credArray[1];
                 } else if (credArray[0].equals("password")) {
                     this.password = credArray[1];
@@ -50,10 +51,33 @@ public class Query {
                     if (!credArray[0].equals("className")) {
                         throw new Exception("Missing Credentials");
                     }
+                    if(className == null ){
+                        this.className = credArray[1];
+                    }
 
-                    this.className = credArray[1];
                 }
             }
+            if(username == null || password == null || className == null || connectionStr == null){
+                Map propMap = new HashMap<String,String>();
+                try(InputStream input = new FileInputStream(Creds)) {
+                    Properties prop = new Properties();
+                    prop.load(input);
+                    prop.forEach((key,value) -> propMap.put(key,value));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    throw e;
+                }
+
+                username = (String)propMap.get("javax.persistence.jdbc.user");
+                password = (String)propMap.get("javax.persistence.jdbc.password");
+                className = (String)propMap.get("javax.persistence.jdbc.driver");
+                connectionStr = (String)propMap.get("javax.persistence.jdbc.url");
+                if(username == null || password == null || className == null || connectionStr == null){
+                    throw new Exception("Missing Credentials");
+                }
+
+            }
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -606,6 +630,39 @@ public class Query {
             throw new Exception(sqlException.getMessage() + " : Could not execute query fo ");
         }
 
+    }
+    /* this query given patients that have both json and fastq  files (found earlier in process) finds hci person ids
+     *  finding these cases are important as they are the ones most likely to be errors caused by the script
+     * */
+
+    public List<String> tempusWithPersonID(String queryIDStr, Set<String> allAccessionIDs) throws Exception {
+
+        Statement stmnt = null;
+        List<String> accessionIDs = new ArrayList<>();
+        String query = "SELECT o.accessionId, tlp.HCIPersonID\n" +
+                "  FROM TpsOrder o\n" +
+                "  LEFT JOIN [MolecularProfiling].[dbo].[VIEW_TempusLinkedPatient] tlp ON  tlp.accessionId = o.accessionId\n" +
+                "  WHERE o.accessionId IN " + queryIDStr + ";";
+        System.out.println(query);
+
+        try {
+            stmnt = this.conn.createStatement();
+            ResultSet rs = stmnt.executeQuery(query);
+
+            while (rs.next()) {
+                String accessionID = rs.getString("accessionId");
+                String hciPersonID = rs.getString("HCIPersonID");
+                allAccessionIDs.add(accessionID);
+                if(hciPersonID != null){
+                    accessionIDs.add(accessionID);
+                }
+            }
+
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+            throw new Exception(sqlException.getMessage() + " : Could not execute query fo ");
+        }
+        return accessionIDs;
     }
 
     public String getPersonIDFromSample(String fileName) throws Exception {
