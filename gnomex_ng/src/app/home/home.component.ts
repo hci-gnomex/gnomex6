@@ -70,7 +70,6 @@ import {DialogsService} from "../util/popup/dialogs.service";
                         </div>
                         <div class="gnomex-splash">
                             <div class="horizontal-center">
-                                <img [src]=site_logo alt="">
                             </div>
                             <div class="full-width progress-bar-container">
                                 <mat-progress-bar  mode="determinate" [value]="this.loadingProgress">
@@ -105,7 +104,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
         .gnomex-splash {
             background-image: url(../gnomex/assets/gnomex_splash_credits.png);
             width: 19em;
-            height: 15em;
+            height: 20em;
             padding: 1em;
             position: relative;
             background-repeat: no-repeat;

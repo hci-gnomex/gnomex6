@@ -147,7 +147,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 	// The definition of valid email addresses can be found at
 	//     https://en.wikipedia.org/wiki/Email_address#Domain
 	//   at the time of writing, which this does not fully support...
-	private emailPatternValidator = Validators.pattern(/^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/);
+//	private emailPatternValidator = Validators.pattern(/^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/);
 
 	public formGroup:FormGroup;
 
@@ -342,7 +342,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			expirationDate:['',[Validators.required]],
 			totalDollarAmount:['',[ Validators.pattern(/^[0-9,]*(\.\d{2})?$/)]],
 			active: false,
-			email:['', [ this.emailPatternValidator, Validators.required ]],
+			email:['', [Validators.pattern(/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/), Validators.required ]],
 			agreement:[false, [Validators.requiredTrue] ],
 			creditLastFour:['',[Validators.pattern(/^\d{4}$/), Validators.required]],
 			creditZipCode: ['', [ Validators.required,  Validators.pattern(/^\d{5}((\s*|(\s*-\s*))(\d{4}))?$/) ]],

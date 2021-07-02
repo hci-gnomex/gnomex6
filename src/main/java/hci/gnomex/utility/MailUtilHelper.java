@@ -216,7 +216,7 @@ public class MailUtilHelper {
 		if (from != null) {
 			return from;
 		}
-		return "";
+		return "DoNotReply@hci.utah.edu";
 	}
 	
 	public void setFrom(String from) {

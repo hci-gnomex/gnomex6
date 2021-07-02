@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
 public class ChangeProductOrderStatus extends GNomExCommand implements Serializable {
-    private static Logger LOG = Logger.getLogger(SaveProductOrder.class);
+    private static Logger LOG = Logger.getLogger(ChangeProductOrderStatus.class);
 
     private JsonArray selectedOrdersArray;
     private JsonArray selectedLineItemsArray;

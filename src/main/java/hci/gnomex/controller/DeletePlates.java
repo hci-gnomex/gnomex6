@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 public class DeletePlates extends GNomExCommand implements Serializable {
 
   // the static field for logging in Log4J
-  private static Logger LOG = Logger.getLogger(DeleteInstrumentRuns.class);
+  private static Logger LOG = Logger.getLogger(DeletePlates.class);
 
   private String platesToDeleteXMLString;
   private Document platesToDeleteDoc;

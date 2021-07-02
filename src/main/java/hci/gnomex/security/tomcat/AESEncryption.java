@@ -35,7 +35,8 @@ public class AESEncryption {
   }       
   
   public String decrypt(String encryptedString) throws InvalidKeyException, IllegalBlockSizeException, BadPaddingException, NoSuchAlgorithmException, NoSuchPaddingException {         
-    Cipher cipher = Cipher.getInstance(ALGORITHM);         
+// System.out.println ("[decrypt] encryptedString --->" + encryptedString + "<---");
+    Cipher cipher = Cipher.getInstance(ALGORITHM);
     cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);         
     byte[] original = cipher.doFinal(toByteArray(encryptedString));         
     return new String(original);     
@@ -92,7 +93,7 @@ public class AESEncryption {
         aes = new AESEncryption(secretKey);             
       }             
       String encryptedString = aes.encrypt(plainText);             
-      System.out.println(plainText + ":" + encryptedString);         
+//      System.out.println(plainText + ":" + encryptedString);
     } else {             
       System.out.println("USAGE: java AES string-to-encrypt [secretKey]");         
     }   

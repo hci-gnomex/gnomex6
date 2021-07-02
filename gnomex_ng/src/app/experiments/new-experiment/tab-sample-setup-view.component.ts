@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild,ChangeDetectorRef} from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 
 import {GnomexService} from "../../services/gnomex.service";
@@ -227,10 +227,14 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     public showSequenomExperimentType: boolean = false;
     public showDefaultSampleNumber: boolean = true;
     private showOrganism: boolean = true;
+    public requireOrganism: boolean = true;
     private showSamplePurification: boolean = true;
     private showQcInstructions: boolean = true;
     private showRnaseBox: boolean = false;
     private showDnaseBox: boolean = false;
+    public _rnaWithDNase: string = 'Click if RNA samples were treated with DNase';
+    public _dnaWithRNase: string = 'Click if DNA samples were treated with RNase';
+
 
     private organisms: any[] = [];
     public filteredApplications: any[] = [];
@@ -392,6 +396,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 public newExperimentService: NewExperimentService,
                 private securityAdvisor: CreateSecurityAdvisorService,
                 private gnomexService: GnomexService,
+                private changeDetectorRef: ChangeDetectorRef,
                 private propertyService: PropertyService,
                 private fb: FormBuilder) {
 
@@ -1000,6 +1005,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             this.showSampleQualityExperimentType = false;
             this.requireSamplePrepContainer = false;
             this.showOrganism = true;
+            this.requireOrganism = true;
             this.showSamplePurification = true;
             this.showQcInstructions = false;
 
@@ -1022,6 +1028,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 this.showSequenomExperimentType = true;
                 this.showDefaultSampleNumber = false;
                 this.showOrganism = false;
+                this.requireOrganism = false;
             }
 
             if (this.requestCategory.codeRequestCategory === "DDPCR BR") {
@@ -1041,6 +1048,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 this.showSampleQualityExperimentType = true;
                 this.requireSamplePrepContainer = true;
                 this.showOrganism = false;
+                this.requireOrganism = false;
                 this.showSamplePurification = false;
             }
 

@@ -2,33 +2,15 @@ package hci.gnomex.controller;
 
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.DataTrack;
-import hci.gnomex.model.DataTrackFolder;
-import hci.gnomex.model.GenomeBuild;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.UCSCLinkFiles;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DataTrackUtil;
 import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-import java.util.regex.Pattern;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -37,11 +19,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import hci.gnomex.utility.Util;
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Edited 1/15/2013 Mosbruger
@@ -87,7 +71,11 @@ protected void doGet(HttpServletRequest req, HttpServletResponse res) throws Ser
 	} catch (Exception ex) {
 		String errorMessage = Util.GNLOG(LOG,"MakeDataTrackIGVLink -- Unhandled exception ", ex);
 		StringBuilder requestDump = Util.printRequest(req);
-		Util.sendErrorReport(HibernateSession.currentSession(),"GNomEx.Support@hci.utah.edu", "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
+
+		PropertyDictionaryHelper propertyHelper = PropertyDictionaryHelper.getInstance(HibernateSession.currentSession());
+		String gnomex_tester_email = propertyHelper.getProperty(PropertyDictionary.CONTACT_EMAIL_SOFTWARE_TESTER);
+
+		Util.sendErrorReport(HibernateSession.currentSession(),gnomex_tester_email, "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
 
 		HibernateSession.rollback();
 	} finally {
@@ -196,10 +184,10 @@ public void execute(HttpServletResponse res, String serverName, SecurityAdvisor 
 		// If the user doesn't have a directory, a new random string will be created.
 		File linkDir = checkIGVLinkDirectory(baseDir, dataTrackFileServerWebContext);
 		String linkPath = this.checkForIGVUserFolderExistence(linkDir, username);
-		System.out.println ("[MakeDataTrackIGVLink] linkPath: " + linkPath);
+//		System.out.println ("[MakeDataTrackIGVLink] linkPath: " + linkPath);
 		if (linkPath == null) {
 			linkPath = UUID.randomUUID().toString() + username;
-			System.out.println ("[MakeDataTrackIGVLink] (2) linkPath: " + linkPath);
+//			System.out.println ("[MakeDataTrackIGVLink] (2) linkPath: " + linkPath);
 		}
 
 		// Create the users' data directory
@@ -213,7 +201,8 @@ public void execute(HttpServletResponse res, String serverName, SecurityAdvisor 
 		ArrayList<String[]> linksToMake = new ArrayList<String[]>();
 
 		/*****************************************************************
-		 * Grab the list of available genomes. Check if the user has data for the genome and if the genome is supported by IGV. If so, create a repository for
+		 * Grab the list of available genomes. Check if the user has data for the genome and if the genome is supported by IGV.
+		 * If so, create a repository for
 		 * the local data and add to Broad repository
 		 */
 
@@ -253,10 +242,10 @@ public void execute(HttpServletResponse res, String serverName, SecurityAdvisor 
 				// Create data repository
 				String result = this.linkContents(rootPath, rootFolder, 1, sess, baseURL, baseDir, analysisBaseDir, secAdvisor, linksToMake);
 				String shortresult = result;
-				if (shortresult.length() > 300) {
-					shortresult = shortresult.substring(0,300);
+				if (shortresult.length() > 600) {
+					shortresult = shortresult.substring(0,600);
 				}
-				System.out.println ("[MakeDataTrackIGVLink] result(short): " + shortresult);
+//				System.out.println ("[MakeDataTrackIGVLink] result(short): " + shortresult);
 
 				// If there was a result, create the repository file and add to registry.
 				if (!result.equals("")) {
@@ -312,7 +301,9 @@ public void execute(HttpServletResponse res, String serverName, SecurityAdvisor 
 
 		// If the user has permission for any data track, give the the repository link
 		if (permissionForAny) {
-			boolean success = this.makeSoftLinkViaUNIXCommandLine(dir.toString(), linksToMake); // deal with embedded spaces
+			boolean success = this.makeSoftLink(dir.toString(), linksToMake); // deal with embedded spaces
+
+//			boolean success = this.makeSoftLinkViaUNIXCommandLine(dir.toString(), linksToMake); // deal with embedded spaces
 
 			if (success) {
 				String preamble = new String(
@@ -484,22 +475,75 @@ private String makeIGVLink(Session sess, DataTrack dataTrack, String directory, 
 
 }
 
+// 01/04/2020 timM   make the soft links directly rather than using bash
+private boolean makeSoftLink(String path, ArrayList<String[]> linksToMake) {
+	System.out.println ("[makeSoftLink] path: " + path + " linksToMake.size: " + linksToMake.size());
+	try {
+	for (String[] links : linksToMake) {
+
+		Path theTarget = Paths.get(links[0]);
+//		System.out.println ("[makeDTIGVLink] thetarget: " + theTarget.toString());
+		if (Files.exists(theTarget)) {
+			Path theLink = Paths.get(links[1]);
+//			System.out.println ("[makeDTIGVLink]  theLink: " + theLink.toString());
+			if (Files.exists(theLink)) {
+				Files.delete(theLink);
+			}
+
+//			System.out.println ("[makeDTIGVLink] thetarget: " + theTarget.toString() + " theLink: " + theLink.toString());
+			Files.createSymbolicLink(theLink, theTarget);
+		}
+	} // end of for
+
+	} catch (Exception e) {
+		LOG.error("Error in MakeDataTrackIGVLink 2", e);
+	}
+
+	return true;
+}
 private boolean makeSoftLinkViaUNIXCommandLine(String path, ArrayList<String[]> linksToMake) {
 	try {
-
+		// we split the file into 3000 line pieces so makeLinks.sh doesn't get too large
 		System.out.println ("[makeSoftLinkViaUNIXCommandLine] path: " + path + " linksToMake.size: " + linksToMake.size());
 		File script = new File(path, "makeLinks.sh");
 		script.createNewFile();
 		BufferedWriter bw = new BufferedWriter(new FileWriter(script));
+		int numprocessed = 0;
+		int nxtfile = 0;
 		for (String[] links : linksToMake) {
-//			bw.write("ln -s \"" + links[0] + "\" \"" + links[1] + "\"\n");
-			bw.write("ln -s '" + links[0] + "' '" + links[1] + "'\n");
+
+			File testit = new File(links[0]);
+			if (testit.exists()) {
+				bw.write("ln -s '" + links[0] + "' '" + links[1] + "'\n");
+			} else
+			{
+				continue;
+			}
+
+			testit = null;
+				numprocessed++;
+			if (numprocessed >= 3000) {
+				numprocessed = 0;
+				bw.write("exit\n");
+				bw.close();
+
+				String[] cmd = { "sh", script.toString() };
+				Process p = Runtime.getRuntime().exec(cmd);
+
+				nxtfile++;
+				script = new File(path, "makeLinks" + nxtfile + ".sh");
+				bw = new BufferedWriter(new FileWriter(script));
+			}
 		}
-		bw.close();
 
-		String[] cmd = { "sh", script.toString() };
-		Process p = Runtime.getRuntime().exec(cmd);
+		if (numprocessed > 0) {
+			// process the last file of links
+			bw.write("exit\n");
+			bw.close();
 
+			String[] cmd = {"sh", script.toString()};
+			Process p = Runtime.getRuntime().exec(cmd);
+		}
 		// script.delete();
 
 		return true;

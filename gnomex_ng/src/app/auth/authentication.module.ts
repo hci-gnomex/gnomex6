@@ -16,6 +16,7 @@ import {AuthorizationInterceptor} from "./authorization.interceptor";
 import {AuthenticationProvider} from "./authentication.provider";
 import {ServicesModule} from "../services/services.module";
 import {CustomInputModule} from "./custom-input/custom-input.module";
+import {ChangeyourPasswordComponent} from "./changeyour-password.component";
 
 /**
  * Provide a single auth service and interceptor for the implementing application.  Also provide everything
@@ -38,12 +39,17 @@ import {CustomInputModule} from "./custom-input/custom-input.module";
     declarations: [
         AuthenticationComponent,
         DirectLoginComponent,
-        TimeoutNotificationComponent
+        TimeoutNotificationComponent,
+        ChangeyourPasswordComponent
     ],
     exports: [
         AuthenticationComponent,
         DirectLoginComponent,
-        TimeoutNotificationComponent
+        TimeoutNotificationComponent,
+        ChangeyourPasswordComponent
+    ],
+    entryComponents: [
+        ChangeyourPasswordComponent,
     ]
 })
 export class AuthenticationModule {

@@ -32,7 +32,7 @@ const ROUTES: Routes = [
     //     canActivate: [SubRouteGuardService]
     // },
 
-    { path: "experiments", component:BrowseExperimentsComponent, children:[
+    { path: 'experiments', component:BrowseExperimentsComponent, children:[
             {
                 path:'overview',
                 component: BrowseOverviewComponent,

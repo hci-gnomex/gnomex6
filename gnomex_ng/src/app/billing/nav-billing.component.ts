@@ -982,12 +982,17 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                 if(!billingItemsMap.has(r.requestNumber)){
                     billingItemsMap.set(r.requestNumber,r.BillingItem);
                     let price: string = r.totalPrice;
+		if (price) {
                     price = price
                         .replace('$', '')
                         .replace(',', '')
                         .replace("(", "-")
                         .replace(")", "");
                     this.totalPrice += Number(price);
+		}
+		else {
+			price = "0.00";
+		}
                 }else{
                     splitKeyList.push(r.requestNumber);
                     billingItemsMap.get(r.requestNumber).push(...r.BillingItem);
@@ -1002,11 +1007,16 @@ export class NavBillingComponent implements OnInit, OnDestroy {
             for(let bi of biList){
                 if(node.data.status !== bi.codeBillingStatus){
                     let price = bi.invoicePrice;
-                    price = price.replace('$', '')
-                        .replace(',', '')
-                        .replace("(", "-")
-                        .replace(")", "");
-                    negateMixedBillingStatus += Number(price);
+                    if (price) {
+                        price = price.replace('$', '')
+                            .replace(',', '')
+                            .replace("(", "-")
+                            .replace(")", "");
+                        negateMixedBillingStatus += Number(price);
+                    }
+                    else {
+                        price = "0.00";
+                    }
                 }
             }
             this.totalPrice = this.totalPrice - negateMixedBillingStatus;
