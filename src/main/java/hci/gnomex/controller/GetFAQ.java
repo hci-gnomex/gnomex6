@@ -1,33 +1,30 @@
 package hci.gnomex.controller;
 
+import hci.framework.control.Command;
+import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.CoreFacility;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
-import hci.framework.control.RollBackCommandException;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class GetFAQ extends GNomExCommand implements Serializable {
   private String isManageMode = "";
   private Set coreFacilities = new HashSet();
 
 
-  private static Logger LOG = Logger.getLogger(GetNewsItem.class);
+  private static Logger LOG = Logger.getLogger(GetFAQ.class);
 
   public void validate() {
   }

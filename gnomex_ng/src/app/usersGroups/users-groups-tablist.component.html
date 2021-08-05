@@ -213,7 +213,7 @@
                                                                 </div>
                                                                 <div class="full-width">
                                                                     <mat-form-field class="formField">
-                                                                        <input matInput matTooltip="Passwords must be 8-25 characters long, contain no spaces or slashes, and contain three or more of the following: lowercase letter, uppercase letter, digit, or symbol." type="password" formControlName="password" placeholder="Password">
+                                                                        <input matInput matTooltip="Passwords must be 8-25 characters long, contain no spaces or slashes, and contain all of the following: lowercase letter, uppercase letter, digit, or symbol." type="password" formControlName="password" placeholder="Password">
                                                                         <mat-error *ngIf="passwordFC.hasError('validatePassword')">
                                                                             {{ passwordUtilService.PASSWORD_COMPLEXITY_ERROR }}
                                                                         </mat-error>
@@ -221,7 +221,7 @@
                                                                 </div>
                                                                 <div class="full-width">
                                                                     <mat-form-field class="formField">
-                                                                        <input matInput matTooltip="Passwords must be 8-25 characters long, contain no spaces or slashes, and contain three or more of the following: lowercase letter, uppercase letter, digit, or symbol." type="password" formControlName="passwordConfirm" placeholder="Confirm Password">
+                                                                        <input matInput matTooltip="Passwords must be 8-25 characters long, contain no spaces or slashes, and contain all of the following: lowercase letter, uppercase letter, digit, or symbol." type="password" formControlName="passwordConfirm" placeholder="Confirm Password">
                                                                         <mat-error *ngIf="passwordConfirmFC.hasError('validatePasswordConfirm')">
                                                                             {{ passwordUtilService.PASSWORD_MATCH_ERROR }}
                                                                         </mat-error>

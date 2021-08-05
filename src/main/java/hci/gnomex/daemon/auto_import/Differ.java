@@ -292,7 +292,7 @@ public class Differ {
 		Set<String> sortID = new TreeSet<>();
 
 		if(startCaptureGroup == null ){ // if cp wasn't specified in args default to capture all groups
-			startCaptureGroup = 0;
+			startCaptureGroup = 1;
 			endCaptureGroup = m.groupCount();
 		}
 
@@ -310,29 +310,17 @@ public class Differ {
 			if(aliasMap != null){
 				String alias = aliasMap.get(m.group(i));
 				if(alias != null){
-					renameBuildStr.append(alias);
 					sortID.add(alias);
 				}else{
-					renameBuildStr.append(m.group(i));
 					sortID.add(m.group(i));
 				}
 			}else{
-				renameBuildStr.append(m.group(i));
 				sortID.add(m.group(i));
 			}
 
-			if(i < m.groupCount()){
-				renameBuildStr.append("-");
-			}
 
 		}
 
-
-		String rename = renameBuildStr.toString();
-		if(rename.endsWith("-")){
-			renameBuildStr.deleteCharAt(renameBuildStr.length() - 1);
-			rename = renameBuildStr.toString();
-		}
 
 		//System.out.println(String.join(",",sortID));
 		renameBuildStr.setLength(0);

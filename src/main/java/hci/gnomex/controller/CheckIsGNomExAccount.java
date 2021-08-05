@@ -21,13 +21,10 @@ import hci.gnomex.model.AppUser;
 import hci.gnomex.utility.HibernateSession;
 
 /**
- * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and
- * Proprietary
- *
  * Created by u0556399 on 3/25/2020.
  */
 public class CheckIsGNomExAccount extends HttpServlet {
-	private static Logger LOG = Logger.getLogger(GetNewAccountServlet.class);
+	private static Logger LOG = Logger.getLogger(CheckIsGNomExAccount.class);
 
 	private static String webContextPath;
 
@@ -73,17 +70,28 @@ public class CheckIsGNomExAccount extends HttpServlet {
 											.add("hasUserAccount", "Y");
 					if (((AppUser) accounts.get(0)).getIsActive() == null || !((AppUser) accounts.get(0)).getIsActive().equals("N")) {
 						value.add("isActive", "Y");
+					} else {
+						value.add("isActive", "N");
 					}
+
+					if (((AppUser) accounts.get(0)).getPasswordExpired() != null && ((AppUser) accounts.get(0)).getPasswordExpired().equals("Y")) {
+						value.add("passwordExpired", "Y");
+					} else {
+						value.add("passwordExpired", "N");
+					}
+
 				} else if (accounts.size() == 0) {
 					value = Json.createObjectBuilder()
 											.add("result", "SUCCESS")
 											.add("hasUserAccount", "N")
-											.add("isActive", "N");
+											.add("isActive", "N")
+											.add("passwordExpired", "N");
 				} else {
 					value = Json.createObjectBuilder()
 											.add("result", "SUCCESS")
 											.add("hasUserAccount", "N")
-											.add("isActive", "N");
+											.add("isActive", "N")
+											.add("passwordExpired", "N");
 				}
 			} else {
 				throw new Exception("No username received. Please contact GNomEx Support for assistance.");

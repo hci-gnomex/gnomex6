@@ -33,9 +33,10 @@ public class MailUtil {
 	private static Logger LOG = Logger.getLogger(MailUtil.class);
 	
 	public static boolean validateAndSendEmail(MailUtilHelper helper) throws AddressException, NamingException, MessagingException, IOException {
-		
+//		System.out.println ("[validateAndSendEmail] start");
 		if (helper != null && helper.hasEssentialParams()) {
 			String to = helper.getNonNullTo();
+//			System.out.println ("[validateAndSendEmail] to: " + to);
 			String cc = helper.getNonNullCC();
 			String bcc = helper.getNonNullBCC();
 			String subject = helper.getNonNullSubject();
@@ -43,6 +44,7 @@ public class MailUtil {
 			
 			if (to.trim().equals("") || !isValidEmail(to)) {
 				to = helper.getTesterEmail();
+//				System.out.println ("[validateAndSendEmail] tester to: " + to);
 		    	subject = "The following email does not have a valid recipient - " + subject;
 		    	body = helper.addNoAddressDetailsToBody();
 			}
@@ -75,8 +77,10 @@ public class MailUtil {
 				cc = "";
 				bcc = "";
 			}
-			
-			send(helper.getSession(), to, cc, bcc, helper.getNonNullFrom(), subject, body, helper.getFile(), helper.getFormatHtml());
+
+//			System.out.println ("[validateAndSendEmail] right before send to: " + to);
+			send(GNomExFrontController.getMailSession(), to, cc, bcc, helper.getNonNullFrom(), subject, body, helper.getFile(), helper.getFormatHtml());
+//			send(helper.getSession(), to, cc, bcc, helper.getNonNullFrom(), subject, body, helper.getFile(), helper.getFormatHtml());
 
 			StringBuffer logConfirmation = new StringBuffer("Confirmation of email sent to ");
 			logConfirmation.append(to);
@@ -91,7 +95,10 @@ public class MailUtil {
 			logConfirmation.append(" on ");
 			logConfirmation.append(LocalDateTime.now().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM, FormatStyle.MEDIUM)));
 			LOG.info(logConfirmation.toString());
-			
+//			logConfirmation.append("\n" + body);
+//			System.out.println ("[validateAndSendEmail] log: " + logConfirmation.toString());
+
+
 			return true;
 		}
 		
@@ -117,6 +124,7 @@ public class MailUtil {
 											sess.getProperty("mail.smtp.user"),
 											null											);
 				// Fill password cache
+//				System.out.println ("[send] url: " + url.toString());
 				sess.setPasswordAuthentication(url,auth);
 	        }
 	  
@@ -157,7 +165,8 @@ public class MailUtil {
 	        
 	        msg.setHeader("X-Mailer", "JavaMailer");
 	        msg.setSentDate(new Date());
-	  
+
+//	        System.out.println ("[send] right before Transport.send ");
 	        Transport.send(msg);
 		}
 	      

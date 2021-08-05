@@ -3,6 +3,8 @@ import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 import {PropertyService} from "../services/property.service";
 import {FileService} from "../services/file.service";
 import {ActionType} from "./interfaces/generic-dialog-action.model";
+import {DialogsService, DialogType} from "./popup/dialogs.service";
+import {first} from "rxjs/operators";
 
 @Component({
     template: `
@@ -15,7 +17,7 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
                     Which download mechanism do you want to use?
                 </div>
                 <div *ngIf="this.isFDTSupported">
-                    (FDT download is recommended for downloads > 300 MB)
+                    (FDT download is required for downloads > 2 TB)
                 </div>
             </div>
             <mat-dialog-actions class="justify-flex-end no-margin no-padding generic-dialog-footer-colors">
@@ -47,6 +49,7 @@ export class DownloadPickerComponent implements OnInit {
 
     constructor(private dialogRef: MatDialogRef<DownloadPickerComponent>,
                 @Inject(MAT_DIALOG_DATA) private data: any,
+                private dialogsService: DialogsService,
                 private propertyService: PropertyService) {
     }
 

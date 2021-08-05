@@ -488,7 +488,8 @@ public class Util {
         return;
       }
 
-      String toaddress = softwareTestEmail;
+      PropertyDictionaryHelper propertyHelper = PropertyDictionaryHelper.getInstance(sess);
+      String toaddress = propertyHelper.getProperty(PropertyDictionary.GNOMEX_SUPPORT_EMAIL);
       java.net.InetAddress localMachine = java.net.InetAddress.getLocalHost();
       String serverName = localMachine.getHostName();
 

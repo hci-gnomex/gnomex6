@@ -55,7 +55,9 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                         </as-split-area>
                         <as-split-area size="50">
                             <div class="full-width full-height flex-container-col padded">
-                                <label>Files to Download</label>
+                                <label>
+                                    Files to Download
+                                </label>
                                 <div class="flex-grow" ondrop="permitDrop($event)" (dragover)="onDropInDownload($event)">
                                     <tree-root #filesToDownloadTreeComponent
                                                [nodes]="filesToDownloadNodes"
@@ -89,7 +91,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                     <button mat-raised-button
                             color="primary"
                             class="primary-action"
-                            [disabled]="filesToDownloadCount < 1"
+                            [disabled]="filesToDownloadCount < 1 || filesToDownloadSize > maxsize"
                             (click)="download()">
                         <img [src]="constantsService.ICON_DOWNLOAD" alt="" class="icon">
                         Download
@@ -171,6 +173,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     public filesToDownloadNodes: any[] = [];
     public filesToDownloadCount: number = 0;
     private filesToDownloadSize: number = 0;
+    public maxsize: number = 2000000000000;
     public filesToDownloadSizeLabel: string = "";
 
     public filesOptions: ITreeOptions;
@@ -199,6 +202,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     }
 
     ngOnInit() {
+        this.utilService.registerChangeDetectorRef(this.changeDetector);
         this.isFDTSupported = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_FDT_SUPPORTED);
 
         this.filesOptions = {
@@ -245,9 +249,16 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
             this.selectFilesRecursively(this.data.downloadListSource, 'N');
             this.data.downloadListSource.isSelected = 'Y';
             this.filesToDownloadNodes = [this.data.downloadListSource];
+    
+setTimeout(() => {
+            this.updateFilesToDownloadTree();
+    
+            this.changeDetector.markForCheck();
+});
         }
 
         if (this.securityAdvisor.isGuest) {
+setTimeout(() => {
             let terms: string = this.propertyService.getPropertyValue(PropertyService.PROPERTY_GUEST_DOWNLOAD_TERMS);
             if (terms) {
                 let guestTermsConfig: MatDialogConfig = new MatDialogConfig();
@@ -269,20 +280,28 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
                     }
                 });
             }
-        }
+});       
+ }
     }
 
     ngOnDestroy(): void {
+        this.utilService.removeChangeDetectorRef(this.changeDetector);
     }
 
     private updateFilesToDownloadTree(): void {
+        setTimeout(() => {
         this.filesToDownloadTreeComponent.treeModel.filterNodes((node: TreeNode) => {
             return node.data.isSelected === 'Y';
         });
-
+});
+        setTimeout(() => {
         this.filesToDownloadCount = this.countFilesRecursively(this.filesToDownloadNodes[0], true);
         this.filesToDownloadSize = this.countFileSizeRecursively(this.filesToDownloadNodes[0], true);
+        if (this.filesToDownloadSize > this.maxsize) {
+            this.dialogsService.alert("Download size exceeds 2 TB limit", null, DialogType.WARNING);
+        }
         this.filesToDownloadSizeLabel = FileService.formatFileSize(this.filesToDownloadSize);
+});
     }
 
     private countFilesRecursively(fileNode: any, filterSelectedOnly: boolean = false): number {
@@ -375,14 +394,19 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
         }
     };
 
+
     public onDropInDownload(event: any): void {
+        setTimeout(() => {
         this.changeDetector.markForCheck();
         this.moveNode(this.filesToDownloadTreeComponent.treeModel, null, event, {from: this.availableFilesTreeComponent, to: this.filesToDownloadTreeComponent});
-    }
+    
+});
+}
 
     public onRemoveFromDownload(event: any): void {
         if (this.treeMostRecentlySelectedFrom === this.filesToDownloadTreeComponent.treeModel) {
-            return this.moveNode(this.availableFilesTreeComponent.treeModel, null, event, {from: this.filesToDownloadTreeComponent, to: this.availableFilesTreeComponent});
+            return this.moveNode(this.availableFilesTreeComponent.treeModel, null, event,
+                {from: this.filesToDownloadTreeComponent, to: this.availableFilesTreeComponent});
         }
     }
 

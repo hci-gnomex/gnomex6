@@ -97,8 +97,8 @@ public class GetWorkItemList extends GNomExCommand implements Serializable {
 		filter.getCodeStepNext().equals(Step.NOSEQ_CLUSTER_GEN) ||
             filter.getCodeStepNext().equals(Step.MISEQ_CLUSTER_GEN) ||
             filter.getCodeStepNext().equals(Step.ILLSEQ_CLUSTER_GEN) ||
-        filter.getCodeStepNext().equals(Step.ALL_CLUSTER_GEN)
-        ){
+        filter.getCodeStepNext().equals(Step.ALL_CLUSTER_GEN) )
+        {
           comparator  = new LaneComparator();
         } else if (filter.getCodeStepNext().equals(Step.SEQ_RUN) ||
             filter.getCodeStepNext().equals(Step.HISEQ_RUN) ||
