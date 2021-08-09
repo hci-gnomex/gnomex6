@@ -7,23 +7,16 @@ package hci.gnomex.controller;
  * @created August 17, 2002
  */
 
-import org.hibernate.Session;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.sql.Timestamp;
-import java.util.Date;
+import hci.gnomex.utility.Util;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.Util;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Date;
 
 public class CheckSessionStatus extends HttpServlet {
 

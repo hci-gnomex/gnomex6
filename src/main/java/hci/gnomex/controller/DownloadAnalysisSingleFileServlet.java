@@ -5,31 +5,19 @@ import hci.gnomex.model.Analysis;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.model.TransferLog;
 import hci.gnomex.security.SecurityAdvisor;
+import hci.gnomex.utility.FileDescriptor;
 import hci.gnomex.utility.*;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.codec.binary.Base64;
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
+import java.io.*;
+import java.math.BigDecimal;
+import java.util.*;
 
 public class DownloadAnalysisSingleFileServlet extends HttpServlet {
 
@@ -276,13 +264,14 @@ public class DownloadAnalysisSingleFileServlet extends HttpServlet {
         } catch (Exception e) {
 //            LOG.error("Error in DownloadAnalysisSingleFileServlet ", e);
             String errorMessage = Util.GNLOG(LOG,"Error in DownloadAnalysisSingleFileServlet ", e);
+            System.out.println ("[DASFS] error: " + errorMessage);
             StringBuilder requestDump = Util.printRequest(req);
             String serverName = req.getServerName();
 
             PropertyDictionaryHelper propertyHelper = PropertyDictionaryHelper.getInstance(HibernateSession.currentSession());
             String gnomex_tester_email = propertyHelper.getProperty(PropertyDictionary.CONTACT_EMAIL_SOFTWARE_TESTER);
 
-            Util.sendErrorReport(HibernateSession.currentSession(),gnomex_tester_email, "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
+//            Util.sendErrorReport(HibernateSession.currentSession(),gnomex_tester_email, "DoNotReply@hci.utah.edu", username, errorMessage, requestDump);
 
             HibernateSession.rollback();
             response.setContentType("text/html; charset=UTF-8");

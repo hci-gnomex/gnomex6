@@ -1,32 +1,21 @@
 package hci.gnomex.utility;
 
+import hci.gnomex.constants.Constants;
+import org.apache.commons.validator.routines.EmailValidator;
+import org.apache.log4j.Logger;
+
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.*;
+import javax.mail.internet.*;
+import javax.naming.NamingException;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Date;
-
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
-import javax.mail.BodyPart;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.URLName;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.naming.NamingException;
-
-import hci.gnomex.constants.Constants;
-import org.apache.commons.validator.routines.EmailValidator;
-import org.apache.log4j.Logger;
 
 public class MailUtil {
 
@@ -79,7 +68,7 @@ public class MailUtil {
 			}
 
 //			System.out.println ("[validateAndSendEmail] right before send to: " + to);
-			send(GNomExFrontController.getMailSession(), to, cc, bcc, helper.getNonNullFrom(), subject, body, helper.getFile(), helper.getFormatHtml());
+			send(helper.getSession(), to, cc, bcc, helper.getNonNullFrom(), subject, body, helper.getFile(), helper.getFormatHtml());
 //			send(helper.getSession(), to, cc, bcc, helper.getNonNullFrom(), subject, body, helper.getFile(), helper.getFormatHtml());
 
 			StringBuffer logConfirmation = new StringBuffer("Confirmation of email sent to ");

@@ -6,28 +6,16 @@ import hci.gnomex.model.Segment;
 import hci.gnomex.model.UCSCLinkFiles;
 import hci.gnomex.useq.USeq2UCSCBig;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import javax.servlet.http.HttpServletRequest;
+import java.io.*;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
 
 public class DataTrackUtil {
 
@@ -565,6 +553,7 @@ public class DataTrackUtil {
 	/** Returns 'bigWig' , 'bigBed', 'bam', 'vcfTabix', or null for xxx.bw, xxx.bb, xxx.bam, xxx.vcf.gz */
 	public static String fetchUCSCDataType(File[] filesToLink) {
 		for (File f : filesToLink) {
+			if (f == null) continue;
 			String name = f.getName();
 			if (name.endsWith(".bw"))
 				return "bigWig";
@@ -573,9 +562,22 @@ public class DataTrackUtil {
 			if (name.endsWith(".bam"))
 				return "bam";
 			if (name.endsWith(".cram"))
-				return "cram";
+				return "bam";
 			if (name.endsWith(".vcf.gz"))
 				return "vcfTabix";
+			if (name.endsWith(".bed.gz"))
+				return "bed";
+			if (name.endsWith(".bed"))
+				return "bed";
+			if (name.endsWith(".narrowPeak"))
+				return "narrowPeak";
+			if (name.endsWith(".broadPeak"))
+				return "broadPeak";
+			if (name.endsWith(".gappedPeak"))
+				return "gappedPeak";
+
+//			".bgr", ".brs", ".gff", ".gtf"
+
 		}
 		return null;
 	}
