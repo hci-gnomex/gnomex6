@@ -255,7 +255,7 @@ public class Downloader {
 
 		// this is reading in tempFile line by line delimiting that line by space hence ' ' allowing only 2 arguments at a time
 		// it is making  shell script for just that one line and running it and substituting where $ is shown arguments
-		String downloadCommand = "cat " + tempFile + " |  xargs -n2 sh -c 'aws --profile " + mfaProfile != null ? mfaProfile : mode
+		String downloadCommand = "cat " + tempFile + " |  xargs -n2 sh -c 'aws --profile " + (mfaProfile != null ? mfaProfile : mode)
 				+ " s3 cp $1 $2' sh" ;
 		// old approach
 		//xargs -P10 -I {} aws --profile tempus s3 cp {} " + this.downloadPath;
@@ -267,7 +267,10 @@ public class Downloader {
 		//why? because it might fail if there are no flagged files in the folder causing the script to crash
 		//commands.add("mv -t " + this.downloadPath + " " + this.downloadPath + File.separator +  "Flagged" +File.separator +  "*" + " 2>/dev/null");
 		commands.add("mv -t " + this.downloadPath + " " + this.downloadPath + File.separator +  "Flagged" +File.separator +  "*" );
+		System.out.println("calling out to subshell with these commands:");
+		System.out.println(commands.toString());
 		executeCommands(commands);
+		System.out.println("Finishing downloading");
 //		try {
 //			Files.deleteIfExists(Paths.get(tempFile));
 //		} catch (IOException e) {

@@ -358,10 +358,14 @@ public class Differ {
 		return rename;
 	}
 
-	public static String getNameByExistingCaptureGroup( List<Integer> captureGroups, Matcher m ){
+	public static String getNameByExistingCaptureGroup( List<Integer> captureGroups, Matcher m, boolean optionalMatches){
 		String matchedName = "";
-		if(!m.matches()){
+		if(!m.matches() && !optionalMatches){
 			System.out.println("With your given pattern: " + m.pattern() + " no match is found please check pattern");
+		}
+		//allow optional matching otherwise script will abort without it when no match found
+		if(optionalMatches && !m.matches()){
+			return "";
 		}
 
 		for(Integer cp : captureGroups){
