@@ -12,7 +12,7 @@ smallFileRegex=".*(result.*)"
 fastqRegex="(?:(?:.*(DNA|RNA).*/)?|.*/?)(TL-[0-9]{2}-[A-Za-z0-9]{6})[^/](?=.*(DNA|RNA|DSQ|RSQ))?.*(md5|gz).*(?:S3.txt)?"
 sampleIdRegex=".*TL-[0-9]{2}-([A-Za-z0-9]{6}).*|result-?_?([A-Za-z0-9]{6}).*"
 sampleFileNameRegex=".*(TL-[0-9]{2}-[A-Za-z0-9]{6}).*|result-?_?([A-Za-z0-9]{6}).*" #get everything but the read end pair number and extension
-associateIDRegex=".*(?:TL-[0-9]{2}|result)-?_?([A-Za-z0-9]{6})._?-?(T|N)?_?-?(DSQ|RSQ|RNA|DNA)?.*"
+associateIDRegex=".*(?:TL-[0-9]{2}|result)-?_?([A-Za-z0-9]{6,8})._?-?(T|N)?_?-?(DSQ|RSQ|RNA|DNA)?.*"
 
 filterRegex=".*(result.*)|$fastqRegex"
 echo $filterRegex
@@ -185,8 +185,8 @@ printf "%s\n" "${fileArray[@]}" > "$pDataPath"importableTempusFileList.out
 cat "$pDataPath"importableTempusFileList.out | java  hci.gnomex.daemon.auto_import.StringModder -sort -delimit "/" > "$pDataPath"importableTempusFileList1.out
 cat "$pDataPath"importableTempusFileList1.out > "$pDataPath"importableTempusFileList.out
 rm "$pDataPath"importableTempusFileList1.out
-#rm "$pDataPath"localTempus*
-#rm "$pDataPath"remoteTempus*
+
+
 java -jar "./tempus-persistence.jar"  -json "$pDataPath"importableTempusFileList.out -cred "$pDataPath"tempus-cred-prod.properties -download "$downloadPath" -out "$pDataPath"tlInfo.out -log "$pDataPath""log/"tempus.log -ld "$pDataPath"localTempusPath.out
 #java hci.ri.tempus.model.TempusPersistenceMain  -json "$pDataPath"importableTempusFileList.out -cred "$pDataPath"tempus-cred.properties -deidentjson "$pDataPath"hello.txt -download "$downloadPath" -out "$pDataPath"tlInfo.out -ld "$pDataPath"localTempusPath.out
 
