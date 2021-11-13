@@ -1,6 +1,5 @@
 package hci.gnomex.daemon.auto_import;
 
-import javax.persistence.criteria.CriteriaBuilder;
 import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -73,12 +72,28 @@ public class Differ {
 				}
 				i--;
 			} else if (args[i].equals("-help")) {
-				//printUsage();
+				printUsage();
 				System.exit(0);
 			}
 
 		}
 	}
+
+	public void printUsage() {
+		System.out.println("-remote - remote location (sftp server or aws) that is being compared against");
+		System.out.println("-local -  local location (example: clingen1)  that is being compared against");
+		System.out.println("-outputPath -  output path and filename  will write a file to this location ");
+		System.out.println("-matchByName - \n" +
+				"\t\tHas sub args of l for local and r for remote. This allows you to apply \n" +
+				"\t\tregex only file name one location in case the format is different between local and remote.\n" +
+				"\t\tUse this in conjunction with " + " -cp command break the filename in capture groups.\n" +
+				"\t\tWhen Omitted the filenames will be compared directly as they are stored on remote and local");
+		System.out.println("-cp -  This is the range with start and end for the capture groups for given regex ");
+		System.out.println("-alias -\n" +
+				"\t\tYou can pass key value pairs delimited by space to be replace in the capture group.\n" +
+				"For example if you have RSQ1 or RSQ2 in the capture group of the regex you could have back the map back to RNA.");
+	}
+
 
 
 	public void findDifference(){

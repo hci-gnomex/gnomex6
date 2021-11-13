@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 
 public class Downloader {
 
+
 	private Integer startCaptureGroup;
 	private Integer endCaptureGroup;
 	private boolean useRemoteFile;
@@ -34,10 +35,14 @@ public class Downloader {
 	private List<String> flaggedFileList;
 	private boolean allowClearFile = false;
 	private String filterRegex;
+	private boolean deleteRemoteAfterDownload;
+	private boolean testRun;
 
 	Downloader(String[] args ){
 		this.useRemoteFile = false;
 		this.mode = "avatar";
+		deleteRemoteAfterDownload = false;
+		testRun = false;
 		for (int i = 0; i < args.length; i++) {
 			args[i] =  args[i].toLowerCase();
 			if (args[i].equals("-filelist")) {
@@ -52,7 +57,7 @@ public class Downloader {
 			} else if (args[i].equals("-mode")) {
 				this.mode = args[++i];
 				if(!(this.mode.equals("tempus") || this.mode.equals("avatar") || this.mode.equals("caris")) ){
-					System.out.println("If you specify mode it has to be either tempus or avatar");
+					System.out.println("If you specify mode it has to be either tempus, avatar or caris");
 					System.exit(1);
 				}
 
@@ -76,7 +81,7 @@ public class Downloader {
 				}
 			}
 			else if(args[i].equals("-remotepath")) { // helps to determine which path to use remote or local in flagged filtered outlist
-				// default is is the flagged(local) path and filename
+				// default is the flagged(local) path and filename
 				useRemoteFile = true;
 			}else if (args[i].equals("-alias")){ // allow list of for your capture groups items aka DNA -> DSQ1
 				aliasMap = new HashMap<String, String>();
@@ -90,6 +95,10 @@ public class Downloader {
 					i = i + 2;
 				}
 				i--;
+			}else if(args[i].equals("-rd") ){ // delete remote files after downloading
+				deleteRemoteAfterDownload = true;
+			}else if(args[i].equals("-t") || args[i].equals("-test")){
+				testRun = true;
 			} else if (args[i].equals("-help")) {
 				//printUsage();
 				System.exit(0);
@@ -110,7 +119,7 @@ public class Downloader {
 
 
 
-	private boolean hasSubProccessErrors(File errorFile) {
+	private boolean hasSubProcessErrors(File errorFile, boolean strictErrorCheck, Process p ) {
 		Scanner scan = null;
 		boolean hasError = false;
 		try{
@@ -132,10 +141,19 @@ public class Downloader {
 		}finally {
 			scan.close();
 		}
+		if(strictErrorCheck){
+		  hasError = p.exitValue() > 0 || hasError;
+		}
+
 		return hasError;
 	}
 
-	private void executeCommands(List<String> commands) {
+
+
+
+
+
+	private void executeCommands(List<String> commands, boolean strictErrorCheck) {
 
 		File tempScript = null;
 
@@ -150,7 +168,7 @@ public class Downloader {
 
 			process = pb.start();
 			process.waitFor();
-			if(hasSubProccessErrors(errorFile)){
+			if(hasSubProcessErrors(errorFile,strictErrorCheck,process)){
 				System.out.println("Error detected exiting script");
 				System.exit(1);
 			}
@@ -223,14 +241,14 @@ public class Downloader {
 		}
 
 
-		executeCommands(commands);
+		executeCommands(commands, false);
 
-		System.out.println("The dowload finished");
+		System.out.println("The download finished");
 		ArrayList<String> downloadedList = new ArrayList<String>();
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
 
-		downloadedList.add("Dowloaded successfully, " + timestamp );
+		downloadedList.add("Downloaded successfully, " + timestamp );
 		downloadedList.add(this.createFormattedPath("", true, true).replace("\"", ""));
 
 		writeToFile(this.dependentDataPath + "download.log", downloadedList);
@@ -243,9 +261,10 @@ public class Downloader {
 
 		List<String> status = Arrays.asList("Downloading in progress...");
 		writeToFile(this.dependentDataPath + "download.log",status); // /home/u0566434/parser_data/download.log
-		String tempFile = writeToAWSFile(fileOfPaths,this.fileNameMap);
+		String tempFile = writeToAWSFile(fileOfPaths,this.fileNameMap, false);
 
 		String serialFileName = dependentDataPath + mode+ "-mfa-arn.txt";
+		String dryRun = testRun ? " --dryrun " : "";
 
 		String mfaProfile = null;
 		if(Files.exists(Paths.get(serialFileName))){
@@ -256,10 +275,9 @@ public class Downloader {
 		// this is reading in tempFile line by line delimiting that line by space hence ' ' allowing only 2 arguments at a time
 		// it is making  shell script for just that one line and running it and substituting where $ is shown arguments
 		String downloadCommand = "cat " + tempFile + " |  xargs -n2 sh -c 'aws --profile " + (mfaProfile != null ? mfaProfile : mode)
-				+ " s3 cp $1 $2' sh" ;
+				+ " s3 cp" + dryRun + "$1 $2' sh" ;
 		// old approach
 		//xargs -P10 -I {} aws --profile tempus s3 cp {} " + this.downloadPath;
-		System.out.println(downloadCommand);
 		if(fileNameMap.size() > 0){
 			commands.add(downloadCommand);
 		}
@@ -269,8 +287,36 @@ public class Downloader {
 		commands.add("mv -t " + this.downloadPath + " " + this.downloadPath + File.separator +  "Flagged" +File.separator +  "*" );
 		System.out.println("calling out to subshell with these commands:");
 		System.out.println(commands.toString());
-		executeCommands(commands);
-		System.out.println("Finishing downloading");
+		executeCommands(commands, true);
+
+		System.out.println("Finished downloading");
+		if(deleteRemoteAfterDownload){
+			commands.clear();
+			tempFile = writeToAWSFile(fileOfPaths,this.fileNameMap, true);
+			String workingPath = Paths.get(tempFile).getParent().toString();
+			String finalRemoveFile = workingPath + File.separator + tempFile.substring(tempFile.length() - 17 , tempFile.length());
+
+			String cpRemoveLog = "aws --profile " + (mfaProfile != null ? mfaProfile : mode) + " s3 cp s3://hci-" +mode + "/"+ Paths.get(finalRemoveFile).getFileName()
+					+ " "  + workingPath + File.separator;
+			String appendRmDate  = "echo -e `date +\"%D %T\"`"  + " >> " + finalRemoveFile;
+			String rmCommand = "cat " + tempFile + " |  xargs -P10 -I {}  aws --profile " + (mfaProfile != null ? mfaProfile : mode)
+					+ " s3 rm" + dryRun + "{}"  +" >> " + finalRemoveFile;
+
+			commands.add("set -e");
+			commands.add("echo this is going to cp the file from s3 to " + workingPath + " command:  " + cpRemoveLog);
+			commands.add(cpRemoveLog);
+			commands.add("echo  >> " +  finalRemoveFile );
+			//commands.add("echo this is running the remove command and prepending current date and time  cmd: " + appendRmDate);
+			commands.add( appendRmDate );
+			commands.add(rmCommand);
+			commands.add("echo now uploading remove list log backup to aws command:" + "aws s3 cp "+ finalRemoveFile  + " s3://hci-" + mode   + "/"+ Paths.get(finalRemoveFile).getFileName() );
+			commands.add("aws s3 cp "+ finalRemoveFile  + " s3://hci-" + mode   + "/" + Paths.get(finalRemoveFile).getFileName());
+
+
+			executeCommands(commands, true);
+		}
+
+
 //		try {
 //			Files.deleteIfExists(Paths.get(tempFile));
 //		} catch (IOException e) {
@@ -354,7 +400,7 @@ public class Downloader {
 				}
 
 				///todo probably remove since it's not generic only helpful for tempus
-				// this is here mitigate issues if proccess is aborted and files don't get renamed to
+				// this is here mitigate issues if process is aborted and files don't get renamed to
 				// proper format
 				if(removedIDs == null){
 					StringBuilder sb = new StringBuilder(flaggedIDName).insert(0,"DNA,");
@@ -570,12 +616,14 @@ public class Downloader {
 		}
 		return dataFromFileList;
 	}
-	public String writeToAWSFile(String fileName, Map<String, List<String>> dataToWrite) {
+	/* This method produces a file for the arguments to be passed into the aws s3 subprocess */
+	public String writeToAWSFile(String fileName, Map<String, List<String>> dataToWrite, boolean isSingleArg) {
+
 		PrintWriter writer = null;
 		String pattern = Pattern.quote(System.getProperty("file.separator"));
 		String[] chunks = fileName.split(pattern);
 		String tempFile = String.join(System.getProperty("file.separator"), Arrays.copyOfRange(chunks,0, chunks.length - 1))
-				+ System.getProperty("file.separator") + "tempDownload.txt";
+				+ System.getProperty("file.separator")  + (  isSingleArg  ? "tempAWSRemoveList.txt" : "tempAWSDownloadList.txt");
 
 
 		try {
@@ -586,11 +634,24 @@ public class Downloader {
 				if(keyChunks.length == 3 && mode.equals("tempus")){
 					String destPath = downloadPath +  keyChunks[0];
 					for(String val : entry.getValue()){
-						writer.println(val + " " + destPath);
+						if(isSingleArg){
+							if(val.endsWith("fastq.gz")){
+								writer.println(val);
+							}
+						}else {
+							writer.println(val + " " + destPath);
+						}
 					}
 				}else{
 					for(String val : entry.getValue()){
-						writer.println(val + " " + downloadPath);
+						if(isSingleArg){
+							if(val.endsWith("fastq.gz")){
+								writer.println(val);
+							}
+						}else {
+							writer.println(val + " " + downloadPath);
+
+						}
 					}
 				}
 
