@@ -17,6 +17,9 @@ public class DiffParser {
 		// TODO Auto-generated method stub
 		Differ d = new Differ(args);
 		d.findDifference();
+		if(d.getLocalExistPath() != null && d.getLocalFilesExist().size() > 0 ){
+			d.writeDiffToFile(d.getLocalFilesExist(), d.getLocalExistPath());
+		}
 		//d.writeDiffToFile(dList);	
 
 	}
