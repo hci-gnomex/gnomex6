@@ -56,7 +56,7 @@ public class Downloader {
 				this.downloadPath = args[++i];
 			} else if (args[i].equals("-mode")) {
 				this.mode = args[++i];
-				if(!(this.mode.equals("tempus") || this.mode.equals("avatar") || this.mode.equals("caris")) ){
+				if(!(this.mode.contains("tempus") || this.mode.equals("avatar") || this.mode.contains("caris")) ){
 					System.out.println("If you specify mode it has to be either tempus, avatar or caris");
 					System.exit(1);
 				}
@@ -264,7 +264,7 @@ public class Downloader {
 		String tempFile = writeToAWSFile(fileOfPaths,this.fileNameMap, false);
 
 		String serialFileName = dependentDataPath + mode+ "-mfa-arn.txt";
-		String dryRun = testRun ? " --dryrun " : "";
+		String dryRun = testRun ? " --dryrun " : " ";
 
 		String mfaProfile = null;
 		if(Files.exists(Paths.get(serialFileName))){

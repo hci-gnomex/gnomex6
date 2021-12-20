@@ -147,8 +147,8 @@ public class FoundationContainer {
 			if(!localChecksum.equals(fileChecksum)){
 				System.out.println(bamFile);
 				System.out.println("no match: " + localChecksum + "  " + fileChecksum );
-				//moveCorruptedFile(bamFile, filterOutList);
-				//moveCorruptedFile(bamFile + ".md5", filterOutList);
+				moveCorruptedFile(bamFile, filterOutList);
+				moveCorruptedFile(bamFile + ".md5", filterOutList);
 			}else{
 				// we finally know its safe to add md5 and its bam
 				if(!bamFile.endsWith("bai")){ // don't check bai since it is not valid check for samtools
@@ -160,8 +160,8 @@ public class FoundationContainer {
 						fileList.add(bamFile+".md5");
 					}else{
 						System.out.print("samtools Error: " + samtoolsError);
-						//moveCorruptedFile(bamFile, filterOutList);
-						//moveCorruptedFile(bamFile + ".md5", filterOutList);
+						moveCorruptedFile(bamFile, filterOutList);
+						moveCorruptedFile(bamFile + ".md5", filterOutList);
 					}
 				}else{
 					fileList.add(bamFile);

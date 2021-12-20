@@ -160,7 +160,7 @@ public class FilterFile {
 		} // end of while
 
 		query.closeConnection();
-
+		//bottleneck checks all new files and
 		fContainer.makeLocalCheckSums(filterOutList,fileList);
 		fContainer.writeFilesList(remoteFileList, fileList );
 		outFile(filteredFile, filterOutList);

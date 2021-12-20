@@ -1,5 +1,6 @@
 package hci.gnomex.daemon.auto_import;
 
+import javax.json.JsonObjectBuilder;
 import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -19,6 +20,9 @@ public class Differ {
 	private Integer startCaptureGroup;
 	private Integer endCaptureGroup;
 	private Map<String, String> aliasMap;
+	private Set<String> localFilesExist;
+	private String localExistPath;
+
 
 
 	public Differ(String[] args) {
@@ -27,6 +31,7 @@ public class Differ {
 		this.uniqueByName = new ArrayList<String>();
 		this.uniqueByChecksum = new ArrayList<String>();
 		this.onlyMatchOn = "all";
+		this.localFilesExist = new HashSet<>();
 
 		for (int i = 0; i < args.length; i++) {
 			args[i] = args[i].toLowerCase();
@@ -71,7 +76,9 @@ public class Differ {
 
 				}
 				i--;
-			} else if (args[i].equals("-help")) {
+			} else if(args[i].equals("-le")){
+				localExistPath = args[++i];
+			}else if (args[i].equals("-help")) {
 				printUsage();
 				System.exit(0);
 			}
@@ -80,18 +87,19 @@ public class Differ {
 	}
 
 	public void printUsage() {
-		System.out.println("-remote - remote location (sftp server or aws) that is being compared against");
-		System.out.println("-local -  local location (example: clingen1)  that is being compared against");
-		System.out.println("-outputPath -  output path and filename  will write a file to this location ");
-		System.out.println("-matchByName - \n" +
+		System.out.println("-remote:  remote location (sftp server or aws) that is being compared against");
+		System.out.println("-local:  local location (example: clingen1)  that is being compared against");
+		System.out.println("-outputPath:   output path and filename  will write a file to this location ");
+		System.out.println("-matchByName: \n" +
 				"\t\tHas sub args of l for local and r for remote. This allows you to apply \n" +
 				"\t\tregex only file name one location in case the format is different between local and remote.\n" +
 				"\t\tUse this in conjunction with " + " -cp command break the filename in capture groups.\n" +
 				"\t\tWhen Omitted the filenames will be compared directly as they are stored on remote and local");
-		System.out.println("-cp -  This is the range with start and end for the capture groups for given regex ");
-		System.out.println("-alias -\n" +
+		System.out.println("-cp:  This is the range with start and end for the capture groups for given regex ");
+		System.out.println("-alias: \n" +
 				"\t\tYou can pass key value pairs delimited by space to be replace in the capture group.\n" +
 				"For example if you have RSQ1 or RSQ2 in the capture group of the regex you could have back the map back to RNA.");
+		System.out.println("-le: print out local files that exist already in the diff you need provide a filename for the output");
 	}
 
 
@@ -215,11 +223,17 @@ public class Differ {
 				Matcher m = p.matcher(line1);
 				if(m.matches()){
 					fileName = constructMatchedFileName(startCaptureGroup, endCaptureGroup, m,renameBuildStr, aliasMap);
-					if(fileMap.get(fileName) == null ){
+					Set<String> filePaths = fileMap.get(fileName);
+					if(filePaths == null ){
 						uniqueByName.add(line1);
+					}else {
+						//files already exist on local;
+						localFilesExist.addAll(filePaths);
 					}
-				}else{
-					addUniqueName(line1);
+				}
+				else{
+					System.out.println("No match for regex " + matchByName +".\n" + "Ignoring " + line1 +  " cause we can't determine if it is truly unique");
+					//addUniqueName(line1);
 				}
 			}else{
 				addUniqueName(line1);
@@ -238,8 +252,12 @@ public class Differ {
 		String[] pathWithFile = line.split("/");
 		String fileName = pathWithFile[pathWithFile.length -1];
 
-		if(fileMap.get(fileName) == null) { // diff
+		Set<String> filePaths = fileMap.get(fileName);
+
+		if(filePaths == null) { // diff
 			uniqueByName.add(line);
+		}else { // local files that already exist
+			localFilesExist.addAll(filePaths);
 		}
 	}
 
@@ -446,11 +464,31 @@ public class Differ {
 		writer.close();
 	}
 
+	public void writeDiffToFile(Set<String> uniqueFiles,String fileName){
+		PrintWriter writer = null;
+		List<String> ufiles =  new ArrayList<String>(uniqueFiles);
+		Collections.sort(ufiles);
+
+		try {
+			writer = new PrintWriter( fileName);
+			for(String file: ufiles) {
+				writer.println(file);
+			}
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			writer.close();
+		}
+
+	}
+
 	public void writeDiffToFile(List<String> uniqueFiles,String fileName){
 		PrintWriter writer = null;
 
 		try {
-			writer = new PrintWriter(this.outputPath + fileName);
+			writer = new PrintWriter( fileName);
 			for(String file: uniqueFiles) {
 				writer.println(file);
 			}
@@ -463,6 +501,15 @@ public class Differ {
 		}
 
 	}
+
+
+	public Set<String> getLocalFilesExist() {
+		return localFilesExist;
+	}
+	public String getLocalExistPath() {
+		return localExistPath;
+	}
+
 
 
 
