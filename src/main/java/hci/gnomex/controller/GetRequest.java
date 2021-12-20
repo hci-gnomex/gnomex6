@@ -2,8 +2,7 @@ package hci.gnomex.controller;
 
 import hci.dictionary.model.NullDictionaryEntry;
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.*;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.framework.security.UnknownPermissionException;
@@ -11,26 +10,22 @@ import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.Util;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 
+import javax.naming.NamingException;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.util.*;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import hci.gnomex.utility.Workflow;
-import org.hibernate.Hibernate;
-import org.hibernate.query.Query;
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
 
 public class GetRequest extends GNomExCommand implements Serializable {
 
@@ -576,7 +571,7 @@ public class GetRequest extends GNomExCommand implements Serializable {
                 protocolName = slp.getDisplay();
               }
               protocolNode.setAttribute("name", protocolName != null ? protocolName : "");
-              protocolNode.setAttribute("label", isFirst ? "Lib. Prep. Protocols" : "");
+              protocolNode.setAttribute("label", isFirst ? "Library Protocols" : "");
 
               String fivePrime = dh.getSeqLibProtocolObject(s.getIdSeqLibProtocol()).getAdapterSequenceFivePrime();
               protocolNode.setAttribute("Adapter5Prime", fivePrime != null ? fivePrime : "");
@@ -598,7 +593,7 @@ public class GetRequest extends GNomExCommand implements Serializable {
               protocolNode.setAttribute("idProtocol", seq.getIdNumberSequencingCyclesAllowed().toString());
               protocolNode.setAttribute("protocolClassName", "hci.gnomex.model.NumberSequencingCyclesAllowed");
               protocolNode.setAttribute("name", dh.getIlluminaSequencingProtocol(seq.getIdNumberSequencingCyclesAllowed()));
-              protocolNode.setAttribute("label", isFirst ? "Seq. Protocols" : "");
+              protocolNode.setAttribute("label", isFirst ? "Sequencing Protocols" : "");
               isFirst = false;
             }
           }

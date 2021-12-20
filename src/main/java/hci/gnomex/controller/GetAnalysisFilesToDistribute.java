@@ -63,7 +63,16 @@ public class GetAnalysisFilesToDistribute extends GNomExCommand implements Seria
                 } else if (afFileNameUpperCase.endsWith(".VCF.GZ")) {
                     // is it already a data track?
                     addAnalysisFile(af,  obj, jsonAnalysisFiles);
-                }
+                } else if (afFileNameUpperCase.endsWith(".BED.GZ")) {
+                    // is it already a data track?
+                    addAnalysisFile(af,  obj, jsonAnalysisFiles);
+                } else if (afFileNameUpperCase.endsWith(".BED")) {
+                    // is it already a data track?
+                    addAnalysisFile(af,  obj, jsonAnalysisFiles);
+                } else if (afFileNameUpperCase.endsWith(".CRAM")) {
+                // is it already a data track?
+                addAnalysisFile(af,  obj, jsonAnalysisFiles);
+            }
 
             }
 
