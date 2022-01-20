@@ -15,6 +15,12 @@ import java.util.*;
 import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.*;
 
 
 public class Downloader {
@@ -142,7 +148,7 @@ public class Downloader {
 			scan.close();
 		}
 		if(strictErrorCheck){
-		  hasError = p.exitValue() > 0 || hasError;
+			hasError = p.exitValue() > 0 || hasError;
 		}
 
 		return hasError;
@@ -287,10 +293,12 @@ public class Downloader {
 		commands.add("mv -t " + this.downloadPath + " " + this.downloadPath + File.separator +  "Flagged" +File.separator +  "*" );
 		System.out.println("calling out to subshell with these commands:");
 		System.out.println(commands.toString());
-		executeCommands(commands, true);
+		//executeCommands(commands, true);
 
 		System.out.println("Finished downloading");
 		if(deleteRemoteAfterDownload){
+
+
 			commands.clear();
 			tempFile = writeToAWSFile(fileOfPaths,this.fileNameMap, true);
 			String workingPath = Paths.get(tempFile).getParent().toString();
@@ -306,13 +314,12 @@ public class Downloader {
 			commands.add("echo this is going to cp the file from s3 to " + workingPath + " command:  " + cpRemoveLog);
 			commands.add(cpRemoveLog);
 			commands.add("echo  >> " +  finalRemoveFile );
-			//commands.add("echo this is running the remove command and prepending current date and time  cmd: " + appendRmDate);
 			commands.add( appendRmDate );
-			commands.add(rmCommand);
+			executeCommands(commands, true);
+			deleteObjectsAndVersions(mfaProfile != null ? mfaProfile : mode, testRun, finalRemoveFile);
+			commands.clear();
 			commands.add("echo now uploading remove list log backup to aws command:" + "aws s3 cp "+ finalRemoveFile  + " s3://hci-" + mode   + "/"+ Paths.get(finalRemoveFile).getFileName() );
 			commands.add("aws s3 cp "+ finalRemoveFile  + " s3://hci-" + mode   + "/" + Paths.get(finalRemoveFile).getFileName());
-
-
 			executeCommands(commands, true);
 		}
 
@@ -331,6 +338,81 @@ public class Downloader {
 
 		writeToFile(this.dependentDataPath + "download.log", downloadedList);
 
+	}
+
+	private void deleteObjectsAndVersions(String profileName, boolean dryrun, String fileName) {
+		String bucketName = "hci-" + mode;
+		System.out.println("getting s3 resource connection ");
+		Date date = new Date();
+		final AmazonS3 s3 = AmazonS3ClientBuilder.standard()
+				.withRegion(Regions.US_WEST_1)
+				.withCredentials(new ProfileCredentialsProvider(profileName)).build();
+		try(PrintWriter writer = new PrintWriter(new FileOutputStream(new File(fileName), true))) {
+			System.out.println(" - removing objects from bucket");
+			ObjectListing object_listing = s3.listObjects(bucketName);
+
+			while (true) {
+				for (Iterator<?> iterator = object_listing.getObjectSummaries().iterator();
+					 iterator.hasNext(); ) {
+					S3ObjectSummary summary = (S3ObjectSummary) iterator.next();
+					if(summary.getKey().contains("fastq.gz")){
+						System.out.print("Deleting this object " + summary.getKey());
+						if (!dryrun) {
+							s3.deleteObject(bucketName, summary.getKey());
+							Timestamp ts = new Timestamp(date.getTime());
+							writer.println(summary.getKey() + "\tDeleted\t" + ts );
+							System.out.println();
+
+						} else {
+							System.out.println( " --dryrun ");
+						}
+					}
+				}
+
+				//more object_listing to retrieve?
+				if (object_listing.isTruncated()) {
+					object_listing = s3.listNextBatchOfObjects(object_listing);
+				} else {
+					break;
+				}
+			}
+			System.out.println(" - removing versions from bucket");
+			VersionListing version_listing = s3.listVersions(
+					new ListVersionsRequest().withBucketName(bucketName));
+			while (true) {
+				for (Iterator<?> iterator =
+					 version_listing.getVersionSummaries().iterator();
+					 iterator.hasNext(); ) {
+					S3VersionSummary vs = (S3VersionSummary) iterator.next();
+					if(vs.getKey().contains("fastq.gz")){
+						System.out.print("Deleting this object version " + vs.getKey());
+						if (!dryrun) {
+							s3.deleteVersion(bucketName, vs.getKey(), vs.getVersionId());
+							Timestamp ts = new Timestamp(date.getTime());
+							writer.println(vs.getKey() + "\tDeleted permanently\t" + ts );
+							System.out.println();
+						} else {
+							writer.println(vs.getKey() + "\tDeleted\t--dryrun" );
+							System.out.println( " --dryrun ");
+						}
+					}
+				}
+
+				if (version_listing.isTruncated()) {
+					version_listing = s3.listNextBatchOfVersions(
+							version_listing);
+				} else {
+					break;
+				}
+			}
+
+		}catch(FileNotFoundException fe) {
+			System.err.println(fe.getMessage());
+			System.exit(1);
+		}catch (AmazonServiceException e ) {
+			System.err.println(e.getErrorMessage());
+			System.exit(1);
+		}
 	}
 
 
