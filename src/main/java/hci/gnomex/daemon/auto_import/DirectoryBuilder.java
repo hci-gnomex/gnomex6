@@ -249,6 +249,10 @@ public class DirectoryBuilder {
 	}
 
 	private void findMissingFiles(Map<String,Set<String>> fileTypeMap, Map<String,List<String>> missingMap, List<String> foundFileIDList){
+		/* fileTypeMap has the key: fileNameId, value: set of extensions found for that id.
+		* missingMap as it sounds holds the key: fileNameId, value list of missing extensions for that id
+		* foundFileIDList holds all file ids that have full  extension set, nothing is missing
+		*  */
 		for(String key : fileTypeMap.keySet()) {
 			Set<String> fileTypes = fileTypeMap.get(key);
 			for(String type : fileTypeCategorySet ) {
@@ -551,7 +555,8 @@ public class DirectoryBuilder {
 			System.out.println("Files to be moved to flagged folder: " + fromToMap.size());
 			moveTheFiles(fromToFilteredMap, new ArrayList<>(),logFileName); // These files we want to move into the flagged folder
 			if(stagePath != null) {
-				rsyncFiles(startStageMap, logFileName);
+				//all for copying and moving files depending on file type
+				rsyncFiles(startStageMap, logFileName, false);
 			}
 			System.out.println("Files to be moved to final destination: " + fromToMap.size());
 			moveTheFiles(fromToMap,makeFileImmutableCmd(fromToMap),logFileName);
@@ -896,18 +901,19 @@ public class DirectoryBuilder {
 
 	}
 
-	public void rsyncFiles(Map<String,String> filesMap,String logFileName) throws Exception{
+	public void rsyncFiles(Map<String,String> filesMap,String logFileName, boolean moveOnly) throws Exception{
 		CollectingProcessOutput output = null;
 		System.out.println("Starting rsync");
 
 		for (String fileKey : filesMap.keySet()) {
 			try {
 				// this is not generic very foundation specific
-				if(!fileKey.endsWith(".xml") && !fileKey.endsWith(".pdf")){
-					System.out.println("Moving file " +  fileKey);
+				if(moveOnly ||  (!fileKey.endsWith(".xml") && !fileKey.endsWith(".pdf"))){
+					System.out.println("Moving file from: " +  fileKey + " to " + filesMap.get(fileKey));
 					RSync rsync = new RSync()
 							.source(fileKey)
 							.destination(filesMap.get(fileKey))
+							.ignoreExisting(true)
 							.recursive(true)
 							.removeSourceFiles(true);
 					output = rsync.execute();
@@ -917,6 +923,7 @@ public class DirectoryBuilder {
 					RSync rsync = new RSync()
 							.source(fileKey)
 							.destination(filesMap.get(fileKey))
+							.ignoreExisting(true)
 							.recursive(true);
 					output = rsync.execute();
 				}

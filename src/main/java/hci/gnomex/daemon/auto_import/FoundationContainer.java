@@ -159,7 +159,7 @@ public class FoundationContainer {
 						fileList.add(bamFile);
 						fileList.add(bamFile+".md5");
 					}else{
-						System.out.print("samtools Error: " + samtoolsError);
+						System.out.println("samtools Error: " + samtoolsError);
 						moveCorruptedFile(bamFile, filterOutList);
 						moveCorruptedFile(bamFile + ".md5", filterOutList);
 					}
