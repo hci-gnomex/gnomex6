@@ -293,7 +293,7 @@ public class Downloader {
 		commands.add("mv -t " + this.downloadPath + " " + this.downloadPath + File.separator +  "Flagged" +File.separator +  "*" );
 		System.out.println("calling out to subshell with these commands:");
 		System.out.println(commands.toString());
-		//executeCommands(commands, true);
+		executeCommands(commands, true);
 
 		System.out.println("Finished downloading");
 		if(deleteRemoteAfterDownload){
