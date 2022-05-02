@@ -84,18 +84,23 @@ public class ImportExperiment {
 	private Set<AppUser> members;
 	private boolean automatedImport;
 
+	private boolean allowDuplicateSample;
+
 	public ImportExperiment(String[] args) {
+		allowDuplicateSample = false;
 		for (int i = 0; i < args.length; i++) {
+			String arg = args[i].toLowerCase();
 			if (args[i].equals("-file")) {
 				fileName = args[++i];
-			} else if (args[i].equals("-annotationFile")) {
+			} else if (arg.equals("-annotationFile")) {
 				annotationFileName = args[++i];
-			} else if (args[i].equals("-isExternal")) {
+			} else if (arg.equals("-isexternal")) {
 				isExternal = args[++i];
-			}else if(args[i].equals("-requestIDList")){
+			}else if(arg.equals("-requestidList")){
 				this.outIDRequest = args[++i];
-			}
-			else if (args[i].equals("-login")) {
+			}else if(arg.equals("-allowdupsample")){
+				allowDuplicateSample = true;
+			} else if (args[i].equals("-login")) {
 				login = args[++i];
 			} else if (args[i].equals("-help")) {
 				printUsage();
@@ -185,7 +190,7 @@ public class ImportExperiment {
 			// Save the samples
 
 
-			saveSamples(updateIDRequest);
+			saveSamples(updateIDRequest != null && updateMode ? updateIDRequest : request.getIdRequest());
 			System.out.println("[ImportExperiment] after saveSamples()");
 
 			// Save the sequence lanes
@@ -232,9 +237,7 @@ public class ImportExperiment {
 		}
 		//FROM Sample samp JOIN samp.request as req
 		if(reqANNOTNode != null){
-			System.out.println("Found the correct annotation!!!!!!!!!!!!!!!! ");
 			String reqANNOTValue = reqANNOTNode.getAttributeValue("value");
-			System.out.println("Property " + queryWithPropEntry + ": "+ reqANNOTValue);
 			if(reqANNOTValue != null){ //:daysInFuture
 				String queryStr = "SELECT req.idRequest, req.number" +
 						"  FROM Request req" +
@@ -248,7 +251,6 @@ public class ImportExperiment {
 					Object[] row = (Object[]) reqSampleTable.get(0);
 					updateReqId = (Integer)row[0];
 
-					System.out.println("idRequest from query of property entry: " + updateReqId);
 
 				}else if( reqSampleTable.size() == 0 ){
 					updateReqId = null;
@@ -748,7 +750,7 @@ public class ImportExperiment {
 		Request r = this.requestParser.getRequest();
 
 		//getStartingNextSampleNumber();
-		Set<String> dupSamples = getDuplicateSamples();
+		Set<String> dupSamples = getDuplicateSamples(updateIDRequest);
 		System.out.println("In save Sample the Request Number: " + r.getNumber());
 		System.out.println("automated Import: " + getAutomatedImport());
 
@@ -760,6 +762,7 @@ public class ImportExperiment {
 					.setParameter("updateIDRequest", updateIDRequest);
 			int length = q.list().size();
 			nextSampleNumber = length + 1;
+
 		}else{ // intial value is one if experiment doesn't already exist
 			this.nextSampleNumber = 1;
 		}
@@ -843,18 +846,41 @@ public class ImportExperiment {
 		nextSampleNumber++;
 	}
 
-	private Set<String> getDuplicateSamples() {
+	private Set<String> getDuplicateSamples(Integer requestID) {
 		List<String> sampleNameList = new ArrayList<String>();
 		for(Object idSample : requestParser.getSampleIds()){
 			String idSampleString = (String) idSample;
 			Sample sample = (Sample) requestParser.getSampleMap().get(idSampleString);
 			sampleNameList.add(sample.getName());
 		}
-		Query query = sess.createQuery("SELECT samp.name FROM Sample samp WHERE samp.name IN (:ids) ");
+//		"SELECT r.id, s.id from Request r join r.samples s where r.number = '" + experimentNumber + "'"
+		Query query = sess.createQuery("SELECT req.id, samp.name FROM Request req join req.samples samp WHERE samp.name IN (:ids) ");
 		query.setParameter("ids",sampleNameList);
-		List<String> sampleNameFromQuery = query.list();
-		Set<String> sampleNameSet = new TreeSet<String>(sampleNameFromQuery);
-		System.out.println("Look this is what the query found as a duplicates " + sampleNameFromQuery.toString() );
+		List srIDs = query.list();
+		Set<String> sampleNameSet = new TreeSet<String>();
+		Map<String, Set<Integer>> sampleRequestMap = new HashMap<>();
+
+		for (Iterator<?> i = srIDs.iterator(); i.hasNext();){
+			Object[] row = (Object[])i.next();
+			Integer idRequest = (Integer)row[0];
+			String sampleName = (String)row[1];
+			if(!allowDuplicateSample){
+				sampleNameSet.add(sampleName);
+			} else {
+				Set<Integer> reqSet = sampleRequestMap.get(sampleName);
+				if(reqSet != null ){
+					sampleRequestMap.get(sampleName).add(idRequest);
+					//duplicate sample names can belong to only one request incase of amended sample
+					if (sampleRequestMap.get(sampleName).size() > 1){
+						sampleNameSet.add(sampleName);
+					}
+				}else {
+					sampleRequestMap.put(sampleName, new HashSet<Integer>(Arrays.asList(idRequest)));
+				}
+			}
+		}
+
+		System.out.println("Look this is what the query found as a duplicates " + sampleNameSet.toString() );
 		return sampleNameSet;
 	}
 
@@ -970,6 +996,8 @@ public class ImportExperiment {
 		System.out.println("   -annotationFile  XML file to be imported, generated from GetPropertyList.gx.");
 		System.out.println("   -[isExternal     Y/N]");
 		System.out.println("   -requestIDList   The name of the output file that is appended to with request IDs delimited by spaces");
+		System.out.println("   -allowDupSample   (boolean) allow samples with same name be  to be imported for the same request.\n" +
+								"\tSample name will not be duplicated among other requests");
 		System.out.println("   -help - gives this message.  Note no other processing is performed if the -help switch is specified.");
 
 	}
