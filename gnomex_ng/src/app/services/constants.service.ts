@@ -5,7 +5,7 @@ export class ConstantsService {
 
     public static readonly FILE_EXTENSIONS_FOR_VIEW: string[] = [
         ".pdf", ".jpg", ".png", ".gif", ".rtf", ".txt", ".html", ".htm", ".csv", ".ppt", ".pptx",
-        ".xls", ".xlsx", ".xml", ".ped", ".Rmd", ".md",
+        ".xls", ".xlsx", ".xml", ".ped", ".Rmd", ".md", ".tiff",
     ];
 
 //    public static readonly emailRegex: RegExp = /^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/;
@@ -75,7 +75,7 @@ export class ConstantsService {
         "QC Frag Size (from)",
         "QC Frag Size (to)",
         "QC Status",
-        "Seq Lib Protocol",
+        "Library Protocol",
         "Seq Lib QC Bioanalyzer method",
         "Seq Lib Conc. ng/uL",
         "Seq Lib Prep Status",

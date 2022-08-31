@@ -17,8 +17,6 @@ import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -56,9 +54,7 @@ public class LinkData extends TimerTask {
     private String[] requestList = new String[MAXREQUESTS];
     private int nxtRequest = 0;
 
-    private String regex;
     private boolean linkFolder= false;
-    private List<Integer> captureGroupIndexes = new ArrayList<>();
     private String errorMessageString = "Error in LinkData";
     private boolean deleteLinks = false;
     private String linkType;
@@ -102,26 +98,9 @@ public class LinkData extends TimerTask {
                 }
 
                 break;
-            }else if( args[i].equals("-regex")){
-                regex = args[++i];
-            }else if(args[i].equals("-cp")){
-                i++;
-                while(i < args.length && args[i].charAt(0) != '-'){
-                    captureGroupIndexes.add(Integer.parseInt(args[i]));
-                    i++;
-                }
-                if(captureGroupIndexes.size() == 0){
-                    System.out.println("If you want to specify which capture groups. You need to provide atleast one index");
-                    System.exit(1);
-                }
-
             } else if( args[i].equals("-linkfolder")){
                 linkFolder = true;
             }
-        }
-        // default is just capture group(1);
-        if(regex != null && captureGroupIndexes.size() == 0){
-            captureGroupIndexes.add(1);
         }
     }
 
@@ -316,6 +295,7 @@ public class LinkData extends TimerTask {
     private void linkData() throws Exception {
 
         int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        String hciPersonID = "";
         String startPath = "/Repository/PersonData/" + currentYear + "/";
         startAvatarPath += "/2017";
         StringBuilder buf = new StringBuilder();
@@ -332,12 +312,13 @@ public class LinkData extends TimerTask {
             Connection con = sessionImpl.connection();
 
             stmt = con.createStatement();
-            buf = new StringBuilder ("select YEAR(createdate) from Request where idRequest = ");
+            buf = new StringBuilder ("select YEAR(createdate), name as hciPersonID from Request where idRequest = ");
             buf.append(requestList[nxtOne] + ";");
             if (debug) System.out.println("Request get year created query: " + buf.toString());
             rs = stmt.executeQuery(buf.toString());
             while (rs.next()) {
                 currentYear = rs.getInt(1);
+                hciPersonID = rs.getString(2);
             }
             rs.close();
             stmt.close();
@@ -346,93 +327,76 @@ public class LinkData extends TimerTask {
             if (debug) System.out.println ("Date adjusted start path: " + startPath);
 
             stmt = con.createStatement();
-            buf = new StringBuilder("select name from Sample where idRequest = ");
-            buf.append(requestList[nxtOne] + ";");
-            if (debug) System.out.println("ExperimentFile query: " + buf.toString());
+            if(!linkFolder){
+                buf = new StringBuilder("select name from Sample where idRequest = ");
 
-            Set<String> names = new HashSet<>();
+                buf.append(requestList[nxtOne] + ";");
+                if (debug) System.out.println("ExperimentFile query: " + buf.toString());
 
-            rs = stmt.executeQuery(buf.toString());
-            while (rs.next()) {
-                names.add(rs.getString(1));
-            }
-            rs.close();
-            stmt.close();
+                Set<String> names = new HashSet<>();
 
-            if (debug) System.out.println("size of names: " + names.size());
-            // match name with regex if specified
-            if(regex != null) {
-                Set<String> regexNames = new HashSet<String>();
-
-                Pattern p = null;
-
-                p = Pattern.compile(regex);
-                if (debug) System.out.println("Pattern: " + p.toString());
-                for (String name : names) {
-                    Matcher m = p.matcher(name);
-                    if(m.matches()){
-                        String capturedName = Differ.getNameByExistingCaptureGroup(captureGroupIndexes, m);
-                        regexNames.add(capturedName);
-                    }else{
-                        regexNames.add(name);
-                    }
-                }
-                names = regexNames;
-            }
-
-            // now using the list of sample 'names' see if we can find any matching experiment files
-            Iterator it = names.iterator();
-
-            while (it.hasNext()) {
-                String theName = (String) it.next();
-
-                stmt = con.createStatement();
-
-                StringBuilder buf1 = new StringBuilder("select filename from ExperimentFile where filename like '");
-                buf1.append(dataType + "%" + theName + "%';"); // case insensitive
-                if (debug) System.out.println("ExperimentFile query: " + buf1.toString());
-
-                List<String> pathnames = new ArrayList<String>();
-
-                rs = stmt.executeQuery(buf1.toString());
+                rs = stmt.executeQuery(buf.toString());
                 while (rs.next()) {
-                    pathnames.add(rs.getString(1));
+                    names.add(rs.getString(1));
                 }
                 rs.close();
                 stmt.close();
 
-                if (debug) System.out.println("size of pathnames: " + pathnames.size());
+                if (debug) System.out.println("size of names: " + names.size());
+
                 // now using the list of sample 'names' see if we can find any matching experiment files
-                Iterator itp = pathnames.iterator();
+                Iterator it = names.iterator();
 
-                //  create the directory
-                String dirPath = startPath + requestList[nxtOne] + "R";
-                if (debug) System.out.println("dirPath: " + dirPath);
-                File f = new File(dirPath);
-                f.mkdir();
+                while (it.hasNext()) {
+                    String theName = (String) it.next();
 
-                String myStartPath = dirPath;
-                while (itp.hasNext()) {
-                    String thePath = (String) itp.next();  // for example: 4R/Whole_Exome/FASTq/SL278299_2.fastq.gz
+                    stmt = con.createStatement();
 
-                    int ipos = thePath.indexOf("/");
-                    if (ipos == -1) {
-                        // bad path
-                        // complain....
-                        continue;
+                    StringBuilder buf1 = new StringBuilder("select filename from ExperimentFile where filename like '");
+                    buf1.append(dataType + "%" + theName + "%';"); // case insensitive
+                    if (debug) System.out.println("ExperimentFile query: " + buf1.toString());
+
+                    List<String> pathnames = new ArrayList<String>();
+
+                    rs = stmt.executeQuery(buf1.toString());
+                    while (rs.next()) {
+                        pathnames.add(rs.getString(1));
                     }
-                    int epos = thePath.lastIndexOf("/");
-                    if (epos <= ipos) {
-                        // that's weird
-                        continue;
-                    }
+                    rs.close();
+                    stmt.close();
 
-                    String middleOfPath = "";
-                    String filename = "";
-                    String parentFolder = "";
-                    String subCommand = "";
+                    if (debug) System.out.println("size of pathnames: " + pathnames.size());
+                    // now using the list of sample 'names' see if we can find any matching experiment files
+                    Iterator itp = pathnames.iterator();
 
-                    if(!linkFolder){ // determines whether we make soft link to file or its parent directory
+                    //  create the directory
+                    String dirPath = startPath + requestList[nxtOne] + "R";
+                    if (debug) System.out.println("dirPath: " + dirPath);
+                    File f = new File(dirPath);
+                    f.mkdir();
+
+                    String myStartPath = dirPath;
+                    while (itp.hasNext()) {
+                        String thePath = (String) itp.next();  // for example: 4R/Whole_Exome/FASTq/SL278299_2.fastq.gz
+
+                        int ipos = thePath.indexOf("/");
+                        if (ipos == -1) {
+                            // bad path
+                            // complain....
+                            continue;
+                        }
+                        int epos = thePath.lastIndexOf("/");
+                        if (epos <= ipos) {
+                            // that's weird
+                            continue;
+                        }
+
+                        String middleOfPath = "";
+                        String filename = "";
+                        String parentFolder = "";
+                        String subCommand = "";
+
+
                         middleOfPath = thePath.substring(ipos + 1, epos);
                         if (debug) System.out.println("middleOfPath: " + middleOfPath); // for example : Whole_Exome/FASTq
 
@@ -440,68 +404,146 @@ public class LinkData extends TimerTask {
                         if (debug) System.out.println("filename or foldername : " + filename);
                         subCommand = "-s";
 
-                    }else {
-                        // length - 2 because I don't want filename want its parent folder
-                        File dummyFile = new File(startAvatarPath + "/" + thePath); //absolute path to file
-                        if(debug) System.out.println("the absolute path: "  + startAvatarPath + "/" + thePath);
 
-                        filename =  dummyFile.getParentFile().getName();
+                        String myPath = dirPath + "/" + middleOfPath;
+                        if (debug) System.out.println("myPath: " + myPath);
 
-                        try{
-                            int personID = Integer.parseInt(filename); //parent folder convention is to be hci person id for folder name
-                                                                      // when using linkFolder argument
-                        }catch(NumberFormatException nfe){
-                            System.out.println("skipping... sample data doesn't have wrapping folder");
-                            continue;
+                        f = new File(myPath);
+                        if(!f.exists()){
+                            f.mkdirs();
                         }
 
+                        //  make the soft link
+                        myPath =  myPath + "/" +  filename;
 
-                        if (debug) System.out.println("filename or foldername : " + filename);
+                        String pathToRealData =  startAvatarPath + "/" + thePath;
+                        File target = new File(pathToRealData);
+                        File linkName = new File(myPath);
+                        if (debug) System.out.println("[LinkData] right before makeSoftLinks, target: " + pathToRealData + "\n\t\t\t\t linkName: " + linkName);
 
-                        parentFolder = dummyFile.getParent();
-                        if(debug) System.out.println("parent folder with real path" + parentFolder);
+                        boolean ok = makeSoftLinks(target, linkName, subCommand);
+                        if (!ok) {
+                            System.out.println("makeSoftLinks failed!");
+                        }
+                    } // end of inner while
 
-                        epos =  thePath.indexOf(filename);
-                        middleOfPath = thePath.substring(ipos+ 1, epos );
-                        if (debug) System.out.println("middleOfPath: " + middleOfPath);
-                        // need to make sure if you try to run making a symlink more than once it doesn't
-                        // stick a symlink inside the src dir pointing to soft link
-                        // the T stops it from drilling into the 'pointer' that points to src dir if it already exists
-                        subCommand = "-sTf";
+                } // end of outer while
+            } else {
+                createLinksWithWrapperFolder(hciPersonID, con, startPath, nxtOne);
+            }
 
-                    }
-
-
-
-                    String myPath = dirPath + "/" + middleOfPath;
-                    if (debug) System.out.println("myPath: " + myPath);
-
-                    f = new File(myPath);
-                    if(!f.exists()){
-                        f.mkdirs();
-                    }
-
-                    //  make the soft link
-                    myPath =  myPath + "/" +  filename;
-
-                    String pathToRealData = !linkFolder ? startAvatarPath + "/" + thePath  :  parentFolder ;
-                    File target = new File(pathToRealData);
-                    File linkName = new File(myPath);
-                    if (debug) System.out.println("[LinkData] right before makeSoftLinks, target: " + pathToRealData + "\n\t\t\t\t linkName: " + linkName);
-
-                    boolean ok = makeSoftLinks(target, linkName, subCommand);
-                    if (!ok) {
-                        System.out.println("makeSoftLinks failed!");
-                    }
-                } // end of inner while
-
-            } // end of outer while
 
             nxtOne++;
 
         } // end of requestList while
         System.out.println("normal exit -- no problems!");
         System.exit(0);
+    }
+
+    private void createLinksWithWrapperFolder(String wrapFolderName, Connection con, String startPath, Integer nxtOne)  {
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            stmt = con.createStatement();
+            StringBuilder buf1 = new StringBuilder("select filename from ExperimentFile where filename like '");
+            buf1.append(dataType + "%" + wrapFolderName + "%';"); // case insensitive
+            if (debug) System.out.println("ExperimentFile query: " + buf1.toString());
+
+            List<String> pathnames = new ArrayList<String>();
+
+            rs = stmt.executeQuery(buf1.toString());
+            while (rs.next()) {
+                pathnames.add(rs.getString(1));
+            }
+            rs.close();
+            stmt.close();
+
+            if (debug) System.out.println("size of pathnames: " + pathnames.size());
+            // now using the list of sample 'names' see if we can find any matching experiment files
+            Iterator itp = pathnames.iterator();
+
+            //  create the directory
+            String dirPath = startPath + requestList[nxtOne] + "R";
+            if (debug) System.out.println("dirPath: " + dirPath);
+            File f = new File(dirPath);
+            f.mkdir();
+
+            String myStartPath = dirPath;
+            while (itp.hasNext()) {
+                String thePath = (String) itp.next();  // for example: 4R/Whole_Exome/FASTq/SL278299_2.fastq.gz
+
+                int ipos = thePath.indexOf("/");
+                if (ipos == -1) {
+                    // bad path
+                    // complain....
+                    continue;
+                }
+                int epos = thePath.lastIndexOf("/");
+                if (epos <= ipos) {
+                    // that's weird
+                    continue;
+                }
+
+                String middleOfPath = "";
+                String filename = "";
+                String parentFolder = "";
+                String subCommand = "";
+
+                File dummyFile = new File(startAvatarPath + "/" + thePath); //absolute path to file
+                if(debug) System.out.println("the absolute path: "  + startAvatarPath + "/" + thePath);
+
+                filename =  dummyFile.getParentFile().getName();
+
+                try{
+                    int personID = Integer.parseInt(filename); //parent folder convention is to be hci person id for folder name
+                    // when using linkFolder argument
+                }catch(NumberFormatException nfe){
+                    System.out.println("skipping... sample data doesn't have wrapping folder");
+                    continue;
+                }
+
+
+                if (debug) System.out.println("filename or foldername : " + filename);
+
+                parentFolder = dummyFile.getParent();
+                if(debug) System.out.println("parent folder with real path" + parentFolder);
+
+                epos =  thePath.indexOf(filename);
+                middleOfPath = thePath.substring(ipos+ 1, epos );
+                if (debug) System.out.println("middleOfPath: " + middleOfPath);
+                // need to make sure if you try to run making a symlink more than once it doesn't
+                // stick a symlink inside the src dir pointing to soft link
+                // the T stops it from drilling into the 'pointer' that points to src dir if it already exists
+                subCommand = "-sTf";
+
+
+                String myPath = dirPath + "/" + middleOfPath;
+                if (debug) System.out.println("myPath: " + myPath);
+
+                f = new File(myPath);
+                if(!f.exists()){
+                    f.mkdirs();
+                }
+
+                //  make the soft link
+                myPath =  myPath + "/" +  filename;
+
+                File target = new File(parentFolder);
+                File linkName = new File(myPath);
+                if (debug) System.out.println("[LinkData] right before makeSoftLinks, target: " + parentFolder + "\n\t\t\t\t linkName: " + linkName);
+
+                boolean ok = makeSoftLinks(target, linkName, subCommand);
+                if (!ok) {
+                    System.out.println("makeSoftLinks failed!");
+                }
+            } // end of inner while
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+
     }
 
     /**

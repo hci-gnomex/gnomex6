@@ -17,7 +17,7 @@ import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
                 </div>
             </div>
             <br><p>Please click on the core of interest to begin.</p>
-            <br><p>You will receive an email when the account is approved.</p>
+            <br><p>Your GNomEx account will not work until you receive an approval email.</p>
             <div class="flex-container-col align-center flex-grow">
                 <div class="flex-container-col align-center flex-grow border-subtle login-background main-form" >
                     <table border="0"  rules="rows">

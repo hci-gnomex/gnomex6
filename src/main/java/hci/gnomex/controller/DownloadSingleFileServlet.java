@@ -321,12 +321,15 @@ public class DownloadSingleFileServlet extends HttpServlet {
       }
     } catch (Exception e) {
         String errorMessage = Util.GNLOG(LOG,"Error in DownloadSingleFileServlet ", e);
+        System.out.println ("[DownloadSingleFileServlet] error: " + errorMessage);
+
         StringBuilder requestDump = Util.printRequest(req);
         String serverName = req.getServerName();
 
         PropertyDictionaryHelper propertyHelper = PropertyDictionaryHelper.getInstance(HibernateSession.currentSession());
         String gnomex_tester_email = propertyHelper.getProperty(PropertyDictionary.CONTACT_EMAIL_SOFTWARE_TESTER);
 
+        /*
       Util.sendErrorReport(
               HibernateSession.currentSession(),
               gnomex_tester_email,
@@ -335,7 +338,7 @@ public class DownloadSingleFileServlet extends HttpServlet {
               errorMessage,
               requestDump
       );
-
+*/
       HibernateSession.rollback();
 
       response.setContentType("text/html; charset=UTF-8");

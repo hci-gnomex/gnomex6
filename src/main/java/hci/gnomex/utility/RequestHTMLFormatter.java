@@ -4,18 +4,9 @@ import hci.dictionary.utility.DictionaryManager;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.jdom.Element;
+
+import java.util.*;
 
 
 public class RequestHTMLFormatter {
@@ -274,7 +265,7 @@ public class RequestHTMLFormatter {
         this.addHeaderCell(rowh, barcodeHeader, rowSpan, new Integer(1));
       }
       if (showSeqLibProtocol) {
-        this.addHeaderCell(rowh, "Seq Lib Protocol", rowSpan, new Integer(1));
+        this.addHeaderCell(rowh, "Library Protocol", rowSpan, new Integer(1));
       }
     }
     if (request.getCodeRequestCategory() != null && request.getCodeRequestCategory().equals(RequestCategory.QUALITY_CONTROL_REQUEST_CATEGORY)) {

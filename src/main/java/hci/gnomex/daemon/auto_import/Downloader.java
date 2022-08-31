@@ -15,11 +15,19 @@ import java.util.*;
 import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import com.amazonaws.AmazonServiceException;
+import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.*;
 
 
 public class Downloader {
 
 
+	private Integer startCaptureGroup;
+	private Integer endCaptureGroup;
 	private boolean useRemoteFile;
 	private HashMap<String, String> aliasMap;
 	private String mode;
@@ -33,10 +41,14 @@ public class Downloader {
 	private List<String> flaggedFileList;
 	private boolean allowClearFile = false;
 	private String filterRegex;
+	private boolean deleteRemoteAfterDownload;
+	private boolean testRun;
 
 	Downloader(String[] args ){
 		this.useRemoteFile = false;
 		this.mode = "avatar";
+		deleteRemoteAfterDownload = false;
+		testRun = false;
 		for (int i = 0; i < args.length; i++) {
 			args[i] =  args[i].toLowerCase();
 			if (args[i].equals("-filelist")) {
@@ -50,8 +62,8 @@ public class Downloader {
 				this.downloadPath = args[++i];
 			} else if (args[i].equals("-mode")) {
 				this.mode = args[++i];
-				if(!(this.mode.equals("tempus") || this.mode.equals("avatar") || this.mode.equals("caris")) ){
-					System.out.println("If you specify mode it has to be either tempus or avatar");
+				if(!(this.mode.contains("tempus") || this.mode.equals("avatar") || this.mode.contains("caris")) ){
+					System.out.println("If you specify mode it has to be either tempus, avatar or caris");
 					System.exit(1);
 				}
 
@@ -59,8 +71,23 @@ public class Downloader {
 				this.allowClearFile = true;
 			}else if(args[i].equals("-filterregex")){
 				filterRegex = args[++i];
-			}else if(args[i].equals("-remotepath")) { // helps to determine which path to use remote or local in flagged filtered outlist
-				                                      // default is is the flagged(local) path and filename
+			}else if(args[i].equals("-cp")){
+				try {
+					this.startCaptureGroup =  Integer.parseInt(args[i + 1]);
+					i++;
+					this.endCaptureGroup = Integer.parseInt(args[i + 1]);
+					i++;
+				}catch(NumberFormatException e){
+					if(startCaptureGroup == null){
+						System.out.println("Please provide at least a starting a range for the capture group");
+						System.exit(1);
+					}if(startCaptureGroup != null && endCaptureGroup == null){
+						endCaptureGroup = startCaptureGroup;
+					}
+				}
+			}
+			else if(args[i].equals("-remotepath")) { // helps to determine which path to use remote or local in flagged filtered outlist
+				// default is the flagged(local) path and filename
 				useRemoteFile = true;
 			}else if (args[i].equals("-alias")){ // allow list of for your capture groups items aka DNA -> DSQ1
 				aliasMap = new HashMap<String, String>();
@@ -74,6 +101,10 @@ public class Downloader {
 					i = i + 2;
 				}
 				i--;
+			}else if(args[i].equals("-rd") ){ // delete remote files after downloading
+				deleteRemoteAfterDownload = true;
+			}else if(args[i].equals("-t") || args[i].equals("-test")){
+				testRun = true;
 			} else if (args[i].equals("-help")) {
 				//printUsage();
 				System.exit(0);
@@ -94,7 +125,7 @@ public class Downloader {
 
 
 
-	private boolean hasSubProccessErrors(File errorFile) {
+	private boolean hasSubProcessErrors(File errorFile, boolean strictErrorCheck, Process p ) {
 		Scanner scan = null;
 		boolean hasError = false;
 		try{
@@ -116,10 +147,19 @@ public class Downloader {
 		}finally {
 			scan.close();
 		}
+		if(strictErrorCheck){
+			hasError = p.exitValue() > 0 || hasError;
+		}
+
 		return hasError;
 	}
 
-	private void executeCommands(List<String> commands) {
+
+
+
+
+
+	private void executeCommands(List<String> commands, boolean strictErrorCheck) {
 
 		File tempScript = null;
 
@@ -134,7 +174,7 @@ public class Downloader {
 
 			process = pb.start();
 			process.waitFor();
-			if(hasSubProccessErrors(errorFile)){
+			if(hasSubProcessErrors(errorFile,strictErrorCheck,process)){
 				System.out.println("Error detected exiting script");
 				System.exit(1);
 			}
@@ -207,14 +247,14 @@ public class Downloader {
 		}
 
 
-		executeCommands(commands);
+		executeCommands(commands, false);
 
-		System.out.println("The dowload finished");
+		System.out.println("The download finished");
 		ArrayList<String> downloadedList = new ArrayList<String>();
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
 
-		downloadedList.add("Dowloaded successfully, " + timestamp );
+		downloadedList.add("Downloaded successfully, " + timestamp );
 		downloadedList.add(this.createFormattedPath("", true, true).replace("\"", ""));
 
 		writeToFile(this.dependentDataPath + "download.log", downloadedList);
@@ -227,15 +267,23 @@ public class Downloader {
 
 		List<String> status = Arrays.asList("Downloading in progress...");
 		writeToFile(this.dependentDataPath + "download.log",status); // /home/u0566434/parser_data/download.log
-		String tempFile = writeToAWSFile(fileOfPaths,this.fileNameMap);
+		String tempFile = writeToAWSFile(fileOfPaths,this.fileNameMap, false);
+
+		String serialFileName = dependentDataPath + mode+ "-mfa-arn.txt";
+		String dryRun = testRun ? " --dryrun " : " ";
+
+		String mfaProfile = null;
+		if(Files.exists(Paths.get(serialFileName))){
+			mfaProfile = mode + "_mfa";
+		}
+
 
 		// this is reading in tempFile line by line delimiting that line by space hence ' ' allowing only 2 arguments at a time
 		// it is making  shell script for just that one line and running it and substituting where $ is shown arguments
-		String downloadCommand = "cat " + tempFile + " |  xargs -n2 sh -c 'aws --profile " + mode + " s3 cp $1 $2' sh" ;
+		String downloadCommand = "cat " + tempFile + " |  xargs -n2 sh -c 'aws --profile " + (mfaProfile != null ? mfaProfile : mode)
+				+ " s3 cp" + dryRun + "$1 $2' sh" ;
 		// old approach
 		//xargs -P10 -I {} aws --profile tempus s3 cp {} " + this.downloadPath;
-
-		System.out.println(downloadCommand);
 		if(fileNameMap.size() > 0){
 			commands.add(downloadCommand);
 		}
@@ -243,7 +291,39 @@ public class Downloader {
 		//why? because it might fail if there are no flagged files in the folder causing the script to crash
 		//commands.add("mv -t " + this.downloadPath + " " + this.downloadPath + File.separator +  "Flagged" +File.separator +  "*" + " 2>/dev/null");
 		commands.add("mv -t " + this.downloadPath + " " + this.downloadPath + File.separator +  "Flagged" +File.separator +  "*" );
-		executeCommands(commands);
+		System.out.println("calling out to subshell with these commands:");
+		System.out.println(commands.toString());
+		executeCommands(commands, true);
+
+		System.out.println("Finished downloading");
+		if(deleteRemoteAfterDownload){
+
+
+			commands.clear();
+			tempFile = writeToAWSFile(fileOfPaths,this.fileNameMap, true);
+			String workingPath = Paths.get(tempFile).getParent().toString();
+			String finalRemoveFile = workingPath + File.separator + tempFile.substring(tempFile.length() - 17 , tempFile.length());
+
+			String cpRemoveLog = "aws --profile " + (mfaProfile != null ? mfaProfile : mode) + " s3 cp s3://hci-" +mode + "/"+ Paths.get(finalRemoveFile).getFileName()
+					+ " "  + workingPath + File.separator;
+			String appendRmDate  = "echo -e `date +\"%D %T\"`"  + " >> " + finalRemoveFile;
+			String rmCommand = "cat " + tempFile + " |  xargs -P10 -I {}  aws --profile " + (mfaProfile != null ? mfaProfile : mode)
+					+ " s3 rm" + dryRun + "{}"  +" >> " + finalRemoveFile;
+
+			commands.add("set -e");
+			commands.add("echo this is going to cp the file from s3 to " + workingPath + " command:  " + cpRemoveLog);
+			commands.add(cpRemoveLog);
+			commands.add("echo  >> " +  finalRemoveFile );
+			commands.add( appendRmDate );
+			executeCommands(commands, true);
+			deleteObjectsAndVersions(mfaProfile != null ? mfaProfile : mode, testRun, finalRemoveFile);
+			commands.clear();
+			commands.add("echo now uploading remove list log backup to aws command:" + "aws s3 cp "+ finalRemoveFile  + " s3://hci-" + mode   + "/"+ Paths.get(finalRemoveFile).getFileName() );
+			commands.add("aws s3 cp "+ finalRemoveFile  + " s3://hci-" + mode   + "/" + Paths.get(finalRemoveFile).getFileName());
+			executeCommands(commands, true);
+		}
+
+
 //		try {
 //			Files.deleteIfExists(Paths.get(tempFile));
 //		} catch (IOException e) {
@@ -258,6 +338,81 @@ public class Downloader {
 
 		writeToFile(this.dependentDataPath + "download.log", downloadedList);
 
+	}
+
+	private void deleteObjectsAndVersions(String profileName, boolean dryrun, String fileName) {
+		String bucketName = "hci-" + mode;
+		System.out.println("getting s3 resource connection ");
+		Date date = new Date();
+		final AmazonS3 s3 = AmazonS3ClientBuilder.standard()
+				.withRegion(Regions.US_WEST_1)
+				.withCredentials(new ProfileCredentialsProvider(profileName)).build();
+		try(PrintWriter writer = new PrintWriter(new FileOutputStream(new File(fileName), true))) {
+			System.out.println(" - removing objects from bucket");
+			ObjectListing object_listing = s3.listObjects(bucketName);
+
+			while (true) {
+				for (Iterator<?> iterator = object_listing.getObjectSummaries().iterator();
+					 iterator.hasNext(); ) {
+					S3ObjectSummary summary = (S3ObjectSummary) iterator.next();
+					if(summary.getKey().contains("fastq.gz")){
+						System.out.print("Deleting this object " + summary.getKey());
+						if (!dryrun) {
+							s3.deleteObject(bucketName, summary.getKey());
+							Timestamp ts = new Timestamp(date.getTime());
+							writer.println(summary.getKey() + "\tDeleted\t" + ts );
+							System.out.println();
+
+						} else {
+							System.out.println( " --dryrun ");
+						}
+					}
+				}
+
+				//more object_listing to retrieve?
+				if (object_listing.isTruncated()) {
+					object_listing = s3.listNextBatchOfObjects(object_listing);
+				} else {
+					break;
+				}
+			}
+			System.out.println(" - removing versions from bucket");
+			VersionListing version_listing = s3.listVersions(
+					new ListVersionsRequest().withBucketName(bucketName));
+			while (true) {
+				for (Iterator<?> iterator =
+					 version_listing.getVersionSummaries().iterator();
+					 iterator.hasNext(); ) {
+					S3VersionSummary vs = (S3VersionSummary) iterator.next();
+					if(vs.getKey().contains("fastq.gz")){
+						System.out.print("Deleting this object version " + vs.getKey());
+						if (!dryrun) {
+							s3.deleteVersion(bucketName, vs.getKey(), vs.getVersionId());
+							Timestamp ts = new Timestamp(date.getTime());
+							writer.println(vs.getKey() + "\tDeleted permanently\t" + ts );
+							System.out.println();
+						} else {
+							writer.println(vs.getKey() + "\tDeleted\t--dryrun" );
+							System.out.println( " --dryrun ");
+						}
+					}
+				}
+
+				if (version_listing.isTruncated()) {
+					version_listing = s3.listNextBatchOfVersions(
+							version_listing);
+				} else {
+					break;
+				}
+			}
+
+		}catch(FileNotFoundException fe) {
+			System.err.println(fe.getMessage());
+			System.exit(1);
+		}catch (AmazonServiceException e ) {
+			System.err.println(e.getErrorMessage());
+			System.exit(1);
+		}
 	}
 
 
@@ -293,8 +448,7 @@ public class Downloader {
 					if(filterRegex != null){
 						Matcher m = pattern.matcher(line);
 						if(m.matches()){
-							//todo should not have the start and end captureGroup hardcode for tempus
-							String matchedFileName = Differ.constructMatchedFileName(1,5,m, new StringBuilder(), aliasMap );
+							String matchedFileName = Differ.constructMatchedFileName(startCaptureGroup,endCaptureGroup,m, new StringBuilder(), aliasMap );
 							addToIDMap(matchedFileName, line, fileNameMap);
 						}else{
 							System.out.println("Could not match pattern " + pattern.pattern() + " ON text " + fileName );
@@ -325,6 +479,18 @@ public class Downloader {
 					fileNames = removedIDs;
 				}else{
 					fileNames = flaggedIDMap.get(flaggedIDName);
+				}
+
+				///todo probably remove since it's not generic only helpful for tempus
+				// this is here mitigate issues if process is aborted and files don't get renamed to
+				// proper format
+				if(removedIDs == null){
+					StringBuilder sb = new StringBuilder(flaggedIDName).insert(0,"DNA,");
+					removedIDs = this.fileNameMap.remove(sb.toString());
+
+					sb = new StringBuilder(flaggedIDName).insert(0,"RNA,");
+					this.fileNameMap.remove(sb.toString());
+
 				}
 
 
@@ -373,7 +539,7 @@ public class Downloader {
 				if (filterRegex != null) {
 					Matcher m = pattern.matcher(file.getName());
 					if (m.matches()) {
-						flaggedFileName = Differ.constructMatchedFileName(1, 5, m, new StringBuilder(), aliasMap);
+						flaggedFileName = Differ.constructMatchedFileName(startCaptureGroup, endCaptureGroup, m, new StringBuilder(), aliasMap);
 						addToIDMap(flaggedFileName, file.getName(), flaggedIDMap);
 					} else {
 						System.out.println("Could not match pattern " + pattern.pattern() + " ON text " + file.getName());
@@ -493,8 +659,6 @@ public class Downloader {
 				String safeFileName = flaggedFileName.replaceAll(" ", "\\\\ ");
 
 				strBuild.append(safeFileName);
-				System.out.println(safeFileName);
-
 				if(i == (flaggedFileList.size() - 1) ){
 					continue;
 				}
@@ -534,12 +698,14 @@ public class Downloader {
 		}
 		return dataFromFileList;
 	}
-	public String writeToAWSFile(String fileName, Map<String, List<String>> dataToWrite) {
+	/* This method produces a file for the arguments to be passed into the aws s3 subprocess */
+	public String writeToAWSFile(String fileName, Map<String, List<String>> dataToWrite, boolean isSingleArg) {
+
 		PrintWriter writer = null;
 		String pattern = Pattern.quote(System.getProperty("file.separator"));
 		String[] chunks = fileName.split(pattern);
 		String tempFile = String.join(System.getProperty("file.separator"), Arrays.copyOfRange(chunks,0, chunks.length - 1))
-				+ System.getProperty("file.separator") + "tempDownload.txt";
+				+ System.getProperty("file.separator")  + (  isSingleArg  ? "tempAWSRemoveList.txt" : "tempAWSDownloadList.txt");
 
 
 		try {
@@ -547,14 +713,27 @@ public class Downloader {
 			for (Map.Entry<String,List<String>> entry : dataToWrite.entrySet()) {
 				String[] keyChunks = entry.getKey().split(",");
 
-				if(keyChunks.length == 3){
+				if(keyChunks.length == 3 && mode.equals("tempus")){
 					String destPath = downloadPath +  keyChunks[0];
 					for(String val : entry.getValue()){
-						writer.println(val + " " + destPath);
+						if(isSingleArg){
+							if(val.endsWith("fastq.gz")){
+								writer.println(val);
+							}
+						}else {
+							writer.println(val + " " + destPath);
+						}
 					}
 				}else{
 					for(String val : entry.getValue()){
-						writer.println(val + " " + downloadPath);
+						if(isSingleArg){
+							if(val.endsWith("fastq.gz")){
+								writer.println(val);
+							}
+						}else {
+							writer.println(val + " " + downloadPath);
+
+						}
 					}
 				}
 

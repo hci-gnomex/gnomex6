@@ -1,27 +1,22 @@
 package hci.gnomex.utility;
 
-import net.sf.json.JSON;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
+import hci.gnomex.constants.Constants;
 import hci.gnomex.model.*;
+import hci.gnomex.security.SecurityAdvisor;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 
-import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
-
-import hci.gnomex.constants.Constants;
-import hci.gnomex.security.SecurityAdvisor;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class RequestParser implements Serializable {
 
@@ -70,13 +65,20 @@ public class RequestParser implements Serializable {
 
   private boolean usingJSON = false;
 
+  public RequestParser(JsonReader reader, SecurityAdvisor secAdvisor, Boolean forDownload) {
+    this.usingJSON = true;
+    this.requestObject = reader.readObject();
+    this.secAdvisor = secAdvisor;
+    this.forDownload = forDownload;
+  }
+
+
   public RequestParser(JsonReader reader, SecurityAdvisor secAdvisor) {
     this.usingJSON = true;
     this.requestObject = reader.readObject();
     this.secAdvisor = secAdvisor;
     this.forDownload = false;
   }
-
   public RequestParser(Document requestDoc, SecurityAdvisor secAdvisor) {
     this.usingJSON = false;
     this.requestNode = requestDoc.getRootElement();
@@ -734,6 +736,7 @@ public class RequestParser implements Serializable {
     if (n.get("includeQubitConcentration") != null && !n.getString("includeQubitConcentration").equals(""))
       request.setIncludeQubitConcentration(n.getString("includeQubitConcentration"));
 
+    if (!this.forDownload) {
     if (n.get("newBillingTemplateIdBillingAccount") != null && !n.getString("newBillingTemplateIdBillingAccount").equals("")) {
       BillingTemplate oldBillingTemplate = BillingTemplateQueryManager.retrieveBillingTemplate(sess, request);
       if (oldBillingTemplate == null || !oldBillingTemplate.canBeDeactivated(sess)) {
@@ -805,6 +808,7 @@ public class RequestParser implements Serializable {
       }
       billingTemplate.setOrder(request);
     }
+} // end of if (this.forDownload...
 
       request.setDescription(n.getString("description"));
 

@@ -6,6 +6,7 @@ import hci.gnomex.utility.*;
 
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -51,10 +52,12 @@ public class DirectoryBuilder {
 	private List<Integer> captureGroupIndexes;
 	private String sampleIdRegex;
 	private String logPath;
+	private Map<String,String> personIDMap;
 
 
 	public DirectoryBuilder(String[] args) {
 		captureGroupIndexes = new ArrayList<Integer>();
+		personIDMap = new HashMap<>();
 		for (int i = 0; i < args.length; i++) {
 			args[i] =  args[i].toLowerCase();
 
@@ -157,7 +160,7 @@ public class DirectoryBuilder {
 							break;
 						}else {
 							if(debug)
-							System.out.println("All files in this set can be accounted for but no files will be moved for " + foundFileID + " because they already reside here: " + remotePath );
+								System.out.println("All files in this set can be accounted for but no files will be moved for " + foundFileID + " because they already reside here: " + remotePath );
 						}
 
 					}
@@ -246,6 +249,10 @@ public class DirectoryBuilder {
 	}
 
 	private void findMissingFiles(Map<String,Set<String>> fileTypeMap, Map<String,List<String>> missingMap, List<String> foundFileIDList){
+		/* fileTypeMap has the key: fileNameId, value: set of extensions found for that id.
+		* missingMap as it sounds holds the key: fileNameId, value list of missing extensions for that id
+		* foundFileIDList holds all file ids that have full  extension set, nothing is missing
+		*  */
 		for(String key : fileTypeMap.keySet()) {
 			Set<String> fileTypes = fileTypeMap.get(key);
 			for(String type : fileTypeCategorySet ) {
@@ -548,7 +555,8 @@ public class DirectoryBuilder {
 			System.out.println("Files to be moved to flagged folder: " + fromToMap.size());
 			moveTheFiles(fromToFilteredMap, new ArrayList<>(),logFileName); // These files we want to move into the flagged folder
 			if(stagePath != null) {
-				rsyncFiles(startStageMap, logFileName);
+				//all for copying and moving files depending on file type
+				rsyncFiles(startStageMap, logFileName, false);
 			}
 			System.out.println("Files to be moved to final destination: " + fromToMap.size());
 			moveTheFiles(fromToMap,makeFileImmutableCmd(fromToMap),logFileName);
@@ -592,6 +600,19 @@ public class DirectoryBuilder {
 	}
 
 
+	private String getIDByRegex(String fileName,  boolean suppressPatWarning){
+		String fileID = null;
+		if(sampleIdRegex != null){ // if regex override default split by '_'
+			System.out.println("Segment of text regex is matching against: " +fileName);
+			Pattern samplePattern = Pattern.compile(sampleIdRegex);
+
+			Matcher m = samplePattern.matcher(fileName);
+			fileID = Differ.getNameByExistingCaptureGroup(captureGroupIndexes,m, suppressPatWarning);
+		}
+		return fileID;
+	}
+
+
 	private void preparePath(List<String> flaggedFiles,Map<String,String> fromToFilteredMap,
 							 List<String> paths, Map<String,String> fromToMap, Map<String, String> startStageMap) throws Exception{
 		File finalDestinationPath = new File(this.root);
@@ -612,6 +633,9 @@ public class DirectoryBuilder {
 			StringBuilder strBuild = new StringBuilder(root);
 			System.out.println("-------------------------------------------------------------------------------");
 			System.out.println("Path being processed: " + p );
+			if(p.equals("")) { // ignore white space
+				continue;
+			}
 
 
 			//todo verify this approach works for tempus. I think that tempus hands file of real relative paths not s3 path
@@ -624,16 +648,11 @@ public class DirectoryBuilder {
 
 			String file = pathChunks[pathChunks.length - 1];
 			String[] fileChunks = file.split("\\.");
-			String fileName = fileChunks[0].split("_")[0];
-			if(sampleIdRegex != null){ // if regex override default split by '_'
-				System.out.println("Segment of text regex is matching against: " + fileChunks[0]);
-				Pattern samplePattern = Pattern.compile(sampleIdRegex);
-				if(fileChunks[0].equals("")) { // ignore white space
-					continue;
-				}
-				Matcher m = samplePattern.matcher(fileChunks[0]);
-				fileName = Differ.getNameByExistingCaptureGroup(captureGroupIndexes,m);
-			}
+			String fileNameWOExt = fileChunks[0]; // just excludes the extension
+			String fileID = fileNameWOExt.split("_")[0];
+			String tempFileID = getIDByRegex(fileNameWOExt, false);
+			fileID = tempFileID != null ? tempFileID : fileID;
+
 
 			String start = "";
 			//sometimes the file in read in has the relative path on the start folder others it is the remote path
@@ -665,7 +684,7 @@ public class DirectoryBuilder {
 
 			if(new File(finalPath).exists() && !finalPath.equals(root)) {
 				String pathWithFile = "";
-				if(addWrapperFolder &&  appendDirPersonID(fileName,strBuild)){
+				if(addWrapperFolder &&  appendDirPersonID(fileID,file, strBuild)){
 					if(this.stagePath != null){
 						String stagePathFile = this.stagePath + File.separator + file;
 						startStageMap.put(start, stagePathFile);
@@ -700,17 +719,18 @@ public class DirectoryBuilder {
 
 	}
 
-	private boolean appendDirPersonID(String fileName, StringBuilder strBuild) {
+	private boolean appendDirPersonID(String fileID,String fullFileName, StringBuilder strBuild) {
 		Query q = null;
 		File personIDDir =  null;
+		String path = XMLParser.getPathWithoutName(this.inFileName);
 		try{
-			String path = XMLParser.getPathWithoutName(this.inFileName);
+
 			q =  new Query(path+"gnomex-creds.properties");
 			//todo this is last resort to avoid id collision need generic way
-			if(mode.equals("tempus") && !fileName.startsWith("TL-")){
-				fileName = "TL-%"+ fileName;
+			if(mode.equals("tempus") && !fileID.startsWith("TL-")){
+				fileID = "TL-%"+ fileID;
 			}
-			String personID = q.getPersonIDFromSample(fileName);
+			String personID = q.getPersonIDFromSample(fileID);
 			strBuild.append(File.separator);
 			strBuild.append(personID);
 			System.out.println("Full path with PersonID to create " +  strBuild.toString());
@@ -722,13 +742,92 @@ public class DirectoryBuilder {
 			}
 
 		}catch(Exception e){
-			e.printStackTrace();
-			q.closeConnection();
-			System.exit(1);
+			//this catch block is for tempus because...  they do everything different!
+			//we need to read the json file in to get the correct accession id then we can search and get the PersonID
+			// pdf also has same file name but of course we can't look inside for the accession id so personIDMap holds
+			// person id from parsing the json so the pdf can reuse it. There will always be a json parsed before pdf
+			// because if there is no json everything else is flagged thus never getting to this step in the code
+			System.out.println("reattempting " + fullFileName + " after failing to get person id from sample");
+			String fileNameWOExt = fullFileName.split("\\.")[0];
+			String personID = personIDMap.get(fileNameWOExt);
+			String interID = null;
+			if(personID == null){
+				interID = getIntermediatoryIDFromFile(currentDownloadLocation + fullFileName);
+				System.out.println("parsed out of file the accesion id " + interID );
+			}
+			if ((interID != null && !interID.equals("")) || (personID != null && !personID.equals(""))) {
+				try {
+					personID = personID != null ? personID : getPersonIDFromFile(path + "tlInfo.out", interID);
+
+					if(personID == null || personID.equals("")){
+						throw new Exception("hci person id not found for file: " + fullFileName);
+					}
+					Integer.parseInt(personID); // making sure truly a person id if not it will throw exception
+
+					System.out.println("found person id " + personID);
+					personIDMap.put(fileNameWOExt, personID);
+					strBuild.append(File.separator);
+					strBuild.append(personID);
+					System.out.println("Full path with PersonID to create " + strBuild.toString());
+					personIDDir = new File(strBuild.toString());
+					if (!personIDDir.exists()) {
+						boolean successDir = personIDDir.mkdir();
+						if (!successDir)
+							System.out.println("The directory was NOT CREATED... something went wrong");
+					}
+				} catch (Exception ex) {
+					e.printStackTrace();
+					q.closeConnection();
+					System.exit(1);
+				}
+			} else {
+				e.printStackTrace();
+				q.closeConnection();
+				System.exit(1);
+			}
 		}finally {
 			q.closeConnection();
 		}
 		return true;
+	}
+
+	private String getPersonIDFromFile(String lookupFile, String lookup) {
+
+		String line = "";
+		String id = "";
+
+		try(BufferedReader sampleBuffer = new BufferedReader(new FileReader(lookupFile))) {
+			while ((line = sampleBuffer.readLine()) != null) {
+				if(line.contains(lookup)) {
+					id = line.split("\t")[1];
+				}
+				if(id != null && !id.equals("")){
+					break;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return id;
+	}
+
+	private String getIntermediatoryIDFromFile(String lookupFile) {
+
+		String line = "";
+		String id = "";
+
+		try(BufferedReader sampleBuffer = new BufferedReader(new FileReader(lookupFile))) {
+			while ((line = sampleBuffer.readLine()) != null) {
+
+				id = getIDByRegex(line,true);
+				if(id != null && !id.equals("")){
+					break;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return id;
 	}
 
 	private void getAllDirs(File[] fList, Map<String,String> dirMap) {
@@ -802,18 +901,19 @@ public class DirectoryBuilder {
 
 	}
 
-	public void rsyncFiles(Map<String,String> filesMap,String logFileName) throws Exception{
+	public void rsyncFiles(Map<String,String> filesMap,String logFileName, boolean moveOnly) throws Exception{
 		CollectingProcessOutput output = null;
 		System.out.println("Starting rsync");
 
 		for (String fileKey : filesMap.keySet()) {
 			try {
 				// this is not generic very foundation specific
-				if(!fileKey.endsWith(".xml") && !fileKey.endsWith(".pdf")){
-					System.out.println("Moving file " +  fileKey);
+				if(moveOnly ||  (!fileKey.endsWith(".xml") && !fileKey.endsWith(".pdf"))){
+					System.out.println("Moving file from: " +  fileKey + " to " + filesMap.get(fileKey));
 					RSync rsync = new RSync()
 							.source(fileKey)
 							.destination(filesMap.get(fileKey))
+							.ignoreExisting(true)
 							.recursive(true)
 							.removeSourceFiles(true);
 					output = rsync.execute();
@@ -823,6 +923,7 @@ public class DirectoryBuilder {
 					RSync rsync = new RSync()
 							.source(fileKey)
 							.destination(filesMap.get(fileKey))
+							.ignoreExisting(true)
 							.recursive(true);
 					output = rsync.execute();
 				}
