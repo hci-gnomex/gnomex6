@@ -2544,6 +2544,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 this.context.dialogService.stopAllSpinnerDialogs();
             }
         }, (err: any) => {
+            this.context.lastCOREChangeEvent.data.sampleAlias_CORE = '';
+            this.context.lastCOREChangeEvent.data.idSample_CORE = '';
+            this.context.samplesGridApi.refreshCells();
+            this.context.dialogService.stopAllSpinnerDialogs();
             this.context.dialogService.error("Unable to reach CORE.  Please contact GNomEx Support to resolve the issue.");
         });
     }
