@@ -231,10 +231,10 @@ public class Differ {
 						localFilesExist.addAll(filePaths);
 					}
 				}
-				else{
-					System.out.println("No match for regex " + matchByName +".\n" + "Ignoring " + line1 +  " cause we can't determine if it is truly unique");
-					//addUniqueName(line1);
-				}
+//				else{
+//					System.out.println("No match for regex " + matchByName +".\n" + "Ignoring " + line1 +  " cause we can't determine if it is truly unique");
+//					addUniqueName(line1);
+//				}
 			}else{
 				addUniqueName(line1);
 			}

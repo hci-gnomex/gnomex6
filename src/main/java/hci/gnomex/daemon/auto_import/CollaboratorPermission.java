@@ -381,19 +381,20 @@ public class CollaboratorPermission {
     private String makeQueryStatement(String dataVendor) {
         StringBuilder strBuild = new StringBuilder("WHERE ");
 
-  //.*A[A-Za-z0-9]{6}
-
+        //.*A[A-Za-z0-9]{6}
         //m2gen looks like this SL423827 tgen looks like this '16-0063480a_C046_0018_010951_LN_Whole_T1_K1ID2_A61708_R1'
         // which we've simplified to A61708
         if (dataVendor.equals("avatar")) {
-            strBuild.append(" s.name LIKE \'SL%\' OR s.name REGEXP \'^[0-9]{2}-[A-Za-z0-9\\.]+.*$\'" +
-                    " OR s.name REGEXP \'.*A[0-9]{5,6}\' ");
+            strBuild.append(" s.name LIKE \'SL%\' OR s.name LIKE \'FT%\' ");
         } else if (dataVendor.equals("foundation")) {
             strBuild.append(" ( s.name  REGEXP \'^T?C?Q?RF[0-9]+\' ");
             strBuild.append(" OR s.name LIKE \'ORD%\' ) ");
         } else if (dataVendor.equals("tempus")){
             strBuild.append(" s.name LIKE \'TL%\' ");
-        }else if(dataVendor.equals("all")) {
+        } else if (dataVendor.equals("caris")){
+            strBuild.append(" s.name LIKE \'TN%\'");
+        }
+        else if(dataVendor.equals("all")) {
             return " ";
         }
 

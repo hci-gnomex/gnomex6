@@ -753,7 +753,7 @@ public class DirectoryBuilder {
 			String interID = null;
 			if(personID == null){
 				interID = getIntermediatoryIDFromFile(currentDownloadLocation + fullFileName);
-				System.out.println("parsed out of file the accesion id " + interID );
+				System.out.println("parsed out of file the accession id " + interID );
 			}
 			if ((interID != null && !interID.equals("")) || (personID != null && !personID.equals(""))) {
 				try {
@@ -777,6 +777,7 @@ public class DirectoryBuilder {
 					}
 				} catch (Exception ex) {
 					e.printStackTrace();
+					ex.printStackTrace();
 					q.closeConnection();
 					System.exit(1);
 				}

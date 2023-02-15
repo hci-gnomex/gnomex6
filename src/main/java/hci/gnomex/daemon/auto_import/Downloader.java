@@ -62,8 +62,9 @@ public class Downloader {
 				this.downloadPath = args[++i];
 			} else if (args[i].equals("-mode")) {
 				this.mode = args[++i];
-				if(!(this.mode.contains("tempus") || this.mode.equals("avatar") || this.mode.contains("caris")) ){
-					System.out.println("If you specify mode it has to be either tempus, avatar or caris");
+				if(!(this.mode.contains("tempus") || this.mode.equals("avatar") || this.mode.contains("caris")
+						|| this.mode.contains("foundation")) ){
+					System.out.println("If you specify mode it has to be either tempus, avatar, caris or foundation");
 					System.exit(1);
 				}
 
@@ -262,14 +263,14 @@ public class Downloader {
 
 	}
 
-	public void executeTempusDownload() {
+	public void executeAWSS3Download() {
 		List<String> commands = new ArrayList<String>();
 
 		List<String> status = Arrays.asList("Downloading in progress...");
 		writeToFile(this.dependentDataPath + "download.log",status); // /home/u0566434/parser_data/download.log
 		String tempFile = writeToAWSFile(fileOfPaths,this.fileNameMap, false);
 
-		String serialFileName = dependentDataPath + mode+ "-mfa-arn.txt";
+		String serialFileName = dependentDataPath + mode + "-mfa-arn.txt";
 		String dryRun = testRun ? " --dryrun " : " ";
 
 		String mfaProfile = null;
@@ -297,8 +298,6 @@ public class Downloader {
 
 		System.out.println("Finished downloading");
 		if(deleteRemoteAfterDownload){
-
-
 			commands.clear();
 			tempFile = writeToAWSFile(fileOfPaths,this.fileNameMap, true);
 			String workingPath = Paths.get(tempFile).getParent().toString();
