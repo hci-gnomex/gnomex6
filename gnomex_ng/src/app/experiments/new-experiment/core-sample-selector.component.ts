@@ -23,29 +23,29 @@ export class CoreSampleSelectorComponent extends BaseGenericContainerDialog impl
         temp.push({
             headerName: "Matched Alias Type",
             field: "aliasType",
-            width:    100,
+            width:    200,
             // width:    5 * this.emToPxConversionRate,
             // minWidth: 15 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
-            suppressSizeToFit: true
+            suppressSizeToFit: false
         });
         temp.push({
             headerName: "Matched Alias",
             field: "alias",
-            width:    100,
+            width:    200,
             // width:    5 * this.emToPxConversionRate,
             // minWidth: 12 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
-            suppressSizeToFit: true
+            suppressSizeToFit: false
         });
         temp.push({
             headerName: "CORE Identification Number",
-            field: "identificationNumber",
-            width:    100,
+            field: "id",
+            width:    200,
             // width:    5 * this.emToPxConversionRate,
             // minWidth: 12 * this.emToPxConversionRate,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
-            suppressSizeToFit: true
+            suppressSizeToFit: false
         });
         temp.push({
             headerName: "Amount",
@@ -112,7 +112,7 @@ export class CoreSampleSelectorComponent extends BaseGenericContainerDialog impl
 
 
     public onSelectionChanged(event: any): void {
-        console.log("Option Selected!")
+        // console.log("Option Selected!")
     }
 
     public onGridReady(event: any): void {

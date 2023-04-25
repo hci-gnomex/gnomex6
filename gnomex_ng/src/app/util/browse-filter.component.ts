@@ -244,7 +244,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
 
         if (this.mode === this.EXPERIMENT_BROWSE) {
             let isBSTLinkageSupported: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CORE_LINKAGE_SUPPORTED);
-            let canAccessBSTX: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_ACCESS_BSTX);
+            let canAccessBSTX: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_ACCESS_CORE);
             if (isAdminState) {
                 this.showAllCheckbox = true;
                 this.showLabComboBox = true;
