@@ -74,6 +74,7 @@ import {TabExternalDescriptionComponent} from "./new-experiment/tab-external-des
 import {AmendExperimentOverviewComponent} from "./amend-experiment-overview.component";
 import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.component";
 import {AddAdditionalAccountsComponent} from "./new-experiment/add-additional-accounts.component";
+import {CoreSampleSelectorComponent} from "./new-experiment/core-sample-selector.component";
 import {ImprovedSelectRenderer} from "../util/grid-renderers/improved-select.renderer";
 import {ImprovedSelectEditor} from "../util/grid-editors/improved-select.editor";
 
@@ -161,6 +162,7 @@ import {ImprovedSelectEditor} from "../util/grid-editors/improved-select.editor"
         TabExternalDescriptionComponent,
         AmendExperimentOverviewComponent,
         TabAmendExperimentSetupComponent,
+        CoreSampleSelectorComponent
     ],
     entryComponents: [
         CreateProjectComponent,
@@ -186,6 +188,7 @@ import {ImprovedSelectEditor} from "../util/grid-editors/improved-select.editor"
         TabExternalSetupComponent,
         TabExternalDescriptionComponent,
         TabAmendExperimentSetupComponent,
+        CoreSampleSelectorComponent
     ],
     exports:[
         CreateProjectComponent,
@@ -209,6 +212,7 @@ import {ImprovedSelectEditor} from "../util/grid-editors/improved-select.editor"
         TabExternalDescriptionComponent,
         AmendExperimentOverviewComponent,
         TabAmendExperimentSetupComponent,
+        CoreSampleSelectorComponent
     ]
 })
 export class ExperimentsModule { }

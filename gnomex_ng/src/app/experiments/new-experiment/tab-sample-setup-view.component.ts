@@ -156,8 +156,68 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
         if (this.onChange_numberOfSamples_Subscription) {
             this.onChange_numberOfSamples_Subscription.unsubscribe();
         }
+        if (this.onChange_numberOfdisSlides_Subscription) {
+            this.onChange_numberOfdisSlides_Subscription.unsubscribe();
+        }
 
         this.onChange_codeRequestCategorySubscription = this._experiment.onChange_codeRequestCategory.subscribe((value) => {
+            if (this.useSliceMode) {
+                this.loadSampleTypes();
+
+                this.sampleSources = this.dictionaryService.getEntries(DictionaryService.SAMPLE_SOURCE);
+
+                if (this.form && this.form.get("selectedSliceType")) {
+                    this.form.get("selectedSliceType").setValue(this._experiment.requestCategory.type);
+                }
+
+                if (this.form && this.form.get("hasSliceType")) {
+                    this.form.get("hasSliceType").setValue(true);
+                }
+
+                if (this.form && this.form.get("isNanoGeoMx")) {
+                    this.form.get("isNanoGeoMx").setValue(false);
+                }
+                if (this.form && this.form.get("showDnaRnaChoices")) {
+                    this.form.get("showDnaRnaChoices").setValue(false);
+                }
+                if (this.form && this.form.get("showExtractionTypeChoices")) {
+                    this.form.get("showExtractionTypeChoices").setValue(false);
+                }
+                if (this.form && this.form.get("hasIsolationTypes")) {
+                    this.form.get("hasIsolationTypes").setValue(false);
+                }
+            }
+
+            if (this.useNanoGeomxMode) {
+                this.loadSampleTypes();
+                this.buildSampleTypes();
+
+                if (this.form && this.form.get("isNanoGeoMx")) {
+                    this.form.get("isNanoGeoMx").setValue(true);
+                }
+
+                if (this.form && this.form.get("selectedSliceType")) {
+                    this.form.get("selectedSliceType").setValue('');
+                }
+
+                if (this.form && this.form.get("hasSliceType")) {
+                    this.form.get("hasSliceType").setValue(false);
+                }
+                if (this.form && this.form.get("showDnaRnaChoices")) {
+                    this.form.get("showDnaRnaChoices").setValue(false);
+                }
+                if (this.form && this.form.get("showExtractionTypeChoices")) {
+                    this.form.get("showExtractionTypeChoices").setValue(false);
+                }
+                if (this.form && this.form.get("showExtractionTypeChoices")) {
+                    this.form.get("showExtractionTypeChoices").setValue(false);
+                }
+                if (this.form && this.form.get("hasIsolationTypes")) {
+                    this.form.get("hasIsolationTypes").setValue(false);
+                }
+
+            }
+
             if (this.useIsolationTypeMode) {
 
                 this.sampleSources = this.dictionaryService.getEntries(DictionaryService.SAMPLE_SOURCE);
@@ -168,14 +228,19 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 if (this.form && this.form.get("showExtractionTypeChoices")) {
                     this.form.get("showExtractionTypeChoices").setValue(true);
                 }
-            } else {
-                if (this.form && this.form.get("showDnaRnaChoices")) {
-                    this.form.get("showDnaRnaChoices").setValue(true);
+                if (this.form && this.form.get("hasIsolationTypes")) {
+                    this.form.get("hasIsolationTypes").setValue(true);
                 }
-                if (this.form && this.form.get("showExtractionTypeChoices")) {
-                    this.form.get("showExtractionTypeChoices").setValue(false);
-                }
+
             }
+//            else {
+//                if (this.form && this.form.get("showDnaRnaChoices")) {
+//                    this.form.get("showDnaRnaChoices").setValue(true);
+//                }
+//                if (this.form && this.form.get("showExtractionTypeChoices")) {
+//                    this.form.get("showExtractionTypeChoices").setValue(false);
+//                }
+//            }
 
             if (this.experimentTypeUsesPlates) {
                 this.form.get("canUsePlates").setValue(true);
@@ -183,14 +248,21 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 this.form.get("canUsePlates").setValue(false);
             }
 
-            if (this.form && this.form.get("hasIsolationTypes")) {
-                this.form.get("hasIsolationTypes").setValue(false);
-            }
+ //           if (this.form && this.form.get("hasIsolationTypes")) {
+ //               this.form.get("hasIsolationTypes").setValue(false);
+ //           }
+
         });
 
         this.onChange_numberOfSamples_Subscription = this._experiment.onChange_numberOfSamples.subscribe((value: string) => {
             if (this.form && this.form.get("numSamples")) {
                 this.form.get("numSamples").setValue(value);
+            }
+        });
+
+        this.onChange_numberOfdisSlides_Subscription = this._experiment.onChange_numberOfdisSlides.subscribe((value: string) => {
+            if (this.form && this.form.get("numdisSlides")) {
+                this.form.get("numdisSlides").setValue(value);
             }
         });
     };
@@ -219,6 +291,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     private sampleType: any;
     public filteredSampleTypeListDna: any[] = [];
     public filteredSampleTypeListRna: any[] = [];
+    public filteredSampleTypeListDis: any[] = [];
     private showSampleNotes: boolean = false;
     public showSamplePrepContainer: boolean = true;
     public showKeepSample: boolean = true;
@@ -226,6 +299,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     public showSampleQualityExperimentType: boolean = false;
     public showSequenomExperimentType: boolean = false;
     public showDefaultSampleNumber: boolean = true;
+    public useNanoGeoMx: boolean = false;
     private showOrganism: boolean = true;
     public requireOrganism: boolean = true;
     private showSamplePurification: boolean = true;
@@ -245,6 +319,8 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     public isolationTypes: any[] = [];
     public sampleSources: any[] = [];
 
+    public sliceTypes: any[] = [];
+
     public allPlates: any[] = [];
 
     private emToPxConversionRate: number = 13;
@@ -256,6 +332,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     private QCChipPriceListSubscription: Subscription;
 
     private onChange_numberOfSamples_Subscription: Subscription;
+    private onChange_numberOfdisSlides_Subscription: Subscription;
     private onChange_codeRequestCategorySubscription: Subscription;
 
 
@@ -264,6 +341,31 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             && this._experiment.requestCategory
             && this._experiment.requestCategory.type
             && this._experiment.requestCategory.type === NewExperimentService.TYPE_ISOLATION) {
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public get useSliceMode(): boolean {
+        if (this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.type
+            && ( this._experiment.requestCategory.type === NewExperimentService.TYPE_LCM  ||
+                 this._experiment.requestCategory.type === NewExperimentService.TYPE_MILLISECT) ) {
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public get useNanoGeomxMode(): boolean {
+        if (this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.type
+            && this._experiment.requestCategory.type === NewExperimentService.TYPE_NANOGEOMX ) {
 
             return true;
         } else {
@@ -280,6 +382,14 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
         if (!this._experiment.samples) {
             this._experiment.samples = [];
         }
+    }
+
+    public get numberOfdisSlides(): number|string {
+        return this._experiment.numberOfdisSlides;
+    }
+    public set numberOfdisSlides(value: number|string) {
+        this._experiment.numberOfdisSlides = '' + value;
+
     }
 
     public get showBioAnalyzerChipTypeGrid(): boolean {
@@ -428,6 +538,11 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 acid:                              [''],
                 requiresCustomSpecification:       [''],
                 customSpecification:               [''],
+                hasSliceTypes:                     [''],
+                isNanoGeoMx:                       [''],
+                selectedSliceType:                 [''],
+                numdisSlides:                      [''],
+                sampleType:                        [''],
                 coreNotes:                         ['', [Validators.maxLength(5000)]]
             },
             { validator: TabSampleSetupViewComponent.validatorWrapper }
@@ -458,10 +573,22 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
         if (this.onChange_numberOfSamples_Subscription) {
             this.onChange_numberOfSamples_Subscription.unsubscribe();
         }
+        if (this.onChange_numberOfdisSlides_Subscription) {
+            this.onChange_numberOfdisSlides_Subscription.unsubscribe();
+        }
+
     }
 
 
     private static validatorWrapper(group: FormGroup): { [s:string]: boolean } {
+        if (group.get("hasSliceType") ) {
+            return null;
+        }
+
+        if (group.get("isNanoGeoMx")) {
+            return null;
+        }
+
         let temp: { [s:string]: boolean } = TabSampleSetupViewComponent.oneCategoryRequired(group);
 
         if (temp) {
@@ -694,6 +821,17 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             this.sampleTypes = this.sampleTypes.concat(this.filteredSampleTypeListDna);
             this.sampleTypes = this.sampleTypes.concat(this.filteredSampleTypeListRna);
         }
+
+        if (this.sampleTypes.length === 0 && this.requestCategory && this.useSliceMode) {
+            this.loadSampleTypes();
+            this.sampleSources = this.dictionaryService.getEntries(DictionaryService.SAMPLE_SOURCE);
+        }
+
+        if (this.sampleTypes.length === 0 && this.requestCategory && this.useNanoGeomxMode) {
+            this.loadSampleTypes();
+            this.buildSampleTypes();
+        }
+
     }
 
     private sampleTypes: any[] = [];
@@ -722,6 +860,30 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
 
         return types;
     }
+
+
+    private loadSampleTypes(): void {
+        let types: any[] = [];
+
+        for (let sampleType of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleType")) {
+            if (sampleType.isActive === 'N' || (sampleType.codeNucleotideType !== "Cell Prep") ) {
+                continue;
+            }
+
+            let requestCategories = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleTypeRequestCategory").filter(sampleRequestCategory =>
+                sampleRequestCategory.value !== "" && sampleRequestCategory.idSampleType === sampleType.idSampleType
+            );
+
+            for (let requestCategory of requestCategories) {
+                if (this._experiment && requestCategory.codeRequestCategory === this._experiment.codeRequestCategory) {
+                    types.push(sampleType);
+                }
+            }
+        }
+
+        this.sampleTypes = types.sort(TabSampleSetupViewComponent.sortSampleTypes);
+    }
+
 
     public static sortSampleTypes(obj1, obj2): number {
         if (obj1 == null && obj2 == null) {
@@ -795,6 +957,10 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
         if (this.form && this.form.get("numPlates")) {
             this.form.get("numPlates").updateValueAndValidity();
         }
+    }
+
+    public onChange_numberOfdisSlides(event: any): void {
+        this.numberOfdisSlides = this.form.get("numdisSlides").value;
     }
 
     public onChange_numberOfPlates(event: any): void {
@@ -1031,6 +1197,19 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 this.requireOrganism = false;
             }
 
+            if (this.requestCategory.codeRequestCategory === "LCM" ||
+                this.requestCategory.codeRequestCategory === "MILLISECT") {
+                this.showSamplePrepContainer = false;
+                this.showKeepSample = true;
+                this.showSampleQualityExperimentType = false;
+                this.requireSamplePrepContainer = false;
+                this.showOrganism = false;
+                this.requireOrganism = false;
+                this.showSamplePurification = false;
+                this.showDefaultSampleNumber = false;
+                this.showQcInstructions = false;
+            }
+
             if (this.requestCategory.codeRequestCategory === "DDPCR BR") {
                 this.showSamplePurification = false;
                 this.showKeepSample = false;
@@ -1041,7 +1220,6 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 this.form.get('showSampleQuality').setValue(this.requestCategory.type === "QC");
             }
 
-            // if (this.requestCategory.codeRequestCategory === "QC" || this.requestCategory.codeRequestCategory === 'MDSQ') {}
             if (this.requestCategory.type === "QC") {
                 this.showSamplePrepContainer = true;
                 this.showKeepSample = false;
@@ -1057,6 +1235,20 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 this.requireSamplePrepContainer = true;
                 this.showSamplePurification = false;
                 this.showKeepSample = false;
+            }
+
+            if (this.requestCategory.type === NewExperimentService.TYPE_NANOGEOMX) {
+                this.useNanoGeoMx = true;
+                this.showSamplePrepContainer = true;
+                this.requireSamplePrepContainer = true;
+                this.showSamplePurification = false;
+                this.showDefaultSampleNumber = false;
+                this.showKeepSample = false;
+                this.showSampleQualityExperimentType = false;
+                this.showOrganism = true;
+                this.requireOrganism = true;
+                this.showQcInstructions = false;
+
             }
 
             if (this._experiment) {
@@ -1181,6 +1373,12 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     public onSelectSampleSource(event: any): void {
         if (event) {
             this._experiment.idSampleSource = event.value;
+        }
+    }
+
+    public onSelectSampleType(event: any): void {
+        if (event) {
+            this._experiment.sampleType = event.value;
         }
     }
 

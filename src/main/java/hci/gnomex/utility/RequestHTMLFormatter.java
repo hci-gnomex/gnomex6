@@ -373,7 +373,7 @@ public class RequestHTMLFormatter {
       if (showCcNumber) {
         if ( sample.getCcNumber() != null && !sample.getCcNumber().toString().equals( "" ) ) {
           String ccLinkString = "<a href=\"" +
-                  dictionaryHelper.getPropertyDictionary(PropertyDictionary.GNOMEX_LINKAGE_BST_URL) + "#ccNumber=" + sample.getCcNumber() +
+                  dictionaryHelper.getPropertyDictionary(PropertyDictionary.GNOMEX_LINKAGE_CORE_URL) + "#ccNumber=" + sample.getCcNumber() +
                   "\">" + sample.getCcNumber() + "</a>";
           this.addCell( row, ccLinkString );
         } else {
@@ -740,7 +740,7 @@ public class RequestHTMLFormatter {
         String ccLinkString = "&nbsp;";
         if (sample.getCcNumber() != null && !sample.getCcNumber().equals("")) {
           ccLinkString = "<a href=\"" +
-                  dictionaryHelper.getPropertyDictionary(PropertyDictionary.GNOMEX_LINKAGE_BST_URL) + "#ccNumber=" + sample.getCcNumber() +
+                  dictionaryHelper.getPropertyDictionary(PropertyDictionary.GNOMEX_LINKAGE_CORE_URL) + "#ccNumber=" + sample.getCcNumber() +
                   "\">" + sample.getCcNumber() + "</a>";
         }
 

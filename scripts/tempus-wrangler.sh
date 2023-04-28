@@ -5,15 +5,14 @@ pDataPath="/home/u0566434/parser_data/"
 downloadPath="/Repository/tempdownloads/tempus/"
 tempusLocalDataPath="/Repository/PersonData/2017/10R/Tempus/"
 
-regex="^.*((TL-[0-9]{2}-[A-Za-z0-9]{6}).*(DNA|RNA|RSQ|DSQ).*gz)$|.*(result.*\.[a-z]+)|.*((TL-[0-9]{2}-[A-Za-z0-9]{6})[-_]*([DRNA]{3})*.*\.md5)"
+regex="^.*((TL-[0-9]{2}-[A-Za-z0-9]{6,8}).*(DNA|RNA|RSQ|DSQ).*gz)$|.*(result.*\.[a-z]+)|.*((TL-[0-9]{2}-[A-Za-z0-9]{6,8})[-_]*([DRNA]{3})*.*\.md5)"
 #regex=".*((TL-[0-9]{2}-[A-Za-z0-9]{6}).*(DNA|RNA|RSQ.|DSQ.).*gz)|.*(result.*\.[a-z]+)|.*(TL-[0-9]{2}-[A-Za-z0-9]{6}[-_]*([DRNA]{3})*.*\.md5)"
 
-#smallFileRegex=".*((TL-[0-9]{2}-[A-Za-z0-9]{6}).*(DNA|RNA|RSQ.|DSQ.).*gz)|.*(result.*\.[a-z]+)|.*(TL-[0-9]{2}-[A-Za-z0-9]{6}[-_]*([DRNA]{3})*.*\.md5)"
 smallFileRegex=".*(result.*)"
 fastqRegex="(?:(?:.*(DNA|RNA).*/)?|.*/?)(TL-[0-9]{2}-[A-Za-z0-9]{6})[^/](?=.*(DNA|RNA|DSQ|RSQ))?.*(md5|gz).*(?:S3.txt)?"
 sampleIdRegex=".*TL-[0-9]{2}-([A-Za-z0-9]{6}).*|result-?_?([A-Za-z0-9]{6}).*"
 sampleFileNameRegex=".*(TL-[0-9]{2}-[A-Za-z0-9]{6}).*|result-?_?([A-Za-z0-9]{6}).*" #get everything but the read end pair number and extension
-associateIDRegex=".*(?:TL-[0-9]{2}|result)-?_?([A-Za-z0-9]{6})._?-?(T|N)?_?-?(DSQ|RSQ|RNA|DNA)?.*"
+associateIDRegex=".*(?:TL-[0-9]{2}|result)-?_?([A-Za-z0-9]{6,8})._?-?(T|N)?_?-?(DSQ|RSQ|RNA|DNA)?.*"
 
 filterRegex=".*(result.*)|$fastqRegex"
 echo $filterRegex
@@ -55,7 +54,6 @@ java hci.gnomex.daemon.auto_import.DiffParser -alias $alias -local "$pDataPath"l
 java hci.gnomex.daemon.auto_import.DiffParser  -local "$pDataPath"localTempusPath.out  -remote "$pDataPath"tempusJson.out -cp 1 -matchByName -l $smallFileRegex > "$pDataPath"uniqueTempusSmallFile.out
 
 cat "$pDataPath"uniqueTempusSmallFile.out "$pDataPath"uniqueTempusFastq.out > "$pDataPath"uniqueTempusFilesToDownload.out
-
 java hci.gnomex.daemon.auto_import.DownloadMain -fileList "$pDataPath"uniqueTempusFilesToDownload.out -downloadPath "$downloadPath" -mode tempus -filterRegex $filterRegex -alias $alias
 # need to filter out from uniqueTempusFilesToDownload reattempt flagged files here
 
@@ -186,9 +184,9 @@ printf "%s\n" "${fileArray[@]}" > "$pDataPath"importableTempusFileList.out
 
 cat "$pDataPath"importableTempusFileList.out | java  hci.gnomex.daemon.auto_import.StringModder -sort -delimit "/" > "$pDataPath"importableTempusFileList1.out
 cat "$pDataPath"importableTempusFileList1.out > "$pDataPath"importableTempusFileList.out
+rm "$pDataPath"importableTempusFileList1.out
 
-#rm "$pDataPath"localTempus*
-#rm "$pDataPath"remoteTempus*
+
 java -jar "./tempus-persistence.jar"  -json "$pDataPath"importableTempusFileList.out -cred "$pDataPath"tempus-cred-prod.properties -download "$downloadPath" -out "$pDataPath"tlInfo.out -log "$pDataPath""log/"tempus.log -ld "$pDataPath"localTempusPath.out
 #java hci.ri.tempus.model.TempusPersistenceMain  -json "$pDataPath"importableTempusFileList.out -cred "$pDataPath"tempus-cred.properties -deidentjson "$pDataPath"hello.txt -download "$downloadPath" -out "$pDataPath"tlInfo.out -ld "$pDataPath"localTempusPath.out
 
@@ -199,11 +197,11 @@ java hci.gnomex.daemon.auto_import.FileMover -file "$pDataPath"importableTempusF
 tempusRequestList=`cat "$pDataPath"tempRequestList.out`
 tempusAnalysisList=`cat "$pDataPath"tempAnalysisList.out`
 echo This is the sample regex $sampleIdRegex
-bash register_files.sh -doNotSendMail -onlyExperiment
-bash linkData.sh -dataSource 10R -regex $sampleIdRegex -linkFolder -debug  -requests $tempusRequestList
+bash register_files.sh -doNotSendMail  -onlyExperiment
+bash linkData.sh -dataSource 10R -linkFolder -debug  -requests $tempusRequestList
 bash register_files.sh -doNotSendMail -onlyExperiment
 bash linkFastqData.sh -debug -linkFolder -analysis $tempusAnalysisList
+bash index_gnomex.sh
 rm "$pDataPath"tempRequestList.out
 rm "$pDataPath"tempAnalysisList.out
-
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------

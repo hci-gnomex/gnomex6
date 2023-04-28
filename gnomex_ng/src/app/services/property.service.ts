@@ -78,8 +78,11 @@ export class PropertyService {
 
     public static readonly PROPERTY_QC_INSTRUCTIONS: string = "qc_instructions";
     public static readonly PROPERTY_BST_LINKAGE_SUPPORTED: string = "bst_linkage_supported";
-    public static readonly PROPERTY_CAN_ACCESS_BSTX: string = "can_access_bstx";
+    public static readonly PROPERTY_CORE_LINKAGE_SUPPORTED: string = "CORE_linkage_supported";
+    public static readonly PROPERTY_CAN_ACCESS_CORE: string = "can_access_core";
     public static readonly PROPERTY_CAN_SHOW_CCNUMBER_EXTERNAL_EXPERIMENTS:string = "can_show_ccnumber_external_experiments";
+
+    public static readonly PROPERTY_CORE_LINKAGE_LOOKUP: string = "GNomEx_linkage_CORE_lookup_url";
 
     public static readonly PROPERTY_MAINTENANCEMODE: string = "maintenancemode";
     public static readonly PROPERTY_MAINTENANCE_SPLASH: string = "maintenance_splash";

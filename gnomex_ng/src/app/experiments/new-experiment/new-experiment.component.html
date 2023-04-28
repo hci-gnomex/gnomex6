@@ -58,7 +58,7 @@
             </div>
             <div class="padded-right">
                 <button mat-raised-button
-                        [disabled]="!formOfCurrentlySelectedTab || formOfCurrentlySelectedTab.invalid || onSubmitTab"
+                        [disabled]="!formOfCurrentlySelectedTab || onSubmitTab"
                         (click)="goNext()">
                     <mat-icon>arrow_right</mat-icon>
                     Next

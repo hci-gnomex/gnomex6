@@ -64,7 +64,7 @@ public class FilterFile {
 		String currentLine = "";
 
 		Pattern r = Pattern.compile(filterRegex);
-		Query query = new Query(credFile);
+		//Query query = new Query(credFile);
 		System.out.println(r.toString());
 
 		String newGroup = "";
@@ -159,8 +159,8 @@ public class FilterFile {
 
 		} // end of while
 
-		query.closeConnection();
-
+		//query.closeConnection();
+		//bottleneck checks all new files and
 		fContainer.makeLocalCheckSums(filterOutList,fileList);
 		fContainer.writeFilesList(remoteFileList, fileList );
 		outFile(filteredFile, filterOutList);

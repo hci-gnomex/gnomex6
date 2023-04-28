@@ -293,6 +293,7 @@ public class SaveLab extends GNomExCommand implements Serializable {
 				}
 
 				if (isNewLab) {
+					if (labScreen.getExcludeUsage() == null) labScreen.setExcludeUsage("N");
 					lab = labScreen;
 					sess.save(lab);
 

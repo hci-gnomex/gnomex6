@@ -31,6 +31,8 @@ import {GridApi, SelectionChangedEvent} from "ag-grid-community";
 import {SampleUploadService} from "../../upload/sample-upload.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {NewExperimentService} from "../../services/new-experiment.service";
+import {CORELinkageService} from "../../services/CORE-linkage.service";
+import {CoreSampleSelectorComponent} from "./core-sample-selector.component";
 import {ImprovedSelectRenderer} from "../../util/grid-renderers/improved-select.renderer";
 import {ImprovedSelectEditor} from "../../util/grid-editors/improved-select.editor";
 
@@ -237,10 +239,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
             }
 
             this._stateChangeSubscription = value.subscribe((state: string) => {
-                if (this.ccCheckbox) {
-                    this.ccCheckbox.checked = false;
-                }
-
                 this._state = state;
                 this.createColumnsBasedOnState(state);
                 this.assignRowDataBasedOnState(state);
@@ -348,9 +346,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public get showCcCheckbox(): boolean {
-        if (this._state === this.STATE_VIEW) {
-            return false;
-        }
+        // if (this._state === this.STATE_VIEW) {
+        //     return false;
+        // }
 
         let showExternalCCNumber = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_SHOW_CCNUMBER_EXTERNAL_EXPERIMENTS);
 
@@ -358,10 +356,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
             return showExternalCCNumber
         }
 
-        let isBSTLinkageSupported: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_BST_LINKAGE_SUPPORTED);
-        let canAccessBSTX: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_ACCESS_BSTX);
+        let isBSTLinkageSupported: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CORE_LINKAGE_SUPPORTED);
+        let canAccessBSTX: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_ACCESS_CORE);
 
-        return isBSTLinkageSupported && canAccessBSTX;
+        return isBSTLinkageSupported && canAccessBSTX && showExternalCCNumber;
     }
 
     public get showNucleicAcidExtractionMethod(): boolean {
@@ -443,7 +441,11 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public get showLinkToCCNumber(): boolean {
-        return this._experiment && this._experiment.hasCCNumber === 'Y';
+        // return this._experiment && this._experiment.hasCCNumber === 'Y';
+
+        let showExternalCCNumber = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_SHOW_CCNUMBER_EXTERNAL_EXPERIMENTS);
+
+        return !(this.experiment && this.experiment.isExternal === "Y" && !showExternalCCNumber);
     }
 
     public get showDescription(): boolean {
@@ -756,23 +758,58 @@ export class TabSamplesIlluminaComponent implements OnInit {
             }
         }
 
+        // temp.push({
+        //     headerName: "CC Number",
+        //     field: "ccNumber",
+        //     width:    9 * this.emToPxConversionRate,
+        //     minWidth: 8 * this.emToPxConversionRate,
+        //     suppressSizeToFit: true,
+        //     editable: true,
+        //     cellRendererFramework: TextAlignLeftMiddleRenderer,
+        //     cellEditorFramework: TextAlignLeftMiddleEditor,
+        //     validators: [Validators.maxLength(20)],
+        //     errorNameErrorMessageMap: [
+        //         {errorName: "maxlength", errorMessage: "Maximum of 20 characters"}
+        //     ],
+        //     showFillButton: true,
+        //     fillGroupAttribute: 'frontEndGridGroup',
+        //     hide: this.hideCCNum,
+        //     ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden
+        // });
+
         temp.push({
-            headerName: "CC Number",
-            field: "ccNumber",
+            headerName: "CORE Sample Alias",
+            field: "sampleAlias_CORE",
             width:    9 * this.emToPxConversionRate,
             minWidth: 8 * this.emToPxConversionRate,
             suppressSizeToFit: true,
             editable: true,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
-            validators: [Validators.maxLength(20)],
+            validators: [Validators.maxLength(30)],
             errorNameErrorMessageMap: [
-                {errorName: "maxlength", errorMessage: "Maximum of 20 characters"}
+                {errorName: "maxlength", errorMessage: "Maximum of 30 characters"}
             ],
-            showFillButton: true,
-            fillGroupAttribute: 'frontEndGridGroup',
+            showFillButton: false,
+            context: this,
+            onCellValueChanged: this.checkExistsCORESamples,
+            // fillGroupAttribute: 'frontEndGridGroup',
             hide: this.hideCCNum,
-            ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden
+            ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
+            sortOrder: 140
+        });
+
+        temp.push({
+            headerName: "CORE Sample ID",
+            field: "idSample_CORE",
+            width:    9 * this.emToPxConversionRate,
+            minWidth: 8 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
+            editable: false,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            hide: this.hideCCNum,
+            ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
+            sortOrder: 145
         });
 
         this._tabIndexToInsertAnnotations = 150;
@@ -1162,24 +1199,60 @@ export class TabSamplesIlluminaComponent implements OnInit {
             }
         }
 
+        // temp.push({
+        //     headerName: "CC Number",
+        //     field: "ccNumber",
+        //     width:    9 * this.emToPxConversionRate,
+        //     minWidth: 8 * this.emToPxConversionRate,
+        //     suppressSizeToFit: true,
+        //     editable: true,
+        //     cellRendererFramework: TextAlignLeftMiddleRenderer,
+        //     cellEditorFramework: TextAlignLeftMiddleEditor,
+        //     validators: [Validators.maxLength(20)],
+        //     errorNameErrorMessageMap: [
+        //         {errorName: "maxlength", errorMessage: "Maximum of 20 characters"}
+        //     ],
+        //     showFillButton: true,
+        //     fillGroupAttribute: 'frontEndGridGroup',
+        //     hide: this.hideCCNum,
+        //     ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
+        //     sortOrder: 139
+        // });
+
+
         temp.push({
-            headerName: "CC Number",
-            field: "ccNumber",
+            headerName: "CORE Sample Alias",
+            field: "sampleAlias_CORE",
             width:    9 * this.emToPxConversionRate,
             minWidth: 8 * this.emToPxConversionRate,
             suppressSizeToFit: true,
             editable: true,
             cellRendererFramework: TextAlignLeftMiddleRenderer,
             cellEditorFramework: TextAlignLeftMiddleEditor,
-            validators: [Validators.maxLength(20)],
+            validators: [Validators.maxLength(30)],
             errorNameErrorMessageMap: [
-                {errorName: "maxlength", errorMessage: "Maximum of 20 characters"}
+                {errorName: "maxlength", errorMessage: "Maximum of 30 characters"}
             ],
-            showFillButton: true,
-            fillGroupAttribute: 'frontEndGridGroup',
+            showFillButton: false,
+            context: this,
+            onCellValueChanged: this.checkExistsCORESamples,
+            // fillGroupAttribute: 'frontEndGridGroup',
             hide: this.hideCCNum,
             ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
             sortOrder: 140
+        });
+
+        temp.push({
+            headerName: "CORE Sample ID",
+            field: "idSample_CORE",
+            width:    9 * this.emToPxConversionRate,
+            minWidth: 8 * this.emToPxConversionRate,
+            suppressSizeToFit: true,
+            editable: false,
+            cellRendererFramework: TextAlignLeftMiddleRenderer,
+            hide: this.hideCCNum,
+            ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
+            sortOrder: 145
         });
 
         this._tabIndexToInsertAnnotations = 150;
@@ -1523,6 +1596,50 @@ export class TabSamplesIlluminaComponent implements OnInit {
             && this._experiment.requestCategory.isIlluminaType
             && this._experiment.requestCategory.isIlluminaType === 'Y') {
 
+            if (this.showLinkToCCNumber) {
+            //     temp.push({
+            //         headerName: "CC Number",
+            //         field: "ccNumber",
+            //         width:    8.5 * this.emToPxConversionRate,
+            //         minWidth: 8.5 * this.emToPxConversionRate,
+            //         suppressSizeToFit: true,
+            //         editable: false,
+            //         cellRendererFramework: LinkButtonRenderer,
+            //         onClickButton: 'onClickCoreLink',
+            //         ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
+            //         buttonValueLabel: 'ccNumber',
+            //         sortOrder: 289
+            //     });
+
+                temp.push({
+                    headerName: "CORE Sample Alias",
+                    field: "sampleAlias_CORE",
+                    width:    8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: false,
+                    cellRendererFramework: LinkButtonRenderer,
+                    onClickButton: 'onClickCoreLink',
+                    ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
+                    buttonValueLabel: 'sampleAlias_CORE',
+                    sortOrder: 290
+                });
+
+                temp.push({
+                    headerName: "CORE Sample ID",
+                    field: "idSample_CORE",
+                    width:    8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: false,
+                    cellRendererFramework: LinkButtonRenderer,
+                    onClickButton: 'onClickCoreLink',
+                    ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
+                    buttonValueLabel: 'idSample_CORE',
+                    sortOrder: 295
+                });
+            }
+
             temp.push({
                 headerName: "Index Tag A",
                 editable: false,
@@ -1651,17 +1768,45 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 });
             }
             if (this.showLinkToCCNumber) {
+                // temp.push({
+                //     headerName: "CC Number",
+                //     field: "ccNumber",
+                //     width:    8.5 * this.emToPxConversionRate,
+                //     minWidth: 8.5 * this.emToPxConversionRate,
+                //     suppressSizeToFit: true,
+                //     editable: false,
+                //     cellRendererFramework: LinkButtonRenderer,
+                //     onClickButton: 'onClickCoreLink',
+                //     ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
+                //     buttonValueLabel: 'ccNumber'
+                // });
+
                 temp.push({
-                    headerName: "CC Number",
-                    field: "ccNumber",
+                    headerName: "CORE Sample Alias",
+                    field: "sampleAlias_CORE",
                     width:    8.5 * this.emToPxConversionRate,
                     minWidth: 8.5 * this.emToPxConversionRate,
                     suppressSizeToFit: true,
                     editable: false,
                     cellRendererFramework: LinkButtonRenderer,
-                    onClickButton: 'onClickCCNumberLink',
+                    onClickButton: 'onClickCoreLink',
                     ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
-                    buttonValueLabel: 'ccNumber'
+                    buttonValueLabel: 'sampleAlias_CORE',
+                    sortOrder: 290
+                });
+
+                temp.push({
+                    headerName: "CORE Sample ID",
+                    field: "idSample_CORE",
+                    width:    8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: false,
+                    cellRendererFramework: LinkButtonRenderer,
+                    onClickButton: 'onClickCoreLink',
+                    ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
+                    buttonValueLabel: 'idSample_CORE',
+                    sortOrder: 295
                 });
             }
 
@@ -1678,17 +1823,45 @@ export class TabSamplesIlluminaComponent implements OnInit {
             }
         } else {
             if (this.showLinkToCCNumber) {
+                // temp.push({
+                //     headerName: "CC Number",
+                //     field: "ccNumber",
+                //     width:    8.5 * this.emToPxConversionRate,
+                //     minWidth: 8.5 * this.emToPxConversionRate,
+                //     suppressSizeToFit: true,
+                //     editable: false,
+                //     cellRendererFramework: LinkButtonRenderer,
+                //     onClickButton: 'onClickCoreLink',
+                //     ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
+                //     buttonValueLabel: 'ccNumber'
+                // });
+
                 temp.push({
-                    headerName: "CC Number",
-                    field: "ccNumber",
+                    headerName: "CORE Sample Alias",
+                    field: "sampleAlias_CORE",
                     width:    8.5 * this.emToPxConversionRate,
                     minWidth: 8.5 * this.emToPxConversionRate,
                     suppressSizeToFit: true,
                     editable: false,
                     cellRendererFramework: LinkButtonRenderer,
-                    onClickButton: 'onClickCCNumberLink',
+                    onClickButton: 'onClickCoreLink',
                     ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
-                    buttonValueLabel: 'ccNumber'
+                    buttonValueLabel: 'sampleAlias_CORE',
+                    sortOrder: 290
+                });
+
+                temp.push({
+                    headerName: "CORE Sample ID",
+                    field: "idSample_CORE",
+                    width:    8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    suppressSizeToFit: true,
+                    editable: false,
+                    cellRendererFramework: LinkButtonRenderer,
+                    onClickButton: 'onClickCoreLink',
+                    ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
+                    buttonValueLabel: 'idSample_CORE',
+                    sortOrder: 295
                 });
             }
         }
@@ -1698,14 +1871,15 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
 
     constructor(public constService: ConstantsService,
+                public dialogService: DialogsService,
                 private annotationService: AnnotationService,
-                private dialogService: DialogsService,
                 private dictionaryService: DictionaryService,
                 private gnomexService: GnomexService,
                 private fb: FormBuilder,
                 private dialog: MatDialog,
                 private propertyService: PropertyService,
                 private sampleUploadService: SampleUploadService,
+                private coreLinkageService: CORELinkageService,
                 public createSecurityAdvisor: CreateSecurityAdvisorService) { }
 
     ngOnInit() {
@@ -2176,9 +2350,11 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 this.samplesGridApi.sizeColumnsToFit();
             }
         }
-        if (this.ccCheckbox) {
-            this.toggleCC(this.ccCheckbox);
-        }
+        // if (this.ccCheckbox) {
+        //     this.toggleCC(this.ccCheckbox);
+        // }
+
+        this.toggleCC({ checked: true });
 
         return temp;
     }
@@ -2275,43 +2451,201 @@ export class TabSamplesIlluminaComponent implements OnInit {
             && this.gridColumnApi.columnController.gridColumns
             && Array.isArray(this.gridColumnApi.columnController.gridColumns)) {
 
+
             let temp: any[] = this.gridColumnApi.columnController.gridColumns.filter((value: any) => {
                 return value && value.colDef && value.colDef.field && value.colDef.field === 'ccNumber'
             });
+            let temp2: any[] = this.gridColumnApi.columnController.gridColumns.filter((value: any) => {
+                return value && value.colDef && value.colDef.field && value.colDef.field === 'sampleAlias_CORE'
+            });
+            let temp3: any[] = this.gridColumnApi.columnController.gridColumns.filter((value: any) => {
+                return value && value.colDef && value.colDef.field && value.colDef.field === 'idSample_CORE'
+            });
 
-            if (temp.length > 0) {
-                this.gridColumnApi.setColumnVisible(temp[0].colId, event.checked);
-                this.ccNumberIsCurrentlyHidden = !event.checked;
-                if(!event.checked) {
-                    this._experiment.hasCCNumber = "N";
-                    for (let sample of this._experiment.samples) {
-                        sample.ccNumber = "";
+
+            let showExternalCCNumber = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_SHOW_CCNUMBER_EXTERNAL_EXPERIMENTS);
+            let isBSTLinkageSupported: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CORE_LINKAGE_SUPPORTED);
+            let canAccessBSTX: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_ACCESS_CORE);
+
+            if (this.experiment && this.experiment.isExternal === "Y" && !showExternalCCNumber) {
+                this.ccNumberIsCurrentlyHidden = false;
+
+                if (temp.length > 0) {
+                    this.gridColumnApi.setColumnVisible(temp[0].colId, false);
+                }
+                if (temp2.length > 0) {
+                    this.gridColumnApi.setColumnVisible(temp2[0].colId, event.checked);
+                }
+                if (temp3.length > 0) {
+                    this.gridColumnApi.setColumnVisible(temp3[0].colId, event.checked);
+                }
+            } else {
+                if (temp.length > 0) {
+                    this.gridColumnApi.setColumnVisible(temp[0].colId, event.checked);
+                    this.ccNumberIsCurrentlyHidden = !event.checked;
+                    if (!event.checked) {
+                        this._experiment.hasCCNumber = "N";
+                        for (let sample of this._experiment.samples) {
+                            sample.ccNumberTempBackup = sample.ccNumber;
+                            sample.ccNumber = "";
+                        }
+                    } else {
+                        let hadAnyOldCCNumbers: boolean = false;
+
+                        for (let sample of this._experiment.samples) {
+                            if (sample.ccNumberTempBackup) {
+                                sample.ccNumber = sample.ccNumberTempBackup;
+                                hadAnyOldCCNumbers = true;
+                            }
+                        }
+
+                        if (hadAnyOldCCNumbers) {
+                            this._experiment.hasCCNumber = "Y";
+                        }
                     }
+                }
+                if (temp2.length > 0) {
+                    this.gridColumnApi.setColumnVisible(temp2[0].colId, event.checked);
+                }
+                if (temp3.length > 0) {
+                    this.gridColumnApi.setColumnVisible(temp3[0].colId, event.checked);
                 }
             }
 
-            if (this.form && this.form.get('invalidateWithoutSamples')) {
-                this.form.get('invalidateWithoutSamples').setValue(true);
-            }
+            // if (this.form && this.form.get('invalidateWithoutSamples')) {
+            //     this.form.get('invalidateWithoutSamples').setValue(true);
+            // }
         }
     }
 
-    public onClickCCNumberLink(event: any): void {
-        //console.log("Hello World");
+    public lastCOREChangeEvent: any;
 
-        let search: any = this.propertyService.getProperty("gnomex_linkage_bst_url");
-        let ccNum: string = '';
-
-        if (this.samplesGridApi
-            && this.samplesGridApi.getRowNode(event)
-            && this.samplesGridApi.getRowNode(event).data
-            && this.samplesGridApi.getRowNode(event).data.ccNumber) {
-
-            ccNum = this.samplesGridApi.getRowNode(event).data.ccNumber;
+    public checkExistsCORESamples(event: any): void {
+        if (!event || !event.newValue) {
+            return null;
         }
 
-        if (search && search.propertyValue) {
-            window.open(search.propertyValue + '#ccNumber=' + ccNum, "_blank");
+        this.context.lastCOREChangeEvent = event;
+
+        if (event.newValue.length < 3) {
+            if (this.lastCOREChangeEvent && this.lastCOREChangeEvent.data) {
+                this.lastCOREChangeEvent.data.sampleAlias_CORE = this.lastCOREChangeEvent.oldValue;
+                this.samplesGridApi.refreshCells();
+            }
+
+            return;
+        }
+
+        if (this.context.lastCOREChangeEvent
+            && this.context.lastCOREChangeEvent.oldValue
+            && this.context.lastCOREChangeEvent.newValue
+            && this.context.lastCOREChangeEvent.oldValue === this.context.lastCOREChangeEvent.newValue) {
+
+            return;
+        }
+
+        this.context.dialogService.startSpinnerDialog('Searching CORE...', 3, 30);
+
+        // cannot access this context through this column event hook.
+        this.context.coreLinkageService.searchForSampleAlias(event.newValue).subscribe((result: any) => {
+            if (result && Array.isArray(result)) {
+
+                for (let i:number = 0; i < result.length; i++) {
+                    if (result[i].amount && result[i].amount === 0) {
+                        result[i].amount = "0.0";
+                    }
+                }
+
+                this.context.dialogService.stopAllSpinnerDialogs();
+
+                if (result.length === 0) {
+                    this.context.openNoCOREMatchesDialog(this, result);
+                } else if (result.length === 1) {
+                    if (this.context
+                        && this.context.lastCOREChangeEvent
+                        && this.context.lastCOREChangeEvent.data
+                        && this.context.samplesGridApi
+                        && result[0].id) {
+
+                        this.context.lastCOREChangeEvent.data.sampleAlias_CORE = result[0].alias ? "" + result[0].alias : "";
+                        this.context.lastCOREChangeEvent.data.idSample_CORE = result[0].id ? "" + result[0].id : "";
+                        this.context.samplesGridApi.refreshCells();
+                    }
+                } else {
+                    this.context.openMultipleCOREMatchesDialog(this, result);
+                }
+            } else {
+                this.context.dialogService.stopAllSpinnerDialogs();
+            }
+        }, (err: any) => {
+            this.context.lastCOREChangeEvent.data.sampleAlias_CORE = '';
+            this.context.lastCOREChangeEvent.data.idSample_CORE = '';
+            this.context.samplesGridApi.refreshCells();
+            this.context.dialogService.stopAllSpinnerDialogs();
+            this.context.dialogService.error("Unable to reach CORE.  Please contact GNomEx Support to resolve the issue.");
+        });
+    }
+
+    private openNoCOREMatchesDialog(rowdata: any, searchResult: any): void {
+
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = '60em';
+        config.height = '45em';
+        config.panelClass = 'no-padding-dialog';
+
+        this.context.dialogService.error("Unable to find matches in CORE.\n Reverting to previous value...");
+
+        if (rowdata && rowdata.context && rowdata.context.lastCOREChangeEvent && rowdata.context.lastCOREChangeEvent.data) {
+            rowdata.context.lastCOREChangeEvent.data.sampleAlias_CORE = rowdata.context.lastCOREChangeEvent.oldValue;
+            this.context.samplesGridApi.refreshCells();
+        }
+    }
+
+    private openMultipleCOREMatchesDialog(rowdata: any, searchResult: any) {
+
+        let config: MatDialogConfig = new MatDialogConfig();
+        config.width = '60em';
+        config.height = '45em';
+        config.panelClass = 'no-padding-dialog';
+        config.data = {
+            event: this.context.lastCOREChangeEvent,
+            searchResults: searchResult
+        };
+
+        this.context.dialogService.genericDialogContainer(CoreSampleSelectorComponent, "Link to CORE Sample", null, config)
+            .subscribe((result: any) => {
+                if (this.context
+                    && this.context.lastCOREChangeEvent
+                    && this.context.lastCOREChangeEvent.data
+                    && this.context.samplesGridApi) {
+
+                    if (Array.isArray(result)) {
+                        if(result[0].id) {
+                            this.context.lastCOREChangeEvent.data.sampleAlias_CORE = result[0].alias ? "" + result[0].alias : "";
+                            this.context.lastCOREChangeEvent.data.idSample_CORE = result[0].id ? "" + result[0].id : "";
+                            this.context.samplesGridApi.refreshCells();
+                        }
+                    } else {
+                        if (rowdata && rowdata.context && rowdata.context.lastCOREChangeEvent && rowdata.context.lastCOREChangeEvent.data) {
+                            rowdata.context.lastCOREChangeEvent.data.sampleAlias_CORE = rowdata.context.lastCOREChangeEvent.oldValue;
+                            rowdata.context.samplesGridApi.refreshCells();
+                        }
+                    }
+                }
+            });
+    }
+
+    public onClickCoreLink(node: any): void {
+        let search: any = this.propertyService.getProperty("GNomEx_linkage_CORE_url");
+        let idSample_CORE: string = '';
+
+        if (this.samplesGridApi && node && node.data && node.data.idSample_CORE) {
+            idSample_CORE = node.data.idSample_CORE;
+
+            if (search && search.propertyValue && idSample_CORE) {
+                // window.open(search.propertyValue + '#ccNumber=' + ccNum, "_blank");
+                window.open(search.propertyValue + idSample_CORE, "_blank");
+            }
         }
     }
 

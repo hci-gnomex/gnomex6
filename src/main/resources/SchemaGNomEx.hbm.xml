@@ -1206,6 +1206,8 @@
             <key column="idSample"/>
             <one-to-many class="hci.gnomex.model.WorkItem"/>
         </set>
+        <property name="sampleAlias_CORE" column="sampleAlias_CORE" type="string"/>
+        <property name="idSample_CORE" column="idSample_CORE" type="string"/>
     </class>
 
     <!-- hci.gnomex.model.SampleExperimentFile -->

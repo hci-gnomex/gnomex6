@@ -173,6 +173,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                     this.showBioinformaticsTab = this.requestCategory
                         && this.requestCategory.type !== this.gnomexService.TYPE_MICROARRAY
                         && (this.requestCategory.type === this.gnomexService.TYPE_NANOSTRING
+                            || (this.requestCategory.type === this.gnomexService.TYPE_NANOGEOMX    )
                             || (this.requestCategory.isIlluminaType === "Y" && this.gnomexService.submitInternalExperiment())
                             || (this.requestCategory.isIlluminaType === "Y" && this.experiment && this.experiment.isExternal !== "Y"))
                         && this.experiment.isExternal !== 'Y';

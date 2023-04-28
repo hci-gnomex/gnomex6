@@ -1,58 +1,25 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.BillingPeriod;
-import hci.gnomex.model.BillingStatus;
-import hci.gnomex.model.BillingTemplate;
-import hci.gnomex.model.CoreFacility;
-import hci.gnomex.model.LabeledSample;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.RequestCategory;
-import hci.gnomex.model.RequestStatus;
-import hci.gnomex.model.Sample;
-import hci.gnomex.model.Step;
-import hci.gnomex.model.WorkItem;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.BillingItemAutoComplete;
-import hci.gnomex.utility.BillingTemplateQueryManager;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.MailUtil;
-import hci.gnomex.utility.MailUtilHelper;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.RequestEmailBodyFormatter;
-import hci.gnomex.utility.SampleComparator;
-import hci.gnomex.utility.Util;
-import hci.gnomex.utility.WorkItemQualityControlParser;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.mail.MessagingException;
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.mail.MessagingException;
+import javax.naming.NamingException;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.util.*;
 
 
 
@@ -99,7 +66,7 @@ public class SaveCombinedWorkItemQualityControl extends GNomExCommand implements
       launchAppURL = this.getLaunchAppURL(request);     
       appURL = this.getAppURL(request);
     } catch (Exception e) {
-      LOG.warn("Cannot get launch app URL in SaveRequest", e);
+      LOG.warn("Cannot get launch app URL in SaveCombinedWorkItemQualityControl ", e);
     }
 
     serverName = request.getServerName();

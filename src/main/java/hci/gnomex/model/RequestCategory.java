@@ -1,12 +1,11 @@
 package hci.gnomex.model;
 
-import java.util.Set;
-
-import java.io.Serializable;
-import java.util.TreeSet;
-
 import hci.dictionary.model.DictionaryEntry;
 import hci.gnomex.utility.DictionaryHelper;
+
+import java.io.Serializable;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 
@@ -77,9 +76,18 @@ public class RequestCategory extends DictionaryEntry implements Comparable, Seri
   }
 
   public static boolean isIlluminaRequestCategory(String codeRequestCategory) {
+    if (codeRequestCategory == null)
+      System.out.println ("[requestcategry] WARNING WARNING codeRequestCategory is null");
+//    else System.out.println ("[requestcategry] codeRequestCategory is " + codeRequestCategory);
+
     DictionaryHelper dh = DictionaryHelper.getInstance(null);
     RequestCategory cat = dh.getRequestCategoryObject(codeRequestCategory);
+    if (cat == null)
+      System.out.println ("[requestcategry] WARNING WARNING requestcategory is null");
+//    else System.out.println ("[requestcategry] cat.getType() is " + cat.getType());
+
     RequestCategoryType type = dh.getRequestCategoryType(cat.getType());
+//    System.out.println ("[requestcategry] type is " + type);
     if (type != null && type.getIsIllumina().equals("Y")) {
       return true;
     } else {
@@ -171,6 +179,17 @@ public class RequestCategory extends DictionaryEntry implements Comparable, Seri
     RequestCategory cat = dh.getRequestCategoryObject(codeRequestCategory);
     RequestCategoryType type = dh.getRequestCategoryType(cat.getType());
     if (type != null && type.getCodeRequestCategoryType().equals( RequestCategoryType.TYPE_NANOSTRING )) {
+      return true;
+    }
+    return false;
+
+  }
+
+  public static boolean isNanoGeomxRequestCategoryType(String codeRequestCategory) {
+    DictionaryHelper dh = DictionaryHelper.getInstance(null);
+    RequestCategory cat = dh.getRequestCategoryObject(codeRequestCategory);
+    RequestCategoryType type = dh.getRequestCategoryType(cat.getType());
+    if (type != null && type.getCodeRequestCategoryType().equals( RequestCategoryType.TYPE_NANOGEOMX )) {
       return true;
     }
     return false;

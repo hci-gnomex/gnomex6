@@ -225,6 +225,9 @@ export class QcWorkflowComponent implements OnInit, OnChanges {
             case qcModes.Nanostring :
                 this.onClickNanostringQC();
                 break;
+            case qcModes.Nanogeomx :
+                this.onClickNanogeomxQC();
+                break;
         }
     }
 
@@ -326,7 +329,9 @@ export class QcWorkflowComponent implements OnInit, OnChanges {
             return request.codeStepNext === this.workflowService.QC
                 && ((type === this.workflowService.MICROARRAY && request.requestCategoryType !== this.workflowService.QC)
                     || (type === this.workflowService.QC && request.requestCategoryType === this.workflowService.QC)
-                    || (type === this.workflowService.NANOSTRING && request.requestCategoryType === this.workflowService.NANOSTRING));
+                    || (type === this.workflowService.NANOSTRING && request.requestCategoryType === this.workflowService.NANOSTRING)
+                    || (type === this.workflowService.NANOSTRING && request.requestCategoryType === this.workflowService.NANOGEOMX)
+                );
         });
 
         this.workflowService.assignBackgroundColor(items, "idRequest");
@@ -501,6 +506,17 @@ export class QcWorkflowComponent implements OnInit, OnChanges {
 
         this.gridApi.setRowData(this.workingWorkItemList);
     }
+
+    private onClickNanogeomxQC(): void {
+        this.workItem = "";
+        this.label = "Nanogeomx";
+        this.codeStepNext = this.workflowService.NANOGEOMX;
+        this.workingWorkItemList = this.filterByRequestCategory(this.workflowService.NANOGEOMX);
+        this.buildRequestIds(this.workingWorkItemList, "");
+
+        this.gridApi.setRowData(this.workingWorkItemList);
+    }
+
 
     public refreshWorklist(event): void {
         this.initialize(true);

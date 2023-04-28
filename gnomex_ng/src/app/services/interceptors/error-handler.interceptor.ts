@@ -11,17 +11,22 @@ import {Observable, throwError} from "rxjs";
 import {catchError, map} from "rxjs/operators";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../../util/popup/dialogs.service";
+import {PropertyService} from "../property.service";
 
 @Injectable()
 export class ErrorHandlerInterceptor implements HttpInterceptor {
 
-    constructor(private dialogService:DialogsService){
-    }
+    constructor(private dialogService:DialogsService,
+                private propertyService: PropertyService) { }
 
     private errHandler = (error:IGnomexErrorResponse) : Observable<never>  => {
         let errorMessage= '';
         if (error.url && error.url.includes("CheckSessionStatus")) {
             // Always skip CheckSessionStatus errors
+        } else if (error.url
+            && this.propertyService.getProperty(PropertyService.PROPERTY_CORE_LINKAGE_LOOKUP)
+            && error.url.includes(this.propertyService.getProperty(PropertyService.PROPERTY_CORE_LINKAGE_LOOKUP).propertyValue)) {
+            // Always skip CORE lookup calls
         } else if(error.error instanceof ErrorEvent){
             errorMessage  ="Client side Error: " +  error.error.message;
             error.gError = {message: errorMessage};

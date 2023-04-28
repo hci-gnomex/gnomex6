@@ -137,7 +137,8 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
         return !(this._experiment
             && this._experiment.requestCategory
             && this._experiment.requestCategory.type
-            && this._experiment.requestCategory.type === NewExperimentService.TYPE_NANOSTRING);
+            && ( this._experiment.requestCategory.type === NewExperimentService.TYPE_NANOSTRING ||
+                 this._experiment.requestCategory.type === NewExperimentService.TYPE_NANOGEOMX) );
     }
 
 

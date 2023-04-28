@@ -14,7 +14,7 @@
 
 	<context-param>
 		<param-name>public-paths</param-name>
-		<param-value>/api/user-session*,/ChangePassword.gx*,/PublicSaveSelfRegisteredAppUser.gx*,/ReportIssueServlet.gx*,/CreateUserPreferences.gx*</param-value>
+		<param-value>/api/user-session*,/ChangePassword.gx*,/PublicSaveSelfRegisteredAppUser.gx*,/ReportIssueFeedbackServlet.gx*,/CreateUserPreferences.gx*</param-value>
 	</context-param>
 
 
@@ -289,18 +289,32 @@
 	</servlet>
 
 	<servlet>
-		<servlet-name>ReportIssueServlet</servlet-name>
+		<servlet-name>ReportIssueFeedbackServlet</servlet-name>
 		<servlet-class>
 			hci.gnomex.controller.ReportIssueFeedbackServlet
 		</servlet-class>
 	</servlet>
 
 	<servlet>
-		<servlet-name>ReportIssueServletGetURL</servlet-name>
+		<servlet-name>ReportIssueFeedbackServletGetURL</servlet-name>
 		<servlet-class>
 			hci.gnomex.controller.ReportIssueFeedbackServletGetURL
 		</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>ReportIssueServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.ReportIssueServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>ReportIssueServletGetURL</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.ReportIssueServletGetURL
+		</servlet-class>
+	</servlet>
+
 
 	<servlet>
 		<servlet-name>UploadExperimentFileServlet</servlet-name>
@@ -554,6 +568,16 @@
 	<servlet-mapping>
 		<servlet-name>UploadAndBroadcastEmailURLServlet</servlet-name>
 		<url-pattern>/UploadAndBroadcastEmailURLServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>ReportIssueFeedbackServlet</servlet-name>
+		<url-pattern>/ReportIssueFeedbackServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>ReportIssueFeedbackServletGetURL</servlet-name>
+		<url-pattern>/ReportIssueFeedbackServletGetURL.gx</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>

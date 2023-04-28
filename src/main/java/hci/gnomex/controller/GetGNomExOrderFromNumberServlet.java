@@ -1,16 +1,18 @@
 package hci.gnomex.controller;
 
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.Analysis;
-import hci.gnomex.model.DataTrack;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.Topic;
-import hci.gnomex.utility.*;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.PropertyDictionaryHelper;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
-import javax.json.*;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
+import javax.json.JsonWriter;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -97,6 +99,7 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
                     throw new Exception("Request number " + requestNumber + " does not exists" );
                 }
 
+                // deal with null pointer exception
                 Request r = (Request)reqRow.get(0);
                 value = Json.createObjectBuilder()
                         .add("result", "SUCCESS")

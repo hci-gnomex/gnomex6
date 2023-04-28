@@ -1,10 +1,6 @@
 package hci.gnomex.daemon.auto_import;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -77,10 +73,12 @@ public class PathMaker {
 
 
 		} catch (IOException e) {
-			System.out.println(e.getStackTrace());
+			System.out.println(e.getMessage());
+			e.printStackTrace();
 
 		}catch(Exception e) {
 			System.out.println(e.getMessage());
+			e.printStackTrace();
 		}
 
 	}
@@ -190,7 +188,7 @@ public class PathMaker {
 		StringBuilder strBuild = new StringBuilder();
 		int spaceCount = 0;
 		boolean countSpaces = true;
-		int softLinkeIndex= -1;
+		int softLinkedIndex= -1;
 
 
 		for (int j = 0; j < lineCharArray.length; j++) {
@@ -199,7 +197,7 @@ public class PathMaker {
 
 			if((asciiChar == 62 )){
 				// remove space and -
-				softLinkeIndex = strBuild.length() - 2;
+				softLinkedIndex = strBuild.length() - 2;
 				//spaceCount--;
 				break;
 			}
@@ -214,8 +212,8 @@ public class PathMaker {
 				strBuild.append(Character.toString(c));
 			}
 		}
-		if(softLinkeIndex != -1){
-			strBuild.delete(softLinkeIndex, strBuild.length());
+		if(softLinkedIndex != -1){
+			strBuild.delete(softLinkedIndex, strBuild.length());
 		}
 
 		spaceCount--;

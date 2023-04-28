@@ -128,7 +128,10 @@ protected static void initLog4j() {
 	// get our request from the url (prefixing .test)
 	String fullURI = request.getRequestURI();
 	String requestName = fullURI.substring((fullURI.lastIndexOf(Constants.FILE_SEPARATOR_CHAR) + 1), fullURI.lastIndexOf('.'));
-
+//	if (requestName.startsWith ("Submit"))
+//	{
+		System.out.println ("GNomExFrontController]  request: " + RequestToString(request,requestName));
+//	}
 	// restrict commands to local host if request is not secure
 	if (!ServletUtil.checkSecureRequest(request, LOG)) {
 //		System.out.println(request.getRemoteAddr());
@@ -152,15 +155,18 @@ protected static void initLog4j() {
 
 	} catch (ClassNotFoundException cnfe) {
 		LOG.error("Command " + requestName + ".class not found");
-		this.forwardWithError(request, response);
+		String cnfestr = "Command " + requestName + ".class not found";
+		this.forwardWithError(request, response,cnfestr);
 		return;
 	} catch (IllegalAccessException ias) {
 		LOG.error("IllegalAccessException while getting command " + requestName);
-		this.forwardWithError(request, response);
+		String cnfestr = "IllegalAccessException while getting command " + requestName;
+		this.forwardWithError(request, response,cnfestr);
 		return;
 	} catch (InstantiationException ie) {
 		LOG.error("Unable to instantiate command " + requestName);
-		this.forwardWithError(request, response);
+		String cnfestr = "Unable to instantiate command " + requestName;
+		this.forwardWithError(request, response,cnfestr);
 		return;
 	}
 	// we should have a valid command.
@@ -352,13 +358,13 @@ protected static void initLog4j() {
 		out.close();
 
 		System.out.println("[GNomExFrontController] Returned " + thejson.length() + " bytes of JSON for request " + requestName);
-		if (requestName.startsWith("Save")) {
-			if (thejson.length() < 1500) {
-				System.out.println("[GNomExFrontController] JSON returned: " + thejson + "\n");
+		if (requestName.startsWith("Submit") || requestName.startsWith("Save")) {
+			if (thejson.length() < 15000) {
+				System.out.println("[GNomExFrontController] " + requestName + " JSON returned: " + thejson + "\n");
 			} else {
 				String only8k = new String();
-				only8k = thejson.substring(0, 1500);
-				System.out.println("[GNomExFrontController] JSON returned (1st 1.5K):" + thejson + "\n");
+				only8k = thejson.substring(0, 15000);
+				System.out.println("[GNomExFrontController] " + requestName + " JSON returned (1st 15K):" + thejson + "\n");
 			}
 		}
 
@@ -386,11 +392,13 @@ protected static void initLog4j() {
 private void forwardWithError(HttpServletRequest request, HttpServletResponse response) {
 
 	String errMsg = "There has been a system error, please try the request again";
+	System.out.println ("[forwardWithError] errMsg: " + errMsg);
 	this.forwardWithError(request, response, errMsg);
 }
 
 private void forwardWithError(HttpServletRequest request, HttpServletResponse response, String message) {
 	String errMsg = message;
+	System.out.println ("[forwardWithError] (2) errMsg: " + errMsg);
 
 	request.setAttribute("message", errMsg);
 	request.setAttribute("statusCode", "ERROR");
@@ -473,7 +481,7 @@ private void sendRedirect(HttpServletResponse response, String url) {
           // yes convert it
           String hintKey = requestName + "." + paramName;
 
-          System.out.println("[convertJSONRequesttoXML] **** found a parameterValue to convert **** " + hintKey + " paramName: " + paramName + " parameterValue:\n " + parameterValue);
+//          System.out.println("[convertJSONRequesttoXML] **** found a parameterValue to convert **** " + hintKey + " paramName: " + paramName + " parameterValue:\n " + parameterValue);
 
           JSONtoXML jsonTOxml = new JSONtoXML();
 
@@ -505,7 +513,7 @@ private void sendRedirect(HttpServletResponse response, String url) {
 		  }
 
           // debug ******
-          System.out.println("[convertJSONRequesttoXML]  *** AFTER *** paramName: " + paramName + " xmlParameterValue:\n" + xmlParameterValue);
+//          System.out.println("[convertJSONRequesttoXML]  *** AFTER *** paramName: " + paramName + " xmlParameterValue:\n" + xmlParameterValue);
 
         // Modify the value...
         if (xmlParameterValue != null) {
@@ -522,5 +530,24 @@ private void sendRedirect(HttpServletResponse response, String url) {
 //    System.out.println("[convertJSONRequesttoXML] *** returning ***: " + converted[0]);
       return;
     }
+
+	public String RequestToString(HttpServletWrappedRequest httpRequest, String requestName) {
+
+		if (requestName == null || httpRequest == null) {
+		return "";
+	}
+
+	String out = requestName + "/" ;
+
+	Enumeration params = httpRequest.getParameterNames();
+    while (params.hasMoreElements()) {
+		String paramName = (String) params.nextElement();
+		String parameterValue = (String) httpRequest.getParameter(paramName);
+		out = out + paramName + "=" + parameterValue + "/\n";
+//      System.out.println("[RequestToString] paramName: " + paramName + " parameterValue: " + parameterValue);
+	} // end of while
+
+      return out;
+}
 
 }

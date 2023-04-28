@@ -71,12 +71,12 @@ public class ReportIssueFeedbackServlet extends HttpServlet {
                     SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY);
             if (secAdvisor == null) {
                 System.out
-                        .println("ReportIssueServlet:  Warning - unable to find existing session. Creating security advisor.");
+                        .println("ReportIssueFeedbackServlet:  Warning - unable to find existing session. Creating security advisor.");
                 secAdvisor = SecurityAdvisor.create(sess, (req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
             }
 
             if (secAdvisor == null) {
-                System.out.println("ReportIssueServlet: Error - Unable to find or create security advisor.");
+                System.out.println("ReportIssueFeedbackServlet: Error - Unable to find or create security advisor.");
                 // 04/05/2021 timM  Don't absolutely have to have the securityAdvisor alive at this point...
 //                throw new ServletException(
 //                        "Unable to report issue.  Servlet unable to obtain security information. Please contact GNomEx support directly.");

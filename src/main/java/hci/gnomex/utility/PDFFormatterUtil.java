@@ -168,7 +168,7 @@ public class PDFFormatterUtil {
 	
 	public static void addCCNumberCell(String ccNumber, PdfPTable table, Font font, DictionaryHelper dictionaryHelper) {
 		Anchor ccNumberAnchor = new Anchor(ccNumber, font);
-		ccNumberAnchor.setReference(dictionaryHelper.getPropertyDictionary(PropertyDictionary.GNOMEX_LINKAGE_BST_URL) + "#ccNumber=" + ccNumber);
+		ccNumberAnchor.setReference(dictionaryHelper.getPropertyDictionary(PropertyDictionary.GNOMEX_LINKAGE_CORE_URL) + "#ccNumber=" + ccNumber);
 		
 		PdfPCell cell = new PdfPCell(ccNumberAnchor);
 		cell.setHorizontalAlignment(Element.ALIGN_LEFT);

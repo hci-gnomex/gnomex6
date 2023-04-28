@@ -12,7 +12,7 @@ import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
 
 import java.io.*;
-
+/* To de-identify the foundation xml */
 public class DeIdentifier {
     public  static boolean removePHI(String fullFileNamePath){
         boolean createdFile = false;

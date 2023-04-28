@@ -1,5 +1,6 @@
 package hci.gnomex.controller;
 
+
 import hci.framework.control.Command;
 import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.Util;
@@ -7,16 +8,15 @@ import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.*;
 import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.*;
-import org.apache.log4j.Logger;
 public class ChangeRequestStatus extends GNomExCommand implements Serializable {
 
   // the static field for logging in Log4J
@@ -37,7 +37,7 @@ public class ChangeRequestStatus extends GNomExCommand implements Serializable {
       launchAppURL = this.getLaunchAppURL(request);
       appURL = this.getAppURL(request);
     } catch (Exception e) {
-      LOG.warn("Cannot get launch app URL in SaveRequest", e);
+      LOG.warn("Cannot get launch app URL in ChangeRequestStatus", e);
     }
     serverName = request.getServerName();
 

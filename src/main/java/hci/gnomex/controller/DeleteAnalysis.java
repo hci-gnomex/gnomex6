@@ -1,29 +1,23 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.model.*;
-import hci.gnomex.utility.*;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.Analysis;
-import hci.gnomex.model.AnalysisCollaborator;
-import hci.gnomex.model.AnalysisFile;
-import hci.gnomex.model.TransferLog;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.model.*;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 
-import org.apache.log4j.Logger;
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Iterator;
+import java.util.List;
 
 
 public class DeleteAnalysis extends GNomExCommand implements Serializable {
@@ -140,6 +134,14 @@ public class DeleteAnalysis extends GNomExCommand implements Serializable {
     if(!f.exists()){
       return;
     }
+
+    Path folderPath = Paths.get(folderName);
+    if (Files.isSymbolicLink(folderPath) ) {
+      // delete the link to the directory NOT the contents of the directory
+      f.delete();
+      return;
+    }
+
     String [] folderContents = f.list();
 
     if(folderContents.length == 0){
@@ -165,10 +167,5 @@ public class DeleteAnalysis extends GNomExCommand implements Serializable {
       LOG.error("Unable to remove " + f.getName() + " from file system");
     }
   }
-
-
-
-
-
 
 }

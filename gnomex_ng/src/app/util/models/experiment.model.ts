@@ -26,6 +26,16 @@ export class Experiment {
     public protocolNumber:                     string = "";
     public invoicePrice:                       string = "";
 
+    public get numberOfddisSlides(): string {
+        return this._numberOfdisSlides;
+    }
+    public set numberOfdisSlides(value: string) {
+        this._numberOfdisSlides = value;
+        this.onChange_numberOfdisSlides.next(value);
+    }
+    private _numberOfdisSlides:                    string = ''; // "0",
+
+
     public get numberOfSamples(): string {
         return this._numberOfSamples;
     }
@@ -45,6 +55,7 @@ export class Experiment {
     private _requiredNumberOfSamples:            string = ''; // "0",
     public onChange_numberOfSamples: Subject<string> = new Subject<string>();
 
+    public onChange_numberOfdisSlides: Subject<string> = new Subject<string>();
     public idSampleTypeDefault:                string = ''; // "1"
 
     private _sampleType: any;
@@ -119,7 +130,7 @@ export class Experiment {
     public includeBisulfideConversion:         string = ''; // "N",
     public includeQubitConcentration:          string = ''; // "N"
     public turnAroundTime:                     string = "";
-    public _idCoreFacility:                     string = ''; // "1"
+    public _idCoreFacility:                    string = ''; // "1"
     public get idCoreFacility(): string {
         return this._idCoreFacility;
     }

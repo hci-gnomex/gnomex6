@@ -384,10 +384,9 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
 		this.statusChangeSubscription.unsubscribe();
 	}
 
-    onClickView(rowId: any): void {
-	    let temp = this.gridApi.getRowNode(rowId);
-	    if (temp && temp.data && temp.data.requestNumber) {
-            this.gnomexService.navByNumber(temp.data.requestNumber);
+    onClickView(node: any): void {
+	    if (node && node.data && node.data.requestNumber) {
+            this.gnomexService.navByNumber(node.data.requestNumber);
         }
     }
 

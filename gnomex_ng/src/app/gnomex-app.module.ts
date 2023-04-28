@@ -105,6 +105,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         {provide: AUTHENTICATION_TOKEN_ENDPOINT, useValue: "/gnomex/api/token"},
         {provide: AUTHENTICATION_LOGOUT_PATH, useValue: "/gnomex/logout"},
         {provide: AUTHENTICATION_ROUTE, useValue: "/authenticate"},
+        // {provide: AUTHENTICATION_TOKEN_KEY, useValue: "core-jwt"},
         {provide: AUTHENTICATION_TOKEN_KEY, useValue: "gnomex-jwt"},
         {provide: AUTHENTICATION_MAX_INACTIVITY_MINUTES, useValue: 1440},
         {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy},

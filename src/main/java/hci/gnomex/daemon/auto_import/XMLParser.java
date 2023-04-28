@@ -45,6 +45,7 @@ public class XMLParser {
 	private static final String IMPORT_EXPERIMENT_ERROR = "import_experiment_error.log";
 	private static final String IMPORT_ANALYSIS_ERROR = "import_analysis_error.log";
 	private static final String LINK_EXP_ANAL_ERROR = "link_exp_analysis_error.log";
+	private static Scanner scanInput = new Scanner(System.in);
 
 
 
@@ -609,28 +610,23 @@ public class XMLParser {
 		DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 		List<String> fileContents = new ArrayList<>();
 		if(useRedirectFile){
+			String redirectStr = logDetails != null ? " 2>&1 | xargs -I {} echo -e {}'\t' `date '+%D %T'` | tee -a temp.txt;"
+					+ " if [ ${PIPESTATUS[0]} -ne 0 ]; then exit 1; fi " : " >> temp.txt 2>&1";  //" [[ ${PIPESTATUS[0]} != 0 ]] && exit 1" : " >> temp.txt 2>&1";
 			for(int i = 0; i < commands.size(); i++){
-				commands.set(i, commands.get(i) + " >> ./temp.txt 2>&1");
+				//output commands stdout and stderr to temp.txt then strip last new line of the last line.
+				//Then to that same line append a timestamp
+				commands.set(i, commands.get(i) + redirectStr);
 				//System.out.println( "adding redirect file to command: " + commands.get(i));
 			}
 		}
-
+		Process process = null;
 		try {
 			System.out.println("started executing command");
 			tempScript = createTempScript(commands);
 			ProcessBuilder pb =  new ProcessBuilder("bash", tempScript.toString());
 			pb.inheritIO();
-			Process process	= pb.start();
-
+			process	= pb.start();
 			process.waitFor();
-			if(process.exitValue() != 0){
-				System.out.println("The subprocess throw an exception");
-				process.destroy();
-				System.exit(1);
-			}else{
-				process.destroy();
-			}
-
 
 			if(useRedirectFile){
 				fileContents = readFileToList("./temp.txt");
@@ -638,7 +634,6 @@ public class XMLParser {
 				if(logDetails != null){
 					try(PrintWriter pw  = new PrintWriter(new FileWriter(logDetails, true))) {
 						for(String fc : fileContents){
-							pw.println(fc);
 							pw.println(fc);
 						}
 					} catch (IOException e) {
@@ -650,20 +645,41 @@ public class XMLParser {
 			}
 
 
+			if(process.exitValue() != 0){
+				System.out.println("The subprocess threw an exception");
+				System.out.print("Continue Any?: ");
+				String response = scanInput.nextLine().toLowerCase();
+				process.destroy();
+				if(response.equals("n") || response.equals("no")){
+					System.exit(1);
+				}
+			}
 			System.out.println("finished executing command");
 		}catch(NoSuchFileException e){
 			e.printStackTrace();
+			if(process != null && process.isAlive()) {
+				process.destroy();
+			}
 			System.exit(1);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+			if(process != null && process.isAlive()) {
+				process.destroy();
+			}
 			System.exit(1);
 		} catch (IOException e1) {
 			e1.printStackTrace();
+			if(process != null && process.isAlive()) {
+				process.destroy();
+			}
 			System.exit(1);
 		}
 		finally{
 			if(tempScript != null){
 				tempScript.delete();
+			}
+			if(process != null && process.isAlive()) {
+				process.destroy();
 			}
 		}
 

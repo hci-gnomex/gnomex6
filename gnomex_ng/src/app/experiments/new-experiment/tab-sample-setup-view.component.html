@@ -1,7 +1,7 @@
 <div class="full-width full-height padded small-font">
     <form [formGroup]="form" class="full-width full-height">
         <div class="full-width full-height">
-            <ol *ngIf="!useIsolationTypeMode" class="full-width three-depth-numbering">
+            <ol *ngIf="!useIsolationTypeMode && !useSliceMode && !useNanoGeomxMode" class="full-width three-depth-numbering">
                 <li *ngIf="showSampleQualityExperimentType" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
                         <div class="heading">
@@ -347,7 +347,7 @@
                     </div>
                 </li>
             </ol>
-            <ol *ngIf="useIsolationTypeMode" class="full-width three-depth-numbering">
+            <ol *ngIf="useIsolationTypeMode && !useSliceMode && !useNanoGeomxMode" class="full-width three-depth-numbering">
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
                         <div class="heading">
@@ -440,6 +440,183 @@
                                               [options]="this.sampleSources"
                                               [formControlName]="'sampleSource'"
                                               (optionSelected)="onSelectSampleSource($event)">
+                            </custom-combo-box>
+                        </div>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width">
+                        <div class="full-width flex-container-row align-baseline">
+                            <div class="heading">
+                                Enter a note for the Core facility
+                            </div>
+                        </div>
+                        <mat-form-field class="long-width">
+                            <textarea matInput
+                                      matTextareaAutosize
+                                      placeholder="Note"
+                                      formControlName="coreNotes"
+                                      matAutosizeMinRows="1"
+                                      matAutosizeMaxRows="10"
+                                      (input)="onInputCoreFacilityNotes($event)">
+                            </textarea>
+                            <mat-error *ngIf="form?.get('coreNotes')?.hasError('maxlength')">Notes can not be over 5000 characters.</mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+            </ol>
+            <ol *ngIf="useSliceMode && !useNanoGeomxMode" class="full-width three-depth-numbering">
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            How many samples will you be submitting?
+                        </div>
+                        <mat-form-field>
+                            <input matInput
+                                   placeholder="Number of samples."
+                                   formControlName="numSamples"
+                                   maxlength="4"
+                                   required
+                                   (change)="onChange_numberOfSamples($event)">
+                            <mat-error *ngIf="form?.get('numSamples')?.hasError('pattern')">
+                                Please check number of samples
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Number of slides?
+                        </div>
+                        <mat-form-field>
+                            <input matInput
+                                   placeholder="Number of slides."
+                                   formControlName="numdisSlides"
+                                   maxlength="4"
+                                   required
+                                   (change)="onChange_numberOfdisSlides($event)">
+                            <mat-error *ngIf="form?.get('numdisSlides')?.hasError('pattern')">
+                                Please check number of slides
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Select the sample type.
+                        </div>
+                        <div class="moderate-width">
+                            <custom-combo-box placeholder="Sample Type"
+                                              [allowNone]="false"
+                                              displayField="display"
+                                              [options]="this.sampleTypes"
+                                              [formControlName]="'sampleType'"
+                                              (optionSelected)="onSelectSampleType($event)">
+                            </custom-combo-box>
+                        </div>
+                    </div>
+                </li>
+                <li *ngIf="showNotifyBMP" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Notify BMP to pickup samples when completed?
+                        </div>
+                        <mat-checkbox formControlName="notifyBMP" (change)="onChangeBMPPickup($event)">Yes</mat-checkbox>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Select the sample source.
+                        </div>
+                        <div class="moderate-width">
+                            <custom-combo-box placeholder="Sample Source"
+                                              [allowNone]="false"
+                                              displayField="display"
+                                              [options]="this.sampleSources"
+                                              [formControlName]="'sampleSource'"
+                                              (optionSelected)="onSelectSampleSource($event)">
+                            </custom-combo-box>
+                        </div>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width">
+                        <div class="full-width flex-container-row align-baseline">
+                            <div class="heading">
+                                Enter a note for the Core facility
+                            </div>
+                        </div>
+                        <mat-form-field class="long-width">
+                            <textarea matInput
+                                      matTextareaAutosize
+                                      placeholder="Note"
+                                      formControlName="coreNotes"
+                                      matAutosizeMinRows="1"
+                                      matAutosizeMaxRows="10"
+                                      (input)="onInputCoreFacilityNotes($event)">
+                            </textarea>
+                            <mat-error *ngIf="form?.get('coreNotes')?.hasError('maxlength')">Notes can not be over 5000 characters.</mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+            </ol>
+            <ol *ngIf="useNanoGeomxMode" class="full-width three-depth-numbering">
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            How many samples will you be submitting?
+                        </div>
+                        <mat-form-field>
+                            <input matInput
+                                   placeholder="Number of samples."
+                                   formControlName="numSamples"
+                                   maxlength="4"
+                                   required
+                                   (change)="onChange_numberOfSamples($event)">
+                            <mat-error *ngIf="form?.get('numSamples')?.hasError('pattern')">
+                                Please check number of samples
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Number of slides?
+                        </div>
+                        <mat-form-field>
+                            <input matInput
+                                   placeholder="Number of slides."
+                                   formControlName="numdisSlides"
+                                   maxlength="4"
+                                   required
+                                   (change)="onChange_numberOfdisSlides($event)">
+                            <mat-error *ngIf="form?.get('numdisSlides')?.hasError('pattern')">
+                                Please check number of slides
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Which organism is the source for these samples?
+                            <context-help name="SampleDetailsOrganism"
+                                          [hasEditPermission]="this.securityAdvisor.isAdmin"
+                                          [idCoreFacility]="this.idCoreFacility"
+                                          popupTitle="Sample Organism Help">
+                            </context-help>
+                        </div>
+                        <div class="moderate-width">
+                            <custom-combo-box placeholder="Organism"
+                                              displayField="combinedName"
+                                              [options]="this.organisms"
+                                              [formControlName]="'organism'"
+                                              (optionSelected)="selectOrganism($event)">
                             </custom-combo-box>
                         </div>
                     </div>
