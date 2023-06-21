@@ -1218,7 +1218,11 @@ public class RequestParser implements Serializable {
 
       if (n.get("idSample_CORE") != null && !n.getString("idSample_CORE").equals("")) {
         String idSample_CORE = n.getString("idSample_CORE");
-        sample.setIdSample_CORE(idSample_CORE);
+        try {
+					sample.setIdSample_CORE(Long.parseLong(idSample_CORE));
+				} catch (Exception e) {
+					sample.setIdSample_CORE(null);
+				}
       } else {
         sample.setIdSample_CORE(null);
       }
