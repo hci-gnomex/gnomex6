@@ -1,6 +1,8 @@
 package hci.gnomex.daemon.auto_import;
 
-//import javax.json.JsonObjectBuilder;
+
+import javax.json.JsonObjectBuilder;
+
 import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -235,6 +237,10 @@ public class Differ {
 					System.out.println("No match for regex " + matchByName +".\n" + "Ignoring " + line1 +  " cause we can't determine if it is truly unique");
 					//addUniqueName(line1);
 				}
+//				else{
+//					System.out.println("No match for regex " + matchByName +".\n" + "Ignoring " + line1 +  " cause we can't determine if it is truly unique");
+//					addUniqueName(line1);
+//				}
 			}else{
 				addUniqueName(line1);
 			}

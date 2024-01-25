@@ -294,12 +294,14 @@ public class Query {
             String sampleName = "";
 
             if (idAnalysisGroup == 11) { //avatar project
-                sampleName = "(s.name LIKE \'SL%\' OR s.name REGEXP \'^[0-9]{2}-[A-Za-z0-9\\.]+.*$\')";
+                sampleName = "(s.name LIKE \'SL%\' OR s.name LIKE \'FT%\' )";
 
             } else if (idAnalysisGroup == 14) {// foundation project{
                 sampleName = "(s.name LIKE \'%RF%\' OR s.name LIKE \'ORD%\' );";
             }else if(idAnalysisGroup == 22){ //tempus project
                 sampleName = "(s.name LIKE \'TL%\')";
+            }else if(idAnalysisGroup == 30){ // caris project
+                sampleName = "(s.name LIKE \'TN\')";
             }
 
             String query = "SELECT r.idRequest, a.idAnalysis, s.name, a.name FROM Sample s \n" +

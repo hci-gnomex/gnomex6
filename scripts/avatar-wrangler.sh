@@ -5,8 +5,8 @@ pDataPath="/home/u0566434/parser_data/"
 downloadPath="/Repository/tempdownloads/avatar/"
 dnaNexusPath="/home/u0566434/dnaNexus/"
 avatarLocalDataPath="/Repository/PersonData/2017/4R/Avatar/"
-regex=".*/(SL[a-zA-Z0-9]+).*(?:md5|gz).*(?:S3.txt)?|.*([0-9]{2}-[A-Za-z0-9\.]+.*)\.fastq.*(?:S3.txt)?" # The SL can be at the first of filename OR come after the '_'
-regex1=".*/(SL[a-zA-Z0-9]+).*|.*([0-9]{2}-[A-Za-z0-9\.]+.*)\.fastq.gz" #this one is for the bash regex doesn't support non-capturing groups
+regex=".*/(SL[a-zA-Z0-9]+).*fastq\.(?:md5|gz).*(?:S3.txt)?|.*(FT-[A-Za-z0-9]+).*fastq\.(?:md5|gz).*(?:S3.txt)?"
+regex1=".*/(SL[a-zA-Z0-9]+).*|.*(FT-[A-Za-z0-9]+)_R.\.fastq.gz" #this one is for the bash regex doesn't support non-capturing groups
 
 TOMCAT_HOME=../../../
 COMMON_LIB=$TOMCAT_HOME/lib
@@ -23,7 +23,8 @@ done
 
 for JAR in $GNOMEX_LIB/*.jar
 do
-    CLASSPATH="$CLASSPATH:$JAR"
+   #CLASSPATH="commons-codec-1.15.jar:./httpcore-4.4.13.jar:./ion-java-1.0.2.jar:./jackson-annotations-2.12.3.jar:./jackson-core-2.12.3.jar:./jackson-databind-2.12.3.jar:./jackson-dataformat-cbor-2.12.3.jar:./jmespath-java-1.12.132.jar:./aws-java-sdk-core-1.12.132.jar:./aws-java-sdk-kms-1.12.132.jar:./aws-java-sdk-s3-1.12.132.jar:./httpclient-4.5.13.jar:./gnomex1.jar:$CLASSPATH:$JAR"
+   CLASSPATH="$CLASSPATH:$JAR"
 done
 
 export CLASSPATH
@@ -34,36 +35,31 @@ export CLASSPATH
 #java hci.gnomex.daemon.auto_import.XMLParserMain $*
 
 set -e
-
 flaggedIDParam=${1:-normal}
 idColumn=${2:-1}
-
 
 echo optional param  $optParam
 downloadCode=0
 fileList=""
 verifiedSlInfo=""
 tokenVal=`cat "$pDataPath"token.properties`
-
-
-
 echo This is the start: $startPath
 echo This is the path : $scriptsPath
 source "$dnaNexusPath"dx-toolkit/environment
 dx login --token $tokenVal
 dx cd /
 dx select HCI_Molecular_Data
-
-tree "$avatarLocalDataPath" --noreport > "$pDataPath"localTree.out
-dx tree / > "$pDataPath"remoteTree.out
-
-java hci.gnomex.daemon.auto_import.PathMaker "$pDataPath"remoteTree.out "$pDataPath"remotePath.out
-java hci.gnomex.daemon.auto_import.PathMaker "$pDataPath"localTree.out  "$pDataPath"localPath.out
+#dx tree / > "$pDataPath"remoteTree.out
+#tree "$avatarLocalDataPath" --noreport > "$pDataPath"localTree.out
+#java hci.gnomex.daemon.auto_import.PathMaker "$pDataPath"localTree.out  "$pDataPath"localPath.out
+dx  find data --name "*fastq*" |  awk '{print $6 }' > "$pDataPath"remotePath.out
+find "$avatarLocalDataPath" -name "*.fastq*" -type f > "$pDataPath"localPath.out
+#java hci.gnomex.daemon.auto_import.PathMaker "$pDataPath"remoteTree.out "$pDataPath"remotePath.out
 
 if [ "$flaggedIDParam" = "normal"  ]; then
-        java hci.gnomex.daemon.auto_import.DiffParser  -local "$pDataPath"localPath.out -remote "$pDataPath"remotePath.out -cp 1 2 -matchbyname $regex > "$pDataPath"uniqueFilesToDownload.out
-        sed -i '/FASTq/!d' "$pDataPath"uniqueFilesToDownload.out
-
+        #echo doing the diff
+        java hci.gnomex.daemon.auto_import.DiffParser  -local "$pDataPath"localPath.out -remote "$pDataPath"remotePath.out -cp 1 2  -matchbyname $regex > "$pDataPath"uniqueFilesToDownload.out
+        #sed -i '/FASTq/!d' "$pDataPath"uniqueFilesToDownload.out  # tgen files have been archived so it brakes the script when trying to download them. filtering out for the moment
 
         echo I am about to download files
         java hci.gnomex.daemon.auto_import.DownloadMain -fileList "$pDataPath"uniqueFilesToDownload.out -downloadPath "$downloadPath" -remotePath  #outputs download.log  reads in uniqueFilesToDownload.out
@@ -93,16 +89,15 @@ echo download Status: $downloadCode
 if [ $downloadCode -eq 0 ]; then
         idStr=""
         while read fileName; do
-                echo reading file $fileName
                 if [[ $fileName =~ $regex1 ]]; then
                         fullMatch=$BASH_REMATCH
                         hudAlphaID="${BASH_REMATCH[1]}"
-                        tGenID="${BASH_REMATCH[2]}"
+                        fulgentID="${BASH_REMATCH[2]}"
 
                         if [ ! -z "$hudAlphaID" ]; then #If var is not empty
                                 idStr+=$hudAlphaID","
-                        elif [ ! -z "$tGenID" ]; then
-                                idStr+=$tGenID","
+                        elif [ ! -z "$fulgentID" ]; then
+                                idStr+=$fulgentID","
                         fi
 
                 fi
@@ -127,8 +122,6 @@ if [ $downloadCode -eq 0 ]; then
             java hci.gnomex.daemon.auto_import.FileMover -file $fileList -skipfirst  -root $avatarLocalDataPath -downloadPath $downloadPath -flaggedFile "$pDataPath"flaggedIDs.out -mode avatar -linkFolder
         fi
 
-
-        #Need to import experiments then and register/link/index
 else
         echo $downloaderStatus
 fi

@@ -39,6 +39,10 @@ repositories {
 }
 
 dependencies {
+
+    implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.132')
+    implementation 'com.amazonaws:aws-java-sdk-s3'
+
     runtime group: 'hci', name: 'hci-servlet-filter-nocache', version: '1.+'
     runtime group: 'hci', name: 'hci-servlet-filter-cors', version: '1.+'
     runtime group: 'hci', name: 'hci-servlet-filter-pushstate', version: '1.+'
