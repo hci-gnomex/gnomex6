@@ -1,17 +1,17 @@
 package hci.gnomex.utility;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.Iterator;
-import java.util.Properties;
-
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Iterator;
+import java.util.Properties;
 
 public class BatchMailer  {
   
@@ -33,7 +33,7 @@ public class BatchMailer  {
     Properties mailProps = new Properties();
     
     String filePath = "../../";
-    if(specifiedOrionPath.length() > 0) {
+    if(!specifiedOrionPath.isEmpty()) {
       filePath = specifiedOrionPath;
     }
     filePath = filePath + "config/server.xml";

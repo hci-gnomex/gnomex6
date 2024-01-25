@@ -4,24 +4,25 @@ package hci.gnomex.daemon;
 // 01/30/2019   tim     fix hardwired 2018 year
 
 
-import hci.gnomex.daemon.auto_import.Differ;
-import hci.gnomex.daemon.auto_import.XMLParser;
 import hci.gnomex.utility.BatchDataSource;
 import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Date;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.internal.SessionImpl;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
 
 public class LinkData extends TimerTask {
 
@@ -330,10 +331,12 @@ public class LinkData extends TimerTask {
             if(!linkFolder){
                 buf = new StringBuilder("select name from Sample where idRequest = ");
 
+
                 buf.append(requestList[nxtOne] + ";");
                 if (debug) System.out.println("ExperimentFile query: " + buf.toString());
 
                 Set<String> names = new HashSet<>();
+
 
                 rs = stmt.executeQuery(buf.toString());
                 while (rs.next()) {
@@ -341,6 +344,9 @@ public class LinkData extends TimerTask {
                 }
                 rs.close();
                 stmt.close();
+
+                if (debug) System.out.println("size of names: " + names.size());
+
 
                 if (debug) System.out.println("size of names: " + names.size());
 
@@ -397,12 +403,15 @@ public class LinkData extends TimerTask {
                         String subCommand = "";
 
 
+
                         middleOfPath = thePath.substring(ipos + 1, epos);
                         if (debug) System.out.println("middleOfPath: " + middleOfPath); // for example : Whole_Exome/FASTq
 
                         filename = thePath.substring(epos + 1); // for example : SL278299_2.fastq.gz
                         if (debug) System.out.println("filename or foldername : " + filename);
                         subCommand = "-s";
+
+/*
 
 
                         String myPath = dirPath + "/" + middleOfPath;
@@ -492,6 +501,97 @@ public class LinkData extends TimerTask {
 
                 File dummyFile = new File(startAvatarPath + "/" + thePath); //absolute path to file
                 if(debug) System.out.println("the absolute path: "  + startAvatarPath + "/" + thePath);
+*/
+
+                        String myPath = dirPath + "/" + middleOfPath;
+                        if (debug) System.out.println("myPath: " + myPath);
+
+                        f = new File(myPath);
+                        if(!f.exists()){
+                            f.mkdirs();
+                        }
+
+                        //  make the soft link
+                        myPath =  myPath + "/" +  filename;
+
+                        String pathToRealData =  startAvatarPath + "/" + thePath;
+                        File target = new File(pathToRealData);
+                        File linkName = new File(myPath);
+                        if (debug) System.out.println("[LinkData] right before makeSoftLinks, target: " + pathToRealData + "\n\t\t\t\t linkName: " + linkName);
+
+                        boolean ok = makeSoftLinks(target, linkName, subCommand);
+                        if (!ok) {
+                            System.out.println("makeSoftLinks failed!");
+                        }
+                    } // end of inner while
+
+                } // end of outer while
+            } else {
+                createLinksWithWrapperFolder(hciPersonID, con, startPath, nxtOne);
+            }
+
+
+
+            nxtOne++;
+
+        } // end of requestList while
+        System.out.println("normal exit -- no problems!");
+        System.exit(0);
+    }
+
+    private void createLinksWithWrapperFolder(String wrapFolderName, Connection con, String startPath, Integer nxtOne)  {
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            stmt = con.createStatement();
+            StringBuilder buf1 = new StringBuilder("select filename from ExperimentFile where filename like '");
+            buf1.append(dataType + "%" + wrapFolderName + "%';"); // case insensitive
+            if (debug) System.out.println("ExperimentFile query: " + buf1.toString());
+
+            List<String> pathnames = new ArrayList<String>();
+
+            rs = stmt.executeQuery(buf1.toString());
+            while (rs.next()) {
+                pathnames.add(rs.getString(1));
+            }
+            rs.close();
+            stmt.close();
+          
+ /*
+            if (debug) System.out.println("size of pathnames: " + pathnames.size());
+            // now using the list of sample 'names' see if we can find any matching experiment files
+            Iterator itp = pathnames.iterator();
+
+            //  create the directory
+            String dirPath = startPath + requestList[nxtOne] + "R";
+            if (debug) System.out.println("dirPath: " + dirPath);
+            File f = new File(dirPath);
+            f.mkdir();
+
+            String myStartPath = dirPath;
+            while (itp.hasNext()) {
+                String thePath = (String) itp.next();  // for example: 4R/Whole_Exome/FASTq/SL278299_2.fastq.gz
+
+                int ipos = thePath.indexOf("/");
+                if (ipos == -1) {
+                    // bad path
+                    // complain....
+                    continue;
+                }
+                int epos = thePath.lastIndexOf("/");
+                if (epos <= ipos) {
+                    // that's weird
+                    continue;
+                }
+
+                String middleOfPath = "";
+                String filename = "";
+                String parentFolder = "";
+                String subCommand = "";
+
+                File dummyFile = new File(startAvatarPath + "/" + thePath); //absolute path to file
+                if(debug) System.out.println("the absolute path: "  + startAvatarPath + "/" + thePath);
 
                 filename =  dummyFile.getParentFile().getName();
 
@@ -532,6 +632,12 @@ public class LinkData extends TimerTask {
                 File target = new File(parentFolder);
                 File linkName = new File(myPath);
                 if (debug) System.out.println("[LinkData] right before makeSoftLinks, target: " + parentFolder + "\n\t\t\t\t linkName: " + linkName);
+
+*/
+                File target = new File(parentFolder);
+                File linkName = new File(myPath);
+                if (debug) System.out.println("[LinkData] right before makeSoftLinks, target: " + parentFolder + "\n\t\t\t\t linkName: " + linkName);
+
 
                 boolean ok = makeSoftLinks(target, linkName, subCommand);
                 if (!ok) {

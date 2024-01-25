@@ -1,29 +1,21 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
-import hci.gnomex.model.CoreFacility;
-import hci.gnomex.model.ExperimentDesign;
-import hci.gnomex.model.ExperimentDesignEntry;
-import hci.gnomex.model.ExperimentFactor;
-import hci.gnomex.model.ExperimentFactorEntry;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.Project;
-
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.model.*;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.List;
 
 public class GetProject extends GNomExCommand implements Serializable {
 
@@ -38,13 +30,13 @@ public class GetProject extends GNomExCommand implements Serializable {
     public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
         if (request.getParameter("idProject") != null) {
-            idProject = new Integer(request.getParameter("idProject"));
+            idProject = Integer.valueOf(request.getParameter("idProject"));
         } else {
             this.addInvalidField("idProject", "idProject is required");
         }
 
         if (request.getParameter("idLab") != null) {
-            idLab = new Integer(request.getParameter("idLab"));
+            idLab = Integer.valueOf(request.getParameter("idLab"));
         } else if (idProject == 0) {
             this.addInvalidField("idLab", "idLab is required");
         }

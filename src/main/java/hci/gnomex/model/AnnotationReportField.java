@@ -1,8 +1,9 @@
 package hci.gnomex.model;
 
-import java.io.Serializable;
-
 import hci.dictionary.model.DictionaryEntry;
+
+import java.io.Serializable;
+import java.util.Objects;
 
 public class AnnotationReportField extends DictionaryEntry implements Serializable   {
   
@@ -19,11 +20,7 @@ public class AnnotationReportField extends DictionaryEntry implements Serializab
 
   @Override
   public String getDisplay() {
-    if(display != null) {
-      return display;
-    } else {
-      return "";
-    }
+      return Objects.requireNonNullElse(display, "");
   }
 
   @Override

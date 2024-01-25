@@ -1,29 +1,22 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.EncryptionUtility;
 import hci.gnomex.utility.*;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.Enumeration;
-import java.util.UUID;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.json.Json;
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
-import org.apache.log4j.Logger;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.UUID;
 
 public class ChangePassword extends GNomExCommand implements Serializable {
 
@@ -65,12 +58,12 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 		this.action = request.getParameter("action");
 		System.out.println ("[ChangePassword] action: " + this.action);
 
-		if (request.getParameter("userName") != null && !request.getParameter("userName").equals("")) {
+		if (request.getParameter("userName") != null && !request.getParameter("userName").isEmpty()) {
 			this.userName = request.getParameter("userName");
 			System.out.println ("[ChangePassword] userName: " + this.userName);
 		}
 
-		if (request.getParameter("email") != null && !request.getParameter("email").equals("")) {
+		if (request.getParameter("email") != null && !request.getParameter("email").isEmpty()) {
 			this.email = request.getParameter("email");
 		}
 
@@ -78,32 +71,32 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 			this.addInvalidField("User name or email required", "Please provide user name or email for lookup.");
 		}
 
-		if (request.getParameter("guid") != null && !request.getParameter("guid").equals("")) {
+		if (request.getParameter("guid") != null && !request.getParameter("guid").isEmpty()) {
 			this.guid = request.getParameter("guid");
 			System.out.println ("[ChangePassword] guid: " + this.guid);
 		}
 
-		if (request.getParameter("newPassword") != null && !request.getParameter("newPassword").equals("")) {
+		if (request.getParameter("newPassword") != null && !request.getParameter("newPassword").isEmpty()) {
 			this.newPassword = request.getParameter("newPassword");
 			System.out.println ("[ChangePassword] newPassword: " + this.newPassword);
 
 		}
 
 		if (action.equals(ACTION_FINALIZE_PASSWORD_RESET) || action.equals(ACTION_CHANGE_EXPIRED_PASSWORD)) {
-			if (newPassword == null || newPassword.equals("")) {
+			if (newPassword == null || newPassword.isEmpty()) {
 				this.addInvalidField("password", "Password is required");
 			} else if (!PasswordUtil.passwordMeetsRequirements(newPassword)) {
 				this.addInvalidField("password", PasswordUtil.COMPLEXITY_ERROR_TEXT);
 			}
 		}
 		if (request.getParameter("responsePageSuccess") != null
-				&& !request.getParameter("responsePageSuccess").equals("")) {
+				&& !request.getParameter("responsePageSuccess").isEmpty()) {
 			responsePageSuccess = request.getParameter("responsePageSuccess");
 		}
-		if (request.getParameter("responsePageError") != null && !request.getParameter("responsePageError").equals("")) {
+		if (request.getParameter("responsePageError") != null && !request.getParameter("responsePageError").isEmpty()) {
 			responsePageError = request.getParameter("responsePageError");
 		}
-		if (request.getParameter("idCoreParm") != null && !request.getParameter("idCoreParm").equals("")) {
+		if (request.getParameter("idCoreParm") != null && !request.getParameter("idCoreParm").isEmpty()) {
 			String idCoreParm = request.getParameter("idCoreParm");
 			launchAppURL = Util.addURLParameter(launchAppURL, idCoreParm);
 		}
@@ -139,7 +132,7 @@ public Command execute() throws RollBackCommandException {
 		}
 	} catch (Exception e) {
 		addInvalidField("exception", "An error occurred processing your request");
-		this.errorDetails = Util.GNLOG(LOG,"An exception occured in ChangePassword ", e);
+		this.errorDetails = Util.GNLOG(LOG,"An exception occurred in ChangePassword ", e);
 		throw new RollBackCommandException();
 	} finally {
 		this.validate();
@@ -185,7 +178,7 @@ private void changePassword(Session sess) {
 
 private void requestPasswordReset(Session sess) throws NamingException, MessagingException, IOException {
 	PropertyDictionaryHelper pdh = PropertyDictionaryHelper.getInstance(sess);
-	if (appUser.getEmail() == null || appUser.getEmail().equals("")) {
+	if (appUser.getEmail() == null || appUser.getEmail().isEmpty()) {
 		regErrorMsg = "Your GNomEx account does not have an email address associated with it. Please contact "
 				+ pdh.getProperty(PropertyDictionary.CONTACT_EMAIL_SOFTWARE_BUGS) + " for help.";
 		this.addInvalidField("Invalid email", regErrorMsg);
@@ -228,8 +221,8 @@ public void validate() {
 public void sendConfirmationEmail(AppUser appUser, String guid) throws NamingException, MessagingException, IOException {
 	StringBuffer content = new StringBuffer();
 
-	if (appUser.getuNID() != null && !appUser.getuNID().equals("")) {
-		// If they provided their email, give them their user name. It might cause them to remember their password.
+	if (appUser.getuNID() != null && !appUser.getuNID().isEmpty()) {
+		// If they provided their email, give them their username. It might cause them to remember their password.
 		// Still provide the link just in case
 		if (email != null) {
 			content.append("Your uNID is : " + appUser.getuNID() + "<br><br>");
@@ -243,7 +236,7 @@ public void sendConfirmationEmail(AppUser appUser, String guid) throws NamingExc
 	} else {
 		appURL += "/change-password/" + guid;
 
-		// If they provided their email, give them their user name. It might cause them to remember their password.
+		// If they provided their email, give them their username. It might cause them to remember their password.
 		// Still provide the link just in case
 		if (email != null) {
 			content.append("Your user name is: " + appUser.getUserNameExternal() + "<br><br>");

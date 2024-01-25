@@ -1,26 +1,25 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.framework.security.UnknownPermissionException;
 import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.model.Price;
 import hci.gnomex.security.SecurityAdvisor;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.naming.NamingException;
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.sql.SQLException;
 
 public class GetPrice extends GNomExCommand implements Serializable {
 
@@ -35,7 +34,7 @@ public class GetPrice extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idPrice") != null) {
-      idPrice = new Integer(request.getParameter("idPrice"));
+      idPrice = Integer.valueOf(request.getParameter("idPrice"));
     } else {
       this.addInvalidField("idPrice", "idPrice is required");
     }
@@ -55,7 +54,7 @@ public class GetPrice extends GNomExCommand implements Serializable {
         Price price = null;
         if (idPrice.intValue() == 0) {
           price = new Price();
-          price.setIdPrice(new Integer(0));
+          price.setIdPrice(0);
           price.setIsActive("Y");
         } else {
           price = (Price)sess.get(Price.class, idPrice);

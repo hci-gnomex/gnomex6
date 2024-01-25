@@ -1,31 +1,24 @@
 package hci.gnomex.controller;
 
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
+import hci.framework.control.Command;
+import hci.framework.control.RollBackCommandException;
+import hci.gnomex.model.*;
+import hci.gnomex.security.SecurityAdvisor;
+import hci.gnomex.utility.DictionaryHelper;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.exception.ConstraintViolationException;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.hibernate.exception.ConstraintViolationException;
-
-import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
-import hci.framework.control.RollBackCommandException;
-import hci.gnomex.model.Property;
-import hci.gnomex.model.PropertyEntry;
-import hci.gnomex.model.PropertyEntryValue;
-import hci.gnomex.model.PropertyOption;
-import hci.gnomex.model.PropertyPlatformApplication;
-import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
-
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeSet;
 
 
 public class DeleteProperty extends GNomExCommand implements Serializable {
@@ -48,7 +41,7 @@ public class DeleteProperty extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idProperty") != null && !request.getParameter("idProperty").equals("")) {
-      idProperty = new Integer(request.getParameter("idProperty"));
+      idProperty = Integer.valueOf(request.getParameter("idProperty"));
     } else {
       this.addInvalidField("idProperty", "idProperty is required.");
     }

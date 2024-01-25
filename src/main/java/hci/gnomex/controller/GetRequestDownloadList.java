@@ -1,38 +1,24 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.*;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.ExperimentFile;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.RequestCategory;
-import hci.gnomex.model.RequestDownloadFilter;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.jdom.Document;
+import org.jdom.Element;
 
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.Serializable;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpSession;
-
-import org.apache.log4j.Logger;
-import org.hibernate.query.Query;
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
+import java.util.*;
 
 public class GetRequestDownloadList extends GNomExCommand implements Serializable {
 
@@ -82,7 +68,7 @@ public class GetRequestDownloadList extends GNomExCommand implements Serializabl
             List<Integer> idRequests = new ArrayList<>();
             String[] keys = idRequestStringList.split(":");
             for (String idRequest : keys) {
-                idRequests.add(new Integer(idRequest));
+                idRequests.add(Integer.valueOf(idRequest));
             }
             filter.setIdRequests(idRequests);
         }
@@ -786,7 +772,7 @@ public class GetRequestDownloadList extends GNomExCommand implements Serializabl
                     String[] hybNumberTokens1 = hybNumber1.split(splitLetter);
                     number1 = hybNumberTokens1[hybNumberTokens1.length - 1];
                     try {
-                        new Integer(number1);
+                        Integer.valueOf(number1);
                     } catch (Exception e) {
                         // ***** NOTE ***** do not log this error
                         number1 = "1";
@@ -813,7 +799,7 @@ public class GetRequestDownloadList extends GNomExCommand implements Serializabl
                     String[] hybNumberTokens2 = hybNumber2.split(splitLetter);
                     number2 = hybNumberTokens2[hybNumberTokens2.length - 1];
                     try {
-                        new Integer(number2);
+                        Integer.valueOf(number2);
                     } catch (Exception e) {
                         // ***** NOTE ***** do not log this error
                         number2 = "1";
@@ -829,7 +815,7 @@ public class GetRequestDownloadList extends GNomExCommand implements Serializabl
                     if (number1.equals(number2)) {
                         return folder1.compareTo(folder2);
                     } else {
-                        return new Integer(number1).compareTo(new Integer(number2));
+                        return Integer.valueOf(number1).compareTo(Integer.valueOf(number2));
                     }
                 } else {
                     return reqNumber2.compareTo(reqNumber1);

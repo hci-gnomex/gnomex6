@@ -304,6 +304,7 @@ export class AuthenticationService {
                 throw new Error("Authentication failed. " + resp.status + ": " + resp.statusText);
             }
         }), catchError((err: IGnomexErrorResponse) => {
+            console.log ("login final err: " + err);
             return throwError(err);
         }));
     }
@@ -373,6 +374,7 @@ export class AuthenticationService {
                 this._isAuthenticatedSubject.next(true);
             }
         } else {
+            console.log ("store token failed with token: " + token);
             this._localStorageService.removeItem(this.authenticationProvider.authenticationTokenKey);
             this._isAuthenticatedSubject.next(false);
             this.unsubscribeFromTokenRefresh();

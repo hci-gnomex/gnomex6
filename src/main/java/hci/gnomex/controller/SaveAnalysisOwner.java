@@ -1,24 +1,22 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Analysis;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-
-import java.io.Serializable;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 
 public class SaveAnalysisOwner extends GNomExCommand implements Serializable {
   
- 
-  
+
   // the static field for logging in Log4J
-  private static Logger LOG = Logger.getLogger(SaveLab.class);
+  private static Logger LOG = Logger.getLogger(SaveAnalysisOwner.class);
   
   private Integer   idAnalysis; 
   private Integer   idOwner; 

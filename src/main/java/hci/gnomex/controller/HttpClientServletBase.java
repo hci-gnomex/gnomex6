@@ -1,12 +1,12 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.HibernateSession;
-
-import java.io.IOException;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.UserPreferences;
+import org.hibernate.Session;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -14,9 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import hci.gnomex.utility.UserPreferences;
-import org.hibernate.Session;
+import java.io.IOException;
 
 public abstract class HttpClientServletBase extends HttpServlet {
 public void init(ServletConfig config) throws ServletException {

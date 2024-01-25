@@ -513,10 +513,10 @@ export class DirectLoginComponent implements OnInit {
                         });
                     }
                 } else {
-                    this._errorMsg = "Please check your credentials.";
+                    this._errorMsg = "Please check your credentials (2).";
                 }
             }, (error: any) => {
-                this._errorMsg = "Please check your credentials.";
+                this._errorMsg = "Please check your credentials (3).";
             });
         }
     }
@@ -531,7 +531,7 @@ export class DirectLoginComponent implements OnInit {
     }
 
     twoFactorVerify(response: any) {
-        console.log(response.elements.sig_response.value);
+        console.log("in twoFactorVerify" + response.elements.sig_response.value);
         var vuser = Duo2.verify_response(this.gnomexService.ikey, this.gnomexService.skey, this.gnomexService.akey, response.elements.sig_response.value);
         console.log(vuser);
         if (vuser) {   // || ( this.gnomexService.duoExceptions && this.gnomexService.duoExceptions.includes(this._loginForm.value.username) )) {

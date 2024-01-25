@@ -52,6 +52,10 @@ export class NewExperimentService {
     public static readonly TYPE_CLINICAL_SEQUENOM: string = "CLINSEQ";
     public static readonly TYPE_SEQUENOM: string = "SEQUENOM";
     public static readonly TYPE_NANOSTRING: string = "NANOSTRING";
+    public static readonly TYPE_NANOGEOMX: string = "NANOGEOMX";
+    public static readonly TYPE_LCM: string = "LCM";
+    public static readonly TYPE_MILLISECT: string = "MILLISECT";
+
     public static readonly TYPE_GENERIC: string = "GENERIC";
 
 
@@ -81,6 +85,8 @@ export class NewExperimentService {
             || this.currentState === 'SequenomEditState'
             || this.currentState === 'IsolationEditState'
             || this.currentState === 'ClinicalSequenomEditState'
+            || this.currentState === 'SliceEditState'
+            || this.currentState === 'NanoGeomxEditState'
             || this.currentState === 'NanoStringEditState';
     }
 

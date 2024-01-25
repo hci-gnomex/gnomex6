@@ -1,45 +1,30 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
-import hci.gnomex.model.BillingChargeKind;
-import hci.gnomex.model.BillingItem;
-import hci.gnomex.model.BillingPeriod;
-import hci.gnomex.model.BillingStatus;
-import hci.gnomex.model.CoreFacility;
-import hci.gnomex.model.DiskUsageByMonth;
-import hci.gnomex.model.Invoice;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.Request;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.report.constants.ReportFormats;
 import hci.report.model.Column;
 import hci.report.model.ReportRow;
 import hci.report.model.ReportTray;
 import hci.report.utility.ReportCommand;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.naming.NamingException;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
+import java.util.*;
 
 public class ShowBillingMonthendReport extends ReportCommand implements Serializable {
   
@@ -65,13 +50,13 @@ public class ShowBillingMonthendReport extends ReportCommand implements Serializ
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idBillingPeriod") != null) {
-      idBillingPeriod = new Integer(request.getParameter("idBillingPeriod"));
+      idBillingPeriod = Integer.valueOf(request.getParameter("idBillingPeriod"));
     } else {
       this.addInvalidField("idBillingPeriod", "idBillingPeriod is required");
     }
 
     if (request.getParameter("idCoreFacility") != null) {
-      idCoreFacility = new Integer(request.getParameter("idCoreFacility"));
+      idCoreFacility = Integer.valueOf(request.getParameter("idCoreFacility"));
     } else {
       this.addInvalidField("idCoreFacility", "idCoreFacility is required");
     }
@@ -475,7 +460,7 @@ public class ShowBillingMonthendReport extends ReportCommand implements Serializ
     Column reportCol = new Column();
     reportCol.setName(name);
     reportCol.setCaption(name);
-    reportCol.setDisplayOrder(new Integer(colNumber));
+    reportCol.setDisplayOrder(Integer.valueOf(colNumber));
     return reportCol;
   }
   

@@ -3,17 +3,12 @@ package hci.gnomex.utility;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Sample;
 import hci.gnomex.model.WorkItem;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
+
+import java.io.Serializable;
+import java.util.*;
 
 
 public class WorkItemSolexaStockParser implements Serializable {
@@ -39,8 +34,8 @@ public class WorkItemSolexaStockParser implements Serializable {
       String idSampleString   = workItemNode.getAttributeValue("idSample");
       String idWorkItemString = workItemNode.getAttributeValue("idWorkItem");
       
-      Sample sample = (Sample)sess.load(Sample.class, new Integer(idSampleString));
-      WorkItem workItem = (WorkItem)sess.load(WorkItem.class, new Integer(idWorkItemString));
+      Sample sample = (Sample)sess.load(Sample.class, Integer.valueOf(idSampleString));
+      WorkItem workItem = (WorkItem)sess.load(WorkItem.class, Integer.valueOf(idWorkItemString));
       
       if (workItemNode.getAttributeValue("seqPrepStockStatus") != null && !workItemNode.getAttributeValue("seqPrepStockStatus").equals("")) {
         workItem.setStatus(workItemNode.getAttributeValue("seqPrepStockStatus"));

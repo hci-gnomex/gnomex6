@@ -22,10 +22,8 @@ public class MailUtil {
 	private static Logger LOG = Logger.getLogger(MailUtil.class);
 	
 	public static boolean validateAndSendEmail(MailUtilHelper helper) throws AddressException, NamingException, MessagingException, IOException {
-//		System.out.println ("[validateAndSendEmail] start");
 		if (helper != null && helper.hasEssentialParams()) {
 			String to = helper.getNonNullTo();
-//			System.out.println ("[validateAndSendEmail] to: " + to);
 			String cc = helper.getNonNullCC();
 			String bcc = helper.getNonNullBCC();
 			String subject = helper.getNonNullSubject();
@@ -33,7 +31,6 @@ public class MailUtil {
 			
 			if (to.trim().equals("") || !isValidEmail(to)) {
 				to = helper.getTesterEmail();
-//				System.out.println ("[validateAndSendEmail] tester to: " + to);
 		    	subject = "The following email does not have a valid recipient - " + subject;
 		    	body = helper.addNoAddressDetailsToBody();
 			}

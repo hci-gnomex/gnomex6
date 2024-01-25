@@ -9,6 +9,8 @@ import hci.gnomex.constants.Constants;
 import hci.gnomex.security.SecurityAdvisor;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -35,7 +37,7 @@ import org.jdom.input.SAXBuilder;
 public class SaveAnalysis extends GNomExCommand implements Serializable {
 
 	// the static field for logging in Log4J
-	private static Logger LOG = Logger.getLogger(SaveLab.class);
+	private static Logger LOG = Logger.getLogger(SaveAnalysis.class);
 
 // private String baseDir;
 
@@ -68,7 +70,7 @@ public class SaveAnalysis extends GNomExCommand implements Serializable {
 
 	private String newAnalysisGroupName;
 	private String newAnalysisGroupDescription;
-	private Integer newAnalysisGroupId = new Integer(-1);
+	private Integer newAnalysisGroupId = -1;
 
 	private boolean isLinkBySample = false;
 	private String analysisIDFile;
@@ -993,195 +995,197 @@ public class SaveAnalysis extends GNomExCommand implements Serializable {
 		}
 
 		File f = new File(fileName);
-		if (!f.delete()) {
-			LOG.error("Unable to remove " + analysisFile.getFileName() + " from file system for analysis "
-					+ analysis.getNumber());
-		}
+			if (!f.delete()) {
+				LOG.error("Unable to remove " + analysisFile.getFileName() + " from file system for analysis "
+						+ analysis.getNumber());
+			}
 
 	}
 
-	public static void removeAnalysisDirectoryFromFileSystem(String baseDir, Analysis analysis) {
-		String dirName = getAnalysisDirectory(baseDir, analysis);
-		File f = new File(dirName);
-		if (!f.delete()) {
-			LOG.error("Unable to remove " + dirName + " from file system for analysis " + analysis.getNumber());
-		}
-
-	}
-
-	private void reassignLabForTransferLog(Session sess, Analysis analysis) {
-		// If an existing request has been assigned to a different lab, change
-		// the idLab on the TransferLogs.
-		String buf = "SELECT tl from TransferLog tl where idAnalysis = " + analysis.getIdAnalysis();
-		List transferLogs = sess.createQuery(buf).list();
-		for (Iterator i = transferLogs.iterator(); i.hasNext();) {
-			TransferLog tl = (TransferLog) i.next();
-			tl.setIdLab(analysis.getIdLab());
-		}
-	}
-
-	private void saveAnalysisProperties(Session sess, Analysis analysis) throws org.jdom.JDOMException {
-		// Delete  properties
-		if (propertiesArray.size() > 0 ) {
-			for (Iterator<?> i = analysis.getPropertyEntries().iterator(); i.hasNext();) {
-				PropertyEntry pe = PropertyEntry.class.cast(i.next());
-				boolean found = false;
-				for (int j = 0; j < propertiesArray.size(); j++) {
-					JsonObject propNode = propertiesArray.getJsonObject(j);
-					String idPropertyEntry = propNode.get("idPropertyEntry") != null ? propNode.getString("idPropertyEntry") : "";
-					if (idPropertyEntry != null && !idPropertyEntry.equals("")) {
-						if (pe.getIdPropertyEntry().equals(new Integer(idPropertyEntry))) {
-							found = true;
-							break;
-						}
-					}
+		public static void removeAnalysisDirectoryFromFileSystem(String baseDir, Analysis analysis) {
+			String dirName = getAnalysisDirectory(baseDir, analysis);
+			File f = new File(dirName);
+//			if (!Files.isSymbolicLink(Paths.get(dirName))) {
+				if (!f.delete()) {
+					LOG.error("Unable to remove " + dirName + " from file system for analysis " + analysis.getNumber());
 				}
-				if (!found) {
-					// delete dataTrack property values
-					for (Iterator<?> i1 = pe.getValues().iterator(); i1.hasNext();) {
-						PropertyEntryValue av = PropertyEntryValue.class.cast(i1.next());
-						sess.delete(av);
-					}
-					sess.flush();
-					pe.setValues(null);
-					sess.save(pe);
-					sess.flush();
-					// delete dataTrack property
-					sess.delete(pe);
+
+//			}
+		}
+
+			private void reassignLabForTransferLog(Session sess, Analysis analysis) {
+				// If an existing request has been assigned to a different lab, change
+				// the idLab on the TransferLogs.
+				String buf = "SELECT tl from TransferLog tl where idAnalysis = " + analysis.getIdAnalysis();
+				List transferLogs = sess.createQuery(buf).list();
+				for (Iterator i = transferLogs.iterator(); i.hasNext();) {
+					TransferLog tl = (TransferLog) i.next();
+					tl.setIdLab(analysis.getIdLab());
 				}
 			}
-			sess.flush();
-			// Add  properties
-			for (int i = 0; i < propertiesArray.size(); i++) {
-				JsonObject node =  propertiesArray.getJsonObject(i);
-				// Adding dataTracks
-				String idPropertyEntry = node.get("idPropertyEntry") != null ? node.getString("idPropertyEntry") : "";
 
-				PropertyEntry pe = null;
-				if (idPropertyEntry == null || idPropertyEntry.equals("")) {
-					pe = new PropertyEntry();
-					pe.setIdProperty(Integer.valueOf(node.get("idProperty") != null ? node.getString("idProperty") : ""));
-				} else {
-					pe = PropertyEntry.class.cast(sess.get(PropertyEntry.class, Integer.valueOf(idPropertyEntry)));
-				}
-				pe.setValue(node.get("value") != null ? node.getString("value") : "" );
-				pe.setIdAnalysis(analysis.getIdAnalysis());
-
-				if (idPropertyEntry == null || idPropertyEntry.equals("")) {
-					sess.save(pe);
-					sess.flush();
-				}
-
-				// Remove PropertyEntryValues
-				JsonArray pEntryValues = node.get("PropertyEntryValue") != null ? node.getJsonArray("PropertyEntryValue") : Json.createArrayBuilder().build();
-				if (pe.getValues() != null) {
-					for (Iterator<?> i1 = pe.getValues().iterator(); i1.hasNext();) {
-						PropertyEntryValue av = PropertyEntryValue.class.cast(i1.next());
+			private void saveAnalysisProperties(Session sess, Analysis analysis) throws org.jdom.JDOMException {
+				// Delete  properties
+				if (propertiesArray.size() > 0 ) {
+					for (Iterator<?> i = analysis.getPropertyEntries().iterator(); i.hasNext();) {
+						PropertyEntry pe = PropertyEntry.class.cast(i.next());
 						boolean found = false;
-						for (int j = 0; j < pEntryValues.size(); j++) {
-							JsonObject n = pEntryValues.getJsonObject(j);
-							String idPropertyEntryValue = n.get("idPropertyEntryValue") != null ? n.getString("idPropertyEntryValue") : "";
-							if (idPropertyEntryValue != null && !idPropertyEntryValue.equals("")) {
-								if (av.getIdPropertyEntryValue().equals(new Integer(idPropertyEntryValue))) {
+						for (int j = 0; j < propertiesArray.size(); j++) {
+							JsonObject propNode = propertiesArray.getJsonObject(j);
+							String idPropertyEntry = propNode.get("idPropertyEntry") != null ? propNode.getString("idPropertyEntry") : "";
+							if (idPropertyEntry != null && !idPropertyEntry.equals("")) {
+								if (pe.getIdPropertyEntry().equals(Integer.valueOf(idPropertyEntry))) {
 									found = true;
 									break;
 								}
 							}
-
 						}
 						if (!found) {
-							sess.delete(av);
+							// delete dataTrack property values
+							for (Iterator<?> i1 = pe.getValues().iterator(); i1.hasNext();) {
+								PropertyEntryValue av = PropertyEntryValue.class.cast(i1.next());
+								sess.delete(av);
+							}
+							sess.flush();
+							pe.setValues(null);
+							sess.save(pe);
+							sess.flush();
+							// delete dataTrack property
+							sess.delete(pe);
 						}
 					}
 					sess.flush();
-				}
+					// Add  properties
+					for (int i = 0; i < propertiesArray.size(); i++) {
+						JsonObject node =  propertiesArray.getJsonObject(i);
+						// Adding dataTracks
+						String idPropertyEntry = node.get("idPropertyEntry") != null ? node.getString("idPropertyEntry") : "";
 
-				// Add and update PropertyEntryValues
-				for (int j = 0; j < pEntryValues.size(); j++) {
-					JsonObject n = pEntryValues.getJsonObject(j);
-					String idPropertyEntryValue = n.get("idPropertyEntryValue") != null ? n.getString("idPropertyEntryValue") : "";
-					String value = n.get("value") != null ? n.getString("value") : "";
-					PropertyEntryValue av = null;
-					// Ignore 'blank' url value
-					if (value == null || value.equals("") || value.equals("Enter URL here...")) {
-						continue;
-					}
-					if (idPropertyEntryValue == null || idPropertyEntryValue.equals("")) {
-						av = new PropertyEntryValue();
-						av.setIdPropertyEntry(pe.getIdPropertyEntry());
-					} else {
-						av = PropertyEntryValue.class.cast(sess.load(PropertyEntryValue.class,
-								Integer.valueOf(idPropertyEntryValue)));
-					}
-					av.setValue(value);
-
-					if (idPropertyEntryValue == null || idPropertyEntryValue.equals("")) {
-						sess.save(av);
-					}
-
-				}
-				sess.flush();
-
-				String optionValue = "";
-				JsonArray pOptions = node.get("PropertyOption") != null ? node.getJsonArray("PropertyOption") : Json.createArrayBuilder().build();
-				TreeSet<PropertyOption> options = new TreeSet<PropertyOption>(new PropertyOptionComparator());
-				for (int j = 0; j < pOptions.size(); j++) {
-					JsonObject n = pOptions.getJsonObject(j);
-					Integer idPropertyOption = Integer.parseInt(n.get("idPropertyOption") != null ? n.getString("idPropertyOption") : "");
-					String selected = n.get("selected") != null ? n.getString("selected") : "";
-					if (selected != null && selected.equals("Y")) {
-						PropertyOption option = PropertyOption.class.cast(sess.load(PropertyOption.class,
-								idPropertyOption));
-						options.add(option);
-						if (optionValue.length() > 0) {
-							optionValue += ",";
+						PropertyEntry pe = null;
+						if (idPropertyEntry == null || idPropertyEntry.equals("")) {
+							pe = new PropertyEntry();
+							pe.setIdProperty(Integer.valueOf(node.get("idProperty") != null ? node.getString("idProperty") : ""));
+						} else {
+							pe = PropertyEntry.class.cast(sess.get(PropertyEntry.class, Integer.valueOf(idPropertyEntry)));
 						}
-						optionValue += option.getOption();
+						pe.setValue(node.get("value") != null ? node.getString("value") : "" );
+						pe.setIdAnalysis(analysis.getIdAnalysis());
+
+						if (idPropertyEntry == null || idPropertyEntry.equals("")) {
+							sess.save(pe);
+							sess.flush();
+						}
+
+						// Remove PropertyEntryValues
+						JsonArray pEntryValues = node.get("PropertyEntryValue") != null ? node.getJsonArray("PropertyEntryValue") : Json.createArrayBuilder().build();
+						if (pe.getValues() != null) {
+							for (Iterator<?> i1 = pe.getValues().iterator(); i1.hasNext();) {
+								PropertyEntryValue av = PropertyEntryValue.class.cast(i1.next());
+								boolean found = false;
+								for (int j = 0; j < pEntryValues.size(); j++) {
+									JsonObject n = pEntryValues.getJsonObject(j);
+									String idPropertyEntryValue = n.get("idPropertyEntryValue") != null ? n.getString("idPropertyEntryValue") : "";
+									if (idPropertyEntryValue != null && !idPropertyEntryValue.equals("")) {
+										if (av.getIdPropertyEntryValue().equals(Integer.valueOf(idPropertyEntryValue))) {
+											found = true;
+											break;
+										}
+									}
+
+								}
+								if (!found) {
+									sess.delete(av);
+								}
+							}
+							sess.flush();
+						}
+
+						// Add and update PropertyEntryValues
+						for (int j = 0; j < pEntryValues.size(); j++) {
+							JsonObject n = pEntryValues.getJsonObject(j);
+							String idPropertyEntryValue = n.get("idPropertyEntryValue") != null ? n.getString("idPropertyEntryValue") : "";
+							String value = n.get("value") != null ? n.getString("value") : "";
+							PropertyEntryValue av = null;
+							// Ignore 'blank' url value
+							if (value == null || value.equals("") || value.equals("Enter URL here...")) {
+								continue;
+							}
+							if (idPropertyEntryValue == null || idPropertyEntryValue.equals("")) {
+								av = new PropertyEntryValue();
+								av.setIdPropertyEntry(pe.getIdPropertyEntry());
+							} else {
+								av = PropertyEntryValue.class.cast(sess.load(PropertyEntryValue.class,
+										Integer.valueOf(idPropertyEntryValue)));
+							}
+							av.setValue(value);
+
+							if (idPropertyEntryValue == null || idPropertyEntryValue.equals("")) {
+								sess.save(av);
+							}
+
+						}
+						sess.flush();
+
+						String optionValue = "";
+						JsonArray pOptions = node.get("PropertyOption") != null ? node.getJsonArray("PropertyOption") : Json.createArrayBuilder().build();
+						TreeSet<PropertyOption> options = new TreeSet<PropertyOption>(new PropertyOptionComparator());
+						for (int j = 0; j < pOptions.size(); j++) {
+							JsonObject n = pOptions.getJsonObject(j);
+							Integer idPropertyOption = Integer.parseInt(n.get("idPropertyOption") != null ? n.getString("idPropertyOption") : "");
+							String selected = n.get("selected") != null ? n.getString("selected") : "";
+							if (selected != null && selected.equals("Y")) {
+								PropertyOption option = PropertyOption.class.cast(sess.load(PropertyOption.class,
+										idPropertyOption));
+								options.add(option);
+								if (optionValue.length() > 0) {
+									optionValue += ",";
+								}
+								optionValue += option.getOption();
+							}
+
+						}
+						pe.setOptions(options);
+						if (options.size() > 0) {
+							pe.setValue(optionValue);
+						}
+						sess.flush();
 					}
+				}
+
+			}
+
+			private class AnalysisGroupComparator implements Comparator, Serializable {
+				public int compare(Object o1, Object o2) {
+					AnalysisGroup ag1 = (AnalysisGroup) o1;
+					AnalysisGroup ag2 = (AnalysisGroup) o2;
+
+					return ag1.getIdAnalysisGroup().compareTo(ag2.getIdAnalysisGroup());
 
 				}
-				pe.setOptions(options);
-				if (options.size() > 0) {
-					pe.setValue(optionValue);
+			}
+
+			private class AnalysisExperimentItemComparator implements Comparator, Serializable {
+				public int compare(Object o1, Object o2) {
+					AnalysisExperimentItem e1 = (AnalysisExperimentItem) o1;
+					AnalysisExperimentItem e2 = (AnalysisExperimentItem) o2;
+
+					String key1 = determineKey(e1);
+					String key2 = determineKey(e2);
+
+					return key1.compareTo(key2);
 				}
-				sess.flush();
+
+				private String determineKey(AnalysisExperimentItem item) {
+					if (item.getIdHybridization() != null) {
+						return "hyb" + item.getIdHybridization();
+					} else if (item.getIdSequenceLane() != null) {
+						return "lane" + item.getIdSequenceLane();
+					} else if (item.getIdSample() != null) {
+						return "sample" + item.getIdSample();
+					} else {
+						return "";
+					}
+				}
 			}
-		}
-
-	}
-
-	private class AnalysisGroupComparator implements Comparator, Serializable {
-		public int compare(Object o1, Object o2) {
-			AnalysisGroup ag1 = (AnalysisGroup) o1;
-			AnalysisGroup ag2 = (AnalysisGroup) o2;
-
-			return ag1.getIdAnalysisGroup().compareTo(ag2.getIdAnalysisGroup());
 
 		}
-	}
-
-	private class AnalysisExperimentItemComparator implements Comparator, Serializable {
-		public int compare(Object o1, Object o2) {
-			AnalysisExperimentItem e1 = (AnalysisExperimentItem) o1;
-			AnalysisExperimentItem e2 = (AnalysisExperimentItem) o2;
-
-			String key1 = determineKey(e1);
-			String key2 = determineKey(e2);
-
-			return key1.compareTo(key2);
-		}
-
-		private String determineKey(AnalysisExperimentItem item) {
-			if (item.getIdHybridization() != null) {
-				return "hyb" + item.getIdHybridization();
-			} else if (item.getIdSequenceLane() != null) {
-				return "lane" + item.getIdSequenceLane();
-			} else if (item.getIdSample() != null) {
-				return "sample" + item.getIdSample();
-			} else {
-				return "";
-			}
-		}
-	}
-
-}

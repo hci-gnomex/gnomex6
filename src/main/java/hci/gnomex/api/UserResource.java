@@ -3,28 +3,20 @@
  */
 package hci.gnomex.api;
 
-import hci.ri.auth.service.UserService;
-
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.*;
-
 import hci.gnomex.api.dto.RoleDTO;
 import hci.gnomex.api.dto.UserDTO;
 import hci.gnomex.model.AppUser;
-
+import hci.ri.auth.service.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.*;
+import javax.ws.rs.core.*;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;

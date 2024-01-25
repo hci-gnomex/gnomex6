@@ -2,25 +2,15 @@ package hci.gnomex.utility;
 
 import hci.framework.model.DetailObject;
 import hci.gnomex.controller.ShowBillingInvoiceForm;
-import hci.gnomex.model.BillingAccount;
-import hci.gnomex.model.BillingItem;
-import hci.gnomex.model.BillingPeriod;
-import hci.gnomex.model.CoreFacility;
-import hci.gnomex.model.DiskUsageByMonth;
-import hci.gnomex.model.Invoice;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.ProductOrder;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.Request;
+import hci.gnomex.model.*;
+import org.hibernate.Session;
+import org.jdom.Element;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.hibernate.Session;
-import org.jdom.Element;
 
 
 public class BillingInvoiceHTMLFormatter  extends DetailObject {
@@ -340,7 +330,7 @@ public class BillingInvoiceHTMLFormatter  extends DetailObject {
 
         Element row = new Element("TR");
         table.addContent(row);
-        this.addEmptyCell(row, new Integer(3));
+        this.addEmptyCell(row, 3);
         this.addCell(row, this.getHTMLString(bi.getCategory() != null ? bi.getCategory() : "&nbsp;"));
         this.addCell(row, this.formatDate(bi.getCompleteDate(), this.DATE_OUTPUT_SLASH));
         this.addCell(row, this.getHTMLString(bi.getDescription() != null ? bi.getDescription() : "&nbsp;"));
@@ -362,7 +352,7 @@ public class BillingInvoiceHTMLFormatter  extends DetailObject {
 
       Element rowt2 = new Element("TR");
       table.addContent(rowt2);
-      this.addEmptyCell(rowt2, new Integer(columnCount - 1));
+      this.addEmptyCell(rowt2, columnCount - 1);
       this.addTotalCell(rowt2, totalPriceForRequest != null ? currencyFormat.format(totalPriceForRequest) : "&nbsp;");
 
       billingItems = (List)relatedBillingItemMap.get(number);
@@ -385,7 +375,7 @@ public class BillingInvoiceHTMLFormatter  extends DetailObject {
 
           Element row = new Element("TR");
           table.addContent(row);
-          this.addEmptyCell(row, new Integer(3));
+          this.addEmptyCell(row, 3);
           this.addCell(row, this.getHTMLString(bi.getCategory() != null ? bi.getCategory() : "&nbsp;"), "gridrelated", null);
           this.addCell(row, this.formatDate(bi.getCompleteDate(), this.DATE_OUTPUT_SLASH), "gridrelated", null);
           this.addCell(row, this.getHTMLString(bi.getDescription() != null ? bi.getDescription() : "&nbsp;"), "gridrelated", null);
@@ -406,22 +396,22 @@ public class BillingInvoiceHTMLFormatter  extends DetailObject {
 
         Element rowrt2 = new Element("TR");
         table.addContent(rowrt2);
-        this.addEmptyCell(rowrt2, new Integer(columnCount - 1));
+        this.addEmptyCell(rowrt2, columnCount - 1);
         this.addCell(rowrt2, totalPriceForRequest != null ? currencyFormat.format(totalPriceForRequest) : "&nbsp;", "gridrightrelated", null, "RIGHT");
       }
 
       Element rowt1 = new Element("TR");
       table.addContent(rowt1);
-      this.addEmptyCell(rowt1, new Integer(columnCount));
+      this.addEmptyCell(rowt1, Integer.valueOf(columnCount));
     }
 
     Element rowt = new Element("TR");
     table.addContent(rowt);
-    this.addEmptyCell(rowt, new Integer(columnCount));
+    this.addEmptyCell(rowt, Integer.valueOf(columnCount));
 
     Element rowgt = new Element("TR");
     table.addContent(rowgt);
-    this.addEmptyCell(rowgt, new Integer(columnCount - 2));
+    this.addEmptyCell(rowgt, Integer.valueOf(columnCount - 2));
     this.addRightAlignCell(rowgt, "Total");
     this.addTotalCell(rowgt, grandTotal != null ? currencyFormat.format(grandTotal) : "&nbsp;");
 

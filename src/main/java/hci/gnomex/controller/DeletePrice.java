@@ -1,20 +1,18 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Price;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.HibernateSession;
-
-import java.io.Serializable;
-
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 
 public class DeletePrice extends GNomExCommand implements Serializable {
 
@@ -29,7 +27,7 @@ public class DeletePrice extends GNomExCommand implements Serializable {
     public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
         if (request.getParameter("idPrice") != null && !request.getParameter("idPrice").equals("")) {
-            idPrice = new Integer(request.getParameter("idPrice"));
+            idPrice = Integer.valueOf(request.getParameter("idPrice"));
         } else {
             this.addInvalidField("idPrice", "idPrice is required.");
         }
@@ -49,7 +47,7 @@ public class DeletePrice extends GNomExCommand implements Serializable {
                 }
                 //
                 // Initialize the price criteria.  We don't want to orphan them unintentionally.
-                // Initalize will explicitly cause the set of PriceCriterias to load, which is lazy.
+                // Initialize will explicitly cause the set of PriceCriterias to load, which is lazy.
                 Hibernate.initialize(price.getPriceCriterias());
 
                 if (this.isValid()) {

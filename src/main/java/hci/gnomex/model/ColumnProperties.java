@@ -1,13 +1,9 @@
 package hci.gnomex.model;
 
-import org.jdom.Document;
-import org.jdom.Element;
+import hci.dictionary.model.DictionaryEntry;
 
 import java.io.Serializable;
-
-import hci.dictionary.model.DictionaryEntry;
-import hci.framework.security.UnknownPermissionException;
-import hci.gnomex.security.SecurityAdvisor;
+//import hci.gnomex.security.SecurityAdvisor;
 
 
 public class ColumnProperties extends DictionaryEntry implements Serializable {

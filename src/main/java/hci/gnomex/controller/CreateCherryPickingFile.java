@@ -1,38 +1,24 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.control.RollBackCommandException;
-import hci.framework.security.UnknownPermissionException;
-import hci.gnomex.model.Plate;
-import hci.gnomex.model.PlateType;
-import hci.gnomex.model.PlateWell;
-import hci.gnomex.model.ReactionType;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.Sample;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.report.constants.ReportFormats;
 import hci.report.model.Column;
 import hci.report.model.ReportRow;
 import hci.report.model.ReportTray;
 import hci.report.utility.ReportCommand;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.*;
 
 public class CreateCherryPickingFile extends ReportCommand implements Serializable {
   
@@ -70,12 +56,12 @@ public class CreateCherryPickingFile extends ReportCommand implements Serializab
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idRequest") != null) {
-      idRequest = new Integer(request.getParameter("idRequest"));
+      idRequest = Integer.valueOf(request.getParameter("idRequest"));
     } else {
       this.addInvalidField("idRequest", "idRequest is required");
     }
     if (request.getParameter("transferVol") != null) {
-      transferVol = new Integer(request.getParameter("transferVol"));
+      transferVol = Integer.valueOf(request.getParameter("transferVol"));
     } else {
       this.addInvalidField("transferVol", "transferVol is required");
     }
@@ -104,7 +90,7 @@ public class CreateCherryPickingFile extends ReportCommand implements Serializab
       Request request = (Request)sess.load(Request.class, idRequest);
 
       int sourcePlateIdx = -1;
-      Integer idSourcePlatePrev = new Integer(-1);
+      Integer idSourcePlatePrev = Integer.valueOf(-1);
       
       if (!secAdvisor.canRead(request)) { 
         throw new RollBackCommandException("Insufficient permissions to run this command");
@@ -174,7 +160,7 @@ public class CreateCherryPickingFile extends ReportCommand implements Serializab
         values.add(DEST_ALP);
         values.add(sourceFxAlpLookup[sourcePlateIdx]);
         values.add(transferVol.toString());
-        values.add(new Integer(sourcePlateIdx+1).toString());
+        values.add(Integer.valueOf(sourcePlateIdx+1).toString());
        
         reportRow.setValues(values);
         tray.addRow(reportRow);
@@ -208,7 +194,7 @@ public class CreateCherryPickingFile extends ReportCommand implements Serializab
     Column reportCol = new Column();
     reportCol.setName(name);
     reportCol.setCaption(name);
-    reportCol.setDisplayOrder(new Integer(colNumber));
+    reportCol.setDisplayOrder(Integer.valueOf(colNumber));
     return reportCol;
   }
 

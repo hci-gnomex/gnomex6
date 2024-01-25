@@ -1,28 +1,25 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.BillingAccount;
 import hci.gnomex.model.BillingStatus;
-import hci.gnomex.model.Invoice;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 
+import javax.naming.NamingException;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.query.Query;
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
 public class GetBillingAccountListForPeriodAndCore extends GNomExCommand implements Serializable {
 
   private static Logger LOG = Logger.getLogger(GetBillingAccountListForPeriodAndCore.class);
@@ -40,17 +37,17 @@ public class GetBillingAccountListForPeriodAndCore extends GNomExCommand impleme
   @Override
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     if (request.getParameter("idBillingPeriod") != null && request.getParameter("idBillingPeriod").length() > 0) {
-      idBillingPeriod = new Integer(request.getParameter("idBillingPeriod"));
+      idBillingPeriod = Integer.valueOf(request.getParameter("idBillingPeriod"));
     } else {
       this.addInvalidField("idBillingPeriod", "idBillingPeriod is required");
     }
     if (request.getParameter("idCoreFacility") != null && request.getParameter("idBillingPeriod").length() > 0) {
-      idCoreFacility = new Integer(request.getParameter("idCoreFacility"));
+      idCoreFacility = Integer.valueOf(request.getParameter("idCoreFacility"));
     } else {
       this.addInvalidField("idCoreFacility", "idCoreFacility is required");
     }
     if (request.getParameter("idLab") != null && request.getParameter("idLab").length() > 0) {
-      idLab = new Integer(request.getParameter("idLab"));
+      idLab = Integer.valueOf(request.getParameter("idLab"));
     }
 
     if (request.getParameter("accountStatusJSONString") != null && request.getParameter("accountStatusJSONString").length() > 0) {

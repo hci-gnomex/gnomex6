@@ -1,32 +1,26 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.Element;
 
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.servlet.http.HttpSession;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ManagePedFile extends GNomExCommand implements Serializable {
 
@@ -51,7 +45,7 @@ public class ManagePedFile extends GNomExCommand implements Serializable {
         // idAnalysis is required to save a .ped file
         idAnalysis = null;
         if (request.getParameter("idAnalysis") != null && !request.getParameter("idAnalysis").equals("")) {
-            idAnalysis = new Integer(request.getParameter("idAnalysis"));
+            idAnalysis = Integer.valueOf(request.getParameter("idAnalysis"));
         }
         System.out.println("[ManagePedFile] idAnalysis: " + idAnalysis);
 
@@ -63,7 +57,7 @@ public class ManagePedFile extends GNomExCommand implements Serializable {
 
         currentFile = 0;
         if (request.getParameter("fileOffset") != null && !request.getParameter("fileOffset").equals("")) {
-            currentFile = new Integer(request.getParameter("fileOffset"));
+            currentFile = Integer.valueOf(request.getParameter("fileOffset"));
         }
         System.out.println("[ManagePedFile] currentFile: " + currentFile);
 

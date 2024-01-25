@@ -3,7 +3,12 @@ package hci.gnomex.utility;
 import hci.framework.model.DetailObject;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.BillingAccount;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.Element;
 
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.DecimalFormatSymbols;
@@ -11,13 +16,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-
-import javax.json.JsonArray;
-import javax.json.JsonObject;
 
 
 public class BillingAccountParser extends DetailObject implements Serializable {
@@ -58,7 +56,7 @@ public class BillingAccountParser extends DetailObject implements Serializable {
       if (idBillingAccountString.startsWith("BillingAccount")) {
         billingAccount = new BillingAccount();
       } else {
-        billingAccount = (BillingAccount)sess.load(BillingAccount.class, new Integer(idBillingAccountString));
+        billingAccount = (BillingAccount)sess.load(BillingAccount.class, Integer.valueOf(idBillingAccountString));
       }
 
       this.initializeBillingAccountXML(sess, node, billingAccount);
@@ -116,7 +114,7 @@ public class BillingAccountParser extends DetailObject implements Serializable {
     }
     
     if (n.getAttributeValue("idFundingAgency") != null && !n.getAttributeValue("idFundingAgency").equals("")) {
-      billingAccount.setIdFundingAgency(new Integer(n.getAttributeValue("idFundingAgency")));
+      billingAccount.setIdFundingAgency(Integer.valueOf(n.getAttributeValue("idFundingAgency")));
     } else {
       billingAccount.setIdFundingAgency(null);
     }
@@ -167,7 +165,7 @@ public class BillingAccountParser extends DetailObject implements Serializable {
     }
     
     if (n.getAttributeValue("idCoreFacility") != null && !n.getAttributeValue("idCoreFacility").equals("")) {
-      billingAccount.setIdCoreFacility(new Integer(n.getAttributeValue("idCoreFacility")));
+      billingAccount.setIdCoreFacility(Integer.valueOf(n.getAttributeValue("idCoreFacility")));
     } else {
       billingAccount.setIdCoreFacility(null);
     }
@@ -250,7 +248,7 @@ public class BillingAccountParser extends DetailObject implements Serializable {
       if (idBillingAccountString.startsWith("BillingAccount")) {
         billingAccount = new BillingAccount();
       } else {
-        billingAccount = (BillingAccount)sess.load(BillingAccount.class, new Integer(idBillingAccountString));
+        billingAccount = (BillingAccount)sess.load(BillingAccount.class, Integer.valueOf(idBillingAccountString));
       }
 
       this.initializeBillingAccountJSON(sess, billingAccountJson, billingAccount);
@@ -308,7 +306,7 @@ public class BillingAccountParser extends DetailObject implements Serializable {
     }
 
     if (billingAccountJson.get("idFundingAgency") != null && !billingAccountJson.getString("idFundingAgency").equals("")) {
-      billingAccount.setIdFundingAgency(new Integer(billingAccountJson.getString("idFundingAgency")));
+      billingAccount.setIdFundingAgency(Integer.valueOf(billingAccountJson.getString("idFundingAgency")));
     } else {
       billingAccount.setIdFundingAgency(null);
     }
@@ -359,7 +357,7 @@ public class BillingAccountParser extends DetailObject implements Serializable {
     }
 
     if (billingAccountJson.get("idCoreFacility") != null && !billingAccountJson.getString("idCoreFacility").equals("")) {
-      billingAccount.setIdCoreFacility(new Integer(billingAccountJson.getString("idCoreFacility")));
+      billingAccount.setIdCoreFacility(Integer.valueOf(billingAccountJson.getString("idCoreFacility")));
     } else {
       billingAccount.setIdCoreFacility(null);
     }

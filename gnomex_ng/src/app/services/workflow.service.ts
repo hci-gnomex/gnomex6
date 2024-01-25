@@ -10,7 +10,8 @@ export enum qcModes {
     Illumina = "Illumina",
     Microarray = "Microarray",
     Samplequality = "Sample Quality",
-    Nanostring = "Nano String"
+    Nanostring = "Nano String",
+    Nanogeomx = "Nano Geomx"
 }
 
 @Injectable()
@@ -39,7 +40,8 @@ export class WorkflowService {
     public readonly FLOWCELL = "FLOWCELL";
     public readonly QC = "QC";
     public readonly MICROARRAY = "MICROARRAY";
-    public readonly NANOSTRING = "NANO";
+    public readonly NANOSTRING = "NANOSTRING";
+    public readonly NANOGEOMX = "NANOGEOMX";
     public readonly ALL = "ALL";
     public readonly ALL_PREP = "ALLPREP";
     public readonly ALL_PREP_QC = "ALLPREPQC";

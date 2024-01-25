@@ -1,29 +1,22 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.framework.security.UnknownPermissionException;
-import hci.gnomex.model.AnalysisProtocol;
-import hci.gnomex.model.FeatureExtractionProtocol;
-import hci.gnomex.model.HybProtocol;
-import hci.gnomex.model.LabelingProtocol;
-import hci.gnomex.model.ScanProtocol;
-import hci.gnomex.model.SeqLibProtocol;
-
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.model.*;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.List;
 
 public class GetProtocolList extends GNomExCommand implements Serializable {
 

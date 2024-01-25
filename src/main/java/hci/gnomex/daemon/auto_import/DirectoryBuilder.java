@@ -2,7 +2,9 @@ package hci.gnomex.daemon.auto_import;
 
 import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
 import com.github.fracpete.rsync4j.RSync;
-import hci.gnomex.utility.*;
+import hci.gnomex.utility.BatchMailer;
+import hci.gnomex.utility.MailUtil;
+import hci.gnomex.utility.MailUtilHelper;
 
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
@@ -10,7 +12,6 @@ import javax.persistence.criteria.CriteriaBuilder;
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

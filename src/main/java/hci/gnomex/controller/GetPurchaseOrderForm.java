@@ -1,19 +1,17 @@
 package hci.gnomex.controller;
 
 import hci.gnomex.model.BillingAccount;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import hci.gnomex.utility.HibernateSession;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 public class GetPurchaseOrderForm extends HttpServlet {
 private static Logger LOG = Logger.getLogger(GetPurchaseOrderForm.class);
@@ -69,7 +67,7 @@ protected void doPost(HttpServletRequest req, HttpServletResponse res) throws Se
 			if (amountRead != -1) {
 				out.write(output, 0, amountRead);
 			}
-			totalRead += new Long(amountRead);
+			totalRead += amountRead;
 		}
 
 		res.setContentLength((int) output.length);

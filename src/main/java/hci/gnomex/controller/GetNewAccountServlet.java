@@ -1,12 +1,13 @@
 package hci.gnomex.controller;
 
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.*;
+import hci.gnomex.model.CoreFacility;
+import hci.gnomex.model.Lab;
+import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
-import org.hibernate.query.Query;
 
 import javax.json.*;
 import javax.servlet.ServletConfig;
@@ -62,7 +63,7 @@ public class GetNewAccountServlet extends HttpServlet {
             String siteLogo = "";
 
             if(idCoreFacility != null){
-                siteLogo = PropertyDictionaryHelper.getSiteLogo(sess, new Integer(idCoreFacility));
+                siteLogo = PropertyDictionaryHelper.getSiteLogo(sess, Integer.valueOf(idCoreFacility));
             }else{
                 siteLogo = PropertyDictionaryHelper.getSiteLogo(sess,null);
             }

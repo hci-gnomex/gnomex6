@@ -1,26 +1,16 @@
 package hci.gnomex.utility;
 
-import hci.gnomex.model.Analysis;
-import hci.gnomex.model.DataTrack;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.Topic;
-import hci.gnomex.model.Visibility;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.TreeMap;
-import java.util.logging.Logger;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.hibernate.query.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.jdom.Document;
 import org.jdom.Element;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
+import java.util.*;
+import java.util.logging.Logger;
 
 
 public class TopicQuery implements Serializable {
@@ -550,7 +540,7 @@ public class TopicQuery implements Serializable {
 	  if (theTopics != null) {
 			for (String folderKey : theTopics.keySet()) {
 				String[] tokens     = folderKey.split(KEY_DELIM);
-				Integer idTopic = new Integer(tokens[1]);
+				Integer idTopic = Integer.valueOf(tokens[1]);
 
 				Element topicNode = null;
         Topic childTopic = null;

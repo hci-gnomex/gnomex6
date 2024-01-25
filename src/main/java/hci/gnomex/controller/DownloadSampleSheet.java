@@ -43,7 +43,7 @@ public class DownloadSampleSheet extends ReportCommand implements Serializable {
   protected String errorDetails = "";
 
   private boolean usingJSON = false;
- 
+
   public void validate() {
   }
   
@@ -62,7 +62,7 @@ public class DownloadSampleSheet extends ReportCommand implements Serializable {
     } catch (JDOMException je ) {
       LOG.error( "Cannot parse names", je );
       this.addInvalidField( "names", "Invalid sample name xml");
-      this.errorDetails = Util.GNLOG(LOG,"Cannot parse names", je);
+      this.errorDetails = Util.GNLOG(LOG,"1Cannot parse names", je);
     }
 
     if (request.getParameter("requestJSONString") != null && !request.getParameter("requestJSONString").equals("")) {
@@ -81,7 +81,7 @@ public class DownloadSampleSheet extends ReportCommand implements Serializable {
       }
       catch (JDOMException je) {
         this.addInvalidField("requestXMLString", "Invalid request xml");
-        this.errorDetails = Util.GNLOG(LOG, "Cannot parse requestXMLString", je);
+        this.errorDetails = Util.GNLOG(LOG, "2Cannot parse requestXMLString", je);
       }
     } else {
       try (JsonReader jsonReader = Json.createReader(new StringReader(request.getParameter("requestJSONString")))) {
@@ -90,7 +90,7 @@ public class DownloadSampleSheet extends ReportCommand implements Serializable {
         requestParser = new RequestParser(jsonReader, this.secAdvisor, true);
       } catch (Exception e) {
         this.addInvalidField( "requestJSONString", "Invalid request json");
-        this.errorDetails = Util.GNLOG(LOG,"Cannot parse requestJSONString", e);
+        this.errorDetails = Util.GNLOG(LOG,"3Cannot parse requestJSONString", e);
       }
     }
 
@@ -144,7 +144,7 @@ public class DownloadSampleSheet extends ReportCommand implements Serializable {
     
     } catch (Exception e) {
       LOG.error("An exception has occurred in DownloadSampleSheet ", e);
-      this.errorDetails = Util.GNLOG(LOG,"An exception has occurred in DownloadSampleSheet ", e);
+      this.errorDetails = Util.GNLOG(LOG,"4An exception has occurred in DownloadSampleSheet ", e);
     
       throw new RollBackCommandException(e.getMessage());
     } finally {
@@ -193,7 +193,7 @@ public class DownloadSampleSheet extends ReportCommand implements Serializable {
     Column reportCol = new Column();
     reportCol.setName(name);
     reportCol.setCaption(caption);
-    reportCol.setDisplayOrder(new Integer(colNumber));
+    reportCol.setDisplayOrder(Integer.valueOf(colNumber));
     return reportCol;
   }
 

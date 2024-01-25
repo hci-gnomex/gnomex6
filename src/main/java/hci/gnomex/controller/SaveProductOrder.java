@@ -1,41 +1,15 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.*;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.billing.ProductPlugin;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.BillingAccount;
-import hci.gnomex.model.BillingItem;
-import hci.gnomex.model.BillingPeriod;
-import hci.gnomex.model.BillingTemplate;
-import hci.gnomex.model.BillingTemplateItem;
-import hci.gnomex.model.CoreFacility;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.MasterBillingItem;
-import hci.gnomex.model.Price;
-import hci.gnomex.model.PriceCategory;
-import hci.gnomex.model.Product;
-import hci.gnomex.model.ProductLineItem;
-import hci.gnomex.model.ProductOrder;
-import hci.gnomex.model.ProductOrderStatus;
-import hci.gnomex.model.ProductType;
-import hci.gnomex.model.PropertyDictionary;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import hci.gnomex.model.*;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.internal.SessionImpl;
+import org.hibernate.query.NativeQuery;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -44,11 +18,15 @@ import javax.json.JsonReader;
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpSession;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.internal.SessionImpl;
-import org.hibernate.query.NativeQuery;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.SQLException;
+import java.util.*;
 
 public class SaveProductOrder extends GNomExCommand implements Serializable {
 

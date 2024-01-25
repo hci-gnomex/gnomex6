@@ -1,24 +1,21 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.DataTrack;
 import hci.gnomex.model.DataTrackFolder;
 import hci.gnomex.model.UnloadDataTrack;
 import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
 
 public class DeleteDataTrack extends GNomExCommand implements Serializable {
 
@@ -40,7 +37,7 @@ public class DeleteDataTrack extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
    if (request.getParameter("idDataTrack") != null && !request.getParameter("idDataTrack").equals("")) {
-     idDataTrack = new Integer(request.getParameter("idDataTrack"));
+     idDataTrack = Integer.valueOf(request.getParameter("idDataTrack"));
    } else {
      this.addInvalidField("idDataTrack", "idDataTrack is required.");
    }

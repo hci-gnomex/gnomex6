@@ -1,26 +1,23 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.AnalysisFile;
 import hci.gnomex.utility.AnalysisFileParser;
 import hci.gnomex.utility.HibernateSession;
-
-import java.io.Serializable;
-import java.io.StringReader;
-import java.util.Iterator;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.util.Iterator;
 
 
 /**
@@ -33,11 +30,10 @@ import org.apache.log4j.Logger;
  *
  */
 public class SaveAnalysisFiles extends GNomExCommand implements Serializable {
-  
- 
+
   
   // the static field for logging in Log4J
-  private static Logger LOG = Logger.getLogger(SaveLab.class);
+  private static Logger LOG = Logger.getLogger(SaveAnalysisFiles.class);
   
   private String                baseDir;
   

@@ -1,8 +1,6 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.gnomex.model.Analysis;
@@ -10,19 +8,14 @@ import hci.gnomex.model.DataTrack;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.Topic;
 import hci.gnomex.utility.HibernateSession;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.*;
 
 
 public class DeleteTopic extends GNomExCommand implements Serializable {
@@ -44,7 +37,7 @@ public class DeleteTopic extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
    if (request.getParameter("idTopic") != null && !request.getParameter("idTopic").equals("")) {
-     idTopic = new Integer(request.getParameter("idTopic"));
+     idTopic = Integer.valueOf(request.getParameter("idTopic"));
    } else {
      this.addInvalidField("idTopic", "idTopic is required.");
    }

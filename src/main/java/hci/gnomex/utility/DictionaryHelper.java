@@ -1,40 +1,16 @@
 package hci.gnomex.utility;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.hibernate.Hibernate;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-
 import hci.dictionary.model.DictionaryEntry;
 import hci.dictionary.model.NullDictionaryEntry;
 import hci.dictionary.utility.DictionaryManager;
 import hci.gnomex.controller.ManageDictionaries;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.Application;
-import hci.gnomex.model.BillingPeriod;
-import hci.gnomex.model.BioanalyzerChipType;
-import hci.gnomex.model.CoreFacility;
-import hci.gnomex.model.GenomeBuild;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.OligoBarcode;
-import hci.gnomex.model.Organism;
-import hci.gnomex.model.ProductType;
-import hci.gnomex.model.Property;
-import hci.gnomex.model.RequestCategory;
-import hci.gnomex.model.RequestCategoryType;
-import hci.gnomex.model.Sample;
-import hci.gnomex.model.SeqLibProtocol;
-import hci.gnomex.model.SeqLibTreatment;
-import hci.gnomex.model.SeqRunType;
-import hci.gnomex.model.SlideDesign;
-import hci.gnomex.model.SubmissionInstruction;
+import hci.gnomex.model.*;
+import org.hibernate.Hibernate;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+
+import java.io.Serializable;
+import java.util.*;
 
 public class DictionaryHelper implements Serializable {
   private static DictionaryHelper theInstance;
@@ -74,8 +50,10 @@ public class DictionaryHelper implements Serializable {
   public static synchronized DictionaryHelper getInstance(Session sess) {
     if (theInstance == null) {
       theInstance = new DictionaryHelper();
+//      System.out.println ("[DictionaryHelper] getInstance: theInstance is null, creating new instance");
     }
     if (!theInstance.dictionariesLoaded && sess != null) {
+//        System.out.println ("[DictionaryHelper] getInstance: dictionariesLoaded is false, loading dictionaries");
       theInstance.loadDictionaries(sess);
     }
     return theInstance;
@@ -103,7 +81,7 @@ public class DictionaryHelper implements Serializable {
     return theInstance;
   }
 
-  private void lazyLoadManagedDictionaries() {
+  public void lazyLoadManagedDictionaries() {
     if (!managedDictionariesLoaded) {
       synchronized (this) {
         if (!managedDictionariesLoaded) {
@@ -113,7 +91,7 @@ public class DictionaryHelper implements Serializable {
     }
   }
 
-  private void loadDictionaries(Session sess) {
+  public void loadDictionaries(Session sess) {
 
     propertyDictionaryHelper = PropertyDictionaryHelper.getInstance(sess);
 
@@ -498,9 +476,12 @@ public class DictionaryHelper implements Serializable {
   }
 
   public RequestCategory getRequestCategoryObject(String code) {
+ //   System.out.println ("ManageDictionaries.getRequestCategoryObject(" + code + ")");
     if (!ManageDictionaries.isLoaded) {
+ //     System.out.println ("ManageDictionaries.getRequestCategoryObject(" + code + ") - not isLoaded = false");
       return null;
     }
+ //  System.out.println ("ManageDictionaries.getRequestCategoryObject(" + code + ") - requestCategoryMap.size() = " + requestCategoryMap.size());
     lazyLoadManagedDictionaries();
     return (RequestCategory) requestCategoryMap.get(code);
   }

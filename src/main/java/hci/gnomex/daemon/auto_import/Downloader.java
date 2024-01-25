@@ -62,9 +62,9 @@ public class Downloader {
 				this.downloadPath = args[++i];
 			} else if (args[i].equals("-mode")) {
 				this.mode = args[++i];
-				if(!(this.mode.contains("tempus") || this.mode.equals("avatar") || this.mode.contains("caris")
-						|| this.mode.contains("foundation")) ){
-					System.out.println("If you specify mode it has to be either tempus, avatar, caris or foundation");
+				if(!(this.mode.contains("tempus") || this.mode.equals("avatar") || this.mode.contains("caris")) ){
+					System.out.println("If you specify mode it has to be either tempus, avatar or caris");
+
 					System.exit(1);
 				}
 

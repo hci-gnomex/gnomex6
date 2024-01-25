@@ -4,12 +4,8 @@ import hci.gnomex.model.AppUser;
 import hci.gnomex.model.Lab;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.*;
-
-import java.io.IOException;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -17,9 +13,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
+import java.io.IOException;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class ApproveLabMembership extends HttpServlet {
 private static Logger LOG = Logger.getLogger(ApproveLabMembership.class);
@@ -41,7 +39,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 		String guid = (request.getParameter("guid") != null) ? request.getParameter("guid") : "";
 
 		Boolean denyRequest = false;
-		if (request.getParameter("denyRequest") != null && !request.getParameter("denyRequest").equals("")
+		if (request.getParameter("denyRequest") != null && !request.getParameter("denyRequest").isEmpty()
 				&& request.getParameter("denyRequest").equals("Y")) {
 			denyRequest = true;
 		}

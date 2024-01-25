@@ -1,41 +1,17 @@
 package hci.gnomex.controller;
 
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.Analysis;
-import hci.gnomex.model.AnalysisFile;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.TransferLog;
-import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.GnomexFile;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.hibernate5utils.HibernateDetailObject;
+import org.apache.log4j.Logger;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import hci.hibernate5utils.HibernateDetailObject;
-import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.hibernate.Session;
-
-import com.oreilly.servlet.multipart.FilePart;
-import com.oreilly.servlet.multipart.MultipartParser;
-import com.oreilly.servlet.multipart.ParamPart;
-import com.oreilly.servlet.multipart.Part;
 
 public class UploadExperimentFileServlet extends UploadFileServletBase {
 
@@ -58,7 +34,7 @@ protected void setNumberFieldName(UploadFileServletData data) {
 
 @Override
 protected void handleIdParameter(UploadFileServletData data, String value) {
-	data.parentObject = data.sess.get(Request.class, new Integer(value));
+	data.parentObject = data.sess.get(Request.class, Integer.valueOf(value));
 }
 
 @Override

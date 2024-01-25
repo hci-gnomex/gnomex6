@@ -9,28 +9,20 @@ import hci.gnomex.controller.GetCoreFacilityLabList;
 import hci.gnomex.lucene.GlobalIndexHelper;
 import hci.gnomex.model.*;
 import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
+import org.hibernate.internal.SessionImpl;
+import org.hibernate.query.Query;
 
+import javax.naming.NamingException;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.naming.NamingException;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Hibernate;
-import org.hibernate.Session;
-import org.hibernate.internal.SessionImpl;
-import org.hibernate.query.Query;
+import java.util.*;
 
 public class SecurityAdvisor extends DetailObject implements Serializable, hci.framework.security.SecurityAdvisor {
     // Security advisor session variable
@@ -2206,9 +2198,9 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
 
     public Integer getIdAppUser() {
         if (isGuest) {
-            return new Integer(-999999);
+            return -999999;
         } else if (isUniversityOnlyUser) {
-            return new Integer(-999999);
+            return -999999;
         } else {
             return appUser.getIdAppUser();
         }
@@ -2657,6 +2649,7 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
                 queryBuf.append(" OR ");
             }
 
+
             appendCoreFacilityCriteria(queryBuf, classShortName);
             if (hasPermission(CAN_SUBMIT_FOR_OTHER_CORES)) {
                 queryBuf.append(" OR ");
@@ -2678,37 +2671,49 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
 
             // Add criteria for collaborator list
             boolean criteriaAdded = appendSecurityCollaboratorListCriteria(queryBuf, collabClassShortName);
+//            System.out.println ("[buildSpannedSecurityCriteria] *1*  " + queryBuf);
 
             // Add criteria with owner visibility
             queryBuf.append(!criteriaAdded ? "WHERE " : " OR ");
             criteriaAdded = appendOwnerCriteria(queryBuf, classShortName);
+//            System.out.println ("[buildSpannedSecurityCriteria] *2*  " + queryBuf);
 
             if (hasPermission(CAN_SUBMIT_FOR_OTHER_CORES)) {
                 queryBuf.append(!criteriaAdded ? "WHERE " : " OR ");
                 criteriaAdded = appendSubmitterCriteria(queryBuf, classShortName);
+//                System.out.println ("[buildSpannedSecurityCriteria] *3*  " + queryBuf);
+
             }
 
             // Add criteria for objects with members visibility
             if (getGroupsIAmMemberOrManagerOf().size() > 0) {
                 queryBuf.append(!criteriaAdded ? "WHERE " : " OR ");
                 criteriaAdded = appendMembershipCriteria(queryBuf, classShortName);
+//                System.out.println ("[buildSpannedSecurityCriteria] *4*  " + queryBuf);
+
             }
 
             // Add criteria for objects with collaborator visibility
             if (getAllMyGroups().size() > 0) {
                 queryBuf.append(!criteriaAdded ? "WHERE " : " OR ");
                 criteriaAdded = appendMembersAndCollaboratorsCriteria(queryBuf, classShortName);
+//                System.out.println ("[buildSpannedSecurityCriteria] *5*  " + queryBuf);
+
             }
 
             // Add criteria for objects with institution visibility
             if (getInstitutionsIAmMemberOf().size() > 0) {
                 queryBuf.append(!criteriaAdded ? "WHERE " : " OR ");
                 criteriaAdded = appendInstitutionCriteria(queryBuf, classShortName);
+//                System.out.println ("[buildSpannedSecurityCriteria] *6*  " + queryBuf);
+
             }
 
             // Add criteria for public objects
             queryBuf.append(!criteriaAdded ? "WHERE " : " OR ");
             criteriaAdded = appendPublicCriteria(queryBuf, classShortName, scopeToGroup);
+//            System.out.println ("[buildSpannedSecurityCriteria] *7*  " + queryBuf);
+
 
             // Pick up "empty" projects or analysis groups that don't have any
             // children but
@@ -2720,11 +2725,15 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
                 queryBuf.append(" AND ");
                 queryBuf.append(" " + leftJoinExclusionCriteria + " is NULL ");
                 queryBuf.append(" ) ");
+//                System.out.println ("[buildSpannedSecurityCriteria] *8*  " + queryBuf);
+
             }
 
             // Pick up "empty" projects or analysis groups that don't have any
             // children but
             // belong to same core user can submit to.
+            // causes empty labs to show up if not core 1
+/*
             if (leftJoinExclusionCriteria != null && this.getCoreFacilitiesICanSubmitTo().size() > 0
                     && labCoreFacilitiesName != null) {
                 queryBuf.append(!criteriaAdded ? "WHERE " : " OR ");
@@ -2733,8 +2742,10 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
                 queryBuf.append(" AND ");
                 queryBuf.append(" " + leftJoinExclusionCriteria + " is NULL ");
                 queryBuf.append(" ) ");
-            }
+                System.out.println ("[buildSpannedSecurityCriteria] *9*  " + queryBuf);
 
+            }
+*/
 		/*
 		 * If a user is the submitter they should be able to view the experiment This case should only be hit if a collaborator submits the experiment
 		 */
@@ -2744,9 +2755,12 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
             queryBuf.append(" ) ");
 
             queryBuf.append(" ) ");
+//            System.out.println ("[buildSpannedSecurityCriteria] *10*  " + queryBuf);
 
             if (hasCoreFacility) {
                 this.appendSpecifiedCoreFacilityCriteria(queryBuf, classShortName, isFirstCriteria);
+//                System.out.println ("[buildSpannedSecurityCriteria] *11*  " + queryBuf);
+
             }
         } else {
             // Guest or University only user can access public objects
@@ -2755,11 +2769,15 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
             queryBuf.append(" ( ");
 
             appendPublicCriteria(queryBuf, classShortName, false);
+//            System.out.println ("[buildSpannedSecurityCriteria] *12*  " + queryBuf);
+
 
             queryBuf.append(" ) ");
 
             if (hasCoreFacility) {
                 this.appendSpecifiedCoreFacilityCriteria(queryBuf, classShortName, isFirstCriteria);
+//                System.out.println ("[buildSpannedSecurityCriteria] *13*  " + queryBuf);
+
             }
         }
         return isFirstCriteria;
@@ -2813,6 +2831,8 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
             if (collabClassShortName != null && collabClassShortName.length() > 0) {
                 criteriaAdded = appendSecurityCollaboratorListCriteria(queryBuf, collabClassShortName);
                 queryBuf.append(!criteriaAdded ? "WHERE " : " OR ");
+//                System.out.println ("[buildSpannedSecurityCriteria] *14*  " + queryBuf);
+
             }
 
             // Add criteria with owner visibility
@@ -2821,6 +2841,8 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
             if (hasPermission(CAN_SUBMIT_FOR_OTHER_CORES) && checkSubmitter) {
                 queryBuf.append(!criteriaAdded ? "WHERE " : " OR ");
                 criteriaAdded = appendSubmitterCriteria(queryBuf, classShortName);
+//                System.out.println ("[buildSpannedSecurityCriteria] *15*  " + queryBuf);
+
             }
 
             if (includeVisCrit) {
@@ -2829,33 +2851,45 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
                 if (getGroupsIAmMemberOrManagerOf().size() > 0) {
                     queryBuf.append(!criteriaAdded ? "WHERE " : " OR ");
                     criteriaAdded = appendMembershipCriteria(queryBuf, classShortName);
+//                    System.out.println ("[buildSpannedSecurityCriteria] *16*  " + queryBuf);
+
                 }
 
                 // Add criteria for objects with collaborator visibility
                 if (getAllMyGroups().size() > 0) {
                     queryBuf.append(!criteriaAdded ? "WHERE " : " OR ");
                     criteriaAdded = appendMembersAndCollaboratorsCriteria(queryBuf, classShortName);
+//                    System.out.println ("[buildSpannedSecurityCriteria] *17*  " + queryBuf);
+
                 }
 
                 // Add criteria for objects with institution visibility
                 if (getInstitutionsIAmMemberOf().size() > 0) {
                     queryBuf.append(!criteriaAdded ? "WHERE " : " OR ");
                     criteriaAdded = appendInstitutionCriteria(queryBuf, classShortName);
+//                    System.out.println ("[buildSpannedSecurityCriteria] *18*  " + queryBuf);
+
                 }
 
                 // Add criteria for public objects
                 queryBuf.append(!criteriaAdded ? "WHERE " : " OR ");
                 criteriaAdded = appendPublicCriteria(queryBuf, classShortName, scopeToGroup);
+//                System.out.println ("[buildSpannedSecurityCriteria] *19*  " + queryBuf);
+
             }
 
             queryBuf.append(" ) ");
 
             if (hasCoreFacility) {
                 this.appendSpecifiedCoreFacilityCriteria(queryBuf, classShortName, isFirstCriteria);
+//                System.out.println ("[buildSpannedSecurityCriteria] *20*  " + queryBuf);
+
             }
         } else if (hasPermission(SecurityAdvisor.CAN_SUBMIT_FOR_OTHER_CORES) && checkSubmitter) {
             queryBuf.append(!isFirstCriteria ? "WHERE " : " AND ");
             appendSubmitterCriteria(queryBuf, classShortName);
+//            System.out.println ("[buildSpannedSecurityCriteria] *21*  " + queryBuf);
+
         } else {
 
             // Guest or University only user cab access public objects
@@ -2866,9 +2900,13 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
             appendPublicCriteria(queryBuf, classShortName, false);
 
             queryBuf.append(" ) ");
+//            System.out.println ("[buildSpannedSecurityCriteria] *22*  " + queryBuf);
+
 
             if (hasCoreFacility) {
                 this.appendSpecifiedCoreFacilityCriteria(queryBuf, classShortName, isFirstCriteria);
+//                System.out.println ("[buildSpannedSecurityCriteria] *23*  " + queryBuf);
+
             }
         }
 
@@ -2884,33 +2922,47 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
             queryBuf.append(" ( ");
 
             // Add criteria for collaborator list
+//            System.out.println ("[buildSpannedSecurityCriteria] *24*  " + queryBuf);
+
             boolean criteriaAdded = appendSecurityCollaboratorListCriteria(queryBuf, collabClassShortName);
+//            System.out.println ("[buildSpannedSecurityCriteria] *25*  " + queryBuf);
+
 
             // Add criteria with owner visibility
             queryBuf.append(!criteriaAdded ? " " : " OR ");
             criteriaAdded = appendOwnerCriteria(queryBuf, classShortName);
+//            System.out.println ("[buildSpannedSecurityCriteria] *26*  " + queryBuf);
+
 
             if (hasPermission(CAN_SUBMIT_FOR_OTHER_CORES)) {
                 queryBuf.append(!criteriaAdded ? " " : " OR ");
                 criteriaAdded = appendSubmitterCriteria(queryBuf, classShortName);
+//                System.out.println ("[buildSpannedSecurityCriteria] *27*  " + queryBuf);
+
             }
 
             // Add criteria for objects with members visibility
             if (getGroupsIAmMemberOrManagerOf().size() > 0) {
                 queryBuf.append(!criteriaAdded ? " " : " OR ");
                 criteriaAdded = appendMembershipCriteria(queryBuf, classShortName);
+//                System.out.println ("[buildSpannedSecurityCriteria] *28*  " + queryBuf);
+
             }
 
             // Add criteria for objects with collaborator visibility
             if (getAllMyGroups().size() > 0) {
                 queryBuf.append(!criteriaAdded ? " " : " OR ");
                 criteriaAdded = appendMembersAndCollaboratorsCriteria(queryBuf, classShortName);
+//                System.out.println ("[buildSpannedSecurityCriteria] *29*  " + queryBuf);
+
             }
 
             // Add criteria for objects with institution visibility
             if (getInstitutionsIAmMemberOf().size() > 0) {
                 queryBuf.append(!criteriaAdded ? " " : " OR ");
                 criteriaAdded = appendInstitutionCriteria(queryBuf, classShortName);
+//                System.out.println ("[buildSpannedSecurityCriteria] *30*  " + queryBuf);
+
             }
 
             queryBuf.append(" ) ");
@@ -2935,6 +2987,8 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
             queryBuf.append(this.getIdAppUser());
 
             queryBuf.append(" ) ");
+//            System.out.println ("[buildSpannedSecurityCriteria] *31*  " + queryBuf);
+
             return true;
         } else {
             return false;
@@ -3067,6 +3121,11 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
                     "Unable to filter admin by core facilties -- no core facilities have been assiged to this user");
         }
 
+        int nn = 2;
+        if (nn ==1) {
+            return true;
+        }
+
         queryBuf.append(" ( ");
 
         // req.idCoreFacility in (....)
@@ -3091,7 +3150,10 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
             throw new RuntimeException(
                     "Unable to filter submitter by core facilties -- no core facilities have been assigned to this user");
         }
-
+        int nn = 2;
+        if (nn ==1) {
+            return true;
+        }
         queryBuf.append(" ( ");
 
         // req.idCoreFacility in (....)

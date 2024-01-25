@@ -4,9 +4,6 @@
 package hci.gnomex.security;
 
 import hci.gnomex.model.AppUser;
-import hci.gnomex.security.EncrypterService;
-import hci.gnomex.security.EncryptionUtility;
-
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 

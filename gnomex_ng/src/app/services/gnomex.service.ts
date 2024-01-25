@@ -48,6 +48,7 @@ export class GnomexService {
 
     public readonly TYPE_MICROARRAY: string = "MICROARRAY";
     public readonly TYPE_NANOSTRING: string = "NANOSTRING";
+    public readonly TYPE_NANOGEOMX: string = "NANOGEOMX";
 
 
 

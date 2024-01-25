@@ -1,23 +1,18 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.*;
 import hci.gnomex.utility.BillingTemplateQueryManager;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.*;
 
 
 
@@ -26,7 +21,7 @@ public class SaveRequestProject extends GNomExCommand implements Serializable {
  
   
   // the static field for logging in Log4J
-  private static Logger LOG = Logger.getLogger(SaveRequest.class);
+  private static Logger LOG = Logger.getLogger(SaveRequestProject.class);
   
 
   
@@ -48,19 +43,19 @@ public class SaveRequestProject extends GNomExCommand implements Serializable {
     
     
     if (request.getParameter("idProject") != null && !request.getParameter("idProject").equals("")) {
-      idProject = new Integer(request.getParameter("idProject"));
+      idProject = Integer.valueOf(request.getParameter("idProject"));
     } else {
       this.addInvalidField("idProject", "idProject is required");
     }
     
     if (request.getParameter("idRequest") != null && !request.getParameter("idRequest").equals("")) {
-      idRequest = new Integer(request.getParameter("idRequest"));
+      idRequest = Integer.valueOf(request.getParameter("idRequest"));
     } else {
       this.addInvalidField("idRequest", "idRequest is required");
     }
     
     if (request.getParameter("idAppUser") != null && !request.getParameter("idAppUser").equals("")) {
-      idAppUser = new Integer(request.getParameter("idAppUser"));
+      idAppUser = Integer.valueOf(request.getParameter("idAppUser"));
     } else {
       this.addInvalidField("idAppUser", "idAppUser is required");
     }
@@ -72,7 +67,7 @@ public class SaveRequestProject extends GNomExCommand implements Serializable {
     }
 
     if (request.getParameter("idBillingAccount") != null && !request.getParameter("idBillingAccount").equals("")) {
-      idBillingAccount = new Integer(request.getParameter("idBillingAccount"));
+      idBillingAccount = Integer.valueOf(request.getParameter("idBillingAccount"));
     }
     
     if (request.getParameter("forceNoChangeBilling") != null && request.getParameter("forceNoChangeBilling").equalsIgnoreCase("true")) {

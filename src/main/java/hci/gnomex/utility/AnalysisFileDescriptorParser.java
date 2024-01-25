@@ -2,15 +2,10 @@ package hci.gnomex.utility;
 
 import hci.framework.model.DetailObject;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import java.io.Serializable;
+import java.util.*;
 
 public class AnalysisFileDescriptorParser extends DetailObject implements Serializable {
 
@@ -41,7 +36,7 @@ public class AnalysisFileDescriptorParser extends DetailObject implements Serial
         FileDescriptor fd = new FileDescriptor();
 
         String idAnalysis = Util.getJsonStringSafe(n, "idAnalysis");
-        fd.setId(idAnalysis != null && !idAnalysis.equals("") ? Integer.valueOf(idAnalysis) : null);
+        fd.setId(idAnalysis != null && !idAnalysis.isEmpty() ? Integer.valueOf(idAnalysis) : null);
         fd.setFileName(n.getString("fileName"));
         fd.setQualifiedFilePath(n.getString("qualifiedFilePath"));
         fd.setBaseFilePath(n.getString("baseFilePath"));

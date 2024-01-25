@@ -12,8 +12,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-//import javax.ejb.Stateless;
-
 /**
  * A stateless session bean providing the REST API for creating, getting and deleting user sessions on the server
  * (i.e. authentication).

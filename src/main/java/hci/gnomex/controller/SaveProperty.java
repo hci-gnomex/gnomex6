@@ -1,47 +1,25 @@
 
 package hci.gnomex.controller;
 
+import hci.framework.control.Command;
+import hci.framework.control.RollBackCommandException;
+import hci.gnomex.model.*;
+import hci.gnomex.security.SecurityAdvisor;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
-
-import javax.json.*;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Hibernate;
-import org.hibernate.query.Query;
-import org.hibernate.Session;
-
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
-import hci.framework.control.RollBackCommandException;
-import hci.gnomex.model.AnalysisType;
-import hci.gnomex.model.AppUserLite;
-import hci.gnomex.model.Application;
-import hci.gnomex.model.Organism;
-import hci.gnomex.model.Price;
-import hci.gnomex.model.PriceCategory;
-import hci.gnomex.model.PriceCriteria;
-import hci.gnomex.model.PriceSheet;
-import hci.gnomex.model.PriceSheetPriceCategory;
-import hci.gnomex.model.Property;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.PropertyOption;
-import hci.gnomex.model.PropertyPlatformApplication;
-import hci.gnomex.model.PropertyType;
-import hci.gnomex.model.RequestCategory;
-import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.PriceUtil;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import org.apache.log4j.Logger;
+import java.util.*;
 
 public class SaveProperty extends GNomExCommand implements Serializable {
 

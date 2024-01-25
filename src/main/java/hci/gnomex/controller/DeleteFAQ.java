@@ -1,24 +1,17 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.TransferLog;
 import hci.gnomex.model.FAQ;
 import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.Serializable;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Hibernate;
-import org.hibernate.Session;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 public class DeleteFAQ extends GNomExCommand implements Serializable {
 
   // the static field for logging in Log4J
@@ -32,7 +25,7 @@ public class DeleteFAQ extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
    if (request.getParameter("idFAQ") != null && !request.getParameter("idFAQ").equals("")) {
-     idFAQ = new Integer(request.getParameter("idFAQ"));
+     idFAQ = Integer.valueOf(request.getParameter("idFAQ"));
    } else {
      this.addInvalidField("idFAQ", "idFAQ is required.");
    }

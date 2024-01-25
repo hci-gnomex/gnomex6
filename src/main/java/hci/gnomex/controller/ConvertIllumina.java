@@ -1,25 +1,17 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
+import hci.framework.control.RollBackCommandException;
+import hci.gnomex.model.*;
+import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.Util;
-import hci.framework.control.RollBackCommandException;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.RequestCategory;
-import hci.gnomex.model.Sample;
-import hci.gnomex.model.SequenceLane;
-import hci.gnomex.model.Step;
-import hci.gnomex.model.WorkItem;
-import hci.gnomex.utility.HibernateSession;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.Iterator;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
 public class ConvertIllumina extends GNomExCommand implements Serializable {
 	// the static field for logging in Log4J
 	private static Logger LOG = Logger.getLogger(ConvertIllumina.class);
@@ -31,27 +23,27 @@ public class ConvertIllumina extends GNomExCommand implements Serializable {
 	private Integer idSeqLibProtocol;
 
 	public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
-		if (request.getParameter("idRequest") != null && !request.getParameter("idRequest").equals("")) {
+		if (request.getParameter("idRequest") != null && !request.getParameter("idRequest").isEmpty()) {
 			this.idRequest = Integer.parseInt(request.getParameter("idRequest"));
 		} else {
 			this.addInvalidField("idRequest", "Missing idRequest");
 		}
 
-		if (request.getParameter("idNumberSequencingCyclesAllowed") != null && !request.getParameter("idNumberSequencingCyclesAllowed").equals("")) {
+		if (request.getParameter("idNumberSequencingCyclesAllowed") != null && !request.getParameter("idNumberSequencingCyclesAllowed").isEmpty()) {
 			this.idNumberSequencingCyclesAllowed = Integer.parseInt(request.getParameter("idNumberSequencingCyclesAllowed"));
 
 		} else {
 			this.addInvalidField("idNumberSequencingCyclesAllowed", "Missing idNumberSequencingCyclesAllowed");
 		}
 
-		if (request.getParameter("idSeqLibProtocol") != null && !request.getParameter("idSeqLibProtocol").equals("")) {
+		if (request.getParameter("idSeqLibProtocol") != null && !request.getParameter("idSeqLibProtocol").isEmpty()) {
 			this.idSeqLibProtocol = Integer.parseInt(request.getParameter("idSeqLibProtocol"));
 
 		} else {
 			this.addInvalidField("idSeqLibProtocol", "Missing idSeqLibProtocol");
 		}
 
-		if (request.getParameter("idNumberSequencingCycles") != null && !request.getParameter("idNumberSequencingCycles").equals("")) {
+		if (request.getParameter("idNumberSequencingCycles") != null && !request.getParameter("idNumberSequencingCycles").isEmpty()) {
 			this.idNumberSequencingCycles = Integer.parseInt(request.getParameter("idNumberSequencingCycles"));
 
 		} else {

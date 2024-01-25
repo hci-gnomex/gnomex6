@@ -1,36 +1,29 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.framework.security.UnknownPermissionException;
 import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.Assay;
-import hci.gnomex.model.InstrumentRun;
-import hci.gnomex.model.Plate;
-import hci.gnomex.model.PlateWell;
-import hci.gnomex.model.Primer;
-import hci.gnomex.model.ReactionType;
-import hci.gnomex.model.Request;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PlateReportHTMLFormatter;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.naming.NamingException;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 public class ShowPlateReport extends GNomExCommand implements Serializable {
 
   private static Logger LOG         = Logger.getLogger( ShowPlateReport.class );
@@ -285,7 +278,7 @@ public class ShowPlateReport extends GNomExCommand implements Serializable {
    * method allows you to manipulate the HttpServletResponse object prior to
    * forwarding to the result JSP (add a cookie, etc.)
    * 
-   * @param request
+   * @param response
    *          The HttpServletResponse for the command
    * @return The processed response
    */

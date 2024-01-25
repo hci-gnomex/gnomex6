@@ -22,6 +22,8 @@ export class Sample implements OnDestroy {
     public concentration:                   string = ''; // "";
     public sampleVolume:                    string = ''; // "";
     public ccNumber:                        string = ''; // "";
+    public sampleAlias_CORE:                string = ''; // "";
+    public idSample_CORE:                   string = ''; // "";
     public label:                           string = ''; // "";
     public idOligoBarcode:                  string = ''; // "";
     public barcodeSequence:                 string = ''; // "";
@@ -228,6 +230,8 @@ export class Sample implements OnDestroy {
         sample.cloneProperty("concentration", source);
         sample.cloneProperty("sampleVolume", source);
         sample.cloneProperty("ccNumber", source);
+        sample.cloneProperty("sampleAlias_CORE", source);
+        sample.cloneProperty("idSample_CORE", source);
         sample.cloneProperty("label", source);
         sample.cloneProperty("idOligoBarcode", source);
         sample.cloneProperty("barcodeSequence", source);
@@ -440,6 +444,8 @@ export class Sample implements OnDestroy {
             concentration:                   this.concentration,
             sampleVolume:                    this.sampleVolume,
             ccNumber:                        this.ccNumber,
+            sampleAlias_CORE:                this.sampleAlias_CORE,
+            idSample_CORE:                   this.idSample_CORE,
             label:                           this.label,
             idOligoBarcode:                  this.idOligoBarcode,
             barcodeSequence:                 this.barcodeSequence,

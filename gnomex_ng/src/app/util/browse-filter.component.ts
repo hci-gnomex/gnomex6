@@ -243,8 +243,8 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
         let isGuestState: boolean = this.createSecurityAdvisorService.isGuest;
 
         if (this.mode === this.EXPERIMENT_BROWSE) {
-            let isBSTLinkageSupported: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_BST_LINKAGE_SUPPORTED);
-            let canAccessBSTX: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_ACCESS_BSTX);
+            let isBSTLinkageSupported: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CORE_LINKAGE_SUPPORTED);
+            let canAccessBSTX: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_ACCESS_CORE);
             if (isAdminState) {
                 this.showAllCheckbox = true;
                 this.showLabComboBox = true;
@@ -740,6 +740,11 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 params = params.set("idLab", this.selectedLab);
             }else{
                 params = params.delete("idLab");
+//
+//                if (this.labList.length > 0) {
+//                    this.selectedLab = this.labList[0].idLab;
+//                    params = params.set("idLab",this.selectedLab);
+//                }
             }
             if (this.showOwnerComboBox && !(this.idAppUserString === "")) {
                 params = params.set("idAppUser", this.selectedOwner);

@@ -33,6 +33,9 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                     <mat-error *ngIf="this.emailFC.hasError('required')">Required</mat-error>
                     <mat-error *ngIf="this.emailFC.hasError('email') && !this.emailFC.hasError('required')">Valid Email Required</mat-error>
                 </mat-form-field>
+                <mat-form-field class="dialogFormField">
+                    <input matInput formControlName="awsAccountNumber" placeholder="AWS Account Number">
+                </mat-form-field>
                 <mat-radio-group class="permission-radio-group" [formControl]="pricingFC">
                     <mat-radio-button value="INTERNAL"><img [src]="'./assets/group.png'"> Internal</mat-radio-button>
                     <mat-radio-button value="EXACADEMIC"><img [src]="'./assets/graduation_cap.png'"> External Academic</mat-radio-button>
@@ -47,6 +50,7 @@ export class NewGroupDialogComponent extends BaseGenericContainerDialog implemen
     public emailFC: FormControl;
     public pricingFC: FormControl;
     public phoneFC: FormControl;
+    public awsAccountNumberFC: FormControl;
     public addGroupFG: FormGroup;
 
 
@@ -60,11 +64,13 @@ export class NewGroupDialogComponent extends BaseGenericContainerDialog implemen
         this.emailFC = new FormControl("", [Validators.required, Validators.pattern("^((\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*)\\s*[,]{0,1}\\s*)+$")]);
         this.pricingFC = new FormControl("", [Validators.required]);
         this.phoneFC = new FormControl("");
+        this.awsAccountNumberFC = new FormControl("");
         this.addGroupFG = this.formBuilder.group({
             lastName: '',
             firstName: '',
             email: this.emailFC,
             phone: this.phoneFC,
+            awsAccountNumber: this.awsAccountNumberFC,
             pricing: this.pricingFC
         }, { validator: this.atLeastOneNameRequired}
             );
@@ -97,6 +103,7 @@ export class NewGroupDialogComponent extends BaseGenericContainerDialog implemen
         params = params.set("collaboratorsJSONString", "");
         params = params.set("contactPhone", this.addGroupFG.controls['phone'].value);
         params = params.set("contactEmail", this.emailFC.value);
+        params = params.set("awsAccountNumber", this.awsAccountNumberFC.value);
         params = params.set("idLab", '0');
         if (this.pricingFC.value === "INTERNAL") {
             params = params.set("isExternalPricing", "N");

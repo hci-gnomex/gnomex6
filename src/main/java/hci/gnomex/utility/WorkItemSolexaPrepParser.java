@@ -3,18 +3,13 @@ package hci.gnomex.utility;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Sample;
 import hci.gnomex.model.WorkItem;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.*;
 
 
 public class WorkItemSolexaPrepParser implements Serializable {
@@ -40,8 +35,8 @@ public class WorkItemSolexaPrepParser implements Serializable {
       String idSampleString   = workItemNode.getAttributeValue("idSample");
       String idWorkItemString = workItemNode.getAttributeValue("idWorkItem");
       
-      Sample sample = (Sample)sess.load(Sample.class, new Integer(idSampleString));
-      WorkItem workItem = (WorkItem)sess.load(WorkItem.class, new Integer(idWorkItemString));
+      Sample sample = (Sample)sess.load(Sample.class, Integer.valueOf(idSampleString));
+      WorkItem workItem = (WorkItem)sess.load(WorkItem.class, Integer.valueOf(idWorkItemString));
       
       
       if (workItemNode.getAttributeValue("seqPrepStatus") != null && !workItemNode.getAttributeValue("seqPrepStatus").equals("")) {
@@ -93,7 +88,7 @@ public class WorkItemSolexaPrepParser implements Serializable {
     }
 
     if (n.getAttributeValue("idLibPrepPerformedBy") != null && !n.getAttributeValue("idLibPrepPerformedBy").equals("")) {
-      sample.setIdLibPrepPerformedBy(new Integer(n.getAttributeValue("idLibPrepPerformedBy")));
+      sample.setIdLibPrepPerformedBy(Integer.valueOf(n.getAttributeValue("idLibPrepPerformedBy")));
     } else {
       sample.setIdLibPrepPerformedBy(null);
     }
@@ -105,33 +100,33 @@ public class WorkItemSolexaPrepParser implements Serializable {
     }    
     
     if (n.getAttributeValue("seqPrepGelFragmentSizeFrom") != null && !n.getAttributeValue("seqPrepGelFragmentSizeFrom").equals("")) {
-      sample.setSeqPrepGelFragmentSizeFrom(new Integer(n.getAttributeValue("seqPrepGelFragmentSizeFrom")));
+      sample.setSeqPrepGelFragmentSizeFrom(Integer.valueOf(n.getAttributeValue("seqPrepGelFragmentSizeFrom")));
     } else {
       sample.setSeqPrepGelFragmentSizeFrom(null);
     }    
 
     if (n.getAttributeValue("seqPrepGelFragmentSizeTo") != null && !n.getAttributeValue("seqPrepGelFragmentSizeTo").equals("")) {
-      sample.setSeqPrepGelFragmentSizeTo(new Integer(n.getAttributeValue("seqPrepGelFragmentSizeTo")));
+      sample.setSeqPrepGelFragmentSizeTo(Integer.valueOf(n.getAttributeValue("seqPrepGelFragmentSizeTo")));
     } else {
       sample.setSeqPrepGelFragmentSizeTo(null);
     }    
     if (n.getAttributeValue("idSeqLibProtocol") != null && !n.getAttributeValue("idSeqLibProtocol").equals("")) {
-      sample.setIdSeqLibProtocol(new Integer(n.getAttributeValue("idSeqLibProtocol")));
+      sample.setIdSeqLibProtocol(Integer.valueOf(n.getAttributeValue("idSeqLibProtocol")));
     } else {
       sample.setIdSeqLibProtocol(null);
     }    
     if (n.getAttributeValue("idOligoBarcode") != null && !n.getAttributeValue("idOligoBarcode").equals("")) {
-      sample.setIdOligoBarcode(new Integer(n.getAttributeValue("idOligoBarcode")));
+      sample.setIdOligoBarcode(Integer.valueOf(n.getAttributeValue("idOligoBarcode")));
     } else {
       sample.setIdOligoBarcode(null);
     }
     if (n.getAttributeValue("meanLibSizeActual") != null && !n.getAttributeValue("meanLibSizeActual").equals("")) {
-      sample.setMeanLibSizeActual((new Integer(n.getAttributeValue("meanLibSizeActual"))));
+      sample.setMeanLibSizeActual((Integer.valueOf(n.getAttributeValue("meanLibSizeActual"))));
     } else {
       sample.setMeanLibSizeActual(null);
     }
     if (n.getAttributeValue("idOligoBarcodeB") != null && !n.getAttributeValue("idOligoBarcodeB").equals("")) {
-      sample.setIdOligoBarcodeB(new Integer(n.getAttributeValue("idOligoBarcodeB")));
+      sample.setIdOligoBarcodeB(Integer.valueOf(n.getAttributeValue("idOligoBarcodeB")));
     } else {
       sample.setIdOligoBarcodeB(null);
     }

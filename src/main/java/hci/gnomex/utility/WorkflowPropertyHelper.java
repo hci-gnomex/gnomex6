@@ -1,6 +1,6 @@
 package hci.gnomex.utility;
 
-import hci.gnomex.model.PropertyDictionary;
+//import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.model.WorkflowProperty;
 import org.hibernate.Session;
 import org.hibernate.query.Query;

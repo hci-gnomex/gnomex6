@@ -1,13 +1,20 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.*;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.ProductOrder;
 import hci.gnomex.model.ProductOrderFile;
 import hci.gnomex.model.TransferLog;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -16,18 +23,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import hci.gnomex.utility.Util;
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
 
 public class OrganizeProductOrderUploadFiles extends GNomExCommand implements Serializable {
 
@@ -50,7 +45,7 @@ public void validate() {
 public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
 	if (request.getParameter("idProductOrder") != null && !request.getParameter("idProductOrder").equals("")) {
-		idProductOrder = new Integer(request.getParameter("idProductOrder"));
+		idProductOrder = Integer.valueOf(request.getParameter("idProductOrder"));
 	} else {
 		this.addInvalidField("idProductOrder", "idProductOrder is required");
 	}
@@ -136,7 +131,7 @@ public Command execute() throws RollBackCommandException {
 					if (idFileString != null) {
 						ProductOrderFile pof;
 						if (!idFileString.startsWith("ProductOrderFile") && !idFileString.equals("")) {
-							pof = (ProductOrderFile) sess.load(ProductOrderFile.class, new Integer(idFileString));
+							pof = (ProductOrderFile) sess.load(ProductOrderFile.class, Integer.valueOf(idFileString));
 							pof.setFileName(displayName);
 							pof.setBaseFilePath(f2.getAbsolutePath().replace("\\", Constants.FILE_SEPARATOR));
 							pof.setQualifiedFilePath(qualifiedFilePath);
@@ -156,7 +151,7 @@ public Command execute() throws RollBackCommandException {
 								if (afParts[1].startsWith("ProductOrderFile")) {
 									continue;
 								}
-								pof = (ProductOrderFile) sess.load(ProductOrderFile.class, new Integer(afParts[1]));
+								pof = (ProductOrderFile) sess.load(ProductOrderFile.class, Integer.valueOf(afParts[1]));
 								pof.setFileName(afParts[3]);
 								pof.setBaseFilePath(afParts[0]);
 
@@ -222,7 +217,7 @@ public Command execute() throws RollBackCommandException {
 						if (idFileString != null) {
 							ProductOrderFile pof = new ProductOrderFile();
 							if (!idFileString.startsWith("ProductOrderFile") && !idFileString.equals("")) {
-								pof = (ProductOrderFile) sess.load(ProductOrderFile.class, new Integer(idFileString));
+								pof = (ProductOrderFile) sess.load(ProductOrderFile.class, Integer.valueOf(idFileString));
 							} else if (idFileString.startsWith("ProductOrderFile")) {
 								pof = new ProductOrderFile();
 								pof.setCreateDate(new java.sql.Date(System.currentTimeMillis()));
@@ -330,7 +325,7 @@ public Command execute() throws RollBackCommandException {
 						if (idFileString != null) {
 							ProductOrderFile pof;
 							if (!idFileString.startsWith("ProductOrderFile") && !idFileString.equals("")) {
-								pof = (ProductOrderFile) sess.load(ProductOrderFile.class, new Integer(idFileString));
+								pof = (ProductOrderFile) sess.load(ProductOrderFile.class, Integer.valueOf(idFileString));
 								productOrder.getFiles().remove(pof);
 							}
 						}

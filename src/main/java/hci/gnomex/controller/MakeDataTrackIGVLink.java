@@ -30,8 +30,7 @@ import java.util.regex.Pattern;
 /**
  * Edited 1/15/2013 Mosbruger
  *
- *
- * /**Used for making html url links formatted for IGV and softlinked to GNomEx files.
+ * Used for making html url links formatted for IGV and softlinked to GNomEx files.
  */
 public class MakeDataTrackIGVLink extends HttpServlet {
 private static final long serialVersionUID = 1L;

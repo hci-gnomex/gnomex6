@@ -1,10 +1,9 @@
 package hci.framework.model;
 
-import hci.framework.utilities.Annotations;
-import hci.framework.utilities.ConfigurationPlugin;
-import hci.framework.utilities.DirtyMarker;
-import hci.framework.utilities.PluginFactory;
-import hci.framework.utilities.XMLReflectException;
+import hci.framework.utilities.*;
+import org.jdom.Attribute;
+import org.jdom.Document;
+import org.jdom.Element;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -12,24 +11,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
 
-/**
- *  A base class for detail objects
- *
- *@author     Kirt Henrie
- *@author     Jen Heninger-Potter
- *@created    August 17, 2002
- */
 public abstract class DetailObject extends FieldInputValidator implements DirtyMarker, Serializable, Comparator<Object> {
 
   /** used by various auditing methods */
@@ -160,7 +144,6 @@ public abstract class DetailObject extends FieldInputValidator implements DirtyM
    * It will only include attributes that haven't been annotated and defaults to DATE_OUTPUT_SLASH as the proper 
    * date output.
    * 
-   * @param useBaseClass Use this list to identify classes that should use the base class at the root xml node.
    * This list gets passed in recursion.
    */
   public String toXMLString(Class[] useBaseClassAsRootNode) throws XMLReflectException {
@@ -172,7 +155,6 @@ public abstract class DetailObject extends FieldInputValidator implements DirtyM
    * (to avoid circular references). It also will not process if the object hasn't been initialized by Hibernate. 
    * It will only include attributes that haven't been annotated.
    * 
-   * @param useBaseClass Use this list to identify classes that should use the base class at the root xml node.
    * This list gets passed in recursion.
    * @param dateOutputStyle Format dates using dateOutputStyle parameter, but override if instance has set its
    * own dateOutputStyle property. This parameter gets passed in recursion.
@@ -235,7 +217,6 @@ public abstract class DetailObject extends FieldInputValidator implements DirtyM
    * xml node. This list gets passed in recursion.
    * @param dateOutputStyle Format dates using dateOutputStyle parameter, but override if instance has set its
    * own dateOutputStyle property. This parameter gets passed in recursion.
-   * @param annotations The master list of annotations to compare against.
    * @param annotationLogic This is one of the ANNOTATION_X statics available in the framework.
    */
   public String toXMLString(Class[] useBaseClassAsRootNode, int dateOutputStyle, List<Class<? extends Annotation>> verifyAnnotationsList, 
@@ -618,11 +599,11 @@ public abstract class DetailObject extends FieldInputValidator implements DirtyM
     if (xmlMethod == DetailObject.XML_METHOD_PARAM1)
       document = (Document) method.invoke(object, new Object[] {useBaseClass});
     else if (xmlMethod == DetailObject.XML_METHOD_PARAM2)
-      document = (Document) method.invoke(object, new Object[] {useBaseClass, new Integer(dateOutputStyle)});
+      document = (Document) method.invoke(object, new Object[] {useBaseClass, Integer.valueOf(dateOutputStyle)});
     else if (xmlMethod == DetailObject.XML_METHOD_PARAM3)
-      document = (Document) method.invoke(object, new Object[] {useBaseClass, new Integer(dateOutputStyle), verifyAnnotationsList});
+      document = (Document) method.invoke(object, new Object[] {useBaseClass, Integer.valueOf(dateOutputStyle), verifyAnnotationsList});
     else if (xmlMethod == DetailObject.XML_METHOD_PARAM4)
-      document = (Document) method.invoke(object, new Object[] {useBaseClass, new Integer(dateOutputStyle), verifyAnnotationsList, annotationLogic});
+      document = (Document) method.invoke(object, new Object[] {useBaseClass, Integer.valueOf(dateOutputStyle), verifyAnnotationsList, annotationLogic});
     return document;
   }
 
@@ -820,7 +801,6 @@ public abstract class DetailObject extends FieldInputValidator implements DirtyM
   
   /**
    * Sets the currently defined list of annotations that are accepted for this object.
-   * @param annotations
    */
   public void setVerifyAnnotationsList(List<Class<? extends Annotation>> verifyAnnotationsList) 
   { 
@@ -844,7 +824,6 @@ public abstract class DetailObject extends FieldInputValidator implements DirtyM
   /**
    *  Clear the excludeMethodsFromXML HashMap
    *
-   *@param  methodName  The name of the method to be excluded
    */
   public void clearExcludeMethodsFromXML() {
     this.excludeMethodsFromXML = null;
@@ -1111,7 +1090,6 @@ public abstract class DetailObject extends FieldInputValidator implements DirtyM
    * test.copyFieldsFrom(anotherTest, annotations, DetailObject.ANNOTATIONS_ALL);
    * 
    * @param input The DetailObject to copy fields from (must be of the same type as the class to copy to).
-   * @param annotations This is the master list of annotations to compare against.
    * @param annotationLogic This is one of the ANNOTATION_X statics available in the framework.
    */
   public void copyFieldsFrom(DetailObject input, List<Class<? extends Annotation>> verifyAnnotationsList, int annotationLogic)

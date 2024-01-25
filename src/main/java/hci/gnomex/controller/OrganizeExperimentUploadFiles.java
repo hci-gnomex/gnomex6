@@ -63,7 +63,7 @@ public class OrganizeExperimentUploadFiles extends GNomExCommand implements Seri
     public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
         if (request.getParameter("idRequest") != null && !request.getParameter("idRequest").equals("")) {
-            idRequest = new Integer(request.getParameter("idRequest"));
+            idRequest = Integer.valueOf(request.getParameter("idRequest"));
         } else {
             this.addInvalidField("idRequest", "idRequest is required");
         }

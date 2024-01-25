@@ -1,36 +1,35 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.security.EncryptionUtility;
 import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.PasswordUtil;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.jdbc.Work;
+import org.hibernate.query.Query;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
-
-import javax.json.*;
-import javax.servlet.http.HttpSession;
-
-import hci.gnomex.utility.PasswordUtil;
-import org.hibernate.query.Query;
-import org.hibernate.Session;
-import org.hibernate.jdbc.Work;
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 public class SaveAppUserPublic extends GNomExCommand implements Serializable {
 
 	// the static field for logging in Log4J
 	private static Logger LOG = Logger.getLogger(SaveAppUserPublic.class);
-
-	//private static String LAB_USER = "USER";
-	//private static String LAB_MANAGER = "MANAGER";
-	//private static String LAB_COLLABORATOR = "COLLABORATOR";
 
 	private AppUser appUserScreen;
 	private JsonArray userNotificationLabs = null;

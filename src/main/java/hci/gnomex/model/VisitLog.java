@@ -1,16 +1,5 @@
 package hci.gnomex.model;
 
-import java.io.File;
-import java.math.BigDecimal;
-
-import org.hibernate.Session;
-
-import com.oreilly.servlet.multipart.FilePart;
-import com.oreilly.servlet.multipart.MultipartParser;
-import com.oreilly.servlet.multipart.Part;
-
-import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.HibernateSession;
 import hci.hibernate5utils.HibernateDetailObject;
 
 public class VisitLog extends HibernateDetailObject {

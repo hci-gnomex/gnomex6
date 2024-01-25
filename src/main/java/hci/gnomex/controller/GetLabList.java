@@ -1,26 +1,27 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.UserPreferences;
-import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.framework.utilities.Annotations;
 import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.UserPreferences;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.*;
-import org.apache.log4j.Logger;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class GetLabList extends GNomExCommand implements Serializable {
 
@@ -71,6 +72,8 @@ public class GetLabList extends GNomExCommand implements Serializable {
                     buf.append(" LEFT JOIN p.requests as req ");
                     buf.append(" LEFT JOIN req.collaborators as collab ");
                     this.getSecAdvisor().buildSecurityCriteria(buf, "req", "collab", true, false, false);
+
+//System.out.println ("[GetLabList] buf = " + buf.toString());
                     List otherLabs = sess.createQuery(buf.toString()).list();
                     for (Iterator i = otherLabs.iterator(); i.hasNext();) {
                         Integer idLabOther = (Integer)i.next();
@@ -112,6 +115,8 @@ public class GetLabList extends GNomExCommand implements Serializable {
                         }
                     }
                     buf.append(")");
+
+//System.out.println ("[GetLabList] buf on behalf of = " + buf.toString());
                     List allLabs = sess.createQuery(buf.toString()).list();
                     for (Iterator i = allLabs.iterator(); i.hasNext();) {
                         Integer idLab = (Integer)i.next();
@@ -128,6 +133,8 @@ public class GetLabList extends GNomExCommand implements Serializable {
                 }
 
                 StringBuffer queryBuf = labFilter.getQueryWithInstitutionAndCore(this.getSecAdvisor());
+
+//System.out.println("[GetLabList] queryBuf collab = " + queryBuf.toString());
                 List labs = sess.createQuery(queryBuf.toString()).list();
 
                 for(Object objLab : labs) {

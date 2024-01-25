@@ -1,11 +1,9 @@
 package hci.gnomex.utility;
 
-import java.io.Serializable;
-
-import java.util.Iterator;
-
 import hci.gnomex.model.Topic;
 import hci.gnomex.model.Visibility;
+
+import java.io.Serializable;
 
 public class TopicTreeLinkInfo implements Serializable {
   private Integer idTopic;

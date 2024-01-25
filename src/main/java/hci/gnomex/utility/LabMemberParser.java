@@ -2,18 +2,16 @@ package hci.gnomex.utility;
 
 import hci.framework.model.DetailObject;
 import hci.gnomex.model.AppUser;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 
 public class LabMemberParser extends DetailObject implements Serializable {
@@ -55,7 +53,7 @@ public class LabMemberParser extends DetailObject implements Serializable {
 
         if (member.get("idAppUser") != null) {
           String idAppUserString = member.getString("idAppUser");
-          AppUser appUser = session.get(AppUser.class, new Integer(idAppUserString));
+          AppUser appUser = session.get(AppUser.class, Integer.valueOf(idAppUserString));
 
           appUserMap.put(appUser.getIdAppUser(), appUser);
 
@@ -75,7 +73,7 @@ public class LabMemberParser extends DetailObject implements Serializable {
       Element node = (Element)i.next();
 
       String idAppUserString = node.getAttributeValue("idAppUser");
-      AppUser appUser = session.get(AppUser.class, new Integer(idAppUserString));
+      AppUser appUser = session.get(AppUser.class, Integer.valueOf(idAppUserString));
 
       appUserMap.put(appUser.getIdAppUser(), appUser);
 

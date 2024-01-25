@@ -1,31 +1,23 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
-import hci.framework.utilities.XMLReflectException;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.InstrumentRun;
-import hci.gnomex.model.Plate;
-import hci.gnomex.model.PlateWell;
-import hci.gnomex.model.Request;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.Iterator;
+import java.util.List;
 
 public class GetInstrumentRun extends GNomExCommand implements Serializable {
 
@@ -41,7 +33,7 @@ public class GetInstrumentRun extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idInstrumentRun") != null) {
-      idInstrumentRun = new Integer(request.getParameter("idInstrumentRun"));
+      idInstrumentRun = Integer.valueOf(request.getParameter("idInstrumentRun"));
     } else {
       this.addInvalidField("idInstrumentRun", "idInstrumentRun is required");
     }

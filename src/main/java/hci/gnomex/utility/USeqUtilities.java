@@ -356,6 +356,8 @@ public class USeqUtilities {
 		ArrayList<String> al = new ArrayList<String>();		
 		try {
 			Runtime rt = Runtime.getRuntime();
+			return null;
+			/*
 			rt.traceInstructions(true); //for debugging
 			rt.traceMethodCalls(true); //for debugging
 			Process p = rt.exec(command);
@@ -371,15 +373,15 @@ public class USeqUtilities {
 			}
 			data.close();
 			error.close();
-
+*/
 		} catch (Exception e) {
 			System.out.println("Problem executing -> "+stringArrayToString(command," ")+" "+e.getLocalizedMessage());
 
 			return null;
 		}
-		String[] res = new String[al.size()];
-		al.toArray(res);
-		return res;
+//		String[] res = new String[al.size()];
+//		al.toArray(res);
+//		return res;
 	}
 	
 	/**Executes a String of shell script commands via a temp file.  Only good for Unix.*/

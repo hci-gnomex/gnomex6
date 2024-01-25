@@ -18,7 +18,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.hibernate.Session;
-
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.servlet.ServletException;

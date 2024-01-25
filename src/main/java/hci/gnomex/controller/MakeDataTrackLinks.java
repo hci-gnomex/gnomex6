@@ -42,21 +42,21 @@ public class MakeDataTrackLinks extends GNomExCommand implements Serializable {
     idDataTrack = -1;
     if (request.getParameter("idDataTrack") != null
         && !request.getParameter("idDataTrack").equals("")) {
-      idDataTrack = new Integer(request.getParameter("idDataTrack"));
+      idDataTrack = Integer.valueOf(request.getParameter("idDataTrack"));
     }
 
     // if idAnalysisFile is a parameter we will need to figure out idDataTrack
     idAnalysisFile = null;
     if (request.getParameter("idAnalysisFile") != null
         && !request.getParameter("idAnalysisFile").equals("")) {
-      idAnalysisFile = new Integer(request.getParameter("idAnalysisFile"));
+      idAnalysisFile = Integer.valueOf(request.getParameter("idAnalysisFile"));
     }
 
     // idAnalysis (needed for IOBIO requests)
     idAnalysis = null;
     if (request.getParameter("idAnalysis") != null
         && !request.getParameter("idAnalysis").equals("")) {
-      idAnalysis = new Integer(request.getParameter("idAnalysis"));
+      idAnalysis = Integer.valueOf(request.getParameter("idAnalysis"));
     }
 
     // do we need to do special things for IOBIO?

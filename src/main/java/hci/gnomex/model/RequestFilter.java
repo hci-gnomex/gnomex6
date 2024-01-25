@@ -161,7 +161,7 @@ public class RequestFilter extends DetailObject {
 
   private void addRequestCriteria() {
     // Search by request number
-    if (number != null && !number.equals("")) {
+    if (number != null && !number.isEmpty()) {
       this.addWhereOrAnd();
       queryBuf.append(" req.number like '");
       queryBuf.append(number);

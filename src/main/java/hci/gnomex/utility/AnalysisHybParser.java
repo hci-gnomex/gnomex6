@@ -1,15 +1,14 @@
 package hci.gnomex.utility;
 
 import hci.framework.model.DetailObject;
+import org.hibernate.Session;
 
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import org.hibernate.Session;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
 
 
 public class AnalysisHybParser extends DetailObject implements Serializable {
@@ -32,10 +31,10 @@ public class AnalysisHybParser extends DetailObject implements Serializable {
       JsonObject node = root.getJsonObject(i);
       
       String idHybridizationString = node.get("idHybridization") != null ? node.getString("idHybridization") : null;
-      Integer idHybridization = new Integer(idHybridizationString);
+      Integer idHybridization = Integer.valueOf(idHybridizationString);
       
       String idRequestString = node.get("idRequest") != null ? node.getString("idRequest") : null;
-      Integer idRequest =  new Integer(idRequestString);
+      Integer idRequest =  Integer.valueOf(idRequestString);
       if(idHybridization != null && idRequest != null){
         idHybridizationList.add(idHybridization);
         idRequestMap.put(idHybridization,idRequest);

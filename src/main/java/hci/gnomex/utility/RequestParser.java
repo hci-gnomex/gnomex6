@@ -223,8 +223,8 @@ public class RequestParser implements Serializable {
 
   private void initializeRequest(JsonObject n, Session sess, RequestCategory requestCategory) throws Exception {
 
-    Integer idRequest = new Integer(n.getString("idRequest"));
-    System.out.println ("[initializeRequest] idRequest: " + idRequest);
+    Integer idRequest = Integer.valueOf(n.getString("idRequest"));
+    System.out.println ("[initializeRequest JSON] idRequest: " + idRequest);
     if (idRequest.intValue() == 0) {
       request = new Request();
       request.setCreateDate(new java.sql.Date(System.currentTimeMillis()));
@@ -253,7 +253,7 @@ public class RequestParser implements Serializable {
       }
 
       if (n.get("idInstitution") != null && !n.getString("idInstitution").equals("")) {
-        request.setIdInstitution(new Integer(n.getString("idInstitution")));
+        request.setIdInstitution(Integer.valueOf(n.getString("idInstitution")));
       }
       isNewRequest = true;
     } else {
@@ -284,7 +284,7 @@ public class RequestParser implements Serializable {
         request.setPrivacyExpirationDate(convertDate(n.getString("privacyExpirationDate")));
 
         if (n.getString("idInstitution") != null && !n.getString("idInstitution").equals("") && !n.getString("idInstitution").equals("null")) {
-          request.setIdInstitution(new Integer(n.getString("idInstitution")));
+          request.setIdInstitution(Integer.valueOf(n.getString("idInstitution")));
         }
       }
     }
@@ -301,8 +301,8 @@ public class RequestParser implements Serializable {
 
   private void initializeRequest(Element n, Session sess, RequestCategory requestCategory) throws Exception {
 
-    Integer idRequest = new Integer(n.getAttributeValue("idRequest"));
-    System.out.println ("[initializeRequest] idRequest: " + idRequest);
+    Integer idRequest = Integer.valueOf(n.getAttributeValue("idRequest"));
+    System.out.println ("[initializeRequest XML] idRequest: " + idRequest);
     if (idRequest.intValue() == 0) {
       request = new Request();
       request.setCreateDate(new java.sql.Date(System.currentTimeMillis()));
@@ -331,7 +331,7 @@ public class RequestParser implements Serializable {
       }
 
       if (n.getAttributeValue("idInstitution") != null && !n.getAttributeValue("idInstitution").equals("")) {
-        request.setIdInstitution(new Integer(n.getAttributeValue("idInstitution")));
+        request.setIdInstitution(Integer.valueOf(n.getAttributeValue("idInstitution")));
       }
       isNewRequest = true;
     } else {
@@ -362,7 +362,7 @@ public class RequestParser implements Serializable {
         request.setPrivacyExpirationDate(convertDate(n.getAttributeValue("privacyExpirationDate")));
 
         if (n.getAttributeValue("idInstitution") != null && !n.getAttributeValue("idInstitution").equals("") && !n.getAttributeValue("idInstitution").equals("null")) {
-          request.setIdInstitution(new Integer(n.getAttributeValue("idInstitution")));
+          request.setIdInstitution(Integer.valueOf(n.getAttributeValue("idInstitution")));
         }
       }
     }
@@ -404,7 +404,7 @@ public class RequestParser implements Serializable {
     request.setCodeRequestCategory(n.getAttributeValue("codeRequestCategory"));
 
     if (n.getAttributeValue("idCoreFacility") != null && !n.getAttributeValue("idCoreFacility").equals("")) {
-      request.setIdCoreFacility(new Integer(n.getAttributeValue("idCoreFacility")));
+      request.setIdCoreFacility(Integer.valueOf(n.getAttributeValue("idCoreFacility")));
     } else {
       request.setIdCoreFacility(null);
     }
@@ -414,37 +414,37 @@ public class RequestParser implements Serializable {
     }
 
     if (n.getAttributeValue("idAppUser") != null && !n.getAttributeValue("idAppUser").equals("")) {
-      request.setIdAppUser(new Integer(n.getAttributeValue("idAppUser")));
+      request.setIdAppUser(Integer.valueOf(n.getAttributeValue("idAppUser")));
     }
     if (n.getAttributeValue("idSubmitter") != null && !n.getAttributeValue("idSubmitter").equals("")) {
-      request.setIdSubmitter(new Integer(n.getAttributeValue("idSubmitter")));
+      request.setIdSubmitter(Integer.valueOf(n.getAttributeValue("idSubmitter")));
     }
     if (n.getAttributeValue("idLab") != null && !n.getAttributeValue("idLab").equals("")) {
-      request.setIdLab(new Integer(n.getAttributeValue("idLab")));
+      request.setIdLab(Integer.valueOf(n.getAttributeValue("idLab")));
     }
     if (n.getAttributeValue("idProject") != null && !n.getAttributeValue("idProject").equals("")) {
-      request.setIdProject(new Integer(n.getAttributeValue("idProject")));
+      request.setIdProject(Integer.valueOf(n.getAttributeValue("idProject")));
     }
 
     if (n.getAttributeValue("idSlideProduct") != null && !n.getAttributeValue("idSlideProduct").equals("")) {
-      request.setIdSlideProduct(new Integer(n.getAttributeValue("idSlideProduct")));
+      request.setIdSlideProduct(Integer.valueOf(n.getAttributeValue("idSlideProduct")));
     }
 
     if (n.getAttributeValue("idSampleTypeDefault") != null && !n.getAttributeValue("idSampleTypeDefault").equals("")) {
-      request.setIdSampleTypeDefault(new Integer(n.getAttributeValue("idSampleTypeDefault")));
+      request.setIdSampleTypeDefault(Integer.valueOf(n.getAttributeValue("idSampleTypeDefault")));
     }
     if (n.getAttributeValue("idOrganismSampleDefault") != null && !n.getAttributeValue("idOrganismSampleDefault").equals("")) {
-      request.setIdOrganismSampleDefault(new Integer(n.getAttributeValue("idOrganismSampleDefault")));
+      request.setIdOrganismSampleDefault(Integer.valueOf(n.getAttributeValue("idOrganismSampleDefault")));
     } else {
       request.setIdOrganismSampleDefault(null);
     }
     if (n.getAttributeValue("idSampleDropOffLocation") != null && !n.getAttributeValue("idSampleDropOffLocation").equals("")) {
-      request.setIdSampleDropOffLocation(new Integer(n.getAttributeValue("idSampleDropOffLocation")));
+      request.setIdSampleDropOffLocation(Integer.valueOf(n.getAttributeValue("idSampleDropOffLocation")));
     } else {
       request.setIdSampleDropOffLocation(null);
     }
     if (n.getAttributeValue("idProduct") != null && !n.getAttributeValue("idProduct").equals("")) {
-      request.setIdProduct(new Integer(n.getAttributeValue("idProduct")));
+      request.setIdProduct(Integer.valueOf(n.getAttributeValue("idProduct")));
     }
     if (n.getAttributeValue("coreToExtractDNA") != null && !n.getAttributeValue("coreToExtractDNA").equals(""))
       request.setCoreToExtractDNA(n.getAttributeValue("coreToExtractDNA"));
@@ -463,7 +463,7 @@ public class RequestParser implements Serializable {
       if (oldBillingTemplate == null || !oldBillingTemplate.canBeDeactivated(sess)) {
         throw new Exception("Current billing template cannot be deactivated");
       }
-      Integer newIdBillingAccount = new Integer(n.getAttributeValue("newBillingTemplateIdBillingAccount"));
+      Integer newIdBillingAccount = Integer.valueOf(n.getAttributeValue("newBillingTemplateIdBillingAccount"));
       request.setIdBillingAccount(newIdBillingAccount);
       billingTemplate = new BillingTemplate(request);
       billingTemplateItems = new TreeSet<BillingTemplateItem>();
@@ -484,7 +484,7 @@ public class RequestParser implements Serializable {
       isOpeningNewBillingTemplate = true;
       reassignBillingAccount = false;
     } else if (n.getAttributeValue("idBillingAccount") != null && !n.getAttributeValue("idBillingAccount").equals("")) {
-      Integer newIdBillingAccount = new Integer(n.getAttributeValue("idBillingAccount"));
+      Integer newIdBillingAccount = Integer.valueOf(n.getAttributeValue("idBillingAccount"));
       request.setIdBillingAccount(newIdBillingAccount);
       billingTemplate = BillingTemplateQueryManager.retrieveBillingTemplate(sess, request);
       // If the billing account has been changed, we need to know so that any billing items can be revised as well.
@@ -584,7 +584,7 @@ public class RequestParser implements Serializable {
     }
 
     if (request.getHasPrePooledLibraries().equals("Y") && n.getAttributeValue("numPrePooledTubes") != null && !n.getAttributeValue("numPrePooledTubes").equals("")) {
-      request.setNumPrePooledTubes(new Integer(n.getAttributeValue("numPrePooledTubes")));
+      request.setNumPrePooledTubes(Integer.valueOf(n.getAttributeValue("numPrePooledTubes")));
     } else {
       request.setNumPrePooledTubes(null);
     }
@@ -682,7 +682,7 @@ public class RequestParser implements Serializable {
     request.setCodeRequestCategory(n.getString("codeRequestCategory"));
 
     if (n.get("idCoreFacility") != null && !n.getString("idCoreFacility").equals("")) {
-      request.setIdCoreFacility(new Integer(n.getString("idCoreFacility")));
+      request.setIdCoreFacility(Integer.valueOf(n.getString("idCoreFacility")));
     } else {
       request.setIdCoreFacility(null);
     }
@@ -692,37 +692,37 @@ public class RequestParser implements Serializable {
     }
 
     if (n.get("idAppUser") != null && !n.getString("idAppUser").equals("")) {
-      request.setIdAppUser(new Integer(n.getString("idAppUser")));
+      request.setIdAppUser(Integer.valueOf(n.getString("idAppUser")));
     }
     if (n.get("idSubmitter") != null && !n.getString("idSubmitter").equals("")) {
-      request.setIdSubmitter(new Integer(n.getString("idSubmitter")));
+      request.setIdSubmitter(Integer.valueOf(n.getString("idSubmitter")));
     }
     if (n.get("idLab") != null && !n.getString("idLab").equals("")) {
-      request.setIdLab(new Integer(n.getString("idLab")));
+      request.setIdLab(Integer.valueOf(n.getString("idLab")));
     }
     if (n.get("idProject") != null && !n.getString("idProject").equals("")) {
-      request.setIdProject(new Integer(n.getString("idProject")));
+      request.setIdProject(Integer.valueOf(n.getString("idProject")));
     }
 
     if (n.get("idSlideProduct") != null && !n.getString("idSlideProduct").equals("")) {
-      request.setIdSlideProduct(new Integer(n.getString("idSlideProduct")));
+      request.setIdSlideProduct(Integer.valueOf(n.getString("idSlideProduct")));
     }
 
     if (n.get("idSampleTypeDefault") != null && !n.getString("idSampleTypeDefault").equals("")) {
-      request.setIdSampleTypeDefault(new Integer(n.getString("idSampleTypeDefault")));
+      request.setIdSampleTypeDefault(Integer.valueOf(n.getString("idSampleTypeDefault")));
     }
     if (n.get("idOrganismSampleDefault") != null && !n.getString("idOrganismSampleDefault").equals("")) {
-      request.setIdOrganismSampleDefault(new Integer(n.getString("idOrganismSampleDefault")));
+      request.setIdOrganismSampleDefault(Integer.valueOf(n.getString("idOrganismSampleDefault")));
     } else {
       request.setIdOrganismSampleDefault(null);
     }
     if (n.get("idSampleDropOffLocation") != null && !n.getString("idSampleDropOffLocation").equals("")) {
-      request.setIdSampleDropOffLocation(new Integer(n.getString("idSampleDropOffLocation")));
+      request.setIdSampleDropOffLocation(Integer.valueOf(n.getString("idSampleDropOffLocation")));
     } else {
       request.setIdSampleDropOffLocation(null);
     }
     if (n.get("idProduct") != null && !n.getString("idProduct").equals("")) {
-      request.setIdProduct(new Integer(n.getString("idProduct")));
+      request.setIdProduct(Integer.valueOf(n.getString("idProduct")));
     }
     if (n.get("coreToExtractDNA") != null && !n.getString("coreToExtractDNA").equals(""))
       request.setCoreToExtractDNA(n.getString("coreToExtractDNA"));
@@ -742,7 +742,7 @@ public class RequestParser implements Serializable {
       if (oldBillingTemplate == null || !oldBillingTemplate.canBeDeactivated(sess)) {
         throw new Exception("Current billing template cannot be deactivated");
       }
-      Integer newIdBillingAccount = new Integer(n.getString("newBillingTemplateIdBillingAccount"));
+      Integer newIdBillingAccount = Integer.valueOf(n.getString("newBillingTemplateIdBillingAccount"));
       request.setIdBillingAccount(newIdBillingAccount);
       billingTemplate = new BillingTemplate(request);
       billingTemplateItems = new TreeSet<BillingTemplateItem>();
@@ -778,7 +778,7 @@ public class RequestParser implements Serializable {
       }
       billingTemplate.setOrder(request);
     } else if (n.get("idBillingAccount") != null && !n.getString("idBillingAccount").equals("")) {
-      Integer newIdBillingAccount = new Integer(n.getString("idBillingAccount"));
+      Integer newIdBillingAccount = Integer.valueOf(n.getString("idBillingAccount"));
       request.setIdBillingAccount(newIdBillingAccount);
       billingTemplate = BillingTemplateQueryManager.retrieveBillingTemplate(sess, request);
       // If the billing account has been changed, we need to know so that any billing items can be revised as well.
@@ -866,7 +866,7 @@ public class RequestParser implements Serializable {
     }
 
     if (request.getHasPrePooledLibraries().equals("Y") && n.getString("numPrePooledTubes") != null && !n.getString("numPrePooledTubes").equals("")) {
-      request.setNumPrePooledTubes(new Integer(n.getString("numPrePooledTubes")));
+      request.setNumPrePooledTubes(Integer.valueOf(n.getString("numPrePooledTubes")));
     } else {
       request.setNumPrePooledTubes(null);
     }
@@ -983,7 +983,7 @@ public class RequestParser implements Serializable {
       sample = new Sample();
       isNewSample = true;
     } else {
-      sample = sess.load(Sample.class, new Integer(idSampleString));
+      sample = sess.load(Sample.class, Integer.valueOf(idSampleString));
     }
     sample.setIdSampleString(idSampleString);
 
@@ -1003,7 +1003,7 @@ public class RequestParser implements Serializable {
       // the request create screen doesn't do the idOrganism at the request
       // level so skip.
       if (requestNode.get("idOrganism") != null && requestNode.getString("idOrganism").toString().length() > 0) {
-        sample.setIdOrganism(new Integer(requestNode.getString("idOrganism")));
+        sample.setIdOrganism(Integer.valueOf(requestNode.getString("idOrganism")));
         if (requestNode.get("otherOrganism") != null) {
           sample.setOtherOrganism(requestNode.getString("otherOrganism"));
         } else {
@@ -1022,7 +1022,7 @@ public class RequestParser implements Serializable {
       sample = new Sample();
       isNewSample = true;
     } else {
-      sample = sess.load(Sample.class, new Integer(idSampleString));
+      sample = sess.load(Sample.class, Integer.valueOf(idSampleString));
     }
     sample.setIdSampleString(idSampleString);
 
@@ -1046,7 +1046,7 @@ public class RequestParser implements Serializable {
       // the request create screen doesn't do the idOrganism at the request
       // level so skip.
       if (requestNode.getAttributeValue("idOrganism") != null && requestNode.getAttributeValue("idOrganism").toString().length() > 0) {
-        sample.setIdOrganism(new Integer(requestNode.getAttributeValue("idOrganism")));
+        sample.setIdOrganism(Integer.valueOf(requestNode.getAttributeValue("idOrganism")));
         if (requestNode.getAttributeValue("otherOrganism") != null) {
           sample.setOtherOrganism(requestNode.getAttributeValue("otherOrganism"));
         } else {
@@ -1068,17 +1068,17 @@ public class RequestParser implements Serializable {
     }
 
     if (n.get("idSampleType") != null && !n.getString("idSampleType").equals("")) {
-      sample.setIdSampleType(new Integer(n.getString("idSampleType")));
+      sample.setIdSampleType(Integer.valueOf(n.getString("idSampleType")));
     } else {
       sample.setIdSampleType(null);
     }
     if (n.get("idSampleSource") != null && !n.getString("idSampleSource").equals("")) {
-      sample.setIdSampleSource(new Integer(n.getString("idSampleSource")));
+      sample.setIdSampleSource(Integer.valueOf(n.getString("idSampleSource")));
     } else {
       sample.setIdSampleSource(null);
     }
     if (n.get("numberSequencingLanes") != null && !n.getString("numberSequencingLanes").equals("")) {
-      sample.setNumberSequencingLanes(new Integer(n.getString("numberSequencingLanes")));
+      sample.setNumberSequencingLanes(Integer.valueOf(n.getString("numberSequencingLanes")));
     } else {
       sample.setNumberSequencingLanes(null);
     }
@@ -1089,7 +1089,7 @@ public class RequestParser implements Serializable {
       sample.setOtherSamplePrepMethod(null);
     }
     if (n.get("idOrganism") != null && !n.getString("idOrganism").equals("")) {
-      sample.setIdOrganism(new Integer(n.getString("idOrganism")));
+      sample.setIdOrganism(Integer.valueOf(n.getString("idOrganism")));
     } else {
       sample.setIdOrganism(null);
     }
@@ -1133,19 +1133,19 @@ public class RequestParser implements Serializable {
       sample.setCodeBioanalyzerChipType(null);
     }
     if (n.get("idOligoBarcode") != null && !n.getString("idOligoBarcode").equals("")) {
-      sample.setIdOligoBarcode(new Integer(n.getString("idOligoBarcode")));
+      sample.setIdOligoBarcode(Integer.valueOf(n.getString("idOligoBarcode")));
     } else {
       sample.setIdOligoBarcode(null);
     }
     if (n.get("idOligoBarcodeB") != null && !n.getString("idOligoBarcodeB").equals("")) {
-      sample.setIdOligoBarcodeB(new Integer(n.getString("idOligoBarcodeB")));
+      sample.setIdOligoBarcodeB(Integer.valueOf(n.getString("idOligoBarcodeB")));
     } else {
       sample.setIdOligoBarcodeB(null);
     }
 
     if (isHiseqOrMiseq) {
       if (n.get("multiplexGroupNumber") != null && !n.getString("multiplexGroupNumber").equals("")) {
-        sample.setMultiplexGroupNumber(new Integer(n.getString("multiplexGroupNumber")));
+        sample.setMultiplexGroupNumber(Integer.valueOf(n.getString("multiplexGroupNumber")));
       } else {
         // Allow to continue if just downloading a spread sheet.
         if (!this.forDownload) {
@@ -1154,7 +1154,7 @@ public class RequestParser implements Serializable {
       }
     } else {
       if (n.get("multiplexGroupNumber") != null && !n.getString("multiplexGroupNumber").equals("")) {
-        sample.setMultiplexGroupNumber(new Integer(n.getString("multiplexGroupNumber")));
+        sample.setMultiplexGroupNumber(Integer.valueOf(n.getString("multiplexGroupNumber")));
       } else {
         sample.setMultiplexGroupNumber(null);
       }
@@ -1171,7 +1171,7 @@ public class RequestParser implements Serializable {
       sample.setBarcodeSequenceB(null);
     }
     if (n.get("idSeqLibProtocol") != null && !n.getString("idSeqLibProtocol").trim().equals("")) {
-      sample.setIdSeqLibProtocol(new Integer(n.getString("idSeqLibProtocol")));
+      sample.setIdSeqLibProtocol(Integer.valueOf(n.getString("idSeqLibProtocol")));
     } else {
       sample.setIdSeqLibProtocol(null);
     }
@@ -1185,12 +1185,12 @@ public class RequestParser implements Serializable {
     }
 
     if (n.get("fragmentSizeFrom") != null && !n.getString("fragmentSizeFrom").equals("")) {
-      sample.setFragmentSizeFrom(new Integer(n.getString("fragmentSizeFrom")));
+      sample.setFragmentSizeFrom(Integer.valueOf(n.getString("fragmentSizeFrom")));
     } else {
       sample.setFragmentSizeFrom(null);
     }
     if (n.get("fragmentSizeTo") != null && !n.getString("fragmentSizeTo").equals("")) {
-      sample.setFragmentSizeTo(new Integer(n.getString("fragmentSizeTo")));
+      sample.setFragmentSizeTo(Integer.valueOf(n.getString("fragmentSizeTo")));
     } else {
       sample.setFragmentSizeTo(null);
     }
@@ -1200,12 +1200,12 @@ public class RequestParser implements Serializable {
       sample.setPrepInstructions(null);
     }
     if (n.get("meanLibSizeActual") != null && !n.getString("meanLibSizeActual").equals("")) {
-      sample.setMeanLibSizeActual(new Integer((n.getString("meanLibSizeActual"))));
+      sample.setMeanLibSizeActual(Integer.valueOf((n.getString("meanLibSizeActual"))));
     } else {
       sample.setMeanLibSizeActual(null);
     }
 
-    if (propertyHelper.getProperty(PropertyDictionary.BST_LINKAGE_SUPPORTED) != null && propertyHelper.getProperty(PropertyDictionary.BST_LINKAGE_SUPPORTED).equals("Y")) {
+    if (propertyHelper.getProperty(PropertyDictionary.CORE_LINKAGE_SUPPORTED) != null && propertyHelper.getProperty(PropertyDictionary.CORE_LINKAGE_SUPPORTED).equals("Y")) {
       if (n.get("ccNumber") != null && !n.getString("ccNumber").equals("")) {
         String ccNumber = n.getString("ccNumber");
         sample.setCcNumber(ccNumber);
@@ -1214,6 +1214,25 @@ public class RequestParser implements Serializable {
         }
       } else {
         sample.setCcNumber(null);
+      }
+
+      if (n.get("idSample_CORE") != null && !n.getString("idSample_CORE").equals("")) {
+        String idSample_CORE = n.getString("idSample_CORE");
+        try {
+          sample.setIdSample_CORE(Long.parseLong(idSample_CORE));
+        }
+        catch (Exception e) {
+          sample.setIdSample_CORE(null);
+        }
+      } else {
+        sample.setIdSample_CORE(null);
+      }
+
+      if (n.get("sampleAlias_CORE") != null && !n.getString("sampleAlias_CORE").equals("")) {
+        String sampleAlias_CORE = n.getString("sampleAlias_CORE");
+        sample.setSampleAlias_CORE(sampleAlias_CORE);
+      } else {
+        sample.setSampleAlias_CORE(null);
       }
     }
 
@@ -1265,12 +1284,12 @@ public class RequestParser implements Serializable {
       }
 
       if (n.get("qualFragmentSizeFrom") != null && !n.getString("qualFragmentSizeFrom").equals("")) {
-        sample.setQualFragmentSizeFrom(new Integer(n.getString("qualFragmentSizeFrom")));
+        sample.setQualFragmentSizeFrom(Integer.valueOf(n.getString("qualFragmentSizeFrom")));
       } else {
         sample.setQualFragmentSizeFrom(null);
       }
       if (n.get("qualFragmentSizeTo") != null && !n.getString("qualFragmentSizeTo").equals("")) {
-        sample.setQualFragmentSizeTo(new Integer(n.getString("qualFragmentSizeTo")));
+        sample.setQualFragmentSizeTo(Integer.valueOf(n.getString("qualFragmentSizeTo")));
       } else {
         sample.setQualFragmentSizeTo(null);
       }
@@ -1323,12 +1342,12 @@ public class RequestParser implements Serializable {
       }
 
       if (n.get("seqPrepGelFragmentSizeFrom") != null && !n.getString("seqPrepGelFragmentSizeFrom").equals("")) {
-        sample.setSeqPrepGelFragmentSizeFrom(new Integer(n.getString("seqPrepGelFragmentSizeFrom")));
+        sample.setSeqPrepGelFragmentSizeFrom(Integer.valueOf(n.getString("seqPrepGelFragmentSizeFrom")));
       } else {
         sample.setSeqPrepGelFragmentSizeFrom(null);
       }
       if (n.get("seqPrepGelFragmentSizeTo") != null && !n.getString("seqPrepGelFragmentSizeTo").equals("")) {
-        sample.setSeqPrepGelFragmentSizeTo(new Integer(n.getString("seqPrepGelFragmentSizeTo")));
+        sample.setSeqPrepGelFragmentSizeTo(Integer.valueOf(n.getString("seqPrepGelFragmentSizeTo")));
       } else {
         sample.setSeqPrepGelFragmentSizeTo(null);
       }
@@ -1428,17 +1447,17 @@ public class RequestParser implements Serializable {
     }
 
     if (n.getAttributeValue("idSampleType") != null && !n.getAttributeValue("idSampleType").equals("")) {
-      sample.setIdSampleType(new Integer(n.getAttributeValue("idSampleType")));
+      sample.setIdSampleType(Integer.valueOf(n.getAttributeValue("idSampleType")));
     } else {
       sample.setIdSampleType(null);
     }
     if (n.getAttributeValue("idSampleSource") != null && !n.getAttributeValue("idSampleSource").equals("")) {
-      sample.setIdSampleSource(new Integer(n.getAttributeValue("idSampleSource")));
+      sample.setIdSampleSource(Integer.valueOf(n.getAttributeValue("idSampleSource")));
     } else {
       sample.setIdSampleSource(null);
     }
     if (n.getAttributeValue("numberSequencingLanes") != null && !n.getAttributeValue("numberSequencingLanes").equals("")) {
-      sample.setNumberSequencingLanes(new Integer(n.getAttributeValue("numberSequencingLanes")));
+      sample.setNumberSequencingLanes(Integer.valueOf(n.getAttributeValue("numberSequencingLanes")));
     } else {
       sample.setNumberSequencingLanes(null);
     }
@@ -1449,7 +1468,7 @@ public class RequestParser implements Serializable {
       sample.setOtherSamplePrepMethod(null);
     }
     if (n.getAttributeValue("idOrganism") != null && !n.getAttributeValue("idOrganism").equals("")) {
-      sample.setIdOrganism(new Integer(n.getAttributeValue("idOrganism")));
+      sample.setIdOrganism(Integer.valueOf(n.getAttributeValue("idOrganism")));
     } else {
       sample.setIdOrganism(null);
     }
@@ -1493,19 +1512,19 @@ public class RequestParser implements Serializable {
       sample.setCodeBioanalyzerChipType(null);
     }
     if (n.getAttributeValue("idOligoBarcode") != null && !n.getAttributeValue("idOligoBarcode").equals("")) {
-      sample.setIdOligoBarcode(new Integer(n.getAttributeValue("idOligoBarcode")));
+      sample.setIdOligoBarcode(Integer.valueOf(n.getAttributeValue("idOligoBarcode")));
     } else {
       sample.setIdOligoBarcode(null);
     }
     if (n.getAttributeValue("idOligoBarcodeB") != null && !n.getAttributeValue("idOligoBarcodeB").equals("")) {
-      sample.setIdOligoBarcodeB(new Integer(n.getAttributeValue("idOligoBarcodeB")));
+      sample.setIdOligoBarcodeB(Integer.valueOf(n.getAttributeValue("idOligoBarcodeB")));
     } else {
       sample.setIdOligoBarcodeB(null);
     }
 
     if (isHiseqOrMiseq) {
       if (n.getAttributeValue("multiplexGroupNumber") != null && !n.getAttributeValue("multiplexGroupNumber").equals("")) {
-        sample.setMultiplexGroupNumber(new Integer(n.getAttributeValue("multiplexGroupNumber")));
+        sample.setMultiplexGroupNumber(Integer.valueOf(n.getAttributeValue("multiplexGroupNumber")));
       } else {
         // Allow to continue if just downloading a spread sheet.
         if (!this.forDownload) {
@@ -1514,7 +1533,7 @@ public class RequestParser implements Serializable {
       }
     } else {
       if (n.getAttributeValue("multiplexGroupNumber") != null && !n.getAttributeValue("multiplexGroupNumber").equals("")) {
-        sample.setMultiplexGroupNumber(new Integer(n.getAttributeValue("multiplexGroupNumber")));
+        sample.setMultiplexGroupNumber(Integer.valueOf(n.getAttributeValue("multiplexGroupNumber")));
       } else {
         sample.setMultiplexGroupNumber(null);
       }
@@ -1531,7 +1550,7 @@ public class RequestParser implements Serializable {
       sample.setBarcodeSequenceB(null);
     }
     if (n.getAttributeValue("idSeqLibProtocol") != null && !n.getAttributeValue("idSeqLibProtocol").trim().equals("")) {
-      sample.setIdSeqLibProtocol(new Integer(n.getAttributeValue("idSeqLibProtocol")));
+      sample.setIdSeqLibProtocol(Integer.valueOf(n.getAttributeValue("idSeqLibProtocol")));
     } else {
       sample.setIdSeqLibProtocol(null);
     }
@@ -1545,12 +1564,12 @@ public class RequestParser implements Serializable {
     }
 
     if (n.getAttributeValue("fragmentSizeFrom") != null && !n.getAttributeValue("fragmentSizeFrom").equals("")) {
-      sample.setFragmentSizeFrom(new Integer(n.getAttributeValue("fragmentSizeFrom")));
+      sample.setFragmentSizeFrom(Integer.valueOf(n.getAttributeValue("fragmentSizeFrom")));
     } else {
       sample.setFragmentSizeFrom(null);
     }
     if (n.getAttributeValue("fragmentSizeTo") != null && !n.getAttributeValue("fragmentSizeTo").equals("")) {
-      sample.setFragmentSizeTo(new Integer(n.getAttributeValue("fragmentSizeTo")));
+      sample.setFragmentSizeTo(Integer.valueOf(n.getAttributeValue("fragmentSizeTo")));
     } else {
       sample.setFragmentSizeTo(null);
     }
@@ -1560,12 +1579,12 @@ public class RequestParser implements Serializable {
       sample.setPrepInstructions(null);
     }
     if (n.getAttributeValue("meanLibSizeActual") != null && !n.getAttributeValue("meanLibSizeActual").equals("")) {
-      sample.setMeanLibSizeActual(new Integer((n.getAttributeValue("meanLibSizeActual"))));
+      sample.setMeanLibSizeActual(Integer.valueOf((n.getAttributeValue("meanLibSizeActual"))));
     } else {
       sample.setMeanLibSizeActual(null);
     }
 
-    if (propertyHelper.getProperty(PropertyDictionary.BST_LINKAGE_SUPPORTED) != null && propertyHelper.getProperty(PropertyDictionary.BST_LINKAGE_SUPPORTED).equals("Y")) {
+    if (propertyHelper.getProperty(PropertyDictionary.CORE_LINKAGE_SUPPORTED) != null && propertyHelper.getProperty(PropertyDictionary.CORE_LINKAGE_SUPPORTED).equals("Y")) {
       if (n.getAttributeValue("ccNumber") != null && !n.getAttributeValue("ccNumber").equals("")) {
         String ccNumber = n.getAttributeValue("ccNumber");
         sample.setCcNumber(ccNumber);
@@ -1628,12 +1647,12 @@ public class RequestParser implements Serializable {
       }
 
       if (n.getAttributeValue("qualFragmentSizeFrom") != null && !n.getAttributeValue("qualFragmentSizeFrom").equals("")) {
-        sample.setQualFragmentSizeFrom(new Integer(n.getAttributeValue("qualFragmentSizeFrom")));
+        sample.setQualFragmentSizeFrom(Integer.valueOf(n.getAttributeValue("qualFragmentSizeFrom")));
       } else {
         sample.setQualFragmentSizeFrom(null);
       }
       if (n.getAttributeValue("qualFragmentSizeTo") != null && !n.getAttributeValue("qualFragmentSizeTo").equals("")) {
-        sample.setQualFragmentSizeTo(new Integer(n.getAttributeValue("qualFragmentSizeTo")));
+        sample.setQualFragmentSizeTo(Integer.valueOf(n.getAttributeValue("qualFragmentSizeTo")));
       } else {
         sample.setQualFragmentSizeTo(null);
       }
@@ -1686,12 +1705,12 @@ public class RequestParser implements Serializable {
       }
 
       if (n.getAttributeValue("seqPrepGelFragmentSizeFrom") != null && !n.getAttributeValue("seqPrepGelFragmentSizeFrom").equals("")) {
-        sample.setSeqPrepGelFragmentSizeFrom(new Integer(n.getAttributeValue("seqPrepGelFragmentSizeFrom")));
+        sample.setSeqPrepGelFragmentSizeFrom(Integer.valueOf(n.getAttributeValue("seqPrepGelFragmentSizeFrom")));
       } else {
         sample.setSeqPrepGelFragmentSizeFrom(null);
       }
       if (n.getAttributeValue("seqPrepGelFragmentSizeTo") != null && !n.getAttributeValue("seqPrepGelFragmentSizeTo").equals("")) {
-        sample.setSeqPrepGelFragmentSizeTo(new Integer(n.getAttributeValue("seqPrepGelFragmentSizeTo")));
+        sample.setSeqPrepGelFragmentSizeTo(Integer.valueOf(n.getAttributeValue("seqPrepGelFragmentSizeTo")));
       } else {
         sample.setSeqPrepGelFragmentSizeTo(null);
       }
@@ -1804,7 +1823,7 @@ public class RequestParser implements Serializable {
     hybInfo.setCodeSlideSource(codeSlideSource);
 
     if (n.get("idSlideDesign") != null && !n.getString("idSlideDesign").equals("")) {
-      hybInfo.setIdSlideDesign(new Integer(n.getString("idSlideDesign")));
+      hybInfo.setIdSlideDesign(Integer.valueOf(n.getString("idSlideDesign")));
     }
 
     hybInfo.setNotes(n.get("notes") != null ? unEscape(n.getString("notes")): null);
@@ -1818,7 +1837,7 @@ public class RequestParser implements Serializable {
       hybInfo.setLabelingYieldChannel1(new BigDecimal(n.getString("labelingYieldChannel1")));
     }
     if (n.get("idLabelingProtocolChannel1") != null && !n.getString("idLabelingProtocolChannel1").equals("")) {
-      hybInfo.setIdLabelingProtocolChannel1(new Integer(n.getString("idLabelingProtocolChannel1")));
+      hybInfo.setIdLabelingProtocolChannel1(Integer.valueOf(n.getString("idLabelingProtocolChannel1")));
     }
 
     if (n.get("codeLabelingReactionSizeChannel1") != null && !n.getString("codeLabelingReactionSizeChannel1").equals("")) {
@@ -1826,7 +1845,7 @@ public class RequestParser implements Serializable {
     }
 
     if (n.get("numberOfReactionsChannel1") != null && !n.getString("numberOfReactionsChannel1").equals("")) {
-      hybInfo.setNumberOfReactionsChannel1(new Integer(n.getString("numberOfReactionsChannel1")));
+      hybInfo.setNumberOfReactionsChannel1(Integer.valueOf(n.getString("numberOfReactionsChannel1")));
     }
     if (n.get("labelingStatusChannel1") != null && !n.getString("labelingStatusChannel1").equals("")) {
       String status = n.getString("labelingStatusChannel1");
@@ -1856,7 +1875,7 @@ public class RequestParser implements Serializable {
       hybInfo.setLabelingYieldChannel2(new BigDecimal(n.getString("labelingYieldChannel2")));
     }
     if (n.get("idLabelingProtocolChannel2") != null && !n.getString("idLabelingProtocolChannel2").equals("")) {
-      hybInfo.setIdLabelingProtocolChannel2(new Integer(n.getString("idLabelingProtocolChannel2")));
+      hybInfo.setIdLabelingProtocolChannel2(Integer.valueOf(n.getString("idLabelingProtocolChannel2")));
     }
 
     if (n.get("codeLabelingReactionSizeChannel2") != null && !n.getString("codeLabelingReactionSizeChannel2").equals("")) {
@@ -1864,7 +1883,7 @@ public class RequestParser implements Serializable {
     }
 
     if (n.get("numberOfReactionsChannel2") != null && !n.getString("numberOfReactionsChannel2").equals("")) {
-      hybInfo.setNumberOfReactionsChannel2(new Integer(n.getString("numberOfReactionsChannel2")));
+      hybInfo.setNumberOfReactionsChannel2(Integer.valueOf(n.getString("numberOfReactionsChannel2")));
     }
     if (n.get("labelingStatusChannel2") != null && !n.getString("labelingStatusChannel2").equals("")) {
       String status = n.getString("labelingStatusChannel2");
@@ -1919,13 +1938,13 @@ public class RequestParser implements Serializable {
     }
 
     if (n.get("idHybProtocol") != null && !n.getString("idHybProtocol").equals("")) {
-      hybInfo.setIdHybProtocol(new Integer(n.getString("idHybProtocol")));
+      hybInfo.setIdHybProtocol(Integer.valueOf(n.getString("idHybProtocol")));
     }
     if (n.get("idScanProtocol") != null && !n.getString("idScanProtocol").equals("")) {
-      hybInfo.setIdScanProtocol(new Integer(n.getString("idScanProtocol")));
+      hybInfo.setIdScanProtocol(Integer.valueOf(n.getString("idScanProtocol")));
     }
     if (n.get("idFeatureExtractionProtocol") != null && !n.getString("idFeatureExtractionProtocol").equals("")) {
-      hybInfo.setIdFeatureExtractionProtocol(new Integer(n.getString("idFeatureExtractionProtocol")));
+      hybInfo.setIdFeatureExtractionProtocol(Integer.valueOf(n.getString("idFeatureExtractionProtocol")));
     }
 
     // Extraction
@@ -1978,7 +1997,7 @@ public class RequestParser implements Serializable {
     hybInfo.setCodeSlideSource(codeSlideSource);
 
     if (n.getAttributeValue("idSlideDesign") != null && !n.getAttributeValue("idSlideDesign").equals("")) {
-      hybInfo.setIdSlideDesign(new Integer(n.getAttributeValue("idSlideDesign")));
+      hybInfo.setIdSlideDesign(Integer.valueOf(n.getAttributeValue("idSlideDesign")));
     }
 
     hybInfo.setNotes(unEscape(n.getAttributeValue("notes")));
@@ -1992,7 +2011,7 @@ public class RequestParser implements Serializable {
       hybInfo.setLabelingYieldChannel1(new BigDecimal(n.getAttributeValue("labelingYieldChannel1")));
     }
     if (n.getAttributeValue("idLabelingProtocolChannel1") != null && !n.getAttributeValue("idLabelingProtocolChannel1").equals("")) {
-      hybInfo.setIdLabelingProtocolChannel1(new Integer(n.getAttributeValue("idLabelingProtocolChannel1")));
+      hybInfo.setIdLabelingProtocolChannel1(Integer.valueOf(n.getAttributeValue("idLabelingProtocolChannel1")));
     }
 
     if (n.getAttributeValue("codeLabelingReactionSizeChannel1") != null && !n.getAttributeValue("codeLabelingReactionSizeChannel1").equals("")) {
@@ -2000,7 +2019,7 @@ public class RequestParser implements Serializable {
     }
 
     if (n.getAttributeValue("numberOfReactionsChannel1") != null && !n.getAttributeValue("numberOfReactionsChannel1").equals("")) {
-      hybInfo.setNumberOfReactionsChannel1(new Integer(n.getAttributeValue("numberOfReactionsChannel1")));
+      hybInfo.setNumberOfReactionsChannel1(Integer.valueOf(n.getAttributeValue("numberOfReactionsChannel1")));
     }
     if (n.getAttributeValue("labelingStatusChannel1") != null && !n.getAttributeValue("labelingStatusChannel1").equals("")) {
       String status = n.getAttributeValue("labelingStatusChannel1");
@@ -2030,7 +2049,7 @@ public class RequestParser implements Serializable {
       hybInfo.setLabelingYieldChannel2(new BigDecimal(n.getAttributeValue("labelingYieldChannel2")));
     }
     if (n.getAttributeValue("idLabelingProtocolChannel2") != null && !n.getAttributeValue("idLabelingProtocolChannel2").equals("")) {
-      hybInfo.setIdLabelingProtocolChannel2(new Integer(n.getAttributeValue("idLabelingProtocolChannel2")));
+      hybInfo.setIdLabelingProtocolChannel2(Integer.valueOf(n.getAttributeValue("idLabelingProtocolChannel2")));
     }
 
     if (n.getAttributeValue("codeLabelingReactionSizeChannel2") != null && !n.getAttributeValue("codeLabelingReactionSizeChannel2").equals("")) {
@@ -2038,7 +2057,7 @@ public class RequestParser implements Serializable {
     }
 
     if (n.getAttributeValue("numberOfReactionsChannel2") != null && !n.getAttributeValue("numberOfReactionsChannel2").equals("")) {
-      hybInfo.setNumberOfReactionsChannel2(new Integer(n.getAttributeValue("numberOfReactionsChannel2")));
+      hybInfo.setNumberOfReactionsChannel2(Integer.valueOf(n.getAttributeValue("numberOfReactionsChannel2")));
     }
     if (n.getAttributeValue("labelingStatusChannel2") != null && !n.getAttributeValue("labelingStatusChannel2").equals("")) {
       String status = n.getAttributeValue("labelingStatusChannel2");
@@ -2093,13 +2112,13 @@ public class RequestParser implements Serializable {
     }
 
     if (n.getAttributeValue("idHybProtocol") != null && !n.getAttributeValue("idHybProtocol").equals("")) {
-      hybInfo.setIdHybProtocol(new Integer(n.getAttributeValue("idHybProtocol")));
+      hybInfo.setIdHybProtocol(Integer.valueOf(n.getAttributeValue("idHybProtocol")));
     }
     if (n.getAttributeValue("idScanProtocol") != null && !n.getAttributeValue("idScanProtocol").equals("")) {
-      hybInfo.setIdScanProtocol(new Integer(n.getAttributeValue("idScanProtocol")));
+      hybInfo.setIdScanProtocol(Integer.valueOf(n.getAttributeValue("idScanProtocol")));
     }
     if (n.getAttributeValue("idFeatureExtractionProtocol") != null && !n.getAttributeValue("idFeatureExtractionProtocol").equals("")) {
-      hybInfo.setIdFeatureExtractionProtocol(new Integer(n.getAttributeValue("idFeatureExtractionProtocol")));
+      hybInfo.setIdFeatureExtractionProtocol(Integer.valueOf(n.getAttributeValue("idFeatureExtractionProtocol")));
     }
 
     // Extraction
@@ -2145,19 +2164,19 @@ public class RequestParser implements Serializable {
     }
 
     if (n.get("idNumberSequencingCycles") != null && !n.getString("idNumberSequencingCycles").equals("")) {
-      sequenceLaneInfo.setIdNumberSequencingCycles(new Integer(n.getString("idNumberSequencingCycles")));
+      sequenceLaneInfo.setIdNumberSequencingCycles(Integer.valueOf(n.getString("idNumberSequencingCycles")));
     }
 
     if (n.get("idNumberSequencingCyclesAllowed") != null && !n.getString("idNumberSequencingCyclesAllowed").equals("")) {
-      sequenceLaneInfo.setIdNumberSequencingCyclesAllowed(new Integer(n.getString("idNumberSequencingCyclesAllowed")));
+      sequenceLaneInfo.setIdNumberSequencingCyclesAllowed(Integer.valueOf(n.getString("idNumberSequencingCyclesAllowed")));
     }
 
     if (n.get("idSeqRunType") != null && !n.getString("idSeqRunType").equals("")) {
-      sequenceLaneInfo.setIdSeqRunType(new Integer(n.getString("idSeqRunType")));
+      sequenceLaneInfo.setIdSeqRunType(Integer.valueOf(n.getString("idSeqRunType")));
     }
 
     if (n.get("idGenomeBuildAlignTo") != null && !n.getString("idGenomeBuildAlignTo").equals("")) {
-      sequenceLaneInfo.setIdGenomeBuildAlignTo(new Integer(n.getString("idGenomeBuildAlignTo")));
+      sequenceLaneInfo.setIdGenomeBuildAlignTo(Integer.valueOf(n.getString("idGenomeBuildAlignTo")));
     }
 
     if (n.get("flowCellChannelSampleConcentrationpM") != null && !n.getString("flowCellChannelSampleConcentrationpM").equals("")) {
@@ -2168,10 +2187,10 @@ public class RequestParser implements Serializable {
     // workflow fields
     //
     if (n.get("numberSequencingCyclesActual") != null && !n.getString("numberSequencingCyclesActual").equals("")) {
-      sequenceLaneInfo.setNumberSequencingCyclesActual(new Integer(n.getString("numberSequencingCyclesActual")));
+      sequenceLaneInfo.setNumberSequencingCyclesActual(Integer.valueOf(n.getString("numberSequencingCyclesActual")));
     }
     if (n.get("clustersPerTile") != null && !n.getString("clustersPerTile").equals("")) {
-      sequenceLaneInfo.setClustersPerTile(new Integer(n.getString("clustersPerTile")));
+      sequenceLaneInfo.setClustersPerTile(Integer.valueOf(n.getString("clustersPerTile")));
     }
     if (n.get("fileName") != null && !n.getString("fileName").equals("")) {
       sequenceLaneInfo.setFileName(n.getString("fileName"));
@@ -2243,19 +2262,19 @@ public class RequestParser implements Serializable {
     }
 
     if (n.getAttributeValue("idNumberSequencingCycles") != null && !n.getAttributeValue("idNumberSequencingCycles").equals("")) {
-      sequenceLaneInfo.setIdNumberSequencingCycles(new Integer(n.getAttributeValue("idNumberSequencingCycles")));
+      sequenceLaneInfo.setIdNumberSequencingCycles(Integer.valueOf(n.getAttributeValue("idNumberSequencingCycles")));
     }
 
     if (n.getAttributeValue("idNumberSequencingCyclesAllowed") != null && !n.getAttributeValue("idNumberSequencingCyclesAllowed").equals("")) {
-      sequenceLaneInfo.setIdNumberSequencingCyclesAllowed(new Integer(n.getAttributeValue("idNumberSequencingCyclesAllowed")));
+      sequenceLaneInfo.setIdNumberSequencingCyclesAllowed(Integer.valueOf(n.getAttributeValue("idNumberSequencingCyclesAllowed")));
     }
 
     if (n.getAttributeValue("idSeqRunType") != null && !n.getAttributeValue("idSeqRunType").equals("")) {
-      sequenceLaneInfo.setIdSeqRunType(new Integer(n.getAttributeValue("idSeqRunType")));
+      sequenceLaneInfo.setIdSeqRunType(Integer.valueOf(n.getAttributeValue("idSeqRunType")));
     }
 
     if (n.getAttributeValue("idGenomeBuildAlignTo") != null && !n.getAttributeValue("idGenomeBuildAlignTo").equals("")) {
-      sequenceLaneInfo.setIdGenomeBuildAlignTo(new Integer(n.getAttributeValue("idGenomeBuildAlignTo")));
+      sequenceLaneInfo.setIdGenomeBuildAlignTo(Integer.valueOf(n.getAttributeValue("idGenomeBuildAlignTo")));
     }
 
     if (n.getAttributeValue("flowCellChannelSampleConcentrationpM") != null && !n.getAttributeValue("flowCellChannelSampleConcentrationpM").equals("")) {
@@ -2266,10 +2285,10 @@ public class RequestParser implements Serializable {
     // workflow fields
     //
     if (n.getAttributeValue("numberSequencingCyclesActual") != null && !n.getAttributeValue("numberSequencingCyclesActual").equals("")) {
-      sequenceLaneInfo.setNumberSequencingCyclesActual(new Integer(n.getAttributeValue("numberSequencingCyclesActual")));
+      sequenceLaneInfo.setNumberSequencingCyclesActual(Integer.valueOf(n.getAttributeValue("numberSequencingCyclesActual")));
     }
     if (n.getAttributeValue("clustersPerTile") != null && !n.getAttributeValue("clustersPerTile").equals("")) {
-      sequenceLaneInfo.setClustersPerTile(new Integer(n.getAttributeValue("clustersPerTile")));
+      sequenceLaneInfo.setClustersPerTile(Integer.valueOf(n.getAttributeValue("clustersPerTile")));
     }
     if (n.getAttributeValue("fileName") != null && !n.getAttributeValue("fileName").equals("")) {
       sequenceLaneInfo.setFileName(n.getAttributeValue("fileName"));

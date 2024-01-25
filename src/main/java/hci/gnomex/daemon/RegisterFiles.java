@@ -6,53 +6,9 @@ import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.controller.GetExpandedAnalysisFileList;
 import hci.gnomex.controller.GetRequestDownloadList;
-import hci.gnomex.model.Analysis;
-import hci.gnomex.model.AnalysisFile;
-import hci.gnomex.model.DataTrack;
-import hci.gnomex.model.DataTrackFile;
-import hci.gnomex.model.ExperimentFile;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.SampleExperimentFile;
-import hci.gnomex.utility.BatchDataSource;
-import hci.gnomex.utility.BatchMailer;
-import hci.gnomex.utility.DictionaryHelper;
+import hci.gnomex.model.*;
 import hci.gnomex.utility.FileDescriptor;
-import hci.gnomex.utility.MailUtil;
-import hci.gnomex.utility.MailUtilHelper;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.UploadDownloadHelper;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import javax.mail.MessagingException;
-import javax.naming.NamingException;
-
+import hci.gnomex.utility.*;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -61,6 +17,13 @@ import org.hibernate.TransactionException;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import javax.mail.MessagingException;
+import javax.naming.NamingException;
+import java.io.*;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class RegisterFiles extends TimerTask {
 
@@ -175,8 +138,7 @@ public RegisterFiles(String[] args) {
 		StackTraceElement[] stack = e.getStackTrace();
 		for (StackTraceElement s : stack) {
 			msg = msg + s.toString() + "\n\t\t";
-		}
-		;
+		};
 
 		System.out.println(msg);
 

@@ -1,7 +1,7 @@
 package hci.gnomex.controller;
 
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.Lab;
@@ -9,26 +9,18 @@ import hci.gnomex.model.PendingSampleFilter;
 import hci.gnomex.model.RequestCategory;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.query.Query;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.*;
 
 public class GetPendingSampleList extends GNomExCommand implements Serializable {
 
@@ -41,7 +33,7 @@ public class GetPendingSampleList extends GNomExCommand implements Serializable 
   private Element              requestNode = null;
   private Element              plateNode = null;
 
-  private Integer              idPlatePrev = new Integer(-1);
+  private Integer              idPlatePrev = -1;
 
 
   TreeMap<Integer, TreeMap<String, List<Object[]>>> requestMap = null;
@@ -250,7 +242,7 @@ public class GetPendingSampleList extends GNomExCommand implements Serializable 
 
         int plateCount = getPlateCount(results);
 
-        idPlatePrev = new Integer(-1);
+        idPlatePrev = -1;
         boolean firstTime = true;
         for (Object[]row : results) {
           if (firstTime && !assayKey.equals(" ")) {

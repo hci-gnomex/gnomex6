@@ -1,37 +1,18 @@
 package hci.gnomex.utility;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import org.hibernate.Session;
-
 import com.itextpdf.text.*;
 import com.itextpdf.text.Font.FontFamily;
-import com.itextpdf.text.pdf.*;
-
+import com.itextpdf.text.pdf.PdfPTable;
 import hci.dictionary.utility.DictionaryManager;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.BillingAccount;
-import hci.gnomex.model.BillingItem;
-import hci.gnomex.model.Hybridization;
-import hci.gnomex.model.LabeledSample;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.RequestCategory;
-import hci.gnomex.model.RequestCategoryType;
-import hci.gnomex.model.Sample;
-import hci.gnomex.model.SequenceLane;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
+import org.hibernate.Session;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+import java.util.*;
 
 
 public class RequestPDFFormatter extends RequestPDFFormatterBase {
@@ -316,6 +297,12 @@ public class RequestPDFFormatter extends RequestPDFFormatterBase {
 				tables.add(PDFFormatterUtil.makeTableTitle("Samples (" + request.getSamples().size() + ")", FONT_TITLE));
 				tables.add(makeTableNANOSTRING());
 			}
+			else if (requestCategoryType.equals(RequestCategoryType.TYPE_NANOGEOMX)) {
+				tables.add(Chunk.NEWLINE);
+				tables.add(PDFFormatterUtil.makeTableTitle("Samples (" + request.getSamples().size() + ")", FONT_TITLE));
+				tables.add(makeTableNANOGEOMX());
+			}
+
 			else if (requestCategoryType.equals(RequestCategoryType.TYPE_QC)) {
 				tables.add(Chunk.NEWLINE);
 				tables.add(PDFFormatterUtil.makeTableTitle("Samples (" + request.getSamples().size() + ")", FONT_TITLE));
@@ -847,7 +834,10 @@ public class RequestPDFFormatter extends RequestPDFFormatterBase {
 		
 		return table;
 	}
-	
+
+	private Element makeTableNANOGEOMX() {
+		return makeTableNANOSTRING();
+	}
 	private Element makeTableNANOSTRING() {
 		Set samples = request.getSamples();
 		boolean showCCNumber = determineShowCCNumber(samples);
@@ -1258,7 +1248,7 @@ public class RequestPDFFormatter extends RequestPDFFormatterBase {
 		} else if (dnaSamples) {
 			table = new PdfPTable(11);
 		} else if (showCCNumber) {
-			table = new PdfPTable(12);
+			table = new PdfPTable(13);			
 		} else {
 			table = new PdfPTable(12);
 		}
@@ -1339,7 +1329,7 @@ public class RequestPDFFormatter extends RequestPDFFormatterBase {
 					}
 				}
 				if (numberOfLanes > 0) {
-					laneNum = new Integer(numberOfLanes).toString();
+					laneNum = Integer.valueOf(numberOfLanes).toString();
 				}
 			}
 			String seqDate = "";
@@ -1483,7 +1473,7 @@ public class RequestPDFFormatter extends RequestPDFFormatterBase {
 				String laneLabel = "";
 				if (newLane) {
 					if (key.equals("")) {
-						laneLabel = new Integer(nonMultiplexedLaneCount++).toString();
+						laneLabel = Integer.valueOf(nonMultiplexedLaneCount++).toString();
 					} else {
 						laneLabel = multiplexGroupID;
 					}

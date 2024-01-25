@@ -1,45 +1,20 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.Analysis;
-import hci.gnomex.model.AnalysisFile;
-import hci.gnomex.model.AnalysisCollaborator;
-import hci.gnomex.model.GenomeBuild;
-import hci.gnomex.model.Lab;
-import hci.gnomex.utility.HibernateSession;
-
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Set;
+import hci.gnomex.model.*;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
 
 import javax.json.*;
 import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.DataTrack;
-import hci.gnomex.model.DataTrackFile;
-import hci.gnomex.model.DataTrackFolder;
-import hci.gnomex.model.Institution;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.AppUserComparator;
-import hci.gnomex.utility.DataTrackComparator;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.RequestParser;
-
-import java.util.List;
-import java.util.TreeSet;
-
-import org.hibernate.Hibernate;
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * Given a list of analysis files, this routine creates data tracks for
@@ -85,7 +60,7 @@ public class CreateAllDataTracks extends GNomExCommand implements Serializable {
             if(idAnalysisFilesJson != null){
                 for(JsonValue idAnalysisFileJson : idAnalysisFilesJson){
                     String idAnalyisFile = ((JsonString)idAnalysisFileJson).getString();
-                    idAnalysisFiles.add(new Integer (idAnalyisFile));
+                    idAnalysisFiles.add(Integer.valueOf (idAnalyisFile));
                 }
 
             }else{

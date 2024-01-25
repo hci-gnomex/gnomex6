@@ -2,7 +2,7 @@ package hci.gnomex.daemon.auto_import;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
+//import java.io.FileReader;
 import java.util.Scanner;
 
 public class PeekableScanner {

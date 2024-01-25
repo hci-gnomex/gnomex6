@@ -2,13 +2,12 @@ package hci.gnomex.model;
 
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.hibernate5utils.HibernateDetailObject;
+import org.hibernate.Session;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.hibernate.Session;
 
 
 public class InternalAccountFieldsConfiguration extends HibernateDetailObject implements Serializable {
@@ -121,11 +120,7 @@ public class InternalAccountFieldsConfiguration extends HibernateDetailObject im
       
       PropertyDictionaryHelper pdh = PropertyDictionaryHelper.getInstance(sess);
       String cba = pdh.getProperty(PropertyDictionary.CONFIGURABLE_BILLING_ACCOUNTS);
-      if (cba != null && cba.equals("Y")) {
-        useConfigurableBillingAccounts = true;
-      } else {
-        useConfigurableBillingAccounts = false;
-      }
+        useConfigurableBillingAccounts = cba != null && cba.equals("Y");
     }
   }
   

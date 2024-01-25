@@ -11,7 +11,6 @@ import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-
 import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.HashSet;

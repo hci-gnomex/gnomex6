@@ -1,13 +1,8 @@
 package hci.gnomex.utility;
 
-import hci.gnomex.model.PropertyDictionary;
-
-import java.io.Serializable;
-
 import javax.servlet.http.HttpServletRequest;
-
-import org.hibernate.query.Query;
-import org.hibernate.Session;
+import java.io.Serializable;
+//import org.hibernate.Session;
 
 public class JspHelper implements Serializable {
 

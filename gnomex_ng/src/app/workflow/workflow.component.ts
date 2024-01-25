@@ -106,9 +106,15 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
         }
 
         if (this.gnomexService.usesExperimentType('NANOSTRING')) {
-            allObj = {label: 'Nano String', code: 'nano'};
+            allObj = {label: 'Nano String', code: 'nanostring'};
             this.combinedQCTabItems.push(allObj);
         }
+
+        if (this.gnomexService.usesExperimentType('NANOGEOMX')) {
+            allObj = {label: 'Nano Geomx', code: 'nanogeomx'};
+            this.combinedQCTabItems.push(allObj);
+        }
+
     }
 
     ngAfterViewInit() {
@@ -152,6 +158,7 @@ export class WorkflowComponent implements OnInit, AfterViewInit {
             case qcModes.Microarray :    this.inputs.mode = qcModes.Microarray;    break;
             case qcModes.Samplequality : this.inputs.mode = qcModes.Samplequality; break;
             case qcModes.Nanostring :    this.inputs.mode = qcModes.Nanostring;    break;
+            case qcModes.Nanogeomx :     this.inputs.mode = qcModes.Nanogeomx;    break;
         }
     }
 

@@ -541,6 +541,32 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 disabled: true,
                 component: TabConfirmIlluminaComponent
             });
+        } else if (category.type === NewExperimentService.TYPE_LCM || category.type === NewExperimentService.TYPE_MILLISECT) {
+            this.newExperimentService.currentState = "SliceState";
+
+            this.tabs.push({
+                label: "Sample Details",
+                disabled: true,
+                component: TabSampleSetupViewComponent
+            });
+
+            this.tabs.push({
+                label: "Annotations",
+                disabled: true,
+                component: TabAnnotationViewComponent
+            });
+
+            this.tabs.push({
+                label: "Samples",
+                disabled: true,
+                component: TabSamplesIlluminaComponent
+            });
+
+            this.tabs.push({
+                label: "Confirm",
+                disabled: true,
+                component: TabConfirmIlluminaComponent
+            });
         } else if (category.type === NewExperimentService.TYPE_NANOSTRING) {
             this.newExperimentService.currentState = "NanoStringState";
 
@@ -599,6 +625,53 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 component: TabConfirmIlluminaComponent
             });
 
+        } else if (category.type === NewExperimentService.TYPE_NANOGEOMX) {
+            this.newExperimentService.currentState = "NanoGeomxState";
+
+
+            this.tabs.push({
+                label: "Sample Details",
+                disabled: true,
+                component: TabSampleSetupViewComponent
+            });
+
+            this.tabs.push({
+                label: "Assay Type",
+                disabled: true,
+                component: TabSeqSetupViewComponent
+            });
+            // this.tabs.push({
+            //     label: "Sequencing Options",
+            //     disabled: true,
+            //     component: TabSeqProtoViewComponent
+            // });
+            this.tabs.push({
+                label: "Annotations",
+                disabled: true,
+                component: TabAnnotationViewComponent
+            });
+            this.tabs.push({
+                label: "Experiment Design",
+                disabled: true,
+                component: TabSamplesIlluminaComponent
+            });
+            this.tabs.push({
+                label: "Visibility",
+                disabled: true,
+                component: TabVisibilityComponent
+            });
+            this.tabs.push({
+                label: "Bioinformatics",
+                disabled: true,
+                component: ExperimentBioinformaticsTabComponent
+            });
+            this.tabs.push({
+                label: "Confirm",
+                disabled: true,
+                component: TabConfirmIlluminaComponent
+            });
+
+
         } else if (category.type === NewExperimentService.TYPE_CLINICAL_SEQUENOM) {
             this.newExperimentService.currentState = "ClinicalSequenomState";
         } else if (category.type === NewExperimentService.TYPE_MICROARRAY) {
@@ -645,7 +718,27 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 if (this.selectedIndex === 0) {
                     this.tabs[0].disabled = false;
                 }
-            }
+            } break;
+            case 'SliceState' : {
+                if (this.selectedIndex === 0) {
+                    this.tabs[0].disabled = false;
+                    this.tabs[1].disabled = false;
+                } else if (this.selectedIndex > 1 && this.selectedIndex < this.tabs.length - 1) {
+                    this.tabs[this.selectedIndex + 1].disabled = false;
+                } else {
+                    // The submit tab is the next one - Do nothing.
+                }
+            } break;
+            case 'NanoGeomxState' : {
+                if (this.selectedIndex === 0) {
+                    this.tabs[0].disabled = false;
+                    this.tabs[1].disabled = false;
+                } else if (this.selectedIndex > 1 && this.selectedIndex < this.tabs.length - 1) {
+                    this.tabs[this.selectedIndex + 1].disabled = false;
+                } else {
+                    // The submit tab is the next one - Do nothing.
+                }
+            } break;
 
         }
 
@@ -682,7 +775,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         // but are used to create Price Quotes on the confirm tab in the new experiment
         this.inputs.experiment.billingItems = [];
 
-        this.experimentService.saveRequest(this.inputs.experiment).subscribe((response) => {
+        this.experimentService. saveRequest(this.inputs.experiment).subscribe((response) => {
             this.dialogService.stopAllSpinnerDialogs();
 
             if (!response) {

@@ -1,19 +1,17 @@
 package hci.gnomex.controller;
 
-import hci.gnomex.model.NewsItem;
-import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.RequestParser;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
-
-import java.io.Serializable;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
+import hci.gnomex.model.NewsItem;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.RequestParser;
+import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 public class SaveNewsItem extends GNomExCommand implements Serializable {
   
   // the static field for logging in Log4J
@@ -92,8 +90,8 @@ public class SaveNewsItem extends GNomExCommand implements Serializable {
 
     newsItem.setTitle(RequestParser.unEscape(title));
     newsItem.setMessage(message);
-    newsItem.setIdSubmitter(new Integer(idSubmitter));
-    newsItem.setIdCoreFacility(new Integer(idCoreFacility));
+    newsItem.setIdSubmitter(Integer.valueOf(idSubmitter));
+    newsItem.setIdCoreFacility(Integer.valueOf(idCoreFacility));
     newsItem.setDate(new java.sql.Date(System.currentTimeMillis()));
     
   }

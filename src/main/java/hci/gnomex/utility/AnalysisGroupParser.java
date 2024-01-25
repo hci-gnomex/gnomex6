@@ -2,15 +2,13 @@ package hci.gnomex.utility;
 
 import hci.framework.model.DetailObject;
 import hci.gnomex.model.AnalysisGroup;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.hibernate.Session;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AnalysisGroupParser extends DetailObject implements Serializable {
 
@@ -26,7 +24,7 @@ public class AnalysisGroupParser extends DetailObject implements Serializable {
             for (int i = 0; i < agArray.size(); i++) {
                 JsonObject node = agArray.getJsonObject(i);
                 String idAnalysisGroupString = Util.getJsonStringSafeNonNull(node, "idAnalysisGroup");
-                AnalysisGroup ag = sess.load(AnalysisGroup.class, new Integer(idAnalysisGroupString));
+                AnalysisGroup ag = sess.load(AnalysisGroup.class, Integer.valueOf(idAnalysisGroupString));
                 analysisGroupMap.put(idAnalysisGroupString, ag);
             }
         }

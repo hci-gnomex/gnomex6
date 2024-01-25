@@ -1,16 +1,4 @@
 package hci.gnomex.daemon.auto_import;
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.regex.Pattern;
 
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -21,6 +9,18 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 
 
@@ -525,12 +525,12 @@ public class XMLParser {
 
 				System.out.println(importAnalysisCommands.get(0));
 				executeCommands(importAnalysisCommands,appendedPathOnly  + IMPORT_ANALYSIS_ERROR);
-				analysisID = new Integer(readInLastEntry(pathOnly + "tempAnalysisList.out" ));
+				analysisID = Integer.valueOf(readInLastEntry(pathOnly + "tempAnalysisList.out" ));
 
 			}else{ // existing analysis
 				if(analysisID != null && !requestID.equals("")){
 
-					if(!q.hasLinkAnalysisExperiment( analysisID, new Integer(requestID))){
+					if(!q.hasLinkAnalysisExperiment( analysisID, Integer.valueOf(requestID))){
 						linkExperimentToAnalysis.add("bash LinkExpToAnal.sh -request " + requestID + " -analysis " + analysisID + " -add");
 						System.out.println(linkExperimentToAnalysis.get(0));
 						executeCommands(linkExperimentToAnalysis,appendedPathOnly  + LINK_EXP_ANAL_ERROR);

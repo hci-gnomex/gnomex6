@@ -78,7 +78,7 @@ public class PasswordUtil {
         if (actual == expected) {
             output += " (expected)";
         } else {
-            output += ", expected " + expected + ". NOOOOOOOOOOOOOOOOOOOOOOOOOO!";
+            output += ", expected " + expected + ". NO!";
         }
         System.out.println(output);
     }

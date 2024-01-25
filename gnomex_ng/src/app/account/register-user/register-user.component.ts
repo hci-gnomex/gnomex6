@@ -24,6 +24,7 @@ import {ConstantsService} from "../../services/constants.service";
                 </div>
             </div>
             <div class="flex-container-col align-center flex-grow">
+                <p style="color: red;font-size: large;">Your GNomEx account will not work until you receive an approval email.</p>
                 <form (ngSubmit)="submit(formGroup)" [formGroup]="formGroup" class="flex-container-col align-center flex-grow border-subtle login-background main-form"   >
                     <h2 mat-dialog-title style="text-align: center"> Sign up for an account </h2>
                     <div class="flex-container-col align-center">
@@ -179,6 +180,7 @@ import {ConstantsService} from "../../services/constants.service";
                         </ng-template>
                     </div>
                     <div class="flex-row-container justify-flex-end">
+                        <p style="color: red;font-size: large;">Your GNomEx account will not work until you receive an approval email.</p>
                         <button type="submit" mat-raised-button [color]="color" [disabled]="this.formGroup.invalid" >Submit</button>
                     </div>
 

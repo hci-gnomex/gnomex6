@@ -3,17 +3,12 @@ package hci.gnomex.utility;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.FlowCellChannel;
 import hci.gnomex.model.WorkItem;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
+
+import java.io.Serializable;
+import java.util.*;
 
 
 public class WorkItemSolexaRunParser implements Serializable {
@@ -39,8 +34,8 @@ public class WorkItemSolexaRunParser implements Serializable {
       String idFlowCellChannelString   = workItemNode.getAttributeValue("idFlowCellChannel");
       String idWorkItemString = workItemNode.getAttributeValue("idWorkItem");
       
-      FlowCellChannel channel = (FlowCellChannel)sess.load(FlowCellChannel.class, new Integer(idFlowCellChannelString));
-      WorkItem workItem = (WorkItem)sess.load(WorkItem.class, new Integer(idWorkItemString));
+      FlowCellChannel channel = (FlowCellChannel)sess.load(FlowCellChannel.class, Integer.valueOf(idFlowCellChannelString));
+      WorkItem workItem = (WorkItem)sess.load(WorkItem.class, Integer.valueOf(idWorkItemString));
       
       if (workItemNode.getAttributeValue("lastCycleStatus") != null && !workItemNode.getAttributeValue("lastCycleStatus").equals("")) {
         workItem.setStatus(workItemNode.getAttributeValue("lastCycleStatus"));
@@ -117,13 +112,13 @@ public class WorkItemSolexaRunParser implements Serializable {
     
     
     if (n.getAttributeValue("numberSequencingCyclesActual") != null && !n.getAttributeValue("numberSequencingCyclesActual").equals("")) {
-      channel.setNumberSequencingCyclesActual(new Integer(n.getAttributeValue("numberSequencingCyclesActual")));
+      channel.setNumberSequencingCyclesActual(Integer.valueOf(n.getAttributeValue("numberSequencingCyclesActual")));
     } else {
       channel.setNumberSequencingCyclesActual(null);
     }
     
     if (n.getAttributeValue("clustersPerTile") != null && !n.getAttributeValue("clustersPerTile").equals("")) {
-      channel.setClustersPerTile(new Integer(n.getAttributeValue("clustersPerTile").replaceAll(",", "")));
+      channel.setClustersPerTile(Integer.valueOf(n.getAttributeValue("clustersPerTile").replaceAll(",", "")));
     } else {
       channel.setClustersPerTile(null);
     }

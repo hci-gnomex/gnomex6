@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.constants.Constants;
@@ -8,20 +8,19 @@ import hci.gnomex.model.FlowCell;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.FlowCellHTMLFormatter;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.naming.NamingException;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.sql.SQLException;
 
 public class ShowFlowCellPrepForm extends GNomExCommand implements Serializable {
   
@@ -43,7 +42,7 @@ public class ShowFlowCellPrepForm extends GNomExCommand implements Serializable 
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idFlowCell") != null) {
-      idFlowCell = new Integer(request.getParameter("idFlowCell"));
+      idFlowCell = Integer.valueOf(request.getParameter("idFlowCell"));
     } else {
       this.addInvalidField("idFlowCell", "idFlowCell is required");
     }
@@ -178,7 +177,7 @@ public class ShowFlowCellPrepForm extends GNomExCommand implements Serializable 
    *  this method allows you to manipulate the HttpServletResponse object prior
    *  to forwarding to the result JSP (add a cookie, etc.)
    *
-   *@param  request  The HttpServletResponse for the command
+   *@param  response  The HttpServletResponse for the command
    *@return          The processed response
    */
   public HttpServletResponse setResponseState(HttpServletResponse response) {

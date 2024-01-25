@@ -2,12 +2,11 @@ package hci.gnomex.utility;
 
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Hybridization;
-
-import java.io.Serializable;
-
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
+
+import java.io.Serializable;
 
 
 public class WorkItemExtractionParser extends WorkItemHybParser implements Serializable {
@@ -45,13 +44,13 @@ public class WorkItemExtractionParser extends WorkItemHybParser implements Seria
     
     
     if (n.getAttributeValue("idScanProtocol") != null && !n.getAttributeValue("idScanProtocol").equals("")) {
-      hyb.setIdScanProtocol(new Integer(n.getAttributeValue("idScanProtocol")));
+      hyb.setIdScanProtocol(Integer.valueOf(n.getAttributeValue("idScanProtocol")));
     } else {
       hyb.setIdScanProtocol(null);
     }
     
     if (n.getAttributeValue("idFeatureExtractionProtocol") != null && !n.getAttributeValue("idFeatureExtractionProtocol").equals("")) {
-      hyb.setIdFeatureExtractionProtocol(new Integer(n.getAttributeValue("idFeatureExtractionProtocol")));
+      hyb.setIdFeatureExtractionProtocol(Integer.valueOf(n.getAttributeValue("idFeatureExtractionProtocol")));
     } else {
       hyb.setIdFeatureExtractionProtocol(null);
     }

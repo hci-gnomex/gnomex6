@@ -1,32 +1,22 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
-import hci.gnomex.model.AnalysisProtocol;
-import hci.gnomex.model.AnalysisType;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.PropertyType;
-import hci.gnomex.model.Visibility;
-import hci.gnomex.utility.AnalysisMatrixLinkInfo;
-import hci.gnomex.utility.ExperimentMatrixLinkInfo;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.MatrixLinkInfoBase;
+import hci.gnomex.model.*;
+import hci.gnomex.utility.*;
 import hci.report.utility.ReportCommand;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.naming.NamingException;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
 /*
  * This class will generate an web page, showing an experiment matrix.
  * The page will be organized into tabs, a tab for each organism.

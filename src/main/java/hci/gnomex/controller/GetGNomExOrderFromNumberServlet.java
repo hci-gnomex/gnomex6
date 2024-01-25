@@ -1,16 +1,18 @@
 package hci.gnomex.controller;
 
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.Analysis;
-import hci.gnomex.model.DataTrack;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.Topic;
-import hci.gnomex.utility.*;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.PropertyDictionaryHelper;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
-import javax.json.*;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
+import javax.json.JsonWriter;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -86,7 +88,7 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
                     query = sess.createQuery(queryStr).setParameter(0 , requestNumberBase + "%" )
                             .setParameter(1, requestNumberBase );
                 }else{
-                    idRequest = new Integer(this.requestNumber);
+                    idRequest = Integer.valueOf(this.requestNumber);
                     queryStr = "SELECT req from Request as req where req.idRequest = :idRequest";
                     query = sess.createQuery(queryStr).setParameter("idRequest", idRequest );
                 }
@@ -97,6 +99,7 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
                     throw new Exception("Request number " + requestNumber + " does not exists" );
                 }
 
+                // deal with null pointer exception
                 Request r = (Request)reqRow.get(0);
                 value = Json.createObjectBuilder()
                         .add("result", "SUCCESS")
@@ -120,7 +123,7 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
                             "FROM Analysis as a JOIN a.analysisGroups as ag WHERE a.number = :analysisNumber" ;
                     query = sess.createQuery(queryStr).setParameter("analysisNumber", analysisNumber );
                 }else{
-                    idAnalysis = new Integer(this.analysisNumber);
+                    idAnalysis = Integer.valueOf(this.analysisNumber);
                     queryStr ="SELECT a.number,ag.idAnalysisGroup,a.codeVisibility, a.idAnalysis, a.idLab " +
                             "FROM Analysis as a JOIN a.analysisGroups ag WHERE a.idAnalysis = :idAnalysis" ;
                     query = sess.createQuery(queryStr).setParameter("idAnalysis", idAnalysis );
@@ -156,7 +159,7 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
                             "WHERE dt.fileName = :dataTrackNumber";
                     query = sess.createQuery(queryStr).setParameter("dataTrackNumber" , dataTrackNumber );
                 }else{
-                    idDataTrack = new Integer(this.dataTrackNumber);
+                    idDataTrack = Integer.valueOf(this.dataTrackNumber);
                     queryStr = "SELECT dt.fileName, dt.codeVisibility, dt.idDataTrack, dt.idLab,dt.idGenomeBuild, gb.idOrganism " +
                             "FROM DataTrack as dt JOIN dt.folders as dtfold JOIN dtfold.genomeBuild as gb " +
                             "WHERE dt.idDataTrack = :idDataTrack";
@@ -191,7 +194,7 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
 
             }else if(topicNumber != null){
                 topicNumber = topicNumber.replaceAll("[A-Za-z#]*", "");
-                Integer idTopic = new Integer(topicNumber);
+                Integer idTopic = Integer.valueOf(topicNumber);
 
                 System.out.println("topicNumber: " + topicNumber ); // not actually a topic number based off of idTopic
 

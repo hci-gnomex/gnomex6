@@ -1,26 +1,13 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.Lab;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.GNomExRollbackException;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.MailUtil;
-import hci.gnomex.utility.MailUtilHelper;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -28,9 +15,13 @@ import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 public class RequestLabMembership extends GNomExCommand implements Serializable {
 	private static Logger LOG = Logger.getLogger(RequestLabMembership.class);
 
@@ -59,8 +50,8 @@ public class RequestLabMembership extends GNomExCommand implements Serializable 
 			Session sess = HibernateSession.currentSession(this.getUsername());
 			AppUser currentUser = sess.load(AppUser.class, this.getSecAdvisor().getAppUser().getIdAppUser());
 
-			// If we have a guid but it is expired then create a new guid with a new
-			// expiration date. Otherwise use what is currently in DB
+			// If we have a guid but, it is expired then create a new guid with a new
+			// expiration date. Otherwise,use what is currently in DB
 			if (currentUser.getGuid() == null
 					|| (currentUser.getGuid() != null && currentUser.getGuidExpiration().before(new Date(System.currentTimeMillis())))) {
 				Timestamp ts = new Timestamp(System.currentTimeMillis() + RequestLabMembership.APPROVE_USER_EXPIRATION_TIME);

@@ -6,8 +6,11 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Optional;
 
-import sun.reflect.Reflection;
+import java.lang.reflect.*;
+import java.lang.StackWalker;
+
 
 /**
  * This class contains several static constants and methods that are used for DetailObject Annotations.
@@ -853,11 +856,35 @@ public class Annotations
    * @throws ClassNotFoundException If the class wasn't found using any of the ClassLoader's in the stack trace.
    * @throws IllegalArgumentException If className is null.
    */
+
   private static Class<?> forName(String className) throws ClassNotFoundException, IllegalArgumentException
   {
     if (className == null)
       throw new IllegalArgumentException("The class name is required to use Annotations.forName(*).");
-    
+
+    try
+    {
+    Optional<Class<?>> callerClass = null;
+    StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+    callerClass = walker.walk(s ->
+            s.map(StackWalker.StackFrame::getDeclaringClass)
+                    .filter(className::equals)
+                    .findFirst());
+      Class<?> clazz = callerClass.orElse(null);
+      if (clazz != null)
+        return clazz;
+      else   throw new ClassNotFoundException(className);
+
+  } catch (Exception ex) {}
+
+// If we didn't find it, then it probably doesn't exist.
+
+            throw new ClassNotFoundException(className);
+
+//            return callerClass;
+            }
+
+/*
     // Get the current stack trace
     Exception e = new Exception();
     StackTraceElement[] ste = e.getStackTrace();
@@ -884,4 +911,5 @@ public class Annotations
     
     return clazz;
   }
+*/
 }

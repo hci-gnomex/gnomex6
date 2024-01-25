@@ -1,20 +1,17 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.BillingAccount;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.HibernateSession;
-
-import java.io.Serializable;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 public class DeletePurchaseForm extends GNomExCommand implements Serializable {
 
   // the static field for logging in Log4J
@@ -29,7 +26,7 @@ public class DeletePurchaseForm extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idBillingAccount") != null && !request.getParameter("idBillingAccount").equals("")) {
-      idBillingAccount = new Integer(request.getParameter("idBillingAccount"));
+      idBillingAccount = Integer.valueOf(request.getParameter("idBillingAccount"));
     } else {
       this.addInvalidField("idBillingAccount", "idBillingAccount is required.");
     }

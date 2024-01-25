@@ -1,22 +1,19 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.WorkItem;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
 
 
 
@@ -43,7 +40,7 @@ public class DeleteWorkItem extends GNomExCommand implements Serializable {
      String[] idStrings = idWorkItems.split(",");
      workItemIds = new ArrayList<Integer>();
      for (String idString : idStrings) {
-       workItemIds.add(new Integer(idString));
+       workItemIds.add(Integer.valueOf(idString));
      }
    } else {
      this.addInvalidField("idWorkItems", "idWorkItems is required.");

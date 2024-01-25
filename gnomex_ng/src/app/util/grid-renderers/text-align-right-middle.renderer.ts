@@ -10,7 +10,10 @@ import {CellRendererValidation} from "./cell-renderer-validation";
 			 class="full-width full-height {{this.errorMessage && this.errorMessage !== '' ? 'error' : ''}}">
 			<div class="t full-width full-height fix-table">
 				<div class="tr">
-					<div class="td vertical-center right-align padded ellipsis">
+					<div *ngIf="showZeroes" class="td vertical-center right-align padded ellipsis">
+						{{ value ? value : "0" }}
+					</div>
+					<div *ngIf="!showZeroes" class="td vertical-center right-align padded ellipsis">
 						{{ value }}
 					</div>
 				</div>
@@ -42,11 +45,13 @@ import {CellRendererValidation} from "./cell-renderer-validation";
 	`]
 })
 export class TextAlignRightMiddleRenderer extends CellRendererValidation {
-    value: string;
+    public value: string;
+	public showZeroes: boolean = false;
     context: any;
 
 	agInit2(params: any): void {
 		this.value = (this.params && this.params.value) ? this.params.value : "";
+		this.showZeroes = (this.params && this.params.colDef  && this.params.colDef.showZeroes) ? !!this.params.colDef.showZeroes : false;
 	}
 
 	refresh(params: any): boolean {

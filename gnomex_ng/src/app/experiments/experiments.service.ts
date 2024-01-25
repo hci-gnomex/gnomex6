@@ -35,6 +35,8 @@ export class ExperimentsService {
     public readonly TYPE_CLINICAL_SEQUENOM: string = "CLINSEQ";
     public readonly TYPE_SEQUENOM: string = "SEQUENOM";
     public readonly TYPE_NANOSTRING: string = "NANOSTRING";
+    public readonly TYPE_NANOGEOMX: string = "NANOGEOMX";
+
     public readonly TYPE_GENERIC: string = "GENERIC";
 
     private experimentOrders: any[];
@@ -259,7 +261,7 @@ export class ExperimentsService {
             .set("idProject", experiment.idProject)
             .set("invoicePrice", experiment.invoicePrice)
             .set("propertiesXML", propertiesXML)
-            .set("noJSONToXMLConversionNeeded","true");
+            .set("noJSONToXMLConversionNeeded","Y");
 
         let headers: HttpHeaders = new HttpHeaders()
             .set("Content-Type", "application/x-www-form-urlencoded");

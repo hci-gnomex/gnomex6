@@ -177,7 +177,7 @@ public abstract class BillingPlugin {
         	theUnitPrice = price.getEffectiveUnitPrice(request.getLab());
         }
         master.setUnitPrice(theUnitPrice);
-        master.setQty(new Integer(qty));
+        master.setQty(Integer.valueOf(qty));
         master.setTotalPrice(theUnitPrice.multiply(BigDecimal.valueOf(qty)));
         master.setIdBillingPeriod(billingPeriod.getIdBillingPeriod());
         master.setIdBillingTemplate(template.getIdBillingTemplate());

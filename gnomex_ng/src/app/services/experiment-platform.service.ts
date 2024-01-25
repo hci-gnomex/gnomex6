@@ -114,12 +114,16 @@ export class ExperimentPlatformService implements OnDestroy {
         return this. _selectedType  && this._selectedType.value === "NANOSTRING";
     }
 
+    public get isNanoGeomx(): Boolean {
+        return this. _selectedType  && this._selectedType.value === "NANOGEOMX";
+    }
+
     public get isQC(): Boolean {
         return this._selectedType && this.selectedType.value === "QC";
     }
 
     getExperimentPlatformTabList(): string[] {
-        if(this.isIllumina || this.isNanoString || this.isSequenom) {
+        if(this.isIllumina || this.isNanoString || this.isSequenom || this.isNanoGeomx) {
             let illuminaLikeList: string[] = [
                 "ExperimentPlatformTabComponent",
                 "EpSampleTypeTabComponent",

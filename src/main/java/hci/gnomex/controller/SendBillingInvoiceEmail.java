@@ -1,33 +1,20 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
-import hci.gnomex.model.BillingAccount;
-import hci.gnomex.model.BillingPeriod;
-import hci.gnomex.model.CoreFacility;
-import hci.gnomex.model.Invoice;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.PropertyDictionary;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.BillingInvoiceEmailFormatter;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.MailUtil;
-import hci.gnomex.utility.MailUtilHelper;
-import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 
+import javax.json.Json;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.TreeMap;
-
-import javax.json.Json;
-import javax.servlet.http.HttpSession;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 
 @SuppressWarnings("serial")
 public class SendBillingInvoiceEmail extends GNomExCommand implements Serializable {
@@ -50,25 +37,25 @@ public class SendBillingInvoiceEmail extends GNomExCommand implements Serializab
 
     public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
         if (request.getParameter("idLab") != null) {
-            idLab = new Integer(request.getParameter("idLab"));
+            idLab = Integer.valueOf(request.getParameter("idLab"));
         } else {
             this.addInvalidField("idLab", "idLab is required");
         }
 
         if (request.getParameter("idBillingAccount") != null && request.getParameter("idBillingAccount").length() > 0) {
-            idBillingAccount = new Integer(request.getParameter("idBillingAccount"));
+            idBillingAccount = Integer.valueOf(request.getParameter("idBillingAccount"));
         } else {
             this.addInvalidField("idBillingAccount", "idBillingAccount is required");
         }
 
         if (request.getParameter("idBillingPeriod") != null) {
-            idBillingPeriod = new Integer(request.getParameter("idBillingPeriod"));
+            idBillingPeriod = Integer.valueOf(request.getParameter("idBillingPeriod"));
         } else {
             this.addInvalidField("idBillingPeriod", "idBillingPeriod is required");
         }
 
         if (request.getParameter("idCoreFacility") != null) {
-            idCoreFacility = new Integer(request.getParameter("idCoreFacility"));
+            idCoreFacility = Integer.valueOf(request.getParameter("idCoreFacility"));
         } else {
             this.addInvalidField("idCoreFacility", "idCoreFacility is required");
         }

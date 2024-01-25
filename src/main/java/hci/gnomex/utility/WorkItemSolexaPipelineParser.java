@@ -3,18 +3,13 @@ package hci.gnomex.utility;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.FlowCellChannel;
 import hci.gnomex.model.WorkItem;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.*;
 
 
 public class WorkItemSolexaPipelineParser implements Serializable {
@@ -40,8 +35,8 @@ public class WorkItemSolexaPipelineParser implements Serializable {
       String idFlowCellChannelString   = workItemNode.getAttributeValue("idFlowCellChannel");
       String idWorkItemString = workItemNode.getAttributeValue("idWorkItem");
       
-      FlowCellChannel channel = (FlowCellChannel)sess.load(FlowCellChannel.class, new Integer(idFlowCellChannelString));
-      WorkItem workItem = (WorkItem)sess.load(WorkItem.class, new Integer(idWorkItemString));
+      FlowCellChannel channel = (FlowCellChannel)sess.load(FlowCellChannel.class, Integer.valueOf(idFlowCellChannelString));
+      WorkItem workItem = (WorkItem)sess.load(WorkItem.class, Integer.valueOf(idWorkItemString));
       
       if (workItemNode.getAttributeValue("pipelineStatus") != null && !workItemNode.getAttributeValue("pipelineStatus").equals("")) {
         workItem.setStatus(workItemNode.getAttributeValue("pipelineStatus"));

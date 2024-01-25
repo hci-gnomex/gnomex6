@@ -3,7 +3,7 @@ package hci.gnomex.model;
 import hci.framework.model.DetailObject;
 import hci.gnomex.security.SecurityAdvisor;
 
-import java.util.Iterator;
+//import java.util.Iterator;
 
 public class AppUserFilter extends DetailObject {
 

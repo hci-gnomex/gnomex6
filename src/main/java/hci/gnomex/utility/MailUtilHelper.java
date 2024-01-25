@@ -4,10 +4,9 @@ import hci.gnomex.controller.GNomExFrontController;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.PropertyDictionary;
 
+import javax.mail.Session;
 import java.io.File;
 import java.util.Properties;
-
-import javax.mail.Session;
 
 public class MailUtilHelper {
 	
@@ -104,13 +103,9 @@ public class MailUtilHelper {
 	}
 	
 	public boolean hasEssentialParams() {
-		boolean hasEssentialParams = true;
-		
-		if (session == null) {
-			hasEssentialParams = false;
-		}
-		
-		boolean hasOverrideTestParams = false;
+		boolean hasEssentialParams = session != null;
+
+        boolean hasOverrideTestParams = false;
 		if (forceTestEmail || forceTestEmailTo != null) {
 			hasOverrideTestParams = true;
 		}

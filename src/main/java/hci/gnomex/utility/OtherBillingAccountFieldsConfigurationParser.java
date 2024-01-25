@@ -2,15 +2,14 @@ package hci.gnomex.utility;
 
 import hci.framework.model.DetailObject;
 import hci.gnomex.model.OtherAccountFieldsConfiguration;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.Element;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
 
 
 public class OtherBillingAccountFieldsConfigurationParser extends DetailObject implements Serializable {
@@ -38,7 +37,7 @@ public class OtherBillingAccountFieldsConfigurationParser extends DetailObject i
       String idString = node.getAttributeValue("idOtherAccountFieldsConfiguration");
       OtherAccountFieldsConfiguration conf = new OtherAccountFieldsConfiguration();
       if (idString != null && idString.length() > 0) {
-        conf = (OtherAccountFieldsConfiguration)sess.load(OtherAccountFieldsConfiguration.class, new Integer(idString));
+        conf = (OtherAccountFieldsConfiguration)sess.load(OtherAccountFieldsConfiguration.class, Integer.valueOf(idString));
       }
       conf.setFieldName(node.getAttributeValue("fieldName"));
       conf.setInclude(node.getAttributeValue("include"));

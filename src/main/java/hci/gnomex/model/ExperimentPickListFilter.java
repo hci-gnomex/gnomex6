@@ -203,11 +203,7 @@ public class ExperimentPickListFilter extends DetailObject {
   }
 
   public boolean hasCriteria() {
-    if (idLab != null) {
-      return true;
-    } else {
-      return false;
-    }
+      return idLab != null;
   }
 
 

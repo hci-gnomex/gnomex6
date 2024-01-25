@@ -56,7 +56,7 @@ public class DownloadSingleFileServlet extends HttpServlet {
 
     // Get the idRequest parameter
     if (req.getParameter("idRequest") != null && !req.getParameter("idRequest").equals("")) {
-      idRequest = new Integer(req.getParameter("idRequest"));
+      idRequest = Integer.valueOf(req.getParameter("idRequest"));
     } else if (req.getParameter("requestNumber") != null && !req.getParameter("requestNumber").equals("")) {
       requestNumber = req.getParameter("requestNumber");
     }

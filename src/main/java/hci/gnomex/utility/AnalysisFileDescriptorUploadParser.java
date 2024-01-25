@@ -2,18 +2,16 @@ package hci.gnomex.utility;
 
 
 import hci.framework.model.DetailObject;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import hci.gnomex.constants.Constants;
 
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class AnalysisFileDescriptorUploadParser extends DetailObject implements Serializable {
@@ -161,7 +159,7 @@ public class AnalysisFileDescriptorUploadParser extends DetailObject implements 
 
             JsonArray grandCF = cf.get("FileDescriptor") != null ? cf.getJsonArray("FileDescriptor") : Json.createArrayBuilder().build();
 
-            if (grandCF.size() > 0) {
+            if (!grandCF.isEmpty()) {
                 renameDirectoryChildren(cf, newFileName);
             }
         }

@@ -2,15 +2,13 @@ package hci.gnomex.utility;
 
 import hci.framework.model.DetailObject;
 import hci.gnomex.model.Application;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class ApplicationParser extends DetailObject implements Serializable {
@@ -26,17 +24,17 @@ public class ApplicationParser extends DetailObject implements Serializable {
   public void parse(Session sess) throws Exception{
     
     Element root = this.doc.getRootElement();
-    
-    
-    for(Iterator i = root.getChildren("Application").iterator(); i.hasNext();) {
-      Element node = (Element)i.next();
-      
-      String code    = node.getAttributeValue("codeApplication");
-      Application mc = (Application)sess.load(Application.class, code);
-      
-      codeApplicationMap.put(code, mc);
 
-    }
+
+      for (Object o : root.getChildren("Application")) {
+          Element node = (Element) o;
+
+          String code = node.getAttributeValue("codeApplication");
+          Application mc = (Application) sess.load(Application.class, code);
+
+          codeApplicationMap.put(code, mc);
+
+      }
   }
 
   

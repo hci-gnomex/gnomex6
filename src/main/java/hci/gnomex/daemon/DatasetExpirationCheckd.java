@@ -1,47 +1,25 @@
 package hci.gnomex.daemon;
 
 import hci.framework.control.RollBackCommandException;
-import hci.gnomex.model.Analysis;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.Visibility;
-import hci.gnomex.model.VisibilityInterface;
-import hci.gnomex.utility.BatchDataSource;
-import hci.gnomex.utility.BatchMailer;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.MailUtil;
-import hci.gnomex.utility.MailUtilHelper;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.InetAddress;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
+import hci.gnomex.model.*;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.naming.NamingException;
-
-import org.apache.log4j.Level;
-import org.hibernate.query.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.apache.log4j.Logger;
-
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.InetAddress;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class DatasetExpirationCheckd extends TimerTask {
 

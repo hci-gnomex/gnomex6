@@ -1,31 +1,20 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
-import hci.gnomex.model.Institution;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.Notification;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.Topic;
-import hci.gnomex.model.Visibility;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.RequestParser;
+import hci.gnomex.model.*;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 
+import javax.json.Json;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-
-import javax.json.Json;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Hibernate;
-import org.hibernate.query.Query;
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
 
 public class SaveTopic extends GNomExCommand implements Serializable {
 

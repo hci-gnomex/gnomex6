@@ -1,25 +1,19 @@
 package hci.gnomex.controller;
 
 import hci.dictionary.model.DictionaryEntry;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
-import hci.gnomex.model.AnalysisProtocol;
-import hci.gnomex.model.FeatureExtractionProtocol;
-import hci.gnomex.model.HybProtocol;
-import hci.gnomex.model.LabelingProtocol;
-import hci.gnomex.model.ScanProtocol;
-import hci.gnomex.model.SeqLibProtocol;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-
-import java.io.Serializable;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.json.Json;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
+import java.io.Serializable;
 
 
 
@@ -49,7 +43,7 @@ public class SaveProtocol extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     
     if (request.getParameter("idProtocol") != null && !request.getParameter("idProtocol").equals("")) {
-      idProtocol = new Integer(request.getParameter("idProtocol"));
+      idProtocol = Integer.valueOf(request.getParameter("idProtocol"));
     } 
     if (request.getParameter("protocolClassName") != null && !request.getParameter("protocolClassName").equals("")) {
       protocolClassName = request.getParameter("protocolClassName");
@@ -70,10 +64,10 @@ public class SaveProtocol extends GNomExCommand implements Serializable {
       codeRequestCategory = request.getParameter("codeRequestCategory");
     } 
     if (request.getParameter("idAnalysisType") != null && !request.getParameter("idAnalysisType").equals("")) {
-      idAnalysisType = new Integer(request.getParameter("idAnalysisType"));
+      idAnalysisType = Integer.valueOf(request.getParameter("idAnalysisType"));
     }
     if (request.getParameter("idAppUser") != null && !request.getParameter("idAppUser").equals("")) {
-      idAppUser = new Integer(request.getParameter("idAppUser"));
+      idAppUser = Integer.valueOf(request.getParameter("idAppUser"));
     }
     if (protocolClassName == null) {
       this.addInvalidField("protocolClassName", "protocolClassName is required");

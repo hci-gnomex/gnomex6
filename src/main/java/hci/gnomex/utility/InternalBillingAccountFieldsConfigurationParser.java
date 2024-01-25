@@ -2,15 +2,14 @@ package hci.gnomex.utility;
 
 import hci.framework.model.DetailObject;
 import hci.gnomex.model.InternalAccountFieldsConfiguration;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.Element;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
 
 
 public class InternalBillingAccountFieldsConfigurationParser extends DetailObject implements Serializable {
@@ -38,16 +37,16 @@ public class InternalBillingAccountFieldsConfigurationParser extends DetailObjec
       String idString = node.getAttributeValue("idInternalAccountFieldsConfiguration");
       InternalAccountFieldsConfiguration conf = new InternalAccountFieldsConfiguration();
       if (idString != null && idString.length() > 0) {
-        conf = (InternalAccountFieldsConfiguration)sess.load(InternalAccountFieldsConfiguration.class, new Integer(idString));
+        conf = (InternalAccountFieldsConfiguration)sess.load(InternalAccountFieldsConfiguration.class, Integer.valueOf(idString));
       }
       conf.setDisplayName(node.getAttributeValue("displayName"));
       conf.setFieldName(node.getAttributeValue("fieldName"));
       conf.setInclude(node.getAttributeValue("include"));
       conf.setIsNumber(node.getAttributeValue("isNumber"));
       conf.setIsRequired(node.getAttributeValue("isRequired"));
-      conf.setMaxLength(new Integer(node.getAttributeValue("maxLength")));
-      conf.setMinLength(new Integer(node.getAttributeValue("minLength")));
-      conf.setSortOrder(new Integer(node.getAttributeValue("sortOrder")));
+      conf.setMaxLength(Integer.valueOf(node.getAttributeValue("maxLength")));
+      conf.setMinLength(Integer.valueOf(node.getAttributeValue("minLength")));
+      conf.setSortOrder(Integer.valueOf(node.getAttributeValue("sortOrder")));
       
       configurations.add(conf);
     }

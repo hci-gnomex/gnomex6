@@ -3,17 +3,15 @@ package hci.gnomex.utility;
 import hci.framework.model.DetailObject;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.*;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BillingItemParser extends DetailObject implements Serializable {
 
@@ -44,7 +42,7 @@ public class BillingItemParser extends DetailObject implements Serializable {
                 billingItem = new BillingItem();
                 masterBillingItem = new MasterBillingItem();
             } else {
-                billingItem = sess.load(BillingItem.class, new Integer(idBillingItemString));
+                billingItem = sess.load(BillingItem.class, Integer.valueOf(idBillingItemString));
                 if (billingItem.getIdMasterBillingItem() != null) {
                     masterBillingItem = sess.load(MasterBillingItem.class, billingItem.getIdMasterBillingItem());
                 } else {
@@ -62,32 +60,32 @@ public class BillingItemParser extends DetailObject implements Serializable {
             billingItem.setCodeBillingChargeKind(node.getString("codeBillingChargeKind"));
             masterBillingItem.setDescription(node.getString("description"));
             billingItem.setDescription(node.getString("description"));
-            masterBillingItem.setIdPriceCategory(!node.getString("idPriceCategory").equals("") ? new Integer(node.getString("idPriceCategory")) : null);
-            billingItem.setIdPriceCategory(!node.getString("idPriceCategory").equals("") ? new Integer(node.getString("idPriceCategory")) : null);
-            masterBillingItem.setIdBillingPeriod(!node.getString("idBillingPeriod").equals("") ? new Integer(node.getString("idBillingPeriod")) : null);
-            billingItem.setIdBillingPeriod(!node.getString("idBillingPeriod").equals("") ? new Integer(node.getString("idBillingPeriod")) : null);
-            masterBillingItem.setIdPrice(!node.getString("idPrice").equals("") ? new Integer(node.getString("idPrice")) : null);
-            billingItem.setIdPrice(!node.getString("idPrice").equals("") ? new Integer(node.getString("idPrice")) : null);
+            masterBillingItem.setIdPriceCategory(!node.getString("idPriceCategory").equals("") ? Integer.valueOf(node.getString("idPriceCategory")) : null);
+            billingItem.setIdPriceCategory(!node.getString("idPriceCategory").equals("") ? Integer.valueOf(node.getString("idPriceCategory")) : null);
+            masterBillingItem.setIdBillingPeriod(!node.getString("idBillingPeriod").equals("") ? Integer.valueOf(node.getString("idBillingPeriod")) : null);
+            billingItem.setIdBillingPeriod(!node.getString("idBillingPeriod").equals("") ? Integer.valueOf(node.getString("idBillingPeriod")) : null);
+            masterBillingItem.setIdPrice(!node.getString("idPrice").equals("") ? Integer.valueOf(node.getString("idPrice")) : null);
+            billingItem.setIdPrice(!node.getString("idPrice").equals("") ? Integer.valueOf(node.getString("idPrice")) : null);
             if (node.get("idDiskUsageByMonth") != null) {
-                billingItem.setIdDiskUsageByMonth(!node.getString("idDiskUsageByMonth").equals("") ? new Integer(node.getString("idDiskUsageByMonth")) : null);
+                billingItem.setIdDiskUsageByMonth(!node.getString("idDiskUsageByMonth").equals("") ? Integer.valueOf(node.getString("idDiskUsageByMonth")) : null);
             }
             BillingTemplate billingTemplate = new BillingTemplate();
             if (node.get("idRequest") != null && !node.getString("idRequest").equals("")) {
-                Request request = sess.load(Request.class, new Integer(node.getString("idRequest")));
+                Request request = sess.load(Request.class, Integer.valueOf(node.getString("idRequest")));
                 billingTemplate = BillingTemplateQueryManager.retrieveBillingTemplate(sess, request);
                 if (billingTemplate == null) {
                     throw new Error("No billing template for request: " + request.getIdRequest());
                 }
-                billingItem.setIdRequest(!node.getString("idRequest").equals("") ? new Integer(node.getString("idRequest")) : null);
+                billingItem.setIdRequest(!node.getString("idRequest").equals("") ? Integer.valueOf(node.getString("idRequest")) : null);
                 masterBillingItem.setIdBillingTemplate(billingTemplate.getIdBillingTemplate());
             }
             if (node.get("idProductOrder") != null && !node.getString("idProductOrder").equals("")) {
-                ProductOrder productOrder = sess.load(ProductOrder.class, new Integer(node.getString("idProductOrder")));
+                ProductOrder productOrder = sess.load(ProductOrder.class, Integer.valueOf(node.getString("idProductOrder")));
                 billingTemplate = BillingTemplateQueryManager.retrieveBillingTemplate(sess, productOrder);
                 if (billingTemplate == null) {
                     throw new Error("No billing template for product order: " + productOrder.getIdProductOrder());
                 }
-                billingItem.setIdProductOrder((node.get("idProductOrder") != null && !node.getString("idProductOrder").equals("")) ? new Integer(node.getString("idProductOrder")) : null);
+                billingItem.setIdProductOrder((node.get("idProductOrder") != null && !node.getString("idProductOrder").equals("")) ? Integer.valueOf(node.getString("idProductOrder")) : null);
                 masterBillingItem.setIdBillingTemplate(billingTemplate.getIdBillingTemplate());
             }
 
@@ -95,7 +93,7 @@ public class BillingItemParser extends DetailObject implements Serializable {
             boolean billingAccountSet = false;
             if (!node.getString("idBillingAccount").equals("")) {
                 // Use billing account from the request node if there is one
-                billingItem.setIdBillingAccount(new Integer(node.getString("idBillingAccount")));
+                billingItem.setIdBillingAccount(Integer.valueOf(node.getString("idBillingAccount")));
                 billingAccountSet = true;
             } else {
                 // Look up the 'accepting balance' account from the billing template
@@ -116,11 +114,11 @@ public class BillingItemParser extends DetailObject implements Serializable {
                 throw new Error("No billing account found");
             }
 
-            billingItem.setIdLab(!node.getString("idLab").equals("") ? new Integer(node.getString("idLab")) : null);
-            masterBillingItem.setQty(!node.getString("qty").equals("") ? new Integer(node.getString("qty")) : null);
-            billingItem.setQty(!node.getString("qty").equals("") ? new Integer(node.getString("qty")) : null);
-            masterBillingItem.setIdCoreFacility(node.get("idCoreFacility") != null && !node.getString("idCoreFacility").equals("") ? new Integer(node.getString("idCoreFacility")) : null);
-            billingItem.setIdCoreFacility(node.get("idCoreFacility") != null && !node.getString("idCoreFacility").equals("") ? new Integer(node.getString("idCoreFacility")) : null);
+            billingItem.setIdLab(!node.getString("idLab").equals("") ? Integer.valueOf(node.getString("idLab")) : null);
+            masterBillingItem.setQty(!node.getString("qty").equals("") ? Integer.valueOf(node.getString("qty")) : null);
+            billingItem.setQty(!node.getString("qty").equals("") ? Integer.valueOf(node.getString("qty")) : null);
+            masterBillingItem.setIdCoreFacility(node.get("idCoreFacility") != null && !node.getString("idCoreFacility").equals("") ? Integer.valueOf(node.getString("idCoreFacility")) : null);
+            billingItem.setIdCoreFacility(node.get("idCoreFacility") != null && !node.getString("idCoreFacility").equals("") ? Integer.valueOf(node.getString("idCoreFacility")) : null);
 
             if (node.get("completeDate") != null && !node.getString("completeDate").equals("")) {
                 billingItem.setCompleteDate(this.parseDate(node.getString("completeDate")));
@@ -193,7 +191,7 @@ public class BillingItemParser extends DetailObject implements Serializable {
             if (idBillingItemString.equals("") || idBillingItemString.startsWith("BillingItem")) {
                 continue;
             }
-            billingItem = sess.load(BillingItem.class, new Integer(idBillingItemString));
+            billingItem = sess.load(BillingItem.class, Integer.valueOf(idBillingItemString));
             billingItemsToRemove.add(billingItem);
         }
 
@@ -205,7 +203,7 @@ public class BillingItemParser extends DetailObject implements Serializable {
             if (node.get("idInvoice") == null || node.getString("idInvoice").equals("")) {
                 continue;
             }
-            invoice = sess.load(Invoice.class, new Integer(node.getString("idInvoice")));
+            invoice = sess.load(Invoice.class, Integer.valueOf(node.getString("idInvoice")));
             if (invoice.getInvoiceNumber() == null || !invoice.getInvoiceNumber().equals(node.getString("invoiceNumber"))) {
                 invoice.setInvoiceNumber(node.getString("invoiceNumber"));
                 invoices.add(invoice);

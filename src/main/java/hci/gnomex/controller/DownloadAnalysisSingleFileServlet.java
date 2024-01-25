@@ -50,7 +50,7 @@ public class DownloadAnalysisSingleFileServlet extends HttpServlet {
 
         // Get the idAnalysis parameter
         if (req.getParameter("idAnalysis") != null && !req.getParameter("idAnalysis").equals("")) {
-            idAnalysis = new Integer(req.getParameter("idAnalysis"));
+            idAnalysis = Integer.valueOf(req.getParameter("idAnalysis"));
         }
         // Get the fileName parameter
         if (req.getParameter("fileName") != null && !req.getParameter("fileName").equals("")) {

@@ -1,22 +1,20 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.DataTrack;
+import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.DictionaryHelper;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import org.apache.log4j.Logger;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
 
 
 
@@ -74,7 +72,7 @@ public class GetEstimatedDownloadDataTrackSize extends GNomExCommand implements 
         if (idTokens.length != 2) {
           throw new Exception("Invalid parameter format " + key + " encountered. Expected 99,99 for idDataTrack and idDataTrackGrouping");
         }
-        Integer idDataTrack = new Integer(idTokens[0]);
+        Integer idDataTrack = Integer.valueOf(idTokens[0]);
 
         DataTrack dataTrack = DataTrack.class.cast(sess.load(DataTrack.class, idDataTrack));
         for (File file : dataTrack.getFiles(this.baseDir, this.analysisBaseDir)) {

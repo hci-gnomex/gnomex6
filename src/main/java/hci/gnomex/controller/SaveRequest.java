@@ -1,6 +1,7 @@
 package hci.gnomex.controller;
 
 //import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
+
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import hci.framework.control.Command;
@@ -31,17 +32,14 @@ import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
-
 import static hci.gnomex.constants.Constants.MAX_DESCRIPT_LIMIT;
 
 public class SaveRequest extends GNomExCommand implements Serializable {
 
 	// the static field for logging in Log4J
-	private static Logger LOG = Logger.getLogger(SaveRequest.class);
+	private final static Logger LOG = Logger.getLogger(SaveRequest.class);
 
 	private String requestXMLString;
 	private String requestJSONString;
@@ -407,7 +405,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 							|| laneInfo.getIdSequenceLane().startsWith("SequenceLane");
 
 					if (!isNewLane) {
-						SequenceLane sl = sess.load(SequenceLane.class, new Integer(laneInfo.getIdSequenceLane()));
+						SequenceLane sl = sess.load(SequenceLane.class, Integer.valueOf(laneInfo.getIdSequenceLane()));
 						boolean seqLaneReassignment = isSeqReassignment(sess, laneInfo, idSampleMap);
 
 						if (!seqLaneReassignment) {
@@ -429,7 +427,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					boolean seqLaneReassignment = false;
 					Integer idSampleReal = null;
 					if (!isNewLane) {
-						SequenceLane sl = sess.load(SequenceLane.class, new Integer(laneInfo.getIdSequenceLane()));
+						SequenceLane sl = sess.load(SequenceLane.class, Integer.valueOf(laneInfo.getIdSequenceLane()));
 						if (laneInfo.getIdSampleString() != null && !laneInfo.getIdSampleString().equals("") && !laneInfo.getIdSampleString().equals("0")) {
 							idSampleReal = (Integer) idSampleMap.get(laneInfo.getIdSampleString());
 						}
@@ -492,7 +490,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 	 * Helper function to determine if an existing sequence lane had a new sample reassigned to it
 	 */
 	private static boolean isSeqReassignment(Session sess, RequestParser.SequenceLaneInfo laneInfo, Map idSampleMap) {
-		SequenceLane sl = sess.load(SequenceLane.class, new Integer(laneInfo.getIdSequenceLane()));
+		SequenceLane sl = sess.load(SequenceLane.class, Integer.valueOf(laneInfo.getIdSequenceLane()));
 		Integer idSampleReal = null;
 		if (laneInfo.getIdSampleString() != null && !laneInfo.getIdSampleString().equals("") && !laneInfo.getIdSampleString().equals("0")) {
 			idSampleReal = (Integer) idSampleMap.get(laneInfo.getIdSampleString());
@@ -520,7 +518,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			sequenceLane.setCreateDate(theTime);
 			isNewSequenceLane = true;
 		} else {
-			sequenceLane = sess.load(SequenceLane.class, new Integer(sequenceLaneInfo.getIdSequenceLane()));
+			sequenceLane = sess.load(SequenceLane.class, Integer.valueOf(sequenceLaneInfo.getIdSequenceLane()));
 		}
 
 		Integer idSampleReal = null;
@@ -811,7 +809,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					for (int j = 0; j < propertiesArray.size(); j++) {
 						String idPropertyEntry = Util.getJsonStringSafe(propertiesArray.getJsonObject(j), "idPropertyEntry");
 						if (idPropertyEntry != null && !idPropertyEntry.equals("")) {
-							if (pe.getIdPropertyEntry().equals(new Integer(idPropertyEntry))) {
+							if (pe.getIdPropertyEntry().equals(Integer.valueOf(idPropertyEntry))) {
 								found = true;
 								break;
 							}
@@ -870,7 +868,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 //							if (valuesArray.getName().equals("PropertyEntryValue")) {
 								String idPropertyEntryValue = Util.getJsonStringSafe(valuesArray.getJsonObject(j), "idPropertyEntryValue");
 								if (idPropertyEntryValue != null && !idPropertyEntryValue.equals("")) {
-									if (av.getIdPropertyEntryValue().equals(new Integer(idPropertyEntryValue))) {
+									if (av.getIdPropertyEntryValue().equals(Integer.valueOf(idPropertyEntryValue))) {
 										found = true;
 										break;
 									}
@@ -1102,6 +1100,9 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 
 	public Command execute() throws GNomExRollbackException {
 
+		long startTime = System.currentTimeMillis();
+		originalRequestNumber = "unknown";
+
 		Session sess = null;
 		String billingAccountMessage = "";
 		String status = null;				// non-null if ccnumbers can't be found in BST
@@ -1126,13 +1127,14 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					this.addInvalidField("Institution", "You must choose an institution when visibility is set to Institute");
 				}
 
-				// The following code makes sure any ccNumbers that have been entered
-				// actually exist
 				PropertyDictionaryHelper propertyHelper = PropertyDictionaryHelper.getInstance(sess);
-				if (propertyHelper.getProperty(PropertyDictionary.BST_LINKAGE_SUPPORTED) != null
-						&& propertyHelper.getProperty(PropertyDictionary.BST_LINKAGE_SUPPORTED).equals("Y")) {
-					status = validateCCNumbers();
-				}
+
+//				// The following code makes sure any ccNumbers that have been entered
+//				// actually exist
+//				if (propertyHelper.getProperty(PropertyDictionary.CORE_LINKAGE_SUPPORTED) != null
+//						&& propertyHelper.getProperty(PropertyDictionary.CORE_LINKAGE_SUPPORTED).equals("Y")) {
+//					status = validateCCNumbers();
+//				}
 
 				if (requestParser.isNewRequest()) {
 					Lab l = sess.load(Lab.class, requestParser.getRequest().getIdLab());
@@ -1178,6 +1180,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 
 					// save request
 					originalRequestNumber = saveRequest(sess, requestParser, description);
+
 					sendNotification(requestParser.getRequest(), sess, requestParser.isNewRequest() ? Notification.NEW_STATE : Notification.EXISTING_STATE,
 							Notification.SOURCE_TYPE_ADMIN, Notification.TYPE_REQUEST);
 					sendNotification(requestParser.getRequest(), sess, requestParser.isNewRequest() ? Notification.NEW_STATE : Notification.EXISTING_STATE,
@@ -1859,6 +1862,8 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			throw new GNomExRollbackException(e.getMessage(), true, "An error occurred saving the request.");
 		}
 
+		String dinfo = "SaveRequest (" + this.getUsername() + " - " + originalRequestNumber + "), ";
+		Util.showTime(startTime, dinfo);
 		return this;
 	}
 
@@ -1950,74 +1955,75 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 
 	}
 
-	private String validateCCNumbers() {
-		String status = null;
-		Session sessGuest = null;
-		Connection con = null;
-
-		boolean hasCCNumbers = false;
-		List<String> ccNumberList = requestParser.getCcNumberList();
-		StringBuffer buf = new StringBuffer("select ccNumber from BST.dbo.Sample WHERE ccNumber in (");
-		Iterator<String> itStr = ccNumberList.iterator();
-		boolean firstTime = true;
-		while (itStr.hasNext()) {
-			hasCCNumbers = true;
-			String thisKey = itStr.next();
-			if (!firstTime)
-				buf.append(",");
-			else
-				firstTime = false;
-			buf.append("'" + thisKey + "'");
-		}
-		buf.append(")");
-
-		if (hasCCNumbers) {
-			try {
-				Statement stmt = null;
-				ResultSet rs = null;
-
-				// Use guest session for validating ccNumbers because it has read permissions on BST
-				sessGuest = this.getSecAdvisor().getReadOnlyHibernateSession(this.getUsername());
-
-				SessionImpl sessionImpl = (SessionImpl) sessGuest;
-				con = sessionImpl.connection();
-
-				stmt = con.createStatement();
-				rs = stmt.executeQuery(buf.toString());
-				List<String> ccNumbersRetreivedList = new ArrayList<String>();
-				while (rs.next()) {
-					ccNumbersRetreivedList.add(rs.getString("ccNumber"));
-				}
-				rs.close();
-				stmt.close();
-
-				buf = new StringBuffer();
-				// Now check to see if any ccNumbers weren't found
-				itStr = ccNumberList.iterator();
-				firstTime = true;
-				while (itStr.hasNext()) {
-					String thisKey = itStr.next();
-					if (!ccNumbersRetreivedList.contains(thisKey)) {
-						if (!firstTime)
-							buf.append(", ");
-						else
-							firstTime = false;
-						buf.append("'" + thisKey + "'");
-					}
-				}
-				if (buf.toString().length() > 0) {
-					status = "The following CC Numbers do not exist in BST: " + buf.toString()
-							+ ".\n\nPlease correct on the Samples tab.";
-				}
-
-			} catch (Exception e) {
-				LOG.error("An exception has occurred in SaveRequest ", e);
-			}
-
-		}
-
-		return status;
-	}
+	// This function was for performing backend validation of samples being linked to itBioPath.
+	// This functionality has changed with the new linkage to CORE - notably, the linking is now primarily
+	// performed on the front end, so this is disabled for now.
+//	private String validateCCNumbers() {
+//		String status = null;
+//		Session sessGuest = null;
+//		Connection con = null;
+//
+//		boolean hasCCNumbers = false;
+//		List<String> ccNumberList = requestParser.getCcNumberList();
+//		StringBuffer buf = new StringBuffer("select ccNumber from BST.dbo.Sample WHERE ccNumber in (");
+//		Iterator<String> itStr = ccNumberList.iterator();
+//		boolean firstTime = true;
+//		while (itStr.hasNext()) {
+//			hasCCNumbers = true;
+//			String thisKey = itStr.next();
+//			if (!firstTime)
+//				buf.append(",");
+//			else
+//				firstTime = false;
+//			buf.append("'" + thisKey + "'");
+//		}
+//		buf.append(")");
+//
+//		if (hasCCNumbers) {
+//			try {
+//				Statement stmt = null;
+//				ResultSet rs = null;
+//
+//				// Use guest session for validating ccNumbers because it has read permissions on BST
+//				sessGuest = this.getSecAdvisor().getReadOnlyHibernateSession(this.getUsername());
+//
+//				SessionImpl sessionImpl = (SessionImpl) sessGuest;
+//				con = sessionImpl.connection();
+//
+//				stmt = con.createStatement();
+//				rs = stmt.executeQuery(buf.toString());
+//				List<String> ccNumbersRetreivedList = new ArrayList<String>();
+//				while (rs.next()) {
+//					ccNumbersRetreivedList.add(rs.getString("ccNumber"));
+//				}
+//				rs.close();
+//				stmt.close();
+//
+//				buf = new StringBuffer();
+//				// Now check to see if any ccNumbers weren't found
+//				itStr = ccNumberList.iterator();
+//				firstTime = true;
+//				while (itStr.hasNext()) {
+//					String thisKey = itStr.next();
+//					if (!ccNumbersRetreivedList.contains(thisKey)) {
+//						if (!firstTime)
+//							buf.append(", ");
+//						else
+//							firstTime = false;
+//						buf.append("'" + thisKey + "'");
+//					}
+//				}
+//				if (buf.toString().length() > 0) {
+//					status = "The following CC Numbers do not exist in BST: " + buf.toString()
+//							+ ".\n\nPlease correct on the Samples tab.";
+//				}
+//			} catch (Exception e) {
+//				LOG.error("An exception has occurred in SaveRequest ", e);
+//			}
+//		}
+//
+//		return status;
+//	}
 
 	private void saveSamples(Session sess) throws Exception {
 		nextSampleNumber = getStartingNextSampleNumber(requestParser);
@@ -2075,7 +2081,8 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					&& (RequestCategory.isIlluminaRequestCategory(requestParser.getRequest().getCodeRequestCategory())
 					|| RequestCategory.isQCRequestCategory(requestParser.getRequest().getCodeRequestCategory())
 					|| RequestCategory.isMicroarrayRequestCategory(requestParser.getRequest().getCodeRequestCategory()) || RequestCategory
-					.isNanoStringRequestCategoryType(requestParser.getRequest().getCodeRequestCategory()))) {
+					.isNanoStringRequestCategoryType(requestParser.getRequest().getCodeRequestCategory()))
+			        || RequestCategory.isNanoGeomxRequestCategoryType(requestParser.getRequest().getCodeRequestCategory()))  {
 				if ((requestParser.isNewRequest() || isNewSample || requestParser.isQCAmendRequest())) {
 					WorkItem workItem = new WorkItem();
 					workItem.setIdRequest(requestParser.getRequest().getIdRequest());
@@ -2209,7 +2216,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 				// in the order they are listed, so set the well position based on
 				// to sample count which is incremented as we iterate through the
 				// list of samples.
-				realWell.setPosition(new Integer(sampleCountOnPlate));
+				realWell.setPosition(Integer.valueOf(sampleCountOnPlate));
 				sess.save(realWell);
 				sess.flush();
 			} else {
@@ -2231,7 +2238,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					well.setSample(sample);
 					well.setIdRequest(requestParser.getRequest().getIdRequest());
 				}
-				well.setPosition(new Integer(sampleCountOnPlate));
+				well.setPosition(Integer.valueOf(sampleCountOnPlate));
 				sess.save(well);
 			}
 
@@ -2267,7 +2274,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 						assayWell.setIdPlate(assayPlate.getIdPlate());
 						assayWell.setIdSample(sample.getIdSample());
 						assayWell.setPlate(assayPlate);
-						assayWell.setPosition(new Integer(sampleCountOnPlate));
+						assayWell.setPosition(Integer.valueOf(sampleCountOnPlate));
 						assayWell.setCol(parsedWell.getCol());
 						assayWell.setRow(parsedWell.getRow());
 						assayWell.setSample(sample);
@@ -2286,7 +2293,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 								if (well.getAssay() != null && assayName.equals(well.getAssay().getName())) {
 									wellsFound.add(well);
 									well.setCol(parsedWell.getCol());
-									well.setPosition(new Integer(sampleCountOnPlate));
+									well.setPosition(Integer.valueOf(sampleCountOnPlate));
 									well.setRow(parsedWell.getRow());
 									sess.save(well);
 									found = true;
@@ -2313,7 +2320,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 							assayWell.setIdPlate(assayPlate.getIdPlate());
 							assayWell.setIdSample(sample.getIdSample());
 							assayWell.setPlate(assayPlate);
-							assayWell.setPosition(new Integer(sampleCountOnPlate));
+							assayWell.setPosition(Integer.valueOf(sampleCountOnPlate));
 							assayWell.setCol(parsedWell.getCol());
 							assayWell.setRow(parsedWell.getRow());
 							assayWell.setSample(sample);
@@ -2356,7 +2363,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					primerWell.setIdPlate(primerPlate.getIdPlate());
 					primerWell.setIdSample(sample.getIdSample());
 					primerWell.setPlate(primerPlate);
-					primerWell.setPosition(new Integer(sampleCountOnPlate));
+					primerWell.setPosition(Integer.valueOf(sampleCountOnPlate));
 					primerWell.setCol(parsedWell.getCol());
 					primerWell.setRow(parsedWell.getRow());
 					primerWell.setSample(sample);
@@ -2367,10 +2374,10 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 				for (Iterator i = sample.getWells().iterator(); i.hasNext();) {
 					PlateWell well = (PlateWell) i.next();
 					if (well.getPlate().getCodePlateType().equals(PlateType.SOURCE_PLATE_TYPE)) {
-						if (!well.getCol().equals(parsedWell.getCol()) || !well.getPosition().equals(new Integer(sampleCountOnPlate))
+						if (!well.getCol().equals(parsedWell.getCol()) || !well.getPosition().equals(Integer.valueOf(sampleCountOnPlate))
 								|| !well.getRow().equals(parsedWell.getRow())) {
 							well.setCol(parsedWell.getCol());
-							well.setPosition(new Integer(sampleCountOnPlate));
+							well.setPosition(Integer.valueOf(sampleCountOnPlate));
 							well.setRow(parsedWell.getRow());
 							sess.save(well);
 						}
@@ -2408,7 +2415,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					sourceWell.setCreateDate(new java.util.Date(System.currentTimeMillis()));
 					sourceWell.setCol(Integer.parseInt(cherryPickSourceWell.substring(1)));
 					sourceWell.setRow(cherryPickSourceWell.substring(0, 1));
-					sourceWell.setPosition(new Integer(sampleCountOnPlate));
+					sourceWell.setPosition(Integer.valueOf(sampleCountOnPlate));
 					sourceWell.setIdPlate(cherrySourcePlate.getIdPlate());
 					sourceWell.setPlate(cherrySourcePlate);
 					sourceWell.setIdSample(sample.getIdSample());
@@ -2421,7 +2428,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 						if (well.getPlate().getCodePlateType().equals(PlateType.SOURCE_PLATE_TYPE)) {
 							well.setCol(Integer.parseInt(cherryPickSourceWell.substring(1)));
 							well.setRow(cherryPickSourceWell.substring(0, 1));
-							well.setPosition(new Integer(sampleCountOnPlate));
+							well.setPosition(Integer.valueOf(sampleCountOnPlate));
 							well.setIdPlate(cherrySourcePlate.getIdPlate());
 							well.setPlate(cherrySourcePlate);
 							sess.save(well);
@@ -2452,7 +2459,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					destinationWell.setCreateDate(new java.util.Date(System.currentTimeMillis()));
 					destinationWell.setCol(Integer.parseInt(cherryPickDestinationWell.substring(1)));
 					destinationWell.setRow(cherryPickDestinationWell.substring(0, 1));
-					destinationWell.setPosition(new Integer(sampleCountOnPlate));
+					destinationWell.setPosition(Integer.valueOf(sampleCountOnPlate));
 					destinationWell.setCodeReactionType(ReactionType.CHERRY_PICKING_REACTION_TYPE);
 					destinationWell.setIdPlate(cherryPickDestinationPlate.getIdPlate());
 					destinationWell.setPlate(cherryPickDestinationPlate);
@@ -2466,7 +2473,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 						if (well.getPlate().getCodePlateType().equals(PlateType.REACTION_PLATE_TYPE)) {
 							well.setCol(Integer.parseInt(cherryPickDestinationWell.substring(1)));
 							well.setRow(cherryPickDestinationWell.substring(0, 1));
-							well.setPosition(new Integer(sampleCountOnPlate));
+							well.setPosition(Integer.valueOf(sampleCountOnPlate));
 							sess.save(well);
 							break;
 						}
@@ -2517,7 +2524,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 				// in the order they are listed, so set the well position based on
 				// to sample count which is incremented as we iterate through the
 				// list of samples.
-				realWell.setPosition(new Integer(sampleCountOnPlate));
+				realWell.setPosition(Integer.valueOf(sampleCountOnPlate));
 				sess.save(realWell);
 				sess.flush();
 			} else {
@@ -2539,7 +2546,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					well.setSample(sample);
 					well.setIdRequest(requestParser.getRequest().getIdRequest());
 				}
-				well.setPosition(new Integer(sampleCountOnPlate));
+				well.setPosition(Integer.valueOf(sampleCountOnPlate));
 				sess.save(well);
 			}
 
@@ -2614,7 +2621,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 			hyb.setIdFeatureExtractionProtocol(idFeatureExtractionProtocolDefault);
 			isNewHyb = true;
 		} else {
-			hyb = sess.load(Hybridization.class, new Integer(hybInfo.getIdHybridization()));
+			hyb = sess.load(Hybridization.class, Integer.valueOf(hybInfo.getIdHybridization()));
 		}
 
 		Integer idSampleChannel1Real = null;
@@ -2637,7 +2644,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 				labeledSampleChannel1.setIdLabel((Integer) labelMap.get("Cy3"));
 				labeledSampleChannel1.setIdRequest(requestParser.getRequest().getIdRequest());
 				labeledSampleChannel1.setCodeLabelingReactionSize(LabelingReactionSize.STANDARD);
-				labeledSampleChannel1.setNumberOfReactions(new Integer(1));
+				labeledSampleChannel1.setNumberOfReactions(Integer.valueOf("1"));
 				labeledSampleChannel1.setIdLabelingProtocol(idLabelingProtocolDefault);
 				sess.save(labeledSampleChannel1);
 
@@ -2659,7 +2666,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					labeledSampleChannel2.setIdLabel((Integer) labelMap.get("Cy5"));
 					labeledSampleChannel2.setIdRequest(requestParser.getRequest().getIdRequest());
 					labeledSampleChannel2.setCodeLabelingReactionSize(LabelingReactionSize.STANDARD);
-					labeledSampleChannel2.setNumberOfReactions(new Integer(1));
+					labeledSampleChannel2.setNumberOfReactions(Integer.valueOf("1"));
 					labeledSampleChannel2.setIdLabelingProtocol(idLabelingProtocolDefault);
 
 					sess.save(labeledSampleChannel2);
@@ -2698,7 +2705,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 						labeledSampleChannel1.setIdLabel((Integer) labelMap.get("Cy3"));
 						labeledSampleChannel1.setIdRequest(requestParser.getRequest().getIdRequest());
 						labeledSampleChannel1.setCodeLabelingReactionSize(LabelingReactionSize.STANDARD);
-						labeledSampleChannel1.setNumberOfReactions(new Integer(1));
+						labeledSampleChannel1.setNumberOfReactions(Integer.valueOf("1"));
 						labeledSampleChannel1.setIdLabelingProtocol(idLabelingProtocolDefault);
 
 						sess.save(labeledSampleChannel1);
@@ -2763,7 +2770,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 						labeledSampleChannel2.setIdLabel((Integer) labelMap.get("Cy5"));
 						labeledSampleChannel2.setIdRequest(requestParser.getRequest().getIdRequest());
 						labeledSampleChannel2.setCodeLabelingReactionSize(LabelingReactionSize.STANDARD);
-						labeledSampleChannel2.setNumberOfReactions(new Integer(1));
+						labeledSampleChannel2.setNumberOfReactions(Integer.valueOf("1"));
 						labeledSampleChannel2.setIdLabelingProtocol(idLabelingProtocolDefault);
 
 						sess.save(labeledSampleChannel2);

@@ -2,18 +2,16 @@ package hci.gnomex.utility;
 
 import hci.framework.model.DetailObject;
 import hci.gnomex.model.CoreFacility;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 
 public class LabCoreFacilityParser extends DetailObject implements Serializable {
@@ -48,7 +46,7 @@ public class LabCoreFacilityParser extends DetailObject implements Serializable 
       Element node = (Element)i.next();
 
       String idCoreFacilityString = node.getAttributeValue("idCoreFacility");
-      CoreFacility facility = (CoreFacility)sess.get(CoreFacility.class, new Integer(idCoreFacilityString));
+      CoreFacility facility = (CoreFacility)sess.get(CoreFacility.class, Integer.valueOf(idCoreFacilityString));
 
       coreFacilityMap.put(facility.getIdCoreFacility(), facility);
     }
@@ -59,7 +57,7 @@ public class LabCoreFacilityParser extends DetailObject implements Serializable 
       JsonObject coreFacilityJson = originalArray.getJsonObject(i);
 
       String idCoreFacilityString = coreFacilityJson.getString("idCoreFacility");
-      CoreFacility facility = sess.get(CoreFacility.class, new Integer(idCoreFacilityString));
+      CoreFacility facility = sess.get(CoreFacility.class, Integer.valueOf(idCoreFacilityString));
 
       coreFacilityMap.put(facility.getIdCoreFacility(), facility);
     }

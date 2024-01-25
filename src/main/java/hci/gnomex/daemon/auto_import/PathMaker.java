@@ -2,7 +2,7 @@ package hci.gnomex.daemon.auto_import;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashSet;
+//import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;

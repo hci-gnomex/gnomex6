@@ -4,19 +4,21 @@ import hci.dictionary.model.DictionaryEntry;
 import hci.dictionary.model.NullDictionaryEntry;
 import hci.dictionary.utility.DictionaryManager;
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.FlowCellChannelComparator;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.WorkItemSolexaAssembleParser;
+import hci.gnomex.utility.*;
 import hci.gnomex.utility.WorkItemSolexaAssembleParser.ChannelContent;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.Serializable;
 import java.io.StringReader;
@@ -24,18 +26,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
-
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
 
 
 
@@ -147,7 +137,7 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
     try {
       appURL = this.getLaunchAppURL(request);      
     } catch (Exception e) {
-      LOG.warn("Cannot get launch app URL in SaveRequest", e);
+      LOG.warn("Cannot get launch app URL in SaveWorkItemSolexaAssemble", e);
     }
     
     serverName = request.getServerName();
@@ -209,24 +199,24 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
             flowCell.setCreateDate(flowCellDate);
 
             if (flowCellRunNumberStr != null && !flowCellRunNumberStr.equals("")) {
-              flowCell.setRunNumber(new Integer(flowCellRunNumberStr));
+              flowCell.setRunNumber(Integer.valueOf(flowCellRunNumberStr));
             }
             if (flowCellSide != null){
               flowCell.setSide(flowCellSide);
             }
             if (flowCellIdSeqRunTypeStr != null && !flowCellIdSeqRunTypeStr.equals("")) {
-              flowCell.setIdSeqRunType(new Integer(flowCellIdSeqRunTypeStr));
+              flowCell.setIdSeqRunType(Integer.valueOf(flowCellIdSeqRunTypeStr));
             }
             if (flowCellIdInstrumentStr != null && !flowCellIdInstrumentStr.equals("")) {
-              flowCell.setIdInstrument(new Integer(flowCellIdInstrumentStr));
+              flowCell.setIdInstrument(Integer.valueOf(flowCellIdInstrumentStr));
             }
 
             Integer flowCellNumCycles = null;
             if (flowCellNumCyclesStr != null && !flowCellNumCyclesStr.equals("")) {
-              flowCellNumCycles = new Integer(flowCellNumCyclesStr);
+              flowCellNumCycles = Integer.valueOf(flowCellNumCyclesStr);
             }
             if (numberSequencingCyclesAllowedStr != null && !numberSequencingCyclesAllowedStr.equals("")) {
-            	flowCell.setIdNumberSequencingCyclesAllowed(new Integer(numberSequencingCyclesAllowedStr));            
+            	flowCell.setIdNumberSequencingCyclesAllowed(Integer.valueOf(numberSequencingCyclesAllowedStr));
 	            for (Iterator i = DictionaryManager.getDictionaryEntries("hci.gnomex.model.NumberSequencingCyclesAllowed").iterator(); i.hasNext();) {
 	              DictionaryEntry de = (DictionaryEntry)i.next();
 	              if (de instanceof NullDictionaryEntry) {
@@ -256,7 +246,7 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
               
               
               FlowCellChannel channel = new FlowCellChannel();
-              channel.setNumber(new Integer(laneNumber)); // laneNumber instead of channelNumber?!
+              channel.setNumber(Integer.valueOf(laneNumber)); // laneNumber instead of channelNumber?!
               channel.setIdFlowCell(flowCell.getIdFlowCell());
               sess.save(channel);
               sess.flush();
@@ -300,7 +290,7 @@ public class SaveWorkItemSolexaAssemble extends GNomExCommand implements Seriali
                   if (nseqcyc.equals("") || nseqcyc == null) {
                     nseqcyc = "0";
                   }
-                  Integer seqCycles = new Integer(nseqcyc);
+                  Integer seqCycles = Integer.valueOf(nseqcyc);
                   if (idNumberSequencingCycles == null ||
                       seqCycles.intValue() > maxCycles ) {
                     idNumberSequencingCycles = lane.getIdNumberSequencingCycles(); // set based on highest number of cycles among all <SequenceLane>s in <FlowCell>

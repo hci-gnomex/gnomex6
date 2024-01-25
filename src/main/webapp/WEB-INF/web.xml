@@ -14,7 +14,7 @@
 
 	<context-param>
 		<param-name>public-paths</param-name>
-		<param-value>/api/user-session*,/ChangePassword.gx*,/PublicSaveSelfRegisteredAppUser.gx*,/ReportIssueServlet.gx*,/CreateUserPreferences.gx*</param-value>
+		<param-value>/api/user-session*,/ChangePassword.gx*,/PublicSaveSelfRegisteredAppUser.gx*,/ReportIssueFeedbackServlet.gx*,/CreateUserPreferences.gx*</param-value>
 	</context-param>
 
 
@@ -289,18 +289,32 @@
 	</servlet>
 
 	<servlet>
-		<servlet-name>ReportIssueServlet</servlet-name>
+		<servlet-name>ReportIssueFeedbackServlet</servlet-name>
 		<servlet-class>
 			hci.gnomex.controller.ReportIssueFeedbackServlet
 		</servlet-class>
 	</servlet>
 
 	<servlet>
-		<servlet-name>ReportIssueServletGetURL</servlet-name>
+		<servlet-name>ReportIssueFeedbackServletGetURL</servlet-name>
 		<servlet-class>
 			hci.gnomex.controller.ReportIssueFeedbackServletGetURL
 		</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>ReportIssueServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.ReportIssueServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>ReportIssueServletGetURL</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.ReportIssueServletGetURL
+		</servlet-class>
+	</servlet>
+
 
 	<servlet>
 		<servlet-name>UploadExperimentFileServlet</servlet-name>
@@ -557,6 +571,16 @@
 	</servlet-mapping>
 
 	<servlet-mapping>
+		<servlet-name>ReportIssueFeedbackServlet</servlet-name>
+		<url-pattern>/ReportIssueFeedbackServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>ReportIssueFeedbackServletGetURL</servlet-name>
+		<url-pattern>/ReportIssueFeedbackServletGetURL.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
 		<servlet-name>ReportIssueServlet</servlet-name>
 		<url-pattern>/ReportIssueServlet.gx</url-pattern>
 	</servlet-mapping>
@@ -674,7 +698,7 @@
 		<filter-class>hci.servlet.filter.CorsFilter</filter-class>
 		<init-param>
 			<param-name>cors.allowed.origins</param-name>
-			<param-value>http://localhost,http://localhost:8080,http://localhost:8081,http://localhost:8084</param-value>
+			<param-value>http://localhost,http://localhost:8080,http://localhost:8081,http://localhost:8084,https://hci-bio-app-old.hci.utah.edu:8445</param-value>
 		</init-param>
 		<init-param>
 			<param-name>cors.support.credentials</param-name>

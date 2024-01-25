@@ -120,7 +120,8 @@ export class TabSeqSetupViewComponent implements OnInit {
             this.isPreppedContainer = this._experiment
                 && this._experiment.requestCategory
                 && this._experiment.requestCategory.type
-                && this._experiment.requestCategory.type === NewExperimentService.TYPE_NANOSTRING;
+                && ((this._experiment.requestCategory.type === NewExperimentService.TYPE_NANOSTRING ) ||
+                   (this._experiment.requestCategory.type === NewExperimentService.TYPE_NANOGEOMX ) );
 
             if (!this.showCoreFacilityPrepQuestion) {
                 this.form.get("seqPrepByCore").setValue("YES");     // was ""
@@ -141,6 +142,10 @@ export class TabSeqSetupViewComponent implements OnInit {
     @Input("lab") set lab(value: any) {
         if (!value || !this.requestCategory) {
             return;
+        }
+
+        if (this.requestCategory.type === NewExperimentService.TYPE_NANOGEOMX) {
+            this.useNanoGeoMx = true;
         }
 
         let appPriceListParams: HttpParams = new HttpParams()
@@ -181,6 +186,8 @@ export class TabSeqSetupViewComponent implements OnInit {
     public readonly NO: string  = "N";
     public readonly SEPARATE: string = "separate";
     public readonly POOLED: string = "pooled";
+
+    private useNanoGeoMx: boolean = false;
 
     private form: FormGroup;
 

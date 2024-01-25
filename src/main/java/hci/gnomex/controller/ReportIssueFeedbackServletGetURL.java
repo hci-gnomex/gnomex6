@@ -1,16 +1,15 @@
 package hci.gnomex.controller;
 
-import hci.gnomex.utility.*;
-
-import java.io.IOException;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.ServletUtil;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
+import java.io.IOException;
 
 public class ReportIssueFeedbackServletGetURL extends HttpServlet {
     private static final Logger LOG = Logger.getLogger(ReportIssueFeedbackServletGetURL.class);
@@ -27,15 +26,15 @@ public class ReportIssueFeedbackServletGetURL extends HttpServlet {
 
         try {
             sess = HibernateSession.currentReadOnlySession((req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
-            Util.buildAndSendUploadFileServletURL(req, res, sess, "ReportIssueFeedbackServletGetURL", "ReportIssueServlet.gx", Util.EMPTY_STRING_ARRAY);
+            hci.gnomex.utility.Util.buildAndSendUploadFileServletURL(req, res, sess, "ReportIssueFeedbackServletGetURL", "ReportIssueFeedbackServlet.gx", hci.gnomex.utility.Util.EMPTY_STRING_ARRAY);
         } catch (Exception e) {
-            LOG.error("An error has occured in ReportIssueServletGetURL - ");
+            LOG.error("An error has occurred in ReportIssueServletGetURL - ");
         } finally {
             if (sess != null) {
                 try {
                     HibernateSession.closeSession();
                 } catch (Exception e) {
-                    LOG.error("An error has occured in ReportIssueServletGetURL - ");
+                    LOG.error("An error has occurred in ReportIssueServletGetURL - ");
                 }
             }
         }

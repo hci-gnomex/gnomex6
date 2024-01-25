@@ -1,16 +1,13 @@
 package hci.gnomex.utility;
 
 import hci.framework.model.DetailObject;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.hibernate.Session;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class AnalysisGenomeBuildParser extends DetailObject implements Serializable {

@@ -7,8 +7,9 @@ import hci.gnomex.model.GenomeBuild;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.ServletUtil;
 import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.ServletUtil;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
 import javax.servlet.ServletException;
@@ -22,7 +23,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
 import java.util.UUID;
-import org.apache.log4j.Logger;
 
 public class FastDataTransferDownloadDataTrackServlet extends HttpServlet {
 
@@ -141,8 +141,8 @@ public class FastDataTransferDownloadDataTrackServlet extends HttpServlet {
                     if (idTokens.length != 2) {
                         throw new Exception("Invalid parameter format " + key + " encountered. Expected 99,99 for idDataTrack and idDataTrackFolder");
                     }
-                    Integer idDataTrack = new Integer(idTokens[0]);
-                    Integer idDataTrackFolder = new Integer(idTokens[1]);
+                    Integer idDataTrack = Integer.valueOf(idTokens[0]);
+                    Integer idDataTrackFolder = Integer.valueOf(idTokens[1]);
 
                     DataTrack dataTrack = DataTrack.class.cast(sess.load(DataTrack.class, idDataTrack));
 

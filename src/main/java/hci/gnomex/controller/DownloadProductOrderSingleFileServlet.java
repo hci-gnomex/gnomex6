@@ -51,7 +51,7 @@ public class DownloadProductOrderSingleFileServlet extends HttpServlet {
 
         // Get the idProductOrder parameter
         if (req.getParameter("idProductOrder") != null && !req.getParameter("idProductOrder").equals("")) {
-            idProductOrder = new Integer(req.getParameter("idProductOrder"));
+            idProductOrder = Integer.valueOf(req.getParameter("idProductOrder"));
         }
         // Get the fileName parameter
         if (req.getParameter("fileName") != null && !req.getParameter("fileName").equals("")) {

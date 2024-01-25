@@ -3,6 +3,7 @@ package hci.gnomex.model;
 import hci.dictionary.model.DictionaryEntry;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Created by u0395021 on 6/2/2016.
@@ -13,11 +14,7 @@ public class LibraryPrepQCProtocol extends DictionaryEntry implements Serializab
     private String codeRequestCategory;
 
     public String getDisplay() {
-        if(this.protocolDisplay == null){
-            return "";
-        } else{
-            return this.protocolDisplay;
-        }
+        return Objects.requireNonNullElse(this.protocolDisplay, "");
     }
 
     @Override

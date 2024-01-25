@@ -2,8 +2,6 @@ package hci.gnomex.model;
 
 import hci.dictionary.model.DictionaryEntry;
 
-import java.util.Iterator;
-
 public class PropertyOption extends DictionaryEntry {
 
 	private Integer idPropertyOption;
@@ -73,12 +71,12 @@ public class PropertyOption extends DictionaryEntry {
 		if (po == null || po.getOption() == null || pc == null || pc.getPrices() == null) {
 			return price;
 		}
-		for (Iterator i = pc.getPrices().iterator(); i.hasNext();) {
-			price = (Price) i.next();
-			if (price.getName().equalsIgnoreCase(po.getOption())) {
-				break;
-			}
-		}
+        for (Object o : pc.getPrices()) {
+            price = (Price) o;
+            if (price.getName().equalsIgnoreCase(po.getOption())) {
+                break;
+            }
+        }
 		return price;
 	}
 

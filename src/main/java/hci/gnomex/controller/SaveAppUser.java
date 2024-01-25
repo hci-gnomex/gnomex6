@@ -1,39 +1,27 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.CoreFacility;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.UserPermissionKind;
+import hci.gnomex.model.*;
 import hci.gnomex.security.EncryptionUtility;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.*;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
-import org.hibernate.query.Query;
-import org.hibernate.Session;
-import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.util.*;
 public class SaveAppUser extends GNomExCommand implements Serializable {
 
   // the static field for logging in Log4J
@@ -503,7 +491,7 @@ public class SaveAppUser extends GNomExCommand implements Serializable {
   }
 
   private void setSubmittingCoreFacilities(Session sess, AppUser appUser) {
-    // Note that since only core facilities the logged in user can see will be in the
+    // Note that since only core facilities the logged-in user can see will be in the
     // list from the front end, we ignore (i.e. neither add or remove) any ids not in
     // list from the front end.
     ArrayList<CoreFacility> facilitiesToRemove = new ArrayList<CoreFacility>();
