@@ -1,29 +1,23 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.DataTrack;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.Topic;
-import hci.gnomex.utility.AnalysisComparator;
-import hci.gnomex.utility.DataTrackComparator;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.RequestComparator;
-
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 public class UnlinkItemFromTopic extends GNomExCommand implements Serializable {
@@ -47,17 +41,17 @@ public class UnlinkItemFromTopic extends GNomExCommand implements Serializable {
   
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     if (request.getParameter("idRequest") != null && !request.getParameter("idRequest").equals("")) {
-      idRequest = new Integer(request.getParameter("idRequest"));
+      idRequest = Integer.valueOf(request.getParameter("idRequest"));
     } else if (request.getParameter("idAnalysis") != null && !request.getParameter("idAnalysis").equals("")) {
-      idAnalysis = new Integer(request.getParameter("idAnalysis"));
+      idAnalysis = Integer.valueOf(request.getParameter("idAnalysis"));
     } else if (request.getParameter("idDataTrack") != null && !request.getParameter("idDataTrack").equals("")) {
-      idDataTrack = new Integer(request.getParameter("idDataTrack"));
+      idDataTrack = Integer.valueOf(request.getParameter("idDataTrack"));
     } else {
       this.addInvalidField("Missing id", "idRequest, idAnalysis, or idDataTrack is required.");      
     }
     
     if (request.getParameter("idTopic") != null && !request.getParameter("idTopic").equals("")) {
-      idTopic = new Integer(request.getParameter("idTopic"));
+      idTopic = Integer.valueOf(request.getParameter("idTopic"));
     } else {
       this.addInvalidField("Missing idTopic", "idTopic is required.");
     }

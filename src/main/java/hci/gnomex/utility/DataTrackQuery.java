@@ -1,30 +1,17 @@
 package hci.gnomex.utility;
 
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.DataTrack;
-import hci.gnomex.model.DataTrackFolder;
-import hci.gnomex.model.GenomeBuild;
-import hci.gnomex.model.Organism;
-import hci.gnomex.model.Segment;
-import hci.gnomex.model.UnloadDataTrack;
-import hci.gnomex.model.Visibility;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.logging.Logger;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.hibernate.query.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.jdom.Document;
 import org.jdom.Element;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.Serializable;
+import java.util.*;
+import java.util.logging.Logger;
 
 
 public class DataTrackQuery implements Serializable {
@@ -902,7 +889,7 @@ public class DataTrackQuery implements Serializable {
 					// For each dataTrack...
 					for (String dtNameKey : dtNameMap.keySet()) {
 						String[] tokens1    = dtNameKey.split(KEY_DELIM);
-						Integer idDataTrack = new Integer(tokens1[1]);
+						Integer idDataTrack = Integer.valueOf(tokens1[1]);
 
 						DataTrack dt = dataTrackMap.get(idDataTrack);
 
@@ -947,7 +934,7 @@ public class DataTrackQuery implements Serializable {
 			for (String folderKey : theFolders.keySet()) {
 				String[] tokens     = folderKey.split(KEY_DELIM);
 				String folderName          = tokens[0];
-				Integer idDataTrackFolder = new Integer(tokens[1]);
+				Integer idDataTrackFolder = Integer.valueOf(tokens[1]);
 
 				Element folderNode = null;
 				DataTrackFolder dtFolder = null;
@@ -1018,7 +1005,7 @@ public class DataTrackQuery implements Serializable {
 					else if (folderNode.getName().equals("DataTrackFolder") &&
 							    folderIdUserGroup != null &&
 							    !folderIdUserGroup.equals("") &&
-							  	(secAdvisor.isGroupIAmMemberOrManagerOf(new Integer(folderIdUserGroup)))) {
+							  	(secAdvisor.isGroupIAmMemberOrManagerOf(Integer.valueOf(folderIdUserGroup)))) {
 						if (this.idLab == null && this.ids == null) {
 							// If we are not filtering by user group, then always
 							// show my group's empty folders
@@ -1026,7 +1013,7 @@ public class DataTrackQuery implements Serializable {
 						} else {
 							// If we are filtering by user group, prune any empty
 							// folders not specifically for the group being filtered
-							if (this.idLab != null && this.idLab.equals(new Integer(folderIdUserGroup))) {
+							if (this.idLab != null && this.idLab.equals(Integer.valueOf(folderIdUserGroup))) {
 								prune = false;
 							} else {
 								prune = true;

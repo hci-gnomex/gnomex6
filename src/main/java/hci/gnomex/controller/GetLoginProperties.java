@@ -4,7 +4,6 @@ import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.HibernateSession;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
-
 import javax.json.Json;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;

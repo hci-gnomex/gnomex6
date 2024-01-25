@@ -1,27 +1,26 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.Lab;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.LabMemberParser;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.apache.log4j.Logger;
 
 
 
@@ -49,7 +48,7 @@ public class SaveGroupMembership extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     
     if (request.getParameter("idLab") != null && !request.getParameter("idLab").equals("")) {
-      idLab = new Integer(request.getParameter("idLab"));
+      idLab = Integer.valueOf(request.getParameter("idLab"));
     } else {
       this.addInvalidField("idLab", "idLab required");
     }

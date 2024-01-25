@@ -89,7 +89,7 @@ public class LabFilter extends DetailObject {
 
   private void addLabCriteria() {
     // Search by lab last name 
-    if (lastName != null && !lastName.equals("")){
+    if (lastName != null && !lastName.isEmpty()){
       this.addWhereOrAnd();
       queryBuf.append(" lab.lastName like '%");
       queryBuf.append(lastName);
@@ -154,8 +154,9 @@ public class LabFilter extends DetailObject {
   private void addUnboundedSecurityCriteria() {
     if (secAdvisor.hasPermission(SecurityAdvisor.CAN_ADMINISTER_ALL_CORE_FACILITIES)) {
       // No criteria needed if this is a super user
-    } else if (secAdvisor.hasPermission(SecurityAdvisor.CAN_ACCESS_ANY_OBJECT) && !secAdvisor.hasPermission(SecurityAdvisor.CAN_SUBMIT_FOR_OTHER_CORES)) { 
+    } else if (secAdvisor.hasPermission(SecurityAdvisor.CAN_ACCESS_ANY_OBJECT) ) {
       // No criteria.  Admins can see labs from all core facilities.
+      // removed && !secAdvisor.hasPermission(SecurityAdvisor.CAN_SUBMIT_FOR_OTHER_CORES) 10/11/2023 ^^
     } else {      
       if (secAdvisor.getCoreFacilitiesForMyLab().isEmpty()) {
         // User is not a member of any lab, let's just show all labs.

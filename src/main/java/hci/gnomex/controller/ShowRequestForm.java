@@ -1,5 +1,23 @@
 package hci.gnomex.controller;
 
+import com.itextpdf.text.Element;
+import hci.framework.control.Command;
+import hci.framework.control.RollBackCommandException;
+import hci.gnomex.model.*;
+import hci.gnomex.security.SecurityAdvisor;
+import hci.gnomex.utility.*;
+import hci.report.constants.ReportFormats;
+import hci.report.model.ReportTray;
+import hci.report.utility.ReportCommand;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.json.JsonValue;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.math.BigDecimal;
@@ -8,30 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Vector;
-
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import javax.json.JsonValue;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import hci.gnomex.constants.Constants;
-import hci.gnomex.model.*;
-import hci.gnomex.utility.*;
-import org.hibernate.Session;
-
-import com.itextpdf.text.*;
-
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.framework.control.RollBackCommandException;
-import hci.gnomex.security.SecurityAdvisor;
-import hci.report.constants.ReportFormats;
-import hci.report.model.ReportTray;
-import hci.report.utility.ReportCommand;
-import org.apache.log4j.Logger;
 @SuppressWarnings("serial")
 public class ShowRequestForm extends ReportCommand implements Serializable {
 
@@ -67,7 +61,7 @@ public class ShowRequestForm extends ReportCommand implements Serializable {
     @Override
     public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
         if (request.getParameter("idRequest") != null) {
-            idRequest = new Integer(request.getParameter("idRequest"));
+            idRequest = Integer.valueOf(request.getParameter("idRequest"));
         } else if (request.getParameter("requestJSONString") != null) {
             isGeneratingQuote = true;
             requestJSONString = request.getParameter("requestJSONString").toString();
@@ -339,7 +333,7 @@ public class ShowRequestForm extends ReportCommand implements Serializable {
      *  this method allows you to manipulate the HttpServletResponse object prior
      *  to forwarding to the result JSP (add a cookie, etc.)
      *
-     *@param  request  The HttpServletResponse for the command
+     *@param  response  The HttpServletResponse for the command
      *@return          The processed response
      */
     @Override

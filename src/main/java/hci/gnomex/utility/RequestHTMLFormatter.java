@@ -170,9 +170,9 @@ public class RequestHTMLFormatter {
 
     Element rowh = new Element("TR");
     table.addContent(rowh);
-    Integer rowSpan = new Integer(1);
+    Integer rowSpan = 1;
     if (includeMicroarrayCoreNotes) {
-      rowSpan = new Integer(2);
+      rowSpan = 2;
     }
 
     boolean showSeqLibProtocol = false;
@@ -196,9 +196,9 @@ public class RequestHTMLFormatter {
     }
 
     if (showMultiplexGroup) {
-      this.addHeaderCell(rowh, "Multiplex Group", rowSpan, new Integer(1), "left");
+      this.addHeaderCell(rowh, "Multiplex Group", rowSpan, 1, "left");
     }
-    this.addHeaderCell(rowh, "Sample #", rowSpan, new Integer(1), showMultiplexGroup ? "normal" : "left");
+    this.addHeaderCell(rowh, "Sample #", rowSpan, 1, showMultiplexGroup ? "normal" : "left");
     if (request.getCodeRequestCategory() != null && request.getCodeRequestCategory().equals(RequestCategory.CAPILLARY_SEQUENCING_REQUEST_CATEGORY)) {
       this.addHeaderCell(rowh, "Container", rowSpan, 1);
       if (request.isCapSeqPlate()) {
@@ -229,54 +229,54 @@ public class RequestHTMLFormatter {
       this.addHeaderCell(rowh, "Well", rowSpan, 1);
     }
     if ( !request.getCodeRequestCategory().equals(RequestCategory.CLINICAL_SEQUENOM_REQUEST_CATEGORY) ) {
-      this.addHeaderCell(rowh, "Sample Name", rowSpan, new Integer(1));
+      this.addHeaderCell(rowh, "Sample Name", rowSpan, 1);
     }
     if (!RequestCategory.isDNASeqCoreRequestCategory(request.getCodeRequestCategory())) {
       if (!RequestCategory.isMolecularDiagnoticsRequestCategory(request.getCodeRequestCategory()) ||
               RequestCategory.isSequenomType( request.getCodeRequestCategory() ) ||
               request.getCodeRequestCategory().equals(RequestCategory.CLINICAL_SEQUENOM_REQUEST_CATEGORY)) {
-        this.addHeaderCell(rowh, "Sample Type", rowSpan, new Integer(1), new Integer(200));
+        this.addHeaderCell(rowh, "Sample Type", rowSpan, 1, 200);
       }
       if (!RequestCategory.isMolecularDiagnoticsRequestCategory(request.getCodeRequestCategory()) || request.getCodeRequestCategory().equals(RequestCategory.CLINICAL_SEQUENOM_REQUEST_CATEGORY)) {
-        this.addHeaderCell(rowh, "Conc.", rowSpan, new Integer(1));
-        this.addHeaderCell(rowh, "Nucl. acid Extraction Method", rowSpan, new Integer(1), new Integer(300));
+        this.addHeaderCell(rowh, "Conc.", rowSpan, 1);
+        this.addHeaderCell(rowh, "Nucl. acid Extraction Method", rowSpan, 1,300);
       }
     } else {
       if (request.getCodeRequestCategory() != null &&
               (request.getCodeRequestCategory().equals(RequestCategory.CAPILLARY_SEQUENCING_REQUEST_CATEGORY) )) {
-        this.addHeaderCell(rowh, "Sample Type", rowSpan, new Integer(1));
+        this.addHeaderCell(rowh, "Sample Type", rowSpan, 1);
       }
       if (request.getCodeRequestCategory() != null && request.getCodeRequestCategory().equals(RequestCategory.FRAGMENT_ANALYSIS_REQUEST_CATEGORY)) {
         // Add in assay headers.
         this.assays = request.getAssays();
         for(Iterator i=assays.keySet().iterator(); i.hasNext();) {
-          this.addHeaderCell(rowh, (String)i.next(), rowSpan, new Integer(1));
+          this.addHeaderCell(rowh, (String)i.next(), rowSpan, 1);
         }
       }
       if (request.getCodeRequestCategory() != null && request.getCodeRequestCategory().equals(RequestCategory.CHERRY_PICKING_REQUEST_CATEGORY)) {
-        this.addHeaderCell(rowh, "Source Plate", rowSpan, new Integer(1));
-        this.addHeaderCell(rowh, "Source Well", rowSpan, new Integer(1));
-        this.addHeaderCell(rowh, "Destination Well", rowSpan, new Integer(1));
+        this.addHeaderCell(rowh, "Source Plate", rowSpan, 1);
+        this.addHeaderCell(rowh, "Source Well", rowSpan, 1);
+        this.addHeaderCell(rowh, "Destination Well", rowSpan, 1);
       }
     }
     if (request.getCodeRequestCategory() != null && RequestCategory.isIlluminaRequestCategory(request.getCodeRequestCategory())) {
       if (showBarcodeTag) {
 
-        this.addHeaderCell(rowh, barcodeHeader, rowSpan, new Integer(1));
+        this.addHeaderCell(rowh, barcodeHeader, rowSpan, 1);
       }
       if (showSeqLibProtocol) {
-        this.addHeaderCell(rowh, "Library Protocol", rowSpan, new Integer(1));
+        this.addHeaderCell(rowh, "Library Protocol", rowSpan, 1);
       }
     }
     if (request.getCodeRequestCategory() != null && request.getCodeRequestCategory().equals(RequestCategory.QUALITY_CONTROL_REQUEST_CATEGORY)) {
 
-      this.addHeaderCell(rowh, "Chip Type",rowSpan, new Integer(1));
+      this.addHeaderCell(rowh, "Chip Type",rowSpan, 1);
     }
     if (includeMicroarrayCoreNotes ) {
-      this.addHeaderCell(rowh, "----------Quality-----------", new Integer(1), new Integer(4),
+      this.addHeaderCell(rowh, "----------Quality-----------", 1, 4,
               "colgroup");
       if (request.getCodeRequestCategory() != null && RequestCategory.isIlluminaRequestCategory(request.getCodeRequestCategory())) {
-        this.addHeaderCell(rowh, "---Lib Prep---", new Integer(1), new Integer(2), "colgroup");
+        this.addHeaderCell(rowh, "---Lib Prep---", 1, 2, "colgroup");
       }
 
       rowh = new Element("TR");
@@ -494,11 +494,11 @@ public class RequestHTMLFormatter {
 
 
       table.addContent(rowh);
-      this.addHeaderCell(rowh, "Sample ID", new Integer(1), new Integer(1), "left");
-      this.addHeaderCell(rowh, "Sample Name", new Integer(1), new Integer(1));
+      this.addHeaderCell(rowh, "Sample ID", 1, 1, "left");
+      this.addHeaderCell(rowh, "Sample Name", 1, 1);
 
-      this.addHeaderCell(rowh, "Covaris Vol", new Integer(1), new Integer(1));
-      this.addHeaderCell(rowh, "Covaris Qty", new Integer(1), new Integer(1));
+      this.addHeaderCell(rowh, "Covaris Vol", 1, 1);
+      this.addHeaderCell(rowh, "Covaris Qty", 1, 1);
 
 
 
@@ -549,18 +549,18 @@ public class RequestHTMLFormatter {
 
 
     table.addContent(rowh);
-    this.addHeaderCell(rowh, "Sample ID", new Integer(2), new Integer(1), "left");
-    this.addHeaderCell(rowh, "Sample Name", new Integer(2), new Integer(1));
-    this.addHeaderCell(rowh, "Sample Conc.", new Integer(2), new Integer(1));
+    this.addHeaderCell(rowh, "Sample ID", 2, 1, "left");
+    this.addHeaderCell(rowh, "Sample Name", 2, 1);
+    this.addHeaderCell(rowh, "Sample Conc.", 2, 1);
 
     if (isDNASampleType) {
       this.addHeaderCell(rowh, "-------------------------- Lib Info --------------------------------",
-              new Integer(1), new Integer(5), "colgroup");
+              1, 5, "colgroup");
     } else {
       this.addHeaderCell(rowh, "--------------------------- Lib Info ---------------------------------",
-              new Integer(1), new Integer(6), "colgroup");
+              1, 6, "colgroup");
     }
-    this.addHeaderCell(rowh, "----- Seq Info -----", new Integer(1), new Integer(2), "colgroup");
+    this.addHeaderCell(rowh, "----- Seq Info -----", 1, 2, "colgroup");
 
 
     rowh = new Element("TR");
@@ -656,7 +656,7 @@ public class RequestHTMLFormatter {
       // Seq Info
       //
       // # of Lanes
-      this.addLeftCell(row, numberOfLanes == 0 ? "&nbsp;" : new Integer(numberOfLanes).toString());
+      this.addLeftCell(row, numberOfLanes == 0 ? "&nbsp;" : Integer.valueOf(numberOfLanes).toString());
       // Seq Date
       this.addCell(row, "&nbsp;");
 
@@ -769,7 +769,7 @@ public class RequestHTMLFormatter {
                         : "&nbsp;");
 
         // # of Lanes
-        this.addCell(row, numberOfLanes == 0 ? "&nbsp;" : new Integer(numberOfLanes).toString());
+        this.addCell(row, numberOfLanes == 0 ? "&nbsp;" : Integer.valueOf(numberOfLanes).toString());
 
       }
     }
@@ -799,15 +799,15 @@ public class RequestHTMLFormatter {
 
     Element rowh = new Element("TR");
     table.addContent(rowh);
-    this.addHeaderCell(rowh, "Sample #", new Integer(2), new Integer(1), "left");
-    this.addHeaderCell(rowh, "Sample Name", new Integer(2), new Integer(1));;
-    this.addHeaderCell(rowh, "Sample Type", new Integer(2), new Integer(1));;
-    this.addHeaderCell(rowh, "Nucl. acid Extraction Method", new Integer(2), new Integer(1));;
-    this.addHeaderCell(rowh, "Conc.", new Integer(2), new Integer(1));;
+    this.addHeaderCell(rowh, "Sample #", 2, 1, "left");
+    this.addHeaderCell(rowh, "Sample Name", 2, 1);;
+    this.addHeaderCell(rowh, "Sample Type", 2, 1);;
+    this.addHeaderCell(rowh, "Nucl. acid Extraction Method", 2, 1);;
+    this.addHeaderCell(rowh, "Conc.", 2, 1);;
     if (request.getCodeRequestCategory() != null && request.getCodeRequestCategory().equals(RequestCategory.QUALITY_CONTROL_REQUEST_CATEGORY)) {
-      this.addHeaderCell(rowh, "Chip Type", new Integer(2), new Integer(1));;
+      this.addHeaderCell(rowh, "Chip Type", 2, 1);;
     }
-    this.addHeaderCell(rowh, "Quality", new Integer(1), new Integer(4), "colgroup");
+    this.addHeaderCell(rowh, "Quality", 1, 4, "colgroup");
 
     rowh = new Element("TR");
     table.addContent(rowh);
@@ -942,12 +942,12 @@ public class RequestHTMLFormatter {
     Element rowh = new Element("TR");
     table.addContent(rowh);
 
-    Integer rowSpan = new Integer(1);
+    Integer rowSpan = 1;
 
 
-    this.addHeaderCell(rowh, "Sample #", rowSpan, new Integer(1), "left");
-    this.addHeaderCell(rowh, "Conc.", rowSpan, new Integer(1));
-    this.addHeaderCell(rowh, "Volume", rowSpan, new Integer(1));
+    this.addHeaderCell(rowh, "Sample #", rowSpan, 1, "left");
+    this.addHeaderCell(rowh, "Conc.", rowSpan, 1);
+    this.addHeaderCell(rowh, "Volume", rowSpan, 1);
 
     for(Iterator i = labeledSamples.iterator(); i.hasNext();) {
       LabeledSample labeledSample = (LabeledSample)i.next();
@@ -998,12 +998,12 @@ public class RequestHTMLFormatter {
                     dictionaryHelper.getRequestCategoryObject(request.getCodeRequestCategory()).getNumberOfChannels().intValue() == 2)) {
       this.addHeaderCell(rowh, "Cy5 Sample #"    );
     }
-    this.addHeaderCell(rowh, "Slide", "normal", new Integer(200));
+    this.addHeaderCell(rowh, "Slide", "normal", 200);
     this.addHeaderCell(rowh, "Array ID");
     this.addHeaderCell(rowh, "Slide Source");
     if (includeMicroarrayCoreNotes) {
-      this.addHeaderCell(rowh, "Barcode", "normal", new Integer(130));
-      this.addHeaderCell(rowh, "Row-col", "normal", new Integer(40));
+      this.addHeaderCell(rowh, "Barcode", "normal", 130);
+      this.addHeaderCell(rowh, "Row-col", "normal", 40);
     }
 
 

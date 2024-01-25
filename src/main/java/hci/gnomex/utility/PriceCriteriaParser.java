@@ -2,15 +2,13 @@ package hci.gnomex.utility;
 
 import hci.framework.model.DetailObject;
 import hci.gnomex.model.PriceCriteria;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.hibernate.Session;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PriceCriteriaParser extends DetailObject implements Serializable {
 
@@ -29,7 +27,7 @@ public class PriceCriteriaParser extends DetailObject implements Serializable {
             if (idPriceCriteriaString.startsWith("PriceCriteria")) {
                 priceCriteria = new PriceCriteria();
             } else {
-                priceCriteria = sess.load(PriceCriteria.class, new Integer(idPriceCriteriaString));
+                priceCriteria = sess.load(PriceCriteria.class, Integer.valueOf(idPriceCriteriaString));
             }
             this.initializePriceCriteria(node, priceCriteria);
             priceCriteriaMap.put(idPriceCriteriaString, priceCriteria);

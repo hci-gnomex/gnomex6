@@ -521,7 +521,9 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
 
             if(codeRequestCategory) {
                 let requestCategory: any = this.dictionaryService.getEntry('hci.gnomex.model.RequestCategory', codeRequestCategory);
+                console.log("requestCategory: " + requestCategory);
                 let solexaFlowCellChannels: number = requestCategory ? requestCategory.numberOfChannels : 0;
+                console.log("solexaFlowCellChannels: " + solexaFlowCellChannels);
 
                 if(solexaFlowCellChannels >= 1) {
                     for (var i = 1; i <= solexaFlowCellChannels; i++) {

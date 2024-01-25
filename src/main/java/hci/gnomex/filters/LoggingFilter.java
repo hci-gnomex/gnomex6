@@ -1,18 +1,11 @@
 package hci.gnomex.filters;
 
+import javax.servlet.*;
 import java.io.IOException;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 
 /**
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and
  * Proprietary
- *
  * Created by u0556399 on 4/2/2020.
  */
 public final class LoggingFilter implements Filter {

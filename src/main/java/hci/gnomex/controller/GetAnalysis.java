@@ -1,35 +1,14 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.model.*;
-import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.framework.security.UnknownPermissionException;
 import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.constants.Constants;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HybNumberComparator;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.SampleComparator;
-import hci.gnomex.utility.SequenceLaneNumberComparator;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.*;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
@@ -37,6 +16,13 @@ import org.hibernate.query.Query;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
+
+import javax.naming.NamingException;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.*;
 
 public class GetAnalysis extends GNomExCommand implements Serializable {
 
@@ -56,7 +42,7 @@ public void validate() {
 public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
 	if (request.getParameter("idAnalysis") != null) {
-		idAnalysis = new Integer(request.getParameter("idAnalysis"));
+		idAnalysis = Integer.valueOf(request.getParameter("idAnalysis"));
 	}
 	if (request.getParameter("analysisNumber") != null && !request.getParameter("analysisNumber").equals("")) {
 		analysisNumber = request.getParameter("analysisNumber");
@@ -97,7 +83,7 @@ public Command execute() throws RollBackCommandException {
 		Analysis a = null;
 		if (idAnalysis != null && idAnalysis.intValue() == 0) {
 			a = new Analysis();
-			a.setIdAnalysis(new Integer(0));
+			a.setIdAnalysis(0);
 		} else if (idAnalysis != null) {
 			a = sess.get(Analysis.class, idAnalysis);
 			Hibernate.initialize(a.getAnalysisGroups());

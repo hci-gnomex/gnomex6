@@ -1,32 +1,26 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
-import hci.gnomex.constants.Constants;
 import hci.gnomex.model.AnalysisGroupFilter;
 import hci.gnomex.model.Lab;
 import hci.gnomex.model.PropertyDictionary;
-//import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.model.Visibility;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
-//import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 public class GetAnalysisGroupList extends GNomExCommand implements Serializable {
 
@@ -126,9 +120,9 @@ public class GetAnalysisGroupList extends GNomExCommand implements Serializable 
             temp.add(row);
           }
 
-          Integer prevIdLab            = new Integer(-1);
-          Integer prevIdAnalysisGroup  = new Integer(-1);
-          Integer prevIdAnalysis       = new Integer(-1);
+          Integer prevIdLab            = -1;
+          Integer prevIdAnalysisGroup  = -1;
+          Integer prevIdAnalysis       = -1;
 
           // idLab is first entry in Object[] of allLabsInQuery
           // idLab is key in labsWithAnalyses
@@ -145,9 +139,9 @@ public class GetAnalysisGroupList extends GNomExCommand implements Serializable 
             else {
               for(Object[] row : temp){
 
-                Integer idAnalysisGroup = row[0] == null ? new Integer(-2) : (Integer)row[0];
-                Integer idAnalysis      = row[7] == null ? new Integer(-2) : (Integer)row[7];
-                Integer idLab           = row[3] == null ? new Integer(-2) : (Integer)row[3];
+                Integer idAnalysisGroup = row[0] == null ? -2 : (Integer)row[0];
+                Integer idAnalysis      = row[7] == null ? -2 : (Integer)row[7];
+                Integer idLab           = row[3] == null ? -2 : (Integer)row[3];
 
                 Element n = null;
                 if (idLab.intValue() != prevIdLab.intValue()) {
@@ -183,9 +177,9 @@ public class GetAnalysisGroupList extends GNomExCommand implements Serializable 
           }
         }else { // labsWithAnalysesIsASubsetOfAllLabsInQuery is false, don't query Labs as superset
 
-          Integer prevIdLab            = new Integer(-1);
-          Integer prevIdAnalysisGroup  = new Integer(-1);
-          Integer prevIdAnalysis       = new Integer(-1);
+          Integer prevIdLab            = -1;
+          Integer prevIdAnalysisGroup  = -1;
+          Integer prevIdAnalysis       = -1;
 
           StringBuffer buf = filter.getQuery(this.getSecAdvisor());
           LOG.info("Query for GetAnalysisGroupList: " + buf.toString());
@@ -194,9 +188,9 @@ public class GetAnalysisGroupList extends GNomExCommand implements Serializable 
           for(Iterator i = results.iterator(); i.hasNext();) {
             Object[] row = (Object[])i.next();
 
-            Integer idAnalysisGroup = row[0] == null ? new Integer(-2) : (Integer)row[0];
-            Integer idAnalysis      = row[7] == null ? new Integer(-2) : (Integer)row[7];
-            Integer idLab           = row[3] == null ? new Integer(-2) : (Integer)row[3];
+            Integer idAnalysisGroup = row[0] == null ? -2 : (Integer)row[0];
+            Integer idAnalysis      = row[7] == null ? -2 : (Integer)row[7];
+            Integer idLab           = row[3] == null ? -2 : (Integer)row[3];
 
             Element n = null;
             if (idLab.intValue() != prevIdLab.intValue()) {

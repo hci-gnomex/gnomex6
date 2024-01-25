@@ -1,29 +1,24 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.Chromatogram;
-import hci.gnomex.model.InstrumentRun;
-import hci.gnomex.model.Plate;
-import hci.gnomex.model.PlateWell;
-import hci.gnomex.model.Request;
+import hci.gnomex.model.*;
 import hci.gnomex.utility.ChromatReadUtil;
 import hci.gnomex.utility.ChromatTrimUtil;
-
-import java.io.File;
-import java.io.Serializable;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.biojava.bio.chromatogram.UnsupportedChromatogramFormatException;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.Serializable;
+import java.util.List;
 
 public class GetChromatogram extends GNomExCommand implements Serializable {
 
@@ -48,7 +43,7 @@ public class GetChromatogram extends GNomExCommand implements Serializable {
     }
 
     if (request.getParameter("idChromatogram") != null) {
-      idChromatogram = new Integer(request.getParameter("idChromatogram"));
+      idChromatogram = Integer.parseInt(request.getParameter("idChromatogram"));
     }
 
     if (request.getParameter("includeSeqString") != null && request.getParameter("includeSeqString").equals("Y")) {

@@ -53,19 +53,15 @@ public class InstrumentRunFilter extends DetailObject {
   public boolean hasSufficientCriteria(SecurityAdvisor secAdvisor) {
     this.secAdvisor = secAdvisor;
     boolean hasLimitingCriteria = false;
-    if (idInstrumentRun != null ||
-        (runName != null && !runName.equals("")) ||
-        (status != null && !status.equals("")) ||
-        (codeReactionType != null && !codeReactionType.equals("")) ||
-        createDateFrom != null ||
-        createDateTo != null ||
-        runDateFrom != null ||
-        runDateTo != null ||
-        (getAll != null && getAll.equals("Y"))) {
-      hasLimitingCriteria = true;
-    } else {
-      hasLimitingCriteria = false;
-    }
+      hasLimitingCriteria = idInstrumentRun != null ||
+              (runName != null && !runName.equals("")) ||
+              (status != null && !status.equals("")) ||
+              (codeReactionType != null && !codeReactionType.equals("")) ||
+              createDateFrom != null ||
+              createDateTo != null ||
+              runDateFrom != null ||
+              runDateTo != null ||
+              (getAll != null && getAll.equals("Y"));
 
     if (secAdvisor.hasPermission(SecurityAdvisor.CAN_ACCESS_ANY_OBJECT)) {
       return hasLimitingCriteria;      

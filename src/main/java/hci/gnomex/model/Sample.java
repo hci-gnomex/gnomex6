@@ -1,23 +1,16 @@
 package hci.gnomex.model;
 
 
-
 import hci.dictionary.utility.DictionaryManager;
 import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.utility.Workflow;
 import hci.hibernate5utils.HibernateDetailObject;
+import org.jdom.Document;
 
 import java.math.BigDecimal;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
-import org.jdom.Document;
+import java.util.*;
 
 
 
@@ -83,7 +76,7 @@ public class Sample extends HibernateDetailObject {
   private String      groupName;
   private String      qcCodeApplication;
   private String      sampleAlias_CORE;
-  private String      idSample_CORE;
+  private Long      idSample_CORE;
   private BigDecimal  qcLibConcentration;
   private Integer     idLibPrepQCProtocol;
   private BigDecimal  sampleVolume;
@@ -789,11 +782,11 @@ public class Sample extends HibernateDetailObject {
             step += ",partial";
           }
         } else if (this.getSeqPrepDate() != null) {
-          step = new Integer(lastStep - 3).toString();
+          step = Integer.valueOf(lastStep - 3).toString();
         } else if (this.getQualDate() != null) {
-          step = new Integer(lastStep - 4).toString();
+          step = Integer.valueOf(lastStep - 4).toString();
         } else {
-          step = new Integer(lastStep - 5).toString();
+          step = Integer.valueOf(lastStep - 5).toString();
         }
 
       } else {
@@ -808,9 +801,9 @@ public class Sample extends HibernateDetailObject {
             step += ",partial";
           }
         }  else if (this.getSeqPrepDate() != null) {
-          step = new Integer(lastStep - 3).toString();
+          step = Integer.valueOf(lastStep - 3).toString();
         } else {
-          step = new Integer(lastStep - 4).toString();
+          step = Integer.valueOf(lastStep - 4).toString();
         }
 
       }
@@ -823,9 +816,9 @@ public class Sample extends HibernateDetailObject {
           step += ",partial";
         }
       } else if (this.getQualDate() != null) {
-        step = new Integer(lastStep - 3).toString();
+        step = Integer.valueOf(lastStep - 3).toString();
       } else {
-        step = new Integer(lastStep - 4).toString();
+        step = Integer.valueOf(lastStep - 4).toString();
       }
     } else if (request.getRequestCategory().getType().equals(RequestCategoryType.TYPE_QC)) {
       if (this.getQualDate() != null) {
@@ -848,13 +841,13 @@ public class Sample extends HibernateDetailObject {
         // Check that the sample is ready to be added to a flow cell
         // Illseq
         if (workItem.getCodeStepNext().equals(Step.NOSEQ_CLUSTER_GEN)) {
-          stepMap.put(new Integer(lastStep - 2).toString(), null);
+          stepMap.put(Integer.valueOf(lastStep - 2).toString(), null);
         } else  if (workItem.getCodeStepNext().equals(Step.HISEQ_CLUSTER_GEN)) {
-          stepMap.put(new Integer(lastStep - 2).toString(), null);
+          stepMap.put(Integer.valueOf(lastStep - 2).toString(), null);
         } else if (workItem.getCodeStepNext().equals(Step.MISEQ_CLUSTER_GEN)) {
-          stepMap.put(new Integer(lastStep - 2).toString(), null);
+          stepMap.put(Integer.valueOf(lastStep - 2).toString(), null);
  	} else if (workItem.getCodeStepNext().equals(Step.ILLSEQ_CLUSTER_GEN)) {
-          stepMap.put(new Integer(lastStep - 2).toString(), null);
+          stepMap.put(Integer.valueOf(lastStep - 2).toString(), null);
         }
       }
     }
@@ -867,21 +860,21 @@ public class Sample extends HibernateDetailObject {
     for (SequenceLane lane : (Set<SequenceLane>)this.getSequenceLanes()) {
 
       if (lane.getPipelineStatus().equals(Constants.STATUS_COMPLETED)) {
-        stepMap.put(new Integer(lastStep).toString(), null);
+        stepMap.put(Integer.valueOf(lastStep).toString(), null);
       } else if (lane.getPipelineStatus().equals(Constants.STATUS_TERMINATED)) {
-        stepMap.put(new Integer(lastStep - 1).toString(), null);
+        stepMap.put(Integer.valueOf(lastStep - 1).toString(), null);
       } else if (lane.getLastCycleStatus().equals(Constants.STATUS_COMPLETED)) {
-        stepMap.put(new Integer(lastStep - 1).toString(), null);
+        stepMap.put(Integer.valueOf(lastStep - 1).toString(), null);
       } else if (lane.getLastCycleStatus().equals(Constants.STATUS_TERMINATED)) {
-        stepMap.put(new Integer(lastStep - 1).toString(), null);
+        stepMap.put(Integer.valueOf(lastStep - 1).toString(), null);
       } else if (lane.getFirstCycleStatus().equals(Constants.STATUS_TERMINATED)) {
-        stepMap.put(new Integer(lastStep - 1).toString(), null);
+        stepMap.put(Integer.valueOf(lastStep - 1).toString(), null);
       } else if (lane.getFlowCellChannelFirstCycleDate() != null) {
-        stepMap.put(new Integer(lastStep - 1).toString(), null);
+        stepMap.put(Integer.valueOf(lastStep - 1).toString(), null);
       } else if (lane.getFlowCellChannelStartDate() != null) {
-        stepMap.put(new Integer(lastStep - 1).toString(), null);
+        stepMap.put(Integer.valueOf(lastStep - 1).toString(), null);
       } else if (lane.getFlowCellChannel() != null) {
-        stepMap.put(new Integer(lastStep - 1).toString(), null);
+        stepMap.put(Integer.valueOf(lastStep - 1).toString(), null);
       }
     }
     return stepMap;
@@ -895,11 +888,11 @@ public class Sample extends HibernateDetailObject {
         if ((hyb.getLabeledSampleChannel1().getIdLabeledSample().equals(ls.getIdLabeledSample())) ||
                 (hyb.getLabeledSampleChannel2() != null && hyb.getLabeledSampleChannel2().getIdLabeledSample().equals(ls.getIdLabeledSample()))) {
           if (hyb.getExtractionDate() != null) {
-            stepMap.put(new Integer(lastStep).toString(), null);
+            stepMap.put(Integer.valueOf(lastStep).toString(), null);
           } else if (hyb.getHybDate() != null) {
-            stepMap.put(new Integer(lastStep - 1).toString(), null);
+            stepMap.put(Integer.valueOf(lastStep - 1).toString(), null);
           } else if (ls.getLabelingDate() != null) {
-            stepMap.put(new Integer(lastStep - 2).toString(), null);
+            stepMap.put(Integer.valueOf(lastStep - 2).toString(), null);
           }
         }
       }
@@ -1002,10 +995,10 @@ public class Sample extends HibernateDetailObject {
   public void setSampleAlias_CORE(String sampleAlias_CORE) {
     this.sampleAlias_CORE = sampleAlias_CORE;
   }
-  public String getIdSample_CORE() {
+  public Long getIdSample_CORE() {
     return idSample_CORE;
   }
-  public void setIdSample_CORE(String idSample_CORE) {
+  public void setIdSample_CORE(Long idSample_CORE) {
     this.idSample_CORE = idSample_CORE;
   }
 

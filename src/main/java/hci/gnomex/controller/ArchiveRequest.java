@@ -1,27 +1,23 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.BillingItem;
 import hci.gnomex.model.BillingStatus;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.RequestStatus;
-import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
 
 public class ArchiveRequest extends GNomExCommand implements Serializable {
 
@@ -33,7 +29,7 @@ public class ArchiveRequest extends GNomExCommand implements Serializable {
 
   @Override
   public void loadCommand(HttpServletWrappedRequest req, HttpSession sess) {
-    if(req.getParameter("idRequest") != null && !req.getParameter("idRequest").equals("")){
+    if(req.getParameter("idRequest") != null && !req.getParameter("idRequest").isEmpty()){
       this.idRequest = Integer.parseInt(req.getParameter("idRequest"));
     } else{
       this.addInvalidField("Missing idRequest", "idRequest is required");

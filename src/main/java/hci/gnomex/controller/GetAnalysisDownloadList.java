@@ -1,9 +1,6 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.framework.model.FieldFormatter;
@@ -12,24 +9,9 @@ import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.AnalysisFile;
 import hci.gnomex.model.AnalysisGroupFilter;
+import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.FileDescriptor;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.File;
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
@@ -37,6 +19,12 @@ import org.hibernate.Session;
 import org.hibernate.query.NativeQuery;
 import org.jdom.Document;
 import org.jdom.Element;
+
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.*;
 
 public class GetAnalysisDownloadList extends GNomExCommand implements Serializable {
 
@@ -67,7 +55,7 @@ public class GetAnalysisDownloadList extends GNomExCommand implements Serializab
         }
 
         if (request.getParameter("idAnalysis") != null) {
-            idAnalysis = new Integer(request.getParameter("idAnalysis"));
+            idAnalysis = Integer.valueOf(request.getParameter("idAnalysis"));
         }
 
         autoCreate = request.getParameter("autoCreate") != null && Util.isParameterTrue(request.getParameter("autoCreate"));

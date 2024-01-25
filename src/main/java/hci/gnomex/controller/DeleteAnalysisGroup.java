@@ -1,20 +1,17 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AnalysisGroup;
 import hci.gnomex.utility.HibernateSession;
-
-import java.io.Serializable;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 
 
 
@@ -37,7 +34,7 @@ public class DeleteAnalysisGroup extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
    if (request.getParameter("idAnalysisGroup") != null && !request.getParameter("idAnalysisGroup").equals("")) {
-     idAnalysisGroup = new Integer(request.getParameter("idAnalysisGroup"));
+     idAnalysisGroup = Integer.valueOf(request.getParameter("idAnalysisGroup"));
    } else {
      this.addInvalidField("idAnalysisGroup", "idAnalysisGroup is required.");
    }

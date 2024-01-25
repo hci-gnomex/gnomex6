@@ -1,30 +1,22 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.RequestCategory;
 import hci.gnomex.model.RequestProgressFilter;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeMap;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 
-import org.apache.log4j.Logger;
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.*;
 public class GetRequestProgressList extends GNomExCommand implements Serializable {
 
   private static Logger LOG = Logger.getLogger(GetRequestProgressList.class);
@@ -105,7 +97,7 @@ public class GetRequestProgressList extends GNomExCommand implements Serializabl
         Element n = new Element("RequestProgress");
         n.setAttribute("key", key);
         n.setAttribute("isSelected", "N");
-        n.setAttribute("altColor", new Boolean(alt).toString());
+        n.setAttribute("altColor", Boolean.toString(alt));
         n.setAttribute("showRequestNumber", !requestNumber.equals(prevRequestNumber) ? "Y" : "N");
         n.setAttribute("idRequest", row[19].toString());
         n.setAttribute("createDate", this.formatDate((java.util.Date)row[0]));
@@ -195,7 +187,7 @@ public class GetRequestProgressList extends GNomExCommand implements Serializabl
 
 
       if (reqNumber1.equals(reqNumber2)) {
-        return new Integer(number1).compareTo(new Integer(number2));
+        return Integer.valueOf(number1).compareTo(Integer.valueOf(number2));
       } else {
         return reqNumber1.compareTo(reqNumber2);
       }

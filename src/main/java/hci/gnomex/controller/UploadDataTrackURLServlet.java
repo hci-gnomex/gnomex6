@@ -1,17 +1,17 @@
 package hci.gnomex.controller;
 
 import hci.gnomex.constants.Constants;
-import hci.gnomex.utility.*;
-
-import java.io.IOException;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.ServletUtil;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
+import java.io.IOException;
 
 public class UploadDataTrackURLServlet extends HttpServlet {
     private static final Logger LOG = Logger.getLogger(UploadDataTrackURLServlet.class);

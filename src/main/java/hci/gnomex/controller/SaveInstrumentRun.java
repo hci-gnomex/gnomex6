@@ -1,38 +1,21 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
-import hci.gnomex.model.BillingItem;
-import hci.gnomex.model.BillingStatus;
-import hci.gnomex.model.InstrumentRun;
-import hci.gnomex.model.InstrumentRunStatus;
-import hci.gnomex.model.Plate;
-import hci.gnomex.model.PlateType;
-import hci.gnomex.model.PlateWell;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.RequestStatus;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.ProductException;
-import hci.gnomex.utility.ProductUtil;
-
-import java.io.Serializable;
-import java.io.StringReader;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.query.Query;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.util.*;
 public class SaveInstrumentRun extends GNomExCommand implements Serializable {
 
   // the static field for logging in Log4J

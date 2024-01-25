@@ -1,18 +1,27 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.Hybridization;
-import hci.gnomex.model.LabeledSample;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.Sample;
-import hci.gnomex.model.SequenceLane;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.RequestParser;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
 
+import javax.json.Json;
+import javax.json.JsonReader;
+import javax.naming.NamingException;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.sql.SQLException;
@@ -20,20 +29,6 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
-
-import javax.json.Json;
-import javax.json.JsonReader;
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
 
 public class GetMultiplexLaneList extends GNomExCommand implements Serializable {
   // the static field for logging in Log4J
@@ -113,7 +108,7 @@ public class GetMultiplexLaneList extends GNomExCommand implements Serializable 
       }
 
       if (request.getIdRequest() == null) {
-        request.setIdRequest(new Integer(0));
+        request.setIdRequest(0);
         request.setNumber("");
       }
 
@@ -129,7 +124,7 @@ public class GetMultiplexLaneList extends GNomExCommand implements Serializable 
           String idSampleString = (String)i.next();
           Sample sample = (Sample)requestParser.getSampleMap().get(idSampleString);
           if (sample.getIdSample() == null) {
-            sample.setIdSample(new Integer(x++));
+            sample.setIdSample(x++);
           }
           samples.add(sample);
         }
@@ -145,7 +140,7 @@ public class GetMultiplexLaneList extends GNomExCommand implements Serializable 
 
         if (isNewLane) {
           if (lane.getIdSequenceLane() == null) {
-            lane.setIdSequenceLane(new Integer(x++));
+            lane.setIdSequenceLane(x++);
             lane.setIdNumberSequencingCycles(laneInfo.getIdNumberSequencingCycles());
             lane.setIdNumberSequencingCyclesAllowed(laneInfo.getIdNumberSequencingCyclesAllowed());
             lane.setIdGenomeBuildAlignTo(laneInfo.getIdGenomeBuildAlignTo());

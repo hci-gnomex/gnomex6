@@ -1,12 +1,11 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 
-import java.io.Serializable;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 
 
 public class GetSessionTimeout extends GNomExCommand implements Serializable {

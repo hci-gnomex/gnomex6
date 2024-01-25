@@ -6,12 +6,16 @@ import hci.gnomex.model.DataTrackFolder;
 import hci.gnomex.model.GenomeBuild;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.ArchiveHelper;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.ServletUtil;
+import hci.gnomex.utility.*;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,16 +23,6 @@ import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
-import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
 
 public class DownloadDataTrackFileServlet extends HttpServlet {
 
@@ -113,8 +107,8 @@ protected void doGet(HttpServletRequest req, HttpServletResponse response) throw
 				throw new Exception("Invalid parameter format " + key
 						+ " encountered. Expected 99,99 for idDataTrack and idDataTrackFolder");
 			}
-			Integer idDataTrack = new Integer(idTokens[0]);
-			Integer idDataTrackFolder = new Integer(idTokens[1]);
+			Integer idDataTrack = Integer.valueOf(idTokens[0]);
+			Integer idDataTrackFolder = Integer.valueOf(idTokens[1]);
 
 			DataTrack dataTrack = DataTrack.class.cast(sess.load(DataTrack.class, idDataTrack));
 

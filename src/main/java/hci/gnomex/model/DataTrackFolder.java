@@ -5,15 +5,13 @@ import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DataTrackUtil;
 import hci.gnomex.utility.DictionaryHelper;
+import org.jdom.Document;
+import org.jdom.Element;
 
 import java.io.Serializable;
 import java.sql.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-
-import org.jdom.Document;
-import org.jdom.Element;
 
 
 public class DataTrackFolder extends DetailObject implements Serializable {
@@ -85,13 +83,13 @@ public class DataTrackFolder extends DetailObject implements Serializable {
 
   public boolean hasVisibility(String codeVisibility) {
     boolean hasVisibility = false;
-    for(Iterator<?> i = this.dataTracks.iterator(); i.hasNext();) {
-      DataTrack a = DataTrack.class.cast(i.next());
-      if (a.getCodeVisibility().equals(codeVisibility)) {
-        hasVisibility = true;
-        break;
+      for (Object dataTrack : this.dataTracks) {
+          DataTrack a = DataTrack.class.cast(dataTrack);
+          if (a.getCodeVisibility().equals(codeVisibility)) {
+              hasVisibility = true;
+              break;
+          }
       }
-    }
     return hasVisibility;
   }
 
@@ -128,7 +126,7 @@ public class DataTrackFolder extends DetailObject implements Serializable {
    }
 
    /*
-    * Get the fully qualifed type name (with genome version in path)
+    * Get the fully qualified type name (with genome version in path)
     */
    public String getQualifiedName() {
      String qualifiedName = getName();
@@ -170,15 +168,15 @@ public class DataTrackFolder extends DetailObject implements Serializable {
 
 
    public void recurseGetChildren(List<Object> descendents) {
-     for(Iterator<?> i = this.getFolders().iterator(); i.hasNext();) {        
-       DataTrackFolder ag = DataTrackFolder.class.cast(i.next());
-       descendents.add(ag);
-       ag.recurseGetChildren(descendents);
-     }
-     for(Iterator<?> i = this.getDataTracks().iterator(); i.hasNext();) {
-       DataTrack a = DataTrack.class.cast(i.next());
-       descendents.add(a);
-     }
+       for (Object o : this.getFolders()) {
+           DataTrackFolder ag = DataTrackFolder.class.cast(o);
+           descendents.add(ag);
+           ag.recurseGetChildren(descendents);
+       }
+       for (Object o : this.getDataTracks()) {
+           DataTrack a = DataTrack.class.cast(o);
+           descendents.add(a);
+       }
    }
 
    public String getCreatedBy() {
@@ -218,13 +216,13 @@ public class DataTrackFolder extends DetailObject implements Serializable {
    
    public boolean hasPublicDataTracks() {
      boolean hasPublicAnalysis = false;
-     for (Iterator i2 = this.getDataTracks().iterator(); i2.hasNext();) {
-       DataTrack dt = (DataTrack)i2.next();
-       if (dt.getCodeVisibility().equals(Visibility.VISIBLE_TO_PUBLIC)) {
-         hasPublicAnalysis = true;
-         break;
+       for (Object o : this.getDataTracks()) {
+           DataTrack dt = (DataTrack) o;
+           if (dt.getCodeVisibility().equals(Visibility.VISIBLE_TO_PUBLIC)) {
+               hasPublicAnalysis = true;
+               break;
+           }
        }
-     }  
      return hasPublicAnalysis;
    }  
    public void registerMethodsToExcludeFromXML() {

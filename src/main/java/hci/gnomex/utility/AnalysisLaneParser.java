@@ -2,13 +2,6 @@ package hci.gnomex.utility;
 
 import hci.framework.model.DetailObject;
 import hci.gnomex.model.SequenceLane;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -16,6 +9,11 @@ import org.jdom.Element;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 
 public class AnalysisLaneParser extends DetailObject implements Serializable {
@@ -82,7 +80,7 @@ public class AnalysisLaneParser extends DetailObject implements Serializable {
         idRequestMap.put(seqLane.getIdSequenceLane(), seqLane.getIdRequest());
       } else {
         String idSequenceLaneString = node.get("idSequenceLane") != null ? node.getString("idSequenceLane") : "";
-        Integer idSequenceLane = new Integer(idSequenceLaneString);
+        Integer idSequenceLane = Integer.valueOf(idSequenceLaneString);
         idSequenceLaneList.add(idSequenceLane);
 
         String idRequestString = node.get("idRequest") != null ? node.getString("idRequest"): "";
@@ -95,7 +93,7 @@ public class AnalysisLaneParser extends DetailObject implements Serializable {
         } else {
           // The idRequest was provided on the XML element, so just use it to save
           // the extra read
-          idRequestMap.put(idSequenceLane, new Integer(idRequestString));
+          idRequestMap.put(idSequenceLane, Integer.valueOf(idRequestString));
 
         }
 
@@ -171,7 +169,7 @@ public class AnalysisLaneParser extends DetailObject implements Serializable {
         idRequestMap.put(seqLane.getIdSequenceLane(), seqLane.getIdRequest());
       } else {
         String idSequenceLaneString = node.getAttributeValue("idSequenceLane");
-        Integer idSequenceLane = new Integer(idSequenceLaneString);
+        Integer idSequenceLane = Integer.valueOf(idSequenceLaneString);
         idSequenceLaneList.add(idSequenceLane);
 
         String idRequestString = node.getAttributeValue("idRequest");
@@ -184,7 +182,7 @@ public class AnalysisLaneParser extends DetailObject implements Serializable {
         } else {
           // The idRequest was provided on the XML element, so just use it to save
           // the extra read
-          idRequestMap.put(idSequenceLane, new Integer(idRequestString));
+          idRequestMap.put(idSequenceLane, Integer.valueOf(idRequestString));
 
         }
 

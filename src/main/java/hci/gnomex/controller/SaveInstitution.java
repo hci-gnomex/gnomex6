@@ -1,25 +1,23 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Institution;
 import hci.gnomex.utility.HibernateSession;
-
-import java.io.Serializable;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SaveInstitution extends GNomExCommand implements Serializable {
 

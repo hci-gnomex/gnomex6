@@ -1,8 +1,6 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.DataTrackFolder;
 import hci.gnomex.model.GenomeBuild;
@@ -10,17 +8,15 @@ import hci.gnomex.model.GenomeBuildAlias;
 import hci.gnomex.model.Segment;
 import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.HibernateSession;
-
-import java.io.Serializable;
-import java.util.Iterator;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 
-import org.apache.log4j.Logger;
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.Iterator;
 
 
 public class DeleteGenomeBuild extends GNomExCommand implements Serializable {
@@ -42,7 +38,7 @@ public class DeleteGenomeBuild extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
    if (request.getParameter("idGenomeBuild") != null && !request.getParameter("idGenomeBuild").equals("")) {
-     idGenomeBuild = new Integer(request.getParameter("idGenomeBuild"));
+     idGenomeBuild = Integer.valueOf(request.getParameter("idGenomeBuild"));
    } else {
      this.addInvalidField("idGenomeBuild", "idGenomeBuild is required.");
    }

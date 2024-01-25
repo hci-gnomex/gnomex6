@@ -6,7 +6,10 @@ import hci.gnomex.controller.GNomExFrontController;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.CoreFacility;
 import hci.gnomex.model.Lab;
-import hci.gnomex.model.PropertyDictionary;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -15,11 +18,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
 
 
 public class VerifyLabUsersEmailFormatter extends DetailObject{

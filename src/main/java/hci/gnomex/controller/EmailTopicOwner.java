@@ -1,20 +1,14 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AppUser;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.MailUtil;
-import hci.gnomex.utility.MailUtilHelper;
-
-import java.io.Serializable;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
+import hci.gnomex.utility.*;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 public class EmailTopicOwner extends GNomExCommand implements Serializable {
   private static Logger LOG = Logger.getLogger(EmailTopicOwner.class);
 
@@ -30,7 +24,7 @@ public class EmailTopicOwner extends GNomExCommand implements Serializable {
 
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     if (request.getParameter("idAppUser") != null && !request.getParameter("idAppUser").equals("")) {
-      idAppUser = new Integer(request.getParameter("idAppUser"));
+      idAppUser = Integer.valueOf(request.getParameter("idAppUser"));
     }
     if (request.getParameter("fromAddress") != null && !request.getParameter("fromAddress").equals("")) {
       fromAddress = request.getParameter("fromAddress");

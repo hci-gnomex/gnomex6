@@ -1,20 +1,15 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.DataTrack;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 
 
 
@@ -29,14 +24,14 @@ public class CheckDataTrackPermission extends GNomExCommand implements Serializa
 
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     String dataTrackNumber = "";
-    if (request.getParameter("dataTrackNumber") != null && !request.getParameter("dataTrackNumber").equals("")) {
+    if (request.getParameter("dataTrackNumber") != null && !request.getParameter("dataTrackNumber").isEmpty()) {
       dataTrackNumber = request.getParameter("dataTrackNumber");
     } else {
       this.addInvalidField("dataTrackNumber", "dataTrackNumber is required");
     }
     if(dataTrackNumber.length() > 0) {
       dataTrackNumber = dataTrackNumber.substring(dataTrackNumber.indexOf("DT")+2);
-      idDataTrack = new Integer(dataTrackNumber);
+      idDataTrack = Integer.valueOf(dataTrackNumber);
     }
   }
 

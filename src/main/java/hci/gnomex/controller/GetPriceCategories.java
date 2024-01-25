@@ -43,7 +43,7 @@ public class GetPriceCategories extends GNomExCommand implements Serializable {
 	public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
 		if (request.getParameter("idPriceSheet") != null) {
-			idPriceSheet = new Integer(request.getParameter("idPriceSheet"));
+			idPriceSheet = Integer.valueOf(request.getParameter("idPriceSheet"));
 		}
 
 		if (request.getParameter("priceSheetName") != null) {

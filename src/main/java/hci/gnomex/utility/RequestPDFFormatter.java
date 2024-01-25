@@ -1329,7 +1329,7 @@ public class RequestPDFFormatter extends RequestPDFFormatterBase {
 					}
 				}
 				if (numberOfLanes > 0) {
-					laneNum = new Integer(numberOfLanes).toString();
+					laneNum = Integer.valueOf(numberOfLanes).toString();
 				}
 			}
 			String seqDate = "";
@@ -1473,7 +1473,7 @@ public class RequestPDFFormatter extends RequestPDFFormatterBase {
 				String laneLabel = "";
 				if (newLane) {
 					if (key.equals("")) {
-						laneLabel = new Integer(nonMultiplexedLaneCount++).toString();
+						laneLabel = Integer.valueOf(nonMultiplexedLaneCount++).toString();
 					} else {
 						laneLabel = multiplexGroupID;
 					}

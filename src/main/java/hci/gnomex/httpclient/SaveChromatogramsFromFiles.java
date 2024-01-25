@@ -169,7 +169,7 @@ private void run() throws Exception {
 			callServletImpl();
 
 			if (idPlateWell != null) {
-				idPlateWell = new Integer(idPlateWell.intValue() + 1);
+				idPlateWell = Integer.valueOf(idPlateWell.intValue() + 1);
 			}
 
 		}

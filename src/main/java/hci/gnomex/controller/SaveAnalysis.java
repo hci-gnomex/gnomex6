@@ -37,7 +37,7 @@ import org.jdom.input.SAXBuilder;
 public class SaveAnalysis extends GNomExCommand implements Serializable {
 
 	// the static field for logging in Log4J
-	private static Logger LOG = Logger.getLogger(SaveLab.class);
+	private static Logger LOG = Logger.getLogger(SaveAnalysis.class);
 
 // private String baseDir;
 
@@ -70,7 +70,7 @@ public class SaveAnalysis extends GNomExCommand implements Serializable {
 
 	private String newAnalysisGroupName;
 	private String newAnalysisGroupDescription;
-	private Integer newAnalysisGroupId = new Integer(-1);
+	private Integer newAnalysisGroupId = -1;
 
 	private boolean isLinkBySample = false;
 	private String analysisIDFile;
@@ -1034,7 +1034,7 @@ public class SaveAnalysis extends GNomExCommand implements Serializable {
 							JsonObject propNode = propertiesArray.getJsonObject(j);
 							String idPropertyEntry = propNode.get("idPropertyEntry") != null ? propNode.getString("idPropertyEntry") : "";
 							if (idPropertyEntry != null && !idPropertyEntry.equals("")) {
-								if (pe.getIdPropertyEntry().equals(new Integer(idPropertyEntry))) {
+								if (pe.getIdPropertyEntry().equals(Integer.valueOf(idPropertyEntry))) {
 									found = true;
 									break;
 								}
@@ -1086,7 +1086,7 @@ public class SaveAnalysis extends GNomExCommand implements Serializable {
 									JsonObject n = pEntryValues.getJsonObject(j);
 									String idPropertyEntryValue = n.get("idPropertyEntryValue") != null ? n.getString("idPropertyEntryValue") : "";
 									if (idPropertyEntryValue != null && !idPropertyEntryValue.equals("")) {
-										if (av.getIdPropertyEntryValue().equals(new Integer(idPropertyEntryValue))) {
+										if (av.getIdPropertyEntryValue().equals(Integer.valueOf(idPropertyEntryValue))) {
 											found = true;
 											break;
 										}

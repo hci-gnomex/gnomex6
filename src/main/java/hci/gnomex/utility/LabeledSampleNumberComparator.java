@@ -17,7 +17,7 @@ import java.util.Comparator;
       String[] tokens2 = s2.getNumber().split("X");
       String number2 = tokens2[tokens2.length - 1];
 
-      return new Integer(number1).compareTo(new Integer(number2));
+      return Integer.valueOf(number1).compareTo(Integer.valueOf(number2));
       
     }
   }

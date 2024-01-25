@@ -1,36 +1,23 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.UserPreferences;
-import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
-import hci.gnomex.model.InstrumentRunStatus;
-import hci.gnomex.model.PlateType;
-import hci.gnomex.model.RequestCategory;
-import hci.gnomex.model.RequestProgressDNASeqFilter;
-import hci.gnomex.model.RequestStatus;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.query.Query;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.UserPreferences;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.*;
 
 public class GetRequestProgressDNASeqList extends GNomExCommand implements Serializable {
 
@@ -89,12 +76,13 @@ public class GetRequestProgressDNASeqList extends GNomExCommand implements Seria
           if (currentNode != null) {
             doc.getRootElement().addContent(currentNode);
           }
+
           firstForWell = true;
           previousStatus = null;
           RequestCategory requestCategory = dictionaryHelper.getRequestCategoryObject(container.getCodeRequestCategory());
           currentNode = new Element("RequestProgress");
           currentNode.setAttribute("isSeletected",          "N");
-          currentNode.setAttribute("altColor",              new Boolean(alt).toString());
+          currentNode.setAttribute("altColor",              Boolean.toString (alt));
           currentNode.setAttribute("showRequestNumber",     prevContainer == null || !container.getRequestNumber().equals(prevContainer.getRequestNumber()) ? "Y" : "N");
           currentNode.setAttribute("requestNumber",         container.getRequestNumber());
           currentNode.setAttribute("createDate",            container.getCreateDate() != null ? this.formatDate(container.getCreateDate()) : "");
@@ -287,9 +275,9 @@ public class GetRequestProgressDNASeqList extends GNomExCommand implements Seria
       }
       key += "\t" + sampleSequence.toString();
       key += "\t" + getAssayOrPrimerName();
-      key += "\t" + new Integer(cal.get(Calendar.YEAR)).toString();
-      key += "\t" + new Integer(cal.get(Calendar.MONTH)+100).toString();
-      key += "\t" + new Integer(cal.get(Calendar.DAY_OF_MONTH)+100).toString();
+      key += "\t" + Integer.valueOf(cal.get(Calendar.YEAR)).toString();
+      key += "\t" + Integer.valueOf(cal.get(Calendar.MONTH)+100).toString();
+      key += "\t" + Integer.valueOf(cal.get(Calendar.DAY_OF_MONTH)+100).toString();
       key += "\t" + idPlateWellLeadingZeroes.toString();
 
       return key;

@@ -1,36 +1,23 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.*;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.DataTrack;
-import hci.gnomex.model.DataTrackFile;
-import hci.gnomex.model.DataTrackFolder;
-import hci.gnomex.model.GenomeBuild;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.Notification;
-import hci.gnomex.model.PropertyEntry;
-import hci.gnomex.model.PropertyEntryValue;
-import hci.gnomex.model.PropertyOption;
-import hci.gnomex.model.Visibility;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
-
-import java.io.File;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.TreeSet;
-
+import hci.gnomex.utility.*;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
+import java.io.File;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 public class SaveDataTrack extends GNomExCommand implements Serializable {
@@ -167,7 +154,7 @@ public class SaveDataTrack extends GNomExCommand implements Serializable {
                             JsonObject propNode = this.propertiesJSON.getJsonObject(i);
                             String idPropertyEntry = Util.getJsonStringSafe(propNode, "idPropertyEntry");
                             if (idPropertyEntry != null && !idPropertyEntry.equals("")) {
-                                if (pe.getIdPropertyEntry().equals(new Integer(idPropertyEntry))) {
+                                if (pe.getIdPropertyEntry().equals(Integer.valueOf(idPropertyEntry))) {
                                     found = true;
                                     break;
                                 }
@@ -215,7 +202,7 @@ public class SaveDataTrack extends GNomExCommand implements Serializable {
                                         JsonObject propertyEntryValue = propertyEntryValuesArray.getJsonObject(i2);
                                         String idPropertyEntryValue = Util.getJsonStringSafe(propertyEntryValue, "idPropertyEntryValue");
                                         if (idPropertyEntryValue != null && !idPropertyEntryValue.equals("")) {
-                                            if (av.getIdPropertyEntryValue().equals(new Integer(idPropertyEntryValue))) {
+                                            if (av.getIdPropertyEntryValue().equals(Integer.valueOf(idPropertyEntryValue))) {
                                                 found = true;
                                                 break;
                                             }

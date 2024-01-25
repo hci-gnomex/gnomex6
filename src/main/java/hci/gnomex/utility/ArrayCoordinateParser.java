@@ -2,15 +2,14 @@ package hci.gnomex.utility;
 
 import hci.framework.model.DetailObject;
 import hci.gnomex.model.ArrayCoordinate;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.Element;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
 
 
 public class ArrayCoordinateParser extends DetailObject implements Serializable {
@@ -40,11 +39,11 @@ public class ArrayCoordinateParser extends DetailObject implements Serializable 
       if (idArrayCoordinateString.startsWith("ArrayCoordinate")) {
         ac = new ArrayCoordinate();
       } else {
-        ac = (ArrayCoordinate)sess.load(ArrayCoordinate.class, new Integer(idArrayCoordinateString));
+        ac = (ArrayCoordinate)sess.load(ArrayCoordinate.class, Integer.valueOf(idArrayCoordinateString));
       }
 
-      ac.setX(new Integer(x));
-      ac.setY(new Integer(y));
+      ac.setX(Integer.valueOf(x));
+      ac.setY(Integer.valueOf(y));
       ac.setName(name);        
       
       

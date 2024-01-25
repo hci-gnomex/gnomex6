@@ -158,52 +158,17 @@ public class WorkItemFilter extends DetailObject {
     this.secAdvisor = secAdvisor;
 
     // ILLSEQ
-    if(this.codeStepNext.equals(Step.QUALITY_CONTROL_STEP) ||
-            this.codeStepNext.equals(Step.SEQ_QC) ||
-            this.codeStepNext.equals(Step.NOSEQ_QC) ||
-            this.codeStepNext.equals(Step.HISEQ_QC) ||
-            this.codeStepNext.equals(Step.MISEQ_QC) ||
-            this.codeStepNext.equals(Step.ILLSEQ_QC) ||
-            this.codeStepNext.equals(Step.SEQ_PREP) ||
-            this.codeStepNext.equals(Step.NOSEQ_PREP) ||
-            this.codeStepNext.equals(Step.HISEQ_PREP) ||
-            this.codeStepNext.equals(Step.MISEQ_PREP) ||
-            this.codeStepNext.equals(Step.ALL_PREP) ||
-            this.codeStepNext.equals(Step.ILLSEQ_PREP) ||
-            this.codeStepNext.equals(Step.SEQ_FLOWCELL_STOCK) ||
-            this.codeStepNext.equals(Step.NOSEQ_PREP_QC) ||
-            this.codeStepNext.equals(Step.HISEQ_PREP_QC) ||
-            this.codeStepNext.equals(Step.MISEQ_PREP_QC) ||
-            this.codeStepNext.equals(Step.ALL_PREP_QC) ||
-            this.codeStepNext.equals(Step.ILLSEQ_PREP_QC)) {
-      return getQuery(this.SAMPLE_LEVEL);
-    } else if (this.codeStepNext.equals(Step.LABELING_STEP)) {
-      return getQuery(this.LABELED_SAMPLE_LEVEL);
-    } else if (this.codeStepNext.equals(Step.HYB_STEP) ||
-            this.codeStepNext.equals(Step.SCAN_EXTRACTION_STEP)) {
-      return getQuery(this.HYB_LEVEL);
-    } else if (this.codeStepNext.equals(Step.SEQ_CLUSTER_GEN) ||
-            this.codeStepNext.equals(Step.NOSEQ_CLUSTER_GEN) ||
-            this.codeStepNext.equals(Step.HISEQ_CLUSTER_GEN) ||
-            this.codeStepNext.equals(Step.MISEQ_CLUSTER_GEN) ||
-            this.codeStepNext.equals(Step.ILLSEQ_CLUSTER_GEN) ||
-            this.codeStepNext.equals(Step.ALL_CLUSTER_GEN)) {
-      return getQuery(this.LANE_LEVEL);
-    } else if (this.codeStepNext.equals(Step.SEQ_RUN) ||
-            this.codeStepNext.equals(Step.HISEQ_RUN) ||
-            this.codeStepNext.equals(Step.NOSEQ_RUN) ||
-            this.codeStepNext.equals(Step.ILLSEQ_RUN) ||
-            this.codeStepNext.equals(Step.SEQ_DATA_PIPELINE) ||
-            this.codeStepNext.equals(Step.HISEQ_DATA_PIPELINE) ||
-            this.codeStepNext.equals(Step.NOSEQ_DATA_PIPELINE) ||
-            this.codeStepNext.equals(Step.MISEQ_DATA_PIPELINE) ||
-            this.codeStepNext.equals(Step.ILLSEQ_DATA_PIPELINE) ||
-            this.codeStepNext.equals(Step.ALL_DATA_PIPELINE)
-    ) {
-      return getQuery(this.FLOW_CELL_LEVEL);
-    } else {
-      return null;
-    }
+      return switch (this.codeStepNext) {
+          case Step.QUALITY_CONTROL_STEP, Step.SEQ_QC, Step.NOSEQ_QC, Step.HISEQ_QC, Step.MISEQ_QC, Step.ILLSEQ_QC, Step.SEQ_PREP, Step.NOSEQ_PREP, Step.HISEQ_PREP, Step.MISEQ_PREP, Step.ALL_PREP, Step.ILLSEQ_PREP, Step.SEQ_FLOWCELL_STOCK, Step.NOSEQ_PREP_QC, Step.HISEQ_PREP_QC, Step.MISEQ_PREP_QC, Step.ALL_PREP_QC, Step.ILLSEQ_PREP_QC ->
+                  getQuery(this.SAMPLE_LEVEL);
+          case Step.LABELING_STEP -> getQuery(this.LABELED_SAMPLE_LEVEL);
+          case Step.HYB_STEP, Step.SCAN_EXTRACTION_STEP -> getQuery(this.HYB_LEVEL);
+          case Step.SEQ_CLUSTER_GEN, Step.NOSEQ_CLUSTER_GEN, Step.HISEQ_CLUSTER_GEN, Step.MISEQ_CLUSTER_GEN, Step.ILLSEQ_CLUSTER_GEN, Step.ALL_CLUSTER_GEN ->
+                  getQuery(this.LANE_LEVEL);
+          case Step.SEQ_RUN, Step.HISEQ_RUN, Step.NOSEQ_RUN, Step.ILLSEQ_RUN, Step.SEQ_DATA_PIPELINE, Step.HISEQ_DATA_PIPELINE, Step.NOSEQ_DATA_PIPELINE, Step.MISEQ_DATA_PIPELINE, Step.ILLSEQ_DATA_PIPELINE, Step.ALL_DATA_PIPELINE ->
+                  getQuery(this.FLOW_CELL_LEVEL);
+          default -> null;
+      };
 
   }
 

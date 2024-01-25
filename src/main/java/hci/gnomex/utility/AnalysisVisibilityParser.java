@@ -2,16 +2,15 @@ package hci.gnomex.utility;
 
 import hci.gnomex.model.Analysis;
 import hci.gnomex.security.SecurityAdvisor;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.Element;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
 
 
 public class AnalysisVisibilityParser implements Serializable {
@@ -35,7 +34,7 @@ public class AnalysisVisibilityParser implements Serializable {
       String idAnalysis           = aNode.getAttributeValue("idAnalysis");
       String codeVisibility       = aNode.getAttributeValue("codeVisibility");
       
-      Analysis analysis = (Analysis)sess.load(Analysis.class, new Integer(idAnalysis));
+      Analysis analysis = (Analysis)sess.load(Analysis.class, Integer.valueOf(idAnalysis));
       
       if (secAdvisor.canUpdate(analysis, SecurityAdvisor.PROFILE_OBJECT_VISIBILITY)) {
         if (codeVisibility == null || codeVisibility.equals("")) {
@@ -64,11 +63,11 @@ public class AnalysisVisibilityParser implements Serializable {
   
   public void resetIsDirty() {
     Element rootNode = this.doc.getRootElement();
-    
-    for(Iterator i = rootNode.getChildren("Analysis").iterator(); i.hasNext();) {
-      Element workItemNode = (Element)i.next();
-      workItemNode.setAttribute("isDirty", "N");
-    }
+
+      for (Object o : rootNode.getChildren("Analysis")) {
+          Element workItemNode = (Element) o;
+          workItemNode.setAttribute("isDirty", "N");
+      }
   }
 
 

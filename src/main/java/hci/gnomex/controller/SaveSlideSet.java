@@ -1,19 +1,18 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.SlideProduct;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
 
 
 
@@ -50,7 +49,7 @@ public class SaveSlideSet extends GNomExCommand implements Serializable {
           slideSet = new SlideProduct();
           slideSet.setName(slideSetScreen.getName());
           slideSet.setIsActive("Y");
-          slideSet.setArraysPerSlide(new Integer(99));
+          slideSet.setArraysPerSlide(99);
           slideSet.setIsSlideSet("Y");
           
           sess.save(slideSet);

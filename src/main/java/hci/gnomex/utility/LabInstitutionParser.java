@@ -2,18 +2,15 @@ package hci.gnomex.utility;
 
 import hci.framework.model.DetailObject;
 import hci.gnomex.model.Institution;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 
 import javax.json.JsonArray;
-import javax.json.JsonObject;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 
 public class LabInstitutionParser extends DetailObject implements Serializable {
@@ -47,7 +44,7 @@ public class LabInstitutionParser extends DetailObject implements Serializable {
       for (int i = 0; i < originalObject.size(); i++) {
         if (originalObject.getJsonObject(i).get("idInstitution") != null) {
           String      idInstitutionString = originalObject.getJsonObject(i).getString("idInstitution");
-          Institution institution         = session.get(Institution.class, new Integer(idInstitutionString));
+          Institution institution         = session.get(Institution.class, Integer.valueOf(idInstitutionString));
 
           institutionMap.put(institution.getIdInstitution(), institution);
         }
@@ -62,7 +59,7 @@ public class LabInstitutionParser extends DetailObject implements Serializable {
       Element node = (Element)i.next();
 
       String idInstitutionString = node.getAttributeValue("idInstitution");
-      Institution institution = (Institution)sess.get(Institution.class, new Integer(idInstitutionString));
+      Institution institution = (Institution)sess.get(Institution.class, Integer.valueOf(idInstitutionString));
 
       institutionMap.put(institution.getIdInstitution(), institution);
     }

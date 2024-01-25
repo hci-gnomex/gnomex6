@@ -1,20 +1,19 @@
 package hci.gnomex.controller;
 
-import java.io.Serializable;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.query.Query;
-import org.hibernate.Session;
-
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Price;
 import hci.gnomex.model.Product;
 import hci.gnomex.security.SecurityAdvisor;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.List;
 @SuppressWarnings("serial")
 public class UpdateProductType extends GNomExCommand implements Serializable {
 
@@ -29,11 +28,11 @@ public class UpdateProductType extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idProductType") != null && !request.getParameter("idProductType").trim().equals("")) {
-      idProductType = new Integer(request.getParameter("idProductType"));
+      idProductType = Integer.valueOf(request.getParameter("idProductType"));
     }
 
     if (request.getParameter("idPriceCategory") != null && !request.getParameter("idPriceCategory").trim().equals("")) {
-      idPriceCategory = new Integer(request.getParameter("idPriceCategory"));
+      idPriceCategory = Integer.valueOf(request.getParameter("idPriceCategory"));
     }
 
   }

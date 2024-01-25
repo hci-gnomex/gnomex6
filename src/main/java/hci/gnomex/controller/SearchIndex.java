@@ -1,61 +1,32 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
 import hci.framework.utilities.XMLReflectException;
-import hci.gnomex.lucene.AnalysisFilter;
-import hci.gnomex.lucene.AnalysisIndexHelper;
-import hci.gnomex.lucene.DataTrackFilter;
-import hci.gnomex.lucene.DataTrackIndexHelper;
-import hci.gnomex.lucene.ExperimentFilter;
-import hci.gnomex.lucene.ExperimentIndexHelper;
-import hci.gnomex.lucene.GlobalFilter;
-import hci.gnomex.lucene.GlobalIndexHelper;
-import hci.gnomex.lucene.ProtocolFilter;
-import hci.gnomex.lucene.ProtocolIndexHelper;
-import hci.gnomex.lucene.SearchListParser;
-import hci.gnomex.lucene.TopicFilter;
-import hci.gnomex.lucene.TopicIndexHelper;
+import hci.gnomex.lucene.*;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.model.RequestCategory;
 import hci.gnomex.model.Visibility;
-import hci.gnomex.utility.DataTrackQuery;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.Serializable;
-import java.io.StringReader;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.*;
 import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.WhitespaceAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.queryParser.QueryParser;
-import org.apache.lucene.search.Hits;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.QueryWrapperFilter;
-import org.apache.lucene.search.Searcher;
+import org.apache.lucene.search.*;
 import org.apache.lucene.util.Version;
 import org.hibernate.Session;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
-import org.apache.log4j.Logger;
+
+import javax.naming.NamingException;
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.sql.SQLException;
+import java.util.*;
 
 public class SearchIndex extends GNomExCommand implements Serializable {
     // the static field for logging in Log4J
@@ -699,7 +670,7 @@ public class SearchIndex extends GNomExCommand implements Serializable {
         dataTrackIds = new ArrayList<Integer>();
         for (int i = 0; i < hits.length(); i++) {
             org.apache.lucene.document.Document doc = hits.doc(i);
-            Integer idDataTrack = doc.get(DataTrackIndexHelper.ID_DATATRACK).equals("unknown") ? null : new Integer(doc.get(DataTrackIndexHelper.ID_DATATRACK));
+            Integer idDataTrack = doc.get(DataTrackIndexHelper.ID_DATATRACK).equals("unknown") ? null : Integer.valueOf(doc.get(DataTrackIndexHelper.ID_DATATRACK));
             if (idDataTrack != null) {
                 dataTrackIds.add(idDataTrack);
             }
@@ -720,7 +691,7 @@ public class SearchIndex extends GNomExCommand implements Serializable {
         topicIds = new ArrayList<Integer>();
         for (int i = 0; i < hits.length(); i++) {
             org.apache.lucene.document.Document doc = hits.doc(i);
-            Integer idTopic = doc.get(TopicIndexHelper.ID_TOPIC).equals("unknown") ? null : new Integer(doc.get(TopicIndexHelper.ID_TOPIC));
+            Integer idTopic = doc.get(TopicIndexHelper.ID_TOPIC).equals("unknown") ? null : Integer.valueOf(doc.get(TopicIndexHelper.ID_TOPIC));
             if (idTopic != null) {
                 topicIds.add(idTopic);
             }
@@ -816,11 +787,11 @@ public class SearchIndex extends GNomExCommand implements Serializable {
         node.setAttribute("className", globalClassName);
         node.setAttribute("idProject", globalProjectId);
         if (rank >= 0) {
-            node.setAttribute("searchRank", new Integer(rank + 1).toString());
+            node.setAttribute("searchRank", Integer.valueOf(rank + 1).toString());
             node.setAttribute("searchInfo", " (Search rank #" + (rank + 1) + ")");
         }
         if (score >= 0) {
-            node.setAttribute("searchScore", new Integer(Math.round(score * 100)).toString() + "%");
+            node.setAttribute("searchScore", Integer.valueOf(Math.round(score * 100)).toString() + "%");
         }
 
         rankedGlobalNodes.add(node);
@@ -828,7 +799,7 @@ public class SearchIndex extends GNomExCommand implements Serializable {
 
     private void mapProtocolDocument(org.apache.lucene.document.Document doc, int rank, float score) {
 
-        Integer idProtocol = new Integer(doc.get(ProtocolIndexHelper.ID_PROTOCOL));
+        Integer idProtocol = Integer.valueOf(doc.get(ProtocolIndexHelper.ID_PROTOCOL));
         String protocolType = doc.get(ProtocolIndexHelper.PROTOCOL_TYPE);
         String protocolName = doc.get(ProtocolIndexHelper.NAME) != null ? doc.get(ProtocolIndexHelper.NAME) : "";
         String protocolDescription = doc.get(ProtocolIndexHelper.DESCRIPTION) != null ? doc.get(ProtocolIndexHelper.DESCRIPTION) : "";
@@ -842,11 +813,11 @@ public class SearchIndex extends GNomExCommand implements Serializable {
         node.setAttribute("description", protocolDescription);
         node.setAttribute("className", protocolClassName);
         if (rank >= 0) {
-            node.setAttribute("searchRank", new Integer(rank + 1).toString());
+            node.setAttribute("searchRank", ""+(rank + 1));
             node.setAttribute("searchInfo", " (Search rank #" + (rank + 1) + ")");
         }
         if (score >= 0) {
-            node.setAttribute("searchScore", new Integer(Math.round(score * 100)).toString() + "%");
+            node.setAttribute("searchScore", Integer.valueOf(Math.round(score * 100)).toString() + "%");
         }
 
         rankedProtocolNodes.add(node);
@@ -854,10 +825,10 @@ public class SearchIndex extends GNomExCommand implements Serializable {
 
     private void mapDocument(org.apache.lucene.document.Document doc, int rank, float score, DictionaryHelper dh) {
 
-        Integer idProject = new Integer(doc.get(ExperimentIndexHelper.ID_PROJECT));
-        //Integer idLab     = new Integer(doc.get(ExperimentIndexHelper.ID_LAB_PROJECT));
-        Integer idLab = doc.get(ExperimentIndexHelper.ID_LAB_PROJECT) != null ? new Integer(doc.get(ExperimentIndexHelper.ID_LAB_PROJECT)) : null;
-        Integer idRequest = doc.get(ExperimentIndexHelper.ID_REQUEST).equals("unknown") ? null : new Integer(doc.get(ExperimentIndexHelper.ID_REQUEST));
+        Integer idProject = Integer.valueOf(doc.get(ExperimentIndexHelper.ID_PROJECT));
+        //Integer idLab     = Integer.valueOf(doc.get(ExperimentIndexHelper.ID_LAB_PROJECT));
+        Integer idLab = doc.get(ExperimentIndexHelper.ID_LAB_PROJECT) != null ? Integer.valueOf(doc.get(ExperimentIndexHelper.ID_LAB_PROJECT)) : null;
+        Integer idRequest = doc.get(ExperimentIndexHelper.ID_REQUEST).equals("unknown") ? null : Integer.valueOf(doc.get(ExperimentIndexHelper.ID_REQUEST));
         String codeRequestCategory = doc.get(ExperimentIndexHelper.CODE_REQUEST_CATEGORY) != null ? doc.get(ExperimentIndexHelper.CODE_REQUEST_CATEGORY) : null;
         String codeApplication = doc.get(ExperimentIndexHelper.CODE_APPLICATION) != null ? doc.get(ExperimentIndexHelper.CODE_APPLICATION) : null;
         String catKey = idProject + "-" + codeRequestCategory + "-" + codeApplication;
@@ -886,11 +857,11 @@ public class SearchIndex extends GNomExCommand implements Serializable {
             node.setAttribute("projectPublicNote", doc.get(ExperimentIndexHelper.PROJECT_PUBLIC_NOTE) != null ? doc.get(ExperimentIndexHelper.PROJECT_PUBLIC_NOTE) : "");
             if (idRequest == null || idRequest.intValue() == 0) {
                 if (rank >= 0) {
-                    node.setAttribute("searchRank", new Integer(rank + 1).toString());
+                    node.setAttribute("searchRank", ""+(rank + 1));
                     node.setAttribute("searchInfo", " (Search rank #" + (rank + 1) + ")");
                 }
                 if (score >= 0) {
-                    node.setAttribute("searchScore", new Integer(Math.round(score * 100)).toString() + "%");
+                    node.setAttribute("searchScore", Integer.valueOf(Math.round(score * 100)).toString() + "%");
                 }
             }
             projectMap.put(idProject, node);
@@ -960,9 +931,9 @@ public class SearchIndex extends GNomExCommand implements Serializable {
 
     private void mapAnalysisDocument(org.apache.lucene.document.Document doc, int rank, float score) {
 
-        Integer idAnalysisGroup = new Integer(doc.get(AnalysisIndexHelper.ID_ANALYSISGROUP));
-        Integer idLab = new Integer(doc.get(AnalysisIndexHelper.ID_LAB_ANALYSISGROUP));
-        Integer idAnalysis = doc.get(AnalysisIndexHelper.ID_ANALYSIS).equals("unknown") ? null : new Integer(doc.get(AnalysisIndexHelper.ID_ANALYSIS));
+        Integer idAnalysisGroup = Integer.valueOf(doc.get(AnalysisIndexHelper.ID_ANALYSISGROUP));
+        Integer idLab = Integer.valueOf(doc.get(AnalysisIndexHelper.ID_LAB_ANALYSISGROUP));
+        Integer idAnalysis = doc.get(AnalysisIndexHelper.ID_ANALYSIS).equals("unknown") ? null : Integer.valueOf(doc.get(AnalysisIndexHelper.ID_ANALYSIS));
 
         Element labNode = (Element) labAnalysisMap.get(idLab);
         if (labNode == null) {
@@ -983,11 +954,11 @@ public class SearchIndex extends GNomExCommand implements Serializable {
             node.setAttribute("codeVisibility", doc.get(AnalysisIndexHelper.CODE_VISIBILITY) != null ? doc.get(AnalysisIndexHelper.CODE_VISIBILITY) : "");
             if (idAnalysis == null || idAnalysis.intValue() == 0) {
                 if (rank >= 0) {
-                    node.setAttribute("searchRank", new Integer(rank + 1).toString());
+                    node.setAttribute("searchRank", ""+(rank + 1));
                     node.setAttribute("searchInfo", " (Search rank #" + (rank + 1) + ")");
                 }
                 if (score >= 0) {
-                    node.setAttribute("searchScore", new Integer(Math.round(score * 100)).toString() + "%");
+                    node.setAttribute("searchScore", Integer.valueOf(Math.round(score * 100)).toString() + "%");
                 }
             }
             analysisGroupMap.put(idAnalysisGroup, node);
@@ -1040,9 +1011,9 @@ public class SearchIndex extends GNomExCommand implements Serializable {
 
     private void mapDataTrackDocument(org.apache.lucene.document.Document doc, int rank, float score) {
 
-        Integer idDataTrackFolder = doc.get(DataTrackIndexHelper.ID_DATATRACKFOLDER) == null ? -1 : new Integer(doc.get(DataTrackIndexHelper.ID_DATATRACKFOLDER));
-        Integer idLab = doc.get(DataTrackIndexHelper.ID_LAB_DATATRACKFOLDER) == null ? -1 : new Integer(doc.get(DataTrackIndexHelper.ID_LAB_DATATRACKFOLDER));
-        Integer idDataTrack = doc.get(DataTrackIndexHelper.ID_DATATRACK).equals("unknown") ? null : new Integer(doc.get(DataTrackIndexHelper.ID_DATATRACK));
+        Integer idDataTrackFolder = doc.get(DataTrackIndexHelper.ID_DATATRACKFOLDER) == null ? -1 : Integer.valueOf(doc.get(DataTrackIndexHelper.ID_DATATRACKFOLDER));
+        Integer idLab = doc.get(DataTrackIndexHelper.ID_LAB_DATATRACKFOLDER) == null ? -1 : Integer.valueOf(doc.get(DataTrackIndexHelper.ID_LAB_DATATRACKFOLDER));
+        Integer idDataTrack = doc.get(DataTrackIndexHelper.ID_DATATRACK).equals("unknown") ? null : Integer.valueOf(doc.get(DataTrackIndexHelper.ID_DATATRACK));
 
         Element labNode = (Element) labDataTrackMap.get(idLab);
         if (labNode == null) {
@@ -1063,11 +1034,11 @@ public class SearchIndex extends GNomExCommand implements Serializable {
             node.setAttribute("codeVisibility", doc.get(DataTrackIndexHelper.CODE_VISIBILITY) != null ? doc.get(DataTrackIndexHelper.CODE_VISIBILITY) : "");
             if (idDataTrack == null || idDataTrack.intValue() == 0) {
                 if (rank >= 0) {
-                    node.setAttribute("searchRank", new Integer(rank + 1).toString());
+                    node.setAttribute("searchRank", ""+(rank + 1));
                     node.setAttribute("searchInfo", " (Search rank #" + (rank + 1) + ")");
                 }
                 if (score >= 0) {
-                    node.setAttribute("searchScore", new Integer(Math.round(score * 100)).toString() + "%");
+                    node.setAttribute("searchScore", Integer.valueOf(Math.round(score * 100)).toString() + "%");
                 }
             }
             dataTrackFolderMap.put(idDataTrackFolder, node);
@@ -1119,8 +1090,8 @@ public class SearchIndex extends GNomExCommand implements Serializable {
     }
 
     private void mapTopicDocument(org.apache.lucene.document.Document doc, int rank, float score) {
-        Integer idLab = doc.get(TopicIndexHelper.ID_LAB) == null ? -1 : new Integer(doc.get(TopicIndexHelper.ID_LAB));
-        Integer idTopic = doc.get(TopicIndexHelper.ID_TOPIC).equals("unknown") ? null : new Integer(doc.get(TopicIndexHelper.ID_TOPIC));
+        Integer idLab = doc.get(TopicIndexHelper.ID_LAB) == null ? -1 : Integer.valueOf(doc.get(TopicIndexHelper.ID_LAB));
+        Integer idTopic = doc.get(TopicIndexHelper.ID_TOPIC).equals("unknown") ? null : Integer.valueOf(doc.get(TopicIndexHelper.ID_TOPIC));
 
         Element labNode = (Element) labTopicMap.get(idLab);
         if (labNode == null) {
@@ -1171,11 +1142,11 @@ public class SearchIndex extends GNomExCommand implements Serializable {
         node.setAttribute("submitterFirstName", doc.get(ExperimentIndexHelper.SUBMITTER_FIRST_NAME) != null ? doc.get(ExperimentIndexHelper.SUBMITTER_FIRST_NAME) : "");
         node.setAttribute("submitterLastName", doc.get(ExperimentIndexHelper.SUBMITTER_LAST_NAME) != null ? doc.get(ExperimentIndexHelper.SUBMITTER_LAST_NAME) : "");
         if (rank >= 0) {
-            node.setAttribute("searchRank", new Integer(rank + 1).toString());
+            node.setAttribute("searchRank", ""+(rank + 1));
             node.setAttribute("searchInfo", " (Search rank #" + (rank + 1) + ")");
         }
         if (score >= 0) {
-            node.setAttribute("searchScore", new Integer(Math.round(score * 100)).toString() + "%");
+            node.setAttribute("searchScore", Integer.valueOf(Math.round(score * 100)).toString() + "%");
         }
 
     }
@@ -1188,11 +1159,11 @@ public class SearchIndex extends GNomExCommand implements Serializable {
         node.setAttribute("label", doc.get(ExperimentIndexHelper.PROJECT_NAME) != null ? doc.get(ExperimentIndexHelper.PROJECT_NAME) : "");
         node.setAttribute("idLab", doc.get(ExperimentIndexHelper.ID_LAB) != null ? doc.get(ExperimentIndexHelper.ID_LAB) : "");
         if (rank >= 0) {
-            node.setAttribute("searchRank", new Integer(rank + 1).toString());
+            node.setAttribute("searchRank", ""+(rank + 1));
             node.setAttribute("searchInfo", " (Search rank #" + (rank + 1) + ")");
         }
         if (score >= 0) {
-            node.setAttribute("searchScore", new Integer(Math.round(score * 100)).toString() + "%");
+            node.setAttribute("searchScore", Integer.valueOf(Math.round(score * 100)).toString() + "%");
         }
 
     }
@@ -1218,11 +1189,11 @@ public class SearchIndex extends GNomExCommand implements Serializable {
         node.setAttribute("analysisType", doc.get(AnalysisIndexHelper.ANALYSIS_TYPE) != null ? doc.get(AnalysisIndexHelper.ANALYSIS_TYPE) : "");
         node.setAttribute("analysisProtocol", doc.get(AnalysisIndexHelper.ANALYSIS_PROTOCOL) != null ? doc.get(AnalysisIndexHelper.ANALYSIS_PROTOCOL) : "");
         if (rank >= 0) {
-            node.setAttribute("searchRank", new Integer(rank + 1).toString());
+            node.setAttribute("searchRank", ""+(rank + 1));
             node.setAttribute("searchInfo", " (Search rank #" + (rank + 1) + ")");
         }
         if (score >= 0) {
-            node.setAttribute("searchScore", new Integer(Math.round(score * 100)).toString() + "%");
+            node.setAttribute("searchScore", Integer.valueOf(Math.round(score * 100)).toString() + "%");
         }
 
     }
@@ -1234,11 +1205,11 @@ public class SearchIndex extends GNomExCommand implements Serializable {
         node.setAttribute("labName", doc.get(AnalysisIndexHelper.LAB_NAME_ANALYSISGROUP) != null ? doc.get(AnalysisIndexHelper.LAB_NAME_ANALYSISGROUP) : "");
         node.setAttribute("label", doc.get(AnalysisIndexHelper.ANALYSIS_GROUP_NAME) != null ? doc.get(AnalysisIndexHelper.ANALYSIS_GROUP_NAME) : "");
         if (rank >= 0) {
-            node.setAttribute("searchRank", new Integer(rank + 1).toString());
+            node.setAttribute("searchRank", ""+(rank + 1));
             node.setAttribute("searchInfo", " (Search rank #" + (rank + 1) + ")");
         }
         if (score >= 0) {
-            node.setAttribute("searchScore", new Integer(Math.round(score * 100)).toString() + "%");
+            node.setAttribute("searchScore", Integer.valueOf(Math.round(score * 100)).toString() + "%");
         }
 
     }
@@ -1259,11 +1230,11 @@ public class SearchIndex extends GNomExCommand implements Serializable {
         node.setAttribute("fileName", doc.get(DataTrackIndexHelper.FILE_NAME) != null ? doc.get(DataTrackIndexHelper.FILE_NAME) : "");
         node.setAttribute("summary", doc.get(DataTrackIndexHelper.SUMMARY) != null ? doc.get(DataTrackIndexHelper.SUMMARY) : "");
         if (rank >= 0) {
-            node.setAttribute("searchRank", new Integer(rank + 1).toString());
+            node.setAttribute("searchRank", ""+(rank + 1));
             node.setAttribute("searchInfo", " (Search rank #" + (rank + 1) + ")");
         }
         if (score >= 0) {
-            node.setAttribute("searchScore", new Integer(Math.round(score * 100)).toString() + "%");
+            node.setAttribute("searchScore", Integer.valueOf(Math.round(score * 100)).toString() + "%");
         }
 
     }
@@ -1275,11 +1246,11 @@ public class SearchIndex extends GNomExCommand implements Serializable {
         node.setAttribute("labName", doc.get(DataTrackIndexHelper.LAB_NAME_DATATRACKFOLDER) != null ? doc.get(DataTrackIndexHelper.LAB_NAME_DATATRACKFOLDER) : "");
         node.setAttribute("label", doc.get(DataTrackIndexHelper.DATATRACK_FOLDER_NAME) != null ? doc.get(DataTrackIndexHelper.DATATRACK_FOLDER_NAME) : "");
         if (rank >= 0) {
-            node.setAttribute("searchRank", new Integer(rank + 1).toString());
+            node.setAttribute("searchRank", ""+(rank + 1));
             node.setAttribute("searchInfo", " (Search rank #" + (rank + 1) + ")");
         }
         if (score >= 0) {
-            node.setAttribute("searchScore", new Integer(Math.round(score * 100)).toString() + "%");
+            node.setAttribute("searchScore", Integer.valueOf(Math.round(score * 100)).toString() + "%");
         }
 
     }
@@ -1299,11 +1270,11 @@ public class SearchIndex extends GNomExCommand implements Serializable {
         node.setAttribute("labName", doc.get(TopicIndexHelper.LAB_NAME) != null ? doc.get(TopicIndexHelper.LAB_NAME) : "");
         node.setAttribute("description", doc.get(TopicIndexHelper.DESCRIPTION) != null ? doc.get(TopicIndexHelper.DESCRIPTION) : "");
         if (rank >= 0) {
-            node.setAttribute("searchRank", new Integer(rank + 1).toString());
+            node.setAttribute("searchRank",  ""+(rank + 1));
             node.setAttribute("searchInfo", " (Search rank #" + (rank + 1) + ")");
         }
         if (score >= 0) {
-            node.setAttribute("searchScore", new Integer(Math.round(score * 100)).toString() + "%");
+            node.setAttribute("searchScore", Integer.valueOf(Math.round(score * 100)).toString() + "%");
         }
     }
 
@@ -1365,7 +1336,7 @@ public class SearchIndex extends GNomExCommand implements Serializable {
             String key = (String) i.next();
 
             String[] tokens = key.split("---");
-            Integer idLab = new Integer(tokens[1]);
+            Integer idLab = Integer.valueOf(tokens[1]);
 
             Element labNode = (Element) labMap.get(idLab);
             Map projectIdMap = (Map) labToProjectMap.get(key);
@@ -1427,7 +1398,7 @@ public class SearchIndex extends GNomExCommand implements Serializable {
             String key = (String) i.next();
 
             String[] tokens = key.split("---");
-            Integer idLab = new Integer(tokens[1]);
+            Integer idLab = Integer.valueOf(tokens[1]);
 
             Element labNode = (Element) labAnalysisMap.get(idLab);
             Map analysisGroupIdMap = (Map) labToAnalysisGroupMap.get(key);
@@ -1471,7 +1442,7 @@ public class SearchIndex extends GNomExCommand implements Serializable {
             String key = (String) i.next();
 
             String[] tokens = key.split("---");
-            Integer idLab = new Integer(tokens[1]);
+            Integer idLab = Integer.valueOf(tokens[1]);
 
             Element labNode = (Element) labDataTrackMap.get(idLab);
             Map dataTrackFolderIdMap = (Map) labToDataTrackFolderMap.get(key);

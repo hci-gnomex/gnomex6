@@ -1,38 +1,25 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.CoreFacility;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.UserPermissionKind;
-import hci.gnomex.security.EncrypterService;
+import hci.gnomex.model.*;
 import hci.gnomex.security.EncryptionUtility;
 import hci.gnomex.utility.*;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.Timestamp;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
+import org.apache.commons.validator.routines.EmailValidator;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
-import org.apache.commons.validator.routines.EmailValidator;
-import org.hibernate.query.Query;
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.*;
 public class PublicSaveSelfRegisteredAppUser extends GNomExCommand implements Serializable {
 
   // the static field for logging in Log4J

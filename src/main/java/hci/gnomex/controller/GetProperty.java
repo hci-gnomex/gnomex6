@@ -1,20 +1,7 @@
 package hci.gnomex.controller;
 
 
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.Iterator;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.framework.security.UnknownPermissionException;
@@ -23,7 +10,19 @@ import hci.gnomex.model.Price;
 import hci.gnomex.model.PriceCategory;
 import hci.gnomex.model.Property;
 import hci.gnomex.model.PropertyOption;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
+
+import javax.naming.NamingException;
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.Iterator;
 
 public class GetProperty extends GNomExCommand implements Serializable {
 
@@ -34,7 +33,7 @@ public class GetProperty extends GNomExCommand implements Serializable {
 
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     if (request.getParameter("idProperty") != null) {
-      idProperty = new Integer(request.getParameter("idProperty"));
+      idProperty = Integer.valueOf(request.getParameter("idProperty"));
     } else {
       this.addInvalidField("idProperty", "idProperty is required");
     }

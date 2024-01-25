@@ -3,18 +3,13 @@ package hci.gnomex.utility;
 import hci.framework.model.DetailObject;
 import hci.gnomex.model.BillingAccount;
 import hci.gnomex.model.Request;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.*;
 
 
 public class BillingAccountSplitParser extends DetailObject implements Serializable {
@@ -37,7 +32,7 @@ public class BillingAccountSplitParser extends DetailObject implements Serializa
     for(Iterator i = root.getChildren("Request").iterator(); i.hasNext();) {
       Element node = (Element)i.next();
       String idRequestString = node.getAttributeValue("idRequest");
-      request = (Request)sess.load(Request.class, new Integer(idRequestString));
+      request = (Request)sess.load(Request.class, Integer.valueOf(idRequestString));
       
       for(Iterator i1 = node.getChildren("BillingAccount").iterator(); i1.hasNext();) {
         Element baNode = (Element)i1.next();
@@ -50,14 +45,14 @@ public class BillingAccountSplitParser extends DetailObject implements Serializa
         
         Double percentage = new Double(percentageString);
         BillingAccount billingAccount = null;
-        billingAccount = (BillingAccount)sess.load(BillingAccount.class, new Integer(idBillingAccountString));
+        billingAccount = (BillingAccount)sess.load(BillingAccount.class, Integer.valueOf(idBillingAccountString));
         
         billingAccounts.add(billingAccount);
         BigDecimal percentPrice = new BigDecimal(percentage).movePointLeft(2);
-        percentageMap.put(new Integer(idBillingAccountString), percentPrice);
+        percentageMap.put(Integer.valueOf(idBillingAccountString), percentPrice);
         
         BigDecimal invoicePrice = new BigDecimal(invoicePriceString);
-        invoicePriceMap.put(new Integer(idBillingAccountString), invoicePrice);
+        invoicePriceMap.put(Integer.valueOf(idBillingAccountString), invoicePrice);
       }
     
     }

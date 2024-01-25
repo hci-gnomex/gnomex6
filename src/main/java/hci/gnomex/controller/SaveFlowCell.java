@@ -4,29 +4,19 @@ import hci.dictionary.model.DictionaryEntry;
 import hci.dictionary.model.NullDictionaryEntry;
 import hci.dictionary.utility.DictionaryManager;
 import hci.framework.control.Command;
-import hci.gnomex.model.*;
-import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.FlowCellChannelParser;
-import hci.gnomex.utility.HibernateSession;
-
-import java.io.Serializable;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import hci.gnomex.model.*;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.util.*;
 
 public class SaveFlowCell extends GNomExCommand implements Serializable {
   // the static field for logging in Log4J
@@ -188,7 +178,7 @@ public class SaveFlowCell extends GNomExCommand implements Serializable {
         Integer numberSequencingCyclesActual = null;
 
         if (numberSequencingCyclesActualStr != null && numberSequencingCyclesActualStr.length() > 0) {
-          numberSequencingCyclesActual = new Integer(numberSequencingCyclesActualStr);
+          numberSequencingCyclesActual = Integer.valueOf(numberSequencingCyclesActualStr);
         }
 
         //

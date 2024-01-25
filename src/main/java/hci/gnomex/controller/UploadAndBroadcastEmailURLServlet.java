@@ -2,17 +2,15 @@ package hci.gnomex.controller;
 
 import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.ServletUtil;
-
-import java.io.IOException;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import hci.gnomex.utility.Util;
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
+import java.io.IOException;
 
 public class UploadAndBroadcastEmailURLServlet extends HttpServlet {
     private static final Logger LOG = Logger.getLogger(UploadAndBroadcastEmailURLServlet.class);
@@ -32,7 +30,7 @@ public class UploadAndBroadcastEmailURLServlet extends HttpServlet {
             Util.buildAndSendUploadFileServletURL(req, resp, sess, "UploadAndBroadcastEmailURLServlet", "UploadAndBroadcastEmailServlet.gx", Util.EMPTY_STRING_ARRAY);
         } catch (Exception e) {
             LOG.error("An exception has occurred in UploadAndBroadcastEmailURLServlet ", e);
-            System.out.println("An error has occurred in UploadAndBroadcastEmailServlet - " + e.toString());
+            System.out.println("An error has occurred in UploadAndBroadcastEmailServlet - " + e);
         } finally {
             if (sess != null) {
                 try {

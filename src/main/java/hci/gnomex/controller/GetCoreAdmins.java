@@ -1,20 +1,20 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
-import hci.framework.model.DetailObject;
 import hci.gnomex.model.AppUser;
-import org.hibernate.query.Query;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.jdom.Document;
 import org.jdom.Element;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
-import org.apache.log4j.Logger;
 /**
  * Created by u0395021 on 7/29/2016.
  */
@@ -27,7 +27,7 @@ public class GetCoreAdmins extends GNomExCommand implements Serializable {
     @Override
     public void loadCommand(HttpServletWrappedRequest request, HttpSession sess) {
         if (request.getParameter("idCoreFacility") != null && !request.getParameter("idCoreFacility").equals("")) {
-            idCoreFacility = new Integer(request.getParameter("idCoreFacility"));
+            idCoreFacility = Integer.valueOf(request.getParameter("idCoreFacility"));
         } else{
             this.addInvalidField("idCoreFacility", "idCoreFacility must be provided");
         }

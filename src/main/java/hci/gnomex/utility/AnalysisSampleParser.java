@@ -1,15 +1,14 @@
 package hci.gnomex.utility;
 
+import hci.framework.model.DetailObject;
+import org.hibernate.Session;
+
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import org.hibernate.Session;
-import hci.framework.model.DetailObject;
-
-import javax.json.JsonArray;
-import javax.json.JsonObject;
 
 @SuppressWarnings("serial")
 public class AnalysisSampleParser extends DetailObject implements Serializable {
@@ -29,10 +28,10 @@ public class AnalysisSampleParser extends DetailObject implements Serializable {
 			JsonObject obj = samplesList.getJsonObject(i);
 			
 			String idSampleString = obj.get("idSample") != null ? obj.getString("idSample") : null;
-			Integer idSample = new Integer(idSampleString);
+			Integer idSample = Integer.valueOf(idSampleString);
 			
 			String idRequestString = obj.get("idRequest") != null ? obj.getString("idRequest") : null;
-			Integer idRequest = new Integer(idRequestString);
+			Integer idRequest = Integer.valueOf(idRequestString);
 			if(idSample != null && idRequest != null){
 				idSampleList.add(idSample);
 				idRequestMap.put(idSample, idRequest);

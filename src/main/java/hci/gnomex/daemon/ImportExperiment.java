@@ -4,26 +4,24 @@ import hci.gnomex.controller.SaveRequest;
 import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.*;
-
-import java.io.*;
-import java.sql.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
-import org.hibernate.jdbc.ReturningWork;
-import org.hibernate.query.NativeQuery;
-import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.XMLOutputter;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static hci.gnomex.controller.SaveRequest.initSample;
 

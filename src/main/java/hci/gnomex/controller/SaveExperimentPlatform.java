@@ -1,37 +1,25 @@
 package hci.gnomex.controller;
 
 
+import hci.framework.control.Command;
+import hci.framework.control.RollBackCommandException;
+import hci.gnomex.model.*;
+import hci.gnomex.security.SecurityAdvisor;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.json.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import hci.gnomex.model.*;
-import org.hibernate.HibernateException;
-import org.hibernate.query.Query;
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-
-import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
-import hci.framework.control.RollBackCommandException;
-import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.PriceUtil;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import org.apache.log4j.Logger;
+import java.util.*;
 public class SaveExperimentPlatform extends GNomExCommand implements Serializable {
 
   // the static field for logging in Log4J
@@ -1081,7 +1069,7 @@ public class SaveExperimentPlatform extends GNomExCommand implements Serializabl
     chip.setMaxSampleBufferStrength(chipNode.get("maxSampleBufferStrength") != null ? chipNode.getString("maxSampleBufferStrength") : "");
     chip.setProtocolDescription(chipNode.get("protocolDescription") != null ? chipNode.getString("protocolDescription") : "");
     String sortOrder = chipNode.get("sortOrder") != null ? chipNode.getString("sortOrder") : "";
-    chip.setSortOrder(!sortOrder.trim().equals("") ? new Integer(sortOrder) : null);
+    chip.setSortOrder(!sortOrder.trim().equals("") ? Integer.valueOf(sortOrder) : null);
 
     String sampleWellsPerChip = chipNode.get("sampleWellsPerChip") != null ? chipNode.getString("sampleWellsPerChip") : "";
     if(!sampleWellsPerChip.equals("")){

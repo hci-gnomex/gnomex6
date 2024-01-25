@@ -1,18 +1,10 @@
 package hci.gnomex.model;
 
 
-import java.math.BigDecimal;
-import java.sql.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import hci.gnomex.security.SecurityAdvisor;
 import hci.framework.model.DetailObject;
+import hci.gnomex.security.SecurityAdvisor;
+
+import java.util.Calendar;
 
 public class ExperimentOverviewFilter extends DetailObject {
   

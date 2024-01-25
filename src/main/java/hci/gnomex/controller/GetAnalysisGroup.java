@@ -1,24 +1,19 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
-import hci.framework.security.UnknownPermissionException;
-import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.model.AnalysisGroup;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 
 public class GetAnalysisGroup extends GNomExCommand implements Serializable {
 
@@ -33,7 +28,7 @@ public class GetAnalysisGroup extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idAnalysisGroup") != null) {
-      idAnalysisGroup = new Integer(request.getParameter("idAnalysisGroup"));
+      idAnalysisGroup = Integer.valueOf(request.getParameter("idAnalysisGroup"));
     } else {
       this.addInvalidField("idAnalysisGroup", "idAnalysisGroup is required");
     }
@@ -47,7 +42,7 @@ public class GetAnalysisGroup extends GNomExCommand implements Serializable {
       AnalysisGroup ag = null;
       if (idAnalysisGroup.intValue() == 0) {
         ag = new AnalysisGroup();
-        ag.setIdAnalysisGroup(new Integer(0));
+        ag.setIdAnalysisGroup(Integer.valueOf(0));
       } else {
         ag = (AnalysisGroup)sess.get(AnalysisGroup.class, idAnalysisGroup);
         if (!this.getSecAdvisor().canRead(ag)) {

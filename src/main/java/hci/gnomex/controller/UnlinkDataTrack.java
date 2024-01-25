@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.DataTrack;
@@ -8,21 +8,20 @@ import hci.gnomex.model.DataTrackFolder;
 import hci.gnomex.model.GenomeBuild;
 import hci.gnomex.model.UnloadDataTrack;
 import hci.gnomex.utility.DataTrackComparator;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-
-import java.io.Serializable;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 public class UnlinkDataTrack extends GNomExCommand implements Serializable {
@@ -45,19 +44,19 @@ public class UnlinkDataTrack extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idDataTrack") != null && !request.getParameter("idDataTrack").equals("")) {
-      idDataTrack = new Integer(request.getParameter("idDataTrack"));
+      idDataTrack = Integer.valueOf(request.getParameter("idDataTrack"));
     } else {
       this.addInvalidField("idDataTrack", "idDataTrack is required.");
     }
     if (request.getParameter("idGenomeBuild") != null && !request.getParameter("idGenomeBuild").equals("")) {
-      idGenomeBuild = new Integer(request.getParameter("idGenomeBuild"));
+      idGenomeBuild = Integer.valueOf(request.getParameter("idGenomeBuild"));
     } else {
       this.addInvalidField("idGenomeBuild", "idGenomeBuild is required.");
     }
 
     //It isn't a deal breaker if we don't have an idDataTrackFolder because the data track could be nested under the genome build
     if (request.getParameter("idDataTrackFolder") != null && !request.getParameter("idDataTrackFolder").equals("")) {
-      idDataTrackFolder = new Integer(request.getParameter("idDataTrackFolder"));
+      idDataTrackFolder = Integer.valueOf(request.getParameter("idDataTrackFolder"));
     }
   }
 

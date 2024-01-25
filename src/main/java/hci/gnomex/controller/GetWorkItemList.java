@@ -1,37 +1,26 @@
 package hci.gnomex.controller;
 
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.gnomex.utility.Util;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.*;
 
 public class GetWorkItemList extends GNomExCommand implements Serializable {
 
@@ -472,7 +461,7 @@ public class GetWorkItemList extends GNomExCommand implements Serializable {
     return this;
   }
   /**
-   * 	Soon after April, 2014 we will switch from allowing the user to choose separately: number of sequencing cycles, code request category and seq run type.
+   * Soon after April, 2014 we will switch from allowing the user to choose separately: number of sequencing cycles, code request category and seq run type.
    * Instead they will be combined, along with a version number into protocols identified in the NumberSequencingCyclesAllowed table.
    * We will use this TreeMap to identify to which protocol a Work Item belongs by using the following attributes from the Work Item:
    * 1. the Sequence Lane's number of sequencing cycles
@@ -505,7 +494,7 @@ public class GetWorkItemList extends GNomExCommand implements Serializable {
     Element n = new Element("WorkItem");
     n.setAttribute("key",                    key);
     n.setAttribute("isSelected",             "N");
-    n.setAttribute("altColor",               new Boolean(alt).toString());
+    n.setAttribute("altColor",                ""+alt);
 
     n.setAttribute("idRequest",              row[WorkItemFilter.ID_REQUEST] == null ? "" : ((Integer)row[WorkItemFilter.ID_REQUEST]).toString());
     n.setAttribute("requestNumber",          row[WorkItemFilter.REQ_NUMBER] == null ? "" : (String)row[WorkItemFilter.REQ_NUMBER]);
@@ -979,7 +968,7 @@ public class GetWorkItemList extends GNomExCommand implements Serializable {
       String number2 = itemNumberTokens2[itemNumberTokens2.length - 1];
 
       if (reqNumber1.equals(reqNumber2)) {
-        return new Integer(number1).compareTo(new Integer(number2));
+        return Integer.valueOf(number1).compareTo(Integer.valueOf(number2));
       } else {
         return Util.compareRequestNumbers(reqNumber1, reqNumber2);
       }
@@ -1010,7 +999,7 @@ public class GetWorkItemList extends GNomExCommand implements Serializable {
       String number2 = itemNumberTokens2[itemNumberTokens2.length - 1];
 
       if (reqNumber1.equals(reqNumber2)) {
-        return new Integer(number1).compareTo(new Integer(number2));
+        return Integer.valueOf(number1).compareTo(Integer.valueOf(number2));
       } else {
         return reqNumber1.compareTo(reqNumber2);
       }
@@ -1075,9 +1064,9 @@ public class GetWorkItemList extends GNomExCommand implements Serializable {
         if (reqNumber1.equals(reqNumber2)) {
           if (multiplexNumber1.equals(multiplexNumber2)) {
             if (sampleNumber1.equals(sampleNumber2)) {
-              return new Integer(seqNumber1).compareTo(new Integer(seqNumber2));
+              return Integer.valueOf(seqNumber1).compareTo(Integer.valueOf(seqNumber2));
             } else {
-              return new Integer(sampleNumber1).compareTo(new Integer(sampleNumber2));
+              return Integer.valueOf(sampleNumber1).compareTo(Integer.valueOf(sampleNumber2));
             }
 
           } else {
@@ -1115,9 +1104,9 @@ public class GetWorkItemList extends GNomExCommand implements Serializable {
       String channelNumber2 = tokens2[1];
 
       if (fcNumber1.equals(fcNumber2)) {
-        return new Integer(channelNumber1).compareTo(new Integer(channelNumber2));
+        return Integer.valueOf(channelNumber1).compareTo(Integer.valueOf(channelNumber2));
       } else {
-        return new Integer(fcOrdinal1).compareTo(new Integer(fcOrdinal2));
+        return Integer.valueOf(fcOrdinal1).compareTo(Integer.valueOf(fcOrdinal2));
       }
 
     }
@@ -1154,12 +1143,12 @@ public class GetWorkItemList extends GNomExCommand implements Serializable {
       if (reqNumber1.equals(reqNumber2)) {
         if (sampleNum1.equals(sampleNum2)) {
           if (idLabel1.equals(idLabel2)) {
-            return new Integer(idLabeledSample1).compareTo(new Integer(idLabeledSample2));
+            return Integer.valueOf(idLabeledSample1).compareTo(Integer.valueOf(idLabeledSample2));
           } else {
-            return new Integer(idLabel1).compareTo(new Integer(idLabel2));
+            return Integer.valueOf(idLabel1).compareTo(Integer.valueOf(idLabel2));
           }
         } else {
-          return new Integer(sampleNum1).compareTo(new Integer(sampleNum2));
+          return Integer.valueOf(sampleNum1).compareTo(Integer.valueOf(sampleNum2));
         }
       } else {
         return reqNumber1.compareTo(reqNumber2);

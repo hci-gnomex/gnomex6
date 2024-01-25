@@ -83,7 +83,7 @@ public class ReportIssueServlet extends HttpServlet {
             }
             /*
              * // Only gnomex admins can send broadcast emails if (!secAdvisor .hasPermission(SecurityAdvisor.CAN_ACCESS_ANY_OBJECT)) { throw new
-             * ServletException("Insufficent permissions"); }
+             * ServletException("Insufficient permissions"); }
              */
             MultipartParser mp = new MultipartParser(req, Integer.MAX_VALUE);
             Part part;

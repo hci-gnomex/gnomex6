@@ -1,38 +1,24 @@
 package hci.gnomex.controller;
 
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import hci.gnomex.constants.Constants;
-import hci.gnomex.model.*;
-import org.hibernate.query.Query;
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-
 import hci.dictionary.model.NullDictionaryEntry;
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.framework.utilities.XMLReflectException;
+import hci.gnomex.constants.Constants;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.PriceUtil;
-import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.*;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.jdom.Document;
+import org.jdom.Element;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.*;
 
 public class GetExperimentPlatformList extends GNomExCommand implements Serializable {
 

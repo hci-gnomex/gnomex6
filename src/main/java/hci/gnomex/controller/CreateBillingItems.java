@@ -1,67 +1,28 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
-import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.billing.BillingPlugin;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.BillingAccount;
-import hci.gnomex.model.BillingItem;
-import hci.gnomex.model.BillingPeriod;
-import hci.gnomex.model.BillingStatus;
-import hci.gnomex.model.BillingTemplate;
-import hci.gnomex.model.BillingTemplateItem;
-import hci.gnomex.model.Hybridization;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.Label;
-import hci.gnomex.model.LabeledSample;
-import hci.gnomex.model.LabelingReactionSize;
-import hci.gnomex.model.Plate;
-import hci.gnomex.model.PlateType;
-import hci.gnomex.model.PlateWell;
-import hci.gnomex.model.PriceCategory;
-import hci.gnomex.model.PriceSheet;
-import hci.gnomex.model.PriceSheetPriceCategory;
-import hci.gnomex.model.PropertyEntry;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.RequestCategory;
-import hci.gnomex.model.Sample;
-import hci.gnomex.model.SequenceLane;
-import hci.gnomex.model.SlideProduct;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.*;
-
-import java.io.Serializable;
-import java.io.StringReader;
-import java.math.BigDecimal;
-import java.sql.SQLException;
-import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.json.Json;
-import javax.json.JsonReader;
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.json.Json;
+import javax.json.JsonReader;
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
+import java.util.*;
 
 public class CreateBillingItems extends GNomExCommand implements Serializable {
 
@@ -85,7 +46,7 @@ public class CreateBillingItems extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idRequest") != null && !request.getParameter("idRequest").equals("")) {
-      idRequest = new Integer(request.getParameter("idRequest"));
+      idRequest = Integer.valueOf(request.getParameter("idRequest"));
     }
 
     if (request.getParameter("requestXMLString") != null && !request.getParameter("requestXMLString").equals("")) {
@@ -105,7 +66,7 @@ public class CreateBillingItems extends GNomExCommand implements Serializable {
     }
 
     if (request.getParameter("idBillingPeriod") != null && !request.getParameter("idBillingPeriod").equals("")) {
-      idBillingPeriod = new Integer(request.getParameter("idBillingPeriod"));
+      idBillingPeriod = Integer.valueOf(request.getParameter("idBillingPeriod"));
     }
 
     if (idRequest == null && requestParser == null) {
@@ -200,7 +161,7 @@ public class CreateBillingItems extends GNomExCommand implements Serializable {
         }
 
         if (request.getIdRequest() == null) {
-          request.setIdRequest(new Integer(0));
+          request.setIdRequest(Integer.valueOf(0));
           request.setNumber("");
         }
 
@@ -241,7 +202,7 @@ public class CreateBillingItems extends GNomExCommand implements Serializable {
             Sample sample = (Sample)requestParser.getSampleMap().get(idSampleString);
             sample.setIdSampleString(idSampleString);
             if (sample.getIdSample() == null) {
-              sample.setIdSample(new Integer(x++));
+              sample.setIdSample(Integer.valueOf(x++));
             }
             PlateWell well = requestParser.getWell(idSampleString);
             if (well != null) {
@@ -264,7 +225,7 @@ public class CreateBillingItems extends GNomExCommand implements Serializable {
           RequestParser.HybInfo hybInfo = (RequestParser.HybInfo)i.next();
           Hybridization hyb = new Hybridization();
           if (hyb.getIdHybridization() == null) {
-            hyb.setIdHybridization(new Integer(x++));
+            hyb.setIdHybridization(Integer.valueOf(x++));
           }
           hyb.setCodeSlideSource(hybInfo.getCodeSlideSource());
           if (hybInfo.getIdSampleChannel1String() != null && !hybInfo.getIdSampleChannel1String().equals("") && !hybInfo.getIdSampleChannel1String().equals("0")) {
@@ -283,22 +244,22 @@ public class CreateBillingItems extends GNomExCommand implements Serializable {
           Object key = i.next();
           LabeledSample ls = new LabeledSample();
           if (ls.getIdLabeledSample() == null) {
-            ls.setIdLabeledSample(new Integer(x++));
+            ls.setIdLabeledSample(Integer.valueOf(x++));
           }
           ls.setIdLabel((Integer)labelMap.get("Cy3"));
           ls.setCodeLabelingReactionSize(LabelingReactionSize.STANDARD);
-          ls.setNumberOfReactions(new Integer(1));
+          ls.setNumberOfReactions(Integer.valueOf(1));
           labeledSamples.add(ls);
         }
         for(Iterator i = labeledSampleChannel2Map.keySet().iterator(); i.hasNext();) {
           Object key = i.next();
           LabeledSample ls = new LabeledSample();
           if (ls.getIdLabeledSample() == null) {
-            ls.setIdLabeledSample(new Integer(x++));
+            ls.setIdLabeledSample(Integer.valueOf(x++));
           }
           ls.setIdLabel((Integer)labelMap.get("Cy5"));
           ls.setCodeLabelingReactionSize(LabelingReactionSize.STANDARD);
-          ls.setNumberOfReactions(new Integer(1));
+          ls.setNumberOfReactions(Integer.valueOf(1));
           labeledSamples.add(ls);
         }
 
@@ -312,7 +273,7 @@ public class CreateBillingItems extends GNomExCommand implements Serializable {
 
           if (isNewLane) {
             if (lane.getIdSequenceLane() == null) {
-              lane.setIdSequenceLane(new Integer(x++));
+              lane.setIdSequenceLane(Integer.valueOf(x++));
               lane.setIdNumberSequencingCycles(laneInfo.getIdNumberSequencingCycles());
               lane.setIdNumberSequencingCyclesAllowed(laneInfo.getIdNumberSequencingCyclesAllowed());
             }

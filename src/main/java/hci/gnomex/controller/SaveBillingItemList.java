@@ -1,36 +1,26 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.*;
 import hci.gnomex.utility.LogLongExecutionTimes.LogItem;
-
-import java.io.File;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.servlet.http.HttpSession;
-
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.hibernate.query.Query;
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
+import java.io.File;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.sql.Date;
+import java.util.*;
 
 
 public class SaveBillingItemList extends GNomExCommand implements Serializable {
@@ -435,7 +425,7 @@ public class SaveBillingItemList extends GNomExCommand implements Serializable {
         boolean readyToInvoice = false;
 
         if (lab != null && idBillingAccount != null) {
-            // Find out if this if all billing items for this lab and billing period
+            // Find out if this is all billing items for this lab and billing period
             // are approved.  If so, send out a billing invoice to the
             // lab's billing contact.
             StringBuilder buf = new StringBuilder();

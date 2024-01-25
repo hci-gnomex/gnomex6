@@ -1,29 +1,23 @@
 
 package hci.gnomex.controller;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.HashMap;
-
-import javax.json.Json;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Price;
 import hci.gnomex.model.PriceCriteria;
 import hci.gnomex.model.Product;
 import hci.gnomex.model.ProductType;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.PriceUtil;
+import hci.gnomex.utility.*;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+
+import javax.json.Json;
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Comparator;
+import java.util.HashMap;
 public class SaveProduct extends GNomExCommand implements Serializable {
 
   // the static field for logging in Log4J

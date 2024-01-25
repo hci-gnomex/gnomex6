@@ -88,7 +88,7 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
                     query = sess.createQuery(queryStr).setParameter(0 , requestNumberBase + "%" )
                             .setParameter(1, requestNumberBase );
                 }else{
-                    idRequest = new Integer(this.requestNumber);
+                    idRequest = Integer.valueOf(this.requestNumber);
                     queryStr = "SELECT req from Request as req where req.idRequest = :idRequest";
                     query = sess.createQuery(queryStr).setParameter("idRequest", idRequest );
                 }
@@ -123,7 +123,7 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
                             "FROM Analysis as a JOIN a.analysisGroups as ag WHERE a.number = :analysisNumber" ;
                     query = sess.createQuery(queryStr).setParameter("analysisNumber", analysisNumber );
                 }else{
-                    idAnalysis = new Integer(this.analysisNumber);
+                    idAnalysis = Integer.valueOf(this.analysisNumber);
                     queryStr ="SELECT a.number,ag.idAnalysisGroup,a.codeVisibility, a.idAnalysis, a.idLab " +
                             "FROM Analysis as a JOIN a.analysisGroups ag WHERE a.idAnalysis = :idAnalysis" ;
                     query = sess.createQuery(queryStr).setParameter("idAnalysis", idAnalysis );
@@ -159,7 +159,7 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
                             "WHERE dt.fileName = :dataTrackNumber";
                     query = sess.createQuery(queryStr).setParameter("dataTrackNumber" , dataTrackNumber );
                 }else{
-                    idDataTrack = new Integer(this.dataTrackNumber);
+                    idDataTrack = Integer.valueOf(this.dataTrackNumber);
                     queryStr = "SELECT dt.fileName, dt.codeVisibility, dt.idDataTrack, dt.idLab,dt.idGenomeBuild, gb.idOrganism " +
                             "FROM DataTrack as dt JOIN dt.folders as dtfold JOIN dtfold.genomeBuild as gb " +
                             "WHERE dt.idDataTrack = :idDataTrack";
@@ -194,7 +194,7 @@ public class GetGNomExOrderFromNumberServlet extends HttpServlet {
 
             }else if(topicNumber != null){
                 topicNumber = topicNumber.replaceAll("[A-Za-z#]*", "");
-                Integer idTopic = new Integer(topicNumber);
+                Integer idTopic = Integer.valueOf(topicNumber);
 
                 System.out.println("topicNumber: " + topicNumber ); // not actually a topic number based off of idTopic
 

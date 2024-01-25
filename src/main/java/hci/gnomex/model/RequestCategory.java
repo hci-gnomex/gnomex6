@@ -77,14 +77,14 @@ public class RequestCategory extends DictionaryEntry implements Comparable, Seri
 
   public static boolean isIlluminaRequestCategory(String codeRequestCategory) {
     if (codeRequestCategory == null)
-      System.out.println ("[requestcategry] WARNING WARNING codeRequestCategory is null");
+      System.out.println ("[requestcategry] WARNING WARNING (1) codeRequestCategory is null");
 //    else System.out.println ("[requestcategry] codeRequestCategory is " + codeRequestCategory);
 
     DictionaryHelper dh = DictionaryHelper.getInstance(null);
     RequestCategory cat = dh.getRequestCategoryObject(codeRequestCategory);
     if (cat == null)
-      System.out.println ("[requestcategry] WARNING WARNING requestcategory is null");
-//    else System.out.println ("[requestcategry] cat.getType() is " + cat.getType());
+      System.out.println ("[requestcategry] WARNING WARNING (2) requestcategory is null");
+ //   else System.out.println ("[requestcategry] cat.getType() is " + cat.getType());
 
     RequestCategoryType type = dh.getRequestCategoryType(cat.getType());
 //    System.out.println ("[requestcategry] type is " + type);

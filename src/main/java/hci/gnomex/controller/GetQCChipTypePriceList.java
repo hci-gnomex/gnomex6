@@ -1,28 +1,27 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.model.Lab;
 import hci.gnomex.model.Price;
 import hci.gnomex.model.PriceCriteria;
 import hci.gnomex.security.SecurityAdvisor;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 
+import javax.naming.NamingException;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.query.Query;
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
 
 
 public class GetQCChipTypePriceList extends GNomExCommand implements Serializable {
@@ -37,7 +36,7 @@ public class GetQCChipTypePriceList extends GNomExCommand implements Serializabl
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idLab") != null && !request.getParameter("idLab").equals("")) {
-      idLab =  new Integer(request.getParameter("idLab"));
+      idLab =  Integer.valueOf(request.getParameter("idLab"));
     } else {
       this.addInvalidField("IdLab", "IdLab required");
     }

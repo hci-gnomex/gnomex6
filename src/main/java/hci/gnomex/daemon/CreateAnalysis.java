@@ -2,46 +2,29 @@ package hci.gnomex.daemon;
 
 // 04/22/2020	tim		SaveAnalysis run as a daemon
 
-import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.controller.GetExpandedAnalysisFileList;
-import hci.gnomex.controller.GetRequestDownloadList;
 import hci.gnomex.model.*;
+import hci.gnomex.utility.FileDescriptor;
 import hci.gnomex.utility.*;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.internal.SessionImpl;
+import org.jdom.Document;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.json.JsonArray;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TimerTask;
-import java.util.TreeSet;
-
-import javax.json.JsonArray;
-
-import hci.gnomex.utility.FileDescriptor;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import org.hibernate.TransactionException;
-import org.hibernate.internal.SessionImpl;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
+import java.util.*;
 
 import static java.lang.System.*;
 
@@ -139,7 +122,7 @@ public class CreateAnalysis extends TimerTask {
 
 	private String newAnalysisGroupName;
 	private String newAnalysisGroupDescription;
-	private Integer newAnalysisGroupId = new Integer(-1);
+	private Integer newAnalysisGroupId = -1;
 
 	protected String propertiesFileName = "/properties/gnomex_httpclient.properties";
 	protected String xmlResult = "";

@@ -1,44 +1,25 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
-import hci.framework.security.UnknownPermissionException;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.Organism;
-import hci.gnomex.model.Property;
-import hci.gnomex.model.PropertyPlatformApplication;
-import hci.gnomex.model.ReportTrayList;
-import hci.gnomex.model.RequestSampleFilter;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.report.constants.ReportFormats;
 import hci.report.model.Column;
 import hci.report.model.ReportRow;
 import hci.report.model.ReportTray;
 import hci.report.utility.ReportCommand;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import org.apache.log4j.Logger;
-
-import org.hibernate.Session;
+import java.util.*;
 
 /*
  * This class will generate a report (excel spreadsheet) show how complete the annotations
@@ -196,7 +177,7 @@ public class ShowAnnotationProgressReport extends ReportCommand implements Seria
 
 
       // For every sample row
-      Integer prevIdRequest = new Integer(-1);
+      Integer prevIdRequest = -1;
       String prevLabName = "";
       ExperimentInfo prevExperimentInfo = null;
       boolean firstTime = true;
@@ -708,7 +689,7 @@ public class ShowAnnotationProgressReport extends ReportCommand implements Seria
     Column reportCol = new Column();
     reportCol.setName(name);
     reportCol.setCaption(name);
-    reportCol.setDisplayOrder(new Integer(colNumber));
+    reportCol.setDisplayOrder(Integer.valueOf(colNumber));
     return reportCol;
   }
 

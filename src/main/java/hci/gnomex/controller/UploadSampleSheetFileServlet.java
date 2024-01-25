@@ -1,31 +1,27 @@
 package hci.gnomex.controller;
 
+import com.oreilly.servlet.multipart.FilePart;
+import com.oreilly.servlet.multipart.MultipartParser;
+import com.oreilly.servlet.multipart.ParamPart;
+import com.oreilly.servlet.multipart.Part;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.*;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.ServletUtil;
+import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 
-import com.oreilly.servlet.multipart.FilePart;
-import com.oreilly.servlet.multipart.MultipartParser;
-import com.oreilly.servlet.multipart.ParamPart;
-import com.oreilly.servlet.multipart.Part;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
 
 public class UploadSampleSheetFileServlet extends HttpServlet {
 
@@ -208,7 +204,7 @@ public class UploadSampleSheetFileServlet extends HttpServlet {
             res.setContentType("application/xml; charset=UTF-8");
             responseOut.println("<ERROR message=\"Illegal data\"/>");
         } catch (Exception e) {
-            LOG.error("An error has occured in UploadSampleSheetFileServlet - " + e.toString(), e);
+            LOG.error("An error has occurred in UploadSampleSheetFileServlet - " + e.toString(), e);
             res.setStatus(ERROR_UPLOAD_MISC);
 
             throw new ServletException("Unable to upload file " + fileName + " due to a server error.\n\n" + e.toString()
@@ -217,7 +213,7 @@ public class UploadSampleSheetFileServlet extends HttpServlet {
             try {
                 HibernateSession.closeSession();
             } catch (Exception e1) {
-                LOG.error("An error has occured in UploadSampleSheetFileServlet - " + e1.toString(), e1);
+                LOG.error("An error has occurred in UploadSampleSheetFileServlet - " + e1.toString(), e1);
             }
         }
 

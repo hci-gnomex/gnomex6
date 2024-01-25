@@ -70,7 +70,7 @@ public void init(ServletConfig config) throws ServletException {
       System.err.println("[GNomExFrontController] ERROR ERROR unable to initHints: " + e);
       System.err.println("[GNomExFrontController] ERROR ERROR unable to initHints: " + e);
     }
-    System.out.println("[GNomExFrontController] xmlHintMap size: " + xmlHintMap.size() + "\nxmlHintMap: " + xmlHintMap);
+//    System.out.println("[GNomExFrontController] xmlHintMap size: " + xmlHintMap.size() + "\nxmlHintMap: " + xmlHintMap);
   } // end of init
 
 public static void setWebContextPath(String theWebContextPath) {
@@ -123,7 +123,7 @@ protected static void initLog4j() {
     // get the users session
     HttpSession session = request.getSession(true);
 
-	session.setAttribute("lastGNomExAccessTime", new Long(new Date().getTime()));
+	session.setAttribute("lastGNomExAccessTime", Long.valueOf(new Date().getTime()));
 
 	// get our request from the url (prefixing .test)
 	String fullURI = request.getRequestURI();

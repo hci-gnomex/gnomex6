@@ -3,43 +3,17 @@ package hci.gnomex.daemon;
 // 03/15/2018	tim
 
 
+import hci.gnomex.model.*;
 import hci.gnomex.utility.BatchDataSource;
 import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import hci.framework.control.Command;
-import hci.framework.control.RollBackCommandException;
-import hci.gnomex.model.AnalysisExperimentItem;
-import hci.gnomex.model.Hybridization;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.Sample;
-import hci.gnomex.model.SequenceLane;
-import hci.gnomex.utility.GNomExRollbackException;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.Util;
-
-import java.io.*;
-import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.hibernate.Transaction;
-import org.hibernate.internal.SessionImpl;
-import org.hibernate.query.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 public class LinkExpToAnal extends TimerTask {

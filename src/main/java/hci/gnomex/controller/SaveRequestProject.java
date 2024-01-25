@@ -43,19 +43,19 @@ public class SaveRequestProject extends GNomExCommand implements Serializable {
     
     
     if (request.getParameter("idProject") != null && !request.getParameter("idProject").equals("")) {
-      idProject = new Integer(request.getParameter("idProject"));
+      idProject = Integer.valueOf(request.getParameter("idProject"));
     } else {
       this.addInvalidField("idProject", "idProject is required");
     }
     
     if (request.getParameter("idRequest") != null && !request.getParameter("idRequest").equals("")) {
-      idRequest = new Integer(request.getParameter("idRequest"));
+      idRequest = Integer.valueOf(request.getParameter("idRequest"));
     } else {
       this.addInvalidField("idRequest", "idRequest is required");
     }
     
     if (request.getParameter("idAppUser") != null && !request.getParameter("idAppUser").equals("")) {
-      idAppUser = new Integer(request.getParameter("idAppUser"));
+      idAppUser = Integer.valueOf(request.getParameter("idAppUser"));
     } else {
       this.addInvalidField("idAppUser", "idAppUser is required");
     }
@@ -67,7 +67,7 @@ public class SaveRequestProject extends GNomExCommand implements Serializable {
     }
 
     if (request.getParameter("idBillingAccount") != null && !request.getParameter("idBillingAccount").equals("")) {
-      idBillingAccount = new Integer(request.getParameter("idBillingAccount"));
+      idBillingAccount = Integer.valueOf(request.getParameter("idBillingAccount"));
     }
     
     if (request.getParameter("forceNoChangeBilling") != null && request.getParameter("forceNoChangeBilling").equalsIgnoreCase("true")) {

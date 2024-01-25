@@ -1,23 +1,20 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.GenomeBuild;
 import hci.gnomex.model.Segment;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
 public class ImportSegments extends GNomExCommand implements Serializable {
 
 
@@ -68,7 +65,7 @@ public class ImportSegments extends GNomExCommand implements Serializable {
           while (mat.find()){
             Segment s = new Segment();
             s.setName(mat.group(1));
-            s.setLength(new Integer (mat.group(2)));
+            s.setLength(Integer.valueOf (mat.group(2)));
             s.setSortOrder(Integer.valueOf(count));
             s.setIdGenomeBuild(genomeBuild.getIdGenomeBuild());
             sess.save(s);

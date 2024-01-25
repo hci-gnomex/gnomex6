@@ -1,6 +1,6 @@
 package hci.gnomex.utility;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.framework.control.Command;//import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.model.FieldFormatter;
 import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;

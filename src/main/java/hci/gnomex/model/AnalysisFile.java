@@ -1,21 +1,13 @@
 package hci.gnomex.model;
 
 
-
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.utility.GnomexFile;
 import hci.gnomex.utility.JsonDetailObject;
-import hci.hibernate5utils.HibernateDetailObject;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonValue;
 import java.io.File;
-import java.math.BigDecimal;
 import java.sql.Date;
 
 

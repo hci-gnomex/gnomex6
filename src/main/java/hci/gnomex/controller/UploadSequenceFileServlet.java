@@ -1,11 +1,17 @@
 package hci.gnomex.controller;
 
+import com.oreilly.servlet.multipart.FilePart;
+import com.oreilly.servlet.multipart.MultipartParser;
+import com.oreilly.servlet.multipart.ParamPart;
+import com.oreilly.servlet.multipart.Part;
 import hci.gnomex.model.GenomeBuild;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.*;
-
-import java.io.File;
-import java.io.IOException;
+import hci.gnomex.utility.DataTrackUtil;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.ServletUtil;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -14,14 +20,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
-
-import com.oreilly.servlet.multipart.FilePart;
-import com.oreilly.servlet.multipart.MultipartParser;
-import com.oreilly.servlet.multipart.ParamPart;
-import com.oreilly.servlet.multipart.Part;
+import java.io.File;
+import java.io.IOException;
 
 public class UploadSequenceFileServlet extends HttpServlet {
     private static Logger LOG = Logger.getLogger(UploadSampleSheetURLServlet.class);
@@ -81,7 +81,7 @@ public class UploadSequenceFileServlet extends HttpServlet {
                     ParamPart paramPart = (ParamPart) part;
                     String value = paramPart.getStringValue();
                     if (name.equals("idGenomeBuild")) {
-                        idGenomeBuild = new Integer(value);
+                        idGenomeBuild = Integer.valueOf(value);
                     }
                 }
 

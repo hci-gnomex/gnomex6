@@ -709,6 +709,7 @@
         <property name="excludeUsage" column="excludeUsage" type="string"/>
         <property name="billingContactPhone" column="billingContactPhone" type="string"/>
         <property name="billingContactEmail" column="billingContactEmail" type="string"/>
+        <property name="awsAccountNumber" column="awsAccountNumber" type="string"/>
         <set name="members" table="LabUser" lazy="true" cascade="none">
             <key column="idLab"/>
             <many-to-many column="idAppUser" class="hci.gnomex.model.AppUser"/>
@@ -1207,7 +1208,7 @@
             <one-to-many class="hci.gnomex.model.WorkItem"/>
         </set>
         <property name="sampleAlias_CORE" column="sampleAlias_CORE" type="string"/>
-        <property name="idSample_CORE" column="idSample_CORE" type="string"/>
+        <property name="idSample_CORE" column="idSample_CORE" type="long"/>
     </class>
 
     <!-- hci.gnomex.model.SampleExperimentFile -->

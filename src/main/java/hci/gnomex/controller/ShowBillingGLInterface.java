@@ -1,45 +1,30 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
-import hci.gnomex.model.BillingAccount;
-import hci.gnomex.model.BillingItem;
-import hci.gnomex.model.BillingPeriod;
-import hci.gnomex.model.BillingStatus;
-import hci.gnomex.model.CoreFacility;
-import hci.gnomex.model.DiskUsageByMonth;
-import hci.gnomex.model.ProductOrder;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.Request;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.report.constants.ReportFormats;
 import hci.report.model.Column;
 import hci.report.model.ReportRow;
 import hci.report.model.ReportTray;
 import hci.report.utility.ReportCommand;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.naming.NamingException;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
+import java.util.*;
 
 
 public class ShowBillingGLInterface extends ReportCommand implements Serializable {
@@ -50,7 +35,7 @@ public class ShowBillingGLInterface extends ReportCommand implements Serializabl
   private Integer                  idBillingPeriod;
   private Integer                  idCoreFacility;
   private BigDecimal               expectedGrandTotalPrice;
-  private Integer                  revisionNumber = new Integer(1);
+  private Integer                  revisionNumber = 1;
   private SecurityAdvisor          secAdvisor;
 
 
@@ -75,13 +60,13 @@ public class ShowBillingGLInterface extends ReportCommand implements Serializabl
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idBillingPeriod") != null) {
-      idBillingPeriod = new Integer(request.getParameter("idBillingPeriod"));
+      idBillingPeriod = Integer.valueOf(request.getParameter("idBillingPeriod"));
     } else {
       this.addInvalidField("idBillingPeriod", "idBillingPeriod is required");
     }
 
     if (request.getParameter("idCoreFacility") != null) {
-      idCoreFacility = new Integer(request.getParameter("idCoreFacility"));
+      idCoreFacility = Integer.valueOf(request.getParameter("idCoreFacility"));
     } else {
       this.addInvalidField("idCoreFacility", "idCoreFacility is required");
     }
@@ -102,7 +87,7 @@ public class ShowBillingGLInterface extends ReportCommand implements Serializabl
 
 
     if (request.getParameter("revisionNumber") != null && !request.getParameter("revisionNumber").equals("")) {
-      revisionNumber = new Integer(request.getParameter("revisionNumber"));
+      revisionNumber = Integer.valueOf(request.getParameter("revisionNumber"));
     } 
 
     secAdvisor = (SecurityAdvisor)session.getAttribute(SecurityAdvisor.SECURITY_ADVISOR_SESSION_KEY);
@@ -246,7 +231,7 @@ public class ShowBillingGLInterface extends ReportCommand implements Serializabl
             ArrayList valueInfo = new ArrayList();
             valueInfo.add(header);
             valueInfo.add(headerX);
-            valueInfo.add(new Integer(headerX.length()));
+            valueInfo.add(Integer.valueOf(headerX.length()));
             valueInfo.add("left");
             values.add(valueInfo.toArray());
 
@@ -588,7 +573,7 @@ public class ShowBillingGLInterface extends ReportCommand implements Serializabl
     ArrayList valueInfo = new ArrayList();
     valueInfo.add(getString(buf, len, true));
     valueInfo.add(getString(buf, len, false));// alignment works at the cost putting space in every cell string
-    valueInfo.add(new Integer(len));
+    valueInfo.add(Integer.valueOf(len));
     valueInfo.add("left"); // on the element later in jsp <td align='left'> is default for string so doesn't affect anything>
     return valueInfo.toArray();
   }
@@ -597,7 +582,7 @@ public class ShowBillingGLInterface extends ReportCommand implements Serializabl
     ArrayList valueInfo = new ArrayList();
     valueInfo.add(getStringRightJustify(buf, len, true));
     valueInfo.add(getStringRightJustify(buf, len, false));// aligntment works at the cost putting space in every cell string
-    valueInfo.add(new Integer(len));
+    valueInfo.add(Integer.valueOf(len));
     valueInfo.add("right");// on the element later in jsp <td align='right'> doesn't actually align right>
     return valueInfo.toArray();
   }
@@ -606,7 +591,7 @@ public class ShowBillingGLInterface extends ReportCommand implements Serializabl
     ArrayList valueInfo = new ArrayList();
     valueInfo.add(getEmptyString(len, true));
     valueInfo.add(getEmptyString(len, false));
-    valueInfo.add(new Integer(len));
+    valueInfo.add(Integer.valueOf(len));
     valueInfo.add("left");
     return valueInfo.toArray();
   }
@@ -677,7 +662,7 @@ public class ShowBillingGLInterface extends ReportCommand implements Serializabl
     Column reportCol = new Column();
     reportCol.setName(name);
     reportCol.setCaption(name);
-    reportCol.setDisplayOrder(new Integer(colNumber));
+    reportCol.setDisplayOrder(Integer.valueOf(colNumber));
     return reportCol;
   }
 

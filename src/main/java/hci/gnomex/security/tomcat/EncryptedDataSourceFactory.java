@@ -1,23 +1,20 @@
 package hci.gnomex.security.tomcat;
-import hci.gnomex.utility.TomcatCatalinaProperties;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
-import java.util.Properties;
+import hci.gnomex.utility.TomcatCatalinaProperties;
+import org.apache.log4j.Logger;
+import org.apache.tomcat.jdbc.pool.DataSourceFactory;
+import org.apache.tomcat.jdbc.pool.PoolConfiguration;
+import org.apache.tomcat.jdbc.pool.XADataSource;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.naming.Context;
 import javax.sql.DataSource;
-
-import org.apache.tomcat.jdbc.pool.DataSourceFactory;
-import org.apache.tomcat.jdbc.pool.PoolConfiguration;
-import org.apache.tomcat.jdbc.pool.XADataSource;
-import org.apache.log4j.Logger;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
+import java.util.Properties;
 public class EncryptedDataSourceFactory extends DataSourceFactory {       
   private static Logger LOG = Logger.getLogger(EncryptedDataSourceFactory.class);
   

@@ -43,7 +43,7 @@ public class GetRequest extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idRequest") != null && !request.getParameter("idRequest").equals("")) {
-      idRequest = new Integer(request.getParameter("idRequest"));
+      idRequest = Integer.valueOf(request.getParameter("idRequest"));
     }
     if (request.getParameter("requestNumber") != null && !request.getParameter("requestNumber").equals("")) {
       requestNumber = request.getParameter("requestNumber");
@@ -1126,9 +1126,9 @@ public class GetRequest extends GNomExCommand implements Serializable {
       stepNumber = sample.getWorkflowStep();
       Integer count = workflowStepHash.get(stepNumber);
       if (count == null) {
-        count = new Integer(1);
+        count = 1;
       } else {
-        count = new Integer(count.intValue() + 1);
+        count = count + 1;
       }
       workflowStepHash.put(stepNumber, count);
     }
@@ -1143,7 +1143,7 @@ public class GetRequest extends GNomExCommand implements Serializable {
         String tokens[] = workflowStep.split(",");
         workflowStep = tokens[0];
       }
-      stepNode.setAttribute("stepName", workflow.get(new Integer(workflowStep).intValue()-1).toString());
+      stepNode.setAttribute("stepName", workflow.get(Integer.parseInt(workflowStep)-1).toString());
       stepNode.setAttribute("numSamples", count.toString());
       stepNode.setAttribute("stepNumber", workflowStep);
       stepNode.setAttribute("title", count.toString() + (count.intValue() > 1 ? " Samples" : " Sample") + (partial ? " (partial progress)" : ""));
@@ -1289,8 +1289,8 @@ public class GetRequest extends GNomExCommand implements Serializable {
 
       if (p1.equals(p2)) {
         // Sort column first numerically, then row
-        Integer w1Int = new Integer(w1.substring(1));
-        Integer w2Int = new Integer(w2.substring(1));
+        Integer w1Int = Integer.valueOf(w1.substring(1));
+        Integer w2Int = Integer.valueOf(w2.substring(1));
         if (w1Int.equals(w2Int)) {
           return w1.compareTo(w2);
         }

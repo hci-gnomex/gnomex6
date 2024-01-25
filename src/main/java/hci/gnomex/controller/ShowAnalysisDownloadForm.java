@@ -1,39 +1,27 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
+import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.FileDescriptor;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.naming.NamingException;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.util.*;
 public class ShowAnalysisDownloadForm extends GNomExCommand implements Serializable {
 
 	private static Logger LOG = Logger.getLogger(ShowAnalysisDownloadForm.class);
@@ -54,7 +42,7 @@ public class ShowAnalysisDownloadForm extends GNomExCommand implements Serializa
 	public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
 		if (request.getParameter("idAnalysis") != null) {
-			idAnalysis = new Integer(request.getParameter("idAnalysis"));
+			idAnalysis = Integer.valueOf(request.getParameter("idAnalysis"));
 		} else {
 			this.addInvalidField("idAnalysis", "idAnalysis is required");
 		}

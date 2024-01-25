@@ -12,7 +12,6 @@ import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
-
 import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.io.StringReader;
@@ -88,18 +87,17 @@ public class SaveWorkItemSolexaPrepQC extends GNomExCommand implements Serializa
               continue;
             }
 
-            // If Solexa sample prep is done or bypassed for this sample, create work items for Solexa stock prep
-            // for the sample
+            // If sample prep is done or bypassed for this sample, create work items for assemble
             Request request = (Request)sess.load(Request.class, workItem.getIdRequest());
             if (sample.getSeqPrepDate() != null ||
                 (sample.getSeqPrepBypassed() != null && sample.getSeqPrepBypassed().equalsIgnoreCase("Y"))) {
-                // Create a cluster gen work item for every unprocessed seq lane of the sample.
+                // Create an assemble work item for every unprocessed seq lane of the sample.
                 for(Iterator i1 = request.getSequenceLanes().iterator(); i1.hasNext();) {
                   SequenceLane lane = (SequenceLane)i1.next();
 
                   if (lane.getIdSample().equals(sample.getIdSample()) && lane.getIdFlowCellChannel() == null) {
 
-                    // Make sure this lane isn't already queued up on the cluster gen workflow
+                    // Make sure this lane isn't already queued up on the assemble workflow
                     List otherWorkItems = (List)sess.createQuery("SELECT wi from WorkItem wi join wi.sequenceLane l where wi.codeStepNext = '" + Step.ILLSEQ_CLUSTER_GEN + "' and l.idSequenceLane = " + lane.getIdSequenceLane()).list();
                     if (otherWorkItems.size() == 0) {
                       WorkItem wi = new WorkItem();
@@ -126,10 +124,9 @@ public class SaveWorkItemSolexaPrepQC extends GNomExCommand implements Serializa
                     }
 
                   }
-                }
+                } // end of for loop for sequence lanes
 
-
-            }
+            } // end of if sample prep is done or bypassed
 
             if (autoCompleteMap.containsKey(request.getIdRequest())) {
               BillingItemAutoComplete auto = autoCompleteMap.get(request.getIdRequest());
@@ -142,7 +139,7 @@ public class SaveWorkItemSolexaPrepQC extends GNomExCommand implements Serializa
               autoCompleteMap.put(request.getIdRequest(), auto);
             }
 
-            // If Solexa sample prep is done or failed for this sample, delete the work item
+            // If sample prep is done, by passed, or failed for this sample, delete the workitem
             if (sample.getSeqPrepDate() != null ||
               (sample.getSeqPrepFailed() != null && sample.getSeqPrepFailed().equalsIgnoreCase("Y")) ||
               (sample.getSeqPrepBypassed() != null && sample.getSeqPrepBypassed().equalsIgnoreCase("Y"))) {
@@ -235,6 +232,7 @@ public class SaveWorkItemSolexaPrepQC extends GNomExCommand implements Serializa
     }
   }
 
+  // NOTE: This method is duplicated in SaveWorkItemSolexaPrep -- IT IS NOT USED HERE
   private void mapRequest(Request request, WorkItem workItem, Map<Integer, Request> requestMap, Map<Integer, List<String>> requestStepMap) {
     if (!requestMap.containsKey(request.getIdRequest())) {
       requestMap.put(request.getIdRequest(), request);

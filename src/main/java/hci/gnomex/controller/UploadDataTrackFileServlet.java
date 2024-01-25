@@ -1,17 +1,25 @@
 package hci.gnomex.controller;
 
+import com.oreilly.servlet.multipart.FilePart;
+import com.oreilly.servlet.multipart.MultipartParser;
+import com.oreilly.servlet.multipart.ParamPart;
+import com.oreilly.servlet.multipart.Part;
 import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.DataTrack;
-import hci.gnomex.model.DataTrackFolder;
-import hci.gnomex.model.GenomeBuild;
-import hci.gnomex.model.PropertyEntry;
-import hci.gnomex.model.PropertyEntryValue;
-import hci.gnomex.model.PropertyOption;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.hibernate.Session;
+import org.jdom.output.XMLOutputter;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
@@ -20,24 +28,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.hibernate.Session;
-
-import org.jdom.output.XMLOutputter;
-
-import com.oreilly.servlet.multipart.FilePart;
-import com.oreilly.servlet.multipart.MultipartParser;
-import com.oreilly.servlet.multipart.ParamPart;
-import com.oreilly.servlet.multipart.Part;
 
 public class UploadDataTrackFileServlet extends HttpServlet {
 
@@ -112,20 +102,20 @@ public class UploadDataTrackFileServlet extends HttpServlet {
                     ParamPart paramPart = (ParamPart) part;
                     String value = paramPart.getStringValue();
                     if (name.equals("idDataTrack")) {
-                        idDataTrack = new Integer(String.class.cast(value));
+                        idDataTrack = Integer.valueOf(String.class.cast(value));
                     } else if (name.equals("name")) {
                         dataTrackName = value;
                     } else if (name.equals("codeVisibility")) {
                         codeVisibility = value;
                     } else if (name.equals("idGenomeBuild")) {
-                        idGenomeBuild = new Integer(value);
+                        idGenomeBuild = Integer.valueOf(value);
                     } else if (name.equals("idDataTrackFolder")) {
                         if (value != null && !value.equals("")) {
-                            idDataTrackFolder = new Integer(value);
+                            idDataTrackFolder = Integer.valueOf(value);
                         }
                     } else if (name.equals("idLab")) {
                         if (value != null && !value.equals("")) {
-                            idLab = new Integer(value);
+                            idLab = Integer.valueOf(value);
                         }
                     }
                 }

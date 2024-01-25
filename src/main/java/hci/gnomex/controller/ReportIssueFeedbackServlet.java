@@ -81,10 +81,7 @@ public class ReportIssueFeedbackServlet extends HttpServlet {
 //                throw new ServletException(
 //                        "Unable to report issue.  Servlet unable to obtain security information. Please contact GNomEx support directly.");
             }
-            /*
-             * // Only gnomex admins can send broadcast emails if (!secAdvisor .hasPermission(SecurityAdvisor.CAN_ACCESS_ANY_OBJECT)) { throw new
-             * ServletException("Insufficent permissions"); }
-             */
+
             MultipartParser mp = new MultipartParser(req, Integer.MAX_VALUE);
             Part part;
             while ((part = mp.readNextPart()) != null) {

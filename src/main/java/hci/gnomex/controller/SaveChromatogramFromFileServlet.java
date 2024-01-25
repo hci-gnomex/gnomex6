@@ -10,7 +10,6 @@ public class SaveChromatogramFromFileServlet extends HttpClientServletBase {
   protected GNomExCommand getCommand() {
     return new SaveChromatogramFromFile();
   }
-  
   protected void logError(String msg, Exception ex) {
     LOG.error(msg, ex);
   }

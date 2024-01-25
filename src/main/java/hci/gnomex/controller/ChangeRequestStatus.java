@@ -41,12 +41,12 @@ public class ChangeRequestStatus extends GNomExCommand implements Serializable {
     }
     serverName = request.getServerName();
 
-    if (request.getParameter("codeRequestStatus") != null && !request.getParameter("codeRequestStatus").equals("")) {
+    if (request.getParameter("codeRequestStatus") != null && !request.getParameter("codeRequestStatus").isEmpty()) {
       codeRequestStatus = request.getParameter("codeRequestStatus");
     }
 
-    if (request.getParameter("idRequest") != null && !request.getParameter("idRequest").equals("")) {
-      idRequest = new Integer(request.getParameter("idRequest"));
+    if (request.getParameter("idRequest") != null && !request.getParameter("idRequest").isEmpty()) {
+      idRequest = Integer.valueOf(request.getParameter("idRequest"));
     }
 
   }
@@ -59,13 +59,13 @@ public class ChangeRequestStatus extends GNomExCommand implements Serializable {
       sess = HibernateSession.currentSession(this.getUsername());
       PropertyDictionaryHelper pdh = PropertyDictionaryHelper.getInstance(sess);
 
-      if (codeRequestStatus == null || idRequest.equals("0")) {
+      if (codeRequestStatus == null || idRequest == 0) {
         this.addInvalidField("Missing information", "id and code request status needed");
       }
 
       if (this.isValid()) {
 
-        Request req = (Request) sess.get(Request.class, idRequest);
+        Request req = sess.get(Request.class, idRequest);
         String oldRequestStatus = req.getCodeRequestStatus();
 
         // If this request uses products, create ledger entries
@@ -75,7 +75,7 @@ public class ChangeRequestStatus extends GNomExCommand implements Serializable {
 
         if (ProductUtil.determineIfRequestUsesProducts(req)) {
           String statusToUseProducts = ProductUtil.determineStatusToUseProducts(sess, req);
-          if (statusToUseProducts != null && !statusToUseProducts.trim().equals("")) {
+          if (statusToUseProducts != null && !statusToUseProducts.trim().isEmpty()) {
             try {
               if (ProductUtil.updateLedgerOnRequestStatusChange(sess, req, oldRequestStatus, codeRequestStatus)) {
                 sess.flush();
@@ -97,13 +97,13 @@ public class ChangeRequestStatus extends GNomExCommand implements Serializable {
               req.setCreateDate(new java.util.Date());
 
               String otherRecipients = PropertyDictionaryHelper.getInstance(sess).getCoreFacilityRequestCategoryProperty(req.getIdCoreFacility(), req.getCodeRequestCategory(), PropertyDictionary.REQUEST_SUBMIT_CONFIRMATION_EMAIL);
-              if ((req.getAppUser() != null && req.getAppUser().getEmail() != null && !req.getAppUser().getEmail().equals("")) || (otherRecipients != null && otherRecipients.length() > 0)) {
+              if ((req.getAppUser() != null && req.getAppUser().getEmail() != null && !req.getAppUser().getEmail().isEmpty()) || (otherRecipients != null && otherRecipients.length() > 0)) {
                 try {
                   // confirmation email for dna seq requests is sent at submit
                   // time.
                   sendConfirmationEmail(sess, req, otherRecipients);
                 } catch (Exception e) {
-                  String msg = "Unable to send confirmation email notifying submitter that request " + req.getNumber() + " has been submitted.  " + e.toString();
+                  String msg = "Unable to send confirmation email notifying submitter that request " + req.getNumber() + " has been submitted.  " + e;
                   LOG.error(msg, e);
                 }
               } else {
@@ -156,7 +156,7 @@ public class ChangeRequestStatus extends GNomExCommand implements Serializable {
             try {
               EmailHelper.sendConfirmationEmail(sess, req, this.getSecAdvisor(), launchAppURL, appURL, serverName);
             } catch (Exception e) {
-              LOG.error("Unable to send confirmation email notifying submitter that request " + req.getNumber() + " is complete. " + e.toString(), e);
+              LOG.error("Unable to send confirmation email notifying submitter that request " + req.getNumber() + " is complete. " + e, e);
             }
 
           }

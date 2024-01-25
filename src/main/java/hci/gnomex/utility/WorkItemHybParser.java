@@ -1,23 +1,13 @@
 package hci.gnomex.utility;
 
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.ArrayCoordinate;
-import hci.gnomex.model.Hybridization;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.Slide;
-import hci.gnomex.model.SlideProduct;
-import hci.gnomex.model.WorkItem;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
+import hci.gnomex.model.*;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
+
+import java.io.Serializable;
+import java.util.*;
 
 
 public class WorkItemHybParser implements Serializable {
@@ -42,8 +32,8 @@ public class WorkItemHybParser implements Serializable {
       String idLabeledSampleString = workItemNode.getAttributeValue("idHybridization");
       String idWorkItemString      = workItemNode.getAttributeValue("idWorkItem");
       
-      Hybridization hybridization = (Hybridization)sess.load(Hybridization.class, new Integer(idLabeledSampleString));
-      WorkItem workItem = (WorkItem)sess.load(WorkItem.class, new Integer(idWorkItemString));
+      Hybridization hybridization = (Hybridization)sess.load(Hybridization.class, Integer.valueOf(idLabeledSampleString));
+      WorkItem workItem = (WorkItem)sess.load(WorkItem.class, Integer.valueOf(idWorkItemString));
       
       if (workItemNode.getAttributeValue("hybStatus") != null && !workItemNode.getAttributeValue("hybStatus").equals("")) {
         workItem.setStatus(workItemNode.getAttributeValue("hybStatus"));
@@ -90,8 +80,8 @@ public class WorkItemHybParser implements Serializable {
     
     
     
-    Integer idSlideDesign = n.getAttributeValue("idSlideDesign") == null || n.getAttributeValue("idSlideDesign").equals("") ? null : new Integer(n.getAttributeValue("idSlideDesign"));
-    Integer idRequest = n.getAttributeValue("idRequest") == null || n.getAttributeValue("idRequest").equals("") ? null : new Integer(n.getAttributeValue("idRequest"));
+    Integer idSlideDesign = n.getAttributeValue("idSlideDesign") == null || n.getAttributeValue("idSlideDesign").equals("") ? null : Integer.valueOf(n.getAttributeValue("idSlideDesign"));
+    Integer idRequest = n.getAttributeValue("idRequest") == null || n.getAttributeValue("idRequest").equals("") ? null : Integer.valueOf(n.getAttributeValue("idRequest"));
 
     Slide slide = hyb.getSlide();
     sess.flush();  // We need to save what we have, because the getSlideForHyb will do a refresh on the hybs
@@ -106,7 +96,7 @@ public class WorkItemHybParser implements Serializable {
         deleteOrphanSlide(sess, hyb, idRequest); 
       }
     }
-    slide.setIdSlideDesign(new Integer(n.getAttributeValue("idSlideDesign")));          
+    slide.setIdSlideDesign(Integer.valueOf(n.getAttributeValue("idSlideDesign")));
     
     // Set the barcode on the slide.
     if (n.getAttributeValue("slideBarcode") != null && !n.getAttributeValue("slideBarcode").equals("")) {
@@ -123,7 +113,7 @@ public class WorkItemHybParser implements Serializable {
     setArrayCoordinate(sess, hyb, slide, n.getAttributeValue("arrayCoordinate"), idRequest);
     
     if (n.getAttributeValue("idHybProtocol") != null && !n.getAttributeValue("idHybProtocol").equals("")) {
-      hyb.setIdHybProtocol(new Integer(n.getAttributeValue("idHybProtocol")));
+      hyb.setIdHybProtocol(Integer.valueOf(n.getAttributeValue("idHybProtocol")));
     } else {
       hyb.setIdHybProtocol(null);
     }

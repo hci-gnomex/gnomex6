@@ -1,22 +1,15 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Topic;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
-import org.hibernate.query.Query;
+import org.hibernate.Session;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 
 
 public class CheckTopicPermission extends GNomExCommand implements Serializable {
@@ -30,13 +23,13 @@ public class CheckTopicPermission extends GNomExCommand implements Serializable 
 
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     String topicNumber = "";
-    if (request.getParameter("topicNumber") != null && !request.getParameter("topicNumber").equals("")) {
+    if (request.getParameter("topicNumber") != null && !request.getParameter("topicNumber").isEmpty()) {
       topicNumber = request.getParameter("topicNumber");
     } else {
       this.addInvalidField("topicNumber", "topicNumber is required");
     }
     if(topicNumber.length() > 0) {
-      idTopic = new Integer(topicNumber);
+      idTopic = Integer.valueOf(topicNumber);
     }
   }
 

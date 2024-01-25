@@ -1,36 +1,23 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
-import hci.gnomex.constants.Constants;
-import hci.gnomex.model.ExperimentPickListFilter;
-import hci.gnomex.model.NumberSequencingCyclesAllowed;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.RequestCategory;
-import hci.gnomex.model.SampleType;
-import hci.gnomex.model.SequenceLane;
-import hci.gnomex.model.SlideDesign;
+import hci.gnomex.model.*;
 import hci.gnomex.utility.DictionaryHelper;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeMap;
-
-import javax.json.*;
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.*;
 
 
 public class GetExperimentPickList extends GNomExCommand implements Serializable {
@@ -165,7 +152,7 @@ public class GetExperimentPickList extends GNomExCommand implements Serializable
 
       Document doc = new Document(new Element("AnalysisExperimentPickList"));
       String prevProjectName  = "";
-      Integer prevIdRequest  = new Integer(-1);
+      Integer prevIdRequest  = -1;
 
       rootNode = doc.getRootElement();
       for(Iterator i = rowMap.keySet().iterator(); i.hasNext();) {
@@ -174,7 +161,7 @@ public class GetExperimentPickList extends GNomExCommand implements Serializable
 
 
         String  projectName = (String)row[0];
-        Integer idRequest = row[1] == null ? new Integer(-2) : (Integer)row[1];
+        Integer idRequest = row[1] == null ? -2 : (Integer)row[1];
 
         Element n = null;
         if (!projectName.equals(prevProjectName)) {

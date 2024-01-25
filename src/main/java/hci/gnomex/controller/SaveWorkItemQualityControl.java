@@ -12,7 +12,6 @@ import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
-
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.mail.MessagingException;

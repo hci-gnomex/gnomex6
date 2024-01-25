@@ -1,21 +1,18 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.GenomeIndex;
 import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.HibernateSession;
-
-import java.io.Serializable;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 
 
 
@@ -35,7 +32,7 @@ public class DeleteGenomeIndex extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
    if (request.getParameter("idGenomeIndex") != null && !request.getParameter("idGenomeIndex").equals("")) {
-     idGenomeIndex = new Integer(request.getParameter("idGenomeIndex"));
+     idGenomeIndex = Integer.valueOf(request.getParameter("idGenomeIndex"));
    } else {
      this.addInvalidField("idGenomeIndex", "idGenomeIndex is required.");
    }

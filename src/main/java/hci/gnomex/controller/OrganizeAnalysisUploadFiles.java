@@ -1,31 +1,22 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.*;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.AnalysisFile;
-import hci.gnomex.model.TransferLog;
-import hci.gnomex.utility.AnalysisFileDescriptorUploadParser;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.model.PropertyDictionary;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.json.*;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
-import java.math.BigDecimal;
 import java.util.*;
-
-import javax.json.*;
-import javax.servlet.http.HttpSession;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 
 public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serializable {
 
@@ -46,7 +37,7 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
     public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
         if (request.getParameter("idAnalysis") != null && !request.getParameter("idAnalysis").equals("")) {
-            idAnalysis = new Integer(request.getParameter("idAnalysis"));
+            idAnalysis = Integer.valueOf(request.getParameter("idAnalysis"));
         } else {
             this.addInvalidField("idAnalysis", "idAnalysis is required");
         }
@@ -157,7 +148,7 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
                                 AnalysisFile af;
                                 if (!idFileString.startsWith("AnalysisFile") && !idFileString.equals("")) {
 //                                    System.out.println("[OAUF] loading AnalysisFile idFileString: " + idFileString);
-                                    af = (AnalysisFile) sess.load(AnalysisFile.class, new Integer(idFileString));
+                                    af = (AnalysisFile) sess.load(AnalysisFile.class, Integer.valueOf(idFileString));
                                     af.setFileName(displayName);
                                     af.setBaseFilePath(f2.getAbsolutePath().replace("\\", Constants.FILE_SEPARATOR));
                                     af.setQualifiedFilePath(qualifiedFilePath);
@@ -179,7 +170,7 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
                                         if (afParts[1].startsWith("AnalysisFile")) {
                                             continue;
                                         }
-                                        af = (AnalysisFile) sess.load(AnalysisFile.class, new Integer(afParts[1]));
+                                        af = (AnalysisFile) sess.load(AnalysisFile.class, Integer.valueOf(afParts[1]));
                                         af.setFileName(afParts[3]);
                                         af.setBaseFilePath(afParts[0]);
 
@@ -250,7 +241,7 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
                                 if (idFileString != null) {
                                     AnalysisFile af = new AnalysisFile();
                                     if (!idFileString.startsWith("AnalysisFile") && !idFileString.equals("")) {
-                                        af = (AnalysisFile) sess.load(AnalysisFile.class, new Integer(idFileString));
+                                        af = (AnalysisFile) sess.load(AnalysisFile.class, Integer.valueOf(idFileString));
                                     } else if (idFileString.startsWith("AnalysisFile")) {
                                         af = new AnalysisFile();
                                         af.setUploadDate(new java.sql.Date(System.currentTimeMillis()));
@@ -392,7 +383,7 @@ public class OrganizeAnalysisUploadFiles extends GNomExCommand implements Serial
                                 if (idFileString != null) {
                                     AnalysisFile af;
                                     if (!idFileString.startsWith("AnalysisFile") && !idFileString.equals("")) {
-                                        af = (AnalysisFile) sess.load(AnalysisFile.class, new Integer(idFileString));
+                                        af = (AnalysisFile) sess.load(AnalysisFile.class, Integer.valueOf(idFileString));
 //                                        System.out.println("[OAUF] trying to remove: " + af.getFileName());
                                         Set aFiles = analysis.getFiles();
 //                                        System.out.println("[OAUF] removing analysisfile: " + fileName);

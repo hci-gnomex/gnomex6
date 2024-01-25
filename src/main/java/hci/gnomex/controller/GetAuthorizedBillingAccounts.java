@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.model.BillingAccount;
@@ -8,24 +8,18 @@ import hci.gnomex.model.CoreFacility;
 import hci.gnomex.model.Lab;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.GNomExRollbackException;
-
-import java.io.Serializable;
-import java.sql.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.sql.Date;
+import java.util.*;
 
 @SuppressWarnings("serial")
 public class GetAuthorizedBillingAccounts extends GNomExCommand implements Serializable {
@@ -50,7 +44,7 @@ public class GetAuthorizedBillingAccounts extends GNomExCommand implements Seria
 	public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 		if (request.getParameter("idAppUser") != null && !request.getParameter("idAppUser").trim().equals("")) {
 			try {
-				idAppUser = new Integer(request.getParameter("idAppUser").trim());
+				idAppUser = Integer.valueOf(request.getParameter("idAppUser").trim());
 			} catch (NumberFormatException e) {
 				this.addInvalidField("idAppUser", "idAppUser must be parsable as an Integer.");
 			}
@@ -58,27 +52,27 @@ public class GetAuthorizedBillingAccounts extends GNomExCommand implements Seria
 
 		if (request.getParameter("idCoreFacility") != null && !request.getParameter("idCoreFacility").trim().equals("")) {
 			try {
-				idCoreFacility = new Integer(request.getParameter("idCoreFacility").trim());
+				idCoreFacility = Integer.valueOf(request.getParameter("idCoreFacility").trim());
 			} catch (NumberFormatException e) {
 				this.addInvalidField("idCoreFacility", "idCoreFacility must be parsable as an Integer.");
 			}
 		}
 
 		if (request.getParameter("includeOnlyApprovedAccounts") != null && !request.getParameter("includeOnlyApprovedAccounts").trim().equals("")) {
-			includeOnlyApprovedAccounts = new Boolean(request.getParameter("includeOnlyApprovedAccounts").trim());
+			includeOnlyApprovedAccounts = Boolean.valueOf(request.getParameter("includeOnlyApprovedAccounts").trim());
 		}
 		if (request.getParameter("includeOnlyActiveLabs") != null && !request.getParameter("includeOnlyActiveLabs").trim().equals("")) {
-			includeOnlyActiveLabs = new Boolean(request.getParameter("includeOnlyActiveLabs").trim());
+			includeOnlyActiveLabs = Boolean.valueOf(request.getParameter("includeOnlyActiveLabs").trim());
 		}
 		if (request.getParameter("includeOnlyUnexpiredAccounts") != null && !request.getParameter("includeOnlyUnexpiredAccounts").trim().equals("")) {
-			includeOnlyUnexpiredAccounts = new Boolean(request.getParameter("includeOnlyUnexpiredAccounts").trim());
+			includeOnlyUnexpiredAccounts = Boolean.valueOf(request.getParameter("includeOnlyUnexpiredAccounts").trim());
 		}
 		if (request.getParameter("includeOnlyStartedAccounts") != null && !request.getParameter("includeOnlyStartedAccounts").trim().equals("")) {
-			includeOnlyStartedAccounts = new Boolean(request.getParameter("includeOnlyStartedAccounts").trim());
+			includeOnlyStartedAccounts = Boolean.valueOf(request.getParameter("includeOnlyStartedAccounts").trim());
 		}
 
 		if (request.getParameter("includeOnlyAccountsActive") != null && !request.getParameter("includeOnlyAccountsActive").trim().equals("")) {
-			includeOnlyAccountsActive = new Boolean(request.getParameter("includeOnlyAccountsActive").trim());
+			includeOnlyAccountsActive = Boolean.valueOf(request.getParameter("includeOnlyAccountsActive").trim());
 		}
 
 		if (this.isValid()) {

@@ -12,7 +12,6 @@ import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
-
 import javax.mail.MessagingException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpSession;

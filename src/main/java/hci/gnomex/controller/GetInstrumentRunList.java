@@ -1,33 +1,28 @@
 
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.framework.utilities.XMLReflectException;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.InstrumentRunFilter;
-import hci.gnomex.model.Plate;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.ReactionType;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 
+import javax.naming.NamingException;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
 public class GetInstrumentRunList extends GNomExCommand implements Serializable {
 
   // the static field for logging in Log4J
@@ -82,7 +77,7 @@ public class GetInstrumentRunList extends GNomExCommand implements Serializable 
 
             Object[] row = ( Object[] ) i.next();
 
-            Integer idInstrumentRun = row[0] == null ? new Integer( - 2 ) : ( Integer ) row[0];
+            Integer idInstrumentRun = row[0] == null ? Integer.valueOf( - 2 ) : ( Integer ) row[0];
             String runDate = this.formatDate( ( java.sql.Timestamp ) row[1] );
             String createDate = this.formatDate( ( java.sql.Timestamp ) row[2] );
             String codeInstrumentRunStatus = row[3] == null ? "" : row[3].toString();

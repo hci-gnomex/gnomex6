@@ -5,25 +5,9 @@ import hci.dictionary.model.NullDictionaryEntry;
 import hci.framework.security.SecurityAdvisor;
 import hci.framework.security.UnknownPermissionException;
 import hci.framework.utilities.XMLReflectException;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.hibernate5utils.HibernateDetailObject;
-
-import java.io.InputStream;
-import java.io.Serializable;
-import java.lang.reflect.Method;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-
+import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.id.Assigned;
@@ -36,7 +20,13 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import java.io.InputStream;
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 /**
  * Utility class responsible for managing cached Hibernate-mapped dictionary
  * classes.
@@ -467,7 +457,7 @@ public final class OnDemandDictionaryManager implements DictionaryActions, Seria
    * @param request
    *          The HttpServletRequest from which to retrieve parameters
    */
-  public void loadCommand(DictionaryCommand command, HttpServletRequest request) {
+  public void loadCommand(DictionaryCommand command, HttpServletWrappedRequest request) {
     command.requestURL = request.getRequestURL().toString();
 
     command.action = request.getParameter("action");

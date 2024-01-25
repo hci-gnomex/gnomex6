@@ -1,17 +1,6 @@
 package hci.gnomex.controller;
 
-import java.io.Serializable;
-import java.util.List;
-
-import javax.json.Json;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Hibernate;
-import org.hibernate.Session;
-
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Price;
 import hci.gnomex.model.Product;
@@ -19,7 +8,16 @@ import hci.gnomex.model.ProductType;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
+
+import javax.json.Json;
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.List;
 
 
 public class DeleteProduct extends GNomExCommand implements Serializable {
@@ -37,7 +35,7 @@ public class DeleteProduct extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idProduct") != null && !request.getParameter("idProduct").equals("")) {
-      idProduct = new Integer(request.getParameter("idProduct"));
+      idProduct = Integer.valueOf(request.getParameter("idProduct"));
     }
 
   }

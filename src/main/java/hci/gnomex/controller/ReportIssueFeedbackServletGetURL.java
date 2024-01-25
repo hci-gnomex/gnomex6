@@ -28,13 +28,13 @@ public class ReportIssueFeedbackServletGetURL extends HttpServlet {
             sess = HibernateSession.currentReadOnlySession((req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
             hci.gnomex.utility.Util.buildAndSendUploadFileServletURL(req, res, sess, "ReportIssueFeedbackServletGetURL", "ReportIssueFeedbackServlet.gx", hci.gnomex.utility.Util.EMPTY_STRING_ARRAY);
         } catch (Exception e) {
-            LOG.error("An error has occured in ReportIssueServletGetURL - ");
+            LOG.error("An error has occurred in ReportIssueServletGetURL - ");
         } finally {
             if (sess != null) {
                 try {
                     HibernateSession.closeSession();
                 } catch (Exception e) {
-                    LOG.error("An error has occured in ReportIssueServletGetURL - ");
+                    LOG.error("An error has occurred in ReportIssueServletGetURL - ");
                 }
             }
         }

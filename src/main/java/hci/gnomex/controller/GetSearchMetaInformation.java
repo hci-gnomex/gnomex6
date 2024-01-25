@@ -2,34 +2,25 @@ package hci.gnomex.controller;
 
 import hci.dictionary.model.DictionaryEntry;
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.lucene.AllObjectsIndexHelper;
 import hci.gnomex.lucene.AnalysisIndexHelper;
 import hci.gnomex.lucene.ExperimentIndexHelper;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.LabFilter;
-import hci.gnomex.model.Property;
-import hci.gnomex.model.PropertyType;
-import hci.gnomex.model.SlideProductFilter;
+import hci.gnomex.model.*;
 import hci.gnomex.utility.DictionaryHelper;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.*;
 public class GetSearchMetaInformation extends GNomExCommand implements Serializable {
 
   // the static field for logging in Log4J

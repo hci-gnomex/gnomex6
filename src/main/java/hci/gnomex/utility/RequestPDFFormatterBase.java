@@ -1,28 +1,13 @@
 package hci.gnomex.utility;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
-
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import hci.gnomex.model.*;
+import hci.gnomex.security.SecurityAdvisor;
 import org.hibernate.Session;
 
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.*;
-
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.BillingAccount;
-import hci.gnomex.model.Property;
-import hci.gnomex.model.PropertyEntry;
-import hci.gnomex.model.PropertyEntryValue;
-import hci.gnomex.model.PropertyOption;
-import hci.gnomex.model.PropertyPlatformApplication;
-import hci.gnomex.model.PropertyType;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.Sample;
-import hci.gnomex.security.SecurityAdvisor;
+import java.util.*;
 
 public abstract class RequestPDFFormatterBase {
 	
@@ -276,8 +261,8 @@ public abstract class RequestPDFFormatterBase {
 			} else {
 				Property p1 = pe1.getProperty();
 				Property p2 = pe2.getProperty();
-				Integer so1 = (p1.getSortOrder() != null && !p1.getSortOrder().toString().equals("")) ? p1.getSortOrder() : new Integer(999999);
-				Integer so2 = (p2.getSortOrder() != null && !p2.getSortOrder().toString().equals("")) ? p2.getSortOrder() : new Integer(999999);
+				Integer so1 = (p1.getSortOrder() != null && !p1.getSortOrder().toString().equals("")) ? p1.getSortOrder() : 999999;
+				Integer so2 = (p2.getSortOrder() != null && !p2.getSortOrder().toString().equals("")) ? p2.getSortOrder() : 999999;
 				String n1 = p1.getName();
 				String n2 = p2.getName();
 				

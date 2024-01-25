@@ -1,15 +1,14 @@
 package hci.dictionary.utility;
 
 import hci.dictionary.model.DictionaryEntry;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.framework.control.Command;
 import hci.framework.model.DetailObject;
 import hci.framework.security.SecurityAdvisor;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.HashMap;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * Base class for commands that use the HCIDictionary API to call the
@@ -95,9 +94,9 @@ public abstract class DictionaryCommand extends Command {
               if (value != null) {
                 try {
                   if (value.equals("0")) {
-                    o = new java.lang.Integer(0);
+                    o = 0;
                   } else {
-                    o = new java.lang.Integer(value);
+                    o = Integer.valueOf(value);
                   }
                 } catch (NumberFormatException nfe) {
                   o = null;

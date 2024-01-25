@@ -6,39 +6,7 @@ import hci.gnomex.constants.Constants;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.Lab;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.BatchDataSource;
-import hci.gnomex.utility.BatchMailer;
-//import hci.gnomex.utility.HibernateUtil;
-import hci.gnomex.utility.MailUtil;
-import hci.gnomex.utility.MailUtilHelper;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.TreeMap;
-
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-
+import hci.gnomex.utility.*;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -46,6 +14,19 @@ import org.hibernate.internal.SessionImpl;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.io.IOException;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class UsageReportd extends TimerTask {
 
@@ -1127,10 +1108,10 @@ public class UsageReportd extends TimerTask {
 	  
 	  public AEGuestUsageStats() {
 		  aeNumber = "";
-		  aeUserCount = new Integer(0);
-		  aeDownloadCount = new Integer(0);
-		  aeCumUserCount = new Integer(0);
-		  aeCumDownloadCount = new Integer(0);
+		  aeUserCount = 0;
+		  aeDownloadCount = 0;
+		  aeCumUserCount = 0;
+		  aeCumDownloadCount = 0;
 	  }
 	  
 	  public String getAEnumber() {

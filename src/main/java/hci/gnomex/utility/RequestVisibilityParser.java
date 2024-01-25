@@ -3,16 +3,15 @@ package hci.gnomex.utility;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.Visibility;
 import hci.gnomex.security.SecurityAdvisor;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.Element;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
 
 
 public class RequestVisibilityParser implements Serializable {
@@ -37,7 +36,7 @@ public class RequestVisibilityParser implements Serializable {
       String codeVisibility      = requestNode.getAttributeValue("codeVisibility");
       String idInstitution       = requestNode.getAttributeValue("idInstitution");
       
-      Request request = (Request)sess.load(Request.class, new Integer(idRequest));
+      Request request = (Request)sess.load(Request.class, Integer.valueOf(idRequest));
       
       if (secAdvisor.canUpdate(request, SecurityAdvisor.PROFILE_OBJECT_VISIBILITY) && (request.getRequestCategory().getIsOwnerOnly() == null || request.getRequestCategory().getIsOwnerOnly().equals("N"))) {
         if (codeVisibility == null || codeVisibility.equals("")) {

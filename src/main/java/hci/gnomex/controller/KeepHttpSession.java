@@ -1,16 +1,12 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
-
-import java.io.Serializable;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 
 /**
  * Command to create data files for upload. It looks into the export tables and
@@ -21,7 +17,7 @@ import org.apache.log4j.Logger;
  * NCCNExportFileGenerator</code>
  * for more detail
  * 
- * @see hci.nccn.util.NCCNExportFileGenerator
+ *
  * @author u0007037
  */
 public class KeepHttpSession extends GNomExCommand implements Serializable {

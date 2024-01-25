@@ -1,47 +1,28 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;
-import hci.gnomex.utility.*;
-import hci.framework.control.RollBackCommandException;
-import hci.gnomex.model.BillingAccount;
-import hci.gnomex.model.BillingItem;
-import hci.gnomex.model.BillingPeriod;
-import hci.gnomex.model.BillingStatus;
-import hci.gnomex.model.CoreFacility;
-import hci.gnomex.model.DiskUsageByMonth;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.ProductLineItem;
-import hci.gnomex.model.ProductOrder;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.Request;
-import hci.gnomex.security.SecurityAdvisor;
-import hci.report.constants.ReportFormats;
-import hci.report.model.ReportTray;
-import hci.report.utility.ReportCommand;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
-
 import com.itextpdf.text.Document;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
+import hci.framework.control.Command;
+import hci.framework.control.RollBackCommandException;
+import hci.gnomex.model.*;
+import hci.gnomex.security.SecurityAdvisor;
+import hci.gnomex.utility.*;
+import hci.report.constants.ReportFormats;
+import hci.report.model.ReportTray;
+import hci.report.utility.ReportCommand;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.Serializable;
+import java.util.*;
 
 @SuppressWarnings("serial")
 public class ShowBillingInvoiceForm extends ReportCommand implements Serializable {
@@ -84,13 +65,13 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 		idLabs = request.getParameter("idLabs");
 
 		if (request.getParameter("idBillingPeriod") != null && !request.getParameter("idBillingPeriod").equals("")) {
-			idBillingPeriod = new Integer(request.getParameter("idBillingPeriod"));
+			idBillingPeriod = Integer.valueOf(request.getParameter("idBillingPeriod"));
 		} else {
 			this.addInvalidField("idBillingPeriod", "idBillingPeriod is required");
 		}
 
 		if (request.getParameter("idCoreFacility") != null && !request.getParameter("idCoreFacility").equals("")) {
-			idCoreFacility = new Integer(request.getParameter("idCoreFacility"));
+			idCoreFacility = Integer.valueOf(request.getParameter("idCoreFacility"));
 		} else {
 			this.addInvalidField("idCoreFacility", "idCoreFacility is required");
 		}
@@ -102,25 +83,25 @@ public void loadCommand(HttpServletWrappedRequest request, HttpSession session) 
 
 	if (idLabs == null) {
 		if (request.getParameter("idLab") != null) {
-			idLab = new Integer(request.getParameter("idLab"));
+			idLab = Integer.valueOf(request.getParameter("idLab"));
 		} else {
 			this.addInvalidField("idLab", "idLab is required");
 		}
 
 		if (request.getParameter("idBillingAccount") != null && request.getParameter("idBillingAccount").length() > 0) {
-			idBillingAccount = new Integer(request.getParameter("idBillingAccount"));
+			idBillingAccount = Integer.valueOf(request.getParameter("idBillingAccount"));
 		} else {
 			this.addInvalidField("idBillingAccount", "idBillingAccount is required");
 		}
 
 		if (request.getParameter("idBillingPeriod") != null) {
-			idBillingPeriod = new Integer(request.getParameter("idBillingPeriod"));
+			idBillingPeriod = Integer.valueOf(request.getParameter("idBillingPeriod"));
 		} else {
 			this.addInvalidField("idBillingPeriod", "idBillingPeriod is required");
 		}
 
 		if (request.getParameter("idCoreFacility") != null) {
-			idCoreFacility = new Integer(request.getParameter("idCoreFacility"));
+			idCoreFacility = Integer.valueOf(request.getParameter("idCoreFacility"));
 		} else {
 			this.addInvalidField("idCoreFacility", "idCoreFacility is required");
 		}
@@ -156,13 +137,13 @@ public Command execute() throws RollBackCommandException {
 					String[] labsAsString = idLabs.split(",");
 					labs = new Lab[labsAsString.length];
 					for (int i = 0; i < labsAsString.length; i++) {
-						labs[i] = (Lab) sess.get(Lab.class, new Integer(labsAsString[i]));
+						labs[i] = (Lab) sess.get(Lab.class, Integer.valueOf(labsAsString[i]));
 					}
 
 					String[] billingAccountsAsString = idBillingAccounts.split(",");
 					billingAccounts = new BillingAccount[billingAccountsAsString.length];
 					for (int i = 0; i < billingAccountsAsString.length; i++) {
-						billingAccounts[i] = (BillingAccount) sess.get(BillingAccount.class, new Integer(
+						billingAccounts[i] = (BillingAccount) sess.get(BillingAccount.class, Integer.valueOf(
 								billingAccountsAsString[i]));
 					}
 
@@ -186,7 +167,7 @@ public Command execute() throws RollBackCommandException {
 				} else {
 					multipleLabs = false;
 
-					lab = (Lab) sess.get(Lab.class, new Integer(idLab));
+					lab = (Lab) sess.get(Lab.class, Integer.valueOf(idLab));
 					billingAccount = (BillingAccount) sess.get(BillingAccount.class, idBillingAccount);
 
 					labs = null;
@@ -534,7 +515,7 @@ public HttpServletWrappedRequest setRequestState(HttpServletWrappedRequest reque
  * The callback method called after the loadCommand, and execute methods, this method allows you to manipulate the HttpServletResponse object prior to
  * forwarding to the result JSP (add a cookie, etc.)
  *
- * @param request
+ * @param response
  *            The HttpServletResponse for the command
  * @return The processed response
  */

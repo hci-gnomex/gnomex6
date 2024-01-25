@@ -20,7 +20,7 @@ import java.util.Comparator;
       Integer multiplexKey2 = s2.getMultiplexGroupNumber() != null ? s2.getMultiplexGroupNumber() : Integer.valueOf(-1);
 
       if (multiplexKey1.equals(multiplexKey2)) {
-        return new Integer(number1).compareTo(new Integer(number2));        
+        return Integer.valueOf(number1).compareTo(Integer.valueOf(number2));
       } else {
         return multiplexKey1.compareTo(multiplexKey2);
       }

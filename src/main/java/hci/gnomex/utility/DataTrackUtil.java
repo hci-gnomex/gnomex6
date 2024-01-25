@@ -165,7 +165,7 @@ public class DataTrackUtil {
 
 	public static Integer getIntegerParameter(HttpServletRequest req, String parameterName) {
 		if (req.getParameter(parameterName) != null && !req.getParameter(parameterName).equals("")) {
-			return new Integer(req.getParameter(parameterName));
+			return Integer.valueOf(req.getParameter(parameterName));
 		} else {
 			return null;
 		}

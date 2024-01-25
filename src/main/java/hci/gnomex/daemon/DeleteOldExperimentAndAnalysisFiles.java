@@ -1,46 +1,20 @@
 package hci.gnomex.daemon;
 
 import hci.gnomex.daemon.RegisterFiles.AnalysisFileInfo;
-import hci.gnomex.model.Analysis;
-import hci.gnomex.model.AnalysisFile;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.BillingAccount;
-import hci.gnomex.model.BillingPeriod;
-import hci.gnomex.model.CoreFacility;
-import hci.gnomex.model.DataTrack;
-import hci.gnomex.model.DataTrackFile;
-import hci.gnomex.model.DiskUsageByMonth;
-import hci.gnomex.model.ExperimentFile;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.Request;
-import hci.gnomex.utility.BatchDataSource;
-import hci.gnomex.utility.BatchMailer;
-import hci.gnomex.utility.DeleteOldExperimentAndAnalysisFilesEmailFormatter;
-import hci.gnomex.utility.MailUtil;
-import hci.gnomex.utility.MailUtilHelper;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.File;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
-
+import hci.gnomex.model.*;
+import hci.gnomex.utility.*;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.TransactionException;
 import org.hibernate.query.Query;
+
+import java.io.File;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class DeleteOldExperimentAndAnalysisFiles {
 
@@ -914,7 +888,7 @@ private void initialize(CoreFacility facility) throws Exception {
 				+ facility.getIdCoreFacility().toString() + ".");
 	}
 
-	// Set todays date
+	// Set today's date
 	Calendar calendar = Calendar.getInstance();
 	runDate = calendar.getTime();
 

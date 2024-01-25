@@ -1,27 +1,22 @@
 package hci.gnomex.controller;
 
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
-import hci.framework.security.UnknownPermissionException;
-import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.model.FlowCellChannel;
 import hci.gnomex.security.SecurityAdvisor;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 
 
 public class GetFlowCellChannel extends GNomExCommand implements Serializable {
@@ -33,7 +28,7 @@ public class GetFlowCellChannel extends GNomExCommand implements Serializable {
 
 	public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 		if (request.getParameter("id") != null) {
-			idFlowCellChannel = new Integer(request.getParameter("id"));
+			idFlowCellChannel = Integer.valueOf(request.getParameter("id"));
 		} else {
 			this.addInvalidField("idFlowCellChannel", "idFlowCellChannel is required");
 		}

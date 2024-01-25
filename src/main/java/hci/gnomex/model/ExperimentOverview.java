@@ -2,7 +2,7 @@ package hci.gnomex.model;
 
 
 
-import java.sql.Date;
+//import java.sql.Date;
 
 import hci.hibernate5utils.HibernateDetailObject;
 

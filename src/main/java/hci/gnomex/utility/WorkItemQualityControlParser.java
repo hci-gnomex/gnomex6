@@ -3,18 +3,13 @@ package hci.gnomex.utility;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Sample;
 import hci.gnomex.model.WorkItem;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.*;
 
 
 public class WorkItemQualityControlParser implements Serializable {
@@ -40,8 +35,8 @@ public class WorkItemQualityControlParser implements Serializable {
       String idSampleString   = workItemNode.getAttributeValue("idSample");
       String idWorkItemString = workItemNode.getAttributeValue("idWorkItem");
       
-      Sample sample = (Sample)sess.load(Sample.class, new Integer(idSampleString));
-      WorkItem workItem = (WorkItem)sess.load(WorkItem.class, new Integer(idWorkItemString));
+      Sample sample = (Sample)sess.load(Sample.class, Integer.valueOf(idSampleString));
+      WorkItem workItem = (WorkItem)sess.load(WorkItem.class, Integer.valueOf(idWorkItemString));
       
       if (workItemNode.getAttributeValue("qualStatus") != null && !workItemNode.getAttributeValue("qualStatus").equals("")) {
         workItem.setStatus(workItemNode.getAttributeValue("qualStatus"));
@@ -101,12 +96,12 @@ public class WorkItemQualityControlParser implements Serializable {
     
     
     if (n.getAttributeValue("qualFragmentSizeFrom") != null && !n.getAttributeValue("qualFragmentSizeFrom").equals("")) {
-      sample.setQualFragmentSizeFrom(new Integer(n.getAttributeValue("qualFragmentSizeFrom")));
+      sample.setQualFragmentSizeFrom(Integer.valueOf(n.getAttributeValue("qualFragmentSizeFrom")));
     } else {
       sample.setQualFragmentSizeFrom(null);
     }
     if (n.getAttributeValue("qualFragmentSizeTo") != null && !n.getAttributeValue("qualFragmentSizeTo").equals("")) {
-      sample.setQualFragmentSizeTo(new Integer(n.getAttributeValue("qualFragmentSizeTo")));
+      sample.setQualFragmentSizeTo(Integer.valueOf(n.getAttributeValue("qualFragmentSizeTo")));
     } else {
       sample.setQualFragmentSizeTo(null);
     }

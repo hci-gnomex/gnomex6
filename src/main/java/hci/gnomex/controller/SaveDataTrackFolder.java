@@ -1,24 +1,18 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.DataTrackFolder;
 import hci.gnomex.model.GenomeBuild;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.RequestParser;
-
-import java.io.Serializable;
-import java.util.HashMap;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.json.Json;
 import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.util.HashMap;
 
 public class SaveDataTrackFolder extends GNomExCommand implements Serializable {
 
@@ -45,7 +39,7 @@ public class SaveDataTrackFolder extends GNomExCommand implements Serializable {
 
         // Make sure that name doesn't have forward slashes (/).
         if (load.getName().contains(Constants.FILE_SEPARATOR) || load.getName().contains("&")) {
-            this.addInvalidField("namechar", "The folder name cannnot contain any characters / or &.");
+            this.addInvalidField("namechar", "The folder name can not contain any characters / or &.");
         }
     }
 

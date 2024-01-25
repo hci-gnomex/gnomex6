@@ -1,12 +1,10 @@
 package hci.gnomex.model;
 
+import hci.hibernate5utils.HibernateDetailObject;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
-import java.math.BigDecimal;
 import java.util.*;
-
-import hci.hibernate5utils.HibernateDetailObject;
 
 
 public class Lab extends HibernateDetailObject implements java.lang.Comparable {
@@ -29,7 +27,9 @@ public class Lab extends HibernateDetailObject implements java.lang.Comparable {
   private String  isActive;
   private String  excludeUsage;
   private String  billingContactPhone;
-  private String  billingContactEmail;  private Long    version;
+  private String  billingContactEmail;
+  private String awsAccountNumber;
+  private Long    version;
   private Set     billingAccounts;
   private Set     members;
   private Set     collaborators;
@@ -142,6 +142,9 @@ public class Lab extends HibernateDetailObject implements java.lang.Comparable {
     this.billingContactEmail = billingContactEmail;
   }
 
+  public String getAwsAccountNumber() {return awsAccountNumber; }
+
+  public void setAwsAccountNumber(String awsAccountNumber) {this.awsAccountNumber = awsAccountNumber; }
 
   public Long getVersion() {
     return version;
@@ -579,7 +582,7 @@ public class Lab extends HibernateDetailObject implements java.lang.Comparable {
 
   public static boolean hasDataTracks(Session sess,Integer idLab){
       Long count = null;
-      Long zero = new Long(0);
+      Long zero = 0L;
       boolean dataTracks = false;
 
       String queryStr = "SELECT COUNT(idLab) FROM DataTrack as d WHERE d.idLab = :idLab";
@@ -597,7 +600,7 @@ public class Lab extends HibernateDetailObject implements java.lang.Comparable {
 
   public static boolean hasExperiments(Session sess, Integer idLab){
       Long count = null;
-      Long zero = new Long(0);
+      Long zero = 0L;
       boolean experiments = false;
 
       String queryStr = "SELECT COUNT(idLab) FROM Request as r WHERE r.idLab = :idLab";
@@ -615,7 +618,7 @@ public class Lab extends HibernateDetailObject implements java.lang.Comparable {
 
   public static boolean hasAnalysis(Session sess, Integer idLab){
       Long count = null;
-      Long zero = new Long(0);
+      Long zero = 0L;
       boolean analyses = false;
 
       String queryStr = "SELECT COUNT(idLab) FROM Analysis as a WHERE a.idLab = :idLab";
@@ -654,7 +657,7 @@ public class Lab extends HibernateDetailObject implements java.lang.Comparable {
 
     public static boolean hasTopics(Session sess, Integer idLab) {
         Long count = null;
-        Long zero = new Long(0);
+        Long zero = 0L;
         boolean topics = false;
 
         String queryStr = "SELECT COUNT(idLab) FROM Topic as t WHERE t.idLab = :idLab";

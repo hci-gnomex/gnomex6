@@ -1,33 +1,23 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.model.GenomeBuild;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Analysis;
+import hci.gnomex.model.GenomeBuild;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.DataTrackUtil;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.*;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.Element;
 
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.servlet.http.HttpSession;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
+import java.io.*;
+import java.util.*;
 
 public class MakeGeneURL extends GNomExCommand implements Serializable {
 
@@ -58,7 +48,7 @@ public class MakeGeneURL extends GNomExCommand implements Serializable {
     public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
         if (request.getParameter("idAnalysis") != null) {
-            idAnalysis = new Integer(request.getParameter("idAnalysis"));
+            idAnalysis = Integer.valueOf(request.getParameter("idAnalysis"));
             System.out.println("[MakeGeneURL] idAnalysis: " + idAnalysis);
         }
 

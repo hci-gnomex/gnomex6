@@ -1,29 +1,19 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Chromatogram;
 import hci.gnomex.model.InstrumentRun;
 import hci.gnomex.model.PlateWell;
 import hci.gnomex.model.Request;
-import hci.gnomex.utility.ChromatReadUtil;
-import hci.gnomex.utility.ChromatTrimUtil;
-import hci.gnomex.utility.ChromatogramParser;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.Serializable;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
 
 public class SaveChromatogramFromFile extends GNomExCommand implements Serializable {
 

@@ -1,9 +1,9 @@
 package hci.gnomex.model;
 
+import hci.hibernate5utils.HibernateDetailObject;
+
 import java.math.BigDecimal;
 import java.util.Set;
-
-import hci.hibernate5utils.HibernateDetailObject;
 
 @SuppressWarnings("serial")
 public class MasterBillingItem extends HibernateDetailObject {
@@ -45,12 +45,9 @@ public class MasterBillingItem extends HibernateDetailObject {
 			return false;
 		MasterBillingItem other = (MasterBillingItem) obj;
 		if (this.getIdMasterBillingItem() == null) {
-			if (other.getIdMasterBillingItem() != null)
-				return false;
-		} else if (!this.getIdMasterBillingItem().equals(other.getIdMasterBillingItem()))
-			return false;
-		return true;
-	}
+            return other.getIdMasterBillingItem() == null;
+		} else return this.getIdMasterBillingItem().equals(other.getIdMasterBillingItem());
+    }
 	public Integer getIdMasterBillingItem() {
 		return this.idMasterBillingItem;
 	}

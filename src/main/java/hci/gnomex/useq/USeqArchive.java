@@ -534,7 +534,7 @@ public class USeqArchive {
 			else if (USeqUtilities.REGION_SCORE_TEXT.matcher(extension).matches()) lastBase = new RegionScoreTextData (dis, si).fetchLastBase();
 			else  throw new IOException("\nFailed to recognize the binary file extension! "+ze.getName());
 
-			chromBase.put(chrom, new Integer(lastBase));
+			chromBase.put(chrom, Integer.valueOf(lastBase));
 		}
 		return chromBase;
 	}

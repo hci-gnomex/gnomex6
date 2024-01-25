@@ -1,49 +1,22 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
-import hci.gnomex.model.AnalysisFile;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.DataTrack;
-import hci.gnomex.model.DataTrackFile;
-import hci.gnomex.model.DataTrackFolder;
-import hci.gnomex.model.GenomeBuild;
-import hci.gnomex.model.Institution;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.PropertyEntry;
-import hci.gnomex.model.PropertyEntryValue;
-import hci.gnomex.model.PropertyOption;
-import hci.gnomex.model.Visibility;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.AppUserComparator;
-import hci.gnomex.utility.DataTrackComparator;
-import hci.gnomex.utility.DataTrackUtil;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.PropertyOptionComparator;
-
-import java.io.File;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.Serializable;
+import java.util.*;
 
 
 public class LinkDataTrackFile extends GNomExCommand implements Serializable {
@@ -73,33 +46,33 @@ public class LinkDataTrackFile extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idDataTrack") != null && !request.getParameter("idDataTrack").equals("")) {
-      idDataTrack = new Integer(request.getParameter("idDataTrack"));
+      idDataTrack = Integer.valueOf(request.getParameter("idDataTrack"));
     }
     if (idDataTrack == null) {
       isNewDataTrack = true;
     }
     if (request.getParameter("idDataTrackToDuplicate") != null && !request.getParameter("idDataTrackToDuplicate").equals("")) {
-      idDataTrackToDuplicate = new Integer(request.getParameter("idDataTrackToDuplicate"));
+      idDataTrackToDuplicate = Integer.valueOf(request.getParameter("idDataTrackToDuplicate"));
     }
     if (request.getParameter("idGenomeBuild") != null && !request.getParameter("idGenomeBuild").equals("")) {
-      idGenomeBuild = new Integer(request.getParameter("idGenomeBuild"));
+      idGenomeBuild = Integer.valueOf(request.getParameter("idGenomeBuild"));
     } else {
       this.addInvalidField("idGenomeBuild", "idGenomeBuild is required.");
     }
     if (request.getParameter("idDataTrackFolder") != null && !request.getParameter("idDataTrackFolder").equals("")) {
-      idDataTrackFolder = new Integer(request.getParameter("idDataTrackFolder"));
+      idDataTrackFolder = Integer.valueOf(request.getParameter("idDataTrackFolder"));
     }
     if (request.getParameter("idAnalysisFile") != null && !request.getParameter("idAnalysisFile").equals("")) {
-      idAnalysisFile = new Integer(request.getParameter("idAnalysisFile"));
+      idAnalysisFile = Integer.valueOf(request.getParameter("idAnalysisFile"));
     } else {
       this.addInvalidField("idAnalysisFile", "idAnalysisFile is required.");
     }
     if (request.getParameter("idAnalysisFileOther") != null && !request.getParameter("idAnalysisFileOther").equals("")) {
-      idAnalysisFileOther = new Integer(request.getParameter("idAnalysisFileOther"));
+      idAnalysisFileOther = Integer.valueOf(request.getParameter("idAnalysisFileOther"));
     }
 
     if (request.getParameter("idLab") != null && !request.getParameter("idLab").equals("")) {
-      idLab = new Integer(request.getParameter("idLab"));
+      idLab = Integer.valueOf(request.getParameter("idLab"));
     } else if (isNewDataTrack) {
       this.addInvalidField("idLab", "idLab is required.");
     }

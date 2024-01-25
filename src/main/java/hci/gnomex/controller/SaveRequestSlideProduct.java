@@ -1,21 +1,20 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Hybridization;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.SlideDesign;
 import hci.gnomex.model.SlideProduct;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.Iterator;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
 
 
 
@@ -42,13 +41,13 @@ public class SaveRequestSlideProduct extends GNomExCommand implements Serializab
     
     
     if (request.getParameter("idSlideProduct") != null && !request.getParameter("idSlideProduct").equals("")) {
-      idSlideProduct = new Integer(request.getParameter("idSlideProduct"));
+      idSlideProduct = Integer.valueOf(request.getParameter("idSlideProduct"));
     } else {
       this.addInvalidField("idSlideProduct", "idSlideProduct is required");
     }
     
     if (request.getParameter("idRequest") != null && !request.getParameter("idRequest").equals("")) {
-      idRequest = new Integer(request.getParameter("idRequest"));
+      idRequest = Integer.valueOf(request.getParameter("idRequest"));
     } else {
       this.addInvalidField("idRequest", "idRequest is required");
     }

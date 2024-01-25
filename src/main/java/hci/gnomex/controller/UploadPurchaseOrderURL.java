@@ -1,16 +1,16 @@
 package hci.gnomex.controller;
 
-import hci.gnomex.utility.*;
-
-import java.io.IOException;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.ServletUtil;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
+import java.io.IOException;
 
 public class UploadPurchaseOrderURL extends HttpServlet {
     private static Logger LOG = Logger.getLogger(UploadPurchaseOrderURL.class);
@@ -29,13 +29,13 @@ public class UploadPurchaseOrderURL extends HttpServlet {
             sess = HibernateSession.currentReadOnlySession((req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
             Util.buildAndSendUploadFileServletURL(req, res, sess, "UploadPurchaseOrderURL", "UploadPurchaseOrder.gx", Util.EMPTY_STRING_ARRAY);
         } catch (Exception e) {
-            LOG.error("An error has occured in UploadPurchaseOrderURL - " + e.toString(), e);
+            LOG.error("An error has occurred in UploadPurchaseOrderURL - " + e.toString(), e);
         } finally {
             if (sess != null) {
                 try {
                     HibernateSession.closeSession();
                 } catch (Exception e) {
-                    LOG.error("An error has occured in UploadPurchaseOrderURL - " + e.toString(), e);
+                    LOG.error("An error has occurred in UploadPurchaseOrderURL - " + e.toString(), e);
                 }
             }
         }

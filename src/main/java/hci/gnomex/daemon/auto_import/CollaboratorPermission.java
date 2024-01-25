@@ -1,8 +1,5 @@
 package hci.gnomex.daemon.auto_import;
 
-import hci.gnomex.model.Visibility;
-
-import java.sql.SQLException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -267,7 +264,7 @@ public class CollaboratorPermission {
         else if (this.level.equals("analysis") && this.attributeType.equals("idanalysis")) {
             List<Integer> tempIntegerList = new ArrayList();
             for(String id: this.attributeIDs) {
-                tempIntegerList.add(new Integer(id));
+                tempIntegerList.add(Integer.valueOf(id));
             }
 
             analysisIDList = tempIntegerList;

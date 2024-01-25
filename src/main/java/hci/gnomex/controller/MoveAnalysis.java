@@ -1,24 +1,21 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.AnalysisGroup;
 import hci.gnomex.utility.HibernateSession;
-
-import java.io.Serializable;
-import java.util.*;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.json.Json;
 import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.util.*;
 
 public class MoveAnalysis extends GNomExCommand implements Serializable {
-
     private static Logger LOG = Logger.getLogger(MoveAnalysis.class);
 
     private Integer idLab;

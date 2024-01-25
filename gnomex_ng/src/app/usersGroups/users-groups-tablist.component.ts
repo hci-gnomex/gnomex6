@@ -238,6 +238,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     public pricingFC: FormControl;
     public phoneFC: FormControl;
     public groupPhoneFC: FormControl;
+    public awsAccountNumberFC: FormControl;
+    public groupAWSAccountNumberFC: FormControl;
     public isActiveFC: FormControl;
 
 
@@ -552,7 +554,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             lastName: this.selectedGroup.lastName,
             pricing: this.selectedGroup.pricing,
             contactPhone: this.selectedGroup.contactPhone,
-            contactEmail: this.selectedGroup.contactEmail
+            contactEmail: this.selectedGroup.contactEmail,
+            awsAccountNumber: this.selectedGroup.awsAccountNumber
         });
     }
 
@@ -591,12 +594,14 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         this.groupEmailFC = new FormControl("", [Validators.required, Validators.pattern("^((\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*)\\s*[,]{0,1}\\s*)+$")]);
         this.pricingFC = new FormControl("", Validators.required);
         this.groupPhoneFC = new FormControl("");
+        this.groupAWSAccountNumberFC = new FormControl("");
 
         this.groupForm = this.formBuilder.group({
             lastName: '',
             firstName: '',
             contactEmail: this.groupEmailFC,
             contactPhone: this.groupPhoneFC,
+            awsAccountNumber: this.groupAWSAccountNumberFC,
             pricing: this.pricingFC
         }, { validator: UsersGroupsTablistComponent.atLeastOneNameRequired});
     }

@@ -755,6 +755,7 @@ public class SaveLab extends GNomExCommand implements Serializable {
 		lab.setExcludeUsage(labScreen.getExcludeUsage());
 		lab.setBillingContactEmail(labScreen.getBillingContactEmail());
 		lab.setBillingContactPhone(labScreen.getBillingContactPhone());
+		lab.setAwsAccountNumber(labScreen.getAwsAccountNumber());
 
 	}
 

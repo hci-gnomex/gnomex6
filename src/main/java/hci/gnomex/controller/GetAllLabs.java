@@ -60,7 +60,7 @@ public class GetAllLabs extends GNomExCommand implements Serializable {
       setResponsePage(this.SUCCESS_JSP);
 
     } catch (Exception e) {
-      this.errorDetails = Util.GNLOG(LOG,"An exception occured in GetAllLabs ", e);
+      this.errorDetails = Util.GNLOG(LOG,"An exception occurred in GetAllLabs ", e);
 
     }
     return this;

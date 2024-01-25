@@ -740,6 +740,11 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                 params = params.set("idLab", this.selectedLab);
             }else{
                 params = params.delete("idLab");
+//
+//                if (this.labList.length > 0) {
+//                    this.selectedLab = this.labList[0].idLab;
+//                    params = params.set("idLab",this.selectedLab);
+//                }
             }
             if (this.showOwnerComboBox && !(this.idAppUserString === "")) {
                 params = params.set("idAppUser", this.selectedOwner);

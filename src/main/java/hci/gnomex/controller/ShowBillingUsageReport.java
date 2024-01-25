@@ -1,36 +1,28 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.model.BillingStatus;
 import hci.gnomex.model.CoreFacility;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.report.constants.ReportFormats;
 import hci.report.model.Column;
 import hci.report.model.ReportRow;
 import hci.report.model.ReportTray;
 import hci.report.utility.ReportCommand;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.naming.NamingException;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
+import java.util.*;
 
 public class ShowBillingUsageReport extends ReportCommand implements Serializable {
   
@@ -369,7 +361,7 @@ public class ShowBillingUsageReport extends ReportCommand implements Serializabl
     Column reportCol = new Column();
     reportCol.setName(name);
     reportCol.setCaption(name);
-    reportCol.setDisplayOrder(new Integer(colNumber));
+    reportCol.setDisplayOrder(Integer.valueOf(colNumber));
     return reportCol;
   }
   

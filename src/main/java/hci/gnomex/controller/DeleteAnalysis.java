@@ -1,4 +1,5 @@
 package hci.gnomex.controller;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 
 import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
@@ -8,7 +9,7 @@ import hci.gnomex.utility.*;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
@@ -18,11 +19,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Iterator;
 import java.util.List;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
 
 public class DeleteAnalysis extends GNomExCommand implements Serializable {
-
-
 
   // the static field for logging in Log4J
   private static Logger LOG = Logger.getLogger(DeleteAnalysis.class);
@@ -41,7 +40,7 @@ public class DeleteAnalysis extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
    if (request.getParameter("idAnalysis") != null && !request.getParameter("idAnalysis").equals("")) {
-     idAnalysis = new Integer(request.getParameter("idAnalysis"));
+     idAnalysis = Integer.valueOf(request.getParameter("idAnalysis"));
    } else {
      this.addInvalidField("idAnalysis", "idAnalysis is required.");
    }

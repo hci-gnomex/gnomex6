@@ -1,6 +1,5 @@
 package hci.gnomex.utility;
 
-import hci.gnomex.constants.Constants;
 import hci.gnomex.model.Sample;
 import hci.gnomex.model.WorkItem;
 import org.hibernate.Session;
@@ -35,8 +34,8 @@ public class WorkItemSolexaPrepQCParser implements Serializable {
             String idSampleString   = workItemNode.getAttributeValue("idSample");
             String idWorkItemString = workItemNode.getAttributeValue("idWorkItem");
 
-            Sample sample = (Sample)sess.load(Sample.class, new Integer(idSampleString));
-            WorkItem workItem = (WorkItem)sess.load(WorkItem.class, new Integer(idWorkItemString));
+            Sample sample = (Sample)sess.load(Sample.class, Integer.valueOf(idSampleString));
+            WorkItem workItem = (WorkItem)sess.load(WorkItem.class, Integer.valueOf(idWorkItemString));
 
 
             if (workItemNode.getAttributeValue("seqPrepQCStatus") != null && !workItemNode.getAttributeValue("seqPrepQCStatus").equals("")) {
@@ -56,7 +55,7 @@ public class WorkItemSolexaPrepQCParser implements Serializable {
 
     private void initializeSample(Element n, Sample sample) throws Exception {
         if (n.getAttributeValue("idLibPrepQCProtocol") != null && !n.getAttributeValue("idLibPrepQCProtocol").equals("")) {
-            sample.setIdLibPrepQCProtocol(new Integer(n.getAttributeValue("idLibPrepQCProtocol")));
+            sample.setIdLibPrepQCProtocol(Integer.valueOf(n.getAttributeValue("idLibPrepQCProtocol")));
         } else {
             sample.setIdLibPrepQCProtocol(null);
         }

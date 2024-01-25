@@ -5,21 +5,15 @@ import hci.framework.model.DetailObject;
 import hci.gnomex.model.FlowCellChannel;
 import hci.gnomex.model.SequenceLane;
 import hci.gnomex.model.WorkItem;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.sql.Date;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
-
 import org.hibernate.Session;
 
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.util.*;
 
 public class FlowCellChannelParser extends DetailObject implements Serializable {
 
@@ -188,17 +182,17 @@ public class FlowCellChannelParser extends DetailObject implements Serializable 
   protected void initializeFlowCellChannel(JsonObject n, FlowCellChannel channel) {
 
     if (n.get("number") != null && !n.getString("number").equals("")) {
-      channel.setNumber(new Integer(n.getString("number")));
+      channel.setNumber(Integer.valueOf(n.getString("number")));
     } else {
       channel.setNumber(null);
     }
 
     if (n.get("idFlowCell") != null && !n.getString("idFlowCell").equals("")) {
-      channel.setIdFlowCell(new Integer(n.getString("idFlowCell")));
+      channel.setIdFlowCell(Integer.valueOf(n.getString("idFlowCell")));
     }
 
     if (n.get("idSequencingControl") != null && !n.getString("idSequencingControl").equals("")) {
-      channel.setIdSequencingControl(new Integer(n.getString("idSequencingControl")));
+      channel.setIdSequencingControl(Integer.valueOf(n.getString("idSequencingControl")));
     } else{
       channel.setIdSequencingControl(null);
     }
@@ -230,7 +224,7 @@ public class FlowCellChannelParser extends DetailObject implements Serializable 
     }
 
     if (n.get("clustersPerTile") != null && !n.getString("clustersPerTile").equals("")){
-      channel.setClustersPerTile(new Integer(n.getString("clustersPerTile")));
+      channel.setClustersPerTile(Integer.valueOf(n.getString("clustersPerTile")));
     } else {
       channel.setClustersPerTile(null);
     }
@@ -240,7 +234,7 @@ public class FlowCellChannelParser extends DetailObject implements Serializable 
     }
 
     if (n.get("numberSequencingCyclesActual") != null && !n.getString("numberSequencingCyclesActual").equals("")){
-      channel.setNumberSequencingCyclesActual(new Integer(n.getString("numberSequencingCyclesActual")));
+      channel.setNumberSequencingCyclesActual(Integer.valueOf(n.getString("numberSequencingCyclesActual")));
     } else {
       channel.setNumberSequencingCyclesActual(null);
     }
@@ -284,7 +278,7 @@ public class FlowCellChannelParser extends DetailObject implements Serializable 
     }
 
     if (n.get("idPipelineProtocol") != null && !n.getString("idPipelineProtocol").equals("")){
-      channel.setIdPipelineProtocol(new Integer(n.getString("idPipelineProtocol")));
+      channel.setIdPipelineProtocol(Integer.valueOf(n.getString("idPipelineProtocol")));
     } else {
       channel.setIdPipelineProtocol(null);
     }

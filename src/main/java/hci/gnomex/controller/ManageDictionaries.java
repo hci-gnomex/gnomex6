@@ -5,28 +5,21 @@ import hci.dictionary.utility.DictionaryActions;
 import hci.dictionary.utility.DictionaryCommand;
 import hci.dictionary.utility.DictionaryManager;
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.DictionaryEntryUserOwned;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
 import hci.gnomex.utility.GNomExRollbackException;
 import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
-import java.io.Serializable;
-import java.sql.SQLException;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.sql.SQLException;
 /**
- *
- *@author
- *@created
- *@version    1.0
  * Manage a dictionary by accepting parameters and passing the list along
  * to the appropriate dictionary class. Reloads the updated dictionary in the cache
  * so dictionaries will load with new/updated display values.

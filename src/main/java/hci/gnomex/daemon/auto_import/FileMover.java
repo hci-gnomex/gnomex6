@@ -1,7 +1,6 @@
 package hci.gnomex.daemon.auto_import;
 
-import java.util.HashMap;
-import java.util.List;
+//import java.util.List;
 
 public class FileMover {
 

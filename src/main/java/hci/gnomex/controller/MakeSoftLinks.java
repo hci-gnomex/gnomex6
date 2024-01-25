@@ -1,26 +1,19 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.utility.FileDescriptor;
-import hci.gnomex.utility.FileDescriptorParser;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.json.Json;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
-
-import javax.json.Json;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
 
 public class MakeSoftLinks extends GNomExCommand implements Serializable {
 
@@ -64,7 +57,6 @@ public class MakeSoftLinks extends GNomExCommand implements Serializable {
 
         return this;
     }
-
     private String makeSoftLinks() throws Exception {
         // Create the users' soft link directory
         String username1 = username;

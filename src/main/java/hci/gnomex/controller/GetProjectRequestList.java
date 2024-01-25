@@ -1,34 +1,20 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.*;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
-import hci.gnomex.model.BillingTemplate;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.ProjectRequestFilter;
-import hci.gnomex.model.PropertyDictionary;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.RequestCategory;
-import hci.gnomex.model.Step;
-import hci.gnomex.model.Visibility;
-import hci.gnomex.model.WorkItem;
-
-import java.io.Serializable;
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.query.Query;
+import hci.gnomex.model.*;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.text.DateFormat;
+import java.util.*;
 
 public class GetProjectRequestList extends GNomExCommand implements Serializable {
 
@@ -106,11 +92,12 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
     String message = "";
 
     try {
-      if (!filter.hasSufficientCriteria(this.getSecAdvisor())) {
-        message = "Please select a filter";
+     if (!filter.hasSufficientCriteria(this.getSecAdvisor())) {
+      message = "Please select a filter";
         rootNode.setAttribute("message", message);
 
-      } else {
+      } else
+      {
         Session sess = this.getSecAdvisor().getReadOnlyHibernateSession(this.getUsername());
 
         DictionaryHelper dictionaryHelper = DictionaryHelper.getInstance(sess);
@@ -175,9 +162,9 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
           }
         }
 
-        Integer prevIdLab      = new Integer(-1);
-        Integer prevIdProject  = new Integer(-1);
-        Integer prevIdRequest  = new Integer(-1);
+        Integer prevIdLab      = -1;
+        Integer prevIdProject  = -1;
+        Integer prevIdRequest  = -1;
         String prevCodeRequestCategory    = "999";
         String prevCodeApplication = "999";
 
@@ -194,13 +181,13 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
           Object[] row = (Object[])i.next();
 
 
-          Integer idProject = row[0] == null ? new Integer(-2) : (Integer)row[0];
-          Integer idRequest = row[4] == null ? new Integer(-2) : (Integer)row[4];
+          Integer idProject = row[0] == null ? -2 : (Integer)row[0];
+          Integer idRequest = row[4] == null ? -2 : (Integer)row[4];
           if (requestsToSkip.get(idRequest) != null) {
             // skip request due to bstx security.
             continue;
           }
-          Integer idLab     = row[11]== null ? new Integer(-2) : (Integer)row[11];
+          Integer idLab     = row[11]== null ? -2 : (Integer)row[11];
           String  codeRequestCategory        = row[15]== null ? "" : (String)row[15];
           String  codeApplication     = row[16]== null ? "" : (String)row[16];
           StringBuffer analysisNames = (StringBuffer)analysisMap.get(idRequest);
@@ -288,7 +275,7 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
 
       XMLOutputter out = new org.jdom.output.XMLOutputter();
       this.xmlResult = out.outputString(doc);
-      System.out.println ("[GetProjectRequestList] this.xmlResult.length(): " + this.xmlResult.length());
+//      System.out.println ("[GetProjectRequestList] this.xmlResult.length(): " + this.xmlResult.length());
 
       // Garbage collect
       out = null;

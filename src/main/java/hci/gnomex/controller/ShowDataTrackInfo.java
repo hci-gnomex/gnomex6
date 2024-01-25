@@ -1,27 +1,25 @@
 package hci.gnomex.controller;
 
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.DataTrack;
 import hci.gnomex.model.PropertyEntry;
 import hci.gnomex.model.PropertyEntryValue;
 import hci.gnomex.model.PropertyType;
 import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-
-import java.io.Serializable;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.hibernate.Session;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.Set;
 public class ShowDataTrackInfo extends GNomExCommand implements Serializable {
 
 	private static Logger LOG = Logger.getLogger(ShowDataTrackInfo.class);
@@ -37,7 +35,7 @@ public class ShowDataTrackInfo extends GNomExCommand implements Serializable {
 	public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
 		if (request.getParameter("idDataTrack") != null) {
-			idDataTrack = new Integer(request.getParameter("org.dom4j.io"));
+			idDataTrack = Integer.valueOf(request.getParameter("org.dom4j.io"));
 		} else {
 			this.addInvalidField("org.dom4j.io", "org.dom4j.io is required");
 		}

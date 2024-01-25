@@ -3,39 +3,27 @@ package hci.gnomex.controller;
 import hci.dictionary.model.DictionaryEntry;
 import hci.dictionary.model.NullDictionaryEntry;
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.model.CoreFacility;
 import hci.gnomex.model.Lab;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-import hci.gnomex.utility.UsageRowDescriptor;
-import hci.gnomex.utility.UsageRowDescriptorComparator;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.naming.NamingException;
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class GetUsageDetail extends GNomExCommand implements Serializable {
 
@@ -261,10 +249,10 @@ public class GetUsageDetail extends GNomExCommand implements Serializable {
         Integer thisCount = rowCounterMap.get(thisCounter);
         if(thisCount != null) {
           // If counter already present then increment
-          thisCount = new Integer(thisCount.intValue()+1);
+          thisCount = thisCount+1;
         } else {
           // If counter not present then start at 1
-          thisCount = new Integer(1);
+          thisCount = 1;
         }
         rowCounterMap.put(thisCounter, thisCount);
 
@@ -321,10 +309,10 @@ public class GetUsageDetail extends GNomExCommand implements Serializable {
         Integer thisCount = rowCounterMap.get(thisCounter);
         if(thisCount != null) {
           // If counter already present then increment
-          thisCount = new Integer(thisCount.intValue()+1);
+          thisCount = thisCount+1;
         } else {
           // If counter not present then start at 1
-          thisCount = new Integer(1);
+          thisCount = 1;
         }
         rowCounterMap.put(thisCounter, thisCount);
 
@@ -388,10 +376,10 @@ public class GetUsageDetail extends GNomExCommand implements Serializable {
       Integer thisCount = rowCounterMap.get(thisCounter);
       if(thisCount != null) {
         // If counter already present then increment
-        thisCount = new Integer(thisCount.intValue()+1);
+        thisCount = thisCount+1;
       } else {
         // If counter not present then start at 1
-        thisCount = new Integer(1);
+        thisCount = 1;
       }
       rowCounterMap.put(thisCounter, thisCount);
     }
@@ -441,10 +429,10 @@ public class GetUsageDetail extends GNomExCommand implements Serializable {
       Integer thisCount = rowCounterMap.get(thisCounter);
       if(thisCount != null) {
         // If counter already present then increment
-        thisCount = new Integer(thisCount.intValue()+1);
+        thisCount = thisCount+1;
       } else {
         // If counter not present then start at 1
-        thisCount = new Integer(1);
+        thisCount = 1;
       }
       rowCounterMap.put(thisCounter, thisCount);
     }

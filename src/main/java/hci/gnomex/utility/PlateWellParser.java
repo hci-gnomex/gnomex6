@@ -6,15 +6,14 @@ import hci.gnomex.model.Assay;
 import hci.gnomex.model.PlateWell;
 import hci.gnomex.model.Primer;
 import hci.gnomex.model.Sample;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.Element;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
 
 public class PlateWellParser extends DetailObject implements Serializable
 {
@@ -70,10 +69,10 @@ public class PlateWellParser extends DetailObject implements Serializable
         && !n.getAttributeValue("idSample").equals("0")) {
 
       Sample samp = (Sample) sess.get(Sample.class,
-          new Integer(n.getAttributeValue("idSample")));
+          Integer.valueOf(n.getAttributeValue("idSample")));
 
       if (samp!=null) {
-        well.setIdSample(new Integer(n.getAttributeValue("idSample")));
+        well.setIdSample(Integer.valueOf(n.getAttributeValue("idSample")));
         well.setSample(samp);
       }
     } 
@@ -81,7 +80,7 @@ public class PlateWellParser extends DetailObject implements Serializable
     if (n.getAttributeValue("idRequest") != null
         && !n.getAttributeValue("idRequest").equals("0")) {
       try {
-        well.setIdRequest(new Integer(n.getAttributeValue("idRequest"))); 
+        well.setIdRequest(Integer.valueOf(n.getAttributeValue("idRequest")));
       } catch (NumberFormatException e) {
         well.setIdRequest(null);
       }
@@ -92,7 +91,7 @@ public class PlateWellParser extends DetailObject implements Serializable
     if (n.getAttributeValue("idAssay") != null
         && !n.getAttributeValue("idAssay").equals("0")) {
       try {
-        well.setIdAssay(new Integer(n.getAttributeValue("idAssay"))); 
+        well.setIdAssay(Integer.valueOf(n.getAttributeValue("idAssay")));
         Assay assay = (Assay) sess.get(Assay.class,well.getIdAssay());
         if ( assay != null ) {
           well.setAssay( assay );
@@ -105,7 +104,7 @@ public class PlateWellParser extends DetailObject implements Serializable
     if (n.getAttributeValue("idPrimer") != null
         && !n.getAttributeValue("idPrimer").equals("0")) {
       try {
-        well.setIdPrimer(new Integer(n.getAttributeValue("idPrimer"))); 
+        well.setIdPrimer(Integer.valueOf(n.getAttributeValue("idPrimer")));
         Primer primer = (Primer) sess.get(Primer.class,well.getIdPrimer());
         if ( primer != null ) {
           well.setPrimer( primer );
@@ -132,12 +131,12 @@ public class PlateWellParser extends DetailObject implements Serializable
     // Col
     if (n.getAttributeValue("col") != null
         && !n.getAttributeValue("col").equals("")) {
-      well.setCol(new Integer(n.getAttributeValue("col")));
+      well.setCol(Integer.valueOf(n.getAttributeValue("col")));
     } 
     // Index
     if (n.getAttributeValue("index") != null
         && !n.getAttributeValue("index").equals("")) {
-      well.setPosition(new Integer(n.getAttributeValue("index")));
+      well.setPosition(Integer.valueOf(n.getAttributeValue("index")));
     } 
 
   }

@@ -1,12 +1,6 @@
 package hci.gnomex.utility;
 
 import hci.framework.model.DetailObject;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.Iterator;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -18,6 +12,11 @@ import org.jdom.input.SAXBuilder;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Iterator;
 
 public class BatchDataSource extends DetailObject {
   
@@ -63,7 +62,7 @@ public class BatchDataSource extends DetailObject {
     catalinaProperties = new TomcatCatalinaProperties(TomcatCatalinaProperties.getCatalinaPropertiesPathFromScripts(specifiedOrionPath));
     this.registerTomcatDataSources(dataSourcesFile);
     String filePath = "../WEB-INF/classes/";
-    if(specifiedSchemaPath.length() > 0) {
+    if(!specifiedSchemaPath.isEmpty()) {
       filePath = specifiedSchemaPath;
     }    
     filePath = filePath + "SchemaGNomEx.hbm.xml";

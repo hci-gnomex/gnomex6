@@ -1,18 +1,22 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.model.RequestCategory;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.DataTrackFolder;
 import hci.gnomex.model.GenomeBuild;
 import hci.gnomex.model.Organism;
+import hci.gnomex.model.RequestCategory;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.DataTrackFolderComparator;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.jdom.Element;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.sql.Date;
@@ -20,14 +24,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.json.*;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
-
-import org.jdom.Element;
 
 
 
@@ -104,7 +100,7 @@ public class SaveOrganism extends GNomExCommand implements Serializable {
           sess.flush();
         }
 
-        // Check to make sure genome builds have build dates. Otherwise throws error when saving
+        // Check to make sure genome builds have build dates. Otherwise, throws error when saving
         if (genomeBuildsArray != null) {
           for(int i = 0; i < this.genomeBuildsArray.size(); i++) {
             JsonObject node = this.genomeBuildsArray.getJsonObject(i);

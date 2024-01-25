@@ -10,7 +10,6 @@ public class SaveTransferLogServlet extends HttpClientServletBase {
   protected GNomExCommand getCommand() {
     return new SaveTransferLog();
   }
-
   protected void logError(String msg, Exception ex) {
     LOG.error(msg, ex);
   }

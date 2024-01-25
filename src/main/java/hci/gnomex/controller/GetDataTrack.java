@@ -1,27 +1,23 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.model.*;
-import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeMap;
 
 
 
@@ -40,7 +36,7 @@ public class GetDataTrack extends GNomExCommand implements Serializable {
 
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     if (request.getParameter("idDataTrack") != null && !request.getParameter("idDataTrack").equals("")) {
-      idDataTrack = new Integer(request.getParameter("idDataTrack"));
+      idDataTrack = Integer.valueOf(request.getParameter("idDataTrack"));
     } else if ( request.getParameter( "dataTrackNumber" ) != null && !request.getParameter("dataTrackNumber").equals("")) {
       dataTrackNumber = request.getParameter( "dataTrackNumber" );
     } else {

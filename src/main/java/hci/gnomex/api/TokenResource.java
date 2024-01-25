@@ -1,31 +1,27 @@
 package hci.gnomex.api;
 
 import hci.gnomex.model.AppUser;
-import hci.ri.auth.service.UserService;
 import hci.ri.auth.util.JwtGenerator;
 import hci.ri.auth.util.KeystoreRSASignatureConfiguration;
-
-import java.util.Collection;
-import java.util.Date;
-
-import javax.inject.Inject;
-import javax.servlet.ServletContext;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.*;
-
 import io.buji.pac4j.subject.Pac4jPrincipal;
-
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.web.env.IniWebEnvironment;
 import org.apache.shiro.web.util.WebUtils;
-import org.joda.time.DateTime;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.jwt.JwtClaims;
 import org.pac4j.jwt.profile.JwtProfile;
-import org.pac4j.saml.credentials.authenticator.SAML2Authenticator;
+
+import javax.servlet.ServletContext;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.Collection;
+import java.util.Date;
+//import org.pac4j.saml.credentials.authenticator.SAML2Authenticator;
 
 /**
  * A resource for operating on user entities in the system.

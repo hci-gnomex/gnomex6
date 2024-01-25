@@ -1,37 +1,24 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.FlowCell;
 import hci.gnomex.model.FlowCellChannel;
 import hci.gnomex.model.SequenceLane;
 import hci.gnomex.model.WorkItem;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.FlowCellChannelParser;
-import hci.gnomex.utility.HibernateSession;
-
-import java.io.Serializable;
-import java.io.StringReader;
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeSet;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.jdom.Document;
 
 import javax.json.Json;
 import javax.json.JsonObject;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.sql.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 public class DeleteFlowCell extends GNomExCommand implements Serializable {
 

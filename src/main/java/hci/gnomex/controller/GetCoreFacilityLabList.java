@@ -1,25 +1,24 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.CoreFacility;
 import hci.gnomex.model.Lab;
 import hci.gnomex.model.UserPermissionKind;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.apache.log4j.Logger;
-import org.hibernate.query.Query;
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
 
 public class GetCoreFacilityLabList extends GNomExCommand implements Serializable {
 private static Logger LOG = Logger.getLogger(GetCoreFacilityLabList.class);
@@ -37,7 +36,7 @@ public Command execute() throws RollBackCommandException {
 		Session sess = this.getSecAdvisor().getReadOnlyHibernateSession(this.getUsername());
 		List idCoreFacility = new ArrayList();
 
-		// If we are super admin add all active core ids. Otherwise get the core facilities that a normal admin manages.
+		// If we are super admin add all active core ids. Otherwise, get the core facilities that a normal admin manages.
 		if (this.getSecAdvisor().getAppUser().getCodeUserPermissionKind()
 				.equals(UserPermissionKind.SUPER_ADMIN_PERMISSION_KIND)) {
 			for (Iterator i = CoreFacility.getActiveCoreFacilities(sess).iterator(); i.hasNext();) {

@@ -5,18 +5,13 @@ import hci.gnomex.model.SequenceLane;
 import hci.gnomex.model.SequencingControl;
 import hci.gnomex.model.WorkItem;
 import hci.gnomex.security.SecurityAdvisor;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
-
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
+
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.*;
 
 
 public class WorkItemSolexaAssembleParser implements Serializable {
@@ -54,15 +49,15 @@ public class WorkItemSolexaAssembleParser implements Serializable {
           String idSequenceLaneString = node.getAttributeValue("idSequenceLane");
           String idWorkItemString     = node.getAttributeValue("idWorkItem");
           
-          SequenceLane lane = (SequenceLane)sess.load(SequenceLane.class, new Integer(idSequenceLaneString));
-          WorkItem workItem = (WorkItem)sess.load(WorkItem.class, new Integer(idWorkItemString));
+          SequenceLane lane = (SequenceLane)sess.load(SequenceLane.class, Integer.valueOf(idSequenceLaneString));
+          WorkItem workItem = (WorkItem)sess.load(WorkItem.class, Integer.valueOf(idWorkItemString));
           idCoreFacility = workItem.getIdCoreFacility();
           codeRequestCategory = node.getAttributeValue("codeRequestCategory");
           cc.setSequenceLane(lane);
           cc.setWorkItem(workItem);
         } else { // if it is not a <WorkItem> then it must be a <DictionaryEntry> for a SequencingControl
           String idSequencingControlString = node.getAttributeValue("idSequencingControl");
-          SequencingControl control = (SequencingControl)sess.load(SequencingControl.class, new Integer(idSequencingControlString));
+          SequencingControl control = (SequencingControl)sess.load(SequencingControl.class, Integer.valueOf(idSequencingControlString));
           cc.setSequenceControl(control);
         }
         
@@ -105,7 +100,7 @@ public class WorkItemSolexaAssembleParser implements Serializable {
       for(Iterator<?> i = dirtyWorkItemListNode.getChildren().iterator(); i.hasNext();) {
         Element node = (Element)i.next();
         String idWorkItemString     = node.getAttributeValue("idWorkItem");
-        WorkItem workItem = (WorkItem)sess.load(WorkItem.class, new Integer(idWorkItemString));
+        WorkItem workItem = (WorkItem)sess.load(WorkItem.class, Integer.valueOf(idWorkItemString));
         if (node.getAttributeValue("assembleStatus") != null && !node.getAttributeValue("assembleStatus").equals("")) {
           workItem.setStatus(node.getAttributeValue("assembleStatus"));
         } else {

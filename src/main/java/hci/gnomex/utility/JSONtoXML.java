@@ -2,10 +2,9 @@ package hci.gnomex.utility;
 
 import hci.gnomex.utility.json.*;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.*;
-import java.io.*;
 
 
 public class JSONtoXML {

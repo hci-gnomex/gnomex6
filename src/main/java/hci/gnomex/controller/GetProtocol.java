@@ -1,22 +1,21 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.framework.security.UnknownPermissionException;
 import hci.gnomex.model.*;
-
-import java.io.Serializable;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
 
 public class GetProtocol extends GNomExCommand implements Serializable {
 
@@ -231,7 +230,7 @@ public class GetProtocol extends GNomExCommand implements Serializable {
 
     if (request.getParameter("id") != null && !request.getParameter("id").equals("")) {
       try {
-        this.idProtocol = new Integer(request.getParameter("id"));
+        this.idProtocol = Integer.valueOf(request.getParameter("id"));
       } catch (NumberFormatException ex) {
         this.codeProtocol = request.getParameter("id");
       }

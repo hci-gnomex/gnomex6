@@ -1,17 +1,13 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 import hci.framework.control.RollBackCommandException;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.MolarityCalculator;
 
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.text.DecimalFormat;
 
 
 public class CalculateMolarity extends GNomExCommand implements Serializable {
@@ -29,16 +25,16 @@ public class CalculateMolarity extends GNomExCommand implements Serializable {
   
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     
-    if (request.getParameter("libConcentration") != null && !request.getParameter("libConcentration").equals("")) {
-      libConcentration = new Integer(request.getParameter("libConcentration"));
+    if (request.getParameter("libConcentration") != null && !request.getParameter("libConcentration").isEmpty()) {
+      libConcentration = Integer.valueOf(request.getParameter("libConcentration"));
     }
-    if (request.getParameter("averageFragmentSize") != null && !request.getParameter("averageFragmentSize").equals("")) {
-      averageFragmentSize = new Integer(request.getParameter("averageFragmentSize"));
+    if (request.getParameter("averageFragmentSize") != null && !request.getParameter("averageFragmentSize").isEmpty()) {
+      averageFragmentSize = Integer.valueOf(request.getParameter("averageFragmentSize"));
     }
     
     
-    double molarity = MolarityCalculator.calculateConcentrationInnM(libConcentration.intValue(), averageFragmentSize.intValue());
-    BigDecimal molarity1 = new BigDecimal(molarity);
+    double molarity = MolarityCalculator.calculateConcentrationInnM(libConcentration, averageFragmentSize);
+//    BigDecimal molarity1 = new BigDecimal(molarity);
     
     double soluteVol = MolarityCalculator.calculateDilutionVol(molarity, 10, 100);
     double solventVol = 100 - soluteVol;

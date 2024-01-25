@@ -1,24 +1,23 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.ProjectFilter;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 
+import javax.naming.NamingException;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
 
 public class GetProjectList extends GNomExCommand implements Serializable {
 
@@ -44,7 +43,7 @@ public class GetProjectList extends GNomExCommand implements Serializable {
     Session sess = this.getSecAdvisor().getReadOnlyHibernateSession(this.getUsername());
 
     StringBuffer buf = projectFilter.getQuery(this.getSecAdvisor());
-    LOG.info("Query for GetProjectList: " + buf.toString());
+//    System.out.println("Query for GetProjectList: " + buf.toString());
     List projects = (List)sess.createQuery(buf.toString()).list();
 
     Document doc = new Document(new Element("ProjectList"));

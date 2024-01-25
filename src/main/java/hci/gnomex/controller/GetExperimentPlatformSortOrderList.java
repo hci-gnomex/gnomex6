@@ -1,20 +1,19 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.RequestCategory;
-
-import java.io.Serializable;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.query.Query;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.List;
 public class GetExperimentPlatformSortOrderList extends GNomExCommand implements Serializable {
 
   // the static field for logging in Log4J
@@ -29,7 +28,7 @@ public class GetExperimentPlatformSortOrderList extends GNomExCommand implements
 
     if (request.getParameter("idCoreFacility") != null && !request.getParameter("idCoreFacility").equals("")) {
       try {
-        idCoreFacility = new Integer(request.getParameter("idCoreFacility"));
+        idCoreFacility = Integer.valueOf(request.getParameter("idCoreFacility"));
       } catch(NumberFormatException ex) {
         LOG.error("Invalid idCoreFacility for GetExperimentPlatformSortOrderList: " + request.getParameter("idCoreFacility"), ex);
         this.addInvalidField("Missing parameters", "idCoreFacility required");

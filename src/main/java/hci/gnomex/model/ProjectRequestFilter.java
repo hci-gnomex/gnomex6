@@ -108,7 +108,10 @@ public class ProjectRequestFilter extends DetailObject {
 
     // Require limiting criteria for admins since they are not scoped by labs
     // automatically
-    if (secAdvisor.hasPermission(secAdvisor.CAN_ACCESS_ANY_OBJECT) || secAdvisor.hasPermission(secAdvisor.CAN_SUBMIT_FOR_OTHER_CORES)) {
+
+    // tim removed || secAdvisor.hasPermission(secAdvisor.CAN_SUBMIT_FOR_OTHER_CORES) on 10/11/2023
+    // this was causing normal MD users to not be able to see any projects
+    if (secAdvisor.hasPermission(secAdvisor.CAN_ACCESS_ANY_OBJECT) ) {
       return hasLimitingCriteria;
     }
     // Non-admins are always scoped by either lab, own experiments,
@@ -167,13 +170,16 @@ public class ProjectRequestFilter extends DetailObject {
     queryBuf.append(" LEFT JOIN           req.appUser as reqOwner ");
     queryBuf.append(" LEFT JOIN           req.lab as lab ");
     queryBuf.append(" LEFT JOIN           req.collaborators as collab ");
+    queryBuf.append(" LEFT JOIN           projectLab.coreFacilities as labFacilities ");
 
+/*
+    // removed || secAdvisor.hasPermission(SecurityAdvisor.CAN_SUBMIT_FOR_OTHER_CORES) on 10/11/2023
     if (!secAdvisor.hasPermission(SecurityAdvisor.CAN_ADMINISTER_ALL_CORE_FACILITIES)
-            && (secAdvisor.hasPermission(SecurityAdvisor.CAN_ACCESS_ANY_OBJECT) || secAdvisor.hasPermission(SecurityAdvisor.CAN_SUBMIT_FOR_OTHER_CORES))) {
+            && (secAdvisor.hasPermission(SecurityAdvisor.CAN_ACCESS_ANY_OBJECT) )) {
       // Admins must do security limit by lab core facility.
       queryBuf.append(" LEFT JOIN           projectLab.coreFacilities as labFacilities ");
     }
-
+*/
     if (experimentDesignCodes != null && experimentDesignCodes.size() > 0) {
       queryBuf.append(" JOIN           project.experimentDesignEntries as ede ");
     }
@@ -204,13 +210,16 @@ public class ProjectRequestFilter extends DetailObject {
     queryBuf.append(" LEFT JOIN           req.slideProduct as slideProduct ");
     queryBuf.append(" LEFT JOIN           req.samples as sample ");
     queryBuf.append(" LEFT JOIN           req.collaborators as collab ");
+    queryBuf.append(" LEFT JOIN           projectLab.coreFacilities as labFacilities ");
 
+/*
+    // removed || secAdvisor.hasPermission(SecurityAdvisor.CAN_SUBMIT_FOR_OTHER_CORES) on 10/11/2023
     if (!secAdvisor.hasPermission(SecurityAdvisor.CAN_ADMINISTER_ALL_CORE_FACILITIES)
-        && (secAdvisor.hasPermission(SecurityAdvisor.CAN_ACCESS_ANY_OBJECT) || secAdvisor.hasPermission(SecurityAdvisor.CAN_SUBMIT_FOR_OTHER_CORES))) {
+        && (secAdvisor.hasPermission(SecurityAdvisor.CAN_ACCESS_ANY_OBJECT) )) {
       // Admins must do security limit by lab core facility.
       queryBuf.append(" LEFT JOIN           projectLab.coreFacilities as labFacilities ");
     }
-
+*/
     if (hasSlideProductCriteria()) {
       queryBuf.append(" JOIN           req.slideProduct as sp ");
     }
@@ -679,17 +688,22 @@ public class ProjectRequestFilter extends DetailObject {
     if (this.allExperiments != null && this.allExperiments.equals("Y")) {
       boolean scopeToGroup = false;
       secAdvisor.buildSpannedSecurityCriteria(queryBuf, "project", "req", "collab", addWhere, "req.codeVisibility", scopeToGroup, "req.idRequest", "labFacilities", true);
+// System.out.println ("[addSecurityCriteria] allExperiments = Y");
     } else if (this.publicExperimentsInOtherGroups != null && this.publicExperimentsInOtherGroups.equalsIgnoreCase("Y")) {
       addWhere = secAdvisor.addPublicOnlySecurityCriteria(queryBuf, "req", addWhere, true);
+//      System.out.println ("[addSecurityCriteria] publicExperimentsInOtherGroups = Y");
     } else {
       boolean scopeToGroup = true;
       secAdvisor.buildSpannedSecurityCriteria(queryBuf, "project", "req", "collab", addWhere, "req.codeVisibility", scopeToGroup, "req.idRequest", "labFacilities", true);
+//      System.out.println ("[addSecurityCriteria] scopeToGroup = true;");
 
     }
 
     if (this.excludeClinicResearch != null && this.excludeClinicResearch.equals("Y")) {
       secAdvisor.appendExcludeClinicResearchCriteria(queryBuf, addWhere, dictionaryHelper, "req");
     }
+
+//    System.out.println("[addSecurityCriteria] ***final*** queryBuf = " + queryBuf.toString());
   }
 
   private void addAnalysisExperimentSecurityCriteria() {

@@ -151,7 +151,7 @@ public class ExpireBillingAccount {
 
                     /**/
 
-                    if (myConn.getMetaData().getDatabaseProductName().toUpperCase().indexOf(Constants.SQL_SERVER) >= 0) { // microsoft sql
+                    if (myConn.getMetaData().getDatabaseProductName().toUpperCase().contains(Constants.SQL_SERVER)) { // microsoft sql
                         System.out.println("sql Server");
                         sendExpiredAccountEmails(strQuery,sqlServerQuery,idCoreFacility,cardType);
 

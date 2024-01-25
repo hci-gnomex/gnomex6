@@ -1,14 +1,12 @@
 package hci.gnomex.utility;
 
 import hci.framework.model.DetailObject;
-
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Iterator;
-
 import org.hibernate.Session;
+
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import java.io.Serializable;
+import java.util.HashMap;
 
 
 public class AnalysisCollaboratorParser extends DetailObject implements Serializable {

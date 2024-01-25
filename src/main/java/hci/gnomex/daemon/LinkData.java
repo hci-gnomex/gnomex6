@@ -4,24 +4,24 @@ package hci.gnomex.daemon;
 // 01/30/2019   tim     fix hardwired 2018 year
 
 
-import hci.gnomex.daemon.auto_import.Differ;
-import hci.gnomex.daemon.auto_import.XMLParser;
 import hci.gnomex.utility.BatchDataSource;
 import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.*;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.Date;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.internal.SessionImpl;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class LinkData extends TimerTask {
 

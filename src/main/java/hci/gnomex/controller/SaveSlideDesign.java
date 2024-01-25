@@ -1,34 +1,23 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Application;
 import hci.gnomex.model.ArrayCoordinate;
 import hci.gnomex.model.SlideDesign;
 import hci.gnomex.model.SlideProduct;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.ApplicationParser;
-import hci.gnomex.utility.ArrayCoordinateParser;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-
-import java.io.Serializable;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
-import org.apache.log4j.Logger;
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.util.*;
 
 
 public class SaveSlideDesign extends GNomExCommand implements Serializable {
@@ -70,7 +59,7 @@ public class SaveSlideDesign extends GNomExCommand implements Serializable {
     if (request.getParameter("slideSet") != null && !request.getParameter("slideSet").equals("")) {
       String slideSet = request.getParameter("slideSet");
       int n = Integer.parseInt(slideSet);
-      idSlideProductScreen = new Integer(n);
+      idSlideProductScreen = n;
     }
     if (request.getParameter("isInSlideSet") != null && !request.getParameter("isInSlideSet").equals("")) {
       isInSlideSet = request.getParameter("isInSlideSet");
@@ -155,7 +144,7 @@ public class SaveSlideDesign extends GNomExCommand implements Serializable {
             initializeSlideProduct();
 
             slideProduct.setName(slideDesignScreen.getName());
-            slideProduct.setSlidesInSet(new Integer(1));
+            slideProduct.setSlidesInSet(1);
             slideProduct.setIsSlideSet("N");
 
             sess.save(slideProduct);
@@ -245,9 +234,9 @@ public class SaveSlideDesign extends GNomExCommand implements Serializable {
 
         // Set the slide count on the slide product
         List slideDesignCount = sess.createQuery("SELECT sd.idSlideDesign from SlideProduct sp JOIN sp.slideDesigns sd WHERE sp.idSlideProduct = " + slideProduct.getIdSlideProduct()).list();
-        slideProduct.setSlidesInSet(new Integer(slideDesignCount.size()));
+        slideProduct.setSlidesInSet(Integer.valueOf(slideDesignCount.size()));
         if (isInSlideSet.equals("Y") && slideProduct.getSlidesInSet().intValue() == 1) {
-          slideProduct.setSlidesInSet(new Integer(2));
+          slideProduct.setSlidesInSet(2);
         }
         sess.flush();
         
@@ -297,7 +286,7 @@ public class SaveSlideDesign extends GNomExCommand implements Serializable {
     
     if(slideProductScreen.getArraysPerSlide() == null || 
        slideProductScreen.getArraysPerSlide().intValue() == 0) {
-      slideProduct.setArraysPerSlide(new Integer(1));
+      slideProduct.setArraysPerSlide(1);
     }
 
   }

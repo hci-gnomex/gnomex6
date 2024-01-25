@@ -1,24 +1,14 @@
 package hci.gnomex.controller;
 
 import hci.dictionary.utility.DictionaryManager;
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.security.UnknownPermissionException;
-import hci.gnomex.model.AnalysisGroupFilter;
-import hci.gnomex.model.AnnotationReportField;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.model.DataTrack;
-import hci.gnomex.model.GenomeBuild;
-import hci.gnomex.model.Lab;
-import hci.gnomex.model.Organism;
-import hci.gnomex.model.Property;
-import hci.gnomex.model.PropertyOption;
-import hci.gnomex.model.PropertyType;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.RequestSampleFilter;
+import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DataTrackQuery;
 import hci.gnomex.utility.DictionaryHelper;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.Util;
 import hci.report.constants.ReportFormats;
 import hci.report.model.Column;
@@ -26,30 +16,15 @@ import hci.report.model.ReportRow;
 import hci.report.model.ReportTray;
 import hci.report.utility.ReportCommand;
 import org.apache.log4j.Logger;
-
-import java.io.Serializable;
-import java.io.StringReader;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import org.hibernate.Session;
 
 import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 public class ShowAnnotationReport extends ReportCommand implements Serializable {
@@ -519,7 +494,7 @@ public class ShowAnnotationReport extends ReportCommand implements Serializable 
     Column reportCol = new Column();
     reportCol.setName(name);
     reportCol.setCaption(name);
-    reportCol.setDisplayOrder(new Integer(colNumber));
+    reportCol.setDisplayOrder(Integer.valueOf(colNumber));
     return reportCol;
   }
 

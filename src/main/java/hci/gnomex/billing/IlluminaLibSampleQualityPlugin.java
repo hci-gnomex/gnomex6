@@ -1,28 +1,10 @@
 package hci.gnomex.billing;
 
-import hci.gnomex.model.BillingItem;
-import hci.gnomex.model.BillingPeriod;
-import hci.gnomex.model.BillingTemplate;
-import hci.gnomex.model.BioanalyzerChipType;
-import hci.gnomex.model.Hybridization;
-import hci.gnomex.model.LabeledSample;
-import hci.gnomex.model.Price;
-import hci.gnomex.model.PriceCategory;
-import hci.gnomex.model.PriceCriteria;
-import hci.gnomex.model.PropertyEntry;
-import hci.gnomex.model.Request;
-import hci.gnomex.model.Sample;
-import hci.gnomex.model.SequenceLane;
+import hci.gnomex.model.*;
 import hci.gnomex.utility.DictionaryHelper;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.hibernate.Session;
+
+import java.util.*;
 
 
 public class IlluminaLibSampleQualityPlugin extends BillingPlugin {
@@ -61,9 +43,9 @@ public class IlluminaLibSampleQualityPlugin extends BillingPlugin {
       
       Integer sampleCount = (Integer)codeChipTypeMap.get(codeChipType);
       if (sampleCount == null) {
-        sampleCount = new Integer(0);
+        sampleCount = 0;
       }
-      sampleCount = new Integer(sampleCount.intValue() + 1);
+      sampleCount = Integer.valueOf(sampleCount.intValue() + 1);
       codeChipTypeMap.put(codeChipType, sampleCount);
       
       // Store the notes associated with this billing item

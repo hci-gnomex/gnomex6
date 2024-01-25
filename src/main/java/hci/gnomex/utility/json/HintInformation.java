@@ -1,8 +1,5 @@
 package  hci.gnomex.utility.json;
 
-import hci.gnomex.utility.json.DataCharBuffer;
-import hci.gnomex.utility.json.IndexBuffer;
-
 /**
  * The hint information we need to convert from JSON to XML with no
  * information lost.

@@ -5,12 +5,9 @@ import hci.gnomex.model.CoreFacility;
 import hci.gnomex.model.Lab;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.utility.*;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
@@ -18,10 +15,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
 
 public class ApproveUser extends HttpServlet {
 public static Logger LOG = Logger.getLogger(ApproveUser.class);
@@ -46,7 +44,7 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response) 
 	String department = "";
 	String labEmail = "";
 	String labPhone = "";
-	Integer requestedLabId = new Integer(-1);
+	Integer requestedLabId = -1;
 	List<Integer> idCoreFacilities = null;
 
 	try {

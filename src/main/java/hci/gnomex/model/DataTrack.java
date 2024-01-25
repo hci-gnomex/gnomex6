@@ -55,14 +55,14 @@ public class DataTrack extends DetailObject implements Serializable, Owned, Visi
         if (fd.exists()) {
             if (fd.isDirectory()) {
                 String[] fileList = fd.list();
-                for (int x = 0; x < fileList.length; x++) {
-                    String fileName = filePath + "/" + fileList[x];
+                for (String s : fileList) {
+                    String fileName = filePath + "/" + s;
                     File f1 = new File(fileName);
 
-                    ucscLinkFile = formatUCSCLink(fileList[x], ucscLinkFile);
+                    ucscLinkFile = formatUCSCLink(s, ucscLinkFile);
 
                     // Show the subdirectory in the name if we are not at the main folder level
-                    String displayName = formatDisplayName(fileList[x], f1, subDirName);
+                    String displayName = formatDisplayName(s, f1, subDirName);
 
                     if (f1.isDirectory()) {
                         Element fileNode = new Element("Dir");
@@ -180,19 +180,11 @@ public class DataTrack extends DetailObject implements Serializable, Owned, Visi
     }
 
     public boolean isOwner(Integer idAppUser) {
-        if (this.getIdAppUser() != null && this.getIdAppUser().equals(idAppUser)) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.getIdAppUser() != null && this.getIdAppUser().equals(idAppUser);
     }
 
     public boolean isLab(Integer idLab) {
-        if (this.getLab() != null && this.getLab().equals(idLab)) {
-            return true;
-        } else {
-            return false;
-        }
+        return this.getLab() != null && this.getLab().equals(idLab);
     }
 
     public Integer getIdAppUser() {

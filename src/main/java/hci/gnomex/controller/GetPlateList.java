@@ -1,6 +1,6 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.model.AppUser;
@@ -8,23 +8,22 @@ import hci.gnomex.model.PlateFilter;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.model.ReactionType;
 import hci.gnomex.security.SecurityAdvisor;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 
+import javax.naming.NamingException;
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
 
 public class GetPlateList extends GNomExCommand implements Serializable {
 
@@ -76,9 +75,9 @@ public class GetPlateList extends GNomExCommand implements Serializable {
 
             Object[] row = (Object[])i.next();
 
-            Integer idPlate          = row[0] == null ? new Integer(0) : (Integer)row[0];
-            Integer idInstrumentRun  = row[1] == null ? new Integer(0) : (Integer)row[1];
-            Integer quadrant         = row[2] == null ? new Integer(0) : (Integer)row[2];
+            Integer idPlate          = row[0] == null ? 0 : (Integer)row[0];
+            Integer idInstrumentRun  = row[1] == null ? 0 : (Integer)row[1];
+            Integer quadrant         = row[2] == null ? 0 : (Integer)row[2];
             String  createDate       = this.formatDate((java.sql.Timestamp)row[3]);
             String  comments         = row[4] == null ? "" : row[4].toString();
             String  label            = row[5] == null ? "" : row[5].toString();

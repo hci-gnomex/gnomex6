@@ -1,27 +1,20 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.DataTrack;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.Topic;
-import hci.gnomex.utility.AnalysisComparator;
-import hci.gnomex.utility.DataTrackComparator;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.RequestComparator;
-import hci.gnomex.utility.TopicComparator;
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import javax.servlet.http.HttpSession;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
 
 
 public class MoveOrCopyTopic extends GNomExCommand implements Serializable {
@@ -42,13 +35,13 @@ public class MoveOrCopyTopic extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idTopic") != null && !request.getParameter("idTopic").equals("")) {
-      idTopic = new Integer(request.getParameter("idTopic"));
+      idTopic = Integer.valueOf(request.getParameter("idTopic"));
     } else {
       this.addInvalidField("Missing idTopic", "idTopic is required.");
     }
 
     if (request.getParameter("idParentTopicNew") != null && !request.getParameter("idParentTopicNew").equals("")) {
-      idParentTopicNew = new Integer(request.getParameter("idParentTopicNew"));
+      idParentTopicNew = Integer.valueOf(request.getParameter("idParentTopicNew"));
     }
 
 

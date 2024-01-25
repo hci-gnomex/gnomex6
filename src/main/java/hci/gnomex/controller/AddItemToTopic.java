@@ -1,31 +1,22 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Analysis;
 import hci.gnomex.model.DataTrack;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.Topic;
-import hci.gnomex.utility.AnalysisComparator;
-import hci.gnomex.utility.DataTrackComparator;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.RequestComparator;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.*;
 
 
 public class AddItemToTopic extends GNomExCommand implements Serializable {
@@ -53,21 +44,21 @@ public class AddItemToTopic extends GNomExCommand implements Serializable {
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     int idCnt = 0;
     if (request.getParameter("idRequest0") != null && !request.getParameter("idRequest0").equals("")) {
-      idRequest = new Integer(request.getParameter("idRequest0"));
+      idRequest = Integer.valueOf(request.getParameter("idRequest0"));
       while(request.getParameter("idRequest"+idCnt) != null && !request.getParameter("idRequest"+idCnt).equals("")) {
-        reqList.add(new Integer(request.getParameter("idRequest"+idCnt)));
+        reqList.add(Integer.valueOf(request.getParameter("idRequest"+idCnt)));
         idCnt++;
       }
     } else if (request.getParameter("idAnalysis0") != null && !request.getParameter("idAnalysis0").equals("")) {
-      idAnalysis = new Integer(request.getParameter("idAnalysis0"));
+      idAnalysis = Integer.valueOf(request.getParameter("idAnalysis0"));
       while(request.getParameter("idAnalysis"+idCnt) != null && !request.getParameter("idAnalysis"+idCnt).equals("")) {
-        anList.add(new Integer(request.getParameter("idAnalysis"+idCnt)));
+        anList.add(Integer.valueOf(request.getParameter("idAnalysis"+idCnt)));
         idCnt++;
       }
     } else if (request.getParameter("idDataTrack0") != null && !request.getParameter("idDataTrack0").equals("")) {
-      idDataTrack = new Integer(request.getParameter("idDataTrack0"));
+      idDataTrack = Integer.valueOf(request.getParameter("idDataTrack0"));
       while(request.getParameter("idDataTrack"+idCnt) != null && !request.getParameter("idDataTrack"+idCnt).equals("")) {
-        dtList.add(new Integer(request.getParameter("idDataTrack"+idCnt)));
+        dtList.add(Integer.valueOf(request.getParameter("idDataTrack"+idCnt)));
         idCnt++;
       }
     } else {
@@ -75,7 +66,7 @@ public class AddItemToTopic extends GNomExCommand implements Serializable {
     }
 
     if (request.getParameter("idTopic") != null && !request.getParameter("idTopic").equals("")) {
-      idTopic = new Integer(request.getParameter("idTopic"));
+      idTopic = Integer.valueOf(request.getParameter("idTopic"));
     } else {
       this.addInvalidField("Missing idTopic", "idTopic is required.");
     }
@@ -83,7 +74,7 @@ public class AddItemToTopic extends GNomExCommand implements Serializable {
     if (request.getParameter("isMove") != null && !request.getParameter("isMove").equals("")) {
       // If move or copy make sure idTopicOld present as well
       if (request.getParameter("idTopicOld") != null && !request.getParameter("idTopicOld").equals("")) {
-        idTopicOld = new Integer(request.getParameter("idTopicOld"));
+        idTopicOld = Integer.valueOf(request.getParameter("idTopicOld"));
       } else {
         this.addInvalidField("Missing idTopicOld", "idTopicOld is required.");
         return;
@@ -213,4 +204,6 @@ public class AddItemToTopic extends GNomExCommand implements Serializable {
 
     return this;
   }
+
+
 }

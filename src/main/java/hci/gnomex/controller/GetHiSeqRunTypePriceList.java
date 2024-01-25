@@ -30,7 +30,7 @@ public class GetHiSeqRunTypePriceList extends GNomExCommand implements Serializa
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
 
     if (request.getParameter("idLab") != null && !request.getParameter("idLab").equals("")) {
-      idLab =  new Integer(request.getParameter("idLab"));
+      idLab =  Integer.valueOf(request.getParameter("idLab"));
     } else {
       this.addInvalidField("IdLab", "IdLab required");
     }

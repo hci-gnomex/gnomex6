@@ -1,10 +1,10 @@
 package hci.gnomex.controller;
 
+import hci.gnomex.constants.Constants;
+import hci.gnomex.model.AppUser;
+import hci.gnomex.utility.HibernateSession;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
-
-import java.io.IOException;
-import java.util.List;
 
 import javax.json.Json;
 import javax.json.JsonObject;
@@ -15,10 +15,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import hci.gnomex.constants.Constants;
-import hci.gnomex.model.AppUser;
-import hci.gnomex.utility.HibernateSession;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by u0556399 on 3/25/2020.
@@ -30,7 +28,7 @@ public class CheckIsGNomExAccount extends HttpServlet {
 
 
 	protected static void initLog4j() {
-		String configFile = "";
+		String configFile;
 		configFile = webContextPath + "/WEB-INF/classes/" + Constants.LOGGING_PROPERTIES;
 		org.apache.log4j.PropertyConfigurator.configure(configFile);
 		if (configFile == null) {

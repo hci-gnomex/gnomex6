@@ -1,31 +1,25 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.DataTrackFolder;
 import hci.gnomex.model.GenomeBuild;
 import hci.gnomex.model.Segment;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.DataTrackFolderComparator;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-
-import java.io.File;
-import java.io.Serializable;
-import java.io.StringReader;
-import java.util.*;
-
+import hci.gnomex.utility.*;
 import org.apache.commons.validator.routines.IntegerValidator;
 import org.apache.log4j.Logger;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.hibernate.Session;
+
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.util.*;
 
 
 
@@ -187,7 +181,7 @@ public class SaveGenomeBuild extends GNomExCommand implements Serializable {
                 Element segmentNode = (Element) objNode;
                 String idSegment = segmentNode.attributeValue("idSegment");
                 if (idSegment != null && !idSegment.equals("")) {
-                  if (segment.getIdSegment().equals(new Integer(idSegment))) {
+                  if (segment.getIdSegment().equals(Integer.valueOf(idSegment))) {
                     found = true;
                     break;
                   }

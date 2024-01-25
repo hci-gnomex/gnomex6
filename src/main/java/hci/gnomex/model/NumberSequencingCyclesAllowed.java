@@ -20,7 +20,7 @@ public class NumberSequencingCyclesAllowed extends DictionaryEntry implements Se
   private String   protocolDescription;
   
   public String getDisplay() {
-    return name != null && !name.equals("") ? 
+    return name != null && !name.isEmpty() ?
         name : 
         getCodeRequestCategory() + " - " + getNumberSequencingCyclesDisplay() + " - " + getSeqRunTypeDisplay();
   }

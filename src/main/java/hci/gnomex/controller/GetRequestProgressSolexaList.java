@@ -1,29 +1,22 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.RequestCategory;
 import hci.gnomex.model.RequestProgressSolexaFilter;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.DictionaryHelper;
-
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TreeMap;
-
-import javax.naming.NamingException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.Util;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.Serializable;
+import java.util.*;
 
 public class GetRequestProgressSolexaList extends GNomExCommand implements Serializable {
 
@@ -133,7 +126,7 @@ public class GetRequestProgressSolexaList extends GNomExCommand implements Seria
         Element n = new Element("RequestProgress");
         n.setAttribute("key", key);
         n.setAttribute("isSelected",      "N");
-        n.setAttribute("altColor",        new Boolean(alt).toString());
+        n.setAttribute("altColor",        Boolean.toString(alt));
         n.setAttribute("showRequestNumber", !requestNumber.equals(prevRequestNumber) ? "Y" : "N");
         n.setAttribute("idRequest",       row[0].toString());
         n.setAttribute("createDate",      this.formatDate((java.util.Date)row[1]));
@@ -154,13 +147,13 @@ public class GetRequestProgressSolexaList extends GNomExCommand implements Seria
         String sampleNumber = (String)row[4];
         Integer sequencedLaneCount = (Integer)laneSeqStatusMap.get(sampleNumber);
         if (sequencedLaneCount == null) {
-          sequencedLaneCount = new Integer(0);
+          sequencedLaneCount = 0;
         }
         n.setAttribute("numberLanesSequenced", sequencedLaneCount != null ? sequencedLaneCount.toString() : "0");
 
         Integer processedLaneCount = (Integer)lanePipelineStatusMap.get(sampleNumber);
         if (processedLaneCount == null) {
-          processedLaneCount = new Integer(0);
+          processedLaneCount = 0;
         }
         n.setAttribute("numberLanesProcessed", processedLaneCount != null ? processedLaneCount.toString() : "0");
 
@@ -168,7 +161,7 @@ public class GetRequestProgressSolexaList extends GNomExCommand implements Seria
         Integer laneCount = (Integer)laneStatusMap.get(sampleNumber);
         n.setAttribute("numberLanes", laneCount != null ? laneCount.toString() : "0");
         if (laneCount == null) {
-          laneCount = new Integer(0);
+          laneCount = 0;
         }
 
 
@@ -241,7 +234,7 @@ public class GetRequestProgressSolexaList extends GNomExCommand implements Seria
 
 
       if (reqNumber1.equals(reqNumber2)) {
-        return new Integer(number1).compareTo(new Integer(number2));
+        return Integer.valueOf(number1).compareTo(Integer.valueOf(number2));
       } else {
         return reqNumber1.compareTo(reqNumber2);
       }

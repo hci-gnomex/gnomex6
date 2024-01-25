@@ -1,36 +1,24 @@
 package hci.gnomex.controller;
 
-import hci.framework.control.Command;import hci.gnomex.utility.HttpServletWrappedRequest;import hci.gnomex.utility.Util;
+import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.framework.model.DetailObject;
 import hci.framework.utilities.XMLReflectException;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.ProductOrder;
 import hci.gnomex.model.ProductOrderFile;
-import hci.gnomex.utility.DictionaryHelper;
-import hci.gnomex.utility.FileDescriptor;
-import hci.gnomex.utility.PropertyDictionaryHelper;
-
-import java.io.File;
-import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.apache.log4j.Logger;
+
+import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.*;
 public class GetProductOrderDownloadList extends GNomExCommand implements Serializable {
 
 	private static Logger LOG = Logger.getLogger(GetProductOrderDownloadList.class);
@@ -44,7 +32,7 @@ public class GetProductOrderDownloadList extends GNomExCommand implements Serial
 	@Override
 	public void loadCommand(HttpServletWrappedRequest req, HttpSession sess) {
 		if (req.getParameter("idProductOrder") != null && !req.getParameter("idProductOrder").equals("")) {
-			idProductOrder = new Integer(req.getParameter("idProductOrder"));
+			idProductOrder = Integer.valueOf(req.getParameter("idProductOrder"));
 		} else {
 			this.addInvalidField("Missing idProductOrder", "Please select a product order");
 		}

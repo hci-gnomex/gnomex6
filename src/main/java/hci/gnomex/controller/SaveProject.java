@@ -1,29 +1,22 @@
 package hci.gnomex.controller;
 
 import hci.framework.control.Command;
+import hci.framework.control.RollBackCommandException;
+import hci.gnomex.model.*;
+import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.gnomex.utility.Util;
-import hci.framework.control.RollBackCommandException;
-import hci.gnomex.model.ExperimentDesign;
-import hci.gnomex.model.ExperimentDesignEntry;
-import hci.gnomex.model.ExperimentFactor;
-import hci.gnomex.model.ExperimentFactorEntry;
-import hci.gnomex.model.Project;
-import hci.gnomex.model.QualityControlStepEntry;
-import hci.gnomex.utility.HibernateSession;
-
-import java.io.Serializable;
-import java.io.StringReader;
-import java.util.Set;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
 import javax.servlet.http.HttpSession;
-
-import org.hibernate.Session;
-import org.apache.log4j.Logger;
+import java.io.Serializable;
+import java.io.StringReader;
+import java.util.Set;
 
 public class SaveProject extends GNomExCommand implements Serializable {
 
