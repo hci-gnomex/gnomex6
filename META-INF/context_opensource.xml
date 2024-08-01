@@ -12,7 +12,7 @@
   <Resource auth="Container" 
     mail.smtp.host="${hci.mailserver}" 
     name="mail/MailSession" 
-    type="javax.mail.Session"/>
+    type="jakarta.mail.Session"/>
 
     
   <!-- GNomEx Realm for authenticating user - encrypted passwords stored in GNomEx db -->

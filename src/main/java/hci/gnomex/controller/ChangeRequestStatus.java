@@ -11,7 +11,7 @@ import hci.gnomex.utility.*;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;

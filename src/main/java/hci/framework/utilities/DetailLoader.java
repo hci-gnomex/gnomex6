@@ -1,4 +1,5 @@
 package hci.framework.utilities;
+
 import hci.framework.model.DetailObject;
 import hci.framework.model.FieldInputValidator;
 import hci.gnomex.utility.HttpServletWrappedRequest;
@@ -10,7 +11,7 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 
-import javax.servlet.http.HttpServletRequest;
+//import javax.servlet.http.HttpServletRequest;
 
 /**
  *  A class that loads a DetailObject from an HttpServletRequest and does the
@@ -27,7 +28,11 @@ public class DetailLoader extends FieldInputValidator implements Serializable {
    */
   public DetailLoader() { }
 
-
+  /*
+  public DetailObject loadDetailFromRequest(HttpServletRequest request, DetailObject detail) {
+    return loadDetailFromRequest((HttpServletWrappedRequest) request, detail);
+  }
+  */
   /**
    *  Handles the conversion and populates the DetailObject passed in from the HttpServletRequest
    *  passed in.  If a conversion can not be accomplished the offending field is put into the

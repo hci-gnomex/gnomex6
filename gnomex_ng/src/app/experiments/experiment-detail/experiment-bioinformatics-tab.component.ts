@@ -1,3 +1,4 @@
+
 import {Component, Input, OnDestroy} from "@angular/core";
 import {DictionaryService} from "../../services/dictionary.service";
 import {PropertyService} from "../../services/property.service";
@@ -131,6 +132,15 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
         return this._experiment && this._experiment.bioinformaticsAssist && this._experiment.bioinformaticsAssist === 'Y';
     }
 
+    set alignToGenomeBuild(value: boolean) {
+        if (this._experiment) {
+            this._experiment.alignToGenomeBuild = value ? 'Y' : 'N';
+        }
+    }
+        get alignToGenomeBuild(): boolean {
+        return this._experiment && this._experiment.alignToGenomeBuild && this._experiment.alignToGenomeBuild === 'Y';
+    }
+
     public get showConsolidatedGenome(): boolean {
         // Directly from the Flex version, we grant this choice to everything with the explicit exclusion of nanostring experiments.
 
@@ -150,7 +160,7 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
     public form: FormGroup;
 
     public organismName: string = '';
-    public alignToGenomeBuild: string = 'N';
+
     public genomeBuild: string = '';
 
     public sampleOrganisms: any[] = [];
@@ -171,7 +181,7 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
         idGenomeBuildAlignTo: string,
         idOrganism: string,
         organismName: string,
-        alignToGenomeBuild: boolean,
+        alignToGenomeBuild: string,
         dictionary: any[],
         sequenceLane: any
     }[] = [];
@@ -195,6 +205,13 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
         }
     }
 
+    public onAlignChanged(event): void {
+        if (event.checked) {
+            this._experiment.alignToGenomeBuild = 'Y';
+        } else {
+            this._experiment.alignToGenomeBuild = 'N';
+        }
+    }
     public onCheckboxChanged(item: any, event: any) {
         if (this._experiment && this._experiment.sequenceLanes) {
             let lanesToChange = this._experiment.sequenceLanes.filter((a) => {
@@ -263,13 +280,13 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
                         idGenomeBuildAlignTo: idGenomeBuildAlignTo,
                         idOrganism: idOrganism,
                         organismName: '',
-                        alignToGenomeBuild: (!!idGenomeBuildAlignTo ? true : false),
+                        alignToGenomeBuild: (!!idGenomeBuildAlignTo ? 'Y' : 'N'),
                         dictionary: [],
                         sequenceLane: sequenceLane
                     };
             
                     for (let info of this.consolidatedGenomeInformation) {
-                        if (temp.idOrganism === info.idOrganism && !info.alignToGenomeBuild) {
+                        if (temp.idOrganism === info.idOrganism && info.alignToGenomeBuild === 'Y')  {
                             info.idGenomeBuildAlignTo = temp.idGenomeBuildAlignTo;
                             info.idOrganism = temp.idOrganism;
                             info.organismName = temp.organismName;
@@ -289,8 +306,8 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
                     if (checkForExisting.length === 0) {
                         let checkForOrganism: any[] = this.consolidatedGenomeInformation.filter((a) => {
                             return temp.idOrganism === a.idOrganism
-                                && !temp.alignToGenomeBuild
-                                && a.alignToGenomeBuild;
+                                && temp.alignToGenomeBuild === 'N'
+                                && a.alignToGenomeBuild === 'Y';
                         });
                 
                         if (checkForOrganism.length === 0) {
@@ -356,7 +373,7 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
             
             
                     let temp: any = {
-                        alignToGenomeBuild: false,
+                        alignToGenomeBuild: 'N',
                         dictionary: [],
                         idGenomeBuildAlignTo: '',
                         idOrganism: idOrganism,
@@ -364,7 +381,7 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
                     };
             
                     for (let info of this.consolidatedGenomeInformation) {
-                        if (temp.idOrganism === info.idOrganism && !info.alignToGenomeBuild) {
+                        if (temp.idOrganism === info.idOrganism && info.alignToGenomeBuild === 'Y') {
                             info.idGenomeBuildAlignTo = temp.idGenomeBuildAlignTo;
                             info.idOrganism = temp.idOrganism;
                             info.organismName = temp.organismName;
@@ -384,8 +401,8 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
                     if (checkForExisting.length === 0) {
                         let checkForOrganism: any[] = this.consolidatedGenomeInformation.filter((a) => {
                             return temp.idOrganism === a.idOrganism
-                                && !temp.alignToGenomeBuild
-                                && a.alignToGenomeBuild;
+                                && temp.alignToGenomeBuild === 'N'
+                                && a.alignToGenomeBuild === 'Y';
                         });
                 
                         if (checkForOrganism.length === 0) {
@@ -401,13 +418,13 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
                 }
             }
         }
-
+/*
         if (this.genomeBuild) {
             this.alignToGenomeBuild = 'Y';
         } else {
             this.alignToGenomeBuild = 'N';
         }
-
+*/
         this.organismName = '';
         this.sampleOrganisms = [];
 

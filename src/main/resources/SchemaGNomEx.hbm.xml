@@ -235,6 +235,15 @@
                      update="false"/>
     </class>
 
+    <!-- hci.gnomex.model.DownstreamAnalysis -->
+    <class name="hci.gnomex.model.DownstreamAnalysis" table="DownstreamAnalysis">
+        <id name="idDownstreamAnalysis" column="idDownstreamAnalysis" type="integer">
+            <generator class="native"/>
+        </id>
+        <property name="downstreamAnalysis" column="downstreamAnalysis" type="string"/>
+        <property name="isActive" column="isActive" type="string"/>
+    </class>
+
     <!-- hci.gnomex.model.Invoice -->
     <class name="hci.gnomex.model.Invoice" table="Invoice">
         <id name="idInvoice" column="idInvoice" type="integer">
@@ -1039,6 +1048,7 @@
         <property name="applicationNotes" column="applicationNotes" type="string"/>
         <property name="processingDate" column="processingDate" type="date"/>
         <property name="bioinformaticsAssist" column="bioinformaticsAssist" type="string"/>
+        <property name="alignToGenomeBuild" column="alignToGenomeBuild" type="string"/>
         <property name="hasPrePooledLibraries" column="hasPrePooledLibraries" type="string"/>
         <property name="numPrePooledTubes" column="numPrePooledTubes" type="integer"/>
         <property name="adminNotes" column="adminNotes" type="string"/>
@@ -1049,6 +1059,11 @@
         <property name="usedDnase" column="usedDnase" type="string"/>
         <property name="usedRnase" column="usedRnase" type="string"/>
         <property name="keepSamples" column="keepSamples" type="string"/>
+        <property name="idDownstreamAnalysis" column="idDownstreamAnalysis" type="integer"/>
+        <!--
+        <many-to-one name="downstreamAnalysis" column="idDownstreamAnalysis" class="hci.gnomex.model.DownstreamAnalysis"
+                     cascade="none" insert="false" update="false"/>
+        -->
         <set name="samples" table="Sample" lazy="true" cascade="delete"
              sort="hci.gnomex.utility.SampleNumberComparator">
             <key column="idRequest"/>

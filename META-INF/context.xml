@@ -9,9 +9,9 @@
         conditionUnless="skipLogging" />
 	    
   <Resource auth="Container" 
-    mail.smtp.host="${hci.mailserver}" 
+    mail.smtp.host="smtp.utah.edu"
     name="mail/MailSession" 
-    type="javax.mail.Session"/>
+    type="jakarta.mail.Session"/>
 
 <Manager pathname="" />
 

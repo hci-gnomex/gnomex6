@@ -444,6 +444,23 @@
                         </div>
                     </div>
                 </li>
+                <li *ngIf="showDownstreamAnalysis" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Select downstream analysis.
+                        </div>
+                        <div class="moderate-width">
+                            <custom-combo-box placeholder="Downstream Analysis"
+                                              [allowNone]="false"
+                                              displayField="display"
+                                              [options]="this.downstreamAnalysis"
+                                              [formControlName]="'downstreamAnalysis'"
+                                              (optionSelected)="onSelectDownstreamAnalysis($event)">
+                            </custom-combo-box>
+                        </div>
+                    </div>
+                </li>
+
                 <li class="full-width align-baseline">
                     <div class="full-width">
                         <div class="full-width flex-container-row align-baseline">

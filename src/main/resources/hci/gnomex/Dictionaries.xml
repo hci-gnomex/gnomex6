@@ -172,6 +172,8 @@
   <Dictionary displayName="DNA Seq Core - Reaction Type" className="hci.gnomex.model.ReactionType" editable="N" />
 	
 	<Dictionary displayName="Molecular Diagnostics - Isolation Prep Type" className="hci.gnomex.model.IsolationPrepType" editable="Y" />
+
+	<Dictionary displayName="Molecular Diagnostics - Downstream Analysis" className="hci.gnomex.model.DownstreamAnalysis" editable="Y" />
   
 	
 

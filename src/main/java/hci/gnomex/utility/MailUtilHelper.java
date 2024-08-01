@@ -4,7 +4,7 @@ import hci.gnomex.controller.GNomExFrontController;
 import hci.gnomex.model.AppUser;
 import hci.gnomex.model.PropertyDictionary;
 
-import javax.mail.Session;
+import jakarta.mail.Session;
 import java.io.File;
 import java.util.Properties;
 
@@ -50,7 +50,7 @@ public class MailUtilHelper {
 							String serverName																) {
 
 		this(to, cc, bcc, from, subject, body, file, formatHtml, null, serverName, dictionaryHelper);
-		this.setSession(javax.mail.Session.getDefaultInstance(props, null));
+		this.setSession(jakarta.mail.Session.getDefaultInstance(props, null));
 
 	}
 	
@@ -58,7 +58,7 @@ public class MailUtilHelper {
 							String body, File file, boolean formatHtml, boolean forceTestEmail, String forceTestEmailTo	) {
 
 		this(to, cc, bcc, from, subject, body, file, formatHtml, null, null, null);
-		this.setSession(javax.mail.Session.getDefaultInstance(props, null));
+		this.setSession(jakarta.mail.Session.getDefaultInstance(props, null));
 		this.setForceTestEmail(forceTestEmail);
 		this.setForceTestEmailTo(forceTestEmailTo);
 

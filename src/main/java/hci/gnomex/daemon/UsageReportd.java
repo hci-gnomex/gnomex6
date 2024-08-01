@@ -15,11 +15,11 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
@@ -1075,7 +1075,7 @@ public class UsageReportd extends TimerTask {
 
     // create some properties and get the default Session
 
-    javax.mail.Session session = javax.mail.Session.getDefaultInstance(props, null);
+    jakarta.mail.Session session = jakarta.mail.Session.getDefaultInstance(props, null);
 
     // create a message
     Message msg = new MimeMessage(session);

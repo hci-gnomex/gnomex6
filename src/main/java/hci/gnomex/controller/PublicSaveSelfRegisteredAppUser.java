@@ -1,5 +1,6 @@
 package hci.gnomex.controller;
 
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
@@ -11,9 +12,9 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.AddressException;
+import jakarta.mail.internet.InternetAddress;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -46,7 +47,7 @@ public class PublicSaveSelfRegisteredAppUser extends GNomExCommand implements Se
   public String responsePageSuccess = null;
   public String responsePageError = null;
 
-  private final static int APPROVE_USER_EXPIRATION_TIME = 86400000 * 3; // Three days
+  private final static int APPROVE_USER_EXPIRATION_TIME = 86400000 * 21; // Three days
 
   public void loadCommand(HttpServletWrappedRequest request, HttpSession session) {
     serverName = request.getServerName();
@@ -464,7 +465,7 @@ public class PublicSaveSelfRegisteredAppUser extends GNomExCommand implements Se
     introForAdmin.append(greeting);
     introForAdmin.append(intro);
 
-    introForAdmin.append("<small>(These links will expire in 3 days.)</small><br><br>");
+    introForAdmin.append("<small>(These links will expire in 21 days.)</small><br><br>");
 
     // Closing for Lab PI/Admin
     if (requestedLab != null) {

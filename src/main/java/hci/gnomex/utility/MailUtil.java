@@ -4,11 +4,11 @@ import hci.gnomex.constants.Constants;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.log4j.Logger;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
-import javax.mail.*;
-import javax.mail.internet.*;
+import jakarta.activation.DataHandler;
+import jakarta.activation.DataSource;
+import jakarta.activation.FileDataSource;
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
 import javax.naming.NamingException;
 import java.io.File;
 import java.io.IOException;
@@ -114,17 +114,17 @@ public class MailUtil {
 				sess.setPasswordAuthentication(url,auth);
 	        }
 	  
-	        javax.mail.Message msg = new MimeMessage(sess);
+	        jakarta.mail.Message msg = new MimeMessage(sess);
 	  
 	        msg.setFrom(new InternetAddress(from));
-	        msg.setRecipients(javax.mail.Message.RecipientType.TO, InternetAddress.parse(to, false));
+	        msg.setRecipients(jakarta.mail.Message.RecipientType.TO, InternetAddress.parse(to, false));
 	        
 	        if (cc != null && !cc.trim().equals("")) {
-	        	msg.setRecipients(javax.mail.Message.RecipientType.CC, InternetAddress.parse(cc, false));
+	        	msg.setRecipients(jakarta.mail.Message.RecipientType.CC, InternetAddress.parse(cc, false));
 	        }
 	        
 	        if (bcc != null && !bcc.trim().equals("")) {
-	        	msg.setRecipients(javax.mail.Message.RecipientType.BCC, InternetAddress.parse(bcc, false));
+	        	msg.setRecipients(jakarta.mail.Message.RecipientType.BCC, InternetAddress.parse(bcc, false));
 	        }
 	        msg.setSubject(subject);
 	  
@@ -152,8 +152,9 @@ public class MailUtil {
 	        msg.setHeader("X-Mailer", "JavaMailer");
 	        msg.setSentDate(new Date());
 
-//	        System.out.println ("[send] right before Transport.send ");
+	        System.out.println ("[send] right before Transport.send ");
 	        Transport.send(msg);
+			System.out.println ("[send] right after Transport.send ");
 		}
 	      
 	}

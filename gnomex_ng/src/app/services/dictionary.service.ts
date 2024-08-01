@@ -32,6 +32,7 @@ export class DictionaryService {
     public static readonly CONTEXT_SENSITIVE_HELP: string = "hci.gnomex.model.ContextSensitiveHelp";
     public static readonly CORE_FACILITY: string = "hci.gnomex.model.CoreFacility";
     public static readonly CREDIT_CARD_COMPANY: string = "hci.gnomex.model.CreditCardCompany";
+    public static readonly DOWNSTREAM_ANALYSIS: string = "hci.gnomex.model.DownstreamAnalysis";
     public static readonly EXPERIMENT_DESIGN: string = "hci.gnomex.model.ExperimentDesign";
     public static readonly EXPERIMENT_FACTOR: string = "hci.gnomex.model.ExperimentFactor";
     public static readonly FEATURE_EXTRACTION_PROTOCOL: string = "hci.gnomex.model.FeatureExtractionProtocol";

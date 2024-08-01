@@ -24,7 +24,7 @@ import java.util.TreeSet;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
-import javax.servlet.http.HttpServletRequest;
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;

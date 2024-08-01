@@ -17,8 +17,8 @@ import java.util.*;
 import hci.gnomex.constants.Constants;
 import org.hibernate.query.Query;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.AddressException;
 import javax.naming.NamingException;
 import javax.persistence.criteria.CriteriaBuilder;
 

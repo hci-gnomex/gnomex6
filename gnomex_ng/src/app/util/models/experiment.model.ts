@@ -25,6 +25,7 @@ export class Experiment {
     public idSlideProduct:                     string = "";
     public protocolNumber:                     string = "";
     public invoicePrice:                       string = "";
+    public alignToGenomeBuild:                 string = "";
 
     public get numberOfddisSlides(): string {
         return this._numberOfdisSlides;
@@ -107,6 +108,7 @@ export class Experiment {
 
 
     public bioinformaticsAssist:               string = "";
+
     public idOrganismSampleDefault:            string = ''; // "204"
     public isArrayINFORequest:                 string = "";
     public canDeleteSample:                    string = "Y";
@@ -130,6 +132,7 @@ export class Experiment {
     public includeBisulfideConversion:         string = ''; // "N",
     public includeQubitConcentration:          string = ''; // "N"
     public turnAroundTime:                     string = "";
+    public idDownstreamAnalysis:               string = "";
     public _idCoreFacility:                    string = ''; // "1"
     public get idCoreFacility(): string {
         return this._idCoreFacility;
@@ -141,7 +144,14 @@ export class Experiment {
             this.filterRequestProperties();
         }
     }
-
+/*
+    public get idDownstreamAnalysis(): string {
+        return this.idDownstreamAnalysis;
+    }
+    public set idDownstreamAnalysis(value: string) {
+        this.idDownstreamAnalysis = value;
+    }
+*/
     public idProductOrder:                     string = "";
 
     public truncatedLabName:                   string = "";
@@ -859,6 +869,7 @@ export class Experiment {
         experiment.cloneProperty("idSampleTypeDefault", value);
         experiment.cloneProperty("sampleType", value);
         experiment.cloneProperty("bioinformaticsAssist", value);
+        experiment.cloneProperty("alignToGenomeBuild", value);
         experiment.cloneProperty("idOrganismSampleDefault", value);
         experiment.cloneProperty("isArrayINFORequest", value);
         experiment.cloneProperty("canDeleteSample", value);
@@ -891,6 +902,7 @@ export class Experiment {
         experiment.cloneProperty("idOwner", value);
         experiment.cloneProperty("createDate", value);
         experiment.cloneProperty("completedDate", value);
+        experiment.cloneProperty("idDownstreamAnalysis", value);
         experiment.cloneProperty("notes", value);
 
         if (value.application) {
@@ -1186,6 +1198,7 @@ export class Experiment {
             targetClassName:                    this.targetClassName,
             idBillingAccount:                   this.idBillingAccount,
             idProduct:                          this.idProduct,
+            idDownstreamAnalysis:               this.idDownstreamAnalysis,
             codeApplication:                    this.codeApplication,
             codeRequestCategory:                this.codeRequestCategory,
             idRequest:                          this.idRequest,
@@ -1227,6 +1240,7 @@ export class Experiment {
             idSampleTypeDefault:                this.idSampleTypeDefault,
             notes:                              this.notes,
             bioinformaticsAssist:               this.bioinformaticsAssist,
+            alignToGenomeBuild:                 this.alignToGenomeBuild,
             completedDate:                      this.completedDate,
             slideProduct:                       this.slideProduct,
             idOrganismSampleDefault:            this.idOrganismSampleDefault,

@@ -5,7 +5,6 @@ import hci.framework.security.SecurityAdvisor;
 import hci.framework.utilities.DetailLoader;
 import hci.gnomex.utility.HttpServletWrappedRequest;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -76,10 +75,12 @@ public abstract class Command extends DetailObject implements Serializable {
      */
     public abstract HttpServletWrappedRequest setRequestState(HttpServletWrappedRequest request);
 
-    public HttpServletRequest setRequestState(HttpServletRequest request) {
-        return request;
-    }
 
+/*
+    public HttpServletRequest setRequestState(HttpServletRequest request) {
+        return setRequestState ((HttpServletWrappedRequest) request);
+    };
+*/
     /**
      * A callback method that allows you to manipulate the response object prior to forwarding to
      * the result JSP

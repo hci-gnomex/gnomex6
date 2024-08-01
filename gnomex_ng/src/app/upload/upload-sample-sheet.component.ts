@@ -13,6 +13,7 @@ import {Experiment} from "../util/models/experiment.model";
 import {Sample} from "../util/models/sample.model";
 import {DictionaryService} from "../services/dictionary.service";
 import {GnomexService} from "../services/gnomex.service";
+import {CORELinkageService} from "../services/CORE-linkage.service";
 import {MultiSelectRenderer} from "../util/grid-renderers/multi-select.renderer";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {PropertyService} from "../services/property.service";
@@ -171,6 +172,7 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
                 private gnomexService: GnomexService,
                 private propertyService: PropertyService,
                 private sampleUploadService: SampleUploadService,
+                private coreLinkageService: CORELinkageService,
                 @Inject(MAT_DIALOG_DATA) private data) {
         super();
     }
@@ -345,6 +347,32 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
                             reportStatus = "Label. Incorrect text: " + uploadColumnValue;
                         }
                     }
+
+                    let uploadColumnValueIdCore: string = "";
+                    if (columnField === 'sampleAlias_CORE') {
+                        uploadColumnValueIdCore = uploadColumnValue;
+                        // get the idSample_CORE
+                        if (uploadColumnValueIdCore && uploadColumnValueIdCore.length > 0) {
+                            this.coreLinkageService.searchForSampleAlias(uploadColumnValueIdCore).subscribe((result) => {
+                                if (result && result.id) {
+                                    uploadColumnValueIdCore = result.id;
+
+                                    // put the idSample_CORE in the data
+                                    if (uploadColumnNumberForThisField+1 < this.fileData[i].Column.length) {
+                                        this.fileData[i].Column[uploadColumnNumberForThisField + 1].Value = uploadColumnValueIdCore;
+                                     }
+                                } else {
+                                    uploadColumnValueIdCore = "";
+
+                                    // need to remember the lookup failed
+                                    reportStatus = "Sample Alias. No match found for alias: " + uploadColumnValue;
+                                }
+                                reportStatus = this.SUCCESS_STATUS;
+                            });
+                        }
+                    }
+
+
                     if (column.typeCode === "URL" || column.typeCode === "MOPTION") {
                         // For these types strip beginning, ending quotation marks if present
                         if (uploadColumnValue && uploadColumnValue.length > 0 && uploadColumnValue.charAt(0) == '"') {
