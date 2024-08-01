@@ -23,6 +23,7 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+
 public class LinkData extends TimerTask {
 
     private static long fONCE_PER_DAY = 1000 * 60 * 60 * 24; // A day in
@@ -330,71 +331,77 @@ public class LinkData extends TimerTask {
             if(!linkFolder){
                 buf = new StringBuilder("select name from Sample where idRequest = ");
 
+
                 buf.append(requestList[nxtOne] + ";");
                 if (debug) System.out.println("ExperimentFile query: " + buf.toString());
 
-            Set<String> names = new HashSet<>();
+                Set<String> names = new HashSet<>();
 
-            rs = stmt.executeQuery(buf.toString());
-            while (rs.next()) {
-                names.add(rs.getString(1));
-            }
-            rs.close();
-            stmt.close();
 
-                if (debug) System.out.println("size of names: " + names.size());
-
-            // now using the list of sample 'names' see if we can find any matching experiment files
-            Iterator it = names.iterator();
-
-            while (it.hasNext()) {
-                String theName = (String) it.next();
-
-                stmt = con.createStatement();
-
-                StringBuilder buf1 = new StringBuilder("select filename from ExperimentFile where filename like '");
-                buf1.append(dataType + "%" + theName + "%';"); // case insensitive
-                if (debug) System.out.println("ExperimentFile query: " + buf1.toString());
-
-                List<String> pathnames = new ArrayList<String>();
-
-                rs = stmt.executeQuery(buf1.toString());
+                rs = stmt.executeQuery(buf.toString());
                 while (rs.next()) {
-                    pathnames.add(rs.getString(1));
+                    names.add(rs.getString(1));
                 }
                 rs.close();
                 stmt.close();
 
-                if (debug) System.out.println("size of pathnames: " + pathnames.size());
+                if (debug) System.out.println("size of names: " + names.size());
+
+
+                if (debug) System.out.println("size of names: " + names.size());
+
                 // now using the list of sample 'names' see if we can find any matching experiment files
-                Iterator itp = pathnames.iterator();
+                Iterator it = names.iterator();
 
-                //  create the directory
-                String dirPath = startPath + requestList[nxtOne] + "R";
-                if (debug) System.out.println("dirPath: " + dirPath);
-                File f = new File(dirPath);
-                f.mkdir();
+                while (it.hasNext()) {
+                    String theName = (String) it.next();
 
-                String myStartPath = dirPath;
-                while (itp.hasNext()) {
-                    String thePath = (String) itp.next();  // for example: 4R/Whole_Exome/FASTq/SL278299_2.fastq.gz
+                    stmt = con.createStatement();
 
-                    int ipos = thePath.indexOf("/");
-                    if (ipos == -1) {
-                        // bad path
-                        // complain....
-                        continue;
+                    StringBuilder buf1 = new StringBuilder("select filename from ExperimentFile where filename like '");
+                    buf1.append(dataType + "%" + theName + "%';"); // case insensitive
+                    if (debug) System.out.println("ExperimentFile query: " + buf1.toString());
+
+                    List<String> pathnames = new ArrayList<String>();
+
+                    rs = stmt.executeQuery(buf1.toString());
+                    while (rs.next()) {
+                        pathnames.add(rs.getString(1));
                     }
-                    int epos = thePath.lastIndexOf("/");
-                    if (epos <= ipos) {
-                        // that's weird
-                        continue;
-                    }
+                    rs.close();
+                    stmt.close();
 
-                    String middleOfPath = "";
-                    String filename = "";
-                    String parentFolder = "";
-                    String subCommand = "";
+                    if (debug) System.out.println("size of pathnames: " + pathnames.size());
+                    // now using the list of sample 'names' see if we can find any matching experiment files
+                    Iterator itp = pathnames.iterator();
+
+                    //  create the directory
+                    String dirPath = startPath + requestList[nxtOne] + "R";
+                    if (debug) System.out.println("dirPath: " + dirPath);
+                    File f = new File(dirPath);
+                    f.mkdir();
+
+                    String myStartPath = dirPath;
+                    while (itp.hasNext()) {
+                        String thePath = (String) itp.next();  // for example: 4R/Whole_Exome/FASTq/SL278299_2.fastq.gz
+
+                        int ipos = thePath.indexOf("/");
+                        if (ipos == -1) {
+                            // bad path
+                            // complain....
+                            continue;
+                        }
+                        int epos = thePath.lastIndexOf("/");
+                        if (epos <= ipos) {
+                            // that's weird
+                            continue;
+                        }
+
+                        String middleOfPath = "";
+                        String filename = "";
+                        String parentFolder = "";
+                        String subCommand = "";
+
 
 
                         middleOfPath = thePath.substring(ipos + 1, epos);
@@ -403,6 +410,8 @@ public class LinkData extends TimerTask {
                         filename = thePath.substring(epos + 1); // for example : SL278299_2.fastq.gz
                         if (debug) System.out.println("filename or foldername : " + filename);
                         subCommand = "-s";
+
+/*
 
 
                         String myPath = dirPath + "/" + middleOfPath;
@@ -492,46 +501,143 @@ public class LinkData extends TimerTask {
 
                 File dummyFile = new File(startAvatarPath + "/" + thePath); //absolute path to file
                 if(debug) System.out.println("the absolute path: "  + startAvatarPath + "/" + thePath);
+*/
 
-                        filename =  dummyFile.getParentFile().getName();
+                        String myPath = dirPath + "/" + middleOfPath;
+                        if (debug) System.out.println("myPath: " + myPath);
 
-                        try{
-                            int personID = Integer.parseInt(filename); //parent folder convention is to be hci person id for folder name
-                                                                      // when using linkFolder argument
-                        }catch(NumberFormatException nfe){
-                            System.out.println("skipping... sample data doesn't have wrapping folder");
-                            continue;
+                        f = new File(myPath);
+                        if(!f.exists()){
+                            f.mkdirs();
                         }
 
+                        //  make the soft link
+                        myPath =  myPath + "/" +  filename;
 
-                        if (debug) System.out.println("filename or foldername : " + filename);
+                        String pathToRealData =  startAvatarPath + "/" + thePath;
+                        File target = new File(pathToRealData);
+                        File linkName = new File(myPath);
+                        if (debug) System.out.println("[LinkData] right before makeSoftLinks, target: " + pathToRealData + "\n\t\t\t\t linkName: " + linkName);
 
-                        parentFolder = dummyFile.getParent();
-                        if(debug) System.out.println("parent folder with real path" + parentFolder);
+                        boolean ok = makeSoftLinks(target, linkName, subCommand);
+                        if (!ok) {
+                            System.out.println("makeSoftLinks failed!");
+                        }
+                    } // end of inner while
 
-                        epos =  thePath.indexOf(filename);
-                        middleOfPath = thePath.substring(ipos+ 1, epos );
-                        if (debug) System.out.println("middleOfPath: " + middleOfPath);
-                        // need to make sure if you try to run making a symlink more than once it doesn't
-                        // stick a symlink inside the src dir pointing to soft link
-                        // the T stops it from drilling into the 'pointer' that points to src dir if it already exists
-                        subCommand = "-sTf";
+                } // end of outer while
+            } else {
+                createLinksWithWrapperFolder(hciPersonID, con, startPath, nxtOne);
+            }
 
 
-                    String myPath = dirPath + "/" + middleOfPath;
-                    if (debug) System.out.println("myPath: " + myPath);
 
-                    f = new File(myPath);
-                    if(!f.exists()){
-                        f.mkdirs();
-                    }
+            nxtOne++;
 
-                    //  make the soft link
-                    myPath =  myPath + "/" +  filename;
+        } // end of requestList while
+        System.out.println("normal exit -- no problems!");
+        System.exit(0);
+    }
+
+    private void createLinksWithWrapperFolder(String wrapFolderName, Connection con, String startPath, Integer nxtOne)  {
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            stmt = con.createStatement();
+            StringBuilder buf1 = new StringBuilder("select filename from ExperimentFile where filename like '");
+            buf1.append(dataType + "%" + wrapFolderName + "%';"); // case insensitive
+            if (debug) System.out.println("ExperimentFile query: " + buf1.toString());
+
+            List<String> pathnames = new ArrayList<String>();
+
+            rs = stmt.executeQuery(buf1.toString());
+            while (rs.next()) {
+                pathnames.add(rs.getString(1));
+            }
+            rs.close();
+            stmt.close();
+          
+ /*
+            if (debug) System.out.println("size of pathnames: " + pathnames.size());
+            // now using the list of sample 'names' see if we can find any matching experiment files
+            Iterator itp = pathnames.iterator();
+
+            //  create the directory
+            String dirPath = startPath + requestList[nxtOne] + "R";
+            if (debug) System.out.println("dirPath: " + dirPath);
+            File f = new File(dirPath);
+            f.mkdir();
+
+            String myStartPath = dirPath;
+            while (itp.hasNext()) {
+                String thePath = (String) itp.next();  // for example: 4R/Whole_Exome/FASTq/SL278299_2.fastq.gz
+
+                int ipos = thePath.indexOf("/");
+                if (ipos == -1) {
+                    // bad path
+                    // complain....
+                    continue;
+                }
+                int epos = thePath.lastIndexOf("/");
+                if (epos <= ipos) {
+                    // that's weird
+                    continue;
+                }
+
+                String middleOfPath = "";
+                String filename = "";
+                String parentFolder = "";
+                String subCommand = "";
+
+                File dummyFile = new File(startAvatarPath + "/" + thePath); //absolute path to file
+                if(debug) System.out.println("the absolute path: "  + startAvatarPath + "/" + thePath);
+
+                filename =  dummyFile.getParentFile().getName();
+
+                try{
+                    int personID = Integer.parseInt(filename); //parent folder convention is to be hci person id for folder name
+                    // when using linkFolder argument
+                }catch(NumberFormatException nfe){
+                    System.out.println("skipping... sample data doesn't have wrapping folder");
+                    continue;
+                }
+
+
+                if (debug) System.out.println("filename or foldername : " + filename);
+
+                parentFolder = dummyFile.getParent();
+                if(debug) System.out.println("parent folder with real path" + parentFolder);
+
+                epos =  thePath.indexOf(filename);
+                middleOfPath = thePath.substring(ipos+ 1, epos );
+                if (debug) System.out.println("middleOfPath: " + middleOfPath);
+                // need to make sure if you try to run making a symlink more than once it doesn't
+                // stick a symlink inside the src dir pointing to soft link
+                // the T stops it from drilling into the 'pointer' that points to src dir if it already exists
+                subCommand = "-sTf";
+
+
+                String myPath = dirPath + "/" + middleOfPath;
+                if (debug) System.out.println("myPath: " + myPath);
+
+                f = new File(myPath);
+                if(!f.exists()){
+                    f.mkdirs();
+                }
+
+                //  make the soft link
+                myPath =  myPath + "/" +  filename;
 
                 File target = new File(parentFolder);
                 File linkName = new File(myPath);
                 if (debug) System.out.println("[LinkData] right before makeSoftLinks, target: " + parentFolder + "\n\t\t\t\t linkName: " + linkName);
+
+*/
+                File target = new File(parentFolder);
+                File linkName = new File(myPath);
+                if (debug) System.out.println("[LinkData] right before makeSoftLinks, target: " + parentFolder + "\n\t\t\t\t linkName: " + linkName);
+
 
                 boolean ok = makeSoftLinks(target, linkName, subCommand);
                 if (!ok) {

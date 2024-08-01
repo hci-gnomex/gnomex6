@@ -284,7 +284,9 @@ public class XMLParser {
 				}
 				if(personList.size() > 1) {
 					flaggedKeys.add(Arrays.asList(key,e.getKey()));
-					this.flaggedAvatarEntries.add(personList);
+					if(!importMode.equalsIgnoreCase("caris")){
+						this.flaggedAvatarEntries.add(personList);
+					}
 				}else if(personList.size() == 1) {
 					if(	personList.get(0).getPersonId().equals("")
 							|| personList.get(0).getFullName().equals("")
@@ -435,6 +437,20 @@ public class XMLParser {
 					entry.setCcNumber("");
 				} else if (importMode.toLowerCase().equals("caris")){ //order matters!!
 					//todo once we determine db output, import the file here
+					entry.setMrn(cleanData(aEntries[0]));
+					entry.setPersonId(cleanData(aEntries[1]));
+					entry.setFullName(cleanData(aEntries[2]));
+					entry.setGender(cleanData(aEntries[3]));
+					entry.setShadowId(cleanData(aEntries[4]));
+					entry.setTestType(cleanData(aEntries[5]));
+					entry.setSlNumber(cleanData(aEntries[6]));
+					entry.setSampleSubtype(cleanData(aEntries[7]));
+					entry.setTissueType(cleanData(aEntries[8]));
+					entry.setSubmittedDiagnosis(cleanData(aEntries[9]));
+					entry.setCaptureTestName(cleanData(aEntries[10]));
+					entry.setCaptureDesign(cleanData(aEntries[11]));
+					entry.setCaptureTestDescription(cleanData(aEntries[12]));
+					entry.setCcNumber("");
 				}
 
 
@@ -487,7 +503,8 @@ public class XMLParser {
 		Query q = new Query(pathOnly + "gnomex-creds.properties");
 
 		importRequestCommands.add("bash " + importScript + " -login adminBatch -file " + outFileName +
-				" -annotationFile " + this.annotationFileName + " -isExternal Y"+ " -requestIDList " + pathOnly + "tempRequestList.out" );
+				" -annotationFile " + this.annotationFileName + " -isExternal Y"+ " -requestIDList "
+				+ pathOnly + "tempRequestList.out" + (importMode.equalsIgnoreCase("caris") ? " -allowDupSample": ""));
 
 		System.out.println(importRequestCommands.get(0));
 
@@ -641,7 +658,6 @@ public class XMLParser {
 						throw e;
 					}
 				}
-
 			}
 
 
