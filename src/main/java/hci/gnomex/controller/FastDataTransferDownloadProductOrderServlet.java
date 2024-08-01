@@ -5,9 +5,8 @@ import hci.gnomex.model.ProductOrder;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.*;
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
-import hci.gnomex.utility.HttpServletWrappedRequest;
-import hci.gnomex.utility.Util;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -20,7 +19,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import org.apache.log4j.Logger;
 
 // ****************************************************************
 //      NOTE FDT is not currently available for Products

@@ -6,16 +6,15 @@ import hci.gnomex.constants.Constants;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.*;
 import hci.hibernate5utils.HibernateDetailObject;
+import org.hibernate.Hibernate;
+import org.hibernate.Session;
+import org.jdom.Document;
+import org.jdom.Element;
 
 import java.sql.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-import org.hibernate.Hibernate;
-import org.hibernate.Session;
-import org.jdom.Document;
-import org.jdom.Element;
 
 
 @SuppressWarnings("serial")
@@ -77,11 +76,14 @@ public class Request extends HibernateDetailObject implements VisibilityInterfac
   private Set             topics;
   private Integer         idSubmitter;
   private AppUser         submitter;
+  private Integer         idDownstreamAnalysis;
+  private String          downstreamAnalysis;
   private String          applicationNotes;
   private String          coreToExtractDNA;
   private Date            processingDate;   // Date request was set to Processing status
   private String          codeIsolationPrepType;
   private String          bioinformaticsAssist;
+  private String          alignToGenomeBuild;
   private String          hasPrePooledLibraries;
   private Integer         numPrePooledTubes;
   private String          includeBisulfideConversion;
@@ -190,12 +192,26 @@ public class Request extends HibernateDetailObject implements VisibilityInterfac
     this.idSubmitter = idSubmitter;
   }
 
+  public Integer getIdDownstreamAnalysis() {
+    return idDownstreamAnalysis;
+  }
+
+  public void setIdDownstreamAnalysis(Integer idDownstreamAnalysis) {
+    this.idDownstreamAnalysis = idDownstreamAnalysis;
+  }
   public AppUser getSubmitter() {
     return submitter;
   }
 
   public void setSubmitter(AppUser submitter) {
     this.submitter = submitter;
+  }
+
+  public String getDownstreamAnalysis() {
+    return downstreamAnalysis;
+  }
+  public void setDownstreamAnalysis(String downstreamAnalysis) {
+    this.downstreamAnalysis = downstreamAnalysis;
   }
 
   public Application getApplication() {
@@ -348,6 +364,15 @@ public class Request extends HibernateDetailObject implements VisibilityInterfac
   public void setBioinformaticsAssist(String bioinformaticsAssist) {
     this.bioinformaticsAssist = bioinformaticsAssist;
   }
+
+  public String getAlignToGenomeBuild() {
+    return alignToGenomeBuild;
+  }
+
+  public void setAlignToGenomeBuild(String alignToGenomeBuild) {
+    this.alignToGenomeBuild = alignToGenomeBuild;
+  }
+
 
   public Set getBillingItems() {
     return billingItems;
@@ -1120,6 +1145,7 @@ public class Request extends HibernateDetailObject implements VisibilityInterfac
     root.setAttribute("projectName",            projectName);
     root.setAttribute("codeVisibility",         this.getNonNullString(this.getCodeVisibility()));
     root.setAttribute("idInstitution",          this.getIdInstitution() != null ? this.getIdInstitution().toString() : "");
+    root.setAttribute("idDownstreamAnalysis",   this.getNonNullString(this.getIdDownstreamAnalysis()));
     root.setAttribute("ownerFirstName",         ownerFirstName);
     root.setAttribute("ownerLastName",          ownerLastName);
     root.setAttribute("isExternal",             this.getNonNullString(this.getIsExternal()));
@@ -1127,7 +1153,7 @@ public class Request extends HibernateDetailObject implements VisibilityInterfac
     root.setAttribute("isDirty",                "N");
     root.setAttribute("isSelected",             "N");
     root.setAttribute("analysisNames",          "");
-    root.setAttribute("idSubmitter",              this.getNonNullString(this.getIdSubmitter()));
+    root.setAttribute("idSubmitter",             this.getNonNullString(this.getIdSubmitter()));
 
     root.setAttribute("application",			this.getNonNullString(this.getApplication()));
 

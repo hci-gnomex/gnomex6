@@ -55,7 +55,7 @@ public class AboutDialog extends javax.swing.JDialog {
         jTextArea1.setEditable(false);
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
-        jTextArea1.setText("\t          FDTClient GUI V 1.0\n\nFDT is a command line data transfer utility build by the folks at CalTech and CERN for fast data transfer over the internet. See http://monalisa.cern.ch/FDT/ and support@monalisa.cern.ch . \n\nThis FDT GUI was built by the University of Utah Bioinformatics Shared Resource (BioInformaticsCore@Utah.Edu) using the FDT command line software.");
+        jTextArea1.setText("\t          FDTClient GUI V 1.0\n\nFDT is a command line data transfer utility build by the folks at CalTech and CERN for fast data transfer over the internet. See http://monalisa.cern.ch/FDT/ and support@monalisa.cern.ch . \n\nThis FDT GUI was built by the Cancer BioInformatics Shared Resource (BioInformaticsCore@Utah.Edu) using the FDT command line software.");
         jTextArea1.setWrapStyleWord(true);
         jScrollPane1.setViewportView(jTextArea1);
 

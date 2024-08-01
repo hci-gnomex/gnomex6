@@ -2,6 +2,7 @@ package hci.gnomex.controller;
 
 //import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import hci.framework.control.Command;
@@ -25,7 +26,7 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import javax.naming.NamingException;
 import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpSession;
@@ -1888,11 +1889,14 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 								+ " has been submitted.  " + e.toString();
 						LOG.error(msg, e);
 						message.append(msg + "\n");
+						this.errorDetails = Util.GNLOG(LOG,msg, e);
+
 					}
 				} else {
 					String msg = ("Unable to send confirmation email notifying submitter that request " + requestParser.getRequest().getNumber() + " has been submitted.  Request submitter or request submitter email is blank.");
 					LOG.error(msg);
 					message.append(msg + "\n");
+
 				}
 			}
 			if (this.invoicePrice.length() > 0) {
@@ -1932,6 +1936,8 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 								+ e.toString();
 						LOG.error(msg, e);
 						message.append(msg + "\n");
+						this.errorDetails = Util.GNLOG(LOG,msg, e); 
+
 					}
 				} else {
 					String msg = "Unable to send estimated charges notification for request " + requestParser.getRequest().getNumber()

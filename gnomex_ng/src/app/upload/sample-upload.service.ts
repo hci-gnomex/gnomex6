@@ -64,7 +64,7 @@ export class SampleUploadService {
         });
     }
 
-    public uploadSampleSheet(formData): Observable<any> {
+    public  uploadSampleSheet(formData): Observable<any> {
         this.cookieUtilService.formatXSRFCookie();
 
         if (!this.sampleUpload_URL) {

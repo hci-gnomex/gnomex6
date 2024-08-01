@@ -1,5 +1,6 @@
 package hci.gnomex.controller;
 
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.billing.BillingPlugin;
@@ -25,8 +26,6 @@ import java.text.NumberFormat;
 import java.util.*;
 
 public class CreateBillingItems extends GNomExCommand implements Serializable {
-
-
 
   // the static field for logging in Log4J
   private static Logger LOG = Logger.getLogger(CreateBillingItems.class);

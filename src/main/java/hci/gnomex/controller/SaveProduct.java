@@ -1,6 +1,7 @@
 
 package hci.gnomex.controller;
 
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.Price;

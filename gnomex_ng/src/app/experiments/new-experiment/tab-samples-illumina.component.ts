@@ -1199,26 +1199,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
             }
         }
 
-        // temp.push({
-        //     headerName: "CC Number",
-        //     field: "ccNumber",
-        //     width:    9 * this.emToPxConversionRate,
-        //     minWidth: 8 * this.emToPxConversionRate,
-        //     suppressSizeToFit: true,
-        //     editable: true,
-        //     cellRendererFramework: TextAlignLeftMiddleRenderer,
-        //     cellEditorFramework: TextAlignLeftMiddleEditor,
-        //     validators: [Validators.maxLength(20)],
-        //     errorNameErrorMessageMap: [
-        //         {errorName: "maxlength", errorMessage: "Maximum of 20 characters"}
-        //     ],
-        //     showFillButton: true,
-        //     fillGroupAttribute: 'frontEndGridGroup',
-        //     hide: this.hideCCNum,
-        //     ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
-        //     sortOrder: 139
-        // });
-
 
         temp.push({
             headerName: "CORE Sample Alias",
@@ -1597,19 +1577,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
             && this._experiment.requestCategory.isIlluminaType === 'Y') {
 
             if (this.showLinkToCCNumber) {
-            //     temp.push({
-            //         headerName: "CC Number",
-            //         field: "ccNumber",
-            //         width:    8.5 * this.emToPxConversionRate,
-            //         minWidth: 8.5 * this.emToPxConversionRate,
-            //         suppressSizeToFit: true,
-            //         editable: false,
-            //         cellRendererFramework: LinkButtonRenderer,
-            //         onClickButton: 'onClickCoreLink',
-            //         ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
-            //         buttonValueLabel: 'ccNumber',
-            //         sortOrder: 289
-            //     });
 
                 temp.push({
                     headerName: "CORE Sample Alias",
@@ -1697,22 +1664,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 });
             } else {
                 // In view mode, if there are no usable Index Tag B's, we just don't display this column.
-
-                // temp.push({
-                //     headerName: "Index Tag B",
-                //     editable: false,
-                //     width:    12 * this.emToPxConversionRate,
-                //     minWidth: 12 * this.emToPxConversionRate,
-                //     maxWidth: 20 * this.emToPxConversionRate,
-                //     field: "idOligoBarcodeB",
-                //     cellRendererFramework: SelectRenderer,
-                //     cellEditorFramework: BarcodeSelectEditor,
-                //     selectOptions: this._barCodes,
-                //     selectOptionsDisplayField: "display",
-                //     selectOptionsValueField: "idOligoBarcodeB",
-                //     indexTagLetter: 'B',
-                //     sortOrder: 302
-                // });
             }
 
             temp.push({
@@ -1768,19 +1719,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 });
             }
             if (this.showLinkToCCNumber) {
-                // temp.push({
-                //     headerName: "CC Number",
-                //     field: "ccNumber",
-                //     width:    8.5 * this.emToPxConversionRate,
-                //     minWidth: 8.5 * this.emToPxConversionRate,
-                //     suppressSizeToFit: true,
-                //     editable: false,
-                //     cellRendererFramework: LinkButtonRenderer,
-                //     onClickButton: 'onClickCoreLink',
-                //     ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
-                //     buttonValueLabel: 'ccNumber'
-                // });
-
                 temp.push({
                     headerName: "CORE Sample Alias",
                     field: "sampleAlias_CORE",
@@ -1823,19 +1761,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
             }
         } else {
             if (this.showLinkToCCNumber) {
-                // temp.push({
-                //     headerName: "CC Number",
-                //     field: "ccNumber",
-                //     width:    8.5 * this.emToPxConversionRate,
-                //     minWidth: 8.5 * this.emToPxConversionRate,
-                //     suppressSizeToFit: true,
-                //     editable: false,
-                //     cellRendererFramework: LinkButtonRenderer,
-                //     onClickButton: 'onClickCoreLink',
-                //     ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
-                //     buttonValueLabel: 'ccNumber'
-                // });
-
                 temp.push({
                     headerName: "CORE Sample Alias",
                     field: "sampleAlias_CORE",

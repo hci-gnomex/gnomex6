@@ -1,5 +1,6 @@
 package hci.gnomex.controller;
 
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.control.Command;
 import hci.gnomex.constants.Constants;
 import hci.gnomex.model.AppUser;
@@ -11,8 +12,8 @@ import org.hibernate.Session;
 
 import javax.json.Json;
 import javax.json.JsonObject;
-import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.AddressException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class RequestLabMembership extends GNomExCommand implements Serializable 
 	private StringBuffer requestURL;
 	private String serverName;
 
-	private final static int APPROVE_USER_EXPIRATION_TIME = 86400000 * 3;// Three
+	private final static int APPROVE_USER_EXPIRATION_TIME = 86400000 * 21;// Three
 
 	// days
 
@@ -151,7 +152,7 @@ public class RequestLabMembership extends GNomExCommand implements Serializable 
 			String closing = "If you have any questions concerning this application for a new account within your lab group, please contact ";
 			closing += "GNomEx Support " + " (" + propertyHelper.getProperty(PropertyDictionary.GNOMEX_SUPPORT_EMAIL) + ").<br><br>";
 			introForAdmin.append(closing);
-			introForAdmin.append("<small>(These links will expire in 3 days.)</small><br><br>");
+			introForAdmin.append("<small>(These links will expire in 21 days.)</small><br><br>");
 		}
 
 		MailUtilHelper helper = new MailUtilHelper(toAddress, ccAddress, null, fromAddress, subject, introForAdmin.toString()

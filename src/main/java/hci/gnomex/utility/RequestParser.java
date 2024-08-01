@@ -139,6 +139,7 @@ public class RequestParser implements Serializable {
     DictionaryHelper dictionaryHelper = DictionaryHelper.getInstance(sess);
     String codeRequestCategoryValue;
 
+
     if (this.usingJSON) {
       codeRequestCategoryValue = requestObject.getString("codeRequestCategory");
     } else {
@@ -289,6 +290,21 @@ public class RequestParser implements Serializable {
       }
     }
 
+    if (n.getString("codeRequestCategory") != null) {
+      request.setCodeRequestCategory(n.getString("codeRequestCategory"));
+      if (requestCategory.getIsOwnerOnly() != null && requestCategory.getIsOwnerOnly().equals("Y")) {
+        request.setCodeVisibility(Visibility.VISIBLE_TO_OWNER);
+      }
+    }
+
+    try {
+      if (n.getString("idDownstreamAnalysis") != null && !n.getString("idDownstreamAnalysis").equals("")) {
+        request.setIdDownstreamAnalysis(Integer.valueOf(n.getString("idDownstreamAnalysis")));
+      }
+    } catch (Exception e) {
+//      request.setIdDownstreamAnalysis(null);
+    }
+
     if (n.get("codeRequestCategory") != null) {
       request.setCodeRequestCategory(n.getString("codeRequestCategory"));
       if (requestCategory.getIsOwnerOnly() != null && requestCategory.getIsOwnerOnly().equals("Y")) {
@@ -361,7 +377,8 @@ public class RequestParser implements Serializable {
         request.setCodeVisibility(n.getAttributeValue("codeVisibility"));
         request.setPrivacyExpirationDate(convertDate(n.getAttributeValue("privacyExpirationDate")));
 
-        if (n.getAttributeValue("idInstitution") != null && !n.getAttributeValue("idInstitution").equals("") && !n.getAttributeValue("idInstitution").equals("null")) {
+        if (n.getAttributeValue("idInstitution") != null && !n.getAttributeValue("idInstitution").equals("") &&
+                !n.getAttributeValue("idInstitution").equals("null")) {
           request.setIdInstitution(Integer.valueOf(n.getAttributeValue("idInstitution")));
         }
       }
@@ -574,6 +591,13 @@ public class RequestParser implements Serializable {
     }
     if (request.getBioinformaticsAssist() == null || (!request.getBioinformaticsAssist().equals("Y") && !request.getBioinformaticsAssist().equals("N"))) {
       request.setBioinformaticsAssist("N");
+    }
+
+    if (n.getAttributeValue("alignToGenomeBuild") != null && !n.getAttributeValue("alignToGenomeBuild").equals("")) {
+      request.setAlignToGenomeBuild(n.getAttributeValue("alignToGenomeBuild"));
+    }
+    if (request.getAlignToGenomeBuild() == null || (!request.getAlignToGenomeBuild().equals("Y") && !request.getAlignToGenomeBuild().equals("N"))) {
+      request.setAlignToGenomeBuild("N");
     }
 
     if (n.getAttributeValue("hasPrePooledLibraries") != null && !n.getAttributeValue("hasPrePooledLibraries").equals("")) {
@@ -856,6 +880,13 @@ public class RequestParser implements Serializable {
     }
     if (request.getBioinformaticsAssist() == null || (!request.getBioinformaticsAssist().equals("Y") && !request.getBioinformaticsAssist().equals("N"))) {
       request.setBioinformaticsAssist("N");
+    }
+
+    if (n.get("alignToGenomeBuild") != null && !n.getString("alignToGenomeBuild").equals("")) {
+      request.setAlignToGenomeBuild(n.getString("alignToGenomeBuild"));
+    }
+    if (request.getAlignToGenomeBuild() == null || (!request.getAlignToGenomeBuild().equals("Y") && !request.getAlignToGenomeBuild().equals("N"))) {
+      request.setAlignToGenomeBuild("N");
     }
 
     if (n.get("hasPrePooledLibraries") != null && !n.getString("hasPrePooledLibraries").equals("")) {

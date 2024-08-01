@@ -8,7 +8,7 @@ import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.model.Request;
 import hci.gnomex.security.SecurityAdvisor;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import javax.naming.NamingException;
 
 import org.hibernate.Session;

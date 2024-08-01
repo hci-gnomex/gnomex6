@@ -222,6 +222,8 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
 
                 this.sampleSources = this.dictionaryService.getEntries(DictionaryService.SAMPLE_SOURCE);
 
+                this.downstreamAnalysis = this.dictionaryService.getEntries(DictionaryService.DOWNSTREAM_ANALYSIS);
+
                 if (this.form && this.form.get("showDnaRnaChoices")) {
                     this.form.get("showDnaRnaChoices").setValue(false);
                 }
@@ -309,6 +311,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     public _rnaWithDNase: string = 'Click if RNA samples were treated with DNase';
     public _dnaWithRNase: string = 'Click if DNA samples were treated with RNase';
 
+    public showDownstreamAnalysis: boolean = false;
 
     private organisms: any[] = [];
     public filteredApplications: any[] = [];
@@ -318,6 +321,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
 
     public isolationTypes: any[] = [];
     public sampleSources: any[] = [];
+    public downstreamAnalysis: any[] = [];
 
     public sliceTypes: any[] = [];
 
@@ -441,6 +445,17 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             && this.form.get('selectedApp').value.samplesPerBatch !== '1';
     }
 
+    /*
+
+    public get showDownstreamAnalysis(): boolean {
+        if (this.form &&
+            this.form.get("selectedRna").value &&
+            this.form.get("selectedRna").value === "RNA") {
+            return true;
+        }
+        return false;
+    }
+    */
     public get numberOfNecessaryPlates(): number {
         if (this.form && this.form.get('numSamples') && this.form.get('numSamples').value) {
             if (+this.form.get('numSamples').value % 96 === 0) {
@@ -543,6 +558,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 selectedSliceType:                 [''],
                 numdisSlides:                      [''],
                 sampleType:                        [''],
+                downstreamAnalysis:                [''],
                 coreNotes:                         ['', [Validators.maxLength(5000)]]
             },
             { validator: TabSampleSetupViewComponent.validatorWrapper }
@@ -1101,6 +1117,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             this.form.get("selectedRna").setValue("");
         }
 
+//        this.showDownstreamAnalysis = false;
         this.setState();
         this.showSampleNotes = !!(this.form.get("selectedDna").value.notes);
         this.form.get("sampleTypeNotes").setValue(this.form.get("selectedDna").value.notes);
@@ -1156,6 +1173,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             this.form.get("selectedDna").setValue("");
         }
 
+//        this.showDownstreamAnalysis = true;
         this.setState();
         this.showSampleNotes = !!(this.form.get("selectedRna").value.notes);
         this.form.get("sampleTypeNotes").setValue(this.form.get("selectedRna").value.notes);
@@ -1269,12 +1287,15 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             if (this.sampleType.codeNucleotideType === 'DNA'){
                 this.showRnaseBox = true;
                 this.showDnaseBox = false;
+//                this.showDownstreamAnalysis = false;
             } else if(this.sampleType.codeNucleotideType == 'RNA'){
                 this.showRnaseBox = false;
                 this.showDnaseBox = true;
+//                this.showDownstreamAnalysis = true;
             } else{
                 this.showRnaseBox = false;
                 this.showDnaseBox = false;
+//                this.showDownstreamAnalysis = false;
             }
         }
 
@@ -1376,6 +1397,11 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
         }
     }
 
+    public onSelectDownstreamAnalysis(event: any): void {
+        if (event) {
+            this._experiment.idDownstreamAnalysis = event.value;
+        }
+    }
     public onSelectSampleType(event: any): void {
         if (event) {
             this._experiment.sampleType = event.value;

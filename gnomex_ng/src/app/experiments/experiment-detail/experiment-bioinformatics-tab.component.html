@@ -13,7 +13,7 @@
                 Align to Genome Build :
             </div>
             <div class="flex-grow">
-                {{ alignToGenomeBuild }}
+                {{ alignToGenomeBuild ? 'Y' : 'N'}}
             </div>
         </div>
         <div class="full-width flex-container-row align-center">
@@ -21,17 +21,17 @@
                 Genome Build(s) :
             </div>
             <div class="flex-grow">
-                {{ genomeBuild }}
+                {{ experiment?.alignToGenomeBuild === 'Y' ? 'most recent' : genomeBuild }}
             </div>
         </div>
         <div class="full-width flex-container-row align-center">
             <div class="label label-width">
-                {{ experiment?.bioinformaticsAssist === 'Y' ? 'Bioinformatics Core Assistance Requested' : 'No Bioinformatics Core Assistance Desired' }}
+                {{ experiment?.bioinformaticsAssist === 'Y' ? 'CBI Assistance Requested' : 'No CBI Assistance Desired' }}
             </div>
         </div>
         <div class="full-width flex-container-row align-center">
             <div class="label label-width">
-                Notes for Bioinformatics Group :
+                Notes for CBI :
             </div>
         </div>
         <div class="full-width padded bordered">
@@ -49,6 +49,7 @@
         <div class="full-width bold">
             {{ header }}
         </div>
+<!--
         <div>
             <div class="min-size">
                 <div class="flex-container-row align-center padded highlight">
@@ -61,6 +62,7 @@
                 </div>
             </div>
         </div>
+-->
         <ol>
             <li *ngIf="showConsolidatedGenome && consolidatedGenomeInformation?.length > 0" class="full-width flex-container-row">
                 <div class="flex-grow padded">
@@ -73,14 +75,8 @@
                             {{ item.organismName }}
                         </div>
                         <div class="margin-top">
-                            <mat-checkbox [(ngModel)]="item.alignToGenomeBuild" (change)="onCheckboxChanged(item, $event)">Yes, align to genome build</mat-checkbox>
-                        </div>
-                        <div class="margin">
-                            <custom-combo-box class="medium-width" [(ngModel)]="item.idGenomeBuildAlignTo" [options]="item.dictionary"
-                                              [disabled]="!item.alignToGenomeBuild" (optionSelected)="onSelectChanged(item, $event)"
-                                              valueField="value" displayField="display">
-                            </custom-combo-box>
-                        </div>
+                            <mat-checkbox [(ngModel)]="alignToGenomeBuild" (change)="onAlignChanged($event)">Yes, Align and QC with the most recent genome build</mat-checkbox>
+                       </div>
                     </div>
                 </div>
             </li>

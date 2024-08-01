@@ -6,7 +6,7 @@ import hci.gnomex.utility.BatchMailer;
 import hci.gnomex.utility.MailUtil;
 import hci.gnomex.utility.MailUtilHelper;
 
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import javax.naming.NamingException;
 import java.io.*;
 import java.text.DateFormat;

@@ -1,5 +1,6 @@
 package hci.gnomex.controller;
 
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.model.AppUser;
@@ -10,7 +11,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
 import javax.json.Json;
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;

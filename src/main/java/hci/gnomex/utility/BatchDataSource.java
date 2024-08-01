@@ -81,7 +81,7 @@ public class BatchDataSource extends DetailObject {
                  .setProperty("hibernate.connection.username", this.gnomex_db_username)
                  .setProperty("hibernate.connection.password", this.gnomex_db_password)
                  .setProperty("hibernate.connection.url", this.gnomex_db_url )
-                 .setProperty("hibernate.cache.provider_class", "org.hibernate.cache.HashtableCacheProvider");
+                 .setProperty("hibernate.cache.provider_class", "org.hibernate.cache.NoCacheProvider");
     
    
     ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build();

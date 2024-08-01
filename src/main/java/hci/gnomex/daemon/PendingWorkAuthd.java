@@ -27,11 +27,11 @@ import java.util.Properties;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
 
 import org.apache.log4j.Level;
 import org.hibernate.query.Query;
@@ -316,7 +316,7 @@ public class PendingWorkAuthd extends TimerTask {
 
     // create some properties and get the default Session
 
-    javax.mail.Session session = javax.mail.Session.getDefaultInstance(props, null);
+    jakarta.mail.Session session = jakarta.mail.Session.getDefaultInstance(props, null);
 
     // create a message
     Message msg = new MimeMessage(session);

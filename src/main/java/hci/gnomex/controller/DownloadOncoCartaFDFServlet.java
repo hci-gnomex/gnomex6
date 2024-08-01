@@ -5,21 +5,19 @@ import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.model.Request;
 import hci.gnomex.model.Sample;
 import hci.gnomex.security.SecurityAdvisor;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
+import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.gnomex.utility.ServletUtil;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
-import org.hibernate.Session;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 
 public class DownloadOncoCartaFDFServlet extends HttpServlet {
 

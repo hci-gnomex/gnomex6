@@ -4,22 +4,20 @@ import hci.framework.model.DetailObject;
 import hci.gnomex.model.Plate;
 import hci.gnomex.model.PlateWell;
 import hci.gnomex.security.SecurityAdvisor;
+import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.ServletUtil;
-import hci.gnomex.utility.HibernateSession;import hci.gnomex.utility.HttpServletWrappedRequest;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Iterator;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.jdom.Element;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.hibernate.Session;
-import org.jdom.Element;
-import org.apache.log4j.Logger;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Iterator;
 public class DownloadPlateSampleSheetFileServlet extends HttpServlet {
 
   private static Logger LOG = Logger.getLogger(DownloadPlateSampleSheetFileServlet.class);

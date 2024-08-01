@@ -12,13 +12,16 @@ import hci.gnomex.constants.Constants;
 import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.*;
+
+import jakarta.mail.*;
+import jakarta.mail.internet.*;
+import jakarta.activation.*;
+
+import jakarta.mail.Session;
 import net.sf.json.JSON;
 import net.sf.json.xml.XMLSerializer;
 import org.apache.log4j.Logger;
 
-import javax.mail.Session;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -27,10 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
+import java.util.*;
 
 public class GNomExFrontController extends HttpServlet {
 private static Logger LOG = Logger.getLogger(GNomExFrontController.class);
@@ -49,15 +49,41 @@ public void init(ServletConfig config) throws ServletException {
 	super.init(config);
 	webContextPath = config.getServletContext().getRealPath(Constants.FILE_SEPARATOR);
 
+/*
 	// Get the mail session
 	try {
 		Context ec = (Context) new InitialContext().lookup("java:comp/env");
 //		mailSession = (Session) ec.lookup(Constants.MAIL_SESSION);
-		mailSession = (javax.mail.Session) ec.lookup(Constants.MAIL_SESSION);
+		mailSession = (jakarta.mail.Session) ec.lookup(Constants.MAIL_SESSION);
 	} catch (Exception me) {
 		LOG.error("Error in gnomexFrontController cannot get mail session: ", me);
 	}
+*/
 
+	String host = "smtp.utah.edu";
+	String name = "mail/MailSession";
+
+	//Get the session object
+	Properties properties = System.getProperties();
+	properties.setProperty("mail.smtp.host", host);
+
+	mailSession = Session.getDefaultInstance(properties);
+/*
+	try{
+		String to = "Tim.Maness@hci.utah.edu";
+		String from = "gnomex.support@hci.utah.edu";
+		MimeMessage message = new MimeMessage(mailSession);
+		message.setFrom(new InternetAddress(from));
+		message.addRecipient(Message.RecipientType.TO,new InternetAddress(to));
+		message.setSubject("Ping");
+		message.setText("Hello, this is example of sending email  ");
+
+		// Send message
+		Transport.send(message);
+		System.out.println("message sent successfully....");
+
+	}catch (MessagingException mex) {mex.printStackTrace();}
+*/
     initLog4j();
 
     // we should only do this once

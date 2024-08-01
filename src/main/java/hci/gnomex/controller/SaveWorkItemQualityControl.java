@@ -1,5 +1,6 @@
 package hci.gnomex.controller;
 
+import hci.gnomex.utility.HttpServletWrappedRequest;
 import hci.framework.control.Command;
 import hci.framework.control.RollBackCommandException;
 import hci.gnomex.constants.Constants;
@@ -14,7 +15,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import javax.json.Json;
 import javax.json.JsonObject;
-import javax.mail.MessagingException;
+import jakarta.mail.MessagingException;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
@@ -211,7 +212,7 @@ public class SaveWorkItemQualityControl extends GNomExCommand implements Seriali
     } else {
       emailSubject = dictionaryHelper.getRequestCategory(request.getCodeRequestCategory())+ " Request " + request.getNumber() + " in progress";
       introNote.append("Request " + request.getNumber() + " is in progress.  ");
-      introNote.append("The " + cf.getFacilityName() + " core has finished Quality Control on all of the samples for Request " + request.getNumber() + ".  The report below summarizes the spectophotometer and bioanalyzer readings.");
+      introNote.append("The " + cf.getFacilityName() + " core has finished Quality Control on all of the samples for Request " + request.getNumber() + ".  The report below summarizes the Qubit and Agilent ScreenTape assays");
       introNote.append("<br>To fetch the quality control reports, click <a href=\"" + downloadRequestURL + "\">" + Constants.APP_NAME + " - " + Constants.WINDOW_NAME_FETCH_RESULTS + "</a>.");      
     } 
 

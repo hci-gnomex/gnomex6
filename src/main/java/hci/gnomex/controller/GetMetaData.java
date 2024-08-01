@@ -1228,26 +1228,6 @@ public class GetMetaData extends GNomExCommand implements Serializable {
     return session;
   }
 
-  /**
-   * The callback method allowing you to manipulate the HttpServletRequest prior to forwarding to the response JSP. This can be used to put the results from the
-   * execute method into the request object for display in the JSP.
-   *
-   * @param request
-   *            The new requestState value
-   * @return Description of the Return Value
-  */
-/*
-  public HttpServletRequest setRequestState(HttpServletRequest request) {
-    // load any result objects into request attributes, keyed by the useBean id in the jsp
-    request.setAttribute("xmlResult", this.xmlResult);
-
-    // Garbage collect
-    this.xmlResult = null;
-    System.gc();
-
-    return request;
-  }
-*/
 
   private static class PlateAndWellComparator implements Comparator {
     public int compare(Object o1, Object o2) {
