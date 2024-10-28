@@ -5,10 +5,10 @@
   "private": true,
   "scripts": {
     "build:dev:wds": "webpack --env development --progress --profile --json > stats.json",
-    "build:dev:tomcat": "webpack --env developmentTomcat --progress --profile --json > stats.json",
+    "build:dev:tomcat": "webpack --env developmentTomcat --timing --progress --profile --json > stats.json",
     "build:prod": "webpack --env productionTomcat --progress --profile --json > stats.json",
     "clean:dist": "npm run rimraf -- dist",
-    "clean:install": "npm set progress=false && npm install",
+    "clean:install": "npm set progress=false && npm --force install",
     "clean": "npm cache clean && npm run rimraf -- node_modules doc coverage dist compiled dll",
     "karma": "karma",
     "rimraf": "rimraf",
@@ -99,7 +99,7 @@
     "@types/uglify-js": "^3.0.4",
     "@types/webpack": "^4.1.3",
     "angular-router-loader": "^0.8.5",
-    "angular-split": "^1.0.2",
+    "angular-split": "^3.0.0",
     "angular2-template-loader": "^0.6.2",
     "autoprefixer": "^9.3.1",
     "awesome-typescript-loader": "^5.0.0-1",
@@ -163,5 +163,6 @@
     "webpack-dev-server": "^3.1.1",
     "webpack-merge": "^4.1.2",
     "webpack-stream": "^5.1.1"
-  }
+  },
+  "version": "0.0.0"
 }
