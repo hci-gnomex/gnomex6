@@ -30,7 +30,6 @@ plugins {
 apply plugin: 'maven-publish'
 apply from: 'common.gradle'
 
-
 repositories {
     maven {
         credentials {
