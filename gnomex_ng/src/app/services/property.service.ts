@@ -60,7 +60,7 @@ export class PropertyService {
     public static readonly PROPERTY_DUOEXCEPTIONS: string = "duoExceptions";
     public static readonly PROPERTY_GUEST_DOWNLOAD_TERMS: string = "guest_download_terms";
     public static readonly PROPERTY_ALLOW_PRICE_QUOTE: string = "allow_price_quote";
-    public static readonly PROPERTY_HIDE_MULTIPLEX_LANE_OOLUMN: string = "hide_multiplex_lane_column";
+    public static readonly PROPERTY_HIDE_MULTIPLEX_LANE_COLUMN: string = "hide_multiplex_lane_column";
     public static readonly PROPERTY_DEFAULT_VALUE_MULTIPLEX_LANE_COLUMN: string = "default_value_multiplex_lane_column";
     public static readonly PROPERTY_ESTIMATED_PRICE_WARNING: string = "estimated_price_warning";
     public static readonly PROPERTY_EMAIL_INVOICE_PRICE_AMOUNT: string = "email_invoice_price_amount";
@@ -90,6 +90,10 @@ export class PropertyService {
     public static readonly PROPERTY_SHOW_TOTAL_DOLLAR_AMOUNT:string = "property_show_total_dollar_amount";
 
     public static readonly PROPERTY_SHOW_CREDIT_CARD:string = "show_credit_card";
+
+    public static readonly PROPERTY_SUBMIT_INSTRUCTIONS: string = "submit_request_instructions";
+    public static readonly PROPERTY_SUBMIT_XENIUM_INSTRUCTIONS: string = "submit_xenium_request_instructions";
+
 
     constructor(private dictionaryService: DictionaryService,
                 private httpClient: HttpClient,

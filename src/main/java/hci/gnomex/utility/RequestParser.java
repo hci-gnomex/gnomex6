@@ -1,3 +1,4 @@
+
 package hci.gnomex.utility;
 
 import hci.gnomex.constants.Constants;
@@ -566,6 +567,17 @@ public class RequestParser implements Serializable {
     if (n.getAttributeValue("keepSamples") != null && !n.getAttributeValue("keepSamples").equals("")) {
       request.setKeepSamples(n.getAttributeValue("keepSamples"));
     }
+    if (n.getAttributeValue("idXeniumGenePanel") != null && !n.getAttributeValue("idXeniumGenePanel").equals("")) {
+      request.setIdXeniumGenePanel(Integer.valueOf(n.getAttributeValue("idXeniumGenePanel")));
+    }
+
+    if (n.getAttributeValue("tissueSection") != null && !n.getAttributeValue("tissueSection").equals("")) {
+      request.setTissueSection(n.getAttributeValue("tissueSection"));
+    }
+
+    if (n.getAttributeValue("suspension") != null && !n.getAttributeValue("suspension").equals("")) {
+      request.setSuspension(n.getAttributeValue("suspension"));
+    }
 
     if (n.getAttributeValue("captureLibDesignId") != null && !n.getAttributeValue("captureLibDesignId").equals(""))
       request.setCaptureLibDesignId(n.getAttributeValue("captureLibDesignId"));
@@ -598,6 +610,13 @@ public class RequestParser implements Serializable {
     }
     if (request.getAlignToGenomeBuild() == null || (!request.getAlignToGenomeBuild().equals("Y") && !request.getAlignToGenomeBuild().equals("N"))) {
       request.setAlignToGenomeBuild("N");
+    }
+
+    if (n.getAttributeValue("oraCompression") != null && !n.getAttributeValue("oraCompression").equals("")) {
+      request.setoraCompression(n.getAttributeValue("oraCompression"));
+    }
+    if (request.getoraCompression() == null || ( !request.getoraCompression().equals("N"))) {
+      request.setoraCompression("Y");
     }
 
     if (n.getAttributeValue("hasPrePooledLibraries") != null && !n.getAttributeValue("hasPrePooledLibraries").equals("")) {
@@ -856,6 +875,18 @@ public class RequestParser implements Serializable {
       request.setKeepSamples(n.getString("keepSamples"));
     }
 
+    if (n.get("idXeniumGenePanel") != null && !n.getString("idXeniumGenePanel").equals("")) {
+      request.setIdXeniumGenePanel(Integer.valueOf(n.getString("idXeniumGenePanel")));
+    }
+
+    if (n.get("tissueSection") != null && !n.getString("tissueSection").equals("")) {
+      request.setTissueSection(n.getString("tissueSection"));
+    }
+
+    if (n.get("suspension") != null && !n.getString("suspension").equals("")) {
+      request.setSuspension(n.getString("suspension"));
+    }
+
     if (n.get("captureLibDesignId") != null && !n.getString("captureLibDesignId").equals(""))
       request.setCaptureLibDesignId(n.getString("captureLibDesignId"));
 
@@ -887,6 +918,13 @@ public class RequestParser implements Serializable {
     }
     if (request.getAlignToGenomeBuild() == null || (!request.getAlignToGenomeBuild().equals("Y") && !request.getAlignToGenomeBuild().equals("N"))) {
       request.setAlignToGenomeBuild("N");
+    }
+
+    if (n.get("oraCompression") != null && !n.getString("oraCompression").equals("")) {
+      request.setoraCompression(n.getString("oraCompression"));
+    }
+    if (request.getoraCompression() == null || (!request.getoraCompression().equals("N"))) {
+      request.setoraCompression("Y");
     }
 
     if (n.get("hasPrePooledLibraries") != null && !n.getString("hasPrePooledLibraries").equals("")) {
@@ -1265,6 +1303,29 @@ public class RequestParser implements Serializable {
       } else {
         sample.setSampleAlias_CORE(null);
       }
+
+      if (n.get("tissueSection") != null && !n.getString("tissueSection").equals("")) {
+        String tissueSection = n.getString("tissueSection");
+        sample.setTissueSection(tissueSection);
+      } else {
+        sample.setTissueSection(null);
+      }
+
+      if (n.get("suspension") != null && !n.getString("suspension").equals("")) {
+        String suspension = n.getString("suspension");
+        sample.setSuspension(suspension);
+      } else {
+        sample.setSuspension(null);
+      }
+
+      if (n.get("idXeniumGenePanel") != null && !n.getString("idXeniumGenePanel").equals("")) {
+        String idXeniumGenePanel = n.getString("idXeniumGenePanel");
+        sample.setIdXeniumGenePanel(Integer.valueOf(idXeniumGenePanel));
+      } else {
+        sample.setIdXeniumGenePanel(null);
+      }
+
+
     }
 
     if (n.get("qcLibConcentration") != null && !n.getString("qcLibConcentration").equals("")) {

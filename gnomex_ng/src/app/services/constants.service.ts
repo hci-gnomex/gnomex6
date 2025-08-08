@@ -156,7 +156,7 @@ export class ConstantsService {
             "assets/microarray_small.png", "assets/microarray_small_single_color.png", "assets/chart_line.png",
             "assets/dna-helix-icon.png", "assets/cherrypick.png", "assets/fraganal.png", "assets/mitseq.png",
             "assets/DNA_diag_miseq.png", "assets/iscan.png", "assets/sequenom_clinical.png", "assets/sequenom_plate.png",
-            "assets/DNA_test_tube.png", "assets/data-accept.png", "assets/nano.png", "assets/flask.png"];
+            "assets/DNA_test_tube.png", "assets/data-accept.png", "assets/nano.png", "assets/flask.png", "assets/xen.png"];
 
 
     public readonly ICON_INFORMATION: string = "assets/information.png";

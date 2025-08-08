@@ -88,6 +88,7 @@ export class DictionaryService {
     public static readonly VENDOR: string = "hci.gnomex.model.Vendor";
     public static readonly VISIBILITY: string = "hci.gnomex.model.Visibility";
     public static readonly WORKFLOW_PROPERTY: string = "hci.gnomex.model.WorkflowProperty";
+    public static readonly XENIUM_GENE_PANEL: string = "hci.gnomex.model.XeniumGenePanel";
 
     private cachedDictionaries: Dictionary[] = [];
     private cachedEntries: { [key: string]: DictionaryEntry[] } = {};

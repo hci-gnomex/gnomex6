@@ -201,6 +201,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     private propertyList: any[];
     private sequenceLanes: any[];
 
+    public xeniumGenePanels: any[] = [];
 
     public get estimatedChargesWarning(): string {
         return this._estimatedChargesWarning ? this._estimatedChargesWarning : '';
@@ -279,6 +280,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     ngOnInit() {
         this.loadBarcodes();
         this.loadSampleTypes();
+        this.xeniumGenePanels = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.XENIUM_GENE_PANEL);
 
         this.form = this.fb.group({});
     }
@@ -357,6 +359,16 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
 
         for (let columnProperty of this.columnProperties) {
+            // Skip the Sample Type column if tissueSection or suspension is set.
+            if (columnProperty.header === "Sample Type1") {
+                if (this._experiment.tissueSection
+                    && this._experiment.tissueSection !== "")
+                    continue;
+
+                if (this._experiment.suspension
+                    && this._experiment.suspension !== "")
+                    continue;
+            }
 
             if (columnProperty.showInNewSummaryMode && columnProperty.showInNewSummaryMode === 'Y') {
                 let editable: boolean = false;
@@ -412,8 +424,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 }
 
                 temp.push(newColumn);
-            }
-        }
+            } // end if columnProperty.showInNewSummaryMode
+        } // end for columnProperties
 
         if (this._experiment.hasCCNumber === "Y") {
             temp.push({
@@ -476,7 +488,51 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                     editable: false,
                 });
             }
-        }
+        } // no illumina seqprepbycore
+
+        if (this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y') {
+
+            if (this._experiment
+                && this._experiment.tissueSection
+                && this._experiment.tissueSection !== "") {
+
+                temp.push({
+                    headerName: "Tissue Section",
+                    field: "tissueSection",
+                    width: 8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    cellEditorFramework: TextAlignLeftMiddleEditor,
+                    cellRendererFramework: TextAlignLeftMiddleRenderer,
+                    showFillButton: true,
+                    fillGroupAttribute: 'frontEndGridGroup',
+                    suppressSizeToFit: false,
+                    editable: false,
+                    sortOrder: 322
+                });
+            }
+
+            if (this._experiment
+                && this._experiment.suspension
+                && this._experiment.suspension !== "") {
+
+                temp.push({
+                    headerName: "Suspension",
+                    field: "suspension",
+                    width: 8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    cellEditorFramework: TextAlignLeftMiddleEditor,
+                    cellRendererFramework: TextAlignLeftMiddleRenderer,
+                    showFillButton: true,
+                    fillGroupAttribute: 'frontEndGridGroup',
+                    suppressSizeToFit: false,
+                    editable: false,
+                    sortOrder: 324
+                });
+            }
+        } // illumina seq by core
 
         this.tabIndexToInsertAnnotations = 150;
 
@@ -514,8 +570,8 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
         temp = TabSamplesIlluminaComponent.sortColumns(temp);
 
-        this.samplesGridConfirmColumnDefs = temp;
-    }
+        this.samplesGridConfirmColumnDefs = temp;               // *********************
+    } // end buildMultiplexLaneColumnDefinitions
 
     private buildNonmultiplexLaneColumnDefinitions(): void {
         this.columnProperties = [];
@@ -581,7 +637,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                 sortOrder: 9,
                 cellRendererFramework: TextAlignLeftMiddleRenderer
             });
-        }
+        } // end if using plates
 
         temp.push({
             headerName: "Sample Name",
@@ -593,6 +649,40 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
             sortOrder: 15
         });
 
+        if (this._experiment.codeRequestCategory === "XENIUM") {
+            temp.push({
+                headerName: "Sample Type",
+                editable: false,
+                width:    12 * this.emToPxConversionRate,
+                minWidth: 12 * this.emToPxConversionRate,
+                field: "idSampleType",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.sampleTypes,
+                selectOptionsDisplayField: "sampleType",
+                selectOptionsValueField: "idSampleType",
+                sortOrder: 290
+            });
+
+//            this.xeniumGenePanels = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.XENIUM_GENE_PANEL);
+
+            temp.push({
+                headerName: "Xenium Gene Panel",
+                editable: false,
+                width:    45 * this.emToPxConversionRate,
+                minWidth: 45 * this.emToPxConversionRate,
+                field: "idXeniumGenePanel",
+                namefield: "xeniumGenePanel",
+                valuefield: "idXeniumGenePanel",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.xeniumGenePanels,
+                selectOptionsDisplayField: "xeniumGenePanel",
+                selectOptionsValueField: "idXeniumGenePanel",
+                sortOrder: 292
+            });
+
+        }
         let isExternal: boolean = this.experiment && this.experiment.isExternal === 'Y';
 
         for (let columnProperty of this.columnProperties) {
@@ -769,7 +859,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
         temp = TabSamplesIlluminaComponent.sortColumns(temp);
 
-        this.samplesGridConfirmColumnDefs = temp;
+        this.samplesGridConfirmColumnDefs = temp;           // ******************
     }
 
     public tabDisplayed(): void {
@@ -842,7 +932,9 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
                     this.clientPrepString += ", " + this._experiment.numPrePooledTubes + " Pre-Pooled Tubes";
                 }
             }
-        }
+
+
+        } // end if finalSamples
 
         this.requestPropBox = this.gnomexService.getCoreFacilityProperty(this._experiment.idCoreFacility, this.gnomexService.PROPERTY_REQUEST_PROPS_ON_CONFIRM_TAB) === 'Y';
     }
@@ -986,6 +1078,30 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
 
     private loadSampleTypes(): void {
         let types: any[] = [];
+
+        for (let category of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleType")) {
+            if (category.isActive === 'N' || (category.codeNucleotideType !== "Section") ) {
+                continue;
+            }
+
+            types.push(category);
+        }
+
+        for (let category of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleType")) {
+            if (category.isActive === 'N' || (category.codeNucleotideType !== "Suspension") ) {
+                continue;
+            }
+
+            types.push(category);
+        }
+
+        for (let category of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleType")) {
+            if (category.isActive === 'N' || (category.codeNucleotideType !== "Xenium") ) {
+                continue;
+            }
+
+            types.push(category);
+        }
 
         for (let sampleType of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleType")) {
             if (sampleType.isActive === 'N'

@@ -2,6 +2,14 @@
     <div *ngIf="masterDisabled" class="full-width full-height flex-container-col">
         <div class="full-width flex-container-row align-center">
             <div class="label label-width">
+                Compression :
+            </div>
+            <div class="flex-grow">
+                {{ oraCompression ? 'Illumina ORA' : 'gzip' }}
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center">
+            <div class="label label-width">
                 Organism(s) :
             </div>
             <div class="flex-grow">
@@ -49,21 +57,24 @@
         <div class="full-width bold">
             {{ header }}
         </div>
-<!--
-        <div>
-            <div class="min-size">
-                <div class="flex-container-row align-center padded highlight">
-                    <div class="padded">
-                        Questions? Please contact the {{ groupName }} at:
-                    </div>
-                    <a href="{{ 'mailto:' + linkUrl }}">
-                        {{ linkUrl }}
-                    </a>
-                </div>
-            </div>
-        </div>
--->
         <ol>
+            <li class="full-width flex-container-row">
+                <div class="flex-grow padded">
+                    <context-help name="oraCompression" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
+                                  [hasEditPermission]="this.createSecurityAdvisorService.isAdmin"
+                                  popupTitle="ORA Compression Help"
+                                  label='Use ORA instead of gzip to compress the fastq files.'>
+                    </context-help>
+                    <div class="margin-top">
+                        See <a href="https://help.ora.illumina.com/product-guides/dragen-ora-decompression/" target="_blank">Illumina ORA</a> for details. Not all species are supported.
+                    </div>
+                    <div class="flex-container-row align-center">
+                        <div class="margin-top">
+                            <mat-checkbox [(ngModel)]="oraCompression" (change)="onORACompressionChanged($event)">Yes, Use ORA Compression</mat-checkbox>
+                        </div>
+                    </div>
+                </div>
+            </li>
             <li *ngIf="showConsolidatedGenome && consolidatedGenomeInformation?.length > 0" class="full-width flex-container-row">
                 <div class="flex-grow padded">
                     <context-help name="bioSequenceAligned" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
@@ -76,10 +87,11 @@
                         </div>
                         <div class="margin-top">
                             <mat-checkbox [(ngModel)]="alignToGenomeBuild" (change)="onAlignChanged($event)">Yes, Align and QC with the most recent genome build</mat-checkbox>
-                       </div>
+                        </div>
                     </div>
                 </div>
             </li>
+
             <li class="full-width flex-container-row">
                 <div class="flex-grow padded">
                     <context-help name="bioAnalysisAssistance" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"

@@ -1,40 +1,45 @@
+import org.apache.tools.ant.filters.FixCrLfFilter;
+
 buildscript {
     repositories {
         maven {
             credentials {
-                username = repo_user
-                password = repo_password
+                username = 'u0974549'
+                password = 'AP6b32YbsxUzayr5KPBeNziaTrVispH4d4ejJ9'
             }
-            url repo_resolve_url
+            url 'https://ri-artifact-new.hci.utah.edu/artifactory/libs-release'
         }
-        maven { url 'https://repo.spring.io/plugins-release' }
+        maven { url 'https://repo.spring.io/plugins-snapshot' }
     }
     dependencies {
-        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.7'
+        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.8-SNAPSHOT'
         classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:3.0.1'
         classpath 'hci:hci-conventions:2.0.0'
+        classpath 'com.amazonaws:aws-java-sdk-bom:1.12.411'
+
     }
 }
+
 
 plugins {
     id 'war'
     id 'idea'
-    id 'maven'
+    id 'maven-publish'
 }
 
+apply plugin: 'maven-publish'
 apply from: 'common.gradle'
-
-import org.apache.tools.ant.filters.*
 
 repositories {
     maven {
         credentials {
-            username = repo_user
-            password = repo_password
+            username = 'u0974549'
+            password = 'AP6b32YbsxUzayr5KPBeNziaTrVispH4d4ejJ9'
         }
-        url repo_resolve_url
+        url 'https://ri-artifact-new.hci.utah.edu/artifactory/libs-release'
     }
-    maven { url 'https://repo.spring.io/plugins-release' }
+    maven { url 'https://repo.spring.io/plugins-snapshot' }
+
     mavenCentral()
 }
 
@@ -43,84 +48,102 @@ dependencies {
     implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.132')
     implementation 'com.amazonaws:aws-java-sdk-s3'
 
-    runtime group: 'hci', name: 'hci-servlet-filter-nocache', version: '1.+'
-    runtime group: 'hci', name: 'hci-servlet-filter-cors', version: '1.+'
-    runtime group: 'hci', name: 'hci-servlet-filter-pushstate', version: '1.+'
 
-    compile group: 'hci', name: 'auth-services', version: '4.+'
-    compile group: 'hci', name: 'auth-persistence', version: '3.1+'
-    compile group: 'hci', name: 'hci-bean-validation', version: '+'
+    runtimeOnly group: 'hci', name: 'hci-servlet-filter-nocache', version: '1.+'
+    runtimeOnly group: 'hci', name: 'hci-servlet-filter-cors', version: '1.+'
+    runtimeOnly group: 'hci', name: 'hci-servlet-filter-pushstate', version: '1.+'
 
-    compile group: 'servlets.com', name: 'cos', version: '05Nov2002'
-    compile group: 'org.apache.commons', name: 'commons-compress', version: '1.1'
-    compile group: 'org.ostermiller', name: 'utils', version: '1.07.00'
-    compile group: 'net.sf.json-lib', name: 'json-lib', version: '2.4', classifier: 'jdk15'
-    compile group: 'com.itextpdf', name: 'itextpdf', version: '5.5.9'
-    compile group: 'org.freemarker', name: 'freemarker', version: '2.3.20'
-    compile group: 'commons-validator', name: 'commons-validator', version: '1.4.0'
-    compile group: 'org.apache.lucene', name: 'lucene-core', version: '2.9.4'
-    compile group: 'commons-codec', name: 'commons-codec', version: '1.10'
-    compile group: 'commons-io', name: 'commons-io', version: '2.4'
-    compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
-    compile group: 'jdom', name: 'jdom', version: '1.0b8'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
-    compile group: 'com.github.fracpete', name: 'rsync4j-all', version: '3.1.2-17'
+    implementation group: 'hci', name: 'auth-services', version: '4.+'
+    implementation group: 'hci', name: 'auth-persistence', version: '3.1+'
+    implementation group: 'hci', name: 'hci-bean-validation', version: '+'
 
-    providedRuntime group: 'com.sun.mail', name: 'javax.mail', version: '1.5.0'
+    implementation group: 'servlets.com', name: 'cos', version: '05Nov2002'
+    implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.1'
+    implementation group: 'org.ostermiller', name: 'utils', version: '1.07.00'
+    implementation group: 'net.sf.json-lib', name: 'json-lib', version: '2.4', classifier: 'jdk15'
+    implementation group: 'com.itextpdf', name: 'itextpdf', version: '5.5.9'
+    implementation group: 'org.freemarker', name: 'freemarker', version: '2.3.20'
+    implementation group: 'commons-validator', name: 'commons-validator', version: '1.4.0'
+    implementation group: 'org.apache.lucene', name: 'lucene-core', version: '2.9.4'
+    implementation group: 'commons-codec', name: 'commons-codec', version: '1.10'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.4'
+    implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
+    implementation group: 'jdom', name: 'jdom', version: '1.0b8'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
+    implementation group: 'com.github.fracpete', name: 'rsync4j-all', version: '3.1.2-17'
 
-    compile group: 'jline', name: 'jline', version: '0.9.94'
-    compile group: 'xom', name: 'xom', version: '1.2.5'
+    implementation fileTree(dir: 'libEnv', include: 'jakarta.mail-api-2.1.3.jar')
+    implementation fileTree(dir: 'libEnv', include: 'jakarta.activation-api-2.1.3.jar')
+    implementation fileTree(dir: 'libEnv', include: 'angus-mail-2.0.3.jar')
+    implementation fileTree(dir: 'libEnv', include: 'angus-activation-2.0.2.jar')
+
+    implementation group: 'jline', name: 'jline', version: '0.9.94'
+    implementation group: 'xom', name: 'xom', version: '1.2.5'
 
     //lib & libEnv
-    compile fileTree(dir: 'libEnv', include: 'hci-hibernate5-utils-1.0.jar')
-    compile fileTree(dir: 'lib', include: 'biojava.jar')
-    compile fileTree(dir: 'lib', include: 'metrixClient-1.4.jar')
-    compile fileTree(dir: 'libEnv', include: 'hci_framework.jar')
-    compile fileTree(dir: 'libEnv', include: 'hci_utils.jar')
-    compile fileTree(dir: 'libEnv', include: 'HCIReport.jar')
-    compile fileTree(dir: 'libEnv', include: 'jdom-2.0.6.jar')
-    compile fileTree(dir: 'libEnv', include: 'jaxen-1.1.6.jar')
-    compile fileTree(dir: 'libEnv', include: 'poi-3.10-FINAL.jar')
-    compile fileTree(dir: 'libEnv', include: 'javax.json-api-jdk8-1.1.3.jar')
-    compile fileTree(dir: 'libEnv', include: 'javax.json-jdk8-1.1.3.jar')
-    compile fileTree(dir: 'libEnv', include: 'hci-servlet-filter-xsrf-1.1.3.jar')
-    compile fileTree(dir: 'libEnv', include: 'rsync4j-3.1.2-8.jar')
-    compile fileTree(dir: 'libEnv', include: 'DuoWeb-1.3.jar')
-    compile fileTree(dir: 'libEnv', include: 'processoutput4j-0.0.7.jar')
-    compile fileTree(dir: 'libEnv', include: 'argparse4j-0.6.0.jar')
+    implementation fileTree(dir: 'libEnv', include: 'hci-hibernate5-utils-1.0.jar')
+    implementation fileTree(dir: 'lib', include: 'biojava.jar')
+    implementation fileTree(dir: 'lib', include: 'metrixClient-1.4.jar')
+//    implementation fileTree(dir: 'libEnv', include: 'hci_framework.jar')
+    implementation fileTree(dir: 'libEnv', include: 'hci_utils.jar')
+    implementation fileTree(dir: 'libEnv', include: 'HCIReport.jar')
+    implementation fileTree(dir: 'libEnv', include: 'jdom-2.0.6.jar')
+    implementation fileTree(dir: 'libEnv', include: 'jaxen-1.1.6.jar')
+    implementation fileTree(dir: 'libEnv', include: 'poi-3.10-FINAL.jar')
+    implementation fileTree(dir: 'libEnv', include: 'javax.json-api-jdk8-1.1.3.jar')
+    implementation fileTree(dir: 'libEnv', include: 'javax.json-jdk8-1.1.3.jar')
+    implementation fileTree(dir: 'libEnv', include: 'hci-servlet-filter-xsrf-1.1.3.jar')
+    implementation fileTree(dir: 'libEnv', include: 'rsync4j-3.1.2-8.jar')
+    implementation fileTree(dir: 'libEnv', include: 'DuoWeb-1.3.jar')
+    implementation fileTree(dir: 'libEnv', include: 'processoutput4j-0.0.7.jar')
+    implementation fileTree(dir: 'libEnv', include: 'argparse4j-0.6.0.jar')
+    implementation fileTree(dir: 'libEnv', include: 'jdk-misc-3.Final.jar')
+    implementation fileTree(dir: 'libEnv', include: 'jaxb-api-2.3.1.jar')
+    implementation fileTree(dir: 'libEnv', include: 'jaxb-core-2.3.0.1.jar')
+    implementation fileTree(dir: 'libEnv', include: 'jaxb-impl-2.3.1.jar')
+    implementation fileTree(dir: 'libEnv', include: 'ant-1.10.13.jar')
+    implementation fileTree(dir: 'libEnv', include: 'ant-launcher-1.10.13.jar')
 
-//    compile fileTree(dir: 'libEnv', include: 'tempus-persistence.jar')
+//    providedCompile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.3.2'
+//    providedCompile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.3.2'
+
+//    implementation fileTree(dir: 'libEnv', include: 'aws-java-sdk-core-1.122.411.jar')
+//    implementation fileTree(dir: 'libEnv', include: 'aws-java-sdk-s3-1.122.411.jar')
 
     //Realm stuff
-    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
-    providedCompile group: 'log4j', name: 'log4j', version: '1.2.12'
+//    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
+//    providedCompile group: 'log4j', name: 'log4j', version: '1.2.12'
     providedCompile group: 'org.apache.tomcat', name: 'tomcat-jdbc', version: '9.0.0.M10'
-    providedCompile group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '7.0.68'
+    providedCompile group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '9.0.10'
 
     //Subprojects
     providedCompile project(':gnomex_crypt')
     providedCompile project(':gnomex_tomcat_support')
 
     //Tomcat
-    compile group: 'org.hibernate', name: 'hibernate-core', version: '5.2.2.Final'
-    compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.0.10.Final'
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.+'
-    compile group: 'commons-codec', name: 'commons-codec', version: '1.10'
-    compile group: 'commons-io', name: 'commons-io', version: '2.4'
-    compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
+    implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.2.2.Final'
+//    implementation group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.0.10.Final'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.+'
+//    implementation group: 'commons-codec', name: 'commons-codec', version: '1.10'
+//    implementation group: 'commons-io', name: 'commons-io', version: '2.4'
+//    implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
     // JAX-RS Related
-    compile group: 'org.jboss.resteasy', name: 'resteasy-jaxrs', version: '3.0.19.Final'
-    compile group: 'org.jboss.resteasy', name: 'resteasy-jackson2-provider', version: '3.0.19.Final'
-    compile group: 'org.jboss.resteasy', name: 'resteasy-client', version: '3.0.19.Final'
-    compile group: 'org.jboss.resteasy', name: 'resteasy-servlet-initializer', version: '3.0.19.Final'
-    compile group: 'org.jboss.resteasy', name: 'resteasy-cdi', version: '3.0.19.Final'
+    implementation group: 'org.jboss.resteasy', name: 'resteasy-jaxrs', version: '3.0.19.Final'
+    implementation group: 'org.jboss.resteasy', name: 'resteasy-jackson2-provider', version: '3.0.19.Final'
+    implementation group: 'org.jboss.resteasy', name: 'resteasy-client', version: '3.0.19.Final'
+    implementation group: 'org.jboss.resteasy', name: 'resteasy-servlet-initializer', version: '3.0.19.Final'
+    implementation group: 'org.jboss.resteasy', name: 'resteasy-cdi', version: '3.0.19.Final'
 
     // CDI Related
     providedCompile group: 'javax.ejb', name: 'javax.ejb-api', version: '3.2'
     providedCompile group: 'javax.enterprise', name: 'cdi-api', version: '1.2'
-    runtime group: 'org.jboss.weld.servlet', name: 'weld-servlet', version: '2.4.1.Final'
+    runtimeOnly group: 'org.jboss.weld.servlet', name: 'weld-servlet', version: '2.4.1.Final'
+
+    // https://mvnrepository.com/artifact/ch.qos.reload4j/reload4j
+    implementation group:  'ch.qos.reload4j', name: 'reload4j', version: '1.2.26'
 }
+
 
 // Main build tasks are named starting with "gnomex"
 task gnomexWindowsWDS(type: GradleBuild) {
@@ -179,7 +202,7 @@ task adjustShiroForWindows() {
 
 task buildWar(type: GradleBuild) {
     mustRunAfter(adjustShiroForWindows, adjustShiroForLinux)
-    tasks = ['clean', 'cleanTomcat', 'makeSQLServer', 'jar', 'clientJar', 'copyScripts', 'copyTomcatJars', 'war']
+    tasks = ['cleanTomcat', 'makeSQLServer', 'jar', 'clientJar', 'copyScripts', 'copyTomcatJars', 'war']
 }
 
 task buildWarOpensource(type: GradleBuild) {
@@ -188,7 +211,7 @@ task buildWarOpensource(type: GradleBuild) {
 }
 
 task cleanTomcat(type: Delete) {
-    delete "${gnomexServerHome}/${gnomexDeployDir}/gnomex"
+//    delete "${gnomexServerHome}/${gnomexDeployDir}/gnomex"
 }
 
 static void replaceString(String fileName, String fromString, String toString) {
@@ -213,8 +236,8 @@ jar {
                 'Class-Path': 'log4j.jar'
         )
         attributes([
-                'Built-By'              : repo_user,
-                'Implementation-Version': "${gnomex_version} (${formattedDate})"
+                'Built-By'              : 'u0974549',
+                'Implementation-Version': "6.26.12 (07/06/2025)"
         ], 'gnomex')
     }
 }
@@ -226,8 +249,8 @@ task clientJar(type: Jar) {
 
     manifest {
         attributes([
-                'Built-By'              : repo_user,
-                'Implementation-Version': gnomex_version
+                'Built-By'              : 'u0974549',
+                'Implementation-Version': '6.26.12'
         ], 'gnomexClient')
     }
 }
@@ -250,10 +273,12 @@ war {
     archiveFileName = warNameTemp
     classpath = classpath - sourceSets.main.output
 
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
     manifest {
         attributes(
-                'Built-By': repo_user,
-                'Implementation-Version': "${gnomex_version} (${formattedDate})",
+                'Built-By': 'u0974549',
+                'Implementation-Version': "6.26.12 (07/06/2025)",
                 'Dependencies': 'org.dom4j, org.apache.log4j'
         )
     }
@@ -302,10 +327,10 @@ war {
 
 task opensourceWar(type: War) {
     archiveFileName = warNameTemp
-
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
         attributes(
-                'Built-By': repo_user,
+                'Built-By': 'u0974549',
                 'Implementation-Version': "${gnomex_version} (${formattedDate})"
         )
     }

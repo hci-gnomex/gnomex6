@@ -65,6 +65,9 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
     public selectedIndex: number = 0;
     public currentTabComponent: any;
 
+    public submitInstructions: string = '';
+    public submitXeniumInstructions: string = '';
+
     private coreFacility: any;
     private sub: any;
 
@@ -104,10 +107,13 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             applicationNotes: '',
             codeApplication: '',
             codeIsolationPrepType: '',
+            idXeniumGenePanel: '',
             coreToExtractDNA: '',
             includeBisulfideConversion: '',
             invoicePrice: '',
-            includeQubitConcentration: ''
+            includeQubitConcentration: '',
+            tissueSection: '',
+            suspension: ''
         }
     };
 
@@ -567,6 +573,33 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 disabled: true,
                 component: TabConfirmIlluminaComponent
             });
+        } else if (category.type === NewExperimentService.TYPE_XENIUM) {
+            this.newExperimentService.currentState = "XeniumState";
+
+            this.tabs.push({
+                label: "Sample Details",
+                disabled: true,
+                component: TabSampleSetupViewComponent
+            });
+
+            this.tabs.push({
+                label: "Annotations",
+                disabled: true,
+                component: TabAnnotationViewComponent
+            });
+
+            this.tabs.push({
+                label: "Samples",
+                disabled: true,
+                component: TabSamplesIlluminaComponent
+            });
+
+            this.tabs.push({
+                label: "Confirm",
+                disabled: true,
+                component: TabConfirmIlluminaComponent
+            });
+
         } else if (category.type === NewExperimentService.TYPE_NANOSTRING) {
             this.newExperimentService.currentState = "NanoStringState";
 
@@ -729,6 +762,17 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                     // The submit tab is the next one - Do nothing.
                 }
             } break;
+            case 'XeniumState' : {
+                if (this.selectedIndex === 0) {
+                    this.tabs[0].disabled = false;
+                    this.tabs[1].disabled = false;
+                } else if (this.selectedIndex > 1 && this.selectedIndex < this.tabs.length - 1) {
+                    this.tabs[this.selectedIndex + 1].disabled = false;
+                } else {
+                    // The submit tab is the next one - Do nothing.
+                }
+            } break;
+
             case 'NanoGeomxState' : {
                 if (this.selectedIndex === 0) {
                     this.tabs[0].disabled = false;
@@ -775,7 +819,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
         // but are used to create Price Quotes on the confirm tab in the new experiment
         this.inputs.experiment.billingItems = [];
 
-        this.experimentService. saveRequest(this.inputs.experiment).subscribe((response) => {
+        this.experimentService.saveRequest(this.inputs.experiment).subscribe((response) => {
             this.dialogService.stopAllSpinnerDialogs();
 
             if (!response) {
@@ -783,11 +827,17 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
                 return;
             }
 
+            this.submitInstructions = this.propertyService.getPropertyValue(PropertyService.PROPERTY_SUBMIT_INSTRUCTIONS, this.coreFacility);
+
+
+                if (this.inputs.experiment.codeRequestCategory === NewExperimentService.TYPE_XENIUM) {
+                    this.submitInstructions = this.propertyService.getPropertyValue(PropertyService.PROPERTY_SUBMIT_INSTRUCTIONS, this.coreFacility, this.inputs.experiment.codeRequestCategory);
+                }
+
+            let theSubmitInstructions: string = this.submitInstructions;
             if (response.requestNumber && this.coreFacility.display) {
                 let submissionMessage = 'Request #  ' + response.requestNumber + '\n'
-                    + 'Experiment has been submitted.  Please print off the request form and deliver it along with your samples to the ' + this.coreFacility.display + '.\n'
-                    + '\n'
-                    + 'Please inscribe database ID numbers on the lids of 1.5 ml microcentrifuge tubes.  Inscribe sample names on the sides of tubes. ';
+                    + theSubmitInstructions;
 
                 let temp = this.dialogService.alert(submissionMessage, "Request Submitted", DialogType.SUCCESS).subscribe((value: boolean) => {
                     if (response.requestNumber) {

@@ -26,6 +26,7 @@ export class Experiment {
     public protocolNumber:                     string = "";
     public invoicePrice:                       string = "";
     public alignToGenomeBuild:                 string = "";
+    public oraCompression:                     string = "";
 
     public get numberOfddisSlides(): string {
         return this._numberOfdisSlides;
@@ -74,6 +75,20 @@ export class Experiment {
     }
     public onChange_sampleType: Subject<string> = new Subject<string>();
 
+    private _xeniumGenePanel: any;
+    public get xeniumGenePanel(): any {
+        return this._xeniumGenePanel;
+    }
+    public set xeniumGenePanel(value: any) {
+
+        for (let sample of this.samples) {
+            sample.xeniumGenePanel = value;
+        }
+
+        this._xeniumGenePanel = value;
+        this.onChange_xeniumGenePanel.next(value);
+    }
+    public onChange_xeniumGenePanel: Subject<string> = new Subject<string>();
 
     private _containerType: any;
     public get containerType(): any {
@@ -134,6 +149,9 @@ export class Experiment {
     public turnAroundTime:                     string = "";
     public idDownstreamAnalysis:               string = "";
     public _idCoreFacility:                    string = ''; // "1"
+    public idXeniumGenePanel:                  string = '';
+    public tissueSection:                      string = "";
+    public suspension:                         string = "";
     public get idCoreFacility(): string {
         return this._idCoreFacility;
     }
@@ -449,7 +467,7 @@ export class Experiment {
 
         this._samples = temp;
     }
-    private _samples:                    Sample[] = [];
+    private _samples: Sample[] = [];
     public _hypothetical_samples_plate: Sample[] = [];
 
     public getAllUsedPlates(): any[] {
@@ -626,6 +644,7 @@ export class Experiment {
                         newSample.numberSequencingLanes = numberSequencingLanes;
                         newSample.idSampleSource = this.idSampleSource;
                         newSample.idSampleType = idSampleType;
+                        newSample.idXeniumGenePanel = this.idXeniumGenePanel;
                         newSample.idSeqLibProtocol = protocol.idSeqLibProtocol;
                         newSample.seqPrepByCore = seqPrepByCore;
                         newSample.idOrganism = idOrganism;
@@ -657,7 +676,7 @@ export class Experiment {
     public protocols:               any[] = [];
 
 
-    //will alway return array just making typescript happy
+    //will always return array just making typescript happy
     public get submitterFromOtherCores():any|any[]{
         return this._submitterFromOtherCores;
     }
@@ -870,6 +889,7 @@ export class Experiment {
         experiment.cloneProperty("sampleType", value);
         experiment.cloneProperty("bioinformaticsAssist", value);
         experiment.cloneProperty("alignToGenomeBuild", value);
+        experiment.cloneProperty("oraCompression", value);
         experiment.cloneProperty("idOrganismSampleDefault", value);
         experiment.cloneProperty("isArrayINFORequest", value);
         experiment.cloneProperty("canDeleteSample", value);
@@ -903,6 +923,10 @@ export class Experiment {
         experiment.cloneProperty("createDate", value);
         experiment.cloneProperty("completedDate", value);
         experiment.cloneProperty("idDownstreamAnalysis", value);
+        experiment.cloneProperty("idXeniumGenePanel", value);
+        experiment.cloneProperty("xeniumGenePanel", value);
+        experiment.cloneProperty("tissueSection", value);
+        experiment.cloneProperty("suspension", value);
         experiment.cloneProperty("notes", value);
 
         if (value.application) {
@@ -1241,6 +1265,7 @@ export class Experiment {
             notes:                              this.notes,
             bioinformaticsAssist:               this.bioinformaticsAssist,
             alignToGenomeBuild:                 this.alignToGenomeBuild,
+            oraCompression:                     this.oraCompression,
             completedDate:                      this.completedDate,
             slideProduct:                       this.slideProduct,
             idOrganismSampleDefault:            this.idOrganismSampleDefault,
@@ -1258,6 +1283,9 @@ export class Experiment {
             coreToExtractDNA:                   this.coreToExtractDNA,
             processingDate:                     this.processingDate,
             codeIsolationPrepType:              this.codeIsolationPrepType,
+            idXeniumGenePanel:                  this.idXeniumGenePanel,
+            tissueSection:                      this.tissueSection,
+            suspension:                         this.suspension,
             hasPrePooledLibraries:              this.hasPrePooledLibraries,
             numPrePooledTubes:                  this.numPrePooledTubes,
             reagent:                            this.reagent,

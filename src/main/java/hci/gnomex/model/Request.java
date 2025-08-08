@@ -58,6 +58,12 @@ public class Request extends HibernateDetailObject implements VisibilityInterfac
   private Date            privacyExpirationDate;
   private Integer         avgInsertSizeFrom;
   private Integer         avgInsertSizeTo;
+
+  private Integer          idXeniumGenePanel;
+
+  private String          suspension;
+  private String          tissueSection;
+
   private Set             samples = new TreeSet();
   private Set             labeledSamples = new TreeSet();
   private Set             hybridizations = new TreeSet();
@@ -84,6 +90,7 @@ public class Request extends HibernateDetailObject implements VisibilityInterfac
   private String          codeIsolationPrepType;
   private String          bioinformaticsAssist;
   private String          alignToGenomeBuild;
+  private String          oraCompression;
   private String          hasPrePooledLibraries;
   private Integer         numPrePooledTubes;
   private String          includeBisulfideConversion;
@@ -300,6 +307,29 @@ public class Request extends HibernateDetailObject implements VisibilityInterfac
     return protocolNumber;
   }
 
+  public void setIdXeniumGenePanel(Integer idXeniumGenePanel) {
+    this.idXeniumGenePanel = idXeniumGenePanel;
+  }
+
+  public Integer getIdXeniumGenePanel() {
+    return idXeniumGenePanel;
+  }
+
+  public void setTissueSection(String tissueSection) {
+    this.tissueSection = tissueSection;
+  }
+  public String getTissueSection() {
+    return tissueSection;
+  }
+
+  public void setSuspension(String suspension) {
+    this.suspension = suspension;
+  }
+
+  public String getSuspension() {
+    return suspension;
+  }
+
   public void setProtocolNumber(String protocolNumber) {
     this.protocolNumber = protocolNumber;
   }
@@ -373,6 +403,13 @@ public class Request extends HibernateDetailObject implements VisibilityInterfac
     this.alignToGenomeBuild = alignToGenomeBuild;
   }
 
+  public String getoraCompression() {
+    return oraCompression;
+  }
+
+  public void setoraCompression(String oraCompression) {
+    this.oraCompression = oraCompression;
+  }
 
   public Set getBillingItems() {
     return billingItems;
@@ -1146,6 +1183,11 @@ public class Request extends HibernateDetailObject implements VisibilityInterfac
     root.setAttribute("codeVisibility",         this.getNonNullString(this.getCodeVisibility()));
     root.setAttribute("idInstitution",          this.getIdInstitution() != null ? this.getIdInstitution().toString() : "");
     root.setAttribute("idDownstreamAnalysis",   this.getNonNullString(this.getIdDownstreamAnalysis()));
+    root.setAttribute("idXeniumGenePanel",      this.getNonNullString(this.getIdXeniumGenePanel()));
+
+    root.setAttribute("tissueSection",          this.getNonNullString(this.getTissueSection()));
+    root.setAttribute("suspension",             this.getNonNullString(this.getSuspension()));
+
     root.setAttribute("ownerFirstName",         ownerFirstName);
     root.setAttribute("ownerLastName",          ownerLastName);
     root.setAttribute("isExternal",             this.getNonNullString(this.getIsExternal()));

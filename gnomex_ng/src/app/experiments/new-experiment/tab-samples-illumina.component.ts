@@ -80,9 +80,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
     @Input('experiment') public set experiment(value: Experiment) {
 
         let newExperiment: boolean = (this._experiment !== value);
-        this.getColumnProperties();
-
         this._experiment = value;
+        this.getColumnProperties();
 
         if(newExperiment) {
             this.selectedSamples = [];
@@ -100,6 +99,11 @@ export class TabSamplesIlluminaComponent implements OnInit {
             this.onChange_sampleTypeSubscription.unsubscribe();
             this.onChange_sampleTypeSubscription = undefined;
         }
+        if (newExperiment && this.onChange_xeniumGenePanelSubscription) {
+            this.onChange_xeniumGenePanelSubscription.unsubscribe();
+            this.onChange_xeniumGenePanelSubscription = undefined;
+        }
+
         if (newExperiment && this.onChange_organismSubscription) {
             this.onChange_organismSubscription.unsubscribe();
             this.onChange_organismSubscription = undefined;
@@ -128,7 +132,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
         if (!this.onChange_codeRequestCategorySubscription) {
             this.onChange_codeRequestCategorySubscription = this._experiment.onChange_codeRequestCategory.subscribe((value) => {
                 this.getColumnProperties();
-                let hide_property = this.propertyService.getProperty(PropertyService.PROPERTY_HIDE_MULTIPLEX_LANE_OOLUMN, this._experiment.idCoreFacility, this._experiment.codeRequestCategory);
+                let hide_property = this.propertyService.getProperty(PropertyService.PROPERTY_HIDE_MULTIPLEX_LANE_COLUMN, this._experiment.idCoreFacility, this._experiment.codeRequestCategory);
                 this._hideMultiplexGroupColumn = hide_property && hide_property.propertyValue && hide_property.propertyValue === 'Y';
             });
         }
@@ -160,6 +164,13 @@ export class TabSamplesIlluminaComponent implements OnInit {
             this.onChange_sampleTypeSubscription = this._experiment.onChange_sampleType.subscribe((value) => {
                 if (value && this.samplesGridApi) {
                     this.changeSampleType();
+                }
+            });
+        }
+        if (!this.onChange_xeniumGenePanelSubscription) {
+            this.onChange_xeniumGenePanelSubscription = this._experiment.onChange_xeniumGenePanel.subscribe((value) => {
+                if (value && this.samplesGridApi) {
+                    this.changeXeniumGenePanel(value);
                 }
             });
         }
@@ -217,6 +228,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
         this.bioanalyzerChipType = this.dictionaryService.getEntries(DictionaryService.BIOANALYZER_CHIP_TYPE).filter((a) => {
             return a.codeApplication === this._experiment.codeApplication;
         });
+
+        this.xeniumGenePanels = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.XENIUM_GENE_PANEL);
 
         this.rebuildColumnDefinitions();
         this.loadSampleTypes();
@@ -279,6 +292,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
     public static readonly OPTION: string = 'option';
     public static readonly IMP_OPTION: string = 'IMPROVED_OPTION';
     public static readonly MULTIOPTION: string = 'multioption';
+
+
 
     private _lab: any;
 
@@ -346,9 +361,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public get showCcCheckbox(): boolean {
-        // if (this._state === this.STATE_VIEW) {
-        //     return false;
-        // }
 
         let showExternalCCNumber = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_SHOW_CCNUMBER_EXTERNAL_EXPERIMENTS);
 
@@ -391,6 +403,14 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public get showSampleTypeInViewMode(): boolean {
+        if (this._experiment.tissueSection
+            && this._experiment.tissueSection !== "")
+            return false;
+
+        if (this._experiment.suspension
+            && this._experiment.suspension !== "")
+            return false;
+
         return this._experiment
             && this._experiment.requestCategory
             && this._experiment.requestCategory.isIlluminaType
@@ -412,6 +432,20 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public get showSeqLibPrepStatus(): boolean {
+        return this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y';
+    }
+
+    public get showTissueSectionStatus(): boolean {
+        return this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y';
+    }
+
+    public get showSuspensionStatus(): boolean {
         return this._experiment
             && this._experiment.requestCategory
             && this._experiment.requestCategory.isIlluminaType
@@ -472,6 +506,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
     private onChange_numberOfSamplesSubscription: Subscription;
     private onChange_sampleTypeSubscription: Subscription;
+    private onChange_xeniumGenePanelSubscription: Subscription;
     private onChange_organismSubscription: Subscription;
     private onChange_codeApplicationSubscription: Subscription;
     private onChange_selectedProtocolSubscription: Subscription;
@@ -486,6 +521,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
     public concentrationUnits: any[] = [];
     public bioanalyzerChipType: any[] = [];
     public bioanalyzerChips: any[] = [];
+    public xeniumGenePanels: any[] = [];
 
     private get workflowStatus(): any[] {
         let temp: any[] = [];
@@ -566,7 +602,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 sortOrder: 9,
                 cellRendererFramework: TextAlignLeftMiddleRenderer
             });
-        } else {
+        } // if (this.usingPlates)
+        else {
             // This is the far more common case at time of writing
             temp.push({
                 headerName: "",
@@ -578,7 +615,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 pinned: "left",
                 sortOrder: 5
             });
-        }
+        } // if not (this.usingPlates)
 
         if (this.usingMultiplexGroupGroups && !this.hideMultiplexGroupColumn) {
             temp.push({
@@ -605,7 +642,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 pinned: "left",
                 sortOrder: 10
             });
-        }
+        } // if (this.usingMultiplexGroupGroups && !this.hideMultiplexGroupColumn)
 
         if (this.usingPlates) {
             temp.push({
@@ -622,10 +659,11 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 ],
                 pinned: "left",
                 outerForm: this.form,
-                formName: "gridFormGroup",
+                formName: "c",
                 sortOrder: 15
             });
-        } else {
+        } // if (this.usingPlates)
+        else {
             temp.push({
                 headerName: "Sample Name",
                 field: "name",
@@ -644,11 +682,21 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 formName: "gridFormGroup",
                 sortOrder: 15
             });
-        }
+        } // if not (this.usingPlates)
 
         let isExternal: boolean = this.experiment && this.experiment.isExternal === 'Y';
 
         for (let columnProperty of this.columnProperties) {
+            // Skip the Sample Type column if tissueSection or suspension is set.
+            if (columnProperty.header === "Sample Type1") {
+                if (this._experiment.tissueSection
+                    && this._experiment.tissueSection !== "")
+                    continue;
+
+                if (this._experiment.suspension
+                    && this._experiment.suspension !== "")
+                    continue;
+            }
 
             if (columnProperty.showInNewMode && columnProperty.showInNewMode === 'Y') {
                 if (isExternal && columnProperty.showForExternal === 'N') {
@@ -755,28 +803,44 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 }
 
                 temp.push(newColumn);
-            }
-        }
+            } // if (columnProperty.showInNewMode === 'Y')
+        } // for (let columnProperty of this.columnProperties)
 
-        // temp.push({
-        //     headerName: "CC Number",
-        //     field: "ccNumber",
-        //     width:    9 * this.emToPxConversionRate,
-        //     minWidth: 8 * this.emToPxConversionRate,
-        //     suppressSizeToFit: true,
-        //     editable: true,
-        //     cellRendererFramework: TextAlignLeftMiddleRenderer,
-        //     cellEditorFramework: TextAlignLeftMiddleEditor,
-        //     validators: [Validators.maxLength(20)],
-        //     errorNameErrorMessageMap: [
-        //         {errorName: "maxlength", errorMessage: "Maximum of 20 characters"}
-        //     ],
-        //     showFillButton: true,
-        //     fillGroupAttribute: 'frontEndGridGroup',
-        //     hide: this.hideCCNum,
-        //     ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden
-        // });
+        if (this._experiment.codeRequestCategory === "XENIUM") {
+            temp.push({
+                headerName: "Sample Type",
+                editable: false,
+                width:    12 * this.emToPxConversionRate,
+                minWidth: 12 * this.emToPxConversionRate,
+                field: "idSampleType",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.sampleTypes,
+                selectOptionsDisplayField: "sampleType",
+                selectOptionsValueField: "idSampleType",
+                sortOrder: 290
+            });
 
+//            this.xeniumGenePanels = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.XENIUM_GENE_PANEL);
+
+
+            temp.push({
+                headerName: "Xenium Gene Panel",
+                editable: false,
+                width:    45 * this.emToPxConversionRate,
+                minWidth: 45 * this.emToPxConversionRate,
+                field: "idXeniumGenePanel",
+                namefield: "xeniumGenePanel",
+                valuefield: "idXeniumGenePanel",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.xeniumGenePanels,
+                selectOptionsDisplayField: "xeniumGenePanel",
+                selectOptionsValueField: "idXeniumGenePanel",
+                sortOrder: 292
+            });
+
+        } // if (this._experiment.codeRequestCategory === "XENIUM") {
         temp.push({
             headerName: "CORE Sample Alias",
             field: "sampleAlias_CORE",
@@ -811,6 +875,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
             sortOrder: 145
         });
+
 
         this._tabIndexToInsertAnnotations = 150;
 
@@ -885,15 +950,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
             });
 
             if (!this.isAmendState) {
-                // temp.push({
-                //     headerName: "Index Tag Sequence A",
-                //     field: "barcodeSequence",
-                //     width:    7.5 * this.emToPxConversionRate,
-                //     minWidth: 6.5 * this.emToPxConversionRate,
-                //     suppressSizeToFit: true,
-                //     editable: false,
-                //     sortOrder: 305
-                // });
 
                 let permittedBarcodes: any[] = [];
 
@@ -920,7 +976,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                         ],
                         sortOrder: 310
                     });
-                } else {
+                }
+                else {
                     temp.push({
                         headerName: "Index Tag B",
                         editable: true,
@@ -936,16 +993,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                         sortOrder: 310
                     });
                 }
-
-                // temp.push({
-                //     headerName: "Index Tag Sequence B",
-                //     field: "barcodeSequenceB",
-                //     width:    7 * this.emToPxConversionRate,
-                //     minWidth: 6.5 * this.emToPxConversionRate,
-                //     suppressSizeToFit: true,
-                //     editable: false,
-                //     sortOrder: 315
-                // });
 
                 temp.push({
                     headerName: "Lib QC Conc.",
@@ -964,8 +1011,54 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     editable: true,
                     sortOrder: 320
                 });
+
+            } // if (!this.isAmendState)
+        } // if (this._experiment.requestCategory.isIlluminaType === 'Y') and notseqbycore
+
+        if (this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.isIlluminaType
+            && this._experiment.requestCategory.isIlluminaType === 'Y') {
+
+            if (this._experiment
+                && this._experiment.tissueSection
+                && this._experiment.tissueSection !== "") {
+
+                temp.push({
+                    headerName: "Tissue Section",
+                    field: "tissueSection",
+                    width: 8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    cellEditorFramework: TextAlignLeftMiddleEditor,
+                    cellRendererFramework: TextAlignLeftMiddleRenderer,
+                    showFillButton: true,
+                    fillGroupAttribute: 'frontEndGridGroup',
+                    suppressSizeToFit: false,
+                    editable: false,
+                    sortOrder: 322
+                });
             }
-        }
+
+            if (this._experiment
+                && this._experiment.suspension
+                && this._experiment.suspension !== "") {
+
+                temp.push({
+                    headerName: "Suspension",
+                    field: "suspension",
+                    width: 8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    cellEditorFramework: TextAlignLeftMiddleEditor,
+                    cellRendererFramework: TextAlignLeftMiddleRenderer,
+                    showFillButton: true,
+                    fillGroupAttribute: 'frontEndGridGroup',
+                    suppressSizeToFit: false,
+                    editable: false,
+                    sortOrder: 324
+                });
+            }
+        } // if (this._experiment.requestCategory.isIlluminaType === 'Y')
+
 
         if (this.showDescription) {
             temp.push({
@@ -984,7 +1077,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
 
         return temp;
-    }
+    }  // end 0f defaultSampleColumnDefinitions ********************
 
     private get editSampleColumnDefinitions(): any[] {
         let temp: any[] = [];
@@ -1020,7 +1113,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 selectOptionsDisplayField: "value",
                 selectOptionsValueField: "value"
             });
-        } else {
+        } // if (this.usingPlates)
+        else {
             temp.push({
                 headerName: "",
                 field: "counter",
@@ -1032,7 +1126,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 sortOrder: 5,
                 pinned: "left"
             });
-        }
+        } // else not using plates
 
 
         if (this.usingMultiplexGroupGroups && !this.hideMultiplexGroupColumn) {
@@ -1060,7 +1154,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 sortOrder: 10,
                 pinned: "left"
             });
-        }
+        } // if (this.usingMultiplexGroupGroups && !this.hideMultiplexGroupColumn)
 
         temp.push({
             headerName: "ID",
@@ -1072,6 +1166,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
             sortOrder: 15,
             pinned: "left"
         });
+
         temp.push({
             headerName: "Sample Name",
             field: "name",
@@ -1094,6 +1189,16 @@ export class TabSamplesIlluminaComponent implements OnInit {
         let isExternal: boolean = this.experiment && this.experiment.isExternal === 'Y';
 
         for (let columnProperty of this.columnProperties) {
+            // Skip the Sample Type column if tissueSection or suspension is set.
+            if (columnProperty.header === "Sample Type1") {
+                if (this._experiment.tissueSection
+                    && this._experiment.tissueSection !== "")
+                    continue;
+
+                if (this._experiment.suspension
+                    && this._experiment.suspension !== "")
+                    continue;
+            }
 
             if (columnProperty.showInEditMode && columnProperty.showInEditMode === 'Y') {
                 if (isExternal && columnProperty.showForExternal === 'N') {
@@ -1196,9 +1301,44 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 }
 
                 temp.push(newColumn);
-            }
-        }
+            } // if (columnProperty.showInEditMode === 'Y')
+        } // end for columnProperties edit mode
 
+        if (this._experiment.codeRequestCategory === "XENIUM") {
+            temp.push({
+                headerName: "Sample Type",
+                editable: false,
+                width:    12 * this.emToPxConversionRate,
+                minWidth: 12 * this.emToPxConversionRate,
+                field: "idSampleType",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.sampleTypes,
+                selectOptionsDisplayField: "sampleType",
+                selectOptionsValueField: "idSampleType",
+                sortOrder: 290
+            });
+
+//            this.xeniumGenePanels = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.XENIUM_GENE_PANEL);
+
+
+            temp.push({
+                headerName: "Xenium Gene Panel",
+                editable: false,
+                width:    45 * this.emToPxConversionRate,
+                minWidth: 45 * this.emToPxConversionRate,
+                field: "idXeniumGenePanel",
+                namefield: "xeniumGenePanel",
+                valuefield: "idXeniumGenePanel",
+                cellRendererFramework: SelectRenderer,
+                cellEditorFramework: SelectEditor,
+                selectOptions: this.xeniumGenePanels,
+                selectOptionsDisplayField: "xeniumGenePanel",
+                selectOptionsValueField: "idXeniumGenePanel",
+                sortOrder: 292
+            });
+
+        } // if (this._experiment.codeRequestCategory === "XENIUM")
 
         temp.push({
             headerName: "CORE Sample Alias",
@@ -1242,6 +1382,36 @@ export class TabSamplesIlluminaComponent implements OnInit {
             && this._experiment.requestCategory.isIlluminaType
             && this._experiment.requestCategory.isIlluminaType === 'Y') {
 
+            if (this._experiment
+                && this._experiment.tissueSection
+                && this._experiment.tissueSection !== "" ) {
+
+                temp.push({
+                    headerName: "Tissue Section",
+                    field: "tissueSection",
+                    width: 8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    suppressSizeToFit: false,
+                    editable: false,
+                    sortOrder: 286
+                });
+            }
+
+            if (this._experiment
+                && this._experiment.suspension
+                && this._experiment.suspension !== "" ) {
+
+                temp.push({
+                    headerName: "Suspension",
+                    field: "suspension",
+                    width: 8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    suppressSizeToFit: false,
+                    editable: false,
+                    sortOrder: 287
+                });
+            }
+
             temp.push({
                 headerName: "Index Tag A",
                 editable: true,
@@ -1260,15 +1430,6 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 ],
                 sortOrder: 300
             });
-            // temp.push({
-            //     headerName: "Index Tag Sequence A",
-            //     field: "barcodeSequence",
-            //     width:    8.5 * this.emToPxConversionRate,
-            //     minWidth: 8.5 * this.emToPxConversionRate,
-            //     suppressSizeToFit: true,
-            //     editable: false,
-            //     sortOrder: 301
-            // });
 
             let permittedBarcodes: any[] = [];
 
@@ -1310,17 +1471,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     indexTagLetter: 'B',
                     sortOrder: 302
                 });
+
+
             }
 
-            // temp.push({
-            //     headerName: "Index Tag Sequence B",
-            //     field: "barcodeSequenceB",
-            //     width:    8.5 * this.emToPxConversionRate,
-            //     minWidth: 8.5 * this.emToPxConversionRate,
-            //     suppressSizeToFit: true,
-            //     editable: false,
-            //     sortOrder: 303
-            // });
 
             temp.push({
                 headerName: "Lib QC Conc.",
@@ -1356,20 +1510,14 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 // fillGroupAttribute: 'frontEndGridGroup',
                 sortOrder: 500
             });
+
             temp.push({
                 headerName: "Seq Lib Prep Status",
                 field: "seqPrepStatus",
                 width:    8.5 * this.emToPxConversionRate,
                 minWidth: 8.5 * this.emToPxConversionRate,
-                // cellRendererFramework: SelectRenderer,
-                // cellEditorFramework: SelectEditor,
-                // selectOptions: this.workflowStatus,
-                // selectOptionsDisplayField: "display",
-                // selectOptionsValueField: "value",
                 suppressSizeToFit: true,
                 editable: false,
-                // showFillButton: true,
-                // fillGroupAttribute: 'frontEndGridGroup',
                 sortOrder: 505
             });
         } else if (!isExternal) {
@@ -1411,11 +1559,11 @@ export class TabSamplesIlluminaComponent implements OnInit {
                             sortOrder: 510
                         });
                     }
-            }
-        }
+            } // if QC
+        } // end of if not illumina seq by core
 
         return temp;
-    }
+    } // end of get editSampleColumnDefinitions()  ******************************
 
     private get viewSampleColumnDefinitions(): any[] {
         let temp: any[] = [];
@@ -1433,7 +1581,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 },
                 pinned: 'left'
             });
-        } else if (this.usingPlates) {
+        } // end if (this.usingMultiplexGroups) {
+        else if (this.usingPlates) {
             temp.push({
                 headerName: "Plate",
                 field: "mainMultiplexGroupNumber",
@@ -1446,7 +1595,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 },
                 pinned: 'left'
             });
-        }
+        } // else not using multiplex groups or plates
 
         temp.push({
             headerName: "ID",
@@ -1486,6 +1635,16 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
         // Add all configurable columns for this RequestCategory.
         for (let columnProperty of this.columnProperties) {
+
+            if (columnProperty.header === "Sample Type1") {
+                if (this._experiment.tissueSection
+                    && this._experiment.tissueSection !== "")
+                    continue;
+
+                if (this._experiment.suspension
+                    && this._experiment.suspension !== "")
+                    continue;
+            }
 
             if (columnProperty.showInViewMode && columnProperty.showInViewMode === 'Y') {
                 if (isExternal && columnProperty.showForExternal === 'N') {
@@ -1564,8 +1723,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 }
 
                 temp.push(newColumn);
-            }
-        }
+            } // if (columnProperty.showInViewMode === 'Y')
+        }  // end of for columnProperties
 
 
         // This is used as the sortOrder basis for the sample annotations.
@@ -1575,6 +1734,36 @@ export class TabSamplesIlluminaComponent implements OnInit {
             && this._experiment.requestCategory
             && this._experiment.requestCategory.isIlluminaType
             && this._experiment.requestCategory.isIlluminaType === 'Y') {
+
+            if (this._experiment
+                && this._experiment.tissueSection
+                && this._experiment.tissueSection !== "" ) {
+
+                temp.push({
+                    headerName: "Tissue Section",
+                    field: "tissueSection",
+                    width: 8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    suppressSizeToFit: false,
+                    editable: false,
+                    sortOrder: 286
+                });
+            }
+
+            if (this._experiment
+                && this._experiment.suspension
+                && this._experiment.suspension !== "" ) {
+
+                temp.push({
+                    headerName: "Suspension",
+                    field: "suspension",
+                    width: 8.5 * this.emToPxConversionRate,
+                    minWidth: 8.5 * this.emToPxConversionRate,
+                    suppressSizeToFit: false,
+                    editable: false,
+                    sortOrder: 287
+                });
+            }
 
             if (this.showLinkToCCNumber) {
 
@@ -1683,6 +1872,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 suppressSizeToFit: true,
                 editable: false,
             });
+
             temp.push({
                 headerName: "Seq Lib Prep Status",
                 field: "seqPrepStatus",
@@ -1707,7 +1897,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                 suppressSizeToFit: true,
                 editable: false,
             });
-        } else if (!this.usingPlates) {
+        } // end of if illumina seq by core
+        else if (!this.usingPlates) {
             if (this.showQCStatus) {
                 temp.push({
                     headerName: "QC Status",
@@ -1747,6 +1938,38 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     sortOrder: 295
                 });
             }
+            if (this._experiment.codeRequestCategory === "XENIUM") {
+                temp.push({
+                    headerName: "Sample Type",
+                    editable: false,
+                    width:    12 * this.emToPxConversionRate,
+                    minWidth: 12 * this.emToPxConversionRate,
+                    field: "idSampleType",
+                    cellRendererFramework: SelectRenderer,
+                    cellEditorFramework: SelectEditor,
+                    selectOptions: this.sampleTypes,
+                    selectOptionsDisplayField: "sampleType",
+                    selectOptionsValueField: "idSampleType",
+                    sortOrder: 198
+                });
+
+                temp.push({
+                    headerName: "Xenium Gene Panel",
+                    editable: false,
+                    width:    45 * this.emToPxConversionRate,
+                    minWidth: 45 * this.emToPxConversionRate,
+                    field: "idXeniumGenePanel",
+                    namefield: "xeniumGenePanel",
+                    valuefield: "idXeniumGenePanel",
+                    cellRendererFramework: SelectRenderer,
+                    cellEditorFramework: SelectEditor,
+                    selectOptions: this.xeniumGenePanels,
+                    selectOptionsDisplayField: "xeniumGenePanel",
+                    selectOptionsValueField: "idXeniumGenePanel",
+                    sortOrder: 199
+                });
+
+            } // if (this._experiment.codeRequestCategory === "XENIUM")
 
             if (this.showDescription) {
                 temp.push({
@@ -1759,7 +1982,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     cellRendererFramework: TextAlignLeftMiddleRenderer
                 });
             }
-        } else {
+        } // end of if not illumina seq by core
+        else {
             if (this.showLinkToCCNumber) {
                 temp.push({
                     headerName: "CORE Sample Alias",
@@ -1772,7 +1996,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     onClickButton: 'onClickCoreLink',
                     ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
                     buttonValueLabel: 'sampleAlias_CORE',
-                    sortOrder: 290
+                    sortOrder: 198
                 });
 
                 temp.push({
@@ -1786,13 +2010,13 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     onClickButton: 'onClickCoreLink',
                     ccNumberIsCurrentlyHidden: this.ccNumberIsCurrentlyHidden,
                     buttonValueLabel: 'idSample_CORE',
-                    sortOrder: 295
+                    sortOrder: 199
                 });
-            }
-        }
+            } // end of if showLinkToCCNumber
+        } // end of else not illumina seq by core
 
         return temp;
-    }
+    } // end of get viewSampleColumnDefinitions()
 
 
     constructor(public constService: ConstantsService,
@@ -1810,6 +2034,7 @@ export class TabSamplesIlluminaComponent implements OnInit {
     ngOnInit() {
         this.selectedSamples = [];
         this.organisms = this.dictionaryService.getEntries(DictionaryService.ORGANISM);
+        this.xeniumGenePanels = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.XENIUM_GENE_PANEL);
         this.concentrationUnits = this.dictionaryService.getEntries(DictionaryService.CONCENTRATION_UNIT);
 
         this.form = this.fb.group({});
@@ -1853,6 +2078,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
         if (this.onChange_sampleTypeSubscription) {
             this.onChange_sampleTypeSubscription.unsubscribe();
         }
+        if (this.onChange_xeniumGenePanelSubscription) {
+            this.onChange_xeniumGenePanelSubscription.unsubscribe();
+        }
         if (this.onChange_organismSubscription) {
             this.onChange_organismSubscription.unsubscribe();
         }
@@ -1893,9 +2121,16 @@ export class TabSamplesIlluminaComponent implements OnInit {
         let types: any[] = [];
 
         for (let sampleType of this.dictionaryService.getEntriesExcludeBlank(DictionaryService.SAMPLE_TYPE)) {
-            if (sampleType.isActive === 'N'
-                || (sampleType.codeNucleotideType !== "RNA" && sampleType.codeNucleotideType !== "DNA")) {
+            if ((sampleType.codeNucleotideType !== "RNA" && sampleType.codeNucleotideType !== "DNA"
+                && sampleType.codeNucleotideType !== "Section" && sampleType.codeNucleotideType !== "Suspension"
+            && sampleType.codeNucleotideType !== "Xenium") || sampleType.isActive === 'N') {
 
+                continue;
+            }
+
+            if (sampleType.codeNucleotideType === "Section" || sampleType.codeNucleotideType === "Suspension" ||
+                sampleType.codeNucleotideType === "Xenium") {
+                types.push(sampleType);
                 continue;
             }
 
@@ -2131,12 +2366,16 @@ export class TabSamplesIlluminaComponent implements OnInit {
             return;
         }
 
-        let idSampleType: string = '';
+        let idSampleType: string = this._experiment.idSampleTypeDefault;
+        let idXeniumGenePanel: string = this._experiment.idXeniumGenePanel;
         let idOrganism: string = '';
         let idNumberSequencingCycles: string = '';
         let idNumberSequencingCyclesAllowed: string = '';
         let idSeqRunType: string = '';
         let protocol: any = '';
+
+        let tissueSection: string = this._experiment.tissueSection;
+        let suspension: string = this._experiment.suspension;
         let numberSequencingLanes: string = this._experiment.isRapidMode === 'Y' ? '2' : '1';
         if (this.isAmendState) {
             numberSequencingLanes = "";
@@ -2182,6 +2421,10 @@ export class TabSamplesIlluminaComponent implements OnInit {
             sample.idSampleType = idSampleType;
             sample.idSeqLibProtocol = protocol.idSeqLibProtocol;
             sample.idOrganism = idOrganism;
+
+            sample.tissueSection = this._experiment.tissueSection;
+            sample.suspension = this._experiment.suspension;
+            sample.idXeniumGenePanel = this._experiment.idXeniumGenePanel;
         }
     }
 
@@ -2223,6 +2466,21 @@ export class TabSamplesIlluminaComponent implements OnInit {
         }
     }
 
+    private changeXeniumGenePanel(value: any) {
+        for (let sample of this._experiment.samples) {
+            sample.idXeniumGenePanel = value && value.idXeniumGenePanel ? value.idXeniumGenePanel : '';
+        }
+
+        if (this.samplesGridApi) {
+            this.samplesGridApi.redrawRows();
+        }
+
+
+//        if (this.samplesGridApi) {
+//              this.updateRows();
+//            this.samplesGridApi.redrawRows();  // probably only gets hit when off of this tab...
+//        }
+    }
 
     private createColumnsBasedOnState(state: string): any[] {
         if (state && this._state !== state) {
@@ -2261,8 +2519,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
                     if (fullProperty && Array.isArray(fullProperty) && fullProperty.length > 0) {
                         TabSamplesIlluminaComponent.addColumnToColumnDef(temp, fullProperty[0], annotationFieldsAreEditable, this._tabIndexToInsertAnnotations, this.emToPxConversionRate, this._state, false);
                     }
-                }
-            }
+                } // end of for sampleAnnotation
+            } // end of if requestCategory
 
             temp = TabSamplesIlluminaComponent.sortColumns(temp);
 

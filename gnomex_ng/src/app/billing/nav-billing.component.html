@@ -166,6 +166,14 @@
                                 <div class="flex-container-row align-baseline">
                                     <div class="double-padded-right">
                                         <button mat-raised-button
+                                                matTooltip="This will move all the selected items to the previous billing period. If no items are selected, all of the displayed items will be updated"
+                                                class="minimize small-font"
+                                                (click)="onMoveToPrevPeriod()">
+                                            Move to previous billing period
+                                        </button>
+                                    </div>
+                                    <div class="double-padded-right">
+                                        <button mat-raised-button
                                                 matTooltip="This will move all the selected items to the next billing period. If no items are selected, all of the displayed items will be updated"
                                                 class="minimize small-font"
                                                 (click)="onMoveToNextPeriod()">
@@ -181,11 +189,6 @@
                                                       [options]="statuses"
                                                       (optionSelected)="onChangeStatus()">
                                     </custom-combo-box>
-                                    <!--<custom-combo-box tooltip="This will update the status for all the selected items. If no items are selected, all of the displayed items' statuses will update"-->
-                                                      <!--placeholder="Change Status" (optionSelected)="onChangeStatus()"-->
-                                                      <!--displayField="display" [options]="statusListShort"-->
-                                                      <!--valueField="codeBillingStatus" [(ngModel)]="changeStatusValue">-->
-                                    <!--</custom-combo-box>-->
                                 </div>
                             </div>
                             <div class="flex-grow min-grid-size">

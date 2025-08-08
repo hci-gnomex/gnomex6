@@ -2,7 +2,13 @@ package hci.gnomex.security.tomcat;
 
 import hci.gnomex.security.EncrypterService;
 import hci.gnomex.security.EncryptionUtility;
+import org.apache.catalina.realm.GenericPrincipal;
+import org.apache.catalina.realm.RealmBase;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 import java.security.Principal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,14 +16,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-
-import org.apache.catalina.realm.GenericPrincipal;
-import org.apache.catalina.realm.RealmBase;
 
 public class GNomExRealm extends RealmBase {
 
@@ -57,7 +55,7 @@ public class GNomExRealm extends RealmBase {
     return password;
   }
 
-  @Override
+//  @Override
   protected String getName() {
     return username;
   }

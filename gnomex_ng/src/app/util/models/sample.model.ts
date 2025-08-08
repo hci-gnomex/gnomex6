@@ -24,6 +24,9 @@ export class Sample implements OnDestroy {
     public ccNumber:                        string = ''; // "";
     public sampleAlias_CORE:                string = ''; // "";
     public idSample_CORE:                   string = ''; // "";
+    public tissueSection:                   string = ''; // "";
+    public suspension:                      string = ''; // "";
+    public idXeniumGenePanel:               string = ''; // "";
     public label:                           string = ''; // "";
     public idOligoBarcode:                  string = ''; // "";
     public barcodeSequence:                 string = ''; // "";
@@ -93,6 +96,17 @@ export class Sample implements OnDestroy {
         }
     }
     private _sampleType: any;
+
+    public get xeniumGenePanel(): any {
+        return this._xeniumGenePanel;
+    }
+    public set xeniumGenePanel(value: any) {
+        if (value && value.idXeniumGenePanel) {
+            this._xeniumGenePanel = value;
+            this.idXeniumGenePanel = value.idXeniumGenePanel;
+        }
+    }
+    private _xeniumGenePanel: any;
 
     public idSampleSource:                  string = '';
     public idSeqLibProtocol:                string = ''; // "361";
@@ -232,6 +246,10 @@ export class Sample implements OnDestroy {
         sample.cloneProperty("ccNumber", source);
         sample.cloneProperty("sampleAlias_CORE", source);
         sample.cloneProperty("idSample_CORE", source);
+        sample.cloneProperty("tissueSection", source);
+        sample.cloneProperty("suspension", source);
+        sample.cloneProperty("idXeniumGenePanel", source);
+        sample.cloneProperty("xeniumGenePanel", source);
         sample.cloneProperty("label", source);
         sample.cloneProperty("idOligoBarcode", source);
         sample.cloneProperty("barcodeSequence", source);
@@ -312,6 +330,9 @@ export class Sample implements OnDestroy {
             let numberSequencingLanes: string = experiment.isRapidMode === 'Y' ? '2' : '1';
             let seqPrepByCore: any = '';
             let otherSamplePrepMethod: string = '';
+            let tissueSection: string = experiment.tissueSection;
+            let suspension: string = experiment.suspension;
+            let idXeniumGenePanel: string = experiment.idXeniumGenePanel ? experiment.idXeniumGenePanel : '';
 
             if (gnomexService.submitInternalExperiment() && experiment.sampleType) {
                 idSampleType = experiment.sampleType.idSampleType;
@@ -320,6 +341,16 @@ export class Sample implements OnDestroy {
             } else {
                 if(gnomexService.submitInternalExperiment() && experiment.samples.length > 0) {
                     idSampleType = experiment.samples[0].idSampleType;
+                }
+            }
+
+            if (gnomexService.submitInternalExperiment() && experiment.xeniumGenePanel) {
+                idXeniumGenePanel = experiment.xeniumGenePanel.idXeniumGenePanel;
+            } else if (experiment.idXeniumGenePanel) {
+                idXeniumGenePanel = experiment.idXeniumGenePanel;
+            } else {
+                if(gnomexService.submitInternalExperiment() && experiment.samples.length > 0) {
+                    idXeniumGenePanel = experiment.samples[0].idXeniumGenePanel;
                 }
             }
 
@@ -392,7 +423,10 @@ export class Sample implements OnDestroy {
                     obj.idSeqRunType = idSeqRunType;
                     obj.numberSequencingLanes = numberSequencingLanes;
                     obj.idSampleSource = experiment.idSampleSource;
-                    obj.idSampleType = idSampleType;
+                    obj.idSampleType = experiment.idSampleTypeDefault;      //idSampleType;
+                    obj.tissueSection = experiment.tissueSection;
+                    obj.suspension = experiment.suspension;
+                    obj.idXeniumGenePanel = experiment.idXeniumGenePanel;
                     obj.idSeqLibProtocol = protocol.idSeqLibProtocol;
                     obj.seqPrepByCore = seqPrepByCore;
                     obj.idOrganism = idOrganism;
@@ -446,6 +480,9 @@ export class Sample implements OnDestroy {
             ccNumber:                        this.ccNumber,
             sampleAlias_CORE:                this.sampleAlias_CORE,
             idSample_CORE:                   this.idSample_CORE,
+            tissueSection:                   this.tissueSection,
+            suspension:                      this.suspension,
+            idXeniumGenePanel:               this.idXeniumGenePanel,
             label:                           this.label,
             idOligoBarcode:                  this.idOligoBarcode,
             barcodeSequence:                 this.barcodeSequence,

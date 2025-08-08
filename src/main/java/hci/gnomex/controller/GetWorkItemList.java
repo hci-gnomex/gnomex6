@@ -180,10 +180,10 @@ public class GetWorkItemList extends GNomExCommand implements Serializable {
             key = flowCellNumber + "," + flowCellChannelNumber;
           } else if (filter.getCodeStepNext().equals(Step.SEQ_DATA_PIPELINE) ||
               filter.getCodeStepNext().equals(Step.HISEQ_DATA_PIPELINE) ||
-		filter.getCodeStepNext().equals(Step.NOSEQ_DATA_PIPELINE) ||
+		      filter.getCodeStepNext().equals(Step.NOSEQ_DATA_PIPELINE) ||
               filter.getCodeStepNext().equals(Step.MISEQ_DATA_PIPELINE) ||
               filter.getCodeStepNext().equals(Step.ILLSEQ_DATA_PIPELINE) ||
-                  filter.getCodeStepNext().equals(Step.ALL_DATA_PIPELINE)
+              filter.getCodeStepNext().equals(Step.ALL_DATA_PIPELINE)
           ) {
             FlowCell fc = (FlowCell)row[WorkItemFilter.FLOWCELL_OBJECT];
             FlowCellChannel ch = (FlowCellChannel)row[WorkItemFilter.FLOWCELL_CHANNEL_OBJECT];

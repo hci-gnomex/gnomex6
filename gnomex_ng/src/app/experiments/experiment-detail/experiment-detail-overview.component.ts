@@ -295,6 +295,10 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
         if(this.showBioinformaticsTab && this.bioinformaticsTab) {
             this._experiment.bioinformaticsAssist = this.bioinformaticsTab.experiment.bioinformaticsAssist;
             this._experiment.analysisInstructions = this.bioinformaticsTab.experiment.analysisInstructions;
+            this._experiment.oraCompression = this.bioinformaticsTab.experiment.oraCompression;
+            this._experiment.alignToGenomeBuild = this.bioinformaticsTab.experiment.alignToGenomeBuild;
+
+
         }
 
         let experimentOverviewForm: FormGroup = this.experimentService.experimentOverviewForm;

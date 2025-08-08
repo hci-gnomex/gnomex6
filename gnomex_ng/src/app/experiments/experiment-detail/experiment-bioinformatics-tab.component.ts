@@ -85,7 +85,9 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
             }
 
             this.prepareComponent();
-
+            if (this.flag_isANewExperiment) {
+                this._experiment.oraCompression = 'Y';
+            }
             this.header        = this.getStringValuedProperty(PropertyService.PROPERTY_ANALYSIS_ASSISTANCE_HEADER,   this._experiment.idCoreFacility);
             this.groupName     = this.getStringValuedProperty(PropertyService.PROPERTY_ANALYSIS_ASSISTANCE_GROUP,    this._experiment.idCoreFacility);
             this.alignmentNote = this.getStringValuedProperty(PropertyService.PROPERTY_REQUEST_BIO_ALIGNMENT_NOTE,   this._experiment.idCoreFacility);
@@ -141,6 +143,15 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
         return this._experiment && this._experiment.alignToGenomeBuild && this._experiment.alignToGenomeBuild === 'Y';
     }
 
+    get oraCompression(): boolean {
+        return this._experiment && this._experiment.oraCompression && this._experiment.oraCompression === 'Y';
+    }
+
+    set oraCompression(value: boolean) {
+        if (this._experiment) {
+            this._experiment.oraCompression = value ? 'Y' : 'N';
+        }
+    }
     public get showConsolidatedGenome(): boolean {
         // Directly from the Flex version, we grant this choice to everything with the explicit exclusion of nanostring experiments.
 
@@ -212,6 +223,14 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
             this._experiment.alignToGenomeBuild = 'N';
         }
     }
+
+    public onORACompressionChanged(event): void {
+        if (event.checked) {
+            this._experiment.oraCompression = 'Y';
+        } else {
+            this._experiment.oraCompression = 'N';
+        }
+    }
     public onCheckboxChanged(item: any, event: any) {
         if (this._experiment && this._experiment.sequenceLanes) {
             let lanesToChange = this._experiment.sequenceLanes.filter((a) => {
@@ -248,6 +267,8 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
     }
 
     private prepareComponent(): void {
+
+//        this._experiment.oraCompression = 'Y';
 
         this.genomeBuild = '';
 
@@ -418,13 +439,7 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
                 }
             }
         }
-/*
-        if (this.genomeBuild) {
-            this.alignToGenomeBuild = 'Y';
-        } else {
-            this.alignToGenomeBuild = 'N';
-        }
-*/
+
         this.organismName = '';
         this.sampleOrganisms = [];
 

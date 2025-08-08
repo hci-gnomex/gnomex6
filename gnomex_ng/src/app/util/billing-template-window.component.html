@@ -13,7 +13,7 @@
 </div>
 <div class="flex-container-row align-center justify-space-between small-font double-padded-left double-padded-right">
     <div>
-        <label *ngIf="totalAmount > 0" class="leadingLabel label-width padded-right">Total Invoice Price: </label>{{totalAmount > 0 ? (this.totalAmount | currency:"USN":"$": "1.2-2") : " "}}
+        <label *ngIf="totalAmount > 0" class="leadingLabel label-width padded-right">Total Invoice Price: </label>{{totalAmount > 0 ? (this.totalAmount | currency:"USD":"$": "1.2-2") : " "}}
     </div>
     <div class="justify-flex-end">
     <label class="leadingLabel label-width padded-right">Split By: </label>

@@ -170,6 +170,13 @@ import {Experiment} from "../../util/models/experiment.model";
             }
             this.coreFacilityName = tempCoreFacilities.length > 0 ? tempCoreFacilities[0].display : '';
 
+            if (this._experiment.idXeniumGenePanel.length > 0) {
+                this.xeniumGenePanelEntry = this.dictionaryService.getEntry(DictionaryService.XENIUM_GENE_PANEL, this._experiment.idXeniumGenePanel);
+                this.xeniumGenePanel = this.xeniumGenePanelEntry ? this.xeniumGenePanelEntry.display : '';
+            }
+
+
+
             let tempRequestCategory: any[] = [];
             if (this.requestCategoryDictionary) {
                 if (!Array.isArray(this.requestCategoryDictionary)) {
@@ -308,6 +315,8 @@ import {Experiment} from "../../util/models/experiment.model";
     public experimentCategoryName: string = '';
     public visibility:             string = '';
     public institutionName:        string = '';
+    public xeniumGenePanelEntry:   any = null;
+    public xeniumGenePanel:        string = '';
 
     public isExternal: boolean = false;
 
