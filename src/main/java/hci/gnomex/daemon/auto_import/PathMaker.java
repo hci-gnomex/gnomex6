@@ -84,16 +84,25 @@ public class PathMaker {
 	}
 
 	public static List<String> pathBuilder(String fileName) throws IOException {
-		PeekableScanner scan = new PeekableScanner(new File(fileName));
-		List<String> paths = new ArrayList<String>();
+		PeekableScanner scan = null;
 		List multiPathsOFFiles = null;
+		try {
+			scan = new PeekableScanner(new File(fileName));
+			List<String> paths = new ArrayList<String>();
 
-		Stack<DirectoryNode> pBuilder = new Stack<DirectoryNode>();
-		int rootCount = 0;
-		//String line = bf.readLine();
-		String rootPath = scan.next();
-		multiPathsOFFiles= pathBuilder(scan, paths, pBuilder, rootCount, rootPath);
-		scan.close();
+
+			Stack<DirectoryNode> pBuilder = new Stack<DirectoryNode>();
+			int rootCount = 0;
+			//String line = bf.readLine();
+			String rootPath = scan.next();
+			multiPathsOFFiles= pathBuilder(scan, paths, pBuilder, rootCount, rootPath);
+		} catch (FileNotFoundException e) {
+			throw e;
+		} catch (IOException e) {
+			throw e;
+		} finally {
+			if (scan != null) { scan.close();}
+		}
 		return multiPathsOFFiles;
 	}
 

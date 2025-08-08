@@ -25,6 +25,7 @@ import com.amazonaws.services.s3.model.*;
 
 public class Downloader {
 
+
 	private Integer startCaptureGroup;
 	private Integer endCaptureGroup;
 	private boolean useRemoteFile;
@@ -63,6 +64,7 @@ public class Downloader {
 				this.mode = args[++i];
 				if(!(this.mode.contains("tempus") || this.mode.equals("avatar") || this.mode.contains("caris")) ){
 					System.out.println("If you specify mode it has to be either tempus, avatar or caris");
+
 					System.exit(1);
 				}
 
@@ -86,7 +88,7 @@ public class Downloader {
 				}
 			}
 			else if(args[i].equals("-remotepath")) { // helps to determine which path to use remote or local in flagged filtered outlist
-				// default is is the flagged(local) path and filename
+				// default is the flagged(local) path and filename
 				useRemoteFile = true;
 			}else if (args[i].equals("-alias")){ // allow list of for your capture groups items aka DNA -> DSQ1
 				aliasMap = new HashMap<String, String>();
@@ -261,7 +263,7 @@ public class Downloader {
 
 	}
 
-	public void executeTempusDownload() {
+	public void executeAWSS3Download() {
 		List<String> commands = new ArrayList<String>();
 
 		List<String> status = Arrays.asList("Downloading in progress...");
@@ -479,7 +481,7 @@ public class Downloader {
 				}
 
 				///todo probably remove since it's not generic only helpful for tempus
-				// this is here mitigate issues if proccess is aborted and files don't get renamed to
+				// this is here mitigate issues if process is aborted and files don't get renamed to
 				// proper format
 				if(removedIDs == null){
 					StringBuilder sb = new StringBuilder(flaggedIDName).insert(0,"DNA,");

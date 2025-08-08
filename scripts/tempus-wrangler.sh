@@ -204,4 +204,4 @@ bash linkFastqData.sh -debug -linkFolder -analysis $tempusAnalysisList
 bash index_gnomex.sh
 rm "$pDataPath"tempRequestList.out
 rm "$pDataPath"tempAnalysisList.out
-#--------------------------------------------------------------------------------------------------------------------------------------------------------------------
+

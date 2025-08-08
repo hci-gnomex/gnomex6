@@ -8,6 +8,7 @@ import hci.gnomex.utility.MailUtilHelper;
 
 import jakarta.mail.MessagingException;
 import javax.naming.NamingException;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -160,7 +161,7 @@ public class DirectoryBuilder {
 							break;
 						}else {
 							if(debug)
-							System.out.println("All files in this set can be accounted for but no files will be moved for " + foundFileID + " because they already reside here: " + remotePath );
+								System.out.println("All files in this set can be accounted for but no files will be moved for " + foundFileID + " because they already reside here: " + remotePath );
 						}
 
 					}
