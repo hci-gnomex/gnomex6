@@ -200,5 +200,7 @@
 		<Filter className="hci.gnomex.model.Application" filterField="codeApplication"/>
 		<Filter className="hci.gnomex.model.Property" filterField="idProperty"/>
 	</Dictionary>
+
+	<Dictionary displayName="Xenium Gene Panel" className="hci.gnomex.model.XeniumGenePanel"  editable="Y" />
 </Dictionaries>
 	

@@ -16,14 +16,14 @@ dependencies {
     compileOnly group: 'org.apache.tomcat', name: 'tomcat-jdbc', version: '9.0.0.M10'
     compileOnly group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '7.0.68'
     compileOnly group: 'log4j', name: 'log4j', version: '1.2.12'
-    compile project(':gnomex_crypt')
+    compileOnly project(':gnomex_crypt')
 }
 
 jar {
     manifest {
         attributes([
-                'Built-By'              : repo_user,
-                'Implementation-Version': gnomex_version
+                'Built-By'              : 'u0974549',
+                'Implementation-Version': '6.26.12'
         ], 'gnomex_tomcat_support')
     }
 }

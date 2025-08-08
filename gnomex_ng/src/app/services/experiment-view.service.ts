@@ -24,7 +24,7 @@ export class ExperimentViewService {
 
 
     /*IMPORTANT
-     * experimentViewRules is the blue print for what will be shown on the form depending on the requestCategory, in future more
+     * experimentViewRules is the blueprint for what will be shown on the form depending on the requestCategory, in future more
       * layers may need to be added. Any leaf node such as labName or email will be dynamically added to this service as property.
       * For example you will have this.experimentViewService.labName added during runtime even though it is not defined
       * explicitly in the code as property of this service. This dynamic property is create in PrimaryTab -> initFormRules()
@@ -35,8 +35,8 @@ export class ExperimentViewService {
       *
        * The visible property is a boolean and will be used in your html to toggle visibility of a field/control
        *
-       * Remember every leaf property in the blueprint(experimentViewRules) will be create as property of this service dynamically.
-       * This saves a lot  extra code defining the properties, but this can be confusing if you don't realize this is
+       * Remember every leaf property in the blueprint(experimentViewRules) will be created as property of this service dynamically.
+       * This saves alot  extra code defining the properties, but this can be confusing if you don't realize this is
        * occuring. We can change it if we'd rather explicitly define each property. Although the path property still needs
        * to be created dynamically.
     */

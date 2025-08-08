@@ -238,6 +238,7 @@ public class GetRequest extends GNomExCommand implements Serializable {
             requestNode.setAttribute("phone", user.getPhone() != null ? user.getPhone() : "");
           }
 
+          // **********************************************
           // Initialize attributes from request category
           RequestCategory requestCategory = null;
           if (request.getCodeRequestCategory() != null && !request.getCodeRequestCategory().equals("")) {
@@ -952,10 +953,10 @@ public class GetRequest extends GNomExCommand implements Serializable {
             } else {
               requestNode.setAttribute("containerType", "TUBE");
             }
-          }
+          } // end if iScan request
 
           // Augment sample with sample type name so that imports can lookup idSampeType based
-          // on the name. Do the same for organism. Also add in codeApplication from the request
+          // on the name. Do the same for organism. Also add in codeApplication from the request,
           // so it can be displayed for experiments with application but no seq lib protocol.
           for (Iterator i1 = requestNode.getChild("samples").getChildren("Sample").iterator(); i1.hasNext();) {
             Element sampleNode = (Element) i1.next();
@@ -976,7 +977,7 @@ public class GetRequest extends GNomExCommand implements Serializable {
               }
             }
             sampleNode.setAttribute("codeApplication", request.getCodeApplication() == null ? "" : request.getCodeApplication());
-          }
+          } // end for samples
 
           // Augment sequence lane node with organism and genome build names.
           if (requestNode.getChild("sequenceLanes") != null) {
@@ -996,7 +997,7 @@ public class GetRequest extends GNomExCommand implements Serializable {
                 sequenceLaneNode.setAttribute("genomeBuild", genomeBuildName);
               }
             }
-          }
+          } // end if sequenceLanes
 
           // Append related analysis and data tracks and topics
           if (!newRequest) {

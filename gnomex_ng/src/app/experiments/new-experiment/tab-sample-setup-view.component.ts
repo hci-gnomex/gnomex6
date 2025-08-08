@@ -183,6 +183,10 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 if (this.form && this.form.get("showExtractionTypeChoices")) {
                     this.form.get("showExtractionTypeChoices").setValue(false);
                 }
+                if (this.form && this.form.get("showSuspensionSectionChoices")) {
+                    this.form.get("showSuspensionSectionChoices").setValue(false);
+                }
+
                 if (this.form && this.form.get("hasIsolationTypes")) {
                     this.form.get("hasIsolationTypes").setValue(false);
                 }
@@ -209,8 +213,8 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 if (this.form && this.form.get("showExtractionTypeChoices")) {
                     this.form.get("showExtractionTypeChoices").setValue(false);
                 }
-                if (this.form && this.form.get("showExtractionTypeChoices")) {
-                    this.form.get("showExtractionTypeChoices").setValue(false);
+                if (this.form && this.form.get("showSuspensionSectionChoices")) {
+                    this.form.get("showSuspensionSectionChoices").setValue(false);
                 }
                 if (this.form && this.form.get("hasIsolationTypes")) {
                     this.form.get("hasIsolationTypes").setValue(false);
@@ -219,7 +223,6 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             }
 
             if (this.useIsolationTypeMode) {
-
                 this.sampleSources = this.dictionaryService.getEntries(DictionaryService.SAMPLE_SOURCE);
 
                 this.downstreamAnalysis = this.dictionaryService.getEntries(DictionaryService.DOWNSTREAM_ANALYSIS);
@@ -227,6 +230,10 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 if (this.form && this.form.get("showDnaRnaChoices")) {
                     this.form.get("showDnaRnaChoices").setValue(false);
                 }
+                if (this.form && this.form.get("showSuspensionSectionChoices")) {
+                    this.form.get("showSuspensionSectionChoices").setValue(false);
+                }
+
                 if (this.form && this.form.get("showExtractionTypeChoices")) {
                     this.form.get("showExtractionTypeChoices").setValue(true);
                 }
@@ -235,24 +242,12 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 }
 
             }
-//            else {
-//                if (this.form && this.form.get("showDnaRnaChoices")) {
-//                    this.form.get("showDnaRnaChoices").setValue(true);
-//                }
-//                if (this.form && this.form.get("showExtractionTypeChoices")) {
-//                    this.form.get("showExtractionTypeChoices").setValue(false);
-//                }
-//            }
 
             if (this.experimentTypeUsesPlates) {
                 this.form.get("canUsePlates").setValue(true);
             } else {
                 this.form.get("canUsePlates").setValue(false);
             }
-
- //           if (this.form && this.form.get("hasIsolationTypes")) {
- //               this.form.get("hasIsolationTypes").setValue(false);
- //           }
 
         });
 
@@ -288,11 +283,16 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     public form: FormGroup;
 
     private _experiment: Experiment;
-    private _organism: Organism;
+    public _organism: Organism;
 
     private sampleType: any;
     public filteredSampleTypeListDna: any[] = [];
     public filteredSampleTypeListRna: any[] = [];
+    public filteredSampleTypeListSuspension: any[] = [];
+    public filteredSampleTypeListSection: any[] = [];
+
+    public filteredSampleTypeListXenium: any[] = [];
+
     public filteredSampleTypeListDis: any[] = [];
     private showSampleNotes: boolean = false;
     public showSamplePrepContainer: boolean = true;
@@ -302,10 +302,12 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     public showSequenomExperimentType: boolean = false;
     public showDefaultSampleNumber: boolean = true;
     public useNanoGeoMx: boolean = false;
+    public useXenium: boolean = false;
     private showOrganism: boolean = true;
     public requireOrganism: boolean = true;
     private showSamplePurification: boolean = true;
     private showQcInstructions: boolean = true;
+
     private showRnaseBox: boolean = false;
     private showDnaseBox: boolean = false;
     public _rnaWithDNase: string = 'Click if RNA samples were treated with DNase';
@@ -313,7 +315,9 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
 
     public showDownstreamAnalysis: boolean = false;
 
-    private organisms: any[] = [];
+    public organisms: any[] = [];
+    public xeniumOrganisms: any[] = [];
+    public defaultOrganisms: any[] = [];
     public filteredApplications: any[] = [];
 
     private bioanalyzerChips: any[] = [];
@@ -322,6 +326,13 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     public isolationTypes: any[] = [];
     public sampleSources: any[] = [];
     public downstreamAnalysis: any[] = [];
+
+    private sampleTypes: any[] = [];
+    private xeniumSampleTypes: any[] = [];
+
+
+    public xeniumGenePanels: any[] = [];
+    public xeniumGenePanel: any;
 
     public sliceTypes: any[] = [];
 
@@ -377,6 +388,18 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
         }
     }
 
+    public get useXeniumMode(): boolean {
+        if (this._experiment
+            && this._experiment.requestCategory
+            && this._experiment.requestCategory.type
+            && this._experiment.requestCategory.type === NewExperimentService.TYPE_XENIUM ) {
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public get numberOfSamples(): number|string {
         return this._experiment.numberOfSamples;
     }
@@ -415,6 +438,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
 
     public get showNotifyBMP(): boolean {
         if (this._experiment && this._experiment.idCoreFacility) {
+
             for (let option of this.gnomexService.coreFacilitiesICanManage) {
                 if (option.idCoreFacility === this._experiment.idCoreFacility) {
                     return true;
@@ -534,8 +558,11 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 selectedApp:                       [''],
                 selectedDna:                       [''],
                 selectedRna:                       [''],
+                selectedSuspension:                [''],
+                selectedSection:                   [''],
                 sampleSource:                      [''],
                 showDnaRnaChoices:                 [''],
+                showSuspensionSectionChoices:      [''],
                 showExtractionTypeChoices:         [''],
                 hasIsolationTypes:                 [''],
                 selectedIsolationExtractionMethod: [''],
@@ -544,6 +571,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 addQubit:                          [''],
                 notifyBMP:                         [''],
                 organism:                          [''],
+                xeniumOrganism:                    [''],
                 reagent:                           ['', [Validators.maxLength(100)]],
                 elution:                           ['', [Validators.maxLength(100)]],
                 extractionMethod:                  ['', [Validators.maxLength(100)]],
@@ -559,14 +587,20 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 numdisSlides:                      [''],
                 sampleType:                        [''],
                 downstreamAnalysis:                [''],
+                isXenium:                          [''],
+                xeniumGenePanel:                   [''],
                 coreNotes:                         ['', [Validators.maxLength(5000)]]
             },
             { validator: TabSampleSetupViewComponent.validatorWrapper }
         );
+
     }
 
     ngOnInit() {
         this.organisms = this.gnomexService.activeOrganismList;
+        this.loadXeniumOrganisms();
+
+        this.loadDefaultOrganism();
 
         this.newExperimentService.currentState_onChangeObservable.subscribe((value) =>{
             if (value) {
@@ -833,9 +867,20 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             this.filteredSampleTypeListRna = this.filterSampleType("RNA")
                 .sort(TabSampleSetupViewComponent.sortSampleTypes);
         }
+
+        if (this.filteredSampleTypeListSection.length === 0 && this.requestCategory) {
+            this.filteredSampleTypeListSection = this.filterSampleType("Section");
+        }
+
+        if (this.filteredSampleTypeListSuspension.length === 0 && this.requestCategory) {
+            this.filteredSampleTypeListSuspension = this.filterSampleType("Suspension");
+        }
+
         if (this.sampleTypes.length === 0) {
             this.sampleTypes = this.sampleTypes.concat(this.filteredSampleTypeListDna);
             this.sampleTypes = this.sampleTypes.concat(this.filteredSampleTypeListRna);
+            this.sampleTypes = this.sampleTypes.concat(this.filteredSampleTypeListSuspension);
+            this.sampleTypes = this.sampleTypes.concat(this.filteredSampleTypeListSection);
         }
 
         if (this.sampleTypes.length === 0 && this.requestCategory && this.useSliceMode) {
@@ -848,12 +893,52 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             this.buildSampleTypes();
         }
 
-    }
+        if (this.xeniumSampleTypes.length === 0 && this.requestCategory && this.useXeniumMode) {
+            this.loadXeniumSampleTypes();
+        }
 
-    private sampleTypes: any[] = [];
+        if (this.xeniumGenePanels.length === 0 && this.useXeniumMode) {
+            this.xeniumGenePanels = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.XENIUM_GENE_PANEL);
+        }
+
+        if (this.useXeniumMode) {
+            if (this.form && this.form.get("numSamples")) {
+                this.form.get("numSamples").setValue('2');
+            }
+            if (this._experiment && this._experiment.numberOfSamples) {
+                this._experiment.numberOfSamples = '2';
+            }
+            if (this._experiment && this._experiment.samples && this._experiment.samples.length === 0) {
+                this._experiment.samples = [];
+            }
+        }
+    }
 
     private filterSampleType(codeNucleotideType: string): any[] {
         let types: any[] = [];
+
+        if (codeNucleotideType == "Section") {
+            for (let category of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleType")) {
+                if (category.isActive === 'N' || (category.codeNucleotideType !== "Section") ) {
+                    continue;
+                }
+
+                types.push(category);
+            }
+            return types;
+        }
+
+        if (codeNucleotideType == "Suspension") {
+            for (let category of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleType")) {
+                if (category.isActive === 'N' || (category.codeNucleotideType !== "Suspension") ) {
+                    continue;
+                }
+
+                types.push(category);
+            }
+            return types;
+        }
+
 
         for (let category of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleType")) {
             if (!this.newExperimentService.isEditState() && category.isActive === 'N') {
@@ -862,7 +947,6 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             if (codeNucleotideType != null && category.codeNucleotideType !== codeNucleotideType) {
                 continue;
             }
-
             let theRequestCategories = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleTypeRequestCategory").filter(category2 =>
                 category2.value !== "" && category2.idSampleType === category.value
             );
@@ -887,8 +971,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             }
 
             let requestCategories = this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleTypeRequestCategory").filter(sampleRequestCategory =>
-                sampleRequestCategory.value !== "" && sampleRequestCategory.idSampleType === sampleType.idSampleType
-            );
+                sampleRequestCategory.value !== "" && sampleRequestCategory.idSampleType === sampleType.idSampleType);
 
             for (let requestCategory of requestCategories) {
                 if (this._experiment && requestCategory.codeRequestCategory === this._experiment.codeRequestCategory) {
@@ -900,6 +983,54 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
         this.sampleTypes = types.sort(TabSampleSetupViewComponent.sortSampleTypes);
     }
 
+    private loadXeniumSampleTypes(): void {
+        let types: any[] = [];
+
+        for (let sampleType of this.dictionaryService.getEntriesExcludeBlank("hci.gnomex.model.SampleType")) {
+            if (sampleType.isActive === 'N' || (sampleType.codeNucleotideType !== "Xenium") ) {
+                continue;
+            }
+
+            types.push(sampleType);
+        }
+        this.sampleTypes = types;
+
+    }
+
+    public loadXeniumOrganisms(): void {
+        this.xeniumOrganisms = [];
+
+        for (let organism of this.organisms) {
+            if (organism.isActive === "Y") {
+
+                if (organism.binomialName === "Homo sapiens") {
+                    this.xeniumOrganisms.push(organism);
+                    continue;
+                }
+                if (organism.binomialName === "Mus musculus") {
+                    this.xeniumOrganisms.push(organism);
+                }
+            }
+        }
+    }
+
+    public loadDefaultOrganism(): void {
+        this.defaultOrganisms = [];
+
+        for (let organism of this.organisms) {
+            if (organism.isActive === "Y") {
+
+                if (organism.binomialName == "Other") {
+                    this.defaultOrganisms.push(organism);
+                    break;
+                }
+            }
+        }
+
+        if (this.defaultOrganisms ) {
+            this._experiment.organism = this.defaultOrganisms[0];
+        }
+    }
 
     public static sortSampleTypes(obj1, obj2): number {
         if (obj1 == null && obj2 == null) {
@@ -965,10 +1096,21 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             this.filteredSampleTypeListRna = this.filterSampleType("RNA")
                 .sort(TabSampleSetupViewComponent.sortSampleTypes);
         }
+
+        if (this.filteredSampleTypeListSuspension.length === 0 && this.requestCategory) {
+            this.filteredSampleTypeListSuspension = this.filterSampleType("Suspension")
+                .sort(TabSampleSetupViewComponent.sortSampleTypes);
+        }
+
+        if (this.filteredSampleTypeListSection.length === 0 && this.requestCategory) {
+            this.filteredSampleTypeListSection = this.filterSampleType("Section")
+                .sort(TabSampleSetupViewComponent.sortSampleTypes);
+        }
     }
 
     public onChange_numberOfSamples(event: any): void {
         this.numberOfSamples = this.form.get("numSamples").value;
+        this._experiment.numberOfSamples = '' + this.numberOfSamples;
 
         if (this.form && this.form.get("numPlates")) {
             this.form.get("numPlates").updateValueAndValidity();
@@ -1078,13 +1220,6 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
             }
         }
 
-        // if (this.requestCategory) {
-        //     let property = this.propertyService.getProperty('qc_instructions', this.idCoreFacility, this.requestCategory.codeRequestCategory);
-        //
-        //     if (property) {
-        //         this.noBioanalyzerChipTypesMessage = property.propertyValue;
-        //     }
-        // }
     }
 
     private static onChangeBioanalyzer(event): void {
@@ -1110,19 +1245,110 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     }
 
     public onDnaChange(event): void {
-        if (this.form
-            && this.form.get("selectedRna")
-            && this.form.get("selectedRna").value) {
-
+        if (this.form.get("selectedRna").value) {
             this.form.get("selectedRna").setValue("");
         }
 
-//        this.showDownstreamAnalysis = false;
+        if (this.form.get("selectedSuspension").value) {
+            this.form.get("selectedSuspension").setValue("");
+        }
+
+        if (this.form.get("selectedSection").value) {
+            this.form.get("selectedSection").setValue("");
+        }
+
+        this.sampleTypes = this.filterSampleType('DNA');
         this.setState();
         this.showSampleNotes = !!(this.form.get("selectedDna").value.notes);
         this.form.get("sampleTypeNotes").setValue(this.form.get("selectedDna").value.notes);
         this.sampleType = this.form.get("selectedDna").value;
         this._experiment.sampleType = this.sampleType;
+        this._experiment.idSampleTypeDefault = this.sampleType.idSampleType;
+        this._experiment.suspension = "";
+        this._experiment.tissueSection = "";
+
+        this.pickSampleType();
+    }
+    public onRnaChange(event): void {
+        if (this.form.get("selectedDna").value) {
+            this.form.get("selectedDna").setValue("");
+        }
+
+        if (this.form.get("selectedSuspension").value) {
+            this.form.get("selectedSuspension").setValue("");
+        }
+
+        if (this.form.get("selectedSection").value) {
+            this.form.get("selectedSection").setValue("");
+        }
+
+        this.sampleTypes = this.filterSampleType('RNA');
+        this.setState();
+        this.showSampleNotes = !!(this.form.get("selectedRna").value.notes);
+        this.form.get("sampleTypeNotes").setValue(this.form.get("selectedRna").value.notes);
+        this.sampleType = this.form.get("selectedRna").value;
+        this._experiment.sampleType = this.sampleType;
+        this._experiment.idSampleTypeDefault = this.sampleType.idSampleType;
+        this._experiment.suspension = "";
+        this._experiment.tissueSection = "";
+
+        this.pickSampleType();
+    }
+
+    public onSuspensionChange(event): void {
+        if (this.form.get("selectedDna").value) {
+            this.form.get("selectedDna").setValue("");
+        }
+        if (this.form.get("selectedRna").value) {
+            this.form.get("selectedRna").setValue("");
+        }
+        if (this.form.get("selectedSection").value) {
+            this.form.get("selectedSection").setValue("");
+        }
+
+        this.sampleTypes = this.filterSampleType('Suspension');
+        this.setState();
+        this.sampleType = this.form.get("selectedSuspension").value;
+        this._experiment.sampleType = this.sampleType;
+        this._experiment.idSampleTypeDefault = this.sampleType.idSampleType;
+
+        if (event) {
+            this._experiment.suspension = event.value.sampleType;
+        }
+        this._experiment.tissueSection = "";
+
+        this.showRnaseBox = false;
+        this.showDnaseBox = false;
+
+        this.pickSampleType();
+    }
+
+    public onSectionChange(event): void {
+        if (this.form.get("selectedDna").value) {
+            this.form.get("selectedDna").setValue("");
+        }
+        if (this.form.get("selectedRna").value) {
+            this.form.get("selectedRna").setValue("");
+        }
+
+        if (this.form.get("selectedSuspension").value) {
+            this.form.get("selectedSuspension").setValue("");
+        }
+
+        this.sampleTypes = this.filterSampleType('Section');
+        this.setState();
+        this.sampleType = this.form.get("selectedSection").value;
+        this._experiment.sampleType = this.sampleType;
+        this._experiment.idSampleTypeDefault = this.sampleType.idSampleType;
+
+        if (event) {
+            this._experiment.tissueSection = event.value.sampleType;
+        }
+        this._experiment.suspension = "";
+
+        this.showRnaseBox = false;
+        this.showDnaseBox = false;
+
         this.pickSampleType();
     }
 
@@ -1166,20 +1392,6 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
         } else {
             this._experiment.codeIsolationPrepType = '';
         }
-    }
-
-    public onRnaChange(event): void {
-        if (this.form.get("selectedDna").value) {
-            this.form.get("selectedDna").setValue("");
-        }
-
-//        this.showDownstreamAnalysis = true;
-        this.setState();
-        this.showSampleNotes = !!(this.form.get("selectedRna").value.notes);
-        this.form.get("sampleTypeNotes").setValue(this.form.get("selectedRna").value.notes);
-        this.sampleType = this.form.get("selectedRna").value;
-        this._experiment.sampleType = this.sampleType;
-        this.pickSampleType();
     }
 
     private setState(): void {
@@ -1268,6 +1480,19 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 this.showQcInstructions = false;
 
             }
+            if (this.requestCategory.type === NewExperimentService.TYPE_XENIUM) {
+                this.useXenium = true;
+                this.showSamplePrepContainer = true;
+                this.requireSamplePrepContainer = true;
+                this.showSamplePurification = false;
+                this.showDefaultSampleNumber = false;
+                this.showKeepSample = false;
+                this.showSampleQualityExperimentType = false;
+                this.showOrganism = true;
+                this.requireOrganism = true;
+                this.showQcInstructions = false;
+
+            }
 
             if (this._experiment) {
                 let qcInstText: any = this.propertyService.getProperty(PropertyService.PROPERTY_QC_INSTRUCTIONS, this._experiment.idCoreFacility, this._experiment.codeRequestCategory);
@@ -1283,19 +1508,16 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     public qcInstructions: string = '';
 
     private pickSampleType(): void {
-        if (this.sampleType){
+        if (this.sampleType) {
             if (this.sampleType.codeNucleotideType === 'DNA'){
                 this.showRnaseBox = true;
                 this.showDnaseBox = false;
-//                this.showDownstreamAnalysis = false;
             } else if(this.sampleType.codeNucleotideType == 'RNA'){
                 this.showRnaseBox = false;
                 this.showDnaseBox = true;
-//                this.showDownstreamAnalysis = true;
             } else{
                 this.showRnaseBox = false;
                 this.showDnaseBox = false;
-//                this.showDownstreamAnalysis = false;
             }
         }
 
@@ -1343,6 +1565,14 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     public selectOrganism(event): void {
         if (event && (!event.idLab || event.idLab !== "0")) {
             this._experiment.organism = this.dictionaryService.getEntry('hci.gnomex.model.OrganismLite', this.form.get("organism").value.idOrganism);
+            this._experiment.idOrganismSampleDefault = this.form.get("organism").value.idOrganism;
+        }
+    }
+
+    public selectXeniumOrganism(event): void {
+        if (event && (!event.idLab || event.idLab !== "0")) {
+            this._experiment.organism = this.dictionaryService.getEntry('hci.gnomex.model.OrganismLite', this.form.get("xeniumOrganism").value.idOrganism);
+            this._experiment.idOrganismSampleDefault = this.form.get("xeniumOrganism").value.idOrganism;
         }
     }
 
@@ -1357,6 +1587,15 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     public onExtractionMethodChanged(event): void {
         this._experiment.extractionMethod = this.form.get("extractionMethod").value;
     }
+
+    public onSelectedXeniumGenePanel(event): void {
+        if (event) {
+            let tempx: any = this.form.get("xeniumGenePanel").value.idXeniumGenePanel;
+            this._experiment.idXeniumGenePanel = tempx;
+            this._experiment.xeniumGenePanel = this.form.get("xeniumGenePanel").value;
+        }
+    }
+
 
     public onDnaseChanged(event): void {
         if (event.checked) {
@@ -1405,6 +1644,8 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
     public onSelectSampleType(event: any): void {
         if (event) {
             this._experiment.sampleType = event.value;
+            this._experiment.idSampleTypeDefault = this._experiment.sampleType.idSampleType;
+
         }
     }
 

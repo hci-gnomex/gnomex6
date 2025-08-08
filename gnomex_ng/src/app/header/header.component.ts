@@ -1033,64 +1033,12 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         divider: true
                     },
-/*
-                    {
-                        displayName: 'Microarray',
-                        context: 'microarray',
-                        iconName: './assets/microarray_small.png',
-                        children: [
-                            {
-                                displayName: 'Labeling',
-                                iconName: './assets/asterisk_yellow.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Hyb',
-                                iconName: './assets/basket_put.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Extraction',
-                                iconName: './assets/microarray_small.png',
-                                route: ''
-                            },
-                        ]
-                    },
-                    {
-                        divider: true
-                    },
-
- */
                     {
                         displayName: 'Workflow (all)',
                         iconName: './assets/building_go.png',
                         route: ''
                     },
-/*
-                    {
-                        divider: true
-                    },
-                    {
-                        displayName: 'Fill Plate',
-                        iconName: './assets/run_review.png',
-                        route: ''
-                    },
-                    {
-                        displayName: 'Build Run',
-                        iconName: './assets/run_add.png',
-                        route: ''
-                    },
-                    {
-                        displayName: 'Plates & Runs',
-                        iconName: './assets/run_review.png',
-                        route: ''
-                    },
-                    {
-                        displayName: 'Results',
-                        iconName: './assets/tv_chart_review.png',
-                        route: ''
-                    },
-*/
+
                 ]
             },
             {
@@ -1147,33 +1095,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         divider: true
                     },
-/*
-                    {
-                        displayName: 'Microarray',
-                        context: 'microarray',
-                        iconName: './assets/microarray_small.png',
-                        children: [
-                            {
-                                displayName: 'Labeling',
-                                iconName: './assets/asterisk_yellow.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Hyb',
-                                iconName: './assets/basket_put.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Extraction',
-                                iconName: './assets/microarray_small.png',
-                                route: ''
-                            },
-                        ]
-                    },
-                    {
-                        divider: true
-                    },
- */
+
                     {
                         displayName: 'Workflow (all)',
                         iconName: './assets/building_go.png',

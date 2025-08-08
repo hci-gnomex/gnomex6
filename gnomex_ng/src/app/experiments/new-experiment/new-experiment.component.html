@@ -20,7 +20,7 @@
                                       [experiment]="inputs?.experiment"
                                       [idCoreFacility]="inputs?.idCoreFacility"
                                       (onChangeLab)="onChangeLab($event)"
-                                      (onChangeRequestCategory)="outputs?.onChangeRequestCategory()">
+                                      (onChangeRequestCategory)="outputs?.onChangeRequestCategory($event)">
                 </new-experiment-setup>
             </mat-tab>
             <mat-tab *ngFor="let tab of tabs; let i = index"
@@ -67,7 +67,7 @@
             <div class="padded-right-large">
                 <button *ngIf="onSubmitTab"
                         mat-raised-button
-                        [disabled]="!isCheckboxChecked || !onSubmitTab"
+                        [disabled]="!onSubmitTab"
                         (click)="SaveNewExperiment()">
                     <img [src]="'./assets/accept.png'">
                     {{ submitOrSaveButtonLabel }}

@@ -1,7 +1,8 @@
+
 <div class="full-width full-height padded small-font">
     <form [formGroup]="form" class="full-width full-height">
         <div class="full-width full-height">
-            <ol *ngIf="!useIsolationTypeMode && !useSliceMode && !useNanoGeomxMode" class="full-width three-depth-numbering">
+            <ol *ngIf="!useXeniumMode &&!useIsolationTypeMode && !useSliceMode && !useNanoGeomxMode" class="full-width three-depth-numbering">
                 <li *ngIf="showSampleQualityExperimentType" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
                         <div class="heading">
@@ -114,6 +115,40 @@
                                 </div>
                             </mat-radio-group>
                         </div>
+
+                        <div *ngIf="!showSampleQualityExperimentType" >
+                            <div *ngIf="filteredSampleTypeListSuspension && filteredSampleTypeListSuspension?.length > 0" class="normal-size-font title">
+                                Suspension
+                            </div>
+                            <mat-radio-group class="flex-container-col"
+                                             formControlName="selectedSuspension"
+                                             (change)="onSuspensionChange($event)">
+                                <div *ngFor="let suspensionCategory of filteredSampleTypeListSuspension">
+                                    <mat-radio-button [value]="suspensionCategory">
+                                        <div class="short-width">
+                                            {{suspensionCategory.display}}
+                                        </div>
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                        <div *ngIf="!showSampleQualityExperimentType">
+                            <div *ngIf="filteredSampleTypeListSection && filteredSampleTypeListSection?.length > 0" class="normal-size-font title">
+                                Tissue Section
+                            </div>
+                            <mat-radio-group class="flex-container-col"
+                                             formControlName="selectedSection"
+                                             (change)="onSectionChange($event)">
+                                <div *ngFor="let sectionCategory of filteredSampleTypeListSection">
+                                    <mat-radio-button [value]="sectionCategory">
+                                        <div class="short-width">
+                                            {{sectionCategory.display}}
+                                        </div>
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+
                     </div>
                 </li>
                 <li *ngIf="!showDefaultSampleNumber" class="full-width align-baseline">
@@ -240,6 +275,7 @@
                                               displayField="combinedName"
                                               [options]="this.organisms"
                                               [formControlName]="'organism'"
+                                              [allowNone]="false"
                                               (optionSelected)="selectOrganism($event)">
                             </custom-combo-box>
                         </div>
@@ -347,7 +383,7 @@
                     </div>
                 </li>
             </ol>
-            <ol *ngIf="useIsolationTypeMode && !useSliceMode && !useNanoGeomxMode" class="full-width three-depth-numbering">
+            <ol *ngIf="useIsolationTypeMode && !useSliceMode && !useNanoGeomxMode  && !useXeniumMode" class="full-width three-depth-numbering">
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
                         <div class="heading">
@@ -482,7 +518,7 @@
                     </div>
                 </li>
             </ol>
-            <ol *ngIf="useSliceMode && !useNanoGeomxMode" class="full-width three-depth-numbering">
+            <ol *ngIf="useSliceMode && !useNanoGeomxMode && !useXeniumMode" class="full-width three-depth-numbering">
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
                         <div class="heading">
@@ -581,7 +617,7 @@
                     </div>
                 </li>
             </ol>
-            <ol *ngIf="useNanoGeomxMode" class="full-width three-depth-numbering">
+            <ol *ngIf="useNanoGeomxMode && !useXeniumMode" class="full-width three-depth-numbering">
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
                         <div class="heading">
@@ -659,6 +695,92 @@
                     </div>
                 </li>
             </ol>
+
+            <ol *ngIf="useXeniumMode" class="full-width three-depth-numbering">
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Which organism is the source for these samples?
+                            <context-help name="SampleDetailsOrganism"
+                                          [hasEditPermission]="this.securityAdvisor.isAdmin"
+                                          [idCoreFacility]="this.idCoreFacility"
+                                          popupTitle="Sample Xenium Organism Help">
+                            </context-help>
+                        </div>
+                        <div class="moderate-width">
+                            <custom-combo-box placeholder="xeniumOrganism"
+                                              displayField="combinedName"
+                                              [options]="this.xeniumOrganisms"
+                                              [formControlName]="'xeniumOrganism'"
+                                              (optionSelected)="selectXeniumOrganism($event)">
+                            </custom-combo-box>
+                        </div>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Select the sample type.
+                        </div>
+                        <mat-radio-group class="flex-container-col"
+                                         formControlName="sampleType"
+                                         (change)="onSelectSampleType($event)">
+
+                            <div *ngFor="let xst of this.sampleTypes">
+                                <mat-radio-button [value]="xst">
+                                    <div class="short-width">
+                                        {{xst.display}}
+                                    </div>
+                                </mat-radio-button>
+                            </div>
+                            <div class="short-width">
+                                <hr>
+                            </div>
+                        </mat-radio-group>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Select gene panel.
+                        </div>
+                        <mat-radio-group class="flex-container-col"
+                                         formControlName="xeniumGenePanel"
+                                         (change)="onSelectedXeniumGenePanel($event)">
+
+                                <div *ngFor="let genePanel of xeniumGenePanels">
+                                    <mat-radio-button [value]="genePanel">
+                                        <div class="short-width">
+                                            {{genePanel.display}}
+                                        </div>
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                    </div>
+                </li>
+
+                <li class="full-width align-baseline">
+                    <div class="full-width">
+                        <div class="full-width flex-container-row align-baseline">
+                            <div class="heading">
+                                Enter a note for the Core facility
+                            </div>
+                        </div>
+                        <mat-form-field class="long-width">
+                            <textarea matInput
+                                      matTextareaAutosize
+                                      placeholder="Note"
+                                      formControlName="coreNotes"
+                                      matAutosizeMinRows="1"
+                                      matAutosizeMaxRows="10"
+                                      (input)="onInputCoreFacilityNotes($event)">
+                            </textarea>
+                            <mat-error *ngIf="form?.get('coreNotes')?.hasError('maxlength')">Notes can not be over 5000 characters.</mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+            </ol>
+
         </div>
     </form>
 </div>

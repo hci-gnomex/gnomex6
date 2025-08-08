@@ -548,7 +548,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         if(event.newValue !== event.oldValue && event.colDef.field === "unitPrice") {
             let value = event.newValue.replace("$", "").replace(",", "");
             if(!isNaN(Number(value)) && Number(value) >= 0) {
-                let currencyValue: string = formatCurrency(Number(value), "en", "$", "USN", "1.2-2");
+                let currencyValue: string = formatCurrency(Number(value), "en-US", "$", "USD", "1.2-2");
                 event.value = currencyValue;
                 event.data.unitPrice = currencyValue;
             }
@@ -1306,6 +1306,34 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         }
     }
 
+    public onMoveToPrevPeriod(): void {
+        if (this.lastFilterEvent.idBillingPeriod) {
+            let months: string[] = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+            let currentPeriodDisplay: string = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_PERIOD).filter((period: any) => {
+                return period.idBillingPeriod === this.lastFilterEvent.idBillingPeriod;
+            })[0].display;
+            let selYear: number = parseInt(currentPeriodDisplay.substring(currentPeriodDisplay.length - 4));
+            let selMonth: number = months.indexOf(currentPeriodDisplay.substring(0, 3));
+
+            let currentPeriodid: string = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_PERIOD).filter((period: any) => {
+                return period.idBillingPeriod === this.lastFilterEvent.idBillingPeriod;
+            })[0].idBillingPeriod;
+
+            let prevMonth: number = (selMonth - 1) % 12;
+            if (prevMonth === 0) {
+                selYear--;
+            }
+            let prevPeriodDisplay: string = months[prevMonth] + " " + selYear;
+            let prevPeriodList: any[] = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_PERIOD).filter((period: any) => {
+                return period.display === prevPeriodDisplay;
+            });
+            if (prevPeriodList.length > 0) {
+                this.updateBillingItemsWithNewValue("idBillingPeriod", prevPeriodList[0].idBillingPeriod);
+            }
+        }
+    }
+
     public openSplitWindow(): void {
         if (this.selectedBillingRequest) {
             let selectedTreeNode: ITreeNode = this.billingItemsTreeSelectedNode;
@@ -1734,7 +1762,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
                 price = this.selectedPriceTreeGridItem.data.unitPriceExternalCommercial;
             }
             price = price.replace("$", "").replace(",", "");
-            let unitPrice: string = (!isNaN(Number(price))) ? formatCurrency(Number(price), "en", "$", "USN", "1.2-2") : "";
+            let unitPrice: string = (!isNaN(Number(price))) ? formatCurrency(Number(price), "en-US", "$", "USD", "1.2-2") : "";
 
             let newBillingItem: any = {
                 codeBillingChargeKind: this.selectedPriceTreeGridItem.data.codeBillingChargeKind,

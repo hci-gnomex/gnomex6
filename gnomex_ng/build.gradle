@@ -5,40 +5,40 @@ buildscript {
 }
 
 plugins {
-    id 'com.moowork.node' version '1.3.1'
+    id "com.github.node-gradle.node" version "3.1.1"
 }
 
 repositories {
     mavenCentral()
 }
 
-task cleanAngular(type: NpmTask) {
+tasks.register('cleanAngular', NpmTask) {
     args = ['run', 'clean:dist']
 }
 
-task cleanNpmInstall(type: NpmTask) {
+tasks.register('cleanNpmInstall', NpmTask) {
     args = ['run', 'clean:install']
 }
 
-task cleanAll(type: NpmTask) {
+tasks.register('cleanAll', NpmTask) {
     args = ['run', 'clean']
 }
 
-task buildWebpackDevWDS(type: NpmTask) {
+tasks.register('buildWebpackDevWDS', NpmTask) {
     dependsOn(cleanAngular, npmInstall)
     args = ['run', 'build:dev:wds']
 }
 
-task buildWebpackDevTomcat(type: NpmTask) {
-    dependsOn(cleanAngular, npmInstall)
+tasks.register('buildWebpackDevTomcat', NpmTask) {
+    dependsOn(npmInstall)
     args = ['run', 'build:dev:tomcat']
 }
 
-task buildWebpackProd(type: NpmTask) {
+tasks.register('buildWebpackProd', NpmTask) {
     dependsOn(cleanAngular, npmInstall)
     args = ['run', 'build:prod']
 }
 
-task runWebpackDevServer(type: NpmTask) {
+tasks.register('runWebpackDevServer', NpmTask) {
     args = ['run', 'webpack-dev-server']
 }

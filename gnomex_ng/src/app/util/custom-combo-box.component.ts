@@ -187,7 +187,7 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
                 this.loadedOptions.push(currentlySelected);
             }
         }
-        // prefer to check id if it has one  vs straight against it's object identity
+        // prefer to check id if it has one  vs straight against its object identity
         if( this.innerControl.value && newValue && this.valueField){
             if(this.innerControl.value[this.valueField] !== newValue[this.valueField]){
                 this.ignoreInnerControlChanges = true;

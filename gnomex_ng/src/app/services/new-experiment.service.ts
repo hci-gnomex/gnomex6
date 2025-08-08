@@ -55,6 +55,7 @@ export class NewExperimentService {
     public static readonly TYPE_NANOGEOMX: string = "NANOGEOMX";
     public static readonly TYPE_LCM: string = "LCM";
     public static readonly TYPE_MILLISECT: string = "MILLISECT";
+    public static readonly TYPE_XENIUM: string = "XENIUM";
 
     public static readonly TYPE_GENERIC: string = "GENERIC";
 
@@ -87,7 +88,8 @@ export class NewExperimentService {
             || this.currentState === 'ClinicalSequenomEditState'
             || this.currentState === 'SliceEditState'
             || this.currentState === 'NanoGeomxEditState'
-            || this.currentState === 'NanoStringEditState';
+            || this.currentState === 'NanoStringEditState'
+            || this.currentState === 'XeniumEditState';
     }
 
     public isMicroarrayState(): boolean {
@@ -99,6 +101,12 @@ export class NewExperimentService {
         return this.currentState === 'QCState'
             || this.currentState === 'QCExternalState'
             || this.currentState === 'QCEditState';
+    }
+
+    public isXeniumState(): boolean {
+        return this.currentState === 'XeniumState'
+            || this.currentState === 'XeniumExternalState'
+            || this.currentState === 'XeniumEditState';
     }
 
     public isSolexaState():Boolean {

@@ -55,6 +55,7 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
     public gridData: any[] = [];
 
     public fileCount: number = 0;
+    public fileSize: number = 0;
     public getRequestDownloadListResult: any;
     private request:any;
     public canUpdate: boolean = false;
@@ -198,10 +199,12 @@ export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
 
     private determineFileCount(): void {
         this.fileCount = 0;
+        this.fileSize = 0;
         if (this.gridApi) {
             this.gridApi.forEachNode((node: RowNode) => {
                 if (node.data.fileSize && node.data.type !== 'dir') {
                     this.fileCount++;
+                    this.fileSize += node.data.fileSize;
                 }
             });
         }

@@ -315,7 +315,7 @@ public class CreateBillingItems extends GNomExCommand implements Serializable {
 
         }
       }
-
+        // If no price sheet found, use the default price sheet
       if (priceSheet != null) {
 
 

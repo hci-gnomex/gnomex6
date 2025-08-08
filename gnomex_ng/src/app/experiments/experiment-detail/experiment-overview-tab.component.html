@@ -47,6 +47,7 @@
                             {{ _experiment?.name }}
                         </div>
                     </div>
+
                     <div class="field-width align-center flex-container-row padded">
                         <div class="full-height label label-width">
                             Experiment
@@ -57,6 +58,39 @@
                             </div>
                         </div>
                     </div>
+                    <div *ngIf="this.xeniumGenePanel?.length > 0" class="field-width align-center flex-container-row padded">
+                        <div class="full-height label label-width">
+                            Gene Panel
+                        </div>
+                        <div class="flex-grow">
+                            <div class="full-width">
+                                {{ this.xeniumGenePanel }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="this._experiment?.tissueSection?.length > 0" class="field-width align-center flex-container-row padded">
+                        <div class="full-height label label-width">
+                            Tissue Section
+                        </div>
+                        <div class="flex-grow">
+                            <div class="full-width">
+                                {{ this._experiment.tissueSection }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="this._experiment?.suspension?.length > 0" class="field-width align-center flex-container-row padded">
+                        <div class="full-height label label-width">
+                            Suspension
+                        </div>
+                        <div class="flex-grow">
+                            <div class="full-width">
+                                {{ this._experiment.suspension }}
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="field-width align-center flex-container-row padded">
                         <div class="full-height label label-width">
                             Library Protocol
@@ -153,69 +187,6 @@
                             {{ _experiment?.phone }}
                         </div>
                     </div>
-                    <!--<div class="field-width align-center flex-container-row padded">-->
-                    <!--<div class="label label-width">-->
-                        <!--Institution-->
-                    <!--</div>-->
-                    <!--<div class="flex-grow">-->
-                        <!--{{ institutionName }}-->
-                    <!--</div>-->
-                <!--</div>-->
-                <!--Commented Visibility and Collaborators as we moved them to Visibility tab-->
-                <!--<div class="field-width flex-container-row padded">-->
-                    <!--<div class="label label-width flex-container-col">-->
-                        <!--Visibility-->
-                        <!--<context-help name="visibilityLevel" [hasEditPermission]="isAdmin && hasEditPermission"-->
-                                      <!--popupTitle="Visibility Level Help"-->
-                                      <!--[idCoreFacility]="this._experiment.idCoreFacility"></context-help>-->
-                    <!--</div>-->
-                    <!--<div class="flex-grow flex-container-row align-center">-->
-                        <!--<mat-radio-group class="flex-container-col"  [(value)]="_experiment.codeVisibility" (change)="onUpdateVisibility($event)" >-->
-                            <!--<mat-radio-button-->
-                                    <!--*ngFor="let rad of visibilityOptions"-->
-                                    <!--[value]="rad.value"-->
-                                    <!--[disabled]="!hasEditPermission || !isAdmin"-->
-                                    <!--[matTooltip]="rad.tooltip">-->
-                                <!--<img [src]="rad.icon">-->
-                                <!--{{ rad.display }}-->
-                            <!--</mat-radio-button>-->
-                        <!--</mat-radio-group>-->
-                        <!--<div class="full-height horizontal-spacing">-->
-                        <!--</div>-->
-                        <!--<div *ngIf="isPrivacyExpSupported && _experiment.codeVisibility !== 'PUBLIC'" class="flex-grow">-->
-                            <!--<mat-form-field class="short-input"-->
-                                            <!--matTooltip="Date of Public Visibility &#13;(Visibility automatically changes to public on this date)">-->
-                                <!--<input matInput-->
-                                       <!--[(value)]="privacyExp"-->
-                                       <!--placeholder="Privacy Expiration"-->
-                                       <!--[matDatepicker]="privacyPicker"-->
-                                       <!--[min]="this.today">-->
-                                <!--<mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>-->
-                                <!--<mat-datepicker #privacyPicker disabled="false"></mat-datepicker>-->
-                            <!--</mat-form-field>-->
-                            <!--<context-help name="visibilityPrivacyExpiration" [hasEditPermission]="isAdmin && hasEditPermission"-->
-                                          <!--popupTitle="Visibility Privacy Expiration Help"-->
-                                          <!--[idCoreFacility]="this._experiment.idCoreFacility"></context-help>-->
-                        <!--</div>-->
-                    <!--</div>-->
-                <!--</div>-->
-                <!--<div class="field-width flex-container-row padded">-->
-                    <!--<div class="label label-width padded">-->
-                        <!--<button mat-button-->
-                                <!--class="label underline minimize limit-width"-->
-                                <!--style="padding-left: 0;"-->
-                                <!--[disabled]="!(isAdmin || _experiment.canUpdate === 'Y')"-->
-                                <!--(click)="onClickCollaborators()">-->
-                            <!--Collaborators-->
-                        <!--</button>-->
-                    <!--</div>-->
-                    <!--<context-help name="visibilityCollaborators" [hasEditPermission]="isAdmin && hasEditPermission"-->
-                                  <!--popupTitle="Visibility Collaborator Help"-->
-                                  <!--[idCoreFacility]="this._experiment.idCoreFacility"></context-help>-->
-                    <!--<div class="flex-grow flex-container-col multi-line max-height padded">-->
-                        <!--{{ currentCollaboratorsDisplay }}-->
-                    <!--</div>-->
-                    <!--</div>-->
                 </div>
             </div>
             <div *ngIf="processedWorkflowSteps && processedWorkflowSteps.length > 0" class="full-width max-width bordered padded margin-top-bottom">

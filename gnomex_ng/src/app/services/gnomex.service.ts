@@ -49,6 +49,7 @@ export class GnomexService {
     public readonly TYPE_MICROARRAY: string = "MICROARRAY";
     public readonly TYPE_NANOSTRING: string = "NANOSTRING";
     public readonly TYPE_NANOGEOMX: string = "NANOGEOMX";
+    public readonly TYPE_XENIUM: string = "XENIUM";
 
 
 
@@ -93,6 +94,7 @@ export class GnomexService {
     public organismList: any[] = [];
     public das2OrganismList: any[] = [];
     public activeOrganismList: any[] = [];
+    public activeXeniumOrganismList: any[] = [];
     public coreFacilityList: any[] = [];
     public seqLibProtocolsWithAppFilters: any[] = [];
 
@@ -599,6 +601,7 @@ export class GnomexService {
     public onGetOrganismList(orgs: any){
         this.das2OrganismList = [];
         this.activeOrganismList = [];
+        this.activeXeniumOrganismList = [];
 
         let orgList:any[] = Array.isArray(orgs) ? orgs : [orgs.Organism];
 
@@ -608,6 +611,14 @@ export class GnomexService {
             }
             if (organism.isActive === "Y") {
                 this.activeOrganismList.push(organism);
+
+                if (organism.bionomialName === "Homo sapiens") {
+                    this.activeXeniumOrganismList.push(organism);
+                }
+                if (organism.bionomialName === "Mus musculus") {
+                    this.activeXeniumOrganismList.push(organism);
+                }
+
             }
         }
         this.activeOrganismList = this.activeOrganismList.sort((obj1, obj2) => {

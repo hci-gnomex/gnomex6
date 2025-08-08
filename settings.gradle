@@ -1,3 +1,15 @@
-rootProject.name='gnomex'
+pluginManagement {
+    repositories {
+        maven {
+            url './maven-repo'
+        }
+        gradlePluginPortal()
+        ivy {
+            url './ivy-repo'
+        }
+    }
+}
+
+rootProject.name='gnomex6'
 
 include 'gnomex_tomcat_support','gnomex_crypt', 'gnomex_ng'

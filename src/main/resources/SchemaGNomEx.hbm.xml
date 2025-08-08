@@ -1049,6 +1049,7 @@
         <property name="processingDate" column="processingDate" type="date"/>
         <property name="bioinformaticsAssist" column="bioinformaticsAssist" type="string"/>
         <property name="alignToGenomeBuild" column="alignToGenomeBuild" type="string"/>
+        <property name="oraCompression" column="oraCompression" type="string"/>
         <property name="hasPrePooledLibraries" column="hasPrePooledLibraries" type="string"/>
         <property name="numPrePooledTubes" column="numPrePooledTubes" type="integer"/>
         <property name="adminNotes" column="adminNotes" type="string"/>
@@ -1059,7 +1060,10 @@
         <property name="usedDnase" column="usedDnase" type="string"/>
         <property name="usedRnase" column="usedRnase" type="string"/>
         <property name="keepSamples" column="keepSamples" type="string"/>
-        <property name="idDownstreamAnalysis" column="idDownstreamAnalysis" type="integer"/>
+        <property name="tissueSection" column="tissueSection" type="string"/>
+        <property name="suspension" column="suspension" type="string"/>
+        <property name="idXeniumGenePanel" column="idXeniumGenePanel" type="integer"/>
+       <property name="idDownstreamAnalysis" column="idDownstreamAnalysis" type="integer"/>
         <!--
         <many-to-one name="downstreamAnalysis" column="idDownstreamAnalysis" class="hci.gnomex.model.DownstreamAnalysis"
                      cascade="none" insert="false" update="false"/>
@@ -1224,6 +1228,9 @@
         </set>
         <property name="sampleAlias_CORE" column="sampleAlias_CORE" type="string"/>
         <property name="idSample_CORE" column="idSample_CORE" type="long"/>
+        <property name="tissueSection" column="tissueSection" type="string"/>
+        <property name="suspension" column="suspension" type="string"/>
+        <property name="idXeniumGenePanel" column="idXeniumGenePanel" type="integer"/>
     </class>
 
     <!-- hci.gnomex.model.SampleExperimentFile -->
@@ -2252,6 +2259,17 @@
         <id name="codeNucleotideType" column="codeNucleotideType" type="string">
             <generator class="assigned"/>
         </id>
+    </class>
+
+    <!-- hci.gnomex.model.XeniumGenePanel -->
+    <class name="hci.gnomex.model.XeniumGenePanel" table="XeniumGenePanel">
+        <id name="idXeniumGenePanel" column="idXeniumGenePanel" type="integer">
+            <generator class="native"/>
+        </id>
+        <property name="xeniumGenePanel" column="xeniumGenePanel" type="string"/>
+        <property name="sortOrder" column="sortOrder" type="integer"/>
+        <property name="isActive" column="isActive" type="string"/>
+        <property name="idCoreFacility" column="idCoreFacility" type="integer"/>
     </class>
 
     <!-- hci.gnomex.model.SampleTypeRequestCategory -->

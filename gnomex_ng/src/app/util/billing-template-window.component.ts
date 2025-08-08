@@ -125,9 +125,9 @@ export class BillingTemplateWindowComponent extends BaseGenericContainerDialog i
 
     private currencyValueFormatter(params: any): string {
         if(!isNaN(Number(params.value)) && Number(params.value) >= 0) {
-            return formatCurrency(Number(params.value), "en", "$", "USN", "1.2-2");
+            return formatCurrency(Number(params.value), "en-US", "$", "USD", "1.2-2");
         } else {
-            return formatCurrency(0, "en", "$", "USN", "1.2-2");
+            return formatCurrency(0, "en-US", "$", "USD", "1.2-2");
         }
     }
 

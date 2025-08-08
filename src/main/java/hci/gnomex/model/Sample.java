@@ -77,6 +77,11 @@ public class Sample extends HibernateDetailObject {
   private String      qcCodeApplication;
   private String      sampleAlias_CORE;
   private Long      idSample_CORE;
+
+  private String      tissueSection;
+  private String      suspension;
+
+  private Integer    idXeniumGenePanel;
   private BigDecimal  qcLibConcentration;
   private Integer     idLibPrepQCProtocol;
   private BigDecimal  sampleVolume;
@@ -932,6 +937,14 @@ public class Sample extends HibernateDetailObject {
     this.idOligoBarcodeB = idOligoBarcodeB;
   }
 
+  public Integer getIdXeniumGenePanel() {
+    return idXeniumGenePanel;
+  }
+
+  public void setIdXeniumGenePanel(Integer idXeniumGenePanel) {
+    this.idXeniumGenePanel = idXeniumGenePanel;
+  }
+
   public String getBarcodeSequenceB() {
     return barcodeSequenceB;
   }
@@ -995,6 +1008,24 @@ public class Sample extends HibernateDetailObject {
   public void setSampleAlias_CORE(String sampleAlias_CORE) {
     this.sampleAlias_CORE = sampleAlias_CORE;
   }
+
+
+  public String getTissueSection() {
+    return tissueSection;
+  }
+  public void setTissueSection(String tissueSection) {
+    this.tissueSection = tissueSection;
+  }
+
+  public String getSuspension() {
+    return suspension;
+  }
+  public void setSuspension(String suspension) {
+    this.suspension = suspension;
+  }
+
+
+
   public Long getIdSample_CORE() {
     return idSample_CORE;
   }

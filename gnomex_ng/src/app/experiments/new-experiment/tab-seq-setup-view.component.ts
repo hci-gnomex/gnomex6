@@ -175,6 +175,17 @@ export class TabSeqSetupViewComponent implements OnInit {
 
             this.filteredApps = this.filterApplication(this.requestCategory, !this.showPool);
             this.setupThemes();
+
+            if (this._experiment.tissueSection && this._experiment.tissueSection.length > 0) {
+                this.form.get('seqType').setValue(this.tissueSectionTheme);
+                this.sequenceType = this.tissueSectionTheme;
+            }
+            if (this._experiment.suspension && this._experiment.suspension.length > 0) {
+                this.form.get('seqType').setValue(this.suspensionTheme);
+                this.sequenceType = this.suspensionTheme;
+            }
+
+
         });
     };
 
@@ -200,6 +211,10 @@ export class TabSeqSetupViewComponent implements OnInit {
     themeMap: Map<string, any> = new Map<string, any>();
 
     public themes: any[] = [];
+
+    public tissueSectionTheme: any;
+    public suspensionTheme: any;
+
 
     get appPrices(): any[] {
         return this._appPrices;
@@ -312,6 +327,15 @@ export class TabSeqSetupViewComponent implements OnInit {
 
         this.filteredApps = this.filterApplication(this.requestCategory, !this.showPool);
         this.setupThemes();
+
+        if (this._experiment.tissueSection && this._experiment.tissueSection.length > 0) {
+            this.form.get('seqType').setValue(this.tissueSectionTheme);
+            this.sequenceType = this.tissueSectionTheme;
+        }
+        if (this._experiment.suspension && this._experiment.suspension.length > 0) {
+            this.form.get('seqType').setValue(this.suspensionTheme);
+            this.sequenceType = this.suspensionTheme;
+        }
     }
 
     private static requireLibraryDesignIfShown(group: FormGroup): { [s:string]: boolean } {
@@ -363,6 +387,13 @@ export class TabSeqSetupViewComponent implements OnInit {
         }
 
         for (let thm of this.themeMap.values()) {
+            if (thm.display === 'Spatial Profiling') {
+                this.tissueSectionTheme = thm;
+            }
+            if (thm.display === 'Single Cell Sequencing') {
+                this.suspensionTheme = thm;
+            }
+
             this.themes.push(thm);
         }
 
@@ -409,6 +440,17 @@ export class TabSeqSetupViewComponent implements OnInit {
 
             this.filteredApps = this.filterApplication(this.requestCategory, !this.showPool);
             this.setupThemes();
+
+            if (this._experiment.tissueSection && this._experiment.tissueSection.length > 0) {
+                this.form.get('seqType').setValue(this.tissueSectionTheme);
+                this.sequenceType = this.tissueSectionTheme;
+
+            }
+            if (this._experiment.suspension && this._experiment.suspension.length > 0) {
+                this.form.get('seqType').setValue(this.suspensionTheme);
+                this.sequenceType = this.suspensionTheme;
+
+            }
         });
 
         this.libToChange = false;
