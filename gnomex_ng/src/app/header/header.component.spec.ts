@@ -13,7 +13,7 @@ import {
 import {FormsModule, FormBuilder, ReactiveFormsModule} from "@angular/forms";
 import {RouterModule} from "@angular/router";
 import {Observable} from "rxjs";
-import {HttpModule} from "@angular/http";
+import {HttpClientTestingModule} from "@angular/common/http/testing";
 import {RouterTestingModule} from "@angular/router/testing";
 import {ILocalStorageServiceConfig, LocalStorageService} from "angular-2-local-storage";
 import {ProgressService} from "../home/progress.service";
@@ -47,7 +47,7 @@ describe('Header Component...', () => {
             imports: [
                 RouterTestingModule,
                 ReactiveFormsModule,
-                HttpModule,
+                HttpClientTestingModule,
                 MatButtonModule,
                 MatInputModule,
                 MatListModule,

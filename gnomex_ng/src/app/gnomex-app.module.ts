@@ -4,7 +4,7 @@ import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {HeaderModule} from "./header/header.module";
 import {APP_ROUTING} from "./gnomex-app.routes";
-import {HttpModule} from "@angular/http";
+import {HttpClientModule, HTTP_INTERCEPTORS} from "@angular/common/http";
 import {HomeModule} from "./home/home.module";
 import {BROWSE_EXPERIMENTS_ENDPOINT} from "./experiments/experiments.service";
 import {ExperimentsService} from "./experiments/experiments.service";
@@ -48,7 +48,6 @@ import {UserModule} from "./hci-user/user.module";
 import {AUTHENTICATED_USER_ENDPOINT, UserService} from "./hci-user/user.service";
 import {AngularSplitModule} from "angular-split";
 import {RegisterUserModule} from "./account/register-user/register-user.module";
-import {HTTP_INTERCEPTORS} from "@angular/common/http";
 import {ErrorHandlerInterceptor} from "./services/interceptors/error-handler.interceptor";
 import {WINDOW_PROVIDERS} from "./services/window.service";
 import {MatDialogModule} from "@angular/material";
@@ -66,7 +65,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
     imports: [
         BrowserModule,
         APP_ROUTING,
-        HttpModule,
+        HttpClientModule,
         RouterModule,
         FormsModule,
         HeaderModule,

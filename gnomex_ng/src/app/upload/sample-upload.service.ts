@@ -1,5 +1,4 @@
 import {Injectable} from "@angular/core";
-import {Http, Headers} from "@angular/http";
 
 import {Observable} from "rxjs";
 import {Subject} from "rxjs";
@@ -43,8 +42,7 @@ export class SampleUploadService {
     private bulkUploadImportedSubject: Subject<any>;
 
 
-    constructor(private http: Http,
-                private cookieUtilService: CookieUtilService,
+    constructor(private cookieUtilService: CookieUtilService,
                 private dialogService: DialogsService,
                 private httpClient: HttpClient) {
         this.hasSampleUploadURLSubject = new Subject();

@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
 import { Router } from "@angular/router";
-import { Http } from "@angular/http";
+import { HttpClient } from "@angular/common/http";
 import { GnomexAppComponent } from "./gnomex-app.component";
 import {CreateSecurityAdvisorService} from "./services/create-security-advisor.service";
 import {ProgressService} from "./home/progress.service";
@@ -18,7 +18,7 @@ import {AuthenticationService} from "./auth/authentication.service";
 describe("SeedAppComponent Tests", () => {
   beforeEach(() => {
     this.gnomexAppComponent = new GnomexAppComponent(<AuthenticationService> null, <CreateSecurityAdvisorService> null,
-                              <DictionaryService> null, <Http> null, <ProgressService> null);
+                              <DictionaryService> null, <HttpClient> null, <ProgressService> null);
   });
 
   it("Should have isCollapsed set to 'true' initially", () => {

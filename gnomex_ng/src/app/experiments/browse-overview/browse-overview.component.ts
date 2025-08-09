@@ -1,6 +1,5 @@
 import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {ActivatedRoute} from "@angular/router";
-import {URLSearchParams} from "@angular/http";
 import {ExperimentsService} from "../experiments.service";
 import {TabContainer} from "../../util/tabs/tab-container.component";
 import {ConstantsService} from "../../services/constants.service";

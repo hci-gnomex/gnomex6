@@ -7,7 +7,6 @@ import {
     ViewChild,
 } from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
-import {URLSearchParams} from "@angular/http";
 import {MatDialogConfig, MatSnackBar, MatSnackBarConfig} from "@angular/material";
 
 import {GridOptions} from "ag-grid-community/main";

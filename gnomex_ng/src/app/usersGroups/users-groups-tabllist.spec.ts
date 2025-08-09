@@ -5,7 +5,8 @@ import {
 } from '@angular/material';
 import {FormsModule, FormBuilder, ReactiveFormsModule} from "@angular/forms";
 import {Observable} from "rxjs";
-import {Http, HttpModule, XHRBackend} from "@angular/http";
+import {HttpClient, HttpParams, XhrFactory} from "@angular/common/http";
+import {HttpClientTestingModule, HttpTestingController} from "@angular/common/http/testing";
 import {RouterTestingModule} from "@angular/router/testing";
 import {ILocalStorageServiceConfig, LocalStorageService} from "angular-2-local-storage";
 import {ProgressService} from "../home/progress.service";
@@ -28,7 +29,6 @@ import {AppUserListService} from "../services/app-user-list.service";
 import {DialogsService} from '../util/popup/dialogs.service';
 import {GetLabService} from '../services/get-lab.service';
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
-import {MockBackend} from "@angular/http/testing";
 import {By} from "@angular/platform-browser";
 import {
     AUTHENTICATION_DIRECT_ENDPOINT,
@@ -50,7 +50,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
 class MockDictionaryService extends DictionaryService {
     constructor() {
         console.log("in test constructor");
-        var _http: Http;
+        var _http: HttpClient;
         super(_http);
     }
     getEntries(className: string): any[] {
@@ -66,7 +66,7 @@ class MockSecurityAdvisorService extends CreateSecurityAdvisorService {
     constructor() {
         super(_http, labListService, dictionaryService);
         console.log("in test constructor");
-        var _http: Http;
+        var _http: HttpClient;
         var labListService: LabListService;
         var dictionaryService: DictionaryService;
     }
@@ -496,11 +496,11 @@ class MockAppUserListService extends AppUserListService {
 class MockLabListService extends LabListService {
     constructor() {
         console.log("in test constructor");
-        var _http: Http;
+        var _http: HttpClient;
         super(_http);
     }
 
-    getLabListWithParams(params: URLSearchParams): Observable<any> {
+    getLabListWithParams(params: HttpParams): Observable<any> {
         return Observable.of ([{
             "name": "tesla Lab",
             "version": "11",
@@ -671,7 +671,7 @@ describe('Users Groups', () => {
             imports: [
                 RouterTestingModule,
                 ReactiveFormsModule,
-                HttpModule,
+                HttpClientTestingModule,
                 AngularMaterialModule,
                 AngularSplitModule,
                 BrowserAnimationsModule,
@@ -690,7 +690,6 @@ describe('Users Groups', () => {
                 {provide:DialogsService, useClass: DialogsService},
                 {provide:GetLabService, useClass: GetLabService},
                 {provide:PasswordUtilService, useClass: PasswordUtilService},
-                {provide: XHRBackend, useClass: MockBackend},
                 {provide: AUTHENTICATION_LOGOUT_PATH, useValue: "https://localhost:8080/auth/logout"},
                 {provide: AUTHENTICATION_DIRECT_ENDPOINT, useValue: "https://localhost:8080/core/api/user/user-session/active"},
                 {provide: AUTHENTICATION_TOKEN_ENDPOINT, useValue: "https://localhost:8080/core/api/token"},

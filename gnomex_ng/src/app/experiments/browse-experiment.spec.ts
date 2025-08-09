@@ -1,4 +1,5 @@
-import {Http, HttpModule, URLSearchParams} from "@angular/http";
+import {HttpClient, HttpParams} from "@angular/common/http";
+import {HttpClientTestingModule, HttpTestingController} from "@angular/common/http/testing";
 import {ExperimentsService} from "./experiments.service";
 import {BrowseExperimentsComponent} from "./browse-experiments.component"
 import {} from 'jasmine';
@@ -37,7 +38,7 @@ import {of} from "rxjs";
 
 class MockAppUserListService extends AppUserListService {
     constructor() {
-        var _http:Http;
+        var _http:HttpClient;
         super(_http);
     }
     getMembersOnly() {
@@ -64,11 +65,11 @@ class MockCreateSecurityAdvisorService extends CreateSecurityAdvisorService {
 class MockExperimentService extends ExperimentsService {
     constructor() {
         console.log("in test constructor");
-        var _http:Http;
+        var _http:HttpClient;
         super(_http, "world");
     }
 
-    getProjectRequestList_fromBackend(params: URLSearchParams): void {
+    getProjectRequestList_fromBackend(params: HttpParams): void {
         this.projectRequestList = [
             {
                 "idLab": "321",
@@ -267,7 +268,7 @@ describe('Browse Experiment Component...', () => {
         console.log("in before each");
 
         TestBed.configureTestingModule({
-            imports: [FormsModule, HttpModule, TreeModule.forRoot(),
+            imports: [FormsModule, HttpClientTestingModule, TreeModule.forRoot(),
                 UtilModule, RouterTestingModule, AngularMaterialModule, AngularSplitModule],
             declarations: [BrowseExperimentsComponent, BrowsePanelComponent],
             providers: [{provide: ExperimentsService, useClass: MockExperimentService},
@@ -300,7 +301,7 @@ describe('Browse Experiment Component...', () => {
         TestBed.compileComponents().then(() => {
 
             var browseExperimentComponent = fixture.componentInstance;
-            browseExperimentComponent.experimentsService.getProjectRequestList_fromBackend(new URLSearchParams());
+            browseExperimentComponent.experimentsService.getProjectRequestList_fromBackend(new HttpParams());
 
 
             fixture.whenStable().then(() => {
@@ -320,7 +321,7 @@ describe('Browse Experiment Component...', () => {
         TestBed.compileComponents().then(() => {
 
             var browseExperimentComponent = fixture.componentInstance;
-            browseExperimentComponent.experimentsService.getProjectRequestList_fromBackend(new URLSearchParams());
+            browseExperimentComponent.experimentsService.getProjectRequestList_fromBackend(new HttpParams());
 
 
             fixture.whenStable().then(() => {
@@ -341,7 +342,7 @@ describe('Browse Experiment Component...', () => {
 
         TestBed.compileComponents().then ( () => {
             var browseExperimentComponent = fixture.componentInstance;
-            browseExperimentComponent.experimentsService.getProjectRequestList_fromBackend(new URLSearchParams());
+            browseExperimentComponent.experimentsService.getProjectRequestList_fromBackend(new HttpParams());
 
             var tree: TreeComponent = browseExperimentComponent.treeComponent;
             fixture.whenStable().then(() => {
@@ -355,7 +356,7 @@ describe('Browse Experiment Component...', () => {
     it('Should have 2 root nodes ', () => {
         TestBed.compileComponents().then(() => {
             var browseExperimentComponent = fixture.componentInstance;
-            browseExperimentComponent.experimentsService.getProjectRequestList_fromBackend(new URLSearchParams());
+            browseExperimentComponent.experimentsService.getProjectRequestList_fromBackend(new HttpParams());
 
             var tree: TreeComponent = browseExperimentComponent.treeComponent;
             fixture.whenStable().then(() => {
