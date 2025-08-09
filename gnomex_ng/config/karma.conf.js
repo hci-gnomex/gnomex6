@@ -54,7 +54,7 @@ module.exports = function (config) {
         reporters: ["mocha", "coverage", "remap-coverage"],
 
         browsers: [
-            "Chrome"
+            "PhantomJS"
         ],
         port: 9876,
         colors: true,
