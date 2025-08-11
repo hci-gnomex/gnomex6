@@ -1,4 +1,4 @@
-<div #headerRef
+<header #headerRef
      *ngIf="showHeader"
      class="full-width header-one small-font align-center overflow-auto animation"
      (mouseenter)="onMouseIn($event)"
@@ -6,15 +6,15 @@
     <div class="flex-container-row align-center foreground">
         <div class="flex-grow flex-container-row">
             <a [routerLink]="['/home']">
-                <img [src]="'./assets/gnomex_logo_big.png'" alt="">
+                <img [src]="'./assets/gnomex_logo_big.png'" alt="GNomEx Home">
                 <p><sup>  6.26.12</sup></p>
             </a>
             <div class="flex-container-row flex-grow align-center">
                 <div class="flex-grow">
                 </div>
-                <button mat-raised-button class="minimize" (click)="togglePinned()">
-                    <img *ngIf="headerIsPinned"  [src]="'./assets/Collapse.png'" alt="">
-                    <img *ngIf="!headerIsPinned" [src]="'./assets/Pushpin.png'" alt="">
+                <button mat-raised-button class="minimize" (click)="togglePinned()" aria-label="Pin or unpin the header">
+                    <img *ngIf="headerIsPinned"  [src]="'./assets/Collapse.png'" alt="Unpin header">
+                    <img *ngIf="!headerIsPinned" [src]="'./assets/Pushpin.png'" alt="Pin header">
                 </button>
                 <div class="flex-grow">
                 </div>
@@ -24,21 +24,21 @@
             <mat-form-field class="padded-left-right"
                             [hideRequiredMarker]="options.value.hideRequired"
                             [floatLabel]="options.value.floatPlaceholder">
-                <input matInput type="text" [(ngModel)]="objNumber" placeholder="Lookup by #" (keyup)="ifPressEnterSearchByNumber($event)">
+                <input matInput type="text" [(ngModel)]="objNumber" placeholder="Lookup by #" (keyup)="ifPressEnterSearchByNumber($event)" aria-label="Lookup by Number">
             </mat-form-field>
-            <button mat-raised-button class="minimize" (click)="searchNumber()">
-                <img [src]="'./assets/arrow_right.png'" alt="">
+            <button mat-raised-button class="minimize" (click)="searchNumber()" aria-label="Search by number">
+                <img [src]="'./assets/arrow_right.png'" alt="Search by number">
             </button>
             <div class="horizontal-spacer">
             </div>
             <mat-form-field class="padded-left-right" floatLabel='auto'>
-                <input matInput class="flex-grow" [(ngModel)]="searchText" placeholder="Search" (keyup)="ifPressEnterSearchByText($event)">
+                <input matInput class="flex-grow" [(ngModel)]="searchText" placeholder="Search" (keyup)="ifPressEnterSearchByText($event)" aria-label="Search by text">
             </mat-form-field>
-            <button mat-raised-button class="minimize" (click)="searchByText()">
-                <img [src]="'./assets/magnifier.png'" alt="">
+            <button mat-raised-button class="minimize" (click)="searchByText()" aria-label="Search by text">
+                <img [src]="'./assets/magnifier.png'" alt="Search by text">
             </button>
         </div>
-        <div class="flex-grow flex-container-row align-center">
+        <nav class="flex-grow flex-container-row align-center">
             <div class="flex-container-row flex-grow align-center">
                 <div class="flex-grow">
                 </div>
@@ -72,10 +72,10 @@
                     </button>
                 </span>
             </div>
-        </div>
+        </nav>
         <!--<mat-list></mat-list>-->
     </div>
-    <div class="flex-container-row header-two">
+    <nav class="flex-container-row header-two">
         <span *ngFor="let item of navItems" class="full-height" [ngClass]="item.class">
             <!-- Handle branch node buttons here -->
             <span *ngIf="item.children && item.children.length > 0" class="full-height">
@@ -99,9 +99,9 @@
                 </button>
             </span>
         </span>
-    </div>
+    </nav>
     <div #bottomNonCollapsing class="flex-container-row minor-height">
     </div>
-</div>
+</header>
 <div #spacerRef *ngIf="showHeader" class="animation collapse-bar">
 </div>
