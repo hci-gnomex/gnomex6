@@ -58,7 +58,7 @@
                             </div>
                         </div>
                     </div>
-                    <div *ngIf="this.xeniumGenePanel?.length > 0" class="field-width align-center flex-container-row padded">
+                    <div *ngIf="this._experiment.codeRequestCategory == 'XENIUM' && this._experiment.idXeniumGenePanel?.length > 0 && this.xeniumGenePanel?.length > 0" class="field-width align-center flex-container-row padded">
                         <div class="full-height label label-width">
                             Gene Panel
                         </div>
@@ -91,7 +91,7 @@
                         </div>
                     </div>
 
-                    <div class="field-width align-center flex-container-row padded">
+                    <div  *ngIf="this._experiment?.codeRequestCategory != 'XENIUM'" class="field-width align-center flex-container-row padded">
                         <div class="full-height label label-width">
                             Library Protocol
                         </div>

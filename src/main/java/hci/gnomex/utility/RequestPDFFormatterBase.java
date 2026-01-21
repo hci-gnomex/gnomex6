@@ -158,6 +158,8 @@ public abstract class RequestPDFFormatterBase {
 	
 	protected Element makeTableDefault() {
 		Set samples = request.getSamples();
+
+		System.out.println ("[RequestPDFFormatterBase makeTableDefault] samples.size(): " + samples.size());
 		
 		PdfPTable table = new PdfPTable(2);
 		Font tableHeaderFont = RequestPDFFormatter.FONT_TABLE_HEADERS_NORMAL;

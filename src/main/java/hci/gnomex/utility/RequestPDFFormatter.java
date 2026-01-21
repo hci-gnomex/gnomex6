@@ -82,6 +82,15 @@ public class RequestPDFFormatter extends RequestPDFFormatterBase {
 	        	header.add(" " + dictionaryHelper.getIsolationPrepType(request.getCodeIsolationPrepType()));
 	        }
 		}
+
+		if (request.getCodeRequestCategory() != null && request.getCodeRequestCategory().equals(Constants.REQUEST_CATEGORY_XENIUM)) {
+			String xeniumGenePanel = hci.dictionary.utility.DictionaryManager.getDisplay("hci.gnomex.model.XeniumGenePanel",request.getIdXeniumGenePanel().toString());
+			if (xeniumGenePanel == null) {
+				System.out.println("[RequestPDFFormatter] theXeniumGenePanel: is null ********");
+				return header;
+			}
+			header.add(" " + xeniumGenePanel);
+		}
 		return header;
 	}
 	

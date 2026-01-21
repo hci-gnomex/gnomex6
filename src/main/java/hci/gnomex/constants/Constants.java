@@ -59,7 +59,8 @@ public class Constants {
   public static final String   DOWNLOAD_KEY_SEPARATOR                         = "\t";
   public static final String   FILE_SEPARATOR                                 = "/";
   public static final char     FILE_SEPARATOR_CHAR                            = '/';
-  public static DecimalFormat  concentrationFormatter                         = new DecimalFormat("######.##");
+    public static final String REQUEST_CATEGORY_XENIUM                        = "XENIUM";
+    public static DecimalFormat  concentrationFormatter                       = new DecimalFormat("######.##");
 
   public static final String   BILLING_SPLIT_TYPE_PERCENT_CODE                = "%";
   public static final String   BILLING_SPLIT_TYPE_AMOUNT_CODE                 = "$";

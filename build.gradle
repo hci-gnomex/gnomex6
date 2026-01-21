@@ -3,20 +3,12 @@ import org.apache.tools.ant.filters.FixCrLfFilter;
 buildscript {
     repositories {
         maven {
-            credentials {
-                username = 'u0974549'
-                password = 'AP6b32YbsxUzayr5KPBeNziaTrVispH4d4ejJ9'
-            }
             url 'https://ri-artifact-new.hci.utah.edu/artifactory/libs-release'
         }
-        maven { url 'https://repo.spring.io/plugins-snapshot' }
+
     }
     dependencies {
-        classpath 'org.springframework.build.gradle:propdeps-plugin:0.0.8-SNAPSHOT'
-        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:3.0.1'
-        classpath 'hci:hci-conventions:2.0.0'
         classpath 'com.amazonaws:aws-java-sdk-bom:1.12.411'
-
     }
 }
 
@@ -32,13 +24,8 @@ apply from: 'common.gradle'
 
 repositories {
     maven {
-        credentials {
-            username = 'u0974549'
-            password = 'AP6b32YbsxUzayr5KPBeNziaTrVispH4d4ejJ9'
-        }
-        url 'https://ri-artifact-new.hci.utah.edu/artifactory/libs-release'
+         url 'https://ri-artifact-new.hci.utah.edu/artifactory/libs-release'
     }
-    maven { url 'https://repo.spring.io/plugins-snapshot' }
 
     mavenCentral()
 }
@@ -71,6 +58,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
     implementation group: 'com.github.fracpete', name: 'rsync4j-all', version: '3.1.2-17'
 
+    implementation group: 'com.fasterxml.jackson.jaxrs', name: 'jackson-jaxrs-json-provider', version: '2.6.3'
     implementation fileTree(dir: 'libEnv', include: 'jakarta.mail-api-2.1.3.jar')
     implementation fileTree(dir: 'libEnv', include: 'jakarta.activation-api-2.1.3.jar')
     implementation fileTree(dir: 'libEnv', include: 'angus-mail-2.0.3.jar')
@@ -83,7 +71,6 @@ dependencies {
     implementation fileTree(dir: 'libEnv', include: 'hci-hibernate5-utils-1.0.jar')
     implementation fileTree(dir: 'lib', include: 'biojava.jar')
     implementation fileTree(dir: 'lib', include: 'metrixClient-1.4.jar')
-//    implementation fileTree(dir: 'libEnv', include: 'hci_framework.jar')
     implementation fileTree(dir: 'libEnv', include: 'hci_utils.jar')
     implementation fileTree(dir: 'libEnv', include: 'HCIReport.jar')
     implementation fileTree(dir: 'libEnv', include: 'jdom-2.0.6.jar')
@@ -103,15 +90,7 @@ dependencies {
     implementation fileTree(dir: 'libEnv', include: 'ant-1.10.13.jar')
     implementation fileTree(dir: 'libEnv', include: 'ant-launcher-1.10.13.jar')
 
-//    providedCompile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.3.2'
-//    providedCompile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.3.2'
-
-//    implementation fileTree(dir: 'libEnv', include: 'aws-java-sdk-core-1.122.411.jar')
-//    implementation fileTree(dir: 'libEnv', include: 'aws-java-sdk-s3-1.122.411.jar')
-
-    //Realm stuff
-//    providedCompile group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
-//    providedCompile group: 'log4j', name: 'log4j', version: '1.2.12'
+//Realm stuff
     providedCompile group: 'org.apache.tomcat', name: 'tomcat-jdbc', version: '9.0.0.M10'
     providedCompile group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '9.0.10'
 
@@ -121,11 +100,7 @@ dependencies {
 
     //Tomcat
     implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.2.2.Final'
-//    implementation group: 'org.hibernate', name: 'hibernate-entitymanager', version: '5.0.10.Final'
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.+'
-//    implementation group: 'commons-codec', name: 'commons-codec', version: '1.10'
-//    implementation group: 'commons-io', name: 'commons-io', version: '2.4'
-//    implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
     // JAX-RS Related
     implementation group: 'org.jboss.resteasy', name: 'resteasy-jaxrs', version: '3.0.19.Final'
@@ -139,7 +114,6 @@ dependencies {
     providedCompile group: 'javax.enterprise', name: 'cdi-api', version: '1.2'
     runtimeOnly group: 'org.jboss.weld.servlet', name: 'weld-servlet', version: '2.4.1.Final'
 
-    // https://mvnrepository.com/artifact/ch.qos.reload4j/reload4j
     implementation group:  'ch.qos.reload4j', name: 'reload4j', version: '1.2.26'
 }
 

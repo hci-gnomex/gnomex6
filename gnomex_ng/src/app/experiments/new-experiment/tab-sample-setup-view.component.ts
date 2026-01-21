@@ -1010,6 +1010,10 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 if (organism.binomialName === "Mus musculus") {
                     this.xeniumOrganisms.push(organism);
                 }
+                if (organism.binomialName === "Other") {
+                    this.xeniumOrganisms.push(organism);
+                }
+
             }
         }
     }

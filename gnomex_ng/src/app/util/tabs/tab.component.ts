@@ -1,4 +1,4 @@
-import { Component,ComponentRef, Input, ContentChild, AfterContentInit, } from '@angular/core';
+import { Component,ComponentRef, Input } from '@angular/core';
 import {PrimaryTab} from './primary-tab.component'
 // Probably in real app would move to a shared folder visible in app.module
 @Component({

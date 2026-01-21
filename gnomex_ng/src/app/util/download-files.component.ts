@@ -107,7 +107,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                     <button mat-raised-button
                             color="primary"
                             class="primary-action"
-                            [disabled]="filesToDownloadCount < 1 || !isFDTSupported"
+                            [disabled]="filesToDownloadCount < 1 || !isFDTSupported || true"
                             (click)="downloadFDT()">
                         <img [src]="constantsService.ICON_DOWNLOAD_LARGE" alt="" class="icon">
                         FDT Download
@@ -116,7 +116,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                             color="primary"
                             class="primary-action"
                             *ngIf="showCreateSoftLinks"
-                            [disabled]="filesToDownloadCount < 1"
+                            [disabled]="filesToDownloadCount < 1 || true"
                             (click)="createSoftLinks()">
                         <img [src]="constantsService.ICON_DOWNLOAD" alt="" class="icon">
                         Create Soft Links
@@ -173,7 +173,7 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
     public filesToDownloadNodes: any[] = [];
     public filesToDownloadCount: number = 0;
     private filesToDownloadSize: number = 0;
-    public maxsize: number = 2000000000000;
+    public maxsize: number = 4000000000;
     public filesToDownloadSizeLabel: string = "";
 
     public filesOptions: ITreeOptions;

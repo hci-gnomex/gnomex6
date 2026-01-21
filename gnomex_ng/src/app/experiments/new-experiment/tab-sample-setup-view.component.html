@@ -708,10 +708,11 @@
                             </context-help>
                         </div>
                         <div class="moderate-width">
-                            <custom-combo-box placeholder="xeniumOrganism"
+                            <custom-combo-box placeholder="Organism"
                                               displayField="combinedName"
                                               [options]="this.xeniumOrganisms"
                                               [formControlName]="'xeniumOrganism'"
+                                              [allowNone]="false"
                                               (optionSelected)="selectXeniumOrganism($event)">
                             </custom-combo-box>
                         </div>

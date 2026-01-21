@@ -22,12 +22,13 @@ public class XeniumPlugin extends BillingPlugin {
     // Generate the billing item.  Find the price using the
     // criteria of the xenium application.
     qty = 1;
-    
+
     // get the xeniumgenepanel from the request
     String xeniumGenePanel = hci.dictionary.utility.DictionaryManager.getDisplay("hci.gnomex.model.XeniumGenePanel",request.getIdXeniumGenePanel().toString());
-    System.out.println("[XeniumPlugin] xeniumGenePanel: is null ********");
+//    System.out.println("[XeniumPlugin] xeniumGenePanel: is null ********");
     if (xeniumGenePanel == null) {
       // If the xenium gene panel is not set, then we cannot bill.
+      System.out.println("[XeniumPlugin] theXeniumGenePanel: is null ********");
       return billingItems;
     }
 
@@ -42,13 +43,11 @@ public class XeniumPlugin extends BillingPlugin {
       System.out.println("[XeniumPlugin] price name:" + price.getName());
 
       if (price.getIsActive() != null && price.getIsActive().equals("Y") && price.getName().equals(xeniumGenePanel)) {
-        price = (Price)i1.next();
-
         break;
       }
     }
     
-    qty = 1;    //this.checkQty(sess, request, samples, qty);
+    qty = 1;
 
     // Instantiate a BillingItem for the matched price
     if (price != null) {

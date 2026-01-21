@@ -331,7 +331,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
                 this.adminNotesEditorConfig.height = this.editorMinorHeight;
                 this.adminNotesEditorConfig.maxHeight = this.editorMinorHeight;
             }
-        }
+        } // else if editMode
     }
     
     private getShowEditors(): number {

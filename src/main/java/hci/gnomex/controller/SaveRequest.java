@@ -2,7 +2,6 @@ package hci.gnomex.controller;
 
 //import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 
-import hci.gnomex.utility.HttpServletWrappedRequest;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import hci.framework.control.Command;
@@ -13,6 +12,7 @@ import hci.gnomex.model.*;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.*;
 import hci.gnomex.utility.RequestParser.HybInfo;
+import jakarta.mail.MessagingException;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.internal.SessionImpl;
@@ -26,7 +26,6 @@ import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonReader;
-import jakarta.mail.MessagingException;
 import javax.naming.NamingException;
 import javax.persistence.PersistenceException;
 import javax.servlet.http.HttpSession;
@@ -35,6 +34,7 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
+
 import static hci.gnomex.constants.Constants.MAX_DESCRIPT_LIMIT;
 
 public class SaveRequest extends GNomExCommand implements Serializable {
@@ -655,7 +655,7 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 
 		if (priceSheet == null) {
 		// throw new Exception("Cannot find price sheet to create billing items for added services");
-			System.out.println ("[SaveRequest:createBillingItmes] WARNING WARNING PRICESHEET IS NULL!");
+			System.out.println ("[SaveRequest:createBillingItems] WARNING WARNING PRICESHEET IS NULL!");
 		}
 
 		if (priceSheet != null) {
@@ -1795,7 +1795,8 @@ public class SaveRequest extends GNomExCommand implements Serializable {
 					sess.flush();
 
 					// Create file server data directories for request based off of code request category
-					if (!requestParser.isExternalExperiment() && RequestCategory.isIlluminaRequestCategory(requestParser.getRequest().getCodeRequestCategory())) {
+					if (!requestParser.isExternalExperiment() && (RequestCategory.isIlluminaRequestCategory(requestParser.getRequest().getCodeRequestCategory()) ||
+							requestParser.getRequest().getCodeRequestCategory().equals("XENIUM"))) {
 
 						this.createResultDirectories(
 								requestParser.getRequest(),
