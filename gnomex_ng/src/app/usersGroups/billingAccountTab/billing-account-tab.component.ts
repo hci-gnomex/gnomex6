@@ -78,7 +78,7 @@ export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
 })
 export class BillingAccountTabComponent implements OnInit, OnDestroy {
 
-    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
 
 	readonly CHARTFIELD:  string = 'CHARTFIELD';
 	readonly PO:          string = 'PO';

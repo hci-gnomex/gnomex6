@@ -86,12 +86,12 @@ import {formatCurrency} from "@angular/common";
 
 export class NavBillingComponent implements OnInit, OnDestroy {
 
-    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
     private emToPxConversionRate: number = 13;
 
     private lastFilterEvent: BillingFilterEvent = null;
 
-    @ViewChild(TreeComponent)
+    @ViewChild(TreeComponent, {static: false})
     private billingItemsTreeComponent: TreeComponent;
     public billingItemsTreeOptions: ITreeOptions;
     public billingItemsTreeNodes: ITreeNode[] = [];

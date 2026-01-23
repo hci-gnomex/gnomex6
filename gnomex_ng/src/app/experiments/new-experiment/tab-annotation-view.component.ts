@@ -46,7 +46,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
 })
 
 export class TabAnnotationViewComponent implements OnDestroy {
-    @ViewChild("customAnnotInput") customAnnotInput: ElementRef;
+    @ViewChild("customAnnotInput", {static: false}) customAnnotInput: ElementRef;
 
     @Input("experiment") set experiment(value: Experiment) {
         this._experiment = value;

@@ -51,7 +51,7 @@ import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-edito
 })
 export class EmailRelatedUsersPopupComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
-	@ViewChild("emailEditorRef") emailEditor: AngularEditorComponent;
+	@ViewChild("emailEditorRef", {static: false}) emailEditor: AngularEditorComponent;
 	public primaryDisable: (action?: GDAction) => boolean;
 	protected subject: string = "";
 	protected body: string = "";

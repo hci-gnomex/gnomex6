@@ -4,7 +4,7 @@ import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {HeaderModule} from "./header/header.module";
 import {APP_ROUTING} from "./gnomex-app.routes";
-import {HttpModule} from "@angular/http";
+import {HttpClientModule} from "@angular/common/http";
 import {HomeModule} from "./home/home.module";
 import {BROWSE_EXPERIMENTS_ENDPOINT} from "./experiments/experiments.service";
 import {ExperimentsService} from "./experiments/experiments.service";
@@ -66,7 +66,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
     imports: [
         BrowserModule,
         APP_ROUTING,
-        HttpModule,
+        HttpClientModule,
         RouterModule,
         FormsModule,
         HeaderModule,

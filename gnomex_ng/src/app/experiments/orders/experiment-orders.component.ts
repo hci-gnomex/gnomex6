@@ -114,7 +114,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 })
 export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestroy {
 
-    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
 
     protected gridApi;
     protected gridColumnApi;

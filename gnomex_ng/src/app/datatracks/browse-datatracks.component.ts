@@ -70,7 +70,7 @@ import {NavigationService} from "../services/navigation.service";
 
 export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewInit {
 
-    @ViewChild("datatracksTree") treeComponent: TreeComponent;
+    @ViewChild("datatracksTree", {static: false}) treeComponent: TreeComponent;
     @Output() selItem: EventEmitter<ITreeNode> = new EventEmitter();
     private treeModel: TreeModel;
     private navInitSubscription: Subscription;

@@ -91,10 +91,10 @@ const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
 
 export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewInit {
 
-    @ViewChild("tree") treeComponent: TreeComponent;
+    @ViewChild("tree", {static: false}) treeComponent: TreeComponent;
     toggleButton: string = "Expand Projects";
 
-    @ViewChild(BrowseFilterComponent)
+    @ViewChild(BrowseFilterComponent, {static: false})
 
     /**
      angular2-tree options

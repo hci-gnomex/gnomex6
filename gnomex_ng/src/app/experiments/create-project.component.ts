@@ -76,7 +76,7 @@ export class CreateProjectComponent extends BaseGenericContainerDialog implement
     public labList: any[] = [];
     public newProjectId: string = "";
     public labDisplayField: string = this.prefService.labDisplayField;
-    @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
+    @ViewChild("descEditorRef", {static: false}) descEditor: AngularEditorComponent;
     descEditorConfig: AngularEditorConfig = {
         height: "20em",
         minHeight: "5em",

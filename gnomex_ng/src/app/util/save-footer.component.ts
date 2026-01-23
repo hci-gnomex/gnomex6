@@ -1,5 +1,4 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
-import {URLSearchParams} from "@angular/http";
 import {DialogsService} from "./popup/dialogs.service";
 import {ActionType} from "./interfaces/generic-dialog-action.model";
 

@@ -22,7 +22,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 
 export class PipelineWorkflowComponent implements OnInit {
 
-    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
 
     private emToPxConversionRate: number = 13;
 

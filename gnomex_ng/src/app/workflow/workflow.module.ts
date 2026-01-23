@@ -12,7 +12,7 @@ import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {UtilModule} from "../util/util.module";
 import {WORKFLOW_ROUTING} from "./workflow.routes";
 import {QcWorkflowComponent} from "./qc-workflow.component";
-import { AgGridModule } from 'ag-grid-angular/main';
+import { AgGridModule } from 'ag-grid-angular';
 import { AgGridEditorModule } from "../util/grid-editors/ag-grid-editor.module";
 import { AgGridRendererModule } from "../util/grid-renderers/ag-grid-renderer.module";
 import { CheckboxRenderer } from "../util/grid-renderers/checkbox.renderer";

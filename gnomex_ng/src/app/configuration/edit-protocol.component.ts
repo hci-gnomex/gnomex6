@@ -80,7 +80,7 @@ import {HttpParams} from "@angular/common/http";
 export class EditProtocolComponent implements OnInit, OnDestroy, OnChanges {
 
     @Output("protocolLoaded") protocolLoaded: EventEmitter<boolean> = new EventEmitter<boolean>();
-    @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
+    @ViewChild("descEditorRef", {static: false}) descEditor: AngularEditorComponent;
     @Input() public isDialog: boolean = false;
     @Input() private selectedItem: any = null;
 

@@ -79,8 +79,8 @@ import {ConstantsService} from "../../services/constants.service";
 })
 
 export class CustomDialogComponent implements OnInit {
-    @ViewChild("anchor", { read: ViewContainerRef }) _vcr;
-    @ViewChild("topmostLeftmost") topmostLeftmost: ElementRef;
+    @ViewChild("anchor", { read: ViewContainerRef, static: false }) _vcr;
+    @ViewChild("topmostLeftmost", {static: false}) topmostLeftmost: ElementRef;
 
     public title: string = "";
     public icon: string = "";

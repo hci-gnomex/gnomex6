@@ -57,7 +57,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 export class ConfigureProductsComponent implements OnInit {
     private static CURRENCY_REGEX: RegExp = /^[0-9]*(?:\.[0-9]{0,2})?$/;
 
-    @ViewChild(TreeComponent) private treeComponent: TreeComponent;
+    @ViewChild(TreeComponent, {static: false}) private treeComponent: TreeComponent;
     private treeModel: TreeModel;
     public options: ITreeOptions;
     public nodes: ITreeNode[];

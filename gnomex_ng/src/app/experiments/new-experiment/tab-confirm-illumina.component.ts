@@ -141,7 +141,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     }
 
 
-    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
 
     public get experiment(): Experiment {
         return this._experiment;

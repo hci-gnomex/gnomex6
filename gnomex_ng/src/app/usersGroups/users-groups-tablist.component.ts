@@ -7,7 +7,6 @@ import {
     ViewChild,
 } from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
-import {URLSearchParams} from "@angular/http";
 import {MatDialogConfig, MatSnackBar, MatSnackBarConfig} from "@angular/material";
 
 import {GridOptions} from "ag-grid-community/main";
@@ -118,9 +117,9 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 })
 export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, OnDestroy {
 
-    @ViewChild("billingAccountTab") billingAccountTab: BillingAccountTabComponent;
-    @ViewChild("billingAdminTab") billingAdminTab: BillingAdminTabComponent;
-    @ViewChild("membershipTab") membershipTab: MembershipTabComponent;
+    @ViewChild("billingAccountTab", {static: false}) billingAccountTab: BillingAccountTabComponent;
+    @ViewChild("billingAdminTab", {static: false}) billingAdminTab: BillingAdminTabComponent;
+    @ViewChild("membershipTab", {static: false}) membershipTab: MembershipTabComponent;
 
     private readonly DUMMY_UNID: string = "u0000000";
     private readonly DUMMY_USERNAME: string = "_";

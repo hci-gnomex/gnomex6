@@ -67,7 +67,7 @@ export class MonthPickerComponent implements ControlValueAccessor {
 
     _customFilter: (d: Moment) => boolean;
 
-    @ViewChild(MatDatepicker) _picker: MatDatepicker<Moment>;
+    @ViewChild(MatDatepicker, {static: false}) _picker: MatDatepicker<Moment>;
 
     _inputCtrl: FormControl = new FormControl();
 

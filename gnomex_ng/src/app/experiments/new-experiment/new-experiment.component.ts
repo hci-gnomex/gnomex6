@@ -53,7 +53,7 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 })
 
 export class NewExperimentComponent implements OnDestroy, OnInit {
-    @ViewChild("setupTab") setupTab: NewExperimentSetupComponent;
+    @ViewChild("setupTab", {static: false}) setupTab: NewExperimentSetupComponent;
 
     @Output() properties = new EventEmitter<any[]>();
 

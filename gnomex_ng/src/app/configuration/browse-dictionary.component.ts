@@ -211,7 +211,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 
 export class BrowseDictionaryComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
-    @ViewChild("treeComponent") private treeComponent: TreeComponent;
+    @ViewChild("treeComponent", {static: false}) private treeComponent: TreeComponent;
     public treeOptions: ITreeOptions = {
         displayField: "display",
         childrenField: "DictionaryEntry",

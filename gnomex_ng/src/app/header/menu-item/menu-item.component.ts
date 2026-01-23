@@ -8,7 +8,7 @@ import {NavigationService} from "../../services/navigation.service";
 })
 export class MenuItemComponent implements OnInit {
     @Input() items: any[];
-    @ViewChild('childMenu') public childMenu;
+    @ViewChild('childMenu', {static: false}) public childMenu;
 
     constructor(public router: Router,
                 private navService:NavigationService) {

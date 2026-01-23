@@ -2,7 +2,7 @@
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
 import {Component, ViewChild, OnInit} from "@angular/core";
-import {Http, Response} from "@angular/http";
+import {HttpClient} from "@angular/common/http";
 import {HeaderComponent} from "./header/header.component";
 
 import {Observable} from "rxjs";
@@ -28,14 +28,14 @@ export class GnomexAppComponent implements OnInit {
     objLoaderStatus: boolean;
     private appNameTitle: string = "Gnomex";
 
-  @ViewChild(HeaderComponent)
+  @ViewChild(HeaderComponent, {static: false})
 
     private _primaryNavEnabled: Observable<boolean>;
 
     constructor(private authenticationService: AuthenticationService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dictionaryService: DictionaryService,
-                private http: Http,
+                private http: HttpClient,
                 private progressService: ProgressService,
                 private navService: NavigationService) {
         navService.trackNavState();

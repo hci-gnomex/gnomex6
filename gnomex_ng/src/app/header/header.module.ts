@@ -7,7 +7,7 @@ import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {MatDialogModule} from "@angular/material";
 import {HEADER_ROUTING} from "./header.routes";
-import {AgGridModule} from "ag-grid-angular/main";
+import {AgGridModule} from "ag-grid-angular";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {NewBillingAccountModule} from "../billing/new_billing_account/new-billing-account.module";
 

@@ -15,7 +15,7 @@ import { AngularSplitModule } from 'angular-split';
 import {BrowseExperimentsComponent} from "./browse-experiments.component";
 import {ExperimentOrdersComponent} from "./orders/experiment-orders.component";
 import {BrowsePanelComponent} from "./browse-panel.component";
-import {AgGridModule} from 'ag-grid-angular/main';
+import {AgGridModule} from 'ag-grid-angular';
 import { DynamicModule } from 'ng-dynamic-component';
 
 import {

@@ -25,7 +25,7 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
 })
 export class CollaboratorsDialogComponent extends BaseGenericContainerDialog implements AfterViewInit {
 
-    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
 
     public context: any = {
         componentParent: this

@@ -63,9 +63,9 @@ import {ImprovedSelectEditor} from "../../util/grid-editors/improved-select.edit
 
 export class TabSamplesIlluminaComponent implements OnInit {
 
-    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
-    @ViewChild('ccCheckbox') ccCheckbox: MatCheckbox;
-    @ViewChild('fileInput') fileInput: ElementRef;
+    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
+    @ViewChild('ccCheckbox', {static: false}) ccCheckbox: MatCheckbox;
+    @ViewChild('fileInput', {static: false}) fileInput: ElementRef;
 
     private emToPxConversionRate: number = 13;
 

@@ -68,9 +68,9 @@ import {UtilService} from "../services/util.service";
 })
 
 export class FlowcellAssemblyWorkflowComponent implements OnInit {
-    @ViewChild("labInput") labInput: ElementRef;
-    @ViewChild('oneEmWidth1') oneEmWidth1: ElementRef;
-    @ViewChild('oneEmWidth2') oneEmWidth2: ElementRef;
+    @ViewChild("labInput", {static: false}) labInput: ElementRef;
+    @ViewChild('oneEmWidth1', {static: false}) oneEmWidth1: ElementRef;
+    @ViewChild('oneEmWidth2', {static: false}) oneEmWidth2: ElementRef;
 
     private emToPxConversionRate1: number = 13;
     private emToPxConversionRate2: number = 13;

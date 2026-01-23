@@ -69,7 +69,7 @@ import {ActionType} from "../interfaces/generic-dialog-action.model";
 })
 export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
 
-    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
 
     private emToPxConversionRate: number = 13;
 
@@ -114,7 +114,7 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
     };
 
 
-    @ViewChild('experimentFileTree')
+    @ViewChild('experimentFileTree', {static: false})
     private experimentFileTree: TreeComponent;
 
     @Output() closeDialog = new EventEmitter<TabChangeEvent>();

@@ -45,7 +45,7 @@ import {debounceTime} from "rxjs/operators";
 })
 
 export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDestroy, ControlValueAccessor {
-    @ViewChild("input") inputElement: ElementRef;
+    @ViewChild("input", {static: false}) inputElement: ElementRef;
 
 
     @Input() public placeholder: string = "";

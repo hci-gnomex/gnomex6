@@ -77,8 +77,8 @@ import {EditProtocolComponent} from "./edit-protocol.component";
 })
 export class ManageProtocolsComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
-    @ViewChild("navigationTree") treeComponent: TreeComponent;
-    @ViewChild("editProtocolCmp") editProtocolCmp: EditProtocolComponent;
+    @ViewChild("navigationTree", {static: false}) treeComponent: TreeComponent;
+    @ViewChild("editProtocolCmp", {static: false}) editProtocolCmp: EditProtocolComponent;
 
     private protocolSubscription: Subscription;
     private protocolListSubscription: Subscription;

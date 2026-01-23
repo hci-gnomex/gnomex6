@@ -34,12 +34,12 @@ import {FlowcellWorkflowComponent} from "./flowcell-workflow.component";
     `]
 })
 export class WorkflowComponent implements OnInit, AfterViewInit {
-    @ViewChild('qcWorkflow') qcWorkflow: QcWorkflowComponent;
-    @ViewChild('libPrepWorkflow') libPrepWorkflow: LibprepWorkflowComponent;
-    @ViewChild('libPrepQcWorkflow') libPrepQcWorkflow: LibprepQcWorkflowComponent;
-    @ViewChild('flowCellAssmWorkflow') flowCellAssmWorkflow: FlowcellAssemblyWorkflowComponent;
-    @ViewChild('finalizeWorkflow') finalizeWorkflow: FinalizeWorkflowComponent;
-    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    @ViewChild('qcWorkflow', {static: false}) qcWorkflow: QcWorkflowComponent;
+    @ViewChild('libPrepWorkflow', {static: false}) libPrepWorkflow: LibprepWorkflowComponent;
+    @ViewChild('libPrepQcWorkflow', {static: false}) libPrepQcWorkflow: LibprepQcWorkflowComponent;
+    @ViewChild('flowCellAssmWorkflow', {static: false}) flowCellAssmWorkflow: FlowcellAssemblyWorkflowComponent;
+    @ViewChild('finalizeWorkflow', {static: false}) finalizeWorkflow: FinalizeWorkflowComponent;
+    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
 
     public showNav: boolean = true;
     public microarrayDisabled: boolean = true;

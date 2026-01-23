@@ -80,7 +80,7 @@ export class UploadViewRemoveRenderer implements ICellRendererAngularComp {
     public file: any;
     public disableEdit: boolean = false;
 
-    @ViewChild('fileInput') fileInput: ElementRef;
+    @ViewChild('fileInput', {static: false}) fileInput: ElementRef;
 
     constructor(private poFormService: BillingPOFormService,
                 private dialogService: DialogsService) {}

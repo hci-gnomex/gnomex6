@@ -62,7 +62,7 @@ import {DialogsService} from "../popup/dialogs.service";
 })
 export class DateEditor implements AfterViewInit, ICellEditorAngularComp {
 
-	@ViewChild('picker') picker: MatDatepicker<Date>;
+	@ViewChild('picker', {static: false}) picker: MatDatepicker<Date>;
 
 	params: any;
 	value: string;

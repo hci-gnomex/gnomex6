@@ -232,9 +232,9 @@ import {FormBuilder, FormGroup} from "@angular/forms";
 })
 export class CustomInputComponent implements AfterViewInit {
 
-    @ViewChild("myInput")   myInput:   ElementRef;
-    @ViewChild("myLabel")   myLabel:   ElementRef;
-    @ViewChild("myTooltip") myTooltip: ElementRef;
+    @ViewChild("myInput", {static: false})   myInput:   ElementRef;
+    @ViewChild("myLabel", {static: false})   myLabel:   ElementRef;
+    @ViewChild("myTooltip", {static: false}) myTooltip: ElementRef;
 
     @Input("type")        type: string = 'text';
 

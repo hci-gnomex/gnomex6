@@ -55,7 +55,7 @@ export class MultipleLineTextRenderer implements ICellRendererAngularComp {
 
     value: string[];
 
-    @ViewChild('totalHeightSource') totalHeightSource: ElementRef;
+    @ViewChild('totalHeightSource', {static: false}) totalHeightSource: ElementRef;
 
     agInit(params: any): void {
         this.params = params;
