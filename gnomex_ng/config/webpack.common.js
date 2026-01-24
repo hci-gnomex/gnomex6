@@ -1,7 +1,7 @@
 const Webpack = require("webpack");
 const Helpers = require("./helpers");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = () => {
@@ -53,12 +53,12 @@ module.exports = () => {
                 },
                 {
                     test: /\.css$/,
-                    use: ExtractTextPlugin.extract({fallback: "style-loader", use: "css-loader?sourceMap"}),
+                    use: [MiniCssExtractPlugin.loader, "css-loader?sourceMap"],
                     exclude: [Helpers.root("src", "assets")]
                 },
                 {
                     test: /\.less$/,
-                    use: ExtractTextPlugin.extract({use: ["css-loader", "less-loader"], fallback: "style-loader"})
+                    use: [MiniCssExtractPlugin.loader, "css-loader", "less-loader"]
                 },
                 {
                     test: /\.scss$/,
@@ -108,21 +108,22 @@ module.exports = () => {
             new HtmlWebpackPlugin({
                 template: "src/index.html",
             }),
-            new CopyWebpackPlugin([
-                {
-                    from: "src/favicon.ico",
-                    to: "favicon.ico"
-                },
-                {
-                    from: "src/assets",
-                    to: "assets"
-                },
-                {
-                    from: "src/data",
-                    to: "data"
-                }
-            ]),
-            new Webpack.NamedModulesPlugin(),
+            new CopyWebpackPlugin({
+                patterns: [
+                    {
+                        from: "src/favicon.ico",
+                        to: "favicon.ico"
+                    },
+                    {
+                        from: "src/assets",
+                        to: "assets"
+                    },
+                    {
+                        from: "src/data",
+                        to: "data"
+                    }
+                ]
+            }),
             new Webpack.ProvidePlugin({
                 $: "jquery",
                 jQuery: "jquery",

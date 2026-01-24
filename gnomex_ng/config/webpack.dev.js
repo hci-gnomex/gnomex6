@@ -1,5 +1,5 @@
 const DefinePlugin = require("webpack/lib/DefinePlugin");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const Helpers = require("./helpers");
 const LoaderOptionsPlugin = require("webpack/lib/LoaderOptionsPlugin");
 //const Visualizer = require('webpack-visualizer-plugin');
@@ -17,7 +17,9 @@ module.exports = (options) => {
             sourceMapFilename: "[file].map"
         },
         plugins: [
-            new ExtractTextPlugin("[name].css"),
+            new MiniCssExtractPlugin({
+                filename: "[name].css"
+            }),
             //new Visualizer(),
             new LoaderOptionsPlugin({
                 debug: true,

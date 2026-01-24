@@ -1,5 +1,5 @@
 const DefinePlugin = require("webpack/lib/DefinePlugin");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const Helpers = require("./helpers");
 const LoaderOptionsPlugin = require("webpack/lib/LoaderOptionsPlugin");
 const OptimizeJsPlugin = require("optimize-js-plugin");
@@ -22,7 +22,9 @@ module.exports = function (options) {
             new OptimizeJsPlugin({
                 sourceMap: false
             }),
-            new ExtractTextPlugin("[name].[contenthash].css"),
+            new MiniCssExtractPlugin({
+                filename: "[name].[contenthash].css"
+            }),
             new DefinePlugin({
                 "ENV": JSON.stringify(Env),
                 "process.env": {

@@ -1,4 +1,4 @@
-const WebpackMerge = require("webpack-merge");
+const { merge } = require("webpack-merge");
 const CommonConfig = require("./config/webpack.common.js");
 const DevConfig = require("./config/webpack.dev");
 const TestConfig = require("./config/webpack.test");
@@ -13,11 +13,11 @@ module.exports = (env) => {
         case 'prod':
         case 'production':
         case 'productionTomcat':
-            return WebpackMerge(CommonConfig(), ProdConfig({env: 'production', publicPath: publicPath}));
+            return merge(CommonConfig(), ProdConfig({env: 'production', publicPath: publicPath}));
         case 'dev':
         case 'development':
         case 'developmentTomcat':
         default:
-            return WebpackMerge(CommonConfig(), DevConfig({env: 'development', publicPath: publicPath}));
+            return merge(CommonConfig(), DevConfig({env: 'development', publicPath: publicPath}));
     }
 };

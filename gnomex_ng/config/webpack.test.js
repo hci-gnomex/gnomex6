@@ -44,8 +44,8 @@ module.exports = (options) => {
                     test: /\.ts$/,
                     use: [
                         {
-                            use: "awesome-typescript-loader",
-                            query: {
+                            loader: "awesome-typescript-loader",
+                            options: {
                                 /**
                                  * Use inline sourcemaps for "karma-remap-coverage" reporter
                                  */
