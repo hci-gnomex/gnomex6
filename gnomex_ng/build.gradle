@@ -30,7 +30,7 @@ tasks.register('buildWebpackDevWDS', NpmTask) {
 }
 
 tasks.register('buildWebpackDevTomcat', NpmTask) {
-    dependsOn(npmInstall)
+//    dependsOn(npmInstall)
     args = ['run', 'build:dev:tomcat']
 }
 

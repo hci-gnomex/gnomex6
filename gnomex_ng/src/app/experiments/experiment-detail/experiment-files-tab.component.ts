@@ -45,7 +45,7 @@ import {UtilService} from "../../services/util.service";
 })
 export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
 
-    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
 
     private emToPxConversionRate: number = 13;
 

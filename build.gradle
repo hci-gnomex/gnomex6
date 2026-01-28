@@ -3,7 +3,11 @@ import org.apache.tools.ant.filters.FixCrLfFilter;
 buildscript {
     repositories {
         maven {
-            url 'https://ri-artifact-new.hci.utah.edu/artifactory/libs-release'
+            credentials {
+                username = 'u0974549'
+                password = 'AP6b32YbsxUzayr5KPBeNziaTrVispH4d4ejJ9'
+            }
+            url 'https://registry.npmjs.org/'
         }
 
     }
@@ -24,6 +28,10 @@ apply from: 'common.gradle'
 
 repositories {
     maven {
+        credentials {
+            username = 'u0974549'
+            password = 'AP6b32YbsxUzayr5KPBeNziaTrVispH4d4ejJ9'
+        }
          url 'https://ri-artifact-new.hci.utah.edu/artifactory/libs-release'
     }
 
@@ -175,7 +183,7 @@ task adjustShiroForWindows() {
 
 task buildWar(type: GradleBuild) {
     mustRunAfter(adjustShiroForWindows, adjustShiroForLinux)
-    tasks = ['cleanTomcat', 'makeSQLServer', 'jar', 'clientJar', 'copyScripts', 'copyTomcatJars', 'war']
+    tasks = ['makeSQLServer', 'jar', 'clientJar', 'copyScripts', 'copyTomcatJars', 'war']
 }
 
 task buildWarOpensource(type: GradleBuild) {
@@ -251,7 +259,7 @@ war {
     manifest {
         attributes(
                 'Built-By': 'u0974549',
-                'Implementation-Version': "6.26.12 (07/06/2025)",
+                'Implementation-Version': "6.26.19 (01/26/2026)",
                 'Dependencies': 'org.dom4j, org.apache.log4j'
         )
     }

@@ -14,6 +14,7 @@ import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
 import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
 import {ActionType} from "./interfaces/generic-dialog-action.model";
 import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
+//import {TreeOptions} from "angular-tree-component/dist/models/tree-options.model";
 
 @Component({
     template: `
@@ -165,14 +166,14 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 })
 export class DownloadFilesComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
-    @ViewChild("availableFilesTreeComponent") private availableFilesTreeComponent: TreeComponent;
+    @ViewChild("availableFilesTreeComponent", {static: false}) private availableFilesTreeComponent: TreeComponent;
     public availableFilesNodes: any[] = [];
     public availableFilesCount: number = 0;
 
-    @ViewChild("filesToDownloadTreeComponent") private filesToDownloadTreeComponent: TreeComponent;
+    @ViewChild("filesToDownloadTreeComponent", {static: false}) private filesToDownloadTreeComponent: TreeComponent;
     public filesToDownloadNodes: any[] = [];
     public filesToDownloadCount: number = 0;
-    private filesToDownloadSize: number = 0;
+    public filesToDownloadSize: number = 0;
     public maxsize: number = 4000000000;
     public filesToDownloadSizeLabel: string = "";
 
@@ -230,9 +231,9 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
                             this.treeMostRecentlySelectedFrom = tree
                         }
                     }
-                },
-            },
-        };
+                },   //  mouse
+            },  // actionMapping
+        };  // filesOptions
 
         if (this.data) {
             this.showCreateSoftLinks = this.data.showCreateSoftLinks;
@@ -255,7 +256,7 @@ setTimeout(() => {
     
             this.changeDetector.markForCheck();
 });
-        }
+        }  // end if (this.data)
 
         if (this.securityAdvisor.isGuest) {
 setTimeout(() => {
@@ -298,7 +299,7 @@ setTimeout(() => {
         this.filesToDownloadCount = this.countFilesRecursively(this.filesToDownloadNodes[0], true);
         this.filesToDownloadSize = this.countFileSizeRecursively(this.filesToDownloadNodes[0], true);
         if (this.filesToDownloadSize > this.maxsize) {
-            this.dialogsService.alert("Download size exceeds 2 TB limit", null, DialogType.WARNING);
+            this.dialogsService.alert("Download size exceeds 4 GB limit", null, DialogType.WARNING);
         }
         this.filesToDownloadSizeLabel = FileService.formatFileSize(this.filesToDownloadSize);
 });
