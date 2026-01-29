@@ -1,0 +1,15 @@
+<mat-form-field>
+    <input matInput
+           [formControl]="this.innerDateFC"
+           [matDatepicker]="datePicker"
+           placeholder="{{ placeholder }}"
+           required="{{ required }}"
+           (dateChange)="onChange()"
+           [disabled]="textInputDisabled">
+    <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+    <mat-datepicker #datePicker [disabled]="datePickerDisabled"></mat-datepicker>
+    <mat-error  *ngIf="this.innerDateFC.hasError('required')">
+        '{{  placeholder }}' is required
+    </mat-error>
+
+</mat-form-field>

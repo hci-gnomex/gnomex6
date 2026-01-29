@@ -1,0 +1,54 @@
+<div class="annot-border flex-column-container">
+
+    <label class="annot-label" for="mainURL"> {{annot?.name}}</label>
+    <div *ngFor="let annot of urlAnnotations; let i = index " >
+        <div [hidden]="!annot.edit" style="display:flex">
+            <mat-form-field style="margin-right:.5em;" >
+                <input matInput
+                       (blur)="onTouched()"
+                       [disabled]="urlDisabled"
+                       [(ngModel)]="annot.urlAlias"
+                       (ngModelChange)="onChange(annot)"
+                       placeholder="name" />
+            </mat-form-field>
+            <mat-form-field>
+                <input matInput
+                       (blur)="onTouched()"
+                       [disabled]="urlDisabled"
+                       [(ngModel)]="annot.url" placeholder="URL"
+                       (ngModelChange)="onChange(annot)"/>
+            </mat-form-field>
+
+            <button mat-button  [disabled]="urlDisabled" (click)="toggleMode(annot)"> edit </button>
+        </div>
+        <div [hidden]="annot.edit" style="display:flex; justify-content: space-between;">
+            <a [href]="annot.url" target="_blank"> {{annot.urlAlias}}</a>
+            <div>
+                <button [disabled]="urlDisabled"  mat-button color="primary" (click)="toggleMode(annot)"> show </button>
+                <button [disabled]="urlDisabled"  mat-button color="warn" (click)="removeLink(i)"> remove </button>
+            </div>
+
+        </div>
+
+    </div>
+    <div style="display:flex" >
+        <mat-form-field style="margin-right: .5em;">
+            <input  id="mainURL"
+                    [(ngModel)]="alias"
+                    (blur)="onTouched()"
+                    [disabled]="urlDisabled"
+                    matInput
+                    placeholder="alias"  />
+        </mat-form-field>
+        <mat-form-field>
+            <input [(ngModel)]="url"
+                   (blur)="onTouched()"
+                   [disabled]="urlDisabled"
+                   matInput
+                   placeholder="URL"  />
+        </mat-form-field>
+
+        <button mat-button [disabled]="urlDisabled" (click)="makeLink()"> add  </button>
+    </div>
+
+</div>

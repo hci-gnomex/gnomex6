@@ -1,0 +1,787 @@
+
+<div class="full-width full-height padded small-font">
+    <form [formGroup]="form" class="full-width full-height">
+        <div class="full-width full-height">
+            <ol *ngIf="!useXeniumMode &&!useIsolationTypeMode && !useSliceMode && !useNanoGeomxMode" class="full-width three-depth-numbering">
+                <li *ngIf="showSampleQualityExperimentType" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Select a sample quality Experiment Type.
+                        </div>
+                        <div>
+                            <mat-radio-group class="flex-container-col"
+                                             formControlName="selectedApp"
+                                             (change)="onAppChange($event)">
+                                <div *ngFor="let app of filteredApplications">
+                                    <mat-radio-button [value]="app">
+                                        <div class="short-width">
+                                            {{app.display}}
+                                        </div>
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                </li>
+                <li *ngIf="showSequenomExperimentType" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline double-left-padded">
+                        <div class="heading">
+                            Select an Experiment Type.
+                        </div>
+                        <div>
+                            <mat-radio-group class="flex-container-col"
+                                             formControlName="selectedApp"
+                                             (change)="onAppChange($event)">
+                                <div *ngFor="let app of filteredApplications">
+                                    <mat-radio-button [value]="app">
+                                        <div class="inline-block short-width">
+                                            {{ app.display }}
+                                        </div>
+                                        <div class="inline-block" *ngIf="app.samplesPerBatch && app.samplesPerBatch !== '1'">
+                                            {{ app.samplesPerBatch }} samples/batch
+                                        </div>
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                            <div *ngIf="form?.get('selectedApp')?.value?.codeApplication === 'OTHER'" class="double-padded flex-container-row align-baseline">
+                                <div class="padded-left-right">
+                                    Please specify :
+                                </div>
+                                <mat-form-field>
+                                    <input matInput
+                                           placeholder=""
+                                           formControlName="customSpecification"
+                                           (change)="onChange_otherSpecification($event)">
+                                    <mat-error *ngIf="form?.get('customSpecification')?.hasError('required')">
+                                        Please explain
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li *ngIf="showDefaultSampleNumber" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            How many samples will be sequenced in this experiment order?
+                        </div>
+                        <mat-form-field>
+                            <input matInput
+                                   placeholder="Number of samples."
+                                   formControlName="numSamples"
+                                   maxlength="4"
+                                   required
+                                   (change)="onChange_numberOfSamples($event)">
+                            <mat-error *ngIf="form?.get('numSamples')?.hasError('pattern')">
+                                Please check number of samples
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Which category best describes your samples?
+                        </div>
+                        <div>
+                            <div *ngIf="filteredSampleTypeListRna && filteredSampleTypeListRna?.length > 0 && filteredSampleTypeListDna && filteredSampleTypeListDna?.length > 0" class="normal-size-font title">
+                                DNA
+                            </div>
+                            <mat-radio-group class="flex-container-col"
+                                             formControlName="selectedDna"
+                                             (change)="onDnaChange($event)">
+                                <div *ngFor="let dnaCategory of filteredSampleTypeListDna">
+                                    <mat-radio-button [value]="dnaCategory">
+                                        <div class="short-width">
+                                            {{dnaCategory.display}}
+                                       </div>
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                        <div>
+                            <div *ngIf="filteredSampleTypeListRna && filteredSampleTypeListRna?.length > 0 && filteredSampleTypeListDna && filteredSampleTypeListDna?.length > 0" class="normal-size-font title">
+                                RNA
+                            </div>
+                            <mat-radio-group class="flex-container-col"
+                                             formControlName="selectedRna"
+                                             (change)="onRnaChange($event)">
+                                <div *ngFor="let rnaCategory of filteredSampleTypeListRna">
+                                    <mat-radio-button [value]="rnaCategory">
+                                        <div class="short-width">
+                                            {{rnaCategory.display}}
+                                        </div>
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+
+                        <div *ngIf="!showSampleQualityExperimentType" >
+                            <div *ngIf="filteredSampleTypeListSuspension && filteredSampleTypeListSuspension?.length > 0" class="normal-size-font title">
+                                Suspension
+                            </div>
+                            <mat-radio-group class="flex-container-col"
+                                             formControlName="selectedSuspension"
+                                             (change)="onSuspensionChange($event)">
+                                <div *ngFor="let suspensionCategory of filteredSampleTypeListSuspension">
+                                    <mat-radio-button [value]="suspensionCategory">
+                                        <div class="short-width">
+                                            {{suspensionCategory.display}}
+                                        </div>
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+                        <div *ngIf="!showSampleQualityExperimentType">
+                            <div *ngIf="filteredSampleTypeListSection && filteredSampleTypeListSection?.length > 0" class="normal-size-font title">
+                                Tissue Section
+                            </div>
+                            <mat-radio-group class="flex-container-col"
+                                             formControlName="selectedSection"
+                                             (change)="onSectionChange($event)">
+                                <div *ngFor="let sectionCategory of filteredSampleTypeListSection">
+                                    <mat-radio-button [value]="sectionCategory">
+                                        <div class="short-width">
+                                            {{sectionCategory.display}}
+                                        </div>
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                        </div>
+
+                    </div>
+                </li>
+                <li *ngIf="!showDefaultSampleNumber" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            How many samples will you be submitting?
+                        </div>
+                        <mat-form-field>
+                            <input matInput
+                                   placeholder="Number of samples."
+                                   formControlName="numSamples"
+                                   maxlength="4"
+                                   required
+                                   (change)="onChange_numberOfSamples($event)">
+                            <mat-error *ngIf="form?.get('numSamples')?.hasError('pattern')">
+                                Please check number of samples
+                            </mat-error>
+                        </mat-form-field>
+                        <div *ngIf="showSpecialSampleNumberBatchWarning" class="double-left-padded green">
+                            You have selected a panel which runs in batches of {{ form.get('selectedApp').value.samplesPerBatch }} samples. Please note you will be responsible to pay for unused wells.
+                        </div>
+                    </div>
+                </li>
+                <li *ngIf="showSampleNotes" class="full-width align-baseline">
+                    <div class="full-width">
+                        <div class="full-width flex-container-row align-baseline">
+                            <div class="heading">
+                                Sample Type Note
+                            </div>
+                        </div>
+                        <mat-form-field class="long-width">
+                            <textarea matInput
+                                      matTextareaAutosize
+                                      formControlName="sampleTypeNotes"
+                                      matAutosizeMinRows="1"
+                                      matAutosizeMaxRows="5">
+                            </textarea>
+                        </mat-form-field>
+                    </div>
+                </li>
+                <li *ngIf="showSequenomExperimentType" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline double-left-padded">
+                        <div class="heading">
+                            The samples will be delivered in what container?
+                        </div>
+                        <div>
+                            <mat-radio-group class="flex-container-col"
+                                             (change)="onContainerChange($event)">
+                                <span class="padded">
+                                    <mat-radio-button checked [value]="'TUBE'">
+                                        <div class="inline-block short-width">
+                                            Tubes
+                                        </div>
+                                    </mat-radio-button>
+                                </span>
+                                <span class="padded">
+                                    <mat-radio-button [value]="'PLATE'">
+                                        <div class="inline-block short-width">
+                                            Plates
+                                        </div>
+                                    </mat-radio-button>
+                                </span>
+                            </mat-radio-group>
+                        </div>
+                    </div>
+                </li>
+                <li *ngIf="showSequenomExperimentType && showNumberPlatesPrompt" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline double-left-padded">
+                        <div class="heading">
+                            How many source plates will you be submitting?
+                        </div>
+                        <mat-form-field>
+                            <input matInput
+                                   placeholder="Number of plates"
+                                   formControlName="numPlates"
+                                   (change)="onChange_numberOfPlates($event)">
+                            <mat-error *ngIf="form?.get('numPlates')?.hasError('pattern')">
+                                Please check number of plates
+                            </mat-error>
+                            <mat-error *ngIf="form?.get('numPlates')?.hasError('requireNumberPlatesIfShownAndAvailableOptions_AND_checkMinimumNeededPlates')">
+                                You will need at least {{ numberOfNecessaryPlates }} for this number of samples (96 samples/plate)
+                            </mat-error>
+                            <mat-error *ngIf="form?.get('numPlates')?.hasError('maximum')">
+                                The maximum number of plates supported is twelve
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+                <li *ngIf="allPlates && allPlates.length > 0" class="full-width align-baseline">
+                    <div class="full-width double-left-padded">
+                        <div class="heading">
+                            Name your plates :
+                        </div>
+                        <div class="full-width">
+                            <div *ngFor="let plate of allPlates" class="inline-block padded">
+                                <div class="inline-block minwidth">
+                                    {{ plate.label }}
+                                </div>
+                                <div class="inline-block">
+                                    <mat-form-field>
+                                        <input matInput
+                                               placeholder="Plate name"
+                                               [value]="plate.plateName"
+                                               (change)="onChangePlateName($event, plate)">
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <li *ngIf="showOrganism" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Which organism is the source for these samples?
+                            <context-help name="SampleDetailsOrganism"
+                                          [hasEditPermission]="this.securityAdvisor.isAdmin"
+                                          [idCoreFacility]="this.idCoreFacility"
+                                          popupTitle="Sample Organism Help">
+                            </context-help>
+                        </div>
+                        <div class="moderate-width">
+                            <custom-combo-box placeholder="Organism"
+                                              displayField="combinedName"
+                                              [options]="this.organisms"
+                                              [formControlName]="'organism'"
+                                              [allowNone]="false"
+                                              (optionSelected)="selectOrganism($event)">
+                            </custom-combo-box>
+                        </div>
+                    </div>
+                </li>
+                <li *ngIf="showSamplePurification" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Please provide details on Sample Purification methods:
+                        </div>
+                        <ol class="flex-grow">
+                            <li class="full-width align-baseline">
+                                <div class="full-width flex-container-row align-baseline">
+                                    <mat-form-field class="moderate-width">
+                                        <input matInput formControlName="reagent" (change)="onReagentChanged($event)" placeholder="Specify the kit or reagents used for the purification of the samples you will be submitting." required>
+                                        <mat-error *ngIf="form?.get('reagent')?.hasError('required')">Reagent name is required.</mat-error>
+                                        <mat-error *ngIf="form?.get('reagent')?.hasError('maxlength')">Reagent name too long, cannot be saved.</mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </li>
+                            <li *ngIf="showElution" class="full-width align-baseline">
+                                <div class="full-width flex-container-row align-baseline">
+                                    <mat-form-field class="moderate-width">
+                                        <input matInput formControlName="elution" (change)="onElutionChanged($event)" placeholder="Specify the elution buffer used for the purification of the samples you will be submitting." required>
+                                        <mat-error *ngIf="form?.get('reagent')?.hasError('required')">Elution buffer name is required.</mat-error>
+                                        <mat-error *ngIf="form?.get('reagent')?.hasError('maxlength')">Elution buffer name too long, cannot be saved.</mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </li>
+                            <li *ngIf="this.newExperimentService.currentState !== 'QCState' && (showDnaseBox || showRnaseBox)" class="full-width align-baseline">
+                                <div class="full-width align-baseline">
+                                    <mat-checkbox *ngIf="showDnaseBox" formControlName="dnaseBox" (change)="onDnaseChanged($event)">Click if RNA samples were treated with DNase</mat-checkbox>
+                                    <mat-checkbox *ngIf="showRnaseBox" formControlName="rnaseBox" (change)="onRnaseChanged($event)">Click if DNA samples were treated with RNase</mat-checkbox>
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
+                </li>
+                <li *ngIf="showKeepSample" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Would you like to retrieve leftover sample from the core facility following completion of the work?
+                        </div>
+                        <mat-radio-group class="flex-grow flex-container-col" (change)="onKeepChange($event)" formControlName="keepSample" required>
+                            <mat-radio-button value="1">Yes (leftover samples will be retained for 90 days)</mat-radio-button>
+                            <mat-radio-button value="2">No (leftover samples will be discarded)</mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                </li>
+                <li *ngIf="showSamplePrepContainer" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Specify the nucleic acid extraction method. {{ requireSamplePrepContainer ? ' (required)' : '' }}
+                        </div>
+                        <mat-form-field class="moderate-width" [floatLabel]="auto">
+                            <input matInput
+                                   formControlName="extractionMethod"
+                                   placeholder="Extraction Method"
+                                   [required]="requireSamplePrepContainer"
+                                   (change)="onExtractionMethodChanged($event)">
+                        </mat-form-field>
+                    </div>
+                </li>
+                <li *ngIf="showBioAnalyzerChipTypeGrid" class="full-width align-baseline">
+                    <div class="full-width flex-container-row">
+                        <div class="heading">
+                            Select a QC Assay.
+                        </div>
+                        <div style="display:grid;" class="flex-grow minimum-height-grid ">
+                            <div>
+                                <div #oneEmWidth class="no-height single-em"></div>
+                                <ag-grid-angular class="ag-theme-fresh full-height full-width"
+                                                 [rowSelection]="'single'"
+                                                 [enableColResize]="true"
+                                                 [gridOptions]="bioanalyzerGridOptions"
+                                                 (gridReady)="this.onGridReady($event)">
+                                </ag-grid-angular>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <div *ngIf="showQcInstructions" class="full-width flex-container-row align-baseline">
+                    <div class="flex-grow double-padded horizontal-center blue">
+                        {{ qcInstructions }}
+                    </div>
+                </div>
+                <li class="full-width align-baseline">
+                    <div class="full-width">
+                        <div class="full-width flex-container-row align-baseline">
+                            <div class="heading">
+                                Enter a note for the Core facility
+                            </div>
+                        </div>
+                        <mat-form-field class="long-width">
+                            <textarea matInput
+                                      matTextareaAutosize
+                                      placeholder="Note"
+                                      formControlName="coreNotes"
+                                      matAutosizeMinRows="1"
+                                      matAutosizeMaxRows="10"
+                                      (input)="onInputCoreFacilityNotes($event)">
+                            </textarea>
+                            <mat-error *ngIf="form?.get('coreNotes')?.hasError('maxlength')">Notes can not be over 5000 characters.</mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+            </ol>
+            <ol *ngIf="useIsolationTypeMode && !useSliceMode && !useNanoGeomxMode  && !useXeniumMode" class="full-width three-depth-numbering">
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            How many samples will you be submitting?
+                        </div>
+                        <mat-form-field>
+                            <input matInput
+                                   placeholder="Number of samples."
+                                   formControlName="numSamples"
+                                   maxlength="4"
+                                   required
+                                   (change)="onChange_numberOfSamples($event)">
+                            <mat-error *ngIf="form?.get('numSamples')?.hasError('pattern')">
+                                Please check number of samples
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Select the extraction type.
+                        </div>
+                        <mat-radio-group class="flex-container-col"
+                                         formControlName="selectedIsolationExtractionMethod"
+                                         (change)="onSelectedIsolationExtractionMethod($event)">
+                            <mat-radio-button [value]="'DNA'">
+                                <div class="short-width">
+                                    DNA
+                                </div>
+                            </mat-radio-button>
+                            <mat-radio-button [value]="'RNA'">
+                                <div class="short-width">
+                                    RNA
+                                </div>
+                            </mat-radio-button>
+                            <mat-radio-button [value]="'BOTH'">
+                                <div class="short-width">
+                                    BOTH
+                                </div>
+                            </mat-radio-button>
+                        </mat-radio-group>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Would you like the core to measure the concentration by Qubit Pico Green?
+                        </div>
+                        <mat-checkbox formControlName="addQubit" (change)="onDnaseChanged($event)">Yes</mat-checkbox>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Select the isolation method.
+                        </div>
+                        <mat-radio-group *ngIf="isolationTypes"
+                                         class="flex-container-col"
+                                         formControlName="selectedIsolationType"
+                                         (change)="onChangeIsolationType($event)">
+                            <mat-radio-button *ngFor="let isolationType of isolationTypes" [value]="isolationType">
+                                <div class="short-width">
+                                    {{ isolationType.display }}
+                                </div>
+                            </mat-radio-button>
+                        </mat-radio-group>
+                        <div *ngIf="!isolationTypes || isolationTypes.length === 0" class="flex-grow green">
+                            There are currently no prep types that use the selected extraction type
+                        </div>
+                    </div>
+                </li>
+                <li *ngIf="showNotifyBMP" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Notify BMP to pickup samples when completed?
+                        </div>
+                        <mat-checkbox formControlName="notifyBMP" (change)="onChangeBMPPickup($event)">Yes</mat-checkbox>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Select the sample source.
+                        </div>
+                        <div class="moderate-width">
+                            <custom-combo-box placeholder="Sample Source"
+                                              [allowNone]="false"
+                                              displayField="display"
+                                              [options]="this.sampleSources"
+                                              [formControlName]="'sampleSource'"
+                                              (optionSelected)="onSelectSampleSource($event)">
+                            </custom-combo-box>
+                        </div>
+                    </div>
+                </li>
+                <li *ngIf="showDownstreamAnalysis" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Select downstream analysis.
+                        </div>
+                        <div class="moderate-width">
+                            <custom-combo-box placeholder="Downstream Analysis"
+                                              [allowNone]="false"
+                                              displayField="display"
+                                              [options]="this.downstreamAnalysis"
+                                              [formControlName]="'downstreamAnalysis'"
+                                              (optionSelected)="onSelectDownstreamAnalysis($event)">
+                            </custom-combo-box>
+                        </div>
+                    </div>
+                </li>
+
+                <li class="full-width align-baseline">
+                    <div class="full-width">
+                        <div class="full-width flex-container-row align-baseline">
+                            <div class="heading">
+                                Enter a note for the Core facility
+                            </div>
+                        </div>
+                        <mat-form-field class="long-width">
+                            <textarea matInput
+                                      matTextareaAutosize
+                                      placeholder="Note"
+                                      formControlName="coreNotes"
+                                      matAutosizeMinRows="1"
+                                      matAutosizeMaxRows="10"
+                                      (input)="onInputCoreFacilityNotes($event)">
+                            </textarea>
+                            <mat-error *ngIf="form?.get('coreNotes')?.hasError('maxlength')">Notes can not be over 5000 characters.</mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+            </ol>
+            <ol *ngIf="useSliceMode && !useNanoGeomxMode && !useXeniumMode" class="full-width three-depth-numbering">
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            How many samples will you be submitting?
+                        </div>
+                        <mat-form-field>
+                            <input matInput
+                                   placeholder="Number of samples."
+                                   formControlName="numSamples"
+                                   maxlength="4"
+                                   required
+                                   (change)="onChange_numberOfSamples($event)">
+                            <mat-error *ngIf="form?.get('numSamples')?.hasError('pattern')">
+                                Please check number of samples
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Number of slides?
+                        </div>
+                        <mat-form-field>
+                            <input matInput
+                                   placeholder="Number of slides."
+                                   formControlName="numdisSlides"
+                                   maxlength="4"
+                                   required
+                                   (change)="onChange_numberOfdisSlides($event)">
+                            <mat-error *ngIf="form?.get('numdisSlides')?.hasError('pattern')">
+                                Please check number of slides
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Select the sample type.
+                        </div>
+                        <div class="moderate-width">
+                            <custom-combo-box placeholder="Sample Type"
+                                              [allowNone]="false"
+                                              displayField="display"
+                                              [options]="this.sampleTypes"
+                                              [formControlName]="'sampleType'"
+                                              (optionSelected)="onSelectSampleType($event)">
+                            </custom-combo-box>
+                        </div>
+                    </div>
+                </li>
+                <li *ngIf="showNotifyBMP" class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Notify BMP to pickup samples when completed?
+                        </div>
+                        <mat-checkbox formControlName="notifyBMP" (change)="onChangeBMPPickup($event)">Yes</mat-checkbox>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Select the sample source.
+                        </div>
+                        <div class="moderate-width">
+                            <custom-combo-box placeholder="Sample Source"
+                                              [allowNone]="false"
+                                              displayField="display"
+                                              [options]="this.sampleSources"
+                                              [formControlName]="'sampleSource'"
+                                              (optionSelected)="onSelectSampleSource($event)">
+                            </custom-combo-box>
+                        </div>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width">
+                        <div class="full-width flex-container-row align-baseline">
+                            <div class="heading">
+                                Enter a note for the Core facility
+                            </div>
+                        </div>
+                        <mat-form-field class="long-width">
+                            <textarea matInput
+                                      matTextareaAutosize
+                                      placeholder="Note"
+                                      formControlName="coreNotes"
+                                      matAutosizeMinRows="1"
+                                      matAutosizeMaxRows="10"
+                                      (input)="onInputCoreFacilityNotes($event)">
+                            </textarea>
+                            <mat-error *ngIf="form?.get('coreNotes')?.hasError('maxlength')">Notes can not be over 5000 characters.</mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+            </ol>
+            <ol *ngIf="useNanoGeomxMode && !useXeniumMode" class="full-width three-depth-numbering">
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            How many samples will you be submitting?
+                        </div>
+                        <mat-form-field>
+                            <input matInput
+                                   placeholder="Number of samples."
+                                   formControlName="numSamples"
+                                   maxlength="4"
+                                   required
+                                   (change)="onChange_numberOfSamples($event)">
+                            <mat-error *ngIf="form?.get('numSamples')?.hasError('pattern')">
+                                Please check number of samples
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Number of slides?
+                        </div>
+                        <mat-form-field>
+                            <input matInput
+                                   placeholder="Number of slides."
+                                   formControlName="numdisSlides"
+                                   maxlength="4"
+                                   required
+                                   (change)="onChange_numberOfdisSlides($event)">
+                            <mat-error *ngIf="form?.get('numdisSlides')?.hasError('pattern')">
+                                Please check number of slides
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Which organism is the source for these samples?
+                            <context-help name="SampleDetailsOrganism"
+                                          [hasEditPermission]="this.securityAdvisor.isAdmin"
+                                          [idCoreFacility]="this.idCoreFacility"
+                                          popupTitle="Sample Organism Help">
+                            </context-help>
+                        </div>
+                        <div class="moderate-width">
+                            <custom-combo-box placeholder="Organism"
+                                              displayField="combinedName"
+                                              [options]="this.organisms"
+                                              [formControlName]="'organism'"
+                                              (optionSelected)="selectOrganism($event)">
+                            </custom-combo-box>
+                        </div>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width">
+                        <div class="full-width flex-container-row align-baseline">
+                            <div class="heading">
+                                Enter a note for the Core facility
+                            </div>
+                        </div>
+                        <mat-form-field class="long-width">
+                            <textarea matInput
+                                      matTextareaAutosize
+                                      placeholder="Note"
+                                      formControlName="coreNotes"
+                                      matAutosizeMinRows="1"
+                                      matAutosizeMaxRows="10"
+                                      (input)="onInputCoreFacilityNotes($event)">
+                            </textarea>
+                            <mat-error *ngIf="form?.get('coreNotes')?.hasError('maxlength')">Notes can not be over 5000 characters.</mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+            </ol>
+
+            <ol *ngIf="useXeniumMode" class="full-width three-depth-numbering">
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Which organism is the source for these samples?
+                            <context-help name="SampleDetailsOrganism"
+                                          [hasEditPermission]="this.securityAdvisor.isAdmin"
+                                          [idCoreFacility]="this.idCoreFacility"
+                                          popupTitle="Sample Xenium Organism Help">
+                            </context-help>
+                        </div>
+                        <div class="moderate-width">
+                            <custom-combo-box placeholder="Organism"
+                                              displayField="combinedName"
+                                              [options]="this.xeniumOrganisms"
+                                              [formControlName]="'xeniumOrganism'"
+                                              [allowNone]="false"
+                                              (optionSelected)="selectXeniumOrganism($event)">
+                            </custom-combo-box>
+                        </div>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Select the sample type.
+                        </div>
+                        <mat-radio-group class="flex-container-col"
+                                         formControlName="sampleType"
+                                         (change)="onSelectSampleType($event)">
+
+                            <div *ngFor="let xst of this.sampleTypes">
+                                <mat-radio-button [value]="xst">
+                                    <div class="short-width">
+                                        {{xst.display}}
+                                    </div>
+                                </mat-radio-button>
+                            </div>
+                            <div class="short-width">
+                                <hr>
+                            </div>
+                        </mat-radio-group>
+                    </div>
+                </li>
+                <li class="full-width align-baseline">
+                    <div class="full-width flex-container-row align-baseline">
+                        <div class="heading">
+                            Select gene panel.
+                        </div>
+                        <mat-radio-group class="flex-container-col"
+                                         formControlName="xeniumGenePanel"
+                                         (change)="onSelectedXeniumGenePanel($event)">
+
+                                <div *ngFor="let genePanel of xeniumGenePanels">
+                                    <mat-radio-button [value]="genePanel">
+                                        <div class="short-width">
+                                            {{genePanel.display}}
+                                        </div>
+                                    </mat-radio-button>
+                                </div>
+                            </mat-radio-group>
+                    </div>
+                </li>
+
+                <li class="full-width align-baseline">
+                    <div class="full-width">
+                        <div class="full-width flex-container-row align-baseline">
+                            <div class="heading">
+                                Enter a note for the Core facility
+                            </div>
+                        </div>
+                        <mat-form-field class="long-width">
+                            <textarea matInput
+                                      matTextareaAutosize
+                                      placeholder="Note"
+                                      formControlName="coreNotes"
+                                      matAutosizeMinRows="1"
+                                      matAutosizeMaxRows="10"
+                                      (input)="onInputCoreFacilityNotes($event)">
+                            </textarea>
+                            <mat-error *ngIf="form?.get('coreNotes')?.hasError('maxlength')">Notes can not be over 5000 characters.</mat-error>
+                        </mat-form-field>
+                    </div>
+                </li>
+            </ol>
+
+        </div>
+    </form>
+</div>

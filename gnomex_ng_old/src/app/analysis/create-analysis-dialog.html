@@ -1,0 +1,122 @@
+<div class="full-height full-width flex-container-col padded">
+    <form class="full-height full-width padded-inner flex-container-col" [formGroup]="createAnalysisForm" >
+        <div class="flex-container-row align-center padded">
+            <label class="label label-width">Group</label>
+            <div class="flex-grow">
+                <custom-combo-box [options]="this.labList"
+                                  placeholder="Select a lab..."
+                                  [temporaryPlaceholder]="true"
+                                  [displayField]="this.labDisplayField"
+                                  valueField="idLab"
+                                  [formControlName]="'selectedLab'"
+                                  (optionSelected)="onLabSelect($event)">
+                </custom-combo-box>
+            </div>
+        </div>
+        <div class="flex-container-row align-center padded" *ngIf="showOwnerComboBox">
+            <label class="label label-width">Analysis Owner</label>
+            <div class="flex-grow">
+                <custom-combo-box [options]="this.ownerList"
+                                  placeholder="Select an Owner..."
+                                  [temporaryPlaceholder]="true"
+                                  [displayField]="this.prefService.userDisplayField"
+                                  valueField="idAppUser"
+                                  [formControlName]="'analysisOwner'"
+                                  (optionSelected)="onUserSelect($event)">
+                </custom-combo-box>
+            </div>
+        </div>
+        <div class="flex-container-row align-center padded" *ngIf="!newAnalysisGroup">
+            <label class="label label-width">Analysis Group</label>
+            <div class="flex-grow">
+                <custom-combo-box [options]="this.analysisGroupList"
+                                  placeholder="..."
+                                  [temporaryPlaceholder]="true"
+                                  [displayField]="'name'"
+                                  valueField="idAnalysisGroup"
+                                  [formControlName]="'analysisGroup'"
+                                  (optionSelected)="onAnalysisGroupSelect($event)">
+                </custom-combo-box>
+            </div>
+        </div>
+        <div class="flex-container-row align-center padded">
+            <button mat-button
+                    class="link-button underlined minimize limit-width"
+                    style="padding: 0;"
+                    (click)="includeNewGroup()">New...
+            </button>
+        </div>
+        <div class="flex-container-row align-center padded" *ngIf="newAnalysisGroup">
+            <label class="label label-width">New Analysis Group Name</label>
+            <mat-form-field>
+                <input matInput formControlName="analysisGroupName">
+                <mat-error *ngIf="newAnalysisGroup && createAnalysisForm.get('analysisGroupName').hasError('required')">
+                    Analysis Group Name is required
+                </mat-error>
+            </mat-form-field>
+
+
+        </div>
+
+        <div class="flex-container-row align-center padded">
+            <label class="label label-width">Analysis Name</label>
+            <mat-form-field class="example-full-width">
+                <input matInput formControlName="analysisName">
+                <mat-error *ngIf="createAnalysisForm.get('analysisName').hasError('required')">
+                    Analysis Name is required
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div class="flex-container-row align-center padded">
+            <label class="label label-width">Organism</label>
+            <div class="flex-grow">
+                <custom-combo-box [options]="this.activeOrganismList"
+                                  placeholder="Organism..."
+                                  [temporaryPlaceholder]="true"
+                                  [displayField]="'display'"
+                                  valueField="idOrganism"
+                                  [formControlName]="'organism'"
+                                  (optionSelected)="onOrganismSelect($event)">
+                </custom-combo-box>
+            </div>
+        </div>
+        <div class="flex-container-row align-center padded">
+            <button mat-button
+                    class="link-button underlined minimize limit-width"
+                    style="padding: 0;"
+                    (click)="newOrganism()">New/Edit...
+            </button>
+        </div>
+
+        <div class="flex-container-row align-center padded">
+            <label class="label label-width">Genome Build(s)</label>
+            <div class="flex-grow">
+                <custom-multi-combo-box [options]="this.genomeBuildList"
+                                        displayField="display"
+                                        [formControlName]="'genomeBuilds'">
+                </custom-multi-combo-box>
+            </div>
+        </div>
+        <div class="flex-container-row align-center padded">
+            <button mat-button
+                    class="link-button underlined minimize limit-width"
+                    style="padding: 0;"
+                    (click)="newOrganism()">New/Edit...
+            </button>
+        </div>
+
+        <div class="flex-container-row align-center padded">
+            <label class="label label-width">Visibility</label>
+            <div class="flex-grow">
+                <custom-combo-box [options]="this.visibilityList"
+                                  placeholder="..."
+                                  [temporaryPlaceholder]="true"
+                                  [displayField]="'display'"
+                                  valueField="value"
+                                  [formControlName]="'visibility'"
+                                  (optionSelected)="onVisibilitySelect($event)">
+                </custom-combo-box>
+            </div>
+        </div>
+    </form>
+</div>

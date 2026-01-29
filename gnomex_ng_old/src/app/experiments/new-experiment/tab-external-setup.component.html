@@ -1,0 +1,93 @@
+<div class="full-height full-width flex-container-col padded">
+    <div class="full-height full-width flex-container-row">
+        <form [formGroup]="form" class="full-height font-small extra-padded">
+            <custom-combo-box placeholder="Lab group"
+                              class="half-width"
+                              formControlName="lab"
+                              [options]="this.labList"
+                              [displayField]="this.prefService.labDisplayField"
+                              (optionSelected)="onLabSelected($event)">
+            </custom-combo-box>
+            <custom-combo-box *ngIf="this.showUserSelection"
+                              placeholder="Submitter"
+                              class="half-width"
+                              formControlName="appUser"
+                              [options]="this.userList"
+                              [displayField]="this.prefService.userDisplayField"
+                              (optionSelected)="onUserSelected()">
+            </custom-combo-box>
+            <div class="flex-container-row full-width align-center">
+                <div>
+                    <button mat-button (click)="this.toggleShowLinkToTopic()">
+                        <img [src]="this.constantsService.ICON_TOPIC" alt="" class="icon">
+                        {{showLinkToTopic ? 'Hide' : 'Show'}} Link to Topic
+                    </button>
+                </div>
+                <div [hidden]="!this.showLinkToTopic" class="half-width">
+                    <custom-multi-combo-box placeholder="Topic(s)"
+                                            formControlName="topic"
+                                            displayField="name"
+                                            [options]="this.topicList"
+                                            (optionSelected)="onTopicSelected()">
+                    </custom-multi-combo-box>
+                </div>
+            </div>
+            <custom-combo-box placeholder="Organism"
+                              class="half-width"
+                              formControlName="organism"
+                              [options]="this.organismList"
+                              [displayField]="'display'"
+                              (optionSelected)="onOrganismSelected()">
+            </custom-combo-box>
+            <div class="flex-container-row full-width align-center">
+                <label class="margin-right">Experiment platform</label>
+                <mat-radio-group class="flex-container-col"
+                                 formControlName="requestCategory"
+                                 (change)="onRequestCategorySelected()">
+                    <mat-radio-button *ngFor="let reqCat of this.requestCategoryList" [value]="reqCat">
+                        <div class="flex-container-row">
+                            <div class="experiment-platform-label">
+                                <img [src]="reqCat.icon" alt="" class="icon">
+                                {{reqCat.display}}
+                            </div>
+                            <div>
+                                {{reqCat.notes}}
+                            </div>
+                        </div>
+                    </mat-radio-button>
+                </mat-radio-group>
+            </div>
+            <custom-combo-box placeholder="Experiment type"
+                              class="half-width"
+                              formControlName="application"
+                              [options]="this.requestApplicationList"
+                              [displayField]="'display'"
+                              (optionSelected)="onApplicationSelected()">
+            </custom-combo-box>
+            <div class="flex-container-row align-center">
+                <custom-combo-box placeholder="Project folder for organizing experiments"
+                                  class="half-width"
+                                  formControlName="project"
+                                  [options]="this.projectList"
+                                  [displayField]="'name'"
+                                  (optionSelected)="onProjectSelected()">
+                </custom-combo-box>
+                <div>
+                    <button mat-button class="link-button minimize"
+                            [disabled]="!this.form.get('project').value"
+                            (click)="this.editProject()">
+                        Edit
+                    </button>
+                </div>
+                <div>
+                    <button mat-button class="link-button minimize"
+                            (click)="this.newProject()">
+                        New
+                    </button>
+                </div>
+            </div>
+        </form>
+        <div class="flex-grow">
+        </div>
+    </div>
+</div>

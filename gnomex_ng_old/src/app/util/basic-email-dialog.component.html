@@ -1,0 +1,21 @@
+<div class="full-height full-width flex-container-col">
+        <div class="full-width full-height flex-container-col double-padded">
+            <form [formGroup]="this.emailGroup">
+                <mat-form-field class="formField">
+                    <input matInput placeholder="Subject" formControlName="subject">
+                    <mat-error *ngIf="this.emailGroup.get('subject').hasError('required')">Subject is required</mat-error>
+                </mat-form-field>
+                <mat-form-field class="formField">
+                    <input matInput placeholder="From" formControlName="fromAddress">
+                    <mat-error *ngIf="this.emailGroup.get('fromAddress').hasError('required')">From is required</mat-error>
+                    <mat-error *ngIf="this.emailGroup.get('fromAddress').hasError('email') && !this.emailGroup.hasError('required')">Please enter a valid email address</mat-error>
+                </mat-form-field>
+                <label class="label" for="emailEditor">Body</label>
+                <angular-editor class="full-width" #emailEditorRef id="emailEditor"
+                                formControlName="body"
+                                [config]="emailEditorConfig">
+                </angular-editor>
+                <mat-error *ngIf="this.emailGroup.get('body').hasError('required')">Email body is required</mat-error>
+            </form>
+        </div>
+</div>

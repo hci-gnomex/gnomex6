@@ -1,0 +1,63 @@
+<form class="full-height full-width small-font padded" [formGroup]="descriptionForm">
+    <div class="flex-container-row align-center padded" *ngIf="editMode">
+        <div class="gx-label label-width">
+            Experiment Name
+        </div>
+        <div class="flex-grow">
+            <mat-form-field class="field-width">
+                <input matInput type="text" formControlName="name">
+                <mat-error *ngIf="descriptionForm.get('name').hasError('maxlength')">
+                    Experiment Name can be at most {{this.constantsService.MAX_LENGTH_200}}
+                    characters
+                </mat-error>
+            </mat-form-field>
+        </div>
+    </div>
+
+    <div class="full-width flex-container-col padded">
+        <label class="gx-label" for="descEditor">Experiment Description</label>
+        <angular-editor #descEditorRef id="descEditor"
+                        formControlName="description"
+                        [config]="descEditorConfig">
+        </angular-editor>
+        <mat-error *ngIf="descriptionForm.get('description').hasError('maxlength')">
+            Description can be at most {{this.constantsService.MAX_LENGTH_5000}} characters
+            including HTML code formatting and styles. Character count: {{descriptionForm.get(
+            'description').value.toString().length}}
+        </mat-error>
+    </div>
+
+    <div class="full-width flex-container-col padded" *ngIf="showProjectDesc">
+        <label class="gx-label" for="projectDescEditor">Project Description</label>
+        <angular-editor #projectDescEditorRef id="projectDescEditor"
+                        formControlName="projectDescription"
+                        [config]="projectDescEditorConfig">
+        </angular-editor>
+    </div>
+
+    <div class="full-width flex-container-col padded" *ngIf="showCorePrepInstructions">
+        <label class="gx-label" for="notesEditor">Notes for Core Facility</label>
+        <angular-editor #notesEditorRef id="notesEditor"
+                        formControlName="corePrepInstructions"
+                        [config]="notesEditorConfig">
+        </angular-editor>
+        <mat-error *ngIf="descriptionForm.get('corePrepInstructions').hasError('maxlength')">
+            Summary can be at most {{this.constantsService.MAX_LENGTH_5000}} characters including
+            HTML code formatting and styles. Character count: {{descriptionForm.get(
+            'corePrepInstructions').value.toString().length}}
+        </mat-error>
+    </div>
+
+    <div class="full-width flex-container-col padded" *ngIf="showAdminNotes">
+        <label class="gx-label" for="adminNotesEditor">Administration Notes</label>
+        <angular-editor #adminNotesEditorRef id="adminNotesEditor"
+                        formControlName="adminNotes"
+                        [config]="adminNotesEditorConfig">
+        </angular-editor>
+        <mat-error *ngIf="descriptionForm.get('adminNotes').hasError('maxlength')">
+            Administration Notes can be at most {{this.constantsService.MAX_LENGTH_5000}} characters
+            including HTML code formatting and styles. Character count: {{descriptionForm.get(
+            'adminNotes').value.toString().length}}
+        </mat-error>
+    </div>
+</form>

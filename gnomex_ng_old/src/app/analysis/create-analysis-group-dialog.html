@@ -1,0 +1,40 @@
+<form [formGroup]="createAnalysisGroupForm" class="full-height full-width padded flex-container-col">
+    <div class="flex-container-row align-center padded">
+        <label class="label label-width">Group:</label>
+        <div class="flex-grow">
+            <custom-combo-box [options]="this.labList"
+                              placeholder="Select a lab..."
+                              [temporaryPlaceholder]="true"
+                              [displayField]="this.labDisplayField"
+                              valueField="idLab"
+                              [formControlName]="'selectedLab'"
+                              (optionSelected)="onLabSelect($event)">
+            </custom-combo-box>
+        </div>
+    </div>
+    <div class="flex-container-row align-center padded">
+        <mat-form-field class="full-width">
+            <input matInput formControlName="analysisGroupName" placeholder="Analysis Group Name">
+            <mat-error
+                    *ngIf="createAnalysisGroupForm.get('analysisGroupName').hasError('required')">
+                Analysis Group Name is required
+            </mat-error>
+            <mat-error
+                    *ngIf="createAnalysisGroupForm.get('analysisGroupName').hasError('maxlength')">
+                Analysis Group Name exceeded the 500 character limit
+            </mat-error>
+        </mat-form-field>
+    </div>
+    <div class="flex-container-col full-width padded">
+        <label class="label label-width" for="descEditor">Description:</label>
+        <angular-editor #descEditorRef id="descEditor"
+                        formControlName="description"
+                        [config]="editorConfig">
+        </angular-editor>
+        <mat-error *ngIf="createAnalysisGroupForm.get('description').hasError('maxlength')">
+            Description exceeded the 500 character limit including HTML code formatting and styles.
+            Character count: {{createAnalysisGroupForm.get('description').value.toString().length}}
+        </mat-error>
+    </div>
+</form>
+

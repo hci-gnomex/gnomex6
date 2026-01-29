@@ -1,4 +1,4 @@
-<Context path="/gnomex" docBase="webapps/gnomex" debug="0" reloadable="true" allowLinking="true">
+<Context reloadable="false" allowLinking="true">
 
   <Valve
 	    className="org.apache.catalina.valves.AccessLogValve"

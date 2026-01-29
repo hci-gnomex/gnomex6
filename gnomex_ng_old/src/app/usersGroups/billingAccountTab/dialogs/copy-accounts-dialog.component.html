@@ -1,0 +1,50 @@
+<div class="flex-container-col full-width fixed-height">
+    <div class="full-width full-height padded">
+        <div class="flex-container-col full-width full-height">
+            <div class="full-width flex-grow small-font">
+                <ag-grid-angular
+                        class="ag-theme-fresh small-font full-width full-height"
+                        [context]="context"
+                        [singleClickEdit]="true"
+                        [rowSelection]="'multiple'"
+                        [suppressRowClickSelection]="true"
+                        [enableSorting]="true"
+                        [enableColResize]="true"
+                        (gridSizeChanged)="onGridSizeChanged($event)"
+                        (gridReady)="onChartfieldGridReady($event)">
+                </ag-grid-angular>
+            </div>
+            <div class="vertical-spacer full-width">
+            </div>
+            <div class="full-width flex-grow small-font">
+                <ag-grid-angular
+                        class="ag-theme-fresh small-font full-width full-height"
+                        [context]="context"
+                        [singleClickEdit]="true"
+                        [rowSelection]="'multiple'"
+                        [suppressRowClickSelection]="true"
+                        [enableSorting]="true"
+                        [enableColResize]="true"
+                        (gridSizeChanged)="onGridSizeChanged($event)"
+                        (gridReady)="onPoGridReady($event)">
+                </ag-grid-angular>
+            </div>
+            <div class="vertical-spacer full-width">
+            </div>
+            <div class="full-width flex-grow small-font">
+                <ag-grid-angular
+                        class="ag-theme-fresh small-font full-width full-height"
+                        [context]="context"
+                        [singleClickEdit]="true"
+                        [rowSelection]="'multiple'"
+                        [suppressRowClickSelection]="true"
+                        [enableSorting]="true"
+                        [enableColResize]="true"
+                        (gridSizeChanged)="onGridSizeChanged($event)"
+                        (gridReady)="onCreditCardGridReady($event)">
+                </ag-grid-angular>
+            </div>
+        </div>
+    </div>
+</div>
+

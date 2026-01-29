@@ -1,0 +1,13 @@
+<div style="height: 85%">
+    <url-annotation [formControl]="urlFormControl"></url-annotation>
+    <div mat-dialog-actions style="margin: 0; display: block;">
+        <div class="t full-width">
+            <div class="tr">
+                <div class="td right-align horizontal-padding">
+                    <button mat-button cdkFocusInitial (click)="updateButtonClicked()">Update</button>
+                    <button mat-button (click)="cancelButtonClicked()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

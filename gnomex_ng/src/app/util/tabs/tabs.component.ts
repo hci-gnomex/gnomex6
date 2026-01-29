@@ -22,7 +22,7 @@ import {Form, FormGroup} from "@angular/forms";
             <!-- note the screens for the tabs will be inserted here dynamically -->
             <!-- the  ref '#container' tells the viewContainerRef where to place the screen  -->
   `,
-    styles: [require("./tabs.component.less").toString()]
+  styleUrls: ['./tabs.component.css']
 
 })
 export class Tabs implements OnDestroy {

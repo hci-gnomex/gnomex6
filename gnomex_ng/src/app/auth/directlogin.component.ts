@@ -1,18 +1,17 @@
-import {Component, OnInit, ChangeDetectorRef} from "@angular/core";
-import {AuthenticationService} from "./authentication.service";
-import {AbstractControl, FormBuilder, FormControl, FormGroup} from "@angular/forms";
-import {Router} from "@angular/router";
-import {GnomexService} from "../services/gnomex.service";
-import {DictionaryService} from "../services/dictionary.service";
+import {Component, OnInit, ChangeDetectorRef} from '@angular/core';
+import {AuthenticationService} from './authentication.service';
+import {AbstractControl, FormBuilder, FormControl, FormGroup} from '@angular/forms';
+import {Router} from '@angular/router';
+import {GnomexService} from '../services/gnomex.service';
+import {DictionaryService} from '../services/dictionary.service';
 import * as Duo from '../services/Duo-Web-v2';
-import * as Duo2 from '../services/duo';
-import {DialogsService, DialogType} from "../util/popup/dialogs.service";
+import {DialogsService, DialogType} from '../util/popup/dialogs.service';
 
 @Component({
-    selector: "hci-login-form",
+    selector: 'hci-login-form',
     template: `
-        
-        <div class="full-height full-width background">    
+
+        <div class="full-height full-width background">
             <div class="full-height full-width flex-container-col">
                 <div class="full-width flex-grow">
                 </div>
@@ -39,8 +38,8 @@ import {DialogsService, DialogType} from "../util/popup/dialogs.service";
                                     <div>
                                         <custom-input [form]="_loginForm"
                                                       [formControlNameToUse]="'username'"
-                                                      [type]="'text'" 
-                                                      [placeholder]="' '" 
+                                                      [type]="'text'"
+                                                      [placeholder]="' '"
                                                       [roundTop]="true"
                                                       [roundBottom]="false"
                                                       [label]="'Username'"
@@ -84,19 +83,19 @@ import {DialogsService, DialogType} from "../util/popup/dialogs.service";
                                     </button>
                                 </div>
                             </form>
-                    
+
                                  <div *ngIf="this.doDuo" class="full-width flex-grow">
-                                   <iframe id="duo_iframe" height="384px"
+                                   <iframe id="duo_iframe" name="duo_iframe" height="384px"
                                         >
-                                    </iframe>"                                
+                                    </iframe>"
                                 </div>
-                                           
-                     </div>    
+
+                     </div>
                     </div>
                     <div class="flex-grow">
                     </div>
                 </div>
-                <div class="full-width flex-grow major-padded-top flex-container-row">  
+                <div class="full-width flex-grow major-padded-top flex-container-row">
                 </div>
                 <div class="full-width flex-grow">
                 </div>
@@ -104,16 +103,16 @@ import {DialogsService, DialogType} from "../util/popup/dialogs.service";
                 </div>
             </div>
         </div>
-        
+
     `,
     styles: [`
-        
+
         .small-font { font-size: small; }
-        
+
         .primary-button {
             font-family: "Arial", Helvetica, sans-serif;
             font-size: 14pt;
-            
+
             color: #FFFFFF;
             border-radius: 6px;
             border-color: #70bb70;
@@ -122,16 +121,16 @@ import {DialogsService, DialogType} from "../util/popup/dialogs.service";
             animation: anim 8s linear infinite alternate;
             background-position: -200px 0;
         }
-        
+
         .primary-button:focus {
             outline: none;
         }
-        
+
         .primary-button:active {
             border-color: darkgreen;
             border-radius: 6px;
         }
-        
+
         @keyframes anim{
             0%{
                 background-position: -300px 0;
@@ -143,16 +142,16 @@ import {DialogsService, DialogType} from "../util/popup/dialogs.service";
                 background-position: 300px 0;
             }
         }
-        
-        .secondary-button { 
+
+        .secondary-button {
             font-family: "Arial", Helvetica, sans-serif;
             font-size: 12pt;
-            
+
             color: grey;
             background-color: #C6CCBE;
             border-radius: 4px
         }
-        
+
         .container {
             width: 24em;
             max-width: 24em;
@@ -160,41 +159,41 @@ import {DialogsService, DialogType} from "../util/popup/dialogs.service";
             border: solid 1px #CCCCCC;
             padding: 1.25em 2.5em;
         }
-        
+
         .bold { font-weight: bold; }
-        
+
         .background { background-color: #F9FFFC; }
-        .foreground { 
+        .foreground {
             background-color: #E9EFDE;
             border-radius: 10px;
-            
+
             box-shadow: rgba(0,0,0,0.3) 5px 5px 5px;
         }
-        
+
         .minimize { height: fit-content; }
-        
-        
+
+
         .error { color: red; }
 
         .padded { padding: 0.4em; }
-        
+
 
         .major-padded-top   { padding-top:   1.5em; }
         .major-padded-left  { padding-left:  1.5em; }
         .major-padded-right { padding-right: 1.5em; }
-        
+
         .horizontal-centered { text-align: center; }
 
         .right-align { text-align: right; }
-        
+
         .vertical-spacer   { height: 10px; }
         .horizontal-spacer { width:  10px; }
 
         .major-vertical-spacer { min-height: 3em; }
-        
-        
+
+
         .major-padding { padding: 15px; }
-        
+
 .iframe {
     width: 100%;
     min-width: 304px;
@@ -227,19 +226,19 @@ import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 
         input[type="text"]:focus, input[type="password"]:focus {
             background-color: white;
-            
+
             transition: all .3s;
         }
-        
+
         input[type="text"]:focus+label {
             font-size: 8pt;
             top: -3.5em;
             left: 0.5em;
             z-index: 5;
             position: relative;
-            
+
             background-color: white;
-            
+
             /*top: 5px;*/
             /*left: 10px;*/
             /*bottom: auto;*/
@@ -248,13 +247,13 @@ import {DialogsService, DialogType} from "../util/popup/dialogs.service";
             /*font-size: 12px;*/
             /*border-bottom: 1px solid rgba(0, 0, 0, .1);*/
             /*color: #999;*/
-            
+
             transition: all .3s;
         }
-        
+
         input[type="password"]:focus+label {
             background-color: white;
-            
+
             top: 5px;
             left: 10px;
             bottom: auto;
@@ -273,7 +272,7 @@ import {DialogsService, DialogType} from "../util/popup/dialogs.service";
             left: 0.5em;
             z-index: 5;
             position: relative;
-            
+
             /*top: 5px;*/
             /*left: 10px;*/
             /*bottom: auto;*/
@@ -282,10 +281,10 @@ import {DialogsService, DialogType} from "../util/popup/dialogs.service";
             /*font-size: 12px;*/
             /*border-bottom: 1px solid rgba(0, 0, 0, .1);*/
             /*color: #999;*/
-            
+
             transition: all .3s;
         }
-        
+
         input:valid {
             z-index:999;
             background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAACJklEQVRIia3WX2jOURzH8dfz2xK25m+7WEvSrpbkSsTFc7EhDSk3YyUlTSjcLGk5l0qSJEq5crFkCCminqRcrZa0NMuFJK2l9VxILLk4v4fHs+ffnnzqV79zzvf7/v5+53zP95yMSgpgHXZhB9ZjJeaQxzs8xRNMpvbzlKkA7sQw9qfQasrjIc7jQ2mgpIzDHrzG0Trg0IaB1OdAaYCmf1rBIG5hRR3gUrVgL37KeiUXOzMpGPowikUNwIs1h8O4Lfydog5c+w9waMYldFGYoqwL6GkA9gv3U86qov4WtMsazQjWYAyrGwjwAP1oxSNsLhrLY0uC7Q3CZ3BS8D2FLS4Zb0NfIm6iheoHjgs+CRKcw8Yydr0JuhsIcAf30vdNOFPBrjvB8gXCP2JIMCdoxRVxDcqpLREzoZy+oBfHxNyW2h4TfE7bw+IfVFSzuEDldBHP04eY2yNicSPYjFPV4MgneFth8BA6011+AwdxVkDQpr6NOZERHMHNCgZvsFvw8U9PDHi5jq+HoQTPxJwupw14JOgs6usRK20t5fG4UOyu4kQV43Hsw1dx13fVEWAE/YUAHWI9X1PFYRbfxMJYS9PYKpgqVNPPYjr+qOK0vE74HE5jikI1zSHnvaxpsXQ0VXCuBz6M64WT7V9QzpiscWzDsgXCpzFYDJ8fALImcRdLxVvFkhrg2dR+AC9Lz+T5t4qCouFa7BSnrRvt4ik4gwm8UOPa8htG8HgowA/lzwAAAABJRU5ErkJggg==');
@@ -295,7 +294,7 @@ import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 
             transition: all .3s;
         }
-        
+
         input:valid+label {
             color: green;
             border-bottom: solid green 1px;
@@ -303,19 +302,19 @@ import {DialogsService, DialogType} from "../util/popup/dialogs.service";
             transition: all .3s;
         }
 
-        input:invalid:not:focus~label {  
+        input:invalid:not:focus~label {
             color: #800;
             border-bottom: solid #800 1px;
 
             transition: all .3s;
         }
-        
+
         input:invalid:focus ~ .tooltip {
             display: block;
 
             transition: all .3s;
         }
-        
+
         input:placeholder-shown ~ .tooltip {
             display: none;
 
@@ -329,7 +328,7 @@ import {DialogsService, DialogType} from "../util/popup/dialogs.service";
             position: relative;
 
             background-color: white;
-            
+
             transition: all .3s;
         }
 
@@ -342,7 +341,7 @@ import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 
             transition: all .3s;
         }
-        
+
         input:placeholder-shown~label {
             top: -2.5em;
             left: 1.0em;
@@ -366,15 +365,15 @@ import {DialogsService, DialogType} from "../util/popup/dialogs.service";
             box-shadow: 1px 1px 3px 1px black;
             transition: all .3s;
         }
-        .tooltip:after { 
-            content: ""; 
-            display: block; 
-            position: absolute; 
-            bottom: 100%; 
-            left:10px; 
-            border-bottom: 10px solid black; 
-            border-top: 0px solid transparent; 
-            border-right: 10px solid transparent; 
+        .tooltip:after {
+            content: "";
+            display: block;
+            position: absolute;
+            bottom: 100%;
+            left:10px;
+            border-bottom: 10px solid black;
+            border-top: 0px solid transparent;
+            border-right: 10px solid transparent;
             border-left: 10px solid transparent;
             transition: all .3s;
         }
@@ -391,22 +390,22 @@ import {DialogsService, DialogType} from "../util/popup/dialogs.service";
             cursor:text;
             transition: all .3s;
         }
-        
+
     `]
 })
 export class DirectLoginComponent implements OnInit {
     public _loginForm: FormGroup;
     public _errorMsg: string;
 
-    public numberOfAttempts: number = 0;
+    public numberOfAttempts = 0;
 
-    public errorClasses: string = '';
+    public errorClasses = '';
 
-    public sig_request: string = "not sig_request";
-    public duo_sig: string = "not duo_sig";
-    public duo_src: string = "not duo_src";
-    public authenticated_username: string = "";
-    public doDuo: boolean = false;
+    public sig_request = 'not sig_request';
+    public duo_sig = 'not duo_sig';
+    public duo_src = 'not duo_src';
+    public authenticated_username = '';
+    public doDuo = false;
 
     constructor(private _authenticationService: AuthenticationService,
                 private _formBuilder: FormBuilder,
@@ -425,8 +424,8 @@ export class DirectLoginComponent implements OnInit {
                 if (control
                     && control.parent
                     && control.parent.controls
-                    && control.parent.controls['username']
-                    && control.parent.controls['password']) {
+                  && (control.parent as any).controls.username
+                  && (control.parent as any).controls.password) {
                     return null;
                 } else {
                     return { message: 'Grid is not populated yet' };
@@ -452,17 +451,11 @@ export class DirectLoginComponent implements OnInit {
         this.numberOfAttempts++;
         this._errorMsg = null;
 
-        let okToLogin: boolean = true;
-        console.log("username: " + this._loginForm.value.username);
+        let okToLogin = true;
+        console.log('username: ' + this._loginForm.value.username);
 
-        if (this.gnomexService.useduo) {
-            if (('' + this._loginForm.value.username).match(/^[uU]\d{7,8}$/)) {
-                this.sig_request = Duo2.sign_request(this.gnomexService.ikey, this.gnomexService.skey, this.gnomexService.akey, this._loginForm.value.username);
-                console.log(this.sig_request);
-            }
-        }
-        if (this.gnomexService.maintenanceMode && !(this._loginForm.value.username === "adminBatch" ) ) {
-            this._errorMsg = "GNomEx is undergoing maintenance.  Please try again later.";
+        if (this.gnomexService.maintenanceMode && !(this._loginForm.value.username === 'adminBatch' ) ) {
+            this._errorMsg = 'GNomEx is undergoing maintenance.  Please try again later.';
             okToLogin = false;
         }
         if (okToLogin) {
@@ -474,29 +467,36 @@ export class DirectLoginComponent implements OnInit {
                         this._authenticationService.findAppUserByUsername(this._loginForm.value.username).subscribe((result: any) => {
                             if (result && result.hasUserAccount && ('' + result.hasUserAccount).toLowerCase() === 'y') {
                                 if (result.isActive && ('' + result.isActive).toLowerCase() === 'y') {
+                                  // tslint:disable-next-line:max-line-length
                                     if (this.gnomexService.duoExceptions && this.gnomexService.duoExceptions.includes(this._loginForm.value.username) ) {
                                         this.gnomexService.useduo = false;
                                     }
                                     if (this.gnomexService.useduo) {
-                                        this.doDuo = true;
 
-                                        this.changeDetectorRef.detectChanges();
+                                      this._authenticationService.getDuoInit(this._loginForm.value.username)
+                                        .subscribe((init: any) => {
+                                          this.doDuo = true;
+                                          this.changeDetectorRef.detectChanges();
 
-                                        Duo.init({
-                                            iframe: "duo_iframe",
-                                            host: this.gnomexService.duo_host,
-                                            sig_request: this.sig_request,
+                                          Duo.init({
+                                            iframe: 'duo_iframe',
+                                            host: init.duohost,          // from /api/duo/sign response
+                                            sig_request: init.sig_request, // from /api/duo/sign response
                                             submit_callback: this.twoFactorVerify.bind(this),
+                                          });
+
+                                        }, () => {
+                                          this.doDuo = false;
+                                          this._errorMsg = 'Unable to start Duo. Please try again or contact support.';
                                         });
-                                    }
-                                    else {
+                                    } else {
                                         this._authenticationService.requestAccessToken(true);
                                     }
                                 } else {
-                                    this._errorMsg = "UID recognized, but account has been inactivated. Please continue with \"Guest Login\" and contact your lab's Core Administrator or GNomEx Support";
+                                    this._errorMsg = 'UID recognized, but account has been inactivated. Please continue with "Guest Login" and contact your lab\'s Core Administrator or GNomEx Support';
                                 }
                             } else {
-                                this._errorMsg = "That UID, while valid, does not belong to any labs. Please create an account or click \"Guest Login\"";
+                                this._errorMsg = 'That UID, while valid, does not belong to any labs. Please create an account or click "Guest Login"';
                             }
                         });
                     } else {
@@ -505,45 +505,51 @@ export class DirectLoginComponent implements OnInit {
                                 if (result.isActive && ('' + result.isActive).toLowerCase() === 'y') {
                                     this._authenticationService.requestAccessToken(true);
                                 } else {
-                                    this._errorMsg = "Your account has been inactivated. Please continue with \"Guest Login\" and contact your lab's Core Administrator or GNomEx Support";
+                                    this._errorMsg = 'Your account has been inactivated. Please continue with "Guest Login" and contact your lab\'s Core Administrator or GNomEx Support';
                                 }
                             } else {
-                                this._errorMsg = "Please check your credentials, create a new account or click \"Guest Login\"";
+                                this._errorMsg = 'Please check your credentials, create a new account or click "Guest Login"';
                             }
                         });
                     }
                 } else {
-                    this._errorMsg = "Please check your credentials (2).";
+                    this._errorMsg = 'Please check your credentials (2).';
                 }
             }, (error: any) => {
-                this._errorMsg = "Please check your credentials (3).";
+                this._errorMsg = 'Please check your credentials (3).';
             });
         }
     }
 
     guestLogin(): void {
         this._authenticationService.guestLogin();
-        this.router.navigateByUrl("home");
+        this.router.navigateByUrl('home');
     }
 
     public onNewAccount(): void {
-        this.router.navigateByUrl("register-user");
+        this.router.navigateByUrl('register-user');
     }
 
-    twoFactorVerify(response: any) {
-        console.log("in twoFactorVerify" + response.elements.sig_response.value);
-        var vuser = Duo2.verify_response(this.gnomexService.ikey, this.gnomexService.skey, this.gnomexService.akey, response.elements.sig_response.value);
-        console.log(vuser);
-        if (vuser) {   // || ( this.gnomexService.duoExceptions && this.gnomexService.duoExceptions.includes(this._loginForm.value.username) )) {
-            this._authenticationService.requestAccessToken(true);
-        } else {
-            this.dialogsService.alert("Invalid passcode - please notify gnomex support", null, DialogType.WARNING);
-        }
-   }
+  twoFactorVerify(response: any) {
+    let sigResponse = null;
+    if (response && response.elements && response.elements.sig_response) {
+      sigResponse = response.elements.sig_response.value;
+    }
+
+    this._authenticationService.verifyDuo(sigResponse).subscribe((res: any) => {
+      if (res && res.ok) {
+        this._authenticationService.requestAccessToken(true);
+      } else {
+        this.dialogsService.alert('Invalid passcode - please notify gnomex support', null, DialogType.WARNING);
+      }
+    }, () => {
+      this.dialogsService.alert('Invalid passcode - please notify gnomex support', null, DialogType.WARNING);
+    });
+  }
 
 
     public onResetPassword(): void {
-        this.router.navigateByUrl("reset-password");
+        this.router.navigateByUrl('reset-password');
     }
 }
 

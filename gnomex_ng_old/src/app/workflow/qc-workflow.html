@@ -1,0 +1,63 @@
+<div class="flex-container-col full-width full-height small-font">
+    <div class="flex-container-row align-center">
+        <img [src]="'./assets/data-accept.png'" alt="" height="16" width="16">
+        <mat-label class="medium-font padded">
+            {{ label }}
+        </mat-label>
+    </div>
+    <div class="flex-container-row align-baseline">
+        <div class="request-number-width padded">
+            <custom-combo-box placeholder="Request #"
+                              displayField="requestNumber"
+                              valueField="requestNumber"
+                              [(ngModel)]="workItem"
+                              [customOptionClasses]="'small-font padded inline-block full-width'"
+                              [options]="requestIds"
+                              [allowNone]="false"
+                              (optionSelected)="selectRequestOption()">
+            </custom-combo-box>
+        </div>
+        <div class="core-facility-width padded">
+            <custom-combo-box placeholder="Core facility"
+                              displayField="display"
+                              [(ngModel)]="core"
+                              [customOptionClasses]="'small-font padded inline-block full-width'"
+                              [options]="cores"
+                              [disabled]="cores.length === 1"
+                              (optionSelected)="selectCoreOption()">
+            </custom-combo-box>
+        </div>
+        <div class="flex-grow">
+        </div>
+        <mat-label class="italic">
+            {{ requestIds.length > 0 ? requestIds.length - 1  : 0 }} requests in worklist
+        </mat-label>
+    </div>
+    <div class="flex-grow padded-bottom">
+        <div #oneEmWidth class="no-height single-em"></div>
+        <ag-grid-angular class="ag-theme-fresh full-height full-width grid-min-height"
+                         [enableColResize]="true"
+                         [enableSorting]="true"
+                         [stopEditingWhenGridLosesFocus]="true"
+                         [singleClickEdit]="true"
+                         [rowClassRules]="workflowService.assmGridRowClassRules"
+                         (cellValueChanged)="onCellValueChanged($event)"
+                         (gridReady)="onGridReady($event)"
+                         (gridSizeChanged)="onGridSizeChanged($event)"
+                         (rowDataChanged)="onNotifyGridRowDataChanged($event)">
+        </ag-grid-angular>
+    </div>
+    <div class="flex-container-row align-baseline">
+        <button mat-raised-button
+                matTooltip="Refresh worklist"
+                (click)="refreshWorklist($event)">
+            <img [src]="'./assets/action_refresh.gif'" alt="">
+            Refresh
+        </button>
+        <save-footer class="flex-grow"
+                     [dirty]="dirty"
+                     [showSpinner]="showSpinner"
+                     (saveClicked)="save()">
+        </save-footer>
+    </div>
+</div>

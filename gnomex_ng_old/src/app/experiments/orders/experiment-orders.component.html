@@ -1,0 +1,91 @@
+<div class="full-width full-height flex-column-container background">
+	<div class="full-width">
+		<browse-filter
+				[label]="'Orders'"
+				[iconSource]="'assets/review.png'"
+				[mode]="'orderBrowse'">
+		</browse-filter>
+	</div>
+	<div class="vertical-spacer">
+	</div>
+	<div class="full-width flex-stretch lower-panel">
+		<div class="full-width full-height flex-column-container">
+			<div class="full-width flex-stretch small-font">
+				<div #oneEmWidth class="no-height single-em"></div>
+				<ag-grid-angular
+						class="ag-theme-fresh full-width full-height small-font"
+						[context]="context"
+						[singleClickEdit]="true"
+						[rowSelection]="'multiple'"
+						[suppressRowClickSelection]="true"
+						[enableSorting]="true"
+						[enableColResize]="true"
+						[suppressNoRowsOverlay]="true"
+						[stopEditingWhenGridLosesFocus]="true"
+						(gridSizeChanged)="onGridSizeChanged($event)"
+						(gridReady)="onGridReady($event)">
+				</ag-grid-angular>
+			</div>
+			<div class="full-width">
+				<div class="grid-footer">
+					<div class="full-width t">
+						<div class="tr">
+							<div class="td most-width vertical-center">
+								<div class="t">
+									<div class="tr">
+										<div class="td vertical-align title">
+											{{gridApi?.getSelectedRows().length}} selected
+										</div>
+										<div class="td vertical-align">
+											<custom-combo-box class="full-height full-width small-font" placeholder="- Change Status -"
+															  [options]="dropdownChoices" displayField="label" valueField="value"
+															  [(ngModel)]="changeStatus">
+											</custom-combo-box>
+										</div>
+										<div class="td vertical-align">
+											<button mat-button
+													[disabled]="!enableChanges || (gridApi?.getSelectedRows().length === 0 || (changeStatus === null || changeStatus === ''))"
+													(click)="goButtonClicked()">
+												<img *ngIf="gridApi?.getSelectedRows().length !== 0 && (changeStatus && changeStatus !== '')"
+													 [src]="'./assets/bullet_go.png'"
+													 alt="" />
+												<img *ngIf="gridApi?.getSelectedRows().length === 0 || (!changeStatus || changeStatus === '')"
+													 [src]="'./assets/bullet_go_disable.png'"
+													 alt=""/>
+												Go
+											</button>
+										</div>
+										<div class="td vertical-align">
+											<button mat-button
+													[disabled]="!enableChanges || gridApi?.getSelectedRows().length === 0"
+													(click)="deleteButtonClicked()">
+												<img *ngIf="gridApi?.getSelectedRows().length !== 0" [src]="'./assets/delete.png'" alt="" />
+												<img *ngIf="gridApi?.getSelectedRows().length === 0" [src]="'./assets/delete_disable.png'" alt=""/>
+												Delete
+											</button>
+										</div>
+										<div class="td vertical-align">
+											<button mat-button
+													[disabled]="gridApi?.getSelectedRows().length === 0"
+													(click)="emailButtonClicked()">
+												<img *ngIf="gridApi?.getSelectedRows().length !== 0" [src]="'./assets/email_go.png'" alt="" />
+												<img *ngIf="gridApi?.getSelectedRows().length === 0" [src]="'./assets/email_go_disable.png'" alt=""/>
+												Email
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div *ngIf="message" class="td vertical-center right-align">
+								({{message}})
+							</div>
+							<div class="td vertical-center right-align">
+								({{(experiments?.length === null) ? 0 : experiments?.length + (experiments?.length != 1 ? " orders" : " order")}})
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

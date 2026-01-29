@@ -1,0 +1,93 @@
+<div class="full-height full-width flex-container-col padded bordered overflow-auto">
+    <div *ngIf="!!icon || !!label" class="full-width align-center padded-bottom">
+        <div class="full-height full-width flex-container-row">
+            <div *ngIf="!!icon" class="padded-left">
+                <img src="{{ icon }}" height="16" width="16">
+            </div>
+            <div *ngIf="!!label" class="flex-grow padded" style="min-height: calc(0.6em + 16px);">
+                {{ label }}
+            </div>
+        </div>
+    </div>
+    <div class="full-width flex-grow overflow-auto bordered">
+        <mat-tab-group #tabGroup
+                       class="full-width full-height"
+                       id="linkDataTabs"
+                       [selectedIndex]="selectedIndex"
+                       (selectedTabChange)="onTabChange($event)">
+            <mat-tab label="Setup" class="full-width full-height">
+                <new-experiment-setup #setupTab
+                                      [experiment]="inputs?.experiment"
+                                      [idCoreFacility]="inputs?.idCoreFacility"
+                                      (onChangeLab)="onChangeLab($event)"
+                                      (onChangeRequestCategory)="outputs?.onChangeRequestCategory($event)">
+                </new-experiment-setup>
+            </mat-tab>
+            <mat-tab *ngFor="let tab of tabs; let i = index"
+                     label="{{tab.label}}"
+                     class="full-height full-width overflow-auto"
+                     [disabled]="i + 1 > index_firstInvalidTab">
+                <!-- Note : This [disabled] attribute is actually looking at the prior form, but we have one non-dynamic tab at the start. -->
+                <div *ngIf="tab.label !== 'Other Details'; else annotate" class="full-width full-height">
+                    <ndc-dynamic class="full-height full-width"
+                                 [ndcDynamicComponent]="tab.component"
+                                 [ndcDynamicInputs]="inputs"
+                                 [ndcDynamicOutputs]="outputs"
+                                 (ndcDynamicCreated)="componentCreated($event)">
+                    </ndc-dynamic>
+                </div>
+                <ng-template #annotate>
+                    <ndc-dynamic class="full-width full-height"
+                                 [ndcDynamicComponent]="tab.component"
+                                 [ndcDynamicInputs]="annotationInputs"
+                                 (ndcDynamicCreated)="componentCreated($event)" >
+                    </ndc-dynamic>
+                </ng-template>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+    <div class="full-width padded-top">
+        <div class="full-width flex-container-row align-center">
+            <div class="padded-right">
+                <button mat-raised-button
+                        [disabled]="selectedIndex === 0"
+                        (click)="goBack()">
+                    <mat-icon>arrow_left</mat-icon>
+                    Back
+                </button>
+            </div>
+            <div class="padded-right">
+                <button mat-raised-button
+                        [disabled]="!formOfCurrentlySelectedTab || formOfCurrentlySelectedTab.invalid || onSubmitTab"
+                        (click)="goNext()">
+                    <mat-icon>arrow_right</mat-icon>
+                    Next
+                </button>
+            </div>
+            <div class="padded-right-large">
+                <button *ngIf="onSubmitTab"
+                        mat-raised-button
+                        [disabled]="!onSubmitTab"
+                        (click)="SaveNewExperiment()">
+                    <img [src]="'./assets/accept.png'">
+                    {{ submitOrSaveButtonLabel }}
+                </button>
+            </div>
+            <div *ngIf="onSubmitTab" class="padded-right">
+                <mat-checkbox [(ngModel)]="isCheckboxChecked" disabled="{{ disable_agreeCheckbox ? 'true' : 'false' }}">
+                    <div class="highlight-agreement">
+                        {{ agreeCheckboxLabel }}
+                    </div>
+                </mat-checkbox>
+            </div>
+            <div class="full-height flex-grow">
+            </div>
+            <div class="padded-left">
+                <button mat-raised-button
+                        (click)="clickCancel()">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

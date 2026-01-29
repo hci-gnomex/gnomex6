@@ -1,0 +1,60 @@
+<div class="flexbox-column">
+    <div class="flex-container-row">
+        <div *ngIf="this.topicNode" style="margin:1em" >
+            <img [src]="this.constService.ICON_TOPIC" class="icon">
+            Topic {{'T' + this.topicNode.idTopic + ' -'}} {{(this.topicNode.name.length > 60) ? (this.topicNode.name | slice:0:60) + '...' : this.topicNode.name}}
+        </div>
+        <button mat-button color="primary" (click)="onShareLinkClick()" style="margin:1em">
+            <img [src]="this.constService.GLOBE_LINK" class="icon">Share URL
+        </button>
+        <button mat-button color="primary" (click)="onEmailClick()" style="margin:1em">
+            <img [src]="this.constService.EMAIL_GO_LINK" class="icon">Email topic owner
+        </button>
+    </div>
+    <form class="full-width" style="flex:8" [formGroup]="topicForm">
+        <mat-tab-group class="mat-tab-group-border full-height">
+            <mat-tab label="Info" class="full-height">
+                <div class="flexbox-column">
+                    <mat-form-field class="formField" >
+                        <input matInput formControlName="name" type="text" placeholder="Name"/>
+                        <mat-error *ngIf="topicForm.get('name').hasError('required')">Name is required</mat-error>
+                    </mat-form-field>
+                    <div *ngIf="this.topicForm.enabled" class="flex-container-row">
+                        <div class="formField">
+                            <custom-combo-box placeholder="Lab" [options]="this.labList"
+                                              valueField="idLab" [displayField]="this.prefService.labDisplayField"
+                                              [formControl]="this.topicForm.get('idLab')">
+                            </custom-combo-box>
+                        </div>
+                        <div class="formField">
+                            <custom-combo-box placeholder="Owner" valueField="idAppUser" [displayField]="this.prefService.userDisplayField"
+                                              [options]="getLabService.labMembersSubject | async" [formControlName]="'idAppUser'">
+                            </custom-combo-box>
+                        </div>
+                    </div>
+                    <div *ngIf="this.topicForm.disabled" class="flex-container-row">
+                        <label class="formField">Lab: {{this.topicNode?.lab}}</label>
+                        <label class="formField">Owner: {{this.topicNode?.appUser}}</label>
+                    </div>
+                    <div class="full-width">
+                        <angular-editor formControlName="description" [config]="this.editorConfig"></angular-editor>
+                    </div>
+                    <div> Created By: {{topicNode?.createdBy}} {{topicNode?.createDate}}
+                    </div>
+                </div>
+            </mat-tab>
+            <mat-tab label="Visibility" class="full-height">
+                <mat-radio-group class="flexbox-column" formControlName="codeVisibility">
+                    <mat-radio-button style="margin: 0.5em" *ngFor="let rad of visRadio" [value]="rad.value">
+                        <img [src]="rad.icon" class="icon">{{rad.display}}
+                    </mat-radio-button>
+                </mat-radio-group>
+            </mat-tab>
+        </mat-tab-group>
+    </form>
+    <div style="flex:1">
+        <save-footer  (saveClicked)="save()" [dirty]="topicForm.dirty" [showSpinner]="showSpinner"
+                      [disableSave]="topicForm.invalid || topicForm.disabled">
+        </save-footer>
+    </div>
+</div>

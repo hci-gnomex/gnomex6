@@ -21,9 +21,7 @@ public class GetLoginProperties extends HttpServlet {
 
     // Properties file keys
     private static final String IKEY = "ikey";
-    private static final String SKEY = "skey";
     private static final String HOST = "host";
-    private static final String AKEY = "akey";
 
     private Properties duoProperties;
 
@@ -82,9 +80,9 @@ public class GetLoginProperties extends HttpServlet {
 
                 PropertyDictionary maintenanceSplashProp = (PropertyDictionary)
                         sess.createQuery(
-                                "from PropertyDictionary p where p.propertyName='"
-                                        + PropertyDictionary.MAINTENANCE_SPLASH
-                                        + "'")
+                                        "from PropertyDictionary p where p.propertyName='"
+                                                + PropertyDictionary.MAINTENANCE_SPLASH
+                                                + "'")
                                 .uniqueResult();
                 if (maintenanceSplashProp != null) {
                     maintenanceSplash = maintenanceSplashProp.getPropertyValue();
@@ -92,8 +90,6 @@ public class GetLoginProperties extends HttpServlet {
             }
 
             String ikey = "";
-            String skey = "";
-            String akey = "";
             String duoHost = "";
 
             if (useDuo) {
@@ -105,10 +101,7 @@ public class GetLoginProperties extends HttpServlet {
                 }
 
                 ikey = duoProperties.getProperty(IKEY);
-                skey = duoProperties.getProperty(SKEY);
-                akey = duoProperties.getProperty(AKEY);
                 duoHost = duoProperties.getProperty(HOST);
-
 
             } // end of useDuo if
 
@@ -119,8 +112,6 @@ public class GetLoginProperties extends HttpServlet {
                     .add(PropertyDictionary.NO_GUEST_ACCESS, noGuestAccess)
                     .add("useduo",useDuostr)
                     .add("ikey", ikey)
-                    .add("skey", skey)
-                    .add("akey", akey)
                     .add("duohost", duoHost)
                     .add(PropertyDictionary.DUOEXCEPTIONS, duoExceptions)
                     .add(PropertyDictionary.NO_PUBLIC_VISIBILITY, noPublicAccess)
@@ -152,12 +143,6 @@ public class GetLoginProperties extends HttpServlet {
         if (!duoProperties.containsKey(IKEY)) {
             throw new DuoPropertyException("ikey is a required property");
         }
-        if (!duoProperties.containsKey(SKEY)) {
-            throw new DuoPropertyException("skey is a required property");
-        }
-        if (!duoProperties.containsKey(AKEY)) {
-            throw new DuoPropertyException("akey is a required property");
-        }
         if (!duoProperties.containsKey(HOST)) {
             throw new DuoPropertyException("host is a required property");
         }
@@ -165,10 +150,9 @@ public class GetLoginProperties extends HttpServlet {
         return duoProperties;
     }
 }
-    final class DuoPropertyException extends Exception {
-        public DuoPropertyException(String message) {
-            super(message);
-        }
 
+final class DuoPropertyException extends Exception {
+    public DuoPropertyException(String message) {
+        super(message);
     }
-
+}

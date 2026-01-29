@@ -1,0 +1,137 @@
+<div class="full-width full-height major-border padded background">
+    <div class="full-width full-height flex-container-col foreground">
+        <div class="full-width small-font border">
+            <menu-header-topics [selectedNode]="selectedItem" (messageEvent)="doLinkData()"></menu-header-topics>
+        </div>
+        <div class="full-width vertical-spacer background">
+        </div>
+        <div class="flex-container-row flex-grow overflow-auto">
+            <as-split>
+                <as-split-area [size]="20">
+                    <div class="full-width full-height small-font border">
+                        <div class="full-height full-width flex-container-col foreground">
+                            <div class="full-width flex-grow left-right-padded top-padded small-font no-overflow">
+                                <div class="full-width full-height border">
+                                    <tree-root #topicsTree
+                                               [nodes]="items"
+                                               [options]="options"
+                                               (updateData)="onTreeUpdateData()"
+                                               (moveNode)="onMoveNode($event)"
+                                               (activate)="treeOnSelect($event)">
+                                        <ng-template #treeNodeTemplate let-node let-index="index">
+                                            <div class="full-width no-word-wrap tree-node-font">
+                                                <img *ngIf="node.data.icon" src="{{node.data.icon}}" alt="" class="tree-node-icon icon">
+                                                <span>{{ node.data.label }}</span>
+                                            </div>
+                                        </ng-template>
+                                        <ng-template #loadingTemplate></ng-template>
+                                    </tree-root>
+                                </div>
+                            </div>
+                            <div class="full-width small-font">
+                                <div class="flex-container-row">
+                                    <div class="padded">
+                                        <button mat-button (click)="expandClicked()">Expand</button>
+                                    </div>
+                                    <div class="padded flex-grow">
+                                        <button mat-button (click)="collapseClicked()">Collapse</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </as-split-area>
+                <as-split-area [size]="80">
+                    <div class="full-width full-height border padded small-font">
+                        <div [hidden]="!linkDataView" class="full-width full-height foreground">
+                            <div class="full-width full-height flex-container-col">
+                                <div class="flex-container-row align-center">
+                                    <img [src]="addIcon" alt="">
+                                    <mat-label class="padded">Add {{addLabel}} (Find and drag to topic)</mat-label>
+                                    <div class="flex-grow">
+                                    </div>
+                                    <mat-radio-group (change)="this.onModeChange()" [(ngModel)]="this.mode">
+                                        <mat-radio-button class="padded" *ngFor="let m of this.modes" [value]="m">
+                                            {{ m }}
+                                        </mat-radio-button>
+                                    </mat-radio-group>
+                                </div>
+                                <div class="full-width flex-grow flex-container-col padded border overflow-auto">
+                                    <div class="full-width flex-container-row align-center">
+                                        <div class="formField">
+                                            <custom-combo-box placeholder="Filter by Lab"
+                                                              [options]="this.pickerLabs"
+                                                              [displayField]="this.prefService.labDisplayField"
+                                                              valueField="idLab"
+                                                              (optionSelected)="this.onLabSelect()"
+                                                              [(ngModel)]="this.selectedLab">
+                                            </custom-combo-box>
+                                        </div>
+                                        <div class="formField" *ngIf="this.mode === this.MODE_DATA_TRACK">
+                                            <custom-combo-box placeholder="Organism"
+                                                              [options]="this.organisms"
+                                                              displayField="binomialName"
+                                                              valueField="idOrganism"
+                                                              (optionSelected)="this.onOrganismSelect()"
+                                                              [(ngModel)]="this.selectedOrganism">
+                                            </custom-combo-box>
+                                        </div>
+                                        <div class="formField" *ngIf="this.mode === this.MODE_DATA_TRACK && this.selectedOrganism">
+                                            <custom-combo-box placeholder="Genome Build"
+                                                              [options]="this.genomeBuildList"
+                                                              displayField="genomeBuildName"
+                                                              valueField="idGenomeBuild"
+                                                              (optionSelected)="this.onGenomeBuildSelect()"
+                                                              [(ngModel)]="selectedGenomeBuild">
+                                            </custom-combo-box>
+                                        </div>
+                                        <mat-form-field class="formField">
+                                            <input matInput [(ngModel)]="searchText" placeholder="Filter by Name" (keyup)="onSearchFilterKeyup($event)">
+                                        </mat-form-field>
+                                        <button mat-button class="minimize" [hidden]="!searchText" (click)="clearSearchText()">
+                                            <img class="small-icon" [src]="constantsService.ICON_CANCEL" alt="">
+                                        </button>
+                                        <button mat-button class="minimize" (click)="searchByText()">
+                                            <img class="small-icon" [src]="constantsService.ICON_MAGNIFIER" alt="">
+                                        </button>
+                                        <div class="flex-grow">
+                                        </div>
+                                        <mat-radio-group *ngIf="this.mode === this.MODE_EXPERIMENT || this.mode === this.MODE_ANALYSIS"
+                                                         (change)="this.onTimeFrameChange()" [(ngModel)]="this.selectedTimeFrame">
+                                            <mat-radio-button class="padded" *ngFor="let frame of this.timeFrames" [value]="frame">
+                                                {{ frame }}
+                                            </mat-radio-button>
+                                        </mat-radio-group>
+                                        <div class="flex-grow">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <mat-label class="left-right-padded">{{countLabel}}</mat-label>
+                                    </div>
+                                    <div class="full-width flex-grow overflow-auto">
+                                        <tree-root #dataTree
+                                                   [nodes]="dataTreeItems"
+                                                   [options]="dataTreeOptions"
+                                                   (updateData)="onDataTreeUpdateData()">
+                                            <ng-template #treeNodeTemplate let-node let-index="index">
+                                                <div class="tree-node-font">
+                                                    <img src="{{node.data.icon}}" class="tree-node-icon icon" alt="">
+                                                    <span>{{ node.data.label }}</span>
+                                                </div>
+                                            </ng-template>
+                                            <ng-template #loadingTemplate></ng-template>
+                                        </tree-root>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div  class="full-width full-height" [hidden]="linkDataView">
+                            <topics-panel></topics-panel>
+                        </div>
+                    </div>
+                </as-split-area>
+            </as-split>
+        </div>
+    </div>
+</div>
+

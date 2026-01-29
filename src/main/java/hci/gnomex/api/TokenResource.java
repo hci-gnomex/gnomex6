@@ -1,24 +1,35 @@
 package hci.gnomex.api;
 
 import hci.gnomex.model.AppUser;
+import hci.gnomex.model.PropertyDictionary;
+import hci.gnomex.security.DuoPolicy;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.ri.auth.util.JwtGenerator;
 import hci.ri.auth.util.KeystoreRSASignatureConfiguration;
 import io.buji.pac4j.subject.Pac4jPrincipal;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.env.IniWebEnvironment;
 import org.apache.shiro.web.util.WebUtils;
+import org.hibernate.Session;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.jwt.JwtClaims;
 import org.pac4j.jwt.profile.JwtProfile;
 
+import javax.naming.NamingException;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
 //import org.pac4j.saml.credentials.authenticator.SAML2Authenticator;
@@ -47,13 +58,30 @@ public class TokenResource {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAuthenticatedUser(@Context ServletContext context) throws Exception {
+    public Response getAuthenticatedUser(@Context ServletContext context,
+                                         @Context HttpServletRequest request) throws Exception {
 
         //Get the keystore-based signing config out of the INI Web Environment, so we don't have to hard-code the keystore parameters or put them somewhere else
         IniWebEnvironment iwe = (IniWebEnvironment) WebUtils.getWebEnvironment(context);
         KeystoreRSASignatureConfiguration sigConfig = (KeystoreRSASignatureConfiguration) iwe.getObject("signingConfig", KeystoreRSASignatureConfiguration.class);
 
         PrincipalCollection principals = SecurityUtils.getSubject().getPrincipals();
+
+        // ===== Duo gate (prefer Shiro session) =====
+        boolean useDuo = DuoPolicy.isDuoEnabled();
+
+        if (useDuo) {
+            org.apache.shiro.session.Session shiroSession = SecurityUtils.getSubject().getSession(false);
+            Object duoOk = (shiroSession != null) ? shiroSession.getAttribute("DUO_OK") : null;
+
+            if (!Boolean.TRUE.equals(duoOk)) {
+                throw new ForbiddenException("Duo verification required");
+            }
+
+            // Optional: require Duo per token request instead of per login session
+            // shiroSession.removeAttribute("DUO_OK");
+        }
+        // ==========================================
 
         //Create the JWT based on a JWT profile, rather than the SAML2Profile, to keep it more useful and concise.
         JwtProfile profile = new JwtProfile();
@@ -112,4 +140,5 @@ public class TokenResource {
             return attribute;
         }
     }
+
 }

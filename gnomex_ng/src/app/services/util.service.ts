@@ -4,8 +4,6 @@ import {ITreeModel, ITreeNode} from "angular-tree-component/dist/defs/api";
 import {Subscription} from "rxjs";
 import {TreeModel, TreeNode} from "angular-tree-component";
 import * as _ from "lodash";
-import {FileService} from "./file.service";
-import {archifyDependencyTree} from "typings/dist/support/cli";
 
 @Injectable()
 export class UtilService {

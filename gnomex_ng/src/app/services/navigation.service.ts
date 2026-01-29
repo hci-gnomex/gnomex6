@@ -13,7 +13,6 @@ import {
 } from "@angular/router";
 import {IRequiredParam} from "../util/interfaces/navigation-definition.model";
 import {filter} from "rxjs/operators";
-import {NavigationItem} from "typedoc";
 import {ITreeNode} from "angular-tree-component/dist/defs/api";
 
 @Injectable()

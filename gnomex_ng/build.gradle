@@ -1,44 +1,87 @@
 buildscript {
-    repositories {
-        mavenCentral()
-    }
+  repositories { mavenCentral() }
 }
 
 plugins {
-    id "com.github.node-gradle.node" version "3.1.1"
+  id "com.github.node-gradle.node" version "3.1.1"
 }
 
 repositories {
-    mavenCentral()
+  mavenCentral()
 }
 
-tasks.register('cleanAngular', NpmTask) {
-    args = ['run', 'clean:dist']
+node {
+  // Angular 7 works well with Node 10.x (you’re using 10.24.1)
+  // If you want Gradle to manage Node automatically, uncomment these:
+  // version = "10.24.1"
+  // npmVersion = "6.14.12"
+  // download = true
+
+  // If you already have Node installed and want to use system Node, leave download=false (default)
+  // download = false
 }
 
-tasks.register('cleanNpmInstall', NpmTask) {
-    args = ['run', 'clean:install']
+def isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
+
+// ----- Clean tasks -----
+tasks.register('cleanAngularDist', NpmTask) {
+  //ensure install has ran
+  dependsOn tasks.named('npmInstallSmart')
+  args = ['run', 'clean:dist']
 }
 
-tasks.register('cleanAll', NpmTask) {
-    args = ['run', 'clean']
+tasks.register('cleanAngularAll', NpmTask) {
+  // Uses: "clean": "npm cache clean --force && rimraf node_modules dist"
+  args = ['run', 'clean']
 }
 
-tasks.register('buildWebpackDevWDS', NpmTask) {
-    dependsOn(cleanAngular, npmInstall)
-    args = ['run', 'build:dev:wds']
+// ----- Install task -----
+// Prefer npm ci when there is a package-lock.json, otherwise fallback to npm install
+tasks.register('npmInstallSmart') {
+  dependsOn tasks.named('npmSetup') // from node-gradle plugin (safe even if system node)
+  doLast {
+    File lock = file("${projectDir}/package-lock.json")
+    if (lock.exists()) {
+      // npm ci is reproducible and faster for CI/build servers
+      exec {
+        workingDir projectDir
+        if (isWindows) {
+          commandLine "cmd", "/c", "npm", "ci"
+        } else {
+          commandLine "npm", "ci"
+        }
+      }
+    } else {
+      exec {
+        workingDir projectDir
+        if (isWindows) {
+          commandLine "cmd", "/c", "npm", "install"
+        } else {
+          commandLine "npm", "install"
+        }
+      }
+    }
+  }
 }
 
-tasks.register('buildWebpackDevTomcat', NpmTask) {
-    dependsOn(npmInstall)
-    args = ['run', 'build:dev:tomcat']
+// ----- Build tasks (Angular CLI) -----
+tasks.register('ngBuildDevTomcat', NpmTask) {
+  // Runs: "build:dev:tomcat": "ng build -c developmentTomcat"
+  dependsOn tasks.named('npmInstallSmart')
+  dependsOn tasks.named('cleanAngularDist')
+  args = ['run', 'build:dev:tomcat']
 }
 
-tasks.register('buildWebpackProd', NpmTask) {
-    dependsOn(cleanAngular, npmInstall)
-    args = ['run', 'build:prod']
+tasks.register('ngBuildProdTomcat', NpmTask) {
+  // Runs: "build:prod:tomcat": "ng build -c productionTomcat"
+  dependsOn tasks.named('npmInstallSmart')
+  dependsOn tasks.named('cleanAngularDist')
+  args = ['run', 'build:prod:tomcat']
 }
 
-tasks.register('runWebpackDevServer', NpmTask) {
-    args = ['run', 'webpack-dev-server']
+// Optional: run dev server from Gradle (for local dev)
+tasks.register('ngServeTomcat', NpmTask) {
+  // Runs: "start": "ng serve -c developmentTomcat --proxy-config proxy.conf.json"
+  dependsOn tasks.named('npmInstallSmart')
+  args = ['run', 'start']
 }

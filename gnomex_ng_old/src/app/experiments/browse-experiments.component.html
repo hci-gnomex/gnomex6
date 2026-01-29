@@ -1,0 +1,104 @@
+<div class="background background-border full-width full-height flex-container-col padding">
+    <div class="full-height flex-container-col foreground">
+        <div class="full-width">
+            <browse-filter [label]="'Experiments'"
+                           [iconSource]="'assets/flask.png'"
+                           [lookupLab]="lookupLab"
+                           [mode]="'experimentBrowse'">
+            </browse-filter>
+        </div>
+        <div class="full-width background vertical-spacer"></div>
+        <div class="flex-container-row flex-grow full-height overflow-auto">
+            <as-split>
+                <as-split-area size="20">
+                    <div class="full-height flex-grow border"> <!-- start tree container -->
+                        <div class="full-height flex-container-col foreground">
+                            <div class="full-width padding">
+                                <div *ngIf="showDragDropHint" class="full-width padded">
+                                    <div class="background-lightyellow allow-line-breaks padded">{{this.DRAG_DROP_HINT}}
+                                    </div>
+                                </div>
+                                <div class="flex-container-row align-center">
+                                    <div class="full-height flex-grow major-left-right-padding no-word-wrap flex-container-col align-center justify-center">
+                                        <label>{{experimentCount}} experiments</label>
+                                        <label style="font-size: 12px;">{{experimentCountMessage}}</label>
+                                    </div>
+                                    <div class="full-height">
+                                        <button mat-button aria-label="Drag-and-drop hint" (click)="onClickShowDragDropHint()"
+                                                [disabled]="this.createSecurityAdvisorService.isGuest" [matTooltip]="this.DRAG_DROP_HINT">
+                                            <img [src]="'./assets/information.png'" alt="" class="padding">
+                                            Drag-and-drop hint
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="full-width flex-grow left-right-padding no-overflow">
+                                <div class="full-width full-height border">
+                                    <tree-root #tree
+                                               (moveNode)="onMoveNode($event)"
+                                               (updateData)="treeUpdateData($event)"
+                                               (activate)="treeOnSelect($event)"
+                                               [(state)]="state"
+                                               [nodes]="items"
+                                               [options]="options">
+                                        <ng-template #treeNodeTemplate let-node let-index="index">
+                                            <div class="full-width no-word-wrap tree-node-font">
+                                                <img src="{{ node?.data?.icon ? node.data.icon : 'assets/flask.png' }}" alt="" class="tree-node-icon icon">
+                                                <span>{{ node.data.label }}</span>
+                                            </div>
+                                        </ng-template>
+                                        <ng-template #loadingTemplate></ng-template>
+                                    </tree-root>
+                                </div>
+                            </div>
+                            <div class="full-width padding">
+                                <div class="flex-container-row align-center justify-space-between">
+                                    <div>
+                                        <button mat-button (click)="expandCollapseClicked()">
+                                            {{toggleButton}}
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <mat-checkbox class="inlineDiv small-font" [(ngModel)]="showEmptyFolders" (change)="onShowEmptyFolders($event)">
+                                            Show Empty Folders
+                                        </mat-checkbox>
+                                    </div>
+                                </div>
+                                <div class="flex-container-col">
+                                    <div class="flex-container-row justify-space-between">
+                                        <div>
+                                            <button mat-button [disabled]="disableNewProject || this.disableAll" (click)="newProjectClicked()">
+                                                <img [src]="'./assets/folder_add.png'" alt="">
+                                                New Project
+                                            </button>
+                                        </div>
+                                        <div>
+                                            <button mat-button [disabled]="disableDeleteProject || this.disableAll" (click)="deleteProjectClicked()">
+                                                <img [src]="'./assets/folder_delete.png'">
+                                                Delete Project
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="flex-container-row">
+                                        <div>
+                                            <button mat-button [disabled]="disableDeleteExperiment || this.disableAll" (click)="deleteExperimentClicked()">
+                                                <img [src]="'./assets/delete.png'" alt="">
+                                                Delete Experiment
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> <!-- end tree container -->
+                </as-split-area>
+                <as-split-area size="80">
+                    <div  class="full-width full-height border padding">
+                        <browse-panel></browse-panel>
+                    </div>
+                </as-split-area>
+            </as-split>
+        </div>
+    </div>
+</div>
+
