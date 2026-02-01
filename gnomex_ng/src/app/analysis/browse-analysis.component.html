@@ -27,7 +27,7 @@
                                 <div>
                                     <button mat-button aria-label="Drag-and-drop hint" (click)="dragDropHintClicked()"
                                             [disabled]="this.createSecurityAdvisorService.isGuest" [matTooltip]="this.DRAG_AND_DROP_HINT">
-                                        <img [src]="'./assets/information.png'">
+                                        <img [src]="'./assets/information.png'" alt="Drag-and-drop hint icon" class="icon">
                                         Drag-and-drop hint
                                     </button>
                                 </div>
@@ -41,7 +41,7 @@
                                                (updateData)="treeUpdateData($event)">
                                         <ng-template #treeNodeTemplate let-node let-index="index">
                                             <div class="full-width no-word-wrap tree-node-font">
-                                                <img src="{{node.data.icon}}" alt="" class="tree-node-icon icon">
+                                                <img src="{{node.data.icon}}" alt="Tree Node Icon" class="tree-node-icon icon">
                                                 <span>{{ node.data.label }}</span>
                                             </div>
                                         </ng-template>
@@ -54,13 +54,13 @@
                                     <div class="tr">
                                         <div class="td">
                                             <button mat-button [disabled]="disableNewAnalysis || this.disableAll" (click)="createAnalysisClicked($event)">
-                                                <img [src]="'./assets/map.png'" alt="">
+                                                <img [src]="'./assets/map.png'" alt="New Analysis Icon">
                                                 New Analysis
                                             </button>
                                         </div>
                                         <div class="td">
                                             <button mat-button [disabled]="disableDelete || this.disableAll" (click)="deleteAnalysisClicked($event)">
-                                                <img class="exit" [src]="'./assets/delete.png'" alt="">
+                                                <img class="exit" [src]="'./assets/delete.png'" alt="Delete Analysis Icon">
                                                 Delete
                                             </button>
                                         </div>
@@ -68,7 +68,7 @@
                                     <div class="tr">
                                         <div class="td">
                                             <button mat-button [disabled]="disableNewAnalysisGroup || this.disableAll" (click)="createAnalysisGroupClicked($event)">
-                                                <img [src]="'./assets/folder_add.png'">
+                                                <img [src]="'./assets/folder_add.png'" alt="New Analysis Group Icon">
                                                 New analysis group
                                             </button>
                                         </div>

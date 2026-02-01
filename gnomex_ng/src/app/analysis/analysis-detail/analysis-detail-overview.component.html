@@ -1,31 +1,31 @@
 <div class="full-width full-height flex-container-col">
     <div class="flex-container-row align-center padded-left-right-bottom small-font overflow-auto">
         <div class="flex-container-row align-center label-min-width">
-            <img [src]="analysisTreeNode?.icon" alt="">
+            <img [src]="analysisTreeNode?.icon" alt="Analysis Icon" class="icon">
             <div class="medium-font padded-left">
                 Analysis {{ analysisTreeNode?.number }}
             </div>
         </div>
         <div class="flex-container-row flex-wrap child-margins">
             <button mat-raised-button *ngIf="showEdit" class="minimize" (click)="editButtonClicked($event)">
-                <img *ngIf="!isEditMode" class="icon" [src]="constService.ICON_TAG_BLUE_EDIT" alt="">
-                <img *ngIf="isEditMode" class="icon" [src]="constService.PAGE" alt="">
+                <img *ngIf="!isEditMode" class="icon" [src]="constService.ICON_TAG_BLUE_EDIT" alt="View Button">
+                <img *ngIf="isEditMode" class="icon" [src]="constService.PAGE" alt="Edit Icon">
                 {{ isEditMode ? "View" : "Edit" }}
             </button>
             <button mat-raised-button *ngIf="showAutoDistributeDataTracks" class="minimize" (click)="distributeDataTracks()">
-                <img class="icon" [src]="constService.ICON_DATATRACK_NEW" alt="">
+                <img class="icon" [src]="constService.ICON_DATATRACK_NEW" alt="Distribute Data Tracks Button">
                 Distribute Data Tracks
             </button>
             <button mat-raised-button *ngIf="showManagePEDFile" class="minimize" (click)="showManagePEDFileWindow()">
-                <img class="icon" [src]="constService.ICON_CHART_ORGANIZATION" alt="">
+                <img class="icon" [src]="constService.ICON_CHART_ORGANIZATION" alt="Show Manage Ped File Button">
                 Manage Ped File
             </button>
             <button mat-raised-button class="minimize" (click)="shareWebLink()">
-                <img class="icon" [src]="constService.GLOBE_LINK" alt="">
+                <img class="icon" [src]="constService.GLOBE_LINK" alt="Share URL Button">
                 Share URL
             </button>
             <button *ngIf="showLinkToExp" mat-raised-button class="minimize" (click)="makeLinkToExperiment()">
-                <img class="icon" [src]="constService.ICON_LINK" alt="">
+                <img class="icon" [src]="constService.ICON_LINK" alt="Show Link to Experiment Button">
                 Link to Experiment
             </button>
         </div>
