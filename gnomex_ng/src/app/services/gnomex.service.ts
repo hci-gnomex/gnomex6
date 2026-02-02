@@ -1030,8 +1030,6 @@ export class GnomexService {
                     this.useduo = true;
                 }
                 this.ikey = response["ikey"];
-                this.skey = response["skey"];
-                this.akey = response["akey"];
                 this.duo_host = response["duohost"];
                 this.duoExceptions = response[PropertyService.PROPERTY_DUOEXCEPTIONS];
                 this.maintenanceMode = response[PropertyService.PROPERTY_MAINTENANCEMODE];

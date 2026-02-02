@@ -438,11 +438,17 @@ export class AuthenticationService {
     }
   }
   getDuoInit(username: string) {
-    return this._http.get<any>(`/api/duo/init?username=${encodeURIComponent(username)}`);
+    return this._http.post<any>(
+      `/${this.getContextRoot()}/api/duo/sign`,
+      { username: username.trim() }
+    );
   }
 
   verifyDuo(sigResponse: string) {
-    return this._http.post<any>(`/api/duo/verify`, { sig_response: sigResponse });
+    return this._http.post<any>(
+      `/${this.getContextRoot()}/api/duo/verify`,
+      { sig_response: sigResponse.trim() }
+    );
   }
 
   private unsubscribeFromTimout(): void {

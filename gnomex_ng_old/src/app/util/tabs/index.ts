@@ -1,7 +1,0 @@
-export * from './tab.component'
-export * from './tabs.component'
-export * from './primary-tab.component'
-export * from './tab-container.component'
-export * from './tab-status-event'
-export * from './tab-change-event'
-export * from './control-change-state'

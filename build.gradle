@@ -32,7 +32,8 @@ dependencies {
 
     runtimeOnly fileTree(dir: 'libEnv', include: 'hci-servlet-filter-nocache-1.0.1.jar')
     runtimeOnly fileTree(dir: 'libEnv', include: 'hci-servlet-filter-cors-1.1.0.jar')
-    runtimeOnly fileTree(dir: 'libEnv', include: 'hci-servlet-filter-pushstate-1.1.1.jar')
+    runtimeOnly fileTree(dir: 'libEnv', include: 'hci-servlet-filter-pushstate-1.0.1.jar')
+    runtimeOnly "javax.activation:activation:1.1.1"
 
 
     implementation group: 'servlets.com', name: 'cos', version: '05Nov2002'
@@ -96,7 +97,7 @@ dependencies {
     implementation fileTree(dir: 'libEnv', include: 'auth-persistence-3.1.1.jar')
     implementation fileTree(dir: 'libEnv', include: 'hci-bean-validation-1.0.jar')
 
-//Realm stuff
+    //Realm stuff
     providedCompile group: 'org.apache.tomcat', name: 'tomcat-jdbc', version: '9.0.0.M10'
     providedCompile group: 'org.apache.tomcat', name: 'tomcat-catalina', version: '9.0.10'
 
@@ -120,14 +121,14 @@ dependencies {
     providedCompile group: 'javax.enterprise', name: 'cdi-api', version: '1.2'
     runtimeOnly group: 'org.jboss.weld.servlet', name: 'weld-servlet', version: '2.4.1.Final'
 
-    implementation group:  'ch.qos.reload4j', name: 'reload4j', version: '1.2.26'
+//    implementation group:  'ch.qos.reload4j', name: 'reload4j', version: '1.2.26'
     implementation group: 'org.slf4j', name: 'slf4j-reload4j', version: '1.7.36'
 
 
 }
 configurations.configureEach {
     exclude group: "jakarta.activation", module: "jakarta.activation-api"
-    exclude group: "javax.activation", module: "activation"
+//    exclude group: "javax.activation", module: "activation"
 }
 
 
@@ -218,9 +219,6 @@ task makeSQLServer() {
 jar {
     archiveFileName = jarName
     manifest {
-        attributes(
-                'Class-Path': 'log4j.jar'
-        )
         attributes([
                 'Built-By'              : 'u0974549',
                 'Implementation-Version': "6.26.12 (07/06/2025)"
