@@ -12,14 +12,16 @@ import {GDAction} from "../util/interfaces/generic-dialog-action.model";
 @Component({
     selector: "reassign-experiment-dialog",
     template: `
-        <form [formGroup]="reassignExperimentForm" class="flex-container-col full-width full-width padded-left-right">
-            <p class="double-padded">Reassign experiment <strong>{{currentItem.label}}</strong> to project <strong>{{targetItem.label}}</strong>? </p>
+        <form [formGroup]="reassignExperimentForm" class="flex-container-col full-width full-width padded-left-right" role="form" aria-label="Reassign experiment form">
+            <p class="double-padded" id="reassignDescription">Reassign experiment <strong>{{currentItem.label}}</strong> to project <strong>{{targetItem.label}}</strong>? </p>
             <div class="double-padded-left-right">
                 <custom-combo-box [options]="this.labMembers"
                                   placeholder="Owner"
                                   [displayField]="'displayName'"
                                   valueField="idAppUser"
-                                  [formControlName]="'selectedOwner'">
+                                  [formControlName]="'selectedOwner'"
+                                  aria-label="Select new owner"
+                                  aria-required="true">
                 </custom-combo-box>
             </div>
 
@@ -28,7 +30,9 @@ import {GDAction} from "../util/interfaces/generic-dialog-action.model";
                                   placeholder="Account"
                                   [displayField]="'accountNameAndNumber'"
                                   valueField="idBillingAccount"
-                                  [formControlName]="'selectedAccount'">
+                                  [formControlName]="'selectedAccount'"
+                                  aria-label="Select billing account"
+                                  aria-required="true">
                 </custom-combo-box>
             </div>
         </form>

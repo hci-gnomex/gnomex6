@@ -1,21 +1,22 @@
-<div class="full-height full-width flex-container-col padded bordered overflow-auto">
-    <div *ngIf="!!icon || !!label" class="full-width align-center padded-bottom">
+<div class="full-height full-width flex-container-col padded bordered overflow-auto" role="main" aria-label="New Experiment Wizard">
+    <div *ngIf="!!icon || !!label" class="full-width align-center padded-bottom" role="banner">
         <div class="full-height full-width flex-container-row">
             <div *ngIf="!!icon" class="padded-left">
-                <img src="{{ icon }}" height="16" width="16">
+                <img src="{{ icon }}" height="16" width="16" alt="" aria-hidden="true">
             </div>
-            <div *ngIf="!!label" class="flex-grow padded" style="min-height: calc(0.6em + 16px);">
+            <div *ngIf="!!label" class="flex-grow padded" style="min-height: calc(0.6em + 16px);" role="heading" aria-level="1">
                 {{ label }}
             </div>
         </div>
     </div>
-    <div class="full-width flex-grow overflow-auto bordered">
+    <div class="full-width flex-grow overflow-auto bordered" role="region" aria-label="Experiment setup steps">
         <mat-tab-group #tabGroup
                        class="full-width full-height"
                        id="linkDataTabs"
                        [selectedIndex]="selectedIndex"
-                       (selectedTabChange)="onTabChange($event)">
-            <mat-tab label="Setup" class="full-width full-height">
+                       (selectedTabChange)="onTabChange($event)"
+                       aria-label="New experiment steps">
+            <mat-tab label="Setup" class="full-width full-height" aria-label="Initial setup step">
                 <new-experiment-setup #setupTab
                                       [experiment]="inputs?.experiment"
                                       [idCoreFacility]="inputs?.idCoreFacility"
@@ -46,21 +47,23 @@
             </mat-tab>
         </mat-tab-group>
     </div>
-    <div class="full-width padded-top">
+    <div class="full-width padded-top" role="toolbar" aria-label="Wizard navigation">
         <div class="full-width flex-container-row align-center">
             <div class="padded-right">
                 <button mat-raised-button
                         [disabled]="selectedIndex === 0"
-                        (click)="goBack()">
-                    <mat-icon>arrow_left</mat-icon>
+                        (click)="goBack()"
+                        aria-label="Go to previous step">
+                    <mat-icon aria-hidden="true">arrow_left</mat-icon>
                     Back
                 </button>
             </div>
             <div class="padded-right">
                 <button mat-raised-button
                         [disabled]="!formOfCurrentlySelectedTab || formOfCurrentlySelectedTab.invalid || onSubmitTab"
-                        (click)="goNext()">
-                    <mat-icon>arrow_right</mat-icon>
+                        (click)="goNext()"
+                        aria-label="Go to next step">
+                    <mat-icon aria-hidden="true">arrow_right</mat-icon>
                     Next
                 </button>
             </div>
@@ -68,23 +71,25 @@
                 <button *ngIf="onSubmitTab"
                         mat-raised-button
                         [disabled]="!onSubmitTab"
-                        (click)="SaveNewExperiment()">
-                    <img [src]="'./assets/accept.png'">
+                        (click)="SaveNewExperiment()"
+                        [attr.aria-label]="submitOrSaveButtonLabel">
+                    <img [src]="'./assets/accept.png'" alt="" aria-hidden="true">
                     {{ submitOrSaveButtonLabel }}
                 </button>
             </div>
             <div *ngIf="onSubmitTab" class="padded-right">
-                <mat-checkbox [(ngModel)]="isCheckboxChecked" disabled="{{ disable_agreeCheckbox ? 'true' : 'false' }}">
+                <mat-checkbox [(ngModel)]="isCheckboxChecked" disabled="{{ disable_agreeCheckbox ? 'true' : 'false' }}" aria-label="Agreement confirmation">
                     <div class="highlight-agreement">
                         {{ agreeCheckboxLabel }}
                     </div>
                 </mat-checkbox>
             </div>
-            <div class="full-height flex-grow">
+            <div class="full-height flex-grow" aria-hidden="true">
             </div>
             <div class="padded-left">
                 <button mat-raised-button
-                        (click)="clickCancel()">
+                        (click)="clickCancel()"
+                        aria-label="Cancel and discard experiment">
                     Cancel
                 </button>
             </div>

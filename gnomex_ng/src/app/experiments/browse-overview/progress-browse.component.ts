@@ -14,21 +14,23 @@ import {IconRendererComponent} from "../../util/grid-renderers";
 @Component({
     selector: "progress-tab",
     template: `
-        <div class="full-width full-height">
+        <div class="full-width full-height" role="region" aria-label="Progress tracking">
             <div class="full-width full-height flex-container-col">
-                <div class="full-width">
+                <div class="full-width" role="group" aria-label="Progress filter options">
                     <div class="full-width flex-container-row">
-                        <mat-radio-group  [(ngModel)]="selectedOpt" (change)="selectSubFilter()" >
-                            <mat-radio-button style="margin: 0.5em"  *ngFor="let opt of progressOptions; let i=index" [value]="opt.label">
+                        <mat-radio-group [(ngModel)]="selectedOpt" (change)="selectSubFilter()" aria-label="Select progress view type">
+                            <mat-radio-button style="margin: 0.5em" *ngFor="let opt of progressOptions; let i=index" [value]="opt.label" [attr.aria-label]="opt.label">
                                 {{opt.label}}
                             </mat-radio-button>
                         </mat-radio-group>
-                        
+
                     </div>
                 </div>
                 <div class="flex-container-col full-width flex-grow">
-                    <div  class="flex-container-col flex-grow full-width">
+                    <div class="flex-container-col flex-grow full-width">
                         <ag-grid-angular class="ag-theme-balham full-height full-width"
+                                         role="grid"
+                                         aria-label="Progress data grid"
                                          (gridReady)="this.onGridReady($event)"
                                          [rowDeselection]="true"
                                          [groupDefaultExpanded]="true"

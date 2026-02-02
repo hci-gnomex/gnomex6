@@ -15,10 +15,12 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 @Component({
     selector: "visibility-browse-tab",
     template: `
-        <div style="width:100%; height:100%; display:flex; flex-direction: column ">
+        <div style="width:100%; height:100%; display:flex; flex-direction: column " role="region" aria-label="Visibility settings">
             <div style="display:flex; flex-direction:column; flex:1; width:100%;">
                 <ag-grid-angular style="width: 100%; height: 100%;"
                                  class="ag-theme-fresh"
+                                 role="grid"
+                                 aria-label="Visibility data grid"
                                  [gridOptions]="gridOpt"
                                  [rowData]="rowData"
                                  [columnDefs]="columnDefs"

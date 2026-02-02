@@ -17,24 +17,26 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: "create-project-component",
     template: `
-        <div class="full-width full-height flex-container-col double-padded-left-right">
+        <div class="full-width full-height flex-container-col double-padded-left-right" role="form" aria-label="Create or edit project">
             <custom-combo-box class="full-width" placeholder="Lab" [options]="this.labList"
                                 valueField="idLab" [displayField]="this.labDisplayField"
-                                [formControl]="this.form.get('idLab')">
+                                [formControl]="this.form.get('idLab')"
+                                aria-label="Select lab">
             </custom-combo-box>
             <mat-form-field class="full-width">
-                <input matInput placeholder="Project name" [formControl]="this.form.get('name')">
-                <mat-error *ngIf="this.form.get('name').hasError('required')">Project name is <strong>required</strong></mat-error>
-                <mat-error *ngIf="this.form.get('name').hasError('maxlength')">
+                <input matInput placeholder="Project name" [formControl]="this.form.get('name')" aria-label="Project name" aria-required="true">
+                <mat-error *ngIf="this.form.get('name').hasError('required')" role="alert">Project name is <strong>required</strong></mat-error>
+                <mat-error *ngIf="this.form.get('name').hasError('maxlength')" role="alert">
                     Project name can be at most {{this.constantsService.MAX_LENGTH_200}} characters
                 </mat-error>
             </mat-form-field>
-            <label for="descEditor">Project description</label>
+            <label for="descEditor" id="descEditorLabel">Project description</label>
             <angular-editor class="full-width" #descEditorRef id="descEditor"
                             [formControl]="this.form.get('description')"
-                            [config]="descEditorConfig">
+                            [config]="descEditorConfig"
+                            aria-labelledby="descEditorLabel">
             </angular-editor>
-            <mat-error *ngIf="this.form.get('description').hasError('maxlength')">
+            <mat-error *ngIf="this.form.get('description').hasError('maxlength')" role="alert" aria-live="polite">
                 Project description can be at most {{this.constantsService.MAX_LENGTH_4000}}
                 characters
                 including HTML code formatting and styles. Character count: {{this.form.get(

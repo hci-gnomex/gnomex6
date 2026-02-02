@@ -1,25 +1,25 @@
-<div class="full-height full-width padded">
-    <form [formGroup]="visibilityForm" class="full-height full-width flex-container-col">
-        <div class="full-width">
-            <label>
+<div class="full-height full-width padded" role="region" aria-label="Visibility Settings">
+    <form [formGroup]="visibilityForm" class="full-height full-width flex-container-col" role="form" aria-label="Visibility form">
+        <div class="full-width" role="group" aria-label="Base visibility level">
+            <label id="visibilityLabel">
                 First, select the base level of visibility:
             </label>
-            <mat-radio-group class="full-width flex-container-col extreme-left-padded"  formControlName="codeVisibility" (change)="updateCollaborators()" >
-                <mat-radio-button *ngFor="let rad of visRadio" [value]="rad.value" [matTooltip]="rad.tooltip">
-                    <img [src]="rad.icon">{{rad.display}}
+            <mat-radio-group class="full-width flex-container-col extreme-left-padded" formControlName="codeVisibility" (change)="updateCollaborators()" aria-labelledby="visibilityLabel">
+                <mat-radio-button *ngFor="let rad of visRadio" [value]="rad.value" [matTooltip]="rad.tooltip" [attr.aria-label]="rad.display">
+                    <img [src]="rad.icon" alt="" aria-hidden="true">{{rad.display}}
                 </mat-radio-button>
             </mat-radio-group>
         </div>
         <mat-form-field *ngIf="isPrivacyExpSupported"
                         class="short-input"
                         matTooltip="Public visibility date&#13;(Visibility automatically changes to 'Public' on this date)">
-            <input matInput [matDatepicker]="privacyPicker" placeholder="Privacy Expiration" formControlName="privacyExp" [min]="this.today">
-            <mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>
+            <input matInput [matDatepicker]="privacyPicker" placeholder="Privacy Expiration" formControlName="privacyExp" [min]="this.today" aria-label="Privacy expiration date">
+            <mat-datepicker-toggle matSuffix [for]="privacyPicker" aria-label="Open date picker"></mat-datepicker-toggle>
             <mat-datepicker #privacyPicker disabled="false"></mat-datepicker>
         </mat-form-field>
         <div class="vertical-spacer"></div>
-        <div *ngIf="showCollaboratorBlock" class="flex-container-col flex-grow padded-top">
-            <label>
+        <div *ngIf="showCollaboratorBlock" class="flex-container-col flex-grow padded-top" role="region" aria-label="Collaborators section">
+            <label id="collaboratorsLabel">
                 Then, specify any other {{ visibilityForm && visibilityForm.get('codeVisibility') && visibilityForm.get('codeVisibility').value && visibilityForm.get('codeVisibility').value === 'OWNER' ? 'lab member(s) and ' : '' }}individual lab collaborator(s) to allow access to this experiment
             </label>
             <!--<div>-->
@@ -48,6 +48,9 @@
             <div class="full-width flex-grow" *ngIf="showCollaboratorBlock" >
                 <ag-grid-angular style="width: 50%;"
                                  class="ag-theme-fresh full-height"
+                                 role="grid"
+                                 aria-label="Collaborators grid"
+                                 aria-describedby="collaboratorsLabel"
                                  [rowDeselection]="true"
                                  (gridReady)="this.onCollabGridReady($event)"
                                  (gridSizeChanged)="onGridSizeChanged()"

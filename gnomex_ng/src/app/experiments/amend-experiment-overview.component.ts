@@ -19,47 +19,48 @@ import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.com
 @Component({
     selector: 'amend-experiment-overview',
     template: `
-        <div class="full-height full-width flex-container-col padded">
-            <div>
+        <div class="full-height full-width flex-container-col padded" role="main" aria-label="Amend Experiment">
+            <div role="heading" aria-level="1">
                 <img *ngIf="this.amendExpService.experiment?.requestCategory"
-                     [src]="this.amendExpService.experiment?.requestCategory.icon" class="icon">
+                     [src]="this.amendExpService.experiment?.requestCategory.icon" class="icon" alt="" aria-hidden="true">
                 {{ this.title }}
             </div>
             <div class="full-width flex-grow padding-light">
                 <mat-tab-group class="full-height full-width" [(selectedIndex)]="this.selectedTabIndex"
-                               (selectedTabChange)="this.onTabChange()">
+                               (selectedTabChange)="this.onTabChange()" aria-label="Experiment amendment steps">
                     <mat-tab *ngFor="let tab of this.tabs; let i = index" class="full-height full-width overflow-auto"
                              [label]="tab.label"
-                             [disabled]="this.checkTabDisabled(i)">
+                             [disabled]="this.checkTabDisabled(i)"
+                             [attr.aria-label]="tab.label">
                         <ndc-dynamic class="full-height full-width" [ndcDynamicComponent]="tab.component"
                                      [ndcDynamicInputs]="this.amendExpService.inputs"></ndc-dynamic>
                     </mat-tab>
                 </mat-tab-group>
             </div>
-            <div class="full-width flex-container-row justify-space-between">
-                <div class="flex-container-row spaced-children-margin align-center">
+            <div class="full-width flex-container-row justify-space-between" role="toolbar" aria-label="Navigation and actions">
+                <div class="flex-container-row spaced-children-margin align-center" role="group" aria-label="Step navigation">
                     <div>
-                        <button mat-raised-button (click)="this.back()"
+                        <button mat-raised-button (click)="this.back()" aria-label="Go to previous step"
                                 [disabled]="this.selectedTabIndex === 0 || this.checkTabDisabled(this.selectedTabIndex - 1)">
-                            <mat-icon>arrow_left</mat-icon>
+                            <mat-icon aria-hidden="true">arrow_left</mat-icon>
                             Back
                         </button>
                     </div>
                     <div>
-                        <button mat-raised-button (click)="this.next()"
+                        <button mat-raised-button (click)="this.next()" aria-label="Go to next step"
                                 [disabled]="this.selectedTabIndex === this.tabs.length - 1 || this.checkTabDisabled(this.selectedTabIndex + 1)">
-                            <mat-icon>arrow_right</mat-icon>
+                            <mat-icon aria-hidden="true">arrow_right</mat-icon>
                             Next
                         </button>
                     </div>
                     <div>
-                        <button mat-raised-button (click)="this.save()"
+                        <button mat-raised-button (click)="this.save()" aria-label="Save experiment changes"
                                 [disabled]="this.amendExpService.form.invalid || this.selectedTabIndex !== this.tabs.length - 1 || !this.billingAgreementChecked">
-                            <img [src]="this.constantsService.ICON_SAVE" class="icon">Save
+                            <img [src]="this.constantsService.ICON_SAVE" class="icon" alt="" aria-hidden="true">Save
                         </button>
                     </div>
                     <div *ngIf="this.onConfirmTab()">
-                        <mat-checkbox [(ngModel)]="this.billingAgreementChecked">
+                        <mat-checkbox [(ngModel)]="this.billingAgreementChecked" aria-label="Billing agreement confirmation">
                             <div class="highlight-agreement">
                                 {{ this.billingAgreementLabel }}
                             </div>
@@ -67,7 +68,7 @@ import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.com
                     </div>
                 </div>
                 <div>
-                    <button mat-raised-button (click)="this.promptToCancel()">Cancel</button>
+                    <button mat-raised-button (click)="this.promptToCancel()" aria-label="Cancel and discard changes">Cancel</button>
                 </div>
             </div>
         </div>

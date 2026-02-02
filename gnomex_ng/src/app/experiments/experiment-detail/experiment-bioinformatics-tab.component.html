@@ -1,10 +1,10 @@
-<div class="full-height full-width padded small-font">
-    <div *ngIf="masterDisabled" class="full-width full-height flex-container-col">
-        <div class="full-width flex-container-row align-center">
-            <div class="label label-width">
+<div class="full-height full-width padded small-font" role="region" aria-label="Bioinformatics Settings">
+    <div *ngIf="masterDisabled" class="full-width full-height flex-container-col" role="region" aria-label="Bioinformatics Summary">
+        <div class="full-width flex-container-row align-center" role="group" aria-labelledby="compressionLabel">
+            <div class="label label-width" id="compressionLabel">
                 Compression :
             </div>
-            <div class="flex-grow">
+            <div class="flex-grow" aria-labelledby="compressionLabel">
                 {{ oraCompression ? 'Illumina ORA' : 'gzip' }}
             </div>
         </div>
@@ -49,15 +49,16 @@
                       matAutosizeMaxRows="8"
                       [(ngModel)]="experiment.analysisInstructions"
                       [disabled]="true"
-                      placeholder="Description">
+                      placeholder="Description"
+                      aria-label="Notes for CBI">
             </textarea>
         </div>
     </div>
-    <div *ngIf="!masterDisabled" class="full-width full-height flex-container-col">
-        <div class="full-width bold">
+    <div *ngIf="!masterDisabled" class="full-width full-height flex-container-col" role="form" aria-label="Bioinformatics Options">
+        <div class="full-width bold" role="heading" aria-level="2">
             {{ header }}
         </div>
-        <ol>
+        <ol role="list" aria-label="Bioinformatics configuration options">
             <li class="full-width flex-container-row">
                 <div class="flex-grow padded">
                     <context-help name="oraCompression" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
@@ -70,7 +71,7 @@
                     </div>
                     <div class="flex-container-row align-center">
                         <div class="margin-top">
-                            <mat-checkbox [(ngModel)]="oraCompression" (change)="onORACompressionChanged($event)">Yes, Use ORA Compression</mat-checkbox>
+                            <mat-checkbox [(ngModel)]="oraCompression" (change)="onORACompressionChanged($event)" aria-label="Use ORA Compression">Yes, Use ORA Compression</mat-checkbox>
                         </div>
                     </div>
                 </div>
@@ -86,7 +87,7 @@
                             {{ item.organismName }}
                         </div>
                         <div class="margin-top">
-                            <mat-checkbox [(ngModel)]="alignToGenomeBuild" (change)="onAlignChanged($event)">Yes, Align and QC with the most recent genome build</mat-checkbox>
+                            <mat-checkbox [(ngModel)]="alignToGenomeBuild" (change)="onAlignChanged($event)" aria-label="Align and QC with the most recent genome build">Yes, Align and QC with the most recent genome build</mat-checkbox>
                         </div>
                     </div>
                 </div>
@@ -100,7 +101,7 @@
                                   label="Would you like the {{ groupName }} to assist you with analysis?"></context-help>
                     <div class="flex-container-row align-center">
                         <div class="label-width margin-top">
-                            <mat-checkbox [(ngModel)]="bioinformaticsAssist">Yes</mat-checkbox>
+                            <mat-checkbox [(ngModel)]="bioinformaticsAssist" aria-label="Request analysis assistance">Yes</mat-checkbox>
                         </div>
                         <div>
                             {{ analysisNote }}
@@ -120,7 +121,8 @@
                           matAutosizeMaxRows="8"
                           [(ngModel)]="experiment.analysisInstructions"
                           [disabled]="!bioinformaticsAssist"
-                          placeholder="Description">
+                          placeholder="Description"
+                          aria-label="Analysis notes and instructions">
                 </textarea>
             </div>
         </div>
