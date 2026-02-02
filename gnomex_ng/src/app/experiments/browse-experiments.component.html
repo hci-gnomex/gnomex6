@@ -26,7 +26,7 @@
                                     <div class="full-height">
                                         <button mat-button aria-label="Drag-and-drop hint" (click)="onClickShowDragDropHint()"
                                                 [disabled]="this.createSecurityAdvisorService.isGuest" [matTooltip]="this.DRAG_DROP_HINT">
-                                            <img [src]="'./assets/information.png'" alt="" class="padding">
+                                            <img [src]="'./assets/information.png'" alt="Help Icon" class="padding">
                                             Drag-and-drop hint
                                         </button>
                                     </div>
@@ -43,7 +43,7 @@
                                                [options]="options">
                                         <ng-template #treeNodeTemplate let-node let-index="index">
                                             <div class="full-width no-word-wrap tree-node-font">
-                                                <img src="{{ node?.data?.icon ? node.data.icon : 'assets/flask.png' }}" alt="" class="tree-node-icon icon">
+                                                <img src="{{ node?.data?.icon ? node.data.icon : 'assets/flask.png' }}" alt="tree node icon" class="tree-node-icon icon">
                                                 <span>{{ node.data.label }}</span>
                                             </div>
                                         </ng-template>
@@ -68,13 +68,13 @@
                                     <div class="flex-container-row justify-space-between">
                                         <div>
                                             <button mat-button [disabled]="disableNewProject || this.disableAll" (click)="newProjectClicked()">
-                                                <img [src]="'./assets/folder_add.png'" alt="">
+                                                <img [src]="'./assets/folder_add.png'" alt="New Project Icon">
                                                 New Project
                                             </button>
                                         </div>
                                         <div>
                                             <button mat-button [disabled]="disableDeleteProject || this.disableAll" (click)="deleteProjectClicked()">
-                                                <img [src]="'./assets/folder_delete.png'">
+                                                <img [src]="'./assets/folder_delete.png'" alt="Delete Project Icon">
                                                 Delete Project
                                             </button>
                                         </div>
@@ -82,7 +82,7 @@
                                     <div class="flex-container-row">
                                         <div>
                                             <button mat-button [disabled]="disableDeleteExperiment || this.disableAll" (click)="deleteExperimentClicked()">
-                                                <img [src]="'./assets/delete.png'" alt="">
+                                                <img [src]="'./assets/delete.png'" alt="Delete Experiment Icon">
                                                 Delete Experiment
                                             </button>
                                         </div>

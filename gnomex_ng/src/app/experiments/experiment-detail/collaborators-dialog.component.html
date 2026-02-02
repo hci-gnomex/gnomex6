@@ -8,7 +8,7 @@
             </custom-combo-box>
         </div>
         <button mat-button [disabled]="!enableAdd" type="button" (click)="addCollaborator()">
-            <img [src]="enableAdd ? this.constantsService.ICON_ADD : this.constantsService.ICON_ADD_DISABLE">
+            <img [src]="enableAdd ? this.constantsService.ICON_ADD : this.constantsService.ICON_ADD_DISABLE" alt="Add Collaborator Icon" class="icon">
             Add
         </button>
     </div>

@@ -1,35 +1,35 @@
 <div class="flexbox-column">
     <div class="flex-container-row">
         <label class="label-title label-title-width">
-            <img class="icon" [src]="experimentOverviewNode?.icon">
+            <img class="icon" [src]="experimentOverviewNode?.icon" alt="Experiment Icon">
             {{nodeTitle}}
         </label>
         <div>
             <button mat-button color="link" *ngIf="showEdit" (click)="startEdit($event)">
-                <img *ngIf="!isEditMode" class="icon" [src]="this.constService.ICON_TAG_BLUE_EDIT">
-                <img *ngIf="isEditMode" class="icon" [src]="this.constService.PAGE">
+                <img *ngIf="!isEditMode" class="icon" [src]="this.constService.ICON_TAG_BLUE_EDIT" alt="Edit Icon">
+                <img *ngIf="isEditMode" class="icon" [src]="this.constService.PAGE" alt="View Icon">
                 {{isEditMode ? "View" : "Edit"}}
             </button>
             <button mat-button (click)="this.handleDownloadFiles()">
-                <img [src]="this.constService.ICON_DOWNLOAD" class="icon">
+                <img [src]="this.constService.ICON_DOWNLOAD" class="icon" alt="Download Files Icon">
                 Download Files
             </button>
             <button mat-button color="link" (click)="showPrintableRequestForm()"
                     [matTooltip]="toolTips.PRINT_EXPERIMENT_ORDER">
-                <img class="icon" [src]="this.constService.PAGE_WHITE_ACROBAT">
+                <img class="icon" [src]="this.constService.PAGE_WHITE_ACROBAT" alt="Print Experiment Order Icon">
                 Print Experiment Order
             </button>
             <button mat-button *ngIf="showCreateAnalysisButton" [disabled]="isDirty"
                     (click)="createNewAnalysis($event)"
                     [matTooltip]="!isDirty ? toolTips.CREATE_NEW_ANALYSIS : toolTips.CREATE_NEW_ANALYSIS_DIRTY">
-                <img class="icon" [src]="this.constService.ICON_ANALYSIS">Create New Analysis
+                <img class="icon" [src]="this.constService.ICON_ANALYSIS" alt="Create New Analysis Button">Create New Analysis
             </button>
             <button mat-button color="link" (click)="shareLink()">
-                <img class="icon" [src]="this.constService.GLOBE_LINK">Share URL
+                <img class="icon" [src]="this.constService.GLOBE_LINK" alt="Share URL">Share URL
             </button>
             <button mat-button *ngIf="!this.secAdvisor.isGuest" color="link" (click)="onEmailClick()"
                     [matTooltip]="toolTips.CONTACT_CORE">
-                <img class="icon" [src]="this.constService.EMAIL_GO_LINK">Contact Core
+                <img class="icon" [src]="this.constService.EMAIL_GO_LINK" alt="Contact Core">Contact Core
             </button>
         </div>
     </div>
