@@ -7,8 +7,8 @@ import {AnalysisService} from "../../services/analysis.service"
 
 @Component({
     selector: 'analysis-panel',
-    template: `        
-        <div class="full-width full-height">
+    template: `
+        <div class="full-width full-height" role="region" aria-label="Analysis panel content">
             <router-outlet ></router-outlet>
         </div>
     `

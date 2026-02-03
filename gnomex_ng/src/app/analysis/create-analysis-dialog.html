@@ -1,7 +1,7 @@
-<div class="full-height full-width flex-container-col padded">
-    <form class="full-height full-width padded-inner flex-container-col" [formGroup]="createAnalysisForm" >
+<div class="full-height full-width flex-container-col padded" role="dialog" aria-label="Create analysis">
+    <form class="full-height full-width padded-inner flex-container-col" [formGroup]="createAnalysisForm" aria-label="Create analysis form">
         <div class="flex-container-row align-center padded">
-            <label class="label label-width">Group</label>
+            <label class="label label-width" id="group-label">Group</label>
             <div class="flex-grow">
                 <custom-combo-box [options]="this.labList"
                                   placeholder="Select a lab..."
@@ -9,12 +9,14 @@
                                   [displayField]="this.labDisplayField"
                                   valueField="idLab"
                                   [formControlName]="'selectedLab'"
-                                  (optionSelected)="onLabSelect($event)">
+                                  (optionSelected)="onLabSelect($event)"
+                                  aria-labelledby="group-label"
+                                  aria-label="Select a lab group">
                 </custom-combo-box>
             </div>
         </div>
         <div class="flex-container-row align-center padded" *ngIf="showOwnerComboBox">
-            <label class="label label-width">Analysis Owner</label>
+            <label class="label label-width" id="owner-label">Analysis Owner</label>
             <div class="flex-grow">
                 <custom-combo-box [options]="this.ownerList"
                                   placeholder="Select an Owner..."
@@ -22,12 +24,14 @@
                                   [displayField]="this.prefService.userDisplayField"
                                   valueField="idAppUser"
                                   [formControlName]="'analysisOwner'"
-                                  (optionSelected)="onUserSelect($event)">
+                                  (optionSelected)="onUserSelect($event)"
+                                  aria-labelledby="owner-label"
+                                  aria-label="Select analysis owner">
                 </custom-combo-box>
             </div>
         </div>
         <div class="flex-container-row align-center padded" *ngIf="!newAnalysisGroup">
-            <label class="label label-width">Analysis Group</label>
+            <label class="label label-width" id="analysis-group-label">Analysis Group</label>
             <div class="flex-grow">
                 <custom-combo-box [options]="this.analysisGroupList"
                                   placeholder="..."
@@ -35,7 +39,9 @@
                                   [displayField]="'name'"
                                   valueField="idAnalysisGroup"
                                   [formControlName]="'analysisGroup'"
-                                  (optionSelected)="onAnalysisGroupSelect($event)">
+                                  (optionSelected)="onAnalysisGroupSelect($event)"
+                                  aria-labelledby="analysis-group-label"
+                                  aria-label="Select analysis group">
                 </custom-combo-box>
             </div>
         </div>
@@ -43,14 +49,16 @@
             <button mat-button
                     class="link-button underlined minimize limit-width"
                     style="padding: 0;"
-                    (click)="includeNewGroup()">New...
+                    (click)="includeNewGroup()"
+                    aria-label="Create new analysis group">New...
             </button>
         </div>
         <div class="flex-container-row align-center padded" *ngIf="newAnalysisGroup">
-            <label class="label label-width">New Analysis Group Name</label>
+            <label class="label label-width" id="new-group-label">New Analysis Group Name</label>
             <mat-form-field>
-                <input matInput formControlName="analysisGroupName">
-                <mat-error *ngIf="newAnalysisGroup && createAnalysisForm.get('analysisGroupName').hasError('required')">
+                <input matInput formControlName="analysisGroupName" aria-labelledby="new-group-label"
+                       aria-required="true">
+                <mat-error *ngIf="newAnalysisGroup && createAnalysisForm.get('analysisGroupName').hasError('required')" role="alert">
                     Analysis Group Name is required
                 </mat-error>
             </mat-form-field>
@@ -59,16 +67,17 @@
         </div>
 
         <div class="flex-container-row align-center padded">
-            <label class="label label-width">Analysis Name</label>
+            <label class="label label-width" id="analysis-name-label">Analysis Name</label>
             <mat-form-field class="example-full-width">
-                <input matInput formControlName="analysisName">
-                <mat-error *ngIf="createAnalysisForm.get('analysisName').hasError('required')">
+                <input matInput formControlName="analysisName" aria-labelledby="analysis-name-label"
+                       aria-required="true">
+                <mat-error *ngIf="createAnalysisForm.get('analysisName').hasError('required')" role="alert">
                     Analysis Name is required
                 </mat-error>
             </mat-form-field>
         </div>
         <div class="flex-container-row align-center padded">
-            <label class="label label-width">Organism</label>
+            <label class="label label-width" id="organism-label">Organism</label>
             <div class="flex-grow">
                 <custom-combo-box [options]="this.activeOrganismList"
                                   placeholder="Organism..."
@@ -76,7 +85,9 @@
                                   [displayField]="'display'"
                                   valueField="idOrganism"
                                   [formControlName]="'organism'"
-                                  (optionSelected)="onOrganismSelect($event)">
+                                  (optionSelected)="onOrganismSelect($event)"
+                                  aria-labelledby="organism-label"
+                                  aria-label="Select organism">
                 </custom-combo-box>
             </div>
         </div>
@@ -84,16 +95,19 @@
             <button mat-button
                     class="link-button underlined minimize limit-width"
                     style="padding: 0;"
-                    (click)="newOrganism()">New/Edit...
+                    (click)="newOrganism()"
+                    aria-label="Create or edit organism">New/Edit...
             </button>
         </div>
 
         <div class="flex-container-row align-center padded">
-            <label class="label label-width">Genome Build(s)</label>
+            <label class="label label-width" id="genome-builds-label">Genome Build(s)</label>
             <div class="flex-grow">
                 <custom-multi-combo-box [options]="this.genomeBuildList"
                                         displayField="display"
-                                        [formControlName]="'genomeBuilds'">
+                                        [formControlName]="'genomeBuilds'"
+                                        aria-labelledby="genome-builds-label"
+                                        aria-label="Select genome builds">
                 </custom-multi-combo-box>
             </div>
         </div>
@@ -101,12 +115,13 @@
             <button mat-button
                     class="link-button underlined minimize limit-width"
                     style="padding: 0;"
-                    (click)="newOrganism()">New/Edit...
+                    (click)="newOrganism()"
+                    aria-label="Create or edit genome builds">New/Edit...
             </button>
         </div>
 
         <div class="flex-container-row align-center padded">
-            <label class="label label-width">Visibility</label>
+            <label class="label label-width" id="visibility-label">Visibility</label>
             <div class="flex-grow">
                 <custom-combo-box [options]="this.visibilityList"
                                   placeholder="..."
@@ -114,7 +129,9 @@
                                   [displayField]="'display'"
                                   valueField="value"
                                   [formControlName]="'visibility'"
-                                  (optionSelected)="onVisibilitySelect($event)">
+                                  (optionSelected)="onVisibilitySelect($event)"
+                                  aria-labelledby="visibility-label"
+                                  aria-label="Select visibility level">
                 </custom-combo-box>
             </div>
         </div>

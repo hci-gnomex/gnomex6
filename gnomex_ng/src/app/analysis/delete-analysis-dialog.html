@@ -1,8 +1,9 @@
-<div class="full-height full-width flex-container-col double-padded">
-    <p>The following items will be deleted:<br>
-        <b>{{_nodesString}}</b>
+<div class="full-height full-width flex-container-col double-padded" role="alertdialog" aria-label="Delete confirmation"
+     aria-describedby="delete-message">
+    <p id="delete-message">The following items will be deleted:<br>
+        <b aria-live="polite">{{_nodesString}}</b>
     </p>
-    <div *ngIf="hasAnalysisGroup">
+    <div *ngIf="hasAnalysisGroup" role="alert">
         <p>One or more analysis groups have been selected.
             Any analysis contained within
             the group will also be deleted.

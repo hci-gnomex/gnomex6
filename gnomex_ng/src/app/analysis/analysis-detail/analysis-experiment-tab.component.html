@@ -1,23 +1,24 @@
-<div class="full-height full-width flex-column-container small-font overflow-auto">
+<div class="full-height full-width flex-column-container small-font overflow-auto" role="region" aria-label="Linked experiments">
     <as-split *ngIf="tabVisible" > <!-- split  mat-tabs have issues -->
         <as-split-area *ngIf="this.analysisService.getEditMode()" size="20" [order]="1">
-            <div class="full-height full-width flex-container-col">
+            <div class="full-height full-width flex-container-col" role="navigation" aria-label="Experiment selection">
                 <div class="padded-left-right-top">
                     <custom-combo-box class="moderate-input"
                                       placeholder="Lab Filter"
                                       [options]="this.labList"
                                       [displayField]="this.prefService.labDisplayField"
-                                      [formControl]="this.currentLabFC">
+                                      [formControl]="this.currentLabFC"
+                                      aria-label="Filter experiments by lab">
                     </custom-combo-box>
                 </div>
                 <div class="flex-grow padded no-overflow">
-                    <div class="full-height full-width border-subtle">
+                    <div class="full-height full-width border-subtle" role="tree" aria-label="Experiments tree">
                         <tree-root #tree
                                    (activate)="treeOnSelect($event)"
                                    [nodes]="items" [options]="options">
                             <ng-template #treeNodeTemplate let-node let-index="index">
-                                <div class="truncate tree-node-font">
-                                    <img src="{{node.level === 3 ? this.constService.ICON_GREEN_BULLET : node.data.icon }}" class="tree-node-icon icon">
+                                <div class="truncate tree-node-font" role="treeitem" [attr.aria-label]="node.data.label">
+                                    <img src="{{node.level === 3 ? this.constService.ICON_GREEN_BULLET : node.data.icon }}" class="tree-node-icon icon" alt="" aria-hidden="true">
                                     <span [matTooltip]="node.data.label" >{{ node.data.label }}</span>
                                 </div>
                             </ng-template>
@@ -27,27 +28,30 @@
             </div> <!-- end tree container -->
         </as-split-area>
         <as-split-area size="80" [order]="2">
-            <div class="full-width full-height flex-container-col">
-                <div class="align-baseline flex-row-container">
+            <div class="full-width full-height flex-container-col" role="region" aria-label="Linked experiments data">
+                <div class="align-baseline flex-row-container" role="toolbar" aria-label="Experiment actions">
                     <div *ngIf="this.analysisService.getEditMode()" class="padded-right">
-                        <button color="primary" mat-button [disabled]="!this.analysisService.getEditMode()" (click)="removeItems()" >
-                            <img class="icon" [src]="this.constService.ICON_DELETE"> Remove
+                        <button color="primary" mat-button [disabled]="!this.analysisService.getEditMode()" (click)="removeItems()"
+                                aria-label="Remove selected experiments">
+                            <img class="icon" [src]="this.constService.ICON_DELETE" alt="" aria-hidden="true"> Remove
                         </button>
                     </div>
                     <div *ngIf="this.analysisService.getEditMode()" class="padded-right">
-                        <button color="primary" mat-button [disabled]="!this.analysisService.getEditMode()" (click)="clearAllItems()" >
-                            <img class="icon" [src]="this.constService.ICON_FOLDER_DELETE"> Clear all
+                        <button color="primary" mat-button [disabled]="!this.analysisService.getEditMode()" (click)="clearAllItems()"
+                                aria-label="Clear all linked experiments">
+                            <img class="icon" [src]="this.constService.ICON_FOLDER_DELETE" alt="" aria-hidden="true"> Clear all
                         </button>
                     </div>
                     <div class="flex-grow">
                     </div>
-                    <mat-radio-group [(ngModel)]="gridRaidoOpt" class="flex-container-row padded" (change)="onGridTypeChange()">
-                        <mat-radio-button [value]="SEQ_LANES" class="padded-left-right" > Illumina Sequencing{{"(" + this.lanesList.length + ")"}} </mat-radio-button>
-                        <mat-radio-button [value]="HYBS" class="padded-left-right" > Microarray Hybridizations{{"(" + this.hybsList.length + ")"}}</mat-radio-button>
-                        <mat-radio-button [value]="SAMPLE" class="padded-left-right"> Other{{"(" + this.sampleList.length + ")"}} </mat-radio-button>
+                    <mat-radio-group [(ngModel)]="gridRaidoOpt" class="flex-container-row padded" (change)="onGridTypeChange()"
+                                     aria-label="Select experiment type to display">
+                        <mat-radio-button [value]="SEQ_LANES" class="padded-left-right" aria-label="Illumina Sequencing experiments"> Illumina Sequencing{{"(" + this.lanesList.length + ")"}} </mat-radio-button>
+                        <mat-radio-button [value]="HYBS" class="padded-left-right" aria-label="Microarray Hybridizations experiments"> Microarray Hybridizations{{"(" + this.hybsList.length + ")"}}</mat-radio-button>
+                        <mat-radio-button [value]="SAMPLE" class="padded-left-right" aria-label="Other experiments"> Other{{"(" + this.sampleList.length + ")"}} </mat-radio-button>
                     </mat-radio-group>
                 </div>
-                <div  class="flex-grow padded">
+                <div  class="flex-grow padded" role="region" aria-label="Experiments grid">
                     <ag-grid-angular style="width: 100%; height: 100%;" class="ag-theme-fresh"
                                      [gridOptions]="gridOpt"
                                      [rowSelection]="'multiple'"
@@ -58,7 +62,8 @@
                                      [enableSorting]="true"
                                      [enableColResize]="true"
                                      (treeDrop)="onDrop($event)"
-                                     [treeAllowDrop]="allowDrop.bind(this)">
+                                     [treeAllowDrop]="allowDrop.bind(this)"
+                                     aria-label="Linked experiments data grid">
                     </ag-grid-angular>
                 </div>
             </div>

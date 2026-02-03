@@ -1,11 +1,11 @@
-<div class="full-height full-width overflow-auto padded small-font">
-    <form [formGroup]="form" class="flex-container-row full-height full-width">
-        <div class="flex-container-col column-width">
+<div class="full-height full-width overflow-auto padded small-font" role="region" aria-label="Analysis information">
+    <form [formGroup]="form" class="flex-container-row full-height full-width" aria-label="Analysis information form">
+        <div class="flex-container-col column-width" role="group" aria-label="Primary analysis details">
             <mat-form-field>
-                <input matInput placeholder="Lab Group" [formControlName]="'labName'">
+                <input matInput placeholder="Lab Group" [formControlName]="'labName'" aria-label="Lab group name">
             </mat-form-field>
             <mat-form-field>
-                <input matInput placeholder="Name" [formControlName]="'name'">
+                <input matInput placeholder="Name" [formControlName]="'name'" aria-label="Analysis name">
             </mat-form-field>
             <div class="flex-container-row align-center">
                 <custom-combo-box placeholder="Analysis Type"
@@ -13,7 +13,8 @@
                                   displayField="display"
                                   valueField="value"
                                   [formControlName]="'idAnalysisType'"
-                                  [options]="analysisTypes">
+                                  [options]="analysisTypes"
+                                  aria-label="Select analysis type">
                 </custom-combo-box>
                 <div class="padded-left">
                     <button mat-button
@@ -21,7 +22,8 @@
                             matTooltip="Add or edit Analysis Type"
                             [disabled]="!isEditMode || !canUpdate"
                             [hidden]="!isEditMode"
-                            (click)="openEditAnalysisType()">
+                            (click)="openEditAnalysisType()"
+                            aria-label="Edit analysis types">
                         Edit
                     </button>
                 </div>
@@ -32,7 +34,8 @@
                                   displayField="label"
                                   valueField="id"
                                   [formControlName]="'idAnalysisProtocol'"
-                                  [options]="protocolList">
+                                  [options]="protocolList"
+                                  aria-label="Select analysis protocol">
                 </custom-combo-box>
                 <div class="padded-left">
                     <button mat-button
@@ -40,7 +43,8 @@
                             matTooltip="Add or edit protocol"
                             [disabled]="!isEditMode || !canUpdate"
                             [hidden]="!isEditMode"
-                            (click)="openEditAnalysisProtocol()">
+                            (click)="openEditAnalysisProtocol()"
+                            aria-label="Edit analysis protocols">
                         Edit
                     </button>
                 </div>
@@ -51,7 +55,8 @@
                                   displayField="display"
                                   valueField="value"
                                   [formControlName]="'idOrganism'"
-                                  [options]="organismList">
+                                  [options]="organismList"
+                                  aria-label="Select organism">
                 </custom-combo-box>
                 <div class="padded-left">
                     <button mat-button
@@ -59,18 +64,20 @@
                             matTooltip="Add or edit organism"
                             [disabled]="!isEditMode || !canUpdate"
                             [hidden]="!isEditMode"
-                            (click)="openEditOrganism()">
+                            (click)="openEditOrganism()"
+                            aria-label="Edit organisms">
                         Edit
                     </button>
                 </div>
             </div>
-            <div *ngIf="isEditMode" class="flex-container-row align-center">
+            <div *ngIf="isEditMode" class="flex-container-row align-center" role="group" aria-label="Genome build selection">
                 <custom-combo-box placeholder="Genome Builds"
                                   displayField="display"
                                   style="flex: 5;"
                                   [formControlName]="'genomeBuildToAdd'"
                                   [hidden]="!isEditMode"
-                                  [options]="genomeBuildList">
+                                  [options]="genomeBuildList"
+                                  aria-label="Select genome build to add">
                 </custom-combo-box>
                 <div class="padded-left">
                     <button mat-raised-button
@@ -78,9 +85,10 @@
                             matTooltip="Add to list"
                             [disabled]="!isEditMode || !canUpdate || !form.controls['genomeBuildToAdd'].value"
                             [hidden]="!isEditMode"
-                            (click)="addGenomeBuild()">
-                        <img *ngIf="!isEditMode || !canUpdate || !form.controls['genomeBuildToAdd'].value" [src]="'./assets/add_disable.png'" alt="">
-                        <img *ngIf="isEditMode && canUpdate && form?.controls['genomeBuildToAdd']?.value" [src]="'./assets/add.png'" alt="">
+                            (click)="addGenomeBuild()"
+                            aria-label="Add genome build to list">
+                        <img *ngIf="!isEditMode || !canUpdate || !form.controls['genomeBuildToAdd'].value" [src]="'./assets/add_disable.png'" alt="" aria-hidden="true">
+                        <img *ngIf="isEditMode && canUpdate && form?.controls['genomeBuildToAdd']?.value" [src]="'./assets/add.png'" alt="" aria-hidden="true">
                     </button>
                 </div>
                 <div class="padded-left">
@@ -89,9 +97,10 @@
                             matTooltip="Remove from list"
                             [disabled]="!isEditMode || !canUpdate || !genomeBuildToRemove"
                             [hidden]="!isEditMode"
-                            (click)="removeGenomeBuild()">
-                        <img *ngIf="!isEditMode || !canUpdate || !genomeBuildToRemove" [src]="'./assets/delete_disable.png'" alt="">
-                        <img *ngIf="isEditMode && canUpdate && genomeBuildToRemove" [src]="'./assets/delete.png'" alt="">
+                            (click)="removeGenomeBuild()"
+                            aria-label="Remove genome build from list">
+                        <img *ngIf="!isEditMode || !canUpdate || !genomeBuildToRemove" [src]="'./assets/delete_disable.png'" alt="" aria-hidden="true">
+                        <img *ngIf="isEditMode && canUpdate && genomeBuildToRemove" [src]="'./assets/delete.png'" alt="" aria-hidden="true">
                     </button>
                 </div>
                 <div class="padded-left">
@@ -99,42 +108,47 @@
                             class="minimize link-button"
                             matTooltip="Add or edit organism"
                             [disabled]="!isEditMode || !canUpdate" (click)="openEditOrganism()"
-                            [hidden]="!isEditMode">
+                            [hidden]="!isEditMode"
+                            aria-label="Edit organisms and genome builds">
                         Edit
                     </button>
                 </div>
             </div>
-            <div class="flex-grow">
+            <div class="flex-grow" role="region" aria-label="Genome builds list">
                 <ag-grid-angular class="ag-theme-balham full-height full-width min-grid-height"
                                  [rowData]="form.controls['genomeBuildsJSONString'].value"
                                  [rowSelection]="'single'"
                                  [suppressMovableColumns]="true"
                                  (gridReady)="onGenomeBuildGridReady($event)"
                                  (gridSizeChanged)="onGridSizeChanged($event)"
-                                 (rowClicked)="onGenomeBuildGridSelection($event)">
+                                 (rowClicked)="onGenomeBuildGridSelection($event)"
+                                 aria-label="Genome builds data grid">
                 </ag-grid-angular>
             </div>
         </div>
         <div class="horizontal-spacer">
         </div>
-        <div class="flex-container-col column-width">
+        <div class="flex-container-col column-width" role="group" aria-label="Secondary analysis details">
             <custom-combo-box placeholder="Owner"
                               valueField="idAppUser"
                               [displayField]="prefService.userDisplayField"
                               [formControlName]="'idAppUser'"
-                              [options]="labUsers">
+                              [options]="labUsers"
+                              aria-label="Select analysis owner">
             </custom-combo-box>
             <mat-form-field>
-                <input matInput placeholder="Submitter" [formControlName]="'submitterName'">
+                <input matInput placeholder="Submitter" [formControlName]="'submitterName'" aria-label="Submitter name">
             </mat-form-field>
             <mat-form-field>
-                <input matInput placeholder="Submit Date" [formControlName]="'submitDate'">
+                <input matInput placeholder="Submit Date" [formControlName]="'submitDate'" aria-label="Submit date">
             </mat-form-field>
-            <mat-radio-group class="flex-container-col double-padded" [formControlName]="'codeVisibility'">
+            <mat-radio-group class="flex-container-col double-padded" [formControlName]="'codeVisibility'"
+                             aria-label="Select visibility level">
                 <mat-radio-button *ngFor="let vis of visibilityList"
                                   [value]="vis.codeVisibility"
                                   [matTooltip]="vis.tooltip"
-                                  [matTooltipPosition]="'left'">
+                                  [matTooltipPosition]="'left'"
+                                  [attr.aria-label]="vis.display + ': ' + vis.tooltip">
                     {{ vis.display }}
                 </mat-radio-button>
             </mat-radio-group>
@@ -145,8 +159,9 @@
                            placeholder="Privacy Expiration"
                            [formControlName]="'privacyExpirationDate'"
                            [matDatepicker]="privacyPicker"
-                           [min]="today">
-                    <mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>
+                           [min]="today"
+                           aria-label="Privacy expiration date">
+                    <mat-datepicker-toggle matSuffix [for]="privacyPicker" aria-label="Open date picker"></mat-datepicker-toggle>
                     <mat-datepicker #privacyPicker disabled="false"></mat-datepicker>
                 </mat-form-field>
             </div>
@@ -156,7 +171,8 @@
                             class="link-button"
                             [disabled]="!isEditMode || !canUpdate"
                             [hidden]="!isEditMode"
-                            (click)="openCollaboratorsWindow()">
+                            (click)="openCollaboratorsWindow()"
+                            aria-label="Manage collaborators">
                         Collaborators
                     </button>
                 </div>
@@ -165,14 +181,15 @@
                               displayField="display"
                               valueField="idInstitution"
                               [formControlName]="'idInstitution'"
-                              [options]="institutionList">
+                              [options]="institutionList"
+                              aria-label="Select institution">
             </custom-combo-box>
-            <div>
-                <div class="italic">
+            <div role="group" aria-label="Analysis groups">
+                <div class="italic" id="analysis-groups-label">
                     Analysis Group(s) :
                 </div>
                 <div class="padded">
-                    <ul>
+                    <ul aria-labelledby="analysis-groups-label">
                         <li *ngFor="let analysisGroup of form.controls['analysisGroupsJSONString'].value">
                             {{ analysisGroup.name }}
                         </li>

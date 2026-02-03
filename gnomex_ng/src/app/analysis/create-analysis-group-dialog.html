@@ -1,6 +1,7 @@
-<form [formGroup]="createAnalysisGroupForm" class="full-height full-width padded flex-container-col">
+<form [formGroup]="createAnalysisGroupForm" class="full-height full-width padded flex-container-col"
+      role="dialog" aria-label="Create analysis group form">
     <div class="flex-container-row align-center padded">
-        <label class="label label-width">Group:</label>
+        <label class="label label-width" id="group-select-label">Group:</label>
         <div class="flex-grow">
             <custom-combo-box [options]="this.labList"
                               placeholder="Select a lab..."
@@ -8,30 +9,34 @@
                               [displayField]="this.labDisplayField"
                               valueField="idLab"
                               [formControlName]="'selectedLab'"
-                              (optionSelected)="onLabSelect($event)">
+                              (optionSelected)="onLabSelect($event)"
+                              aria-labelledby="group-select-label"
+                              aria-label="Select a lab group">
             </custom-combo-box>
         </div>
     </div>
     <div class="flex-container-row align-center padded">
         <mat-form-field class="full-width">
-            <input matInput formControlName="analysisGroupName" placeholder="Analysis Group Name">
+            <input matInput formControlName="analysisGroupName" placeholder="Analysis Group Name"
+                   aria-label="Analysis group name" aria-required="true">
             <mat-error
-                    *ngIf="createAnalysisGroupForm.get('analysisGroupName').hasError('required')">
+                    *ngIf="createAnalysisGroupForm.get('analysisGroupName').hasError('required')" role="alert">
                 Analysis Group Name is required
             </mat-error>
             <mat-error
-                    *ngIf="createAnalysisGroupForm.get('analysisGroupName').hasError('maxlength')">
+                    *ngIf="createAnalysisGroupForm.get('analysisGroupName').hasError('maxlength')" role="alert">
                 Analysis Group Name exceeded the 500 character limit
             </mat-error>
         </mat-form-field>
     </div>
-    <div class="flex-container-col full-width padded">
+    <div class="flex-container-col full-width padded" role="group" aria-label="Description section">
         <label class="label label-width" for="descEditor">Description:</label>
         <angular-editor #descEditorRef id="descEditor"
                         formControlName="description"
-                        [config]="editorConfig">
+                        [config]="editorConfig"
+                        aria-label="Analysis group description">
         </angular-editor>
-        <mat-error *ngIf="createAnalysisGroupForm.get('description').hasError('maxlength')">
+        <mat-error *ngIf="createAnalysisGroupForm.get('description').hasError('maxlength')" role="alert">
             Description exceeded the 500 character limit including HTML code formatting and styles.
             Character count: {{createAnalysisGroupForm.get('description').value.toString().length}}
         </mat-error>
