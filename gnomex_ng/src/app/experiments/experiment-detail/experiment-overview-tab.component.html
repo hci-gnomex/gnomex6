@@ -30,7 +30,9 @@
                             Project
                         </div>
                         <div class="flex-grow">
-                            <div [matTooltip]="_experiment?.project?.Project?.name">
+                          <div
+                            [matTooltip]="_experiment?.project?.Project?.name || ''"
+                            [matTooltipDisabled]="false">
                                 <custom-combo-box class="full-width" (optionSelected)="onChange_project($event)"
                                                   [disabled]="disableProject"
                                                   [options]="projectsDictionary" displayField="name" valueField="idProject"

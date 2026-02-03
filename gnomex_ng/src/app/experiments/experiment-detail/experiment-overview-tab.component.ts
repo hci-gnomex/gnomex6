@@ -128,11 +128,6 @@ import {Experiment} from "../../util/models/experiment.model";
         .allow-line-breaks {
             white-space: pre-line;
         }
-        
-        ::ng-deep.mat-tab-label.mat-tab-label-active {
-        min-width: 0!important;
-        font-size: 12px!important;
-        }
 
 
     `]
@@ -457,7 +452,7 @@ import {Experiment} from "../../util/models/experiment.model";
         setTimeout(() => {
             this.dialogService.startDefaultSpinnerDialog();
         });
-        
+
         this.overviewTabForm = this.fb.group({
             idLab: [{value: "", disabled: true}, Validators.required],
             idAppUser: [{value: "", disabled: true}, Validators.required]

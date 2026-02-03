@@ -11,7 +11,6 @@ import {ANALYSIS_ROUTING} from "./analysis.routes";
 import {DeleteAnalysisComponent} from "./delete-analysis.component";
 import { AngularMaterialModule} from "../../modules/angular-material.module";
 import {MatAutocompleteModule} from "@angular/material";
-import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {CreateAnalysisComponent} from "./create-analysis.component";
 import {CreateAnalysisGroupComponent} from "./create-analysis-group.component";
 import {DialogsModule} from "../util/popup/dialogs.module";
@@ -30,7 +29,6 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         MatAutocompleteModule,
         AngularMaterialModule,
         DialogsModule,
-        BrowserAnimationsModule,
         ANALYSIS_ROUTING,
         CommonModule,
         EmailRelatedUsersPopupModule,

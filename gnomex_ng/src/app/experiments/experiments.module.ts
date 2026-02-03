@@ -82,7 +82,7 @@ import {ImprovedSelectEditor} from "../util/grid-editors/improved-select.editor"
     imports: [
         EXPERIMENTS_ROUTING,
         CommonModule,
-        EmailRelatedUsersPopupModule,
+      EmailRelatedUsersPopupModule,
         FormsModule,
         ServicesModule,
         TreeModule.forRoot(),

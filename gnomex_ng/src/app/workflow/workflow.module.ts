@@ -6,7 +6,6 @@ import {CommonModule} from "@angular/common";
 import {FormsModule,ReactiveFormsModule} from "@angular/forms";
 
 import {ServicesModule} from "../services/services.module";
-import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
 import {DialogsModule} from "../util/popup/dialogs.module";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {UtilModule} from "../util/util.module";
@@ -72,7 +71,6 @@ import {AddSamplesDialogComponent} from "./add-samples-dialog.component";
         AngularMaterialModule,
         AngularSplitModule,
         DialogsModule,
-        BrowserAnimationsModule,
         WORKFLOW_ROUTING,
         CommonModule,
         FormsModule,
