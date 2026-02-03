@@ -17,17 +17,19 @@ import {UtilService} from "../../services/util.service";
 @Component({
     selector: 'experiment-files-tab',
     template: `
-        <div class="padded flex-container-col full-height">
-            <div class="flex-container-row">
-                <button mat-button (click)="this.handleUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD" class="icon">Upload Files</button>
-                <button mat-button *ngIf="!isClinicalResearch && isFDTSupported" (click)="this.handleFDTUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Files</button>
-                <button mat-button *ngIf="!isClinicalResearch && isFDTSupported" (click)="this.handleFDTUploadCommandLine()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Command Line</button>
-                <button mat-button (click)="this.handleManageFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon">Manage Files</button>
-                <button mat-button (click)="this.handleDownloadFiles()"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download Files</button>
+        <div class="padded flex-container-col full-height" role="region" aria-label="Experiment Files">
+            <div class="flex-container-row" role="toolbar" aria-label="File actions">
+                <button mat-button (click)="this.handleUploadFiles()" [disabled]="!this.canUpdate" aria-label="Upload files"><img [src]="this.constantsService.ICON_UPLOAD" class="icon" alt="" aria-hidden="true">Upload Files</button>
+                <button mat-button *ngIf="!isClinicalResearch && isFDTSupported" (click)="this.handleFDTUploadFiles()" [disabled]="!this.canUpdate" aria-label="FDT Upload files"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon" alt="" aria-hidden="true">FDT Upload Files</button>
+                <button mat-button *ngIf="!isClinicalResearch && isFDTSupported" (click)="this.handleFDTUploadCommandLine()" [disabled]="!this.canUpdate" aria-label="FDT Upload command line"><img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon" alt="" aria-hidden="true">FDT Upload Command Line</button>
+                <button mat-button (click)="this.handleManageFiles()" [disabled]="!this.canUpdate" aria-label="Manage files"><img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon" alt="" aria-hidden="true">Manage Files</button>
+                <button mat-button (click)="this.handleDownloadFiles()" aria-label="Download files"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon" alt="" aria-hidden="true">Download Files</button>
             </div>
             <div class="flex-grow">
-                <div #oneEmWidth class="no-height single-em"></div>
+                <div #oneEmWidth class="no-height single-em" aria-hidden="true"></div>
                 <ag-grid-angular class="ag-theme-balham full-height full-width"
+                                 role="grid"
+                                 aria-label="Files data grid"
                                  (gridReady)="this.onGridReady($event)"
                                  (gridSizeChanged)="this.onGridSizeChanged($event)"
                                  (rowDoubleClicked)="this.onGridRowDoubleClicked($event)"
@@ -36,7 +38,7 @@ import {UtilService} from "../../services/util.service";
                                  [rowData]="this.gridData">
                 </ag-grid-angular>
             </div>
-            <div>
+            <div role="status" aria-live="polite">
                 <label>{{this.fileCount}} file(s)</label>
             </div>
         </div>
@@ -45,7 +47,7 @@ import {UtilService} from "../../services/util.service";
 })
 export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
 
-    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
 
     private emToPxConversionRate: number = 13;
 

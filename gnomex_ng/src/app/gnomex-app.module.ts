@@ -4,7 +4,8 @@ import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {HeaderModule} from "./header/header.module";
 import {APP_ROUTING} from "./gnomex-app.routes";
-import {HttpModule} from "@angular/http";
+import {HttpClientModule} from "@angular/common/http";
+import { JwtModule } from '@auth0/angular-jwt';
 import {HomeModule} from "./home/home.module";
 import {BROWSE_EXPERIMENTS_ENDPOINT} from "./experiments/experiments.service";
 import {ExperimentsService} from "./experiments/experiments.service";
@@ -56,6 +57,17 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
     storageType: "localStorage"
 };
 
+// Create a Factory for our JwtModule config since Angular doesn't allow functions in decorators.
+// Also, we have to add the export keyword, otherwise Angular complains again
+export function JwtModuleConfigFactory() {
+    return localStorage.getItem('access_token');
+}
+
+// Function to retrieve the token from local storage
+export function tokenGetter() {
+    return localStorage.getItem("access_token");
+}
+
 /**
  * @since 1.0.0
  */
@@ -63,7 +75,12 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
     imports: [
         BrowserModule,
         APP_ROUTING,
-        HttpModule,
+        HttpClientModule,
+        JwtModule.forRoot({
+            config: {
+                tokenGetter: JwtModuleConfigFactory // good to go!
+            }
+        }),
         RouterModule,
         FormsModule,
         HeaderModule,
@@ -92,7 +109,7 @@ let localStorageServiceConfig: ILocalStorageServiceConfig = {
         BillingModule,
         AngularSplitModule,
         RegisterUserModule
-    ],
+   ],
     declarations: [GnomexAppComponent],
     bootstrap: [GnomexAppComponent],
     providers: [

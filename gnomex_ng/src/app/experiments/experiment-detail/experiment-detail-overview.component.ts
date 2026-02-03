@@ -111,14 +111,14 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
     private overviewListSubscription: Subscription;
     private requestCategory: any;
 
-    @ViewChild(ExperimentSequenceLanesTab) private sequenceLanesTab: ExperimentSequenceLanesTab;
+    @ViewChild(ExperimentSequenceLanesTab, {static: false}) private sequenceLanesTab: ExperimentSequenceLanesTab;
 
-    @ViewChild("tabSamplesIlluminaComponent") private tabSamplesIlluminaComponent: TabSamplesIlluminaComponent;
+    @ViewChild("tabSamplesIlluminaComponent", {static: false}) private tabSamplesIlluminaComponent: TabSamplesIlluminaComponent;
 
-    @ViewChild(AnnotationTabComponent) private annotationTab: AnnotationTabComponent;
-    @ViewChild(VisibilityDetailTabComponent) private visibilityDetailTab: VisibilityDetailTabComponent;
-    @ViewChild(ExperimentBioinformaticsTabComponent) private bioinformaticsTab : ExperimentBioinformaticsTabComponent;
-    @ViewChild(ExperimentBillingTabComponent) private billingTab: ExperimentBillingTabComponent;
+    @ViewChild(AnnotationTabComponent, {static: false}) private annotationTab: AnnotationTabComponent;
+    @ViewChild(VisibilityDetailTabComponent, {static: false}) private visibilityDetailTab: VisibilityDetailTabComponent;
+    @ViewChild(ExperimentBioinformaticsTabComponent, {static: false}) private bioinformaticsTab : ExperimentBioinformaticsTabComponent;
+    @ViewChild(ExperimentBillingTabComponent, {static: false}) private billingTab: ExperimentBillingTabComponent;
 
     constructor(private securityAdvisor: CreateSecurityAdvisorService,
                 private dictionaryService: DictionaryService,

@@ -27,7 +27,7 @@ export class DatatracksSummaryTabComponent implements OnInit, OnDestroy {
     public summaryFormGroup: FormGroup;
     description: string = "";
     public datatrackTreeNodeSubscription: Subscription;
-    @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
+    @ViewChild("descEditorRef", {static: false}) descEditor: AngularEditorComponent;
     @Input() private editable: boolean = false;
 
 

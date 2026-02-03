@@ -28,35 +28,39 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
 @Component({
     selector: 'analysis-files-tab',
     template: `
-        <div class="padded flex-container-col full-height">
-            <div class="flex-container-row flex-wrap">
-                <button mat-button class="minimize" (click)="this.handleUploadFiles()" [disabled]="!this.canUpdate"><img [src]="this.constantsService.ICON_UPLOAD" class="icon">
+        <div class="padded flex-container-col full-height" role="region" aria-label="Analysis files">
+            <div class="flex-container-row flex-wrap" role="toolbar" aria-label="File actions">
+                <button mat-button class="minimize" (click)="this.handleUploadFiles()" [disabled]="!this.canUpdate" aria-label="Upload files">
+                    <img [src]="this.constantsService.ICON_UPLOAD" class="icon" alt="" aria-hidden="true">
                     Upload Files
                 </button>
-                <button mat-button class="minimize" *ngIf="isFDTSupported" (click)="this.handleFDTUploadCommandLine()" [disabled]="!this.canUpdate">
-                    <img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Command Line
+                <button mat-button class="minimize" *ngIf="isFDTSupported" (click)="this.handleFDTUploadCommandLine()" [disabled]="!this.canUpdate"
+                        aria-label="FDT upload command line">
+                    <img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon" alt="" aria-hidden="true">FDT Upload Command Line
                 </button>
-                <button mat-button class="minimize" *ngIf="isFDTSupported" (click)="this.handleFDTUploadFiles()" [disabled]="!this.canUpdate">
-                    <img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon">FDT Upload Files
+                <button mat-button class="minimize" *ngIf="isFDTSupported" (click)="this.handleFDTUploadFiles()" [disabled]="!this.canUpdate"
+                        aria-label="FDT upload files">
+                    <img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon" alt="" aria-hidden="true">FDT Upload Files
                 </button>
-                <button mat-button class="minimize" (click)="this.handleManageFiles()" [disabled]="!this.canUpdate">
-                    <img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon">Manage Files
+                <button mat-button class="minimize" (click)="this.handleManageFiles()" [disabled]="!this.canUpdate" aria-label="Manage files">
+                    <img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon" alt="" aria-hidden="true">Manage Files
                 </button>
-                <button mat-button class="minimize" (click)="this.handleDownloadFiles()">
-                    <img [src]="this.constantsService.ICON_DOWNLOAD" class="icon">Download Files
+                <button mat-button class="minimize" (click)="this.handleDownloadFiles()" aria-label="Download files">
+                    <img [src]="this.constantsService.ICON_DOWNLOAD" class="icon" alt="" aria-hidden="true">Download Files
                 </button>
             </div>
-            <div class="flex-grow">
+            <div class="flex-grow" role="region" aria-label="Files list">
                 <ag-grid-angular class="ag-theme-balham full-height full-width"
                                  (gridReady)="this.onGridReady($event)"
                                  (gridSizeChanged)="this.onGridSizeChanged($event)"
                                  (rowDoubleClicked)="this.onGridRowDoubleClicked($event)"
                                  [getNodeChildDetails]="this.getNodeChildDetails"
                                  [enableColResize]="true"
-                                 [rowData]="this.gridData">
+                                 [rowData]="this.gridData"
+                                 aria-label="Analysis files data grid">
                 </ag-grid-angular>
             </div>
-            <div class="flex-container-row justify-flex-end">
+            <div class="flex-container-row justify-flex-end" aria-live="polite">
                 <label>{{this.fileCount}} file(s)</label>
             </div>
         </div>

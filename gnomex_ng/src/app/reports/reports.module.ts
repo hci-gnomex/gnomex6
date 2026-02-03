@@ -7,7 +7,7 @@ import {CommonModule} from "@angular/common";
 import {AnnotationReportComponent} from "./annotation-report.component";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {UtilModule} from "../util/util.module";
-import {AgGridModule} from "ag-grid-angular/main";
+import {AgGridModule} from "ag-grid-angular";
 import {TrackUsageComponent} from "./track-usage.component";
 import {ChartsModule} from "ng2-charts";
 import {EmailAllUsersComponent} from "./email-all-users.component";

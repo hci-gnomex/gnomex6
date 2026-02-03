@@ -72,9 +72,9 @@ export class ManageFilesDialogComponent extends BaseGenericContainerDialog imple
     selectedTabIndex:number = 0;
     showLinkedSampleTab:boolean = false;
 
-    @ViewChild(LinkedSampleFileComponent) private linkedSampleTab: LinkedSampleFileComponent;
-    @ViewChild(OrganizeFilesComponent) private orgFileTab: OrganizeFilesComponent;
-    @ViewChild(UploadFileComponent) private uploadFileTab: UploadFileComponent;
+    @ViewChild(LinkedSampleFileComponent, {static: false}) private linkedSampleTab: LinkedSampleFileComponent;
+    @ViewChild(OrganizeFilesComponent, {static: false}) private orgFileTab: OrganizeFilesComponent;
+    @ViewChild(UploadFileComponent, {static: false}) private uploadFileTab: UploadFileComponent;
     saveSubscription:Subscription;
 
 

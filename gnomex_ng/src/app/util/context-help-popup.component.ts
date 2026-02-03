@@ -64,7 +64,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 })
 
 export class ContextHelpPopupComponent extends BaseGenericContainerDialog implements OnInit {
-    @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
+    @ViewChild("descEditorRef", {static: false}) descEditor: AngularEditorComponent;
 
     public tooltipControl: FormControl;
     public actionType: any = ActionType;

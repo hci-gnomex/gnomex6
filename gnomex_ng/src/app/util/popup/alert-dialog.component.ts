@@ -116,7 +116,7 @@ import {DialogType} from "./dialogs.service";
 }) export class AlertDialogComponent implements OnInit {
     public type: any = DialogType;
 
-    @ViewChild("topmostLeftmost") topmostLeftmost: ElementRef;
+    @ViewChild("topmostLeftmost", {static: false}) topmostLeftmost: ElementRef;
 
     public message: string[] = null;
     public title: string = "";

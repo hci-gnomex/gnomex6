@@ -89,7 +89,7 @@ import {NavigationService} from "../services/navigation.service";
 
 export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
 
-    @ViewChild("analysisTree") treeComponent: TreeComponent;
+    @ViewChild("analysisTree", {static: false}) treeComponent: TreeComponent;
 
     public readonly DRAG_AND_DROP_HINT: string = "Drag-and-drop to move analyses to another lab and/or group. Hold Ctrl while dragging-and-dropping to assign to multiple groups";
     public showDragDropHint: boolean = false;

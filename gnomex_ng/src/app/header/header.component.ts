@@ -35,62 +35,80 @@ import {BrowseDictionaryComponent} from "../configuration/browse-dictionary.comp
     selector: "gnomex-header",
     templateUrl: "./header.component.html",
     styles: [`
-        
+
         .red {
             /*font-weight: bold;*/
-            color: red;
+            color: #fc0026;
         }
-        
+
         .no-padding-dialog .mat-dialog-container {
             padding: 0;
         }
-        .no-padding-dialog .mat-dialog-container .mat-dialog-actions{
+
+        .no-padding-dialog .mat-dialog-container .mat-dialog-actions {
             background-color: #eeeeeb;
         }
-        
+
         .header-one {
             position: fixed;
             z-index: 1;
         }
+
         .header-two {
             background-color: #f5fffa;
             color: black;
         }
-        
+
         .top-menu-item {
             flex: 1;
         }
+
         .right-align {
             text-align: right;
         }
+
         .links {
             flex: .25;
             text-decoration: none;
         }
+
         .link {
             font-size: small;
             color: inherit;
             text-decoration: none;
             text-align: center;
         }
+
         .problem {
-            color: red !important;
+            color: #fc0026 !important;
             text-decoration: underline !important;
         }
+
         .header-flex0 {
             flex: 0 !important;
         }
+
         [hidden] {
             display: none !important;
             flex: 0 !important;
         }
+
         .mat-menu-panel.no-max-width {
             max-width: none;
         }
-        .inline-block { display: inline-block; }
-        .horizontal-padding { padding: 0 0.4em; }
-        .horizontal-center { text-align: center; }
-        
+
+        .inline-block {
+            display: inline-block;
+        }
+
+        .horizontal-padding {
+            padding: 0 0.4em;
+        }
+
+        .horizontal-center {
+            text-align: center;
+        }
+
         .horizontal-spacer {
             width: 2em;
         }
@@ -98,28 +116,28 @@ import {BrowseDictionaryComponent} from "../configuration/browse-dictionary.comp
         .minor-height {
             height: 1em;
         }
-        
+
         .collapse-bar {
             background-color: #eeeeee;
             border-bottom: 1px solid silver;
         }
-        
+
         .animation {
             -webkit-transition: .5s ease-in-out;
             -moz-transition: .5s ease-in-out;
             -o-transition: .5s ease-in-out;
             transition: .5s ease-in-out;
         }
-        
+
     `],
     encapsulation: ViewEncapsulation.None
 })
 
 export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
 
-    @ViewChild('headerRef') headerRef: ElementRef;
-    @ViewChild('spacerRef') spacerRef: ElementRef;
-    @ViewChild('bottomNonCollapsing') bottomNonCollapsing: ElementRef;
+    @ViewChild('headerRef', {static: false}) headerRef: ElementRef;
+    @ViewChild('spacerRef', {static: false}) spacerRef: ElementRef;
+    @ViewChild('bottomNonCollapsing', {static: false}) bottomNonCollapsing: ElementRef;
 
     options: FormGroup;
     private readonly serviceParams: any;

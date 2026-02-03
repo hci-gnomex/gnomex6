@@ -4,7 +4,7 @@
 import {NgModule} from "@angular/core";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
-import {AgGridModule} from 'ag-grid-angular/main';
+import {AgGridModule} from 'ag-grid-angular';
 import {AgGridEditorModule} from "../util/grid-editors/ag-grid-editor.module";
 import {AgGridRendererModule} from "../util/grid-renderers/ag-grid-renderer.module";
 

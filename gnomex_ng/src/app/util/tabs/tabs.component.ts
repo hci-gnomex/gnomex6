@@ -29,7 +29,7 @@ export class Tabs implements OnDestroy {
     tabs: Tab[];
     activeTabId: number;
     state:string;
-    @ViewChild('container', {read: ViewContainerRef}) tabsContainer:ViewContainerRef;
+    @ViewChild('container', {read: ViewContainerRef, static: false}) tabsContainer:ViewContainerRef;
 
     @Output() tabChanging = new EventEmitter<TabChangeEvent>();
     @Output() tabChanged = new EventEmitter<any>();

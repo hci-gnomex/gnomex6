@@ -1,6 +1,5 @@
 import {Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {ActivatedRoute} from "@angular/router";
-import {URLSearchParams} from "@angular/http";
 import {ExperimentsService} from "../experiments.service";
 import {TabContainer} from "../../util/tabs/tab-container.component";
 import {ConstantsService} from "../../services/constants.service";
@@ -17,30 +16,31 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 
 @Component({
     template: `
-        <div class="flex-container-col full-height full-width">
-            <div class="flex-container-row justify-space-between align-center">
-                <div >
+        <div class="flex-container-col full-height full-width" role="main" aria-label="Browse Overview">
+            <div class="flex-container-row justify-space-between align-center" role="banner">
+                <div role="heading" aria-level="1" aria-live="polite">
                     {{ nodeTitle}} &nbsp;&nbsp;&nbsp;&nbsp; {{ "(" + this.experimentsService.experimentList.length + " Experiments)"}}
                 </div>
                 <div class="flex-container-row align-center right-padding">
-                    <label>Experiment #</label>
+                    <label id="experimentFilterLabel">Experiment #</label>
                     <custom-combo-box [options]="this.orderedExperimentIds"
-                                      (optionSelected)="onIDSelect($event)">
+                                      (optionSelected)="onIDSelect($event)"
+                                      aria-labelledby="experimentFilterLabel">
                     </custom-combo-box>
                 </div>
             </div>
-            <div class="full-width full-height flex-grow overflow-auto">
-                <mat-tab-group class="mat-tab-group-border full-height full-width" (selectedTabChange)="tabChanged($event)">
-                    <mat-tab class="full-height" label="Experiment">
+            <div class="full-width full-height flex-grow overflow-auto" role="region" aria-label="Experiment tabs">
+                <mat-tab-group class="mat-tab-group-border full-height full-width" (selectedTabChange)="tabChanged($event)" aria-label="Experiment view tabs">
+                    <mat-tab class="full-height" label="Experiment" aria-label="Experiment list tab">
                         <experiment-browse-tab></experiment-browse-tab>
                     </mat-tab>
-                    <mat-tab class="full-height" label="Progress">
+                    <mat-tab class="full-height" label="Progress" aria-label="Progress tracking tab">
                         <progress-tab></progress-tab>
                     </mat-tab>
-                    <mat-tab class="full-height" label="Visibility">
+                    <mat-tab class="full-height" label="Visibility" aria-label="Visibility settings tab">
                         <visibility-browse-tab (saveSuccess)="saveVis()"></visibility-browse-tab>
                     </mat-tab>
-                    <mat-tab *ngIf="this.project" class="full-height" label="Project">
+                    <mat-tab *ngIf="this.project" class="full-height" label="Project" aria-label="Project details tab">
                         <project-tab (saveSuccess)="saveProject($event)"></project-tab>
                     </mat-tab>
                 </mat-tab-group>
@@ -64,8 +64,8 @@ import {DialogsService} from "../../util/popup/dialogs.service";
     `]
 })
 export class BrowseOverviewComponent implements OnInit, OnDestroy {
-    @ViewChild(MatTabGroup) tabs: MatTabGroup;
-    @ViewChild(TabContainer) tabView: TabContainer;
+    @ViewChild(MatTabGroup, {static: false}) tabs: MatTabGroup;
+    @ViewChild(TabContainer, {static: false}) tabView: TabContainer;
     state: string = TabContainer.VIEW;
     public project: any;
     public nodeTitle: string = "";

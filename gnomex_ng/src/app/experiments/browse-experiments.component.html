@@ -1,4 +1,4 @@
-<div class="background background-border full-width full-height flex-container-col padding">
+<div class="background background-border full-width full-height flex-container-col padding" role="main" aria-label="Experiments Browser">
     <div class="full-height flex-container-col foreground">
         <div class="full-width">
             <browse-filter [label]="'Experiments'"
@@ -7,26 +7,26 @@
                            [mode]="'experimentBrowse'">
             </browse-filter>
         </div>
-        <div class="full-width background vertical-spacer"></div>
-        <div class="flex-container-row flex-grow full-height overflow-auto">
+        <div class="full-width background vertical-spacer" aria-hidden="true"></div>
+        <div class="flex-container-row flex-grow full-height overflow-auto" role="region" aria-label="Experiments content area">
             <as-split>
                 <as-split-area size="20">
-                    <div class="full-height flex-grow border"> <!-- start tree container -->
+                    <div class="full-height flex-grow border" role="navigation" aria-label="Experiments tree navigation"> <!-- start tree container -->
                         <div class="full-height flex-container-col foreground">
                             <div class="full-width padding">
-                                <div *ngIf="showDragDropHint" class="full-width padded">
+                                <div *ngIf="showDragDropHint" class="full-width padded" role="alert" aria-live="polite">
                                     <div class="background-lightyellow allow-line-breaks padded">{{this.DRAG_DROP_HINT}}
                                     </div>
                                 </div>
                                 <div class="flex-container-row align-center">
-                                    <div class="full-height flex-grow major-left-right-padding no-word-wrap flex-container-col align-center justify-center">
-                                        <label>{{experimentCount}} experiments</label>
-                                        <label style="font-size: 12px;">{{experimentCountMessage}}</label>
+                                    <div class="full-height flex-grow major-left-right-padding no-word-wrap flex-container-col align-center justify-center" role="status" aria-live="polite" aria-atomic="true">
+                                        <label id="experiment-count-label">{{experimentCount}} experiments</label>
+                                        <label id="experiment-count-message" style="font-size: 12px;">{{experimentCountMessage}}</label>
                                     </div>
                                     <div class="full-height">
                                         <button mat-button aria-label="Drag-and-drop hint" (click)="onClickShowDragDropHint()"
                                                 [disabled]="this.createSecurityAdvisorService.isGuest" [matTooltip]="this.DRAG_DROP_HINT">
-                                            <img [src]="'./assets/information.png'" alt="" class="padding">
+                                            <img [src]="'./assets/information.png'" alt="Help Icon" class="padding">
                                             Drag-and-drop hint
                                         </button>
                                     </div>
@@ -35,6 +35,8 @@
                             <div class="full-width flex-grow left-right-padding no-overflow">
                                 <div class="full-width full-height border">
                                     <tree-root #tree
+                                               role="tree"
+                                               aria-label="Experiments hierarchy"
                                                (moveNode)="onMoveNode($event)"
                                                (updateData)="treeUpdateData($event)"
                                                (activate)="treeOnSelect($event)"
@@ -42,8 +44,8 @@
                                                [nodes]="items"
                                                [options]="options">
                                         <ng-template #treeNodeTemplate let-node let-index="index">
-                                            <div class="full-width no-word-wrap tree-node-font">
-                                                <img src="{{ node?.data?.icon ? node.data.icon : 'assets/flask.png' }}" alt="" class="tree-node-icon icon">
+                                            <div class="full-width no-word-wrap tree-node-font" role="treeitem" [attr.aria-label]="node.data.label">
+                                                <img src="{{ node?.data?.icon ? node.data.icon : 'assets/flask.png' }}" alt="" aria-hidden="true" class="tree-node-icon icon">
                                                 <span>{{ node.data.label }}</span>
                                             </div>
                                         </ng-template>
@@ -51,38 +53,38 @@
                                     </tree-root>
                                 </div>
                             </div>
-                            <div class="full-width padding">
+                            <div class="full-width padding" role="toolbar" aria-label="Tree actions">
                                 <div class="flex-container-row align-center justify-space-between">
                                     <div>
-                                        <button mat-button (click)="expandCollapseClicked()">
+                                        <button mat-button (click)="expandCollapseClicked()" [attr.aria-label]="toggleButton + ' all tree nodes'">
                                             {{toggleButton}}
                                         </button>
                                     </div>
                                     <div>
-                                        <mat-checkbox class="inlineDiv small-font" [(ngModel)]="showEmptyFolders" (change)="onShowEmptyFolders($event)">
+                                        <mat-checkbox class="inlineDiv small-font" [(ngModel)]="showEmptyFolders" (change)="onShowEmptyFolders($event)" aria-label="Show Empty Folders">
                                             Show Empty Folders
                                         </mat-checkbox>
                                     </div>
                                 </div>
-                                <div class="flex-container-col">
+                                <div class="flex-container-col" role="group" aria-label="Project and experiment actions">
                                     <div class="flex-container-row justify-space-between">
                                         <div>
-                                            <button mat-button [disabled]="disableNewProject || this.disableAll" (click)="newProjectClicked()">
-                                                <img [src]="'./assets/folder_add.png'" alt="">
+                                            <button mat-button [disabled]="disableNewProject || this.disableAll" (click)="newProjectClicked()" aria-label="Create new project">
+                                                <img [src]="'./assets/folder_add.png'" alt="" aria-hidden="true">
                                                 New Project
                                             </button>
                                         </div>
                                         <div>
-                                            <button mat-button [disabled]="disableDeleteProject || this.disableAll" (click)="deleteProjectClicked()">
-                                                <img [src]="'./assets/folder_delete.png'">
+                                            <button mat-button [disabled]="disableDeleteProject || this.disableAll" (click)="deleteProjectClicked()" aria-label="Delete selected project">
+                                                <img [src]="'./assets/folder_delete.png'" alt="" aria-hidden="true">
                                                 Delete Project
                                             </button>
                                         </div>
                                     </div>
                                     <div class="flex-container-row">
                                         <div>
-                                            <button mat-button [disabled]="disableDeleteExperiment || this.disableAll" (click)="deleteExperimentClicked()">
-                                                <img [src]="'./assets/delete.png'" alt="">
+                                            <button mat-button [disabled]="disableDeleteExperiment || this.disableAll" (click)="deleteExperimentClicked()" aria-label="Delete selected experiment">
+                                                <img [src]="'./assets/delete.png'" alt="" aria-hidden="true">
                                                 Delete Experiment
                                             </button>
                                         </div>
@@ -93,7 +95,7 @@
                     </div> <!-- end tree container -->
                 </as-split-area>
                 <as-split-area size="80">
-                    <div  class="full-width full-height border padding">
+                    <div class="full-width full-height border padding" role="region" aria-label="Experiment details panel">
                         <browse-panel></browse-panel>
                     </div>
                 </as-split-area>

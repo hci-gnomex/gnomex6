@@ -7,9 +7,10 @@ import {AnalysisService} from "../../services/analysis.service";
 @Component({
     selector: "analysis-description-tab",
     template: `
-        <div class="full-height">
-            <form [formGroup]="this.form" class="full-height overflow-auto">
-                <angular-editor #descEditorRef id="descEditor" formControlName="description" [config]="this.editorConfig">
+        <div class="full-height" role="region" aria-label="Analysis description">
+            <form [formGroup]="this.form" class="full-height overflow-auto" aria-label="Description form">
+                <angular-editor #descEditorRef id="descEditor" formControlName="description" [config]="this.editorConfig"
+                                aria-label="Analysis description editor">
                 </angular-editor>
             </form>
         </div>
@@ -26,7 +27,7 @@ import {AnalysisService} from "../../services/analysis.service";
 export class AnalysisDescriptionTabComponent implements OnInit, OnChanges {
 
     @Input() public isEditMode: boolean = false;
-    @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
+    @ViewChild("descEditorRef", {static: false}) descEditor: AngularEditorComponent;
 
     public form: FormGroup;
     public editorConfig: AngularEditorConfig;

@@ -43,7 +43,7 @@ import {FormControl} from "@angular/forms";
 })
 export class DatatracksFilesTabComponent implements OnInit {
 
-    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
 
     private emToPxConversionRate: number = 13;
 

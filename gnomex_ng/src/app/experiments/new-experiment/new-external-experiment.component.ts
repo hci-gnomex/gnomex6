@@ -240,9 +240,15 @@ export class NewExternalExperimentComponent implements OnInit, OnDestroy {
         this.selectedTabIndex--;
     }
 
+//    this.tabsRefArray[index].componentRef.instance[this.tabs[index].formField])
+
     public onTabChange(): void {
+
         if (this.tabsRefArray[this.selectedTabIndex].componentRef.instance.tabDisplayed) {
             this.tabsRefArray[this.selectedTabIndex].componentRef.instance.tabDisplayed();
+
+//        if (this.tabsRefArray[this.selectedTabIndex].componentRef.instance[this.tabs[this.selectedTabIndex].tabDisplayed] ){
+//            this.tabsRefArray[this.selectedTabIndex].componentRef.instance.tabDisplayed();
         }
     }
 }

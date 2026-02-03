@@ -78,7 +78,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
     `]
 })
 export class AnalysisOverviewComponent implements OnInit, OnDestroy {
-    @ViewChild(MatTabGroup) tabs: MatTabGroup;
+    @ViewChild(MatTabGroup, {static: false}) tabs: MatTabGroup;
     state: string = TabContainer.VIEW;
     public nodeTitle: string = "";
     public analysisGroup: any;

@@ -151,8 +151,8 @@ import {ConstantsService} from "../../services/constants.service";
 })
 export class AdvancedSearchComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
-    @ViewChild("searchResultsTree") treeComponent: TreeComponent;
-    @ViewChild('topmostLeftmost') topmostLeftmost: ElementRef;
+    @ViewChild("searchResultsTree", {static: false}) treeComponent: TreeComponent;
+    @ViewChild('topmostLeftmost', {static: false}) topmostLeftmost: ElementRef;
 
     public actionType: any = ActionType ;
 

@@ -29,7 +29,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
     `]
 })
 export class ConfigCoreFacilityEditComponent implements OnInit, OnDestroy {
-    @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
+    @ViewChild("descEditorRef", {static: false}) descEditor: AngularEditorComponent;
     @Output() refreshedCore = new EventEmitter<any>();
 
     public editorConfig: AngularEditorConfig;

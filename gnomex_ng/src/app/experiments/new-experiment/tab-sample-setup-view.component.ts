@@ -278,7 +278,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
         this._organism = value;
     };
 
-    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
 
     public form: FormGroup;
 

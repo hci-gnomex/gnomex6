@@ -56,7 +56,7 @@ import {ConstantsService} from "../../services/constants.service";
 })
 export class GenericContainerDialogComponent implements OnInit, OnDestroy {
 
-    @ViewChild('topmostLeftmost') topmostLeftmost: ElementRef;
+    @ViewChild('topmostLeftmost', {static: false}) topmostLeftmost: ElementRef;
 
     type = ActionType;
     title:string;

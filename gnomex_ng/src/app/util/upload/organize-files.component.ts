@@ -26,7 +26,7 @@ import {IFileParams} from "../interfaces/file-params.model";
 import {ActionType} from "../interfaces/generic-dialog-action.model";
 import {UtilService} from "../../services/util.service";
 import * as _ from "lodash";
-import {changesFromRecord} from "ng-dynamic-component/dynamic/util";
+//import {changesFromRecord} from "ng-dynamic-component/dynamic/util";
 
 
 
@@ -74,9 +74,9 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     private isLastSelectOrgTree:boolean;
 
 
-    @ViewChild('organizeTree')
+    @ViewChild('organizeTree', {static: false})
     private organizeTree: TreeComponent;
-    @ViewChild('uploadTree')
+    @ViewChild('uploadTree', {static: false})
     private uploadTree: TreeComponent;
 
     @Output() closeDialog = new EventEmitter<TabChangeEvent>();

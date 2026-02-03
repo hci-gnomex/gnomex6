@@ -51,8 +51,8 @@ import {MatSelect} from "@angular/material";
 })
 
 export class CustomMultiComboBoxComponent implements AfterViewInit, OnChanges, OnDestroy, ControlValueAccessor {
-    @ViewChild("input") inputElement: ElementRef;
-    @ViewChild("select") selectElement: MatSelect;
+    @ViewChild("input", {static: false}) inputElement: ElementRef;
+    @ViewChild("select", {static: false}) selectElement: MatSelect;
 
     @Input() public placeholder: string = "";
     @Input() public temporaryPlaceholder: boolean = false;

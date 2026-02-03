@@ -50,10 +50,10 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
 })
 export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit, OnDestroy {
 
-    @ViewChild(DatatracksSummaryTabComponent) summaryComponet: DatatracksSummaryTabComponent;
-    @ViewChild(AnnotationTabComponent) annotationComponent: AnnotationTabComponent;
-    @ViewChild(DatatracksVisibilityTabComponent) visibilityComponent: DatatracksVisibilityTabComponent;
-    @ViewChild(DatatracksFilesTabComponent) filesComponent: DatatracksFilesTabComponent;
+    @ViewChild(DatatracksSummaryTabComponent, {static: false}) summaryComponet: DatatracksSummaryTabComponent;
+    @ViewChild(AnnotationTabComponent, {static: false}) annotationComponent: AnnotationTabComponent;
+    @ViewChild(DatatracksVisibilityTabComponent, {static: false}) visibilityComponent: DatatracksVisibilityTabComponent;
+    @ViewChild(DatatracksFilesTabComponent, {static: false}) filesComponent: DatatracksFilesTabComponent;
 
     public dtOverviewForm: FormGroup;
     public annotations: IAnnotation[];

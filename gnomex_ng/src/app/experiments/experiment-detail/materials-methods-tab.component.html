@@ -1,18 +1,18 @@
-<div class="full-height full-width padded small-font">
+<div class="full-height full-width padded small-font" role="region" aria-label="Materials and Methods">
     <div class="full-width flex-container-col">
-        <div class="full-width flex-container-row align-center padded">
-            <div class="gx-label label-width">
+        <div class="full-width flex-container-row align-center padded" role="group" aria-labelledby="nameLabel">
+            <div class="gx-label label-width" id="nameLabel">
                 Name
             </div>
-            <div class="flex-grow padded-left">
+            <div class="flex-grow padded-left" aria-labelledby="nameLabel">
                 {{_experiment?.name}}
             </div>
         </div>
-        <div class="full-width flex-container-row align-center padded">
-            <div class="gx-label label-width">
+        <div class="full-width flex-container-row align-center padded" role="group" aria-labelledby="experimentLabel">
+            <div class="gx-label label-width" id="experimentLabel">
                 Experiment
             </div>
-            <div class="flex-grow padded-left">
+            <div class="flex-grow padded-left" aria-labelledby="experimentLabel">
                 {{requestCategoryName}}
             </div>
         </div>
@@ -41,9 +41,9 @@
                 {{codeIsolationPrepType}}
             </div>
         </div>
-        <div class="full-width flex-container-row padded" *ngIf="protocols.length > 0">
+        <div class="full-width flex-container-row padded" *ngIf="protocols.length > 0" role="region" aria-label="Protocols">
             <div class="flex-container-col">
-                <div class="flex-container-row padded-top-bottom" *ngFor="let protocol of protocols">
+                <div class="flex-container-row padded-top-bottom" *ngFor="let protocol of protocols" role="group" [attr.aria-label]="protocol.label + ' protocol'">
                     <div class="flex-container-col">
                         <div class="gx-label label-width">
                             {{protocol.label}}
@@ -54,7 +54,8 @@
                             <button mat-button
                                     class="link-button underlined minimize limit-width"
                                     style="padding: 0;"
-                                    (click)="showProtocol(protocol)">
+                                    (click)="showProtocol(protocol)"
+                                    [attr.aria-label]="'View protocol: ' + protocol.name">
                                 {{protocol.name}}
                             </button>
                         </div>

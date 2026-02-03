@@ -49,9 +49,9 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 })
 
 export class QcWorkflowComponent implements OnInit, OnChanges {
-    @ViewChild("requestInput") requestInput: ElementRef;
-    @ViewChild("coreFacility") coreFacilityInput: ElementRef;
-    @ViewChild("oneEmWidth") oneEmWidth: ElementRef;
+    @ViewChild("requestInput", {static: false}) requestInput: ElementRef;
+    @ViewChild("coreFacility", {static: false}) coreFacilityInput: ElementRef;
+    @ViewChild("oneEmWidth", {static: false}) oneEmWidth: ElementRef;
 
     @Input() mode: string;
 

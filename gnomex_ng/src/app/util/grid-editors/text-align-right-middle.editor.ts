@@ -42,7 +42,7 @@ import {SpinnerDialogComponent} from "../popup/spinner-dialog.component";
 })
 export class TextAlignRightMiddleEditor implements ICellEditorAngularComp {
 
-    @ViewChild('theInput') theInput: ElementRef;
+    @ViewChild('theInput', {static: false}) theInput: ElementRef;
 
     params: any;
     value: string;

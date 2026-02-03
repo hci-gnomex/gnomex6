@@ -253,15 +253,6 @@ task copyTomcatJars(type: Copy) {
     into "${gnomexServerHome}/lib"
 }
 
-tasks.named('war') {
-    dependsOn 'jar', 'clientJar', 'copyScripts'
-
-    // if you include scripts in the war:
-    from(tasks.named('copyScripts')) {
-        into 'WEB-INF/scripts'   // adjust to whatever path your app expects
-    }
-}
-
 war {
     dependsOn 'jar', 'clientJar', 'copyScripts'
     archiveFileName = warNameTemp

@@ -1,75 +1,76 @@
-<div class="flexbox-column">
-    <div class="flex-container-row">
-        <label class="label-title label-title-width">
-            <img class="icon" [src]="experimentOverviewNode?.icon">
+<div class="flexbox-column" role="main" aria-label="Experiment Detail Overview">
+    <div class="flex-container-row" role="banner">
+        <label class="label-title label-title-width" role="heading" aria-level="1">
+            <img class="icon" [src]="experimentOverviewNode?.icon" alt="" aria-hidden="true">
             {{nodeTitle}}
         </label>
-        <div>
-            <button mat-button color="link" *ngIf="showEdit" (click)="startEdit($event)">
-                <img *ngIf="!isEditMode" class="icon" [src]="this.constService.ICON_TAG_BLUE_EDIT">
-                <img *ngIf="isEditMode" class="icon" [src]="this.constService.PAGE">
+        <div role="toolbar" aria-label="Experiment actions">
+            <button mat-button color="link" *ngIf="showEdit" (click)="startEdit($event)" [attr.aria-label]="isEditMode ? 'Switch to view mode' : 'Switch to edit mode'">
+                <img *ngIf="!isEditMode" class="icon" [src]="this.constService.ICON_TAG_BLUE_EDIT" alt="" aria-hidden="true">
+                <img *ngIf="isEditMode" class="icon" [src]="this.constService.PAGE" alt="" aria-hidden="true">
                 {{isEditMode ? "View" : "Edit"}}
             </button>
-            <button mat-button (click)="this.handleDownloadFiles()">
-                <img [src]="this.constService.ICON_DOWNLOAD" class="icon">
+            <button mat-button (click)="this.handleDownloadFiles()" aria-label="Download experiment files">
+                <img [src]="this.constService.ICON_DOWNLOAD" class="icon" alt="" aria-hidden="true">
                 Download Files
             </button>
             <button mat-button color="link" (click)="showPrintableRequestForm()"
-                    [matTooltip]="toolTips.PRINT_EXPERIMENT_ORDER">
-                <img class="icon" [src]="this.constService.PAGE_WHITE_ACROBAT">
+                    [matTooltip]="toolTips.PRINT_EXPERIMENT_ORDER" aria-label="Print experiment order form">
+                <img class="icon" [src]="this.constService.PAGE_WHITE_ACROBAT" alt="" aria-hidden="true">
                 Print Experiment Order
             </button>
             <button mat-button *ngIf="showCreateAnalysisButton" [disabled]="isDirty"
                     (click)="createNewAnalysis($event)"
-                    [matTooltip]="!isDirty ? toolTips.CREATE_NEW_ANALYSIS : toolTips.CREATE_NEW_ANALYSIS_DIRTY">
-                <img class="icon" [src]="this.constService.ICON_ANALYSIS">Create New Analysis
+                    [matTooltip]="!isDirty ? toolTips.CREATE_NEW_ANALYSIS : toolTips.CREATE_NEW_ANALYSIS_DIRTY"
+                    aria-label="Create new analysis from this experiment">
+                <img class="icon" [src]="this.constService.ICON_ANALYSIS" alt="" aria-hidden="true">Create New Analysis
             </button>
-            <button mat-button color="link" (click)="shareLink()">
-                <img class="icon" [src]="this.constService.GLOBE_LINK">Share URL
+            <button mat-button color="link" (click)="shareLink()" aria-label="Share experiment URL">
+                <img class="icon" [src]="this.constService.GLOBE_LINK" alt="" aria-hidden="true">Share URL
             </button>
             <button mat-button *ngIf="!this.secAdvisor.isGuest" color="link" (click)="onEmailClick()"
-                    [matTooltip]="toolTips.CONTACT_CORE">
-                <img class="icon" [src]="this.constService.EMAIL_GO_LINK">Contact Core
+                    [matTooltip]="toolTips.CONTACT_CORE" aria-label="Contact core facility via email">
+                <img class="icon" [src]="this.constService.EMAIL_GO_LINK" alt="" aria-hidden="true">Contact Core
             </button>
         </div>
     </div>
-    <div class="flex-grow-greater overflow-auto">
+    <div class="flex-grow-greater overflow-auto" role="region" aria-label="Experiment tabs content">
         <mat-tab-group class="full-width full-height bordered" [selectedIndex]="this.experimentService.currentTabIndex"
-                       (selectedTabChange)="tabChanged($event)">
-            <mat-tab label="Overview">
+                       (selectedTabChange)="tabChanged($event)" aria-label="Experiment detail tabs">
+            <mat-tab label="Overview" aria-label="Overview tab">
                 <experiment-overview-tab [experiment]="_experiment" [editMode]="isEditMode"></experiment-overview-tab>
             </mat-tab>
-            <mat-tab label="Description">
+            <mat-tab label="Description" aria-label="Description tab">
                 <description-tab [editMode]="isEditMode" ></description-tab>
             </mat-tab>
-            <mat-tab label="Materials & Methods" *ngIf="showMaterialsMethodsTab">
+            <mat-tab label="Materials & Methods" *ngIf="showMaterialsMethodsTab" aria-label="Materials and Methods tab">
                 <materials-methods-tab></materials-methods-tab>
             </mat-tab>
-            <mat-tab label="Related Data" *ngIf="showRelatedDataTab">
+            <mat-tab label="Related Data" *ngIf="showRelatedDataTab" aria-label="Related Data tab">
                 <related-data-tab [relatedObjects]="relatedObjects" ></related-data-tab>
             </mat-tab>
-            <mat-tab label="Other Details" *ngIf="annotations && annotations.length > 0">
+            <mat-tab label="Other Details" *ngIf="annotations && annotations.length > 0" aria-label="Other Details tab">
                 <annotation-tab [annotations]="annotations" [disabled]="!isEditMode" [orderType]="types.EXPERIMENT" [showConfigureAnnotationsButton]="false"> </annotation-tab>
             </mat-tab>
-            <mat-tab label="Annotations" *ngIf="isEditMode && showAnnotationsTab">
+            <mat-tab label="Annotations" *ngIf="isEditMode && showAnnotationsTab" aria-label="Annotations tab">
                 <tab-annotation-view [experiment]="_experiment"> </tab-annotation-view>
             </mat-tab>
-            <mat-tab label="Experiment Design">
+            <mat-tab label="Experiment Design" aria-label="Experiment Design tab">
                  <tab-samples-illumina #tabSamplesIlluminaComponent [experiment]="_experiment" [stateChangeSubject]="modeSubject"></tab-samples-illumina>
             </mat-tab>
-            <mat-tab label="Visibility" >
+            <mat-tab label="Visibility" aria-label="Visibility settings tab">
                  <visibility-detail-tab [disabled]="!isEditMode"></visibility-detail-tab>
             </mat-tab>
-            <mat-tab *ngIf="showSequenceLanesTab" label="Sequence Lanes">
+            <mat-tab *ngIf="showSequenceLanesTab" label="Sequence Lanes" aria-label="Sequence Lanes tab">
                 <experiment-sequence-lanes-tab [editMode]="this.experimentService.getEditMode()" [experiment]="_experiment"></experiment-sequence-lanes-tab>
             </mat-tab>
-            <mat-tab *ngIf="showBioinformaticsTab" label="Bioinformatics">
+            <mat-tab *ngIf="showBioinformaticsTab" label="Bioinformatics" aria-label="Bioinformatics tab">
                 <experiment-bioinformatics-tab [experiment]="experiment" [editMode]="isEditMode"></experiment-bioinformatics-tab>
             </mat-tab>
-            <mat-tab label="Files">
+            <mat-tab label="Files" aria-label="Files tab">
                 <experiment-files-tab></experiment-files-tab>
             </mat-tab>
-            <mat-tab *ngIf="showBillingTab" label="Billing">
+            <mat-tab *ngIf="showBillingTab" label="Billing" aria-label="Billing tab">
                 <experiment-billing-tab></experiment-billing-tab>
             </mat-tab>
         </mat-tab-group>

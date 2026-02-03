@@ -14,7 +14,7 @@ import {IconRendererComponent} from "../../util/grid-renderers";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
-import {AgGridNg2} from "ag-grid-angular";
+import {AgGridAngular} from "ag-grid-angular";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {Experiment} from "../../util/models/experiment.model";
 
@@ -70,7 +70,7 @@ import {Experiment} from "../../util/models/experiment.model";
     `],
 })
 export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
-    @ViewChild("lanesGrid") lanesGrid: AgGridNg2;
+    @ViewChild("lanesGrid", {static: false}) lanesGrid: AgGridAngular;
     
     @Input() editMode: boolean;
     @Input() experiment: Experiment;

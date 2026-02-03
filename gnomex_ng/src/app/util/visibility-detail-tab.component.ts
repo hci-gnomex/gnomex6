@@ -3,7 +3,6 @@ import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {GetLabService} from "../services/get-lab.service";
-import {URLSearchParams} from "@angular/http";
 import {GnomexService} from "../services/gnomex.service";
 import {ConstantsService} from "../services/constants.service";
 import {PropertyService} from "../services/property.service";

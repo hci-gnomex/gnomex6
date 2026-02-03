@@ -89,7 +89,7 @@ export class ProductOrdersComponent implements OnInit {
     public labLineItems: any[] = [];
     public productOrderLineItems: any[] = [];
 
-    @ViewChild(TreeComponent) private treeComponent: TreeComponent;
+    @ViewChild(TreeComponent, {static: false}) private treeComponent: TreeComponent;
     public treeOptions: ITreeOptions;
     public productOrderList: ITreeNode[] = [];
     public selectedTreeNode: ITreeNode;

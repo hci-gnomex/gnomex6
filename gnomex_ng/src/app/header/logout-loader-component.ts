@@ -8,7 +8,6 @@ import {AuthenticationService} from "../auth/authentication.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {first} from "rxjs/operators";
 import {BootController} from "../../boot-control";
-import {URLSearchParams} from "@angular/http";
 import {LaunchPropertiesService} from "../services/launch-properites.service";
 
 @Component({

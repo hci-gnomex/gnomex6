@@ -34,7 +34,7 @@ import {UrlAnnotRenderer} from "../grid-renderers/url-annot-renderer";
     optionsDisplayField: string;
     gridValueField: string;
     uniqueColumn: any;
-    @ViewChild("urlRenderer") urlAnnotRenderer: UrlAnnotRenderer;
+    @ViewChild("urlRenderer", {static: false}) urlAnnotRenderer: UrlAnnotRenderer;
 
     constructor(private dialog: MatDialog) { }
 

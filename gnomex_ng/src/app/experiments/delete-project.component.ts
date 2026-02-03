@@ -10,7 +10,7 @@ import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-d
 @Component({
     selector: "delete-project-dialog",
     template: `
-        <div class="double-padded">
+        <div class="double-padded" role="alertdialog" aria-label="Confirm project deletion">
             {{selectedItem.data.label}}?
         </div>
     `

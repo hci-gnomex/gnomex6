@@ -23,23 +23,25 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
     selector: "analysis-tab",
     template: `
 
-        <div class="full-height full-width">
+        <div class="full-height full-width" role="region" aria-label="Analysis list">
             <div class="full-height full-width flex-container-col">
-                <div class="full-width flex-container-row">
+                <div class="full-width flex-container-row" role="toolbar" aria-label="Analysis list actions">
                     <div class="padded">
-                        <button mat-button [disabled]="!enableCreateAnalysis || this.createSecurityAdvisorService.isGuest" (click)="create()">
-                            <img [src]="this.newSegment" alt="">
+                        <button mat-button [disabled]="!enableCreateAnalysis || this.createSecurityAdvisorService.isGuest" (click)="create()"
+                                aria-label="Create new analysis">
+                            <img [src]="this.newSegment" alt="" aria-hidden="true">
                             New
                         </button>
                     </div>
                     <div class="padded">
-                        <button mat-button [disabled]="!enableRemoveAnalysis || this.createSecurityAdvisorService.isGuest" (click)="remove()">
-                            <img [src]="this.removeSegment" alt="">
+                        <button mat-button [disabled]="!enableRemoveAnalysis || this.createSecurityAdvisorService.isGuest" (click)="remove()"
+                                aria-label="Remove selected analysis">
+                            <img [src]="this.removeSegment" alt="" aria-hidden="true">
                             Remove
                         </button>
                     </div>
                 </div>
-                <div class="full-width flex-grow">
+                <div class="full-width flex-grow" role="region" aria-label="Analysis data">
                     <ag-grid-angular class="full-width full-height ag-theme-fresh"
                                      [gridOptions]="gridOpt"
                                      [columnDefs]="columnDefs"
@@ -52,7 +54,8 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                                      (gridSizeChanged)="adjustColumnSize($event)"
                                      (rowSelected)="selectedRow($event)"
                                      (cellDoubleClicked)="forwardToAnalysis($event)"
-                                     (cellEditingStarted)="startEditingCell($event)">
+                                     (cellEditingStarted)="startEditingCell($event)"
+                                     aria-label="Analysis data grid">
                     </ag-grid-angular>
                 </div>
             </div>

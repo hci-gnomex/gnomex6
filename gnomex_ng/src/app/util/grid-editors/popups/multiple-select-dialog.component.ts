@@ -1,6 +1,5 @@
 import { Component, Inject } from "@angular/core";
 import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material";
-import { URLSearchParams } from "@angular/http";
 
 import { TextAlignLeftMiddleRenderer } from "../../../util/grid-renderers/text-align-left-middle.renderer";
 

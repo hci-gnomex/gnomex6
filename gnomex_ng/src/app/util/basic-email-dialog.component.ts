@@ -42,7 +42,7 @@ import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-edito
 })
 export class BasicEmailDialogComponent extends BaseGenericContainerDialog implements OnInit {
 
-    @ViewChild("emailEditorRef") emailEditor: AngularEditorComponent;
+    @ViewChild("emailEditorRef", {static: false}) emailEditor: AngularEditorComponent;
 
     public emailGroup: FormGroup;
     public subjectText: string = "";

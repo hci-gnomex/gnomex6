@@ -20,14 +20,16 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 @Component({
     selector: 'experiment-billing-tab',
     template: `
-        <div class="padded flex-container-col full-height">
-            <div class="flex-container-row align-center" *ngIf="this.isInternal">
-                <button mat-button (click)="this.editBillingTemplate()" [disabled]="!this.canUpdate || !this.experimentsService.getEditMode()">Edit Billing Template</button>
-                <label class="small-font"><span class="italic">Current Account(s):</span> {{this.currentAccountsLabel}}</label>
+        <div class="padded flex-container-col full-height" role="region" aria-label="Billing Information">
+            <div class="flex-container-row align-center" *ngIf="this.isInternal" role="toolbar" aria-label="Billing actions">
+                <button mat-button (click)="this.editBillingTemplate()" [disabled]="!this.canUpdate || !this.experimentsService.getEditMode()" aria-label="Edit billing template">Edit Billing Template</button>
+                <label class="small-font" aria-live="polite"><span class="italic">Current Account(s):</span> {{this.currentAccountsLabel}}</label>
             </div>
             <div class="flex-grow">
-                <div #oneEmWidth class="no-height single-em"></div>
+                <div #oneEmWidth class="no-height single-em" aria-hidden="true"></div>
                 <ag-grid-angular class="ag-theme-balham full-height full-width"
+                                 role="grid"
+                                 aria-label="Billing items grid"
                                  (gridReady)="this.onGridReady($event)"
                                  (gridSizeChanged)="this.onGridSizeChanged($event)"
                                  [getNodeChildDetails]="this.getNodeChildDetails"
@@ -43,7 +45,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 })
 export class ExperimentBillingTabComponent implements OnInit {
 
-    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
 
     public getNodeChildDetails;
     public gridColDefs: any[] = [];
