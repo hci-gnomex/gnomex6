@@ -1,17 +1,18 @@
-<div class="double-padded overflow-auto" style="display:flex">
-    <form [formGroup]="form" style=" height:100%;width:100%; display:flex; flex-direction:column;">
-        <div [ngSwitch]="annot.codePropertyType" *ngFor="let annot of annotations" class="full-width full-height small-font padded">
-            <div class="display-white-space" innerHTML="{{ annot && annot.description ? annot.description : '' }}"></div>
+<div class="double-padded overflow-auto" style="display:flex" role="region" aria-label="Annotations">
+    <form [formGroup]="form" style=" height:100%;width:100%; display:flex; flex-direction:column;" aria-label="Annotations form">
+        <div [ngSwitch]="annot.codePropertyType" *ngFor="let annot of annotations" class="full-width full-height small-font padded"
+             role="group" [attr.aria-label]="annot.name + ' annotation'">
+            <div class="display-white-space" innerHTML="{{ annot && annot.description ? annot.description : '' }}" aria-hidden="true"></div>
             <div *ngSwitchCase="'CHECK'" class="annot-control">
-                <mat-checkbox  [formControl]="this.form.controls[annot.name]" >
+                <mat-checkbox [formControl]="this.form.controls[annot.name]" [attr.aria-label]="annot.name">
                     {{ annot && annot.name ? annot.name : "" }}
                 </mat-checkbox>
-                <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('required')">
+                <mat-error *ngIf="this.form?.controls[annot.name]?.hasError('required')" role="alert">
                     This field is required
                 </mat-error>
             </div>
             <div *ngSwitchCase="'TEXT'" class="annot-control-editor" >
-                <label class="padded-bottom">{{annot.name}}</label>
+                <label class="padded-bottom" [attr.id]="'label-' + annot.name">{{annot.name}}</label>
                 <div class="full-width padded enable-bordered">
                     <textarea style="white-space: pre-line"
                               matInput
@@ -19,14 +20,15 @@
                               matAutosizeMinRows="8"
                               matAutosizeMaxRows="8"
                               [formControl]="this.form.controls[annot.name]"
-                              [disabled]="this.disabled">
+                              [disabled]="this.disabled"
+                              [attr.aria-labelledby]="'label-' + annot.name">
                     </textarea>
                 </div>
-                <div  style="color:red" *ngIf="this.form?.controls[annot.name]?.hasError('required')
+                <div style="color:red" role="alert" *ngIf="this.form?.controls[annot.name]?.hasError('required')
                                         && this.form?.controls[annot.name]?.touched">
                     Field is required
                 </div>
-                <div  style="color:red" *ngIf="this.form?.controls[annot.name]?.hasError('maxlength')
+                <div style="color:red" role="alert" *ngIf="this.form?.controls[annot.name]?.hasError('maxlength')
                                         && this.form?.controls[annot.name]?.touched">
                     Field exceeded the {{this.constService.MAX_LENGTH_2000}} character limit
                 </div>
@@ -36,23 +38,26 @@
                                         [formControl]="this.form.controls[annot.name]"
                                         [options]="annot.PropertyOption"
                                         (selectionChanged)="selectOpts($event, annot)"
-                                        displayField="name">
+                                        displayField="name"
+                                        [attr.aria-label]="annot.name + ' multi-select'">
                 </custom-multi-combo-box>
             </div>
             <div *ngSwitchCase="'OPTION'" class="annot-control">
                 <custom-combo-box [placeholder]="annot && annot.name ? annot.name : ''"
                                   (optionSelected)="selectChanged($event,annot)"
                                   [options]="annot.PropertyOption" displayField="name"
-                                  [formControl]="this.form.controls[annot.name]">
+                                  [formControl]="this.form.controls[annot.name]"
+                                  [attr.aria-label]="annot.name + ' dropdown'">
                 </custom-combo-box>
             </div>
             <div *ngSwitchCase="'URL'" class="annot-control">
-                <url-annotation [formControl]="this.form.controls[annot.name]">  </url-annotation>
+                <url-annotation [formControl]="this.form.controls[annot.name]" [attr.aria-label]="annot.name + ' URL'">  </url-annotation>
             </div>
         </div>
     </form>
     <div *ngIf="showConfigureAnnotationsButton" class="flex-grow">
-        <button mat-raised-button class="minimize link-button" [disabled]="this.disabled" style="margin:1em" (click)="loadConfigAnnotations()"> Configure Annotations </button>
+        <button mat-raised-button class="minimize link-button" [disabled]="this.disabled" style="margin:1em" (click)="loadConfigAnnotations()"
+                aria-label="Configure annotations"> Configure Annotations </button>
     </div>
 </div>
 

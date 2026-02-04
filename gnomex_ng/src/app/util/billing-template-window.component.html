@@ -1,29 +1,34 @@
-<div class="flex-container-row align-center children-margin-right padded">
+<div class="flex-container-row align-center children-margin-right padded" role="toolbar" aria-label="Billing template controls">
     <context-help name="billingTemplateHelp"
                   [hasEditPermission]="this.createSecurityAdvisorService.isSuperAdmin" label="Help" popupTitle="Billing Templates"></context-help>
     <custom-combo-box placeholder="Lab" [options]="this.labList" displayField="name"
-                      [(ngModel)]="this.selectedLab" (optionSelected)="this.loadAccountsForLab()">
+                      [(ngModel)]="this.selectedLab" (optionSelected)="this.loadAccountsForLab()"
+                      aria-label="Select lab">
     </custom-combo-box>
     <custom-combo-box placeholder="Account" [options]="this.accountList"
-                      displayField="accountNumberDisplay" [(ngModel)]="this.selectedAccount">
+                      displayField="accountNumberDisplay" [(ngModel)]="this.selectedAccount"
+                      aria-label="Select account">
     </custom-combo-box>
-    <mat-checkbox [(ngModel)]="this.showInactiveAccounts" (change)="this.loadLabs()">Show inactive accounts</mat-checkbox>
-    <button mat-button (click)="this.addAccount()" [disabled]="!this.selectedAccount"><img [src]="'./assets/add.png'" class="icon">Add</button>
-    <button mat-button (click)="this.removeAccount()" [disabled]="this.selectedRowIndex === null"><img [src]="'./assets/delete.png'" class="icon">Remove</button>
+    <mat-checkbox [(ngModel)]="this.showInactiveAccounts" (change)="this.loadLabs()" aria-label="Show inactive accounts">Show inactive accounts</mat-checkbox>
+    <button mat-button (click)="this.addAccount()" [disabled]="!this.selectedAccount" aria-label="Add account">
+        <img [src]="'./assets/add.png'" class="icon" alt="" aria-hidden="true">Add</button>
+    <button mat-button (click)="this.removeAccount()" [disabled]="this.selectedRowIndex === null" aria-label="Remove selected account">
+        <img [src]="'./assets/delete.png'" class="icon" alt="" aria-hidden="true">Remove</button>
 </div>
-<div class="flex-container-row align-center justify-space-between small-font double-padded-left double-padded-right">
-    <div>
-        <label *ngIf="totalAmount > 0" class="leadingLabel label-width padded-right">Total Invoice Price: </label>{{totalAmount > 0 ? (this.totalAmount | currency:"USD":"$": "1.2-2") : " "}}
+<div class="flex-container-row align-center justify-space-between small-font double-padded-left double-padded-right" role="region" aria-label="Billing summary">
+    <div aria-live="polite">
+        <label *ngIf="totalAmount > 0" class="leadingLabel label-width padded-right" id="total-price-label">Total Invoice Price: </label>{{totalAmount > 0 ? (this.totalAmount | currency:"USD":"$": "1.2-2") : " "}}
     </div>
     <div class="justify-flex-end">
-    <label class="leadingLabel label-width padded-right">Split By: </label>
-    <mat-radio-group class="custom-mat-radio padded-right" [(ngModel)]="this.splitBy" (change)="this.onSplitByChange()" style="font-size: small;">
-        <mat-radio-button class="double-padded-left" [value]="SPLIT_BY_PERCENT">%</mat-radio-button>
-        <mat-radio-button class="double-padded-left" [value]="SPLIT_BY_DOLLAR">$</mat-radio-button>
+    <label class="leadingLabel label-width padded-right" id="split-by-label">Split By: </label>
+    <mat-radio-group class="custom-mat-radio padded-right" [(ngModel)]="this.splitBy" (change)="this.onSplitByChange()" style="font-size: small;"
+                     aria-labelledby="split-by-label">
+        <mat-radio-button class="double-padded-left" [value]="SPLIT_BY_PERCENT" aria-label="Split by percentage">%</mat-radio-button>
+        <mat-radio-button class="double-padded-left" [value]="SPLIT_BY_DOLLAR" aria-label="Split by dollar amount">$</mat-radio-button>
     </mat-radio-group>
     </div>
 </div>
-<div class="accounts-grid-div full-width padded">
+<div class="accounts-grid-div full-width padded" role="region" aria-label="Billing accounts">
     <ag-grid-angular class="ag-theme-fresh full-height full-width"
                      (gridReady)="this.onGridReady($event)"
                      (gridSizeChanged)="this.onGridSizeChanged($event)"
@@ -32,7 +37,8 @@
                      (rowSelected)="this.onGridRowSelected($event)"
                      (cellValueChanged)="this.onCellValueChanged($event)"
                      [stopEditingWhenGridLosesFocus]="true"
-                     [rowData]="this.currentAccountsList">
+                     [rowData]="this.currentAccountsList"
+                     aria-label="Billing accounts data grid">
     </ag-grid-angular>
 </div>
 

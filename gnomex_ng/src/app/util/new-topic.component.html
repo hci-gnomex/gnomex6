@@ -1,17 +1,19 @@
-<div class="full-width full-height flex-container-col double-padded-left-right">
+<div class="full-width full-height flex-container-col double-padded-left-right" role="dialog" aria-label="New topic">
     <mat-form-field class="full-width">
-        <input matInput placeholder="Name" [formControl]="this.form.get('name')">
-        <mat-error *ngIf="this.form.get('name').hasError('required')">Project name is <strong>required</strong></mat-error>
-        <mat-error *ngIf="this.form.get('name').hasError('maxlength')">
+        <input matInput placeholder="Name" [formControl]="this.form.get('name')" aria-label="Topic name" aria-required="true">
+        <mat-error *ngIf="this.form.get('name').hasError('required')" role="alert">Project name is <strong>required</strong></mat-error>
+        <mat-error *ngIf="this.form.get('name').hasError('maxlength')" role="alert">
             Project name can be at most 2000 characters
         </mat-error>
     </mat-form-field>
     <custom-combo-box class="full-width" placeholder="Group" [options]="this.labList"
                       valueField="idLab" [displayField]="this.prefService.labDisplayField" (optionSelected)="onLabSelect()"
-                      [formControl]="this.form.get('idLab')">
+                      [formControl]="this.form.get('idLab')"
+                      aria-label="Select group">
     </custom-combo-box>
     <custom-combo-box class="full-width" placeholder="Owner" [options]="this.ownerList"
                       valueField="idAppUser" [displayField]="this.prefService.userDisplayField"
-                      [formControl]="this.form.get('idAppUser')">
+                      [formControl]="this.form.get('idAppUser')"
+                      aria-label="Select owner">
     </custom-combo-box>
 </div>

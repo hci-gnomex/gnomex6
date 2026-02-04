@@ -1,7 +1,7 @@
-<div class="annot-border flex-column-container">
+<div class="annot-border flex-column-container" role="group" aria-label="URL annotations">
 
-    <label class="annot-label" for="mainURL"> {{annot?.name}}</label>
-    <div *ngFor="let annot of urlAnnotations; let i = index " >
+    <label class="annot-label" for="mainURL" id="url-annot-label"> {{annot?.name}}</label>
+    <div *ngFor="let annot of urlAnnotations; let i = index " role="listitem">
         <div [hidden]="!annot.edit" style="display:flex">
             <mat-form-field style="margin-right:.5em;" >
                 <input matInput
@@ -9,46 +9,50 @@
                        [disabled]="urlDisabled"
                        [(ngModel)]="annot.urlAlias"
                        (ngModelChange)="onChange(annot)"
-                       placeholder="name" />
+                       placeholder="name"
+                       aria-label="URL alias name" />
             </mat-form-field>
             <mat-form-field>
                 <input matInput
                        (blur)="onTouched()"
                        [disabled]="urlDisabled"
                        [(ngModel)]="annot.url" placeholder="URL"
-                       (ngModelChange)="onChange(annot)"/>
+                       (ngModelChange)="onChange(annot)"
+                       aria-label="URL address"/>
             </mat-form-field>
 
-            <button mat-button  [disabled]="urlDisabled" (click)="toggleMode(annot)"> edit </button>
+            <button mat-button [disabled]="urlDisabled" (click)="toggleMode(annot)" aria-label="Toggle edit mode"> edit </button>
         </div>
         <div [hidden]="annot.edit" style="display:flex; justify-content: space-between;">
-            <a [href]="annot.url" target="_blank"> {{annot.urlAlias}}</a>
+            <a [href]="annot.url" target="_blank" [attr.aria-label]="'Open ' + annot.urlAlias + ' in new tab'"> {{annot.urlAlias}}</a>
             <div>
-                <button [disabled]="urlDisabled"  mat-button color="primary" (click)="toggleMode(annot)"> show </button>
-                <button [disabled]="urlDisabled"  mat-button color="warn" (click)="removeLink(i)"> remove </button>
+                <button [disabled]="urlDisabled" mat-button color="primary" (click)="toggleMode(annot)" aria-label="Show URL details"> show </button>
+                <button [disabled]="urlDisabled" mat-button color="warn" (click)="removeLink(i)" aria-label="Remove this URL"> remove </button>
             </div>
 
         </div>
 
     </div>
-    <div style="display:flex" >
+    <div style="display:flex" role="group" aria-label="Add new URL">
         <mat-form-field style="margin-right: .5em;">
             <input  id="mainURL"
                     [(ngModel)]="alias"
                     (blur)="onTouched()"
                     [disabled]="urlDisabled"
                     matInput
-                    placeholder="alias"  />
+                    placeholder="alias"
+                    aria-label="New URL alias" />
         </mat-form-field>
         <mat-form-field>
             <input [(ngModel)]="url"
                    (blur)="onTouched()"
                    [disabled]="urlDisabled"
                    matInput
-                   placeholder="URL"  />
+                   placeholder="URL"
+                   aria-label="New URL address" />
         </mat-form-field>
 
-        <button mat-button [disabled]="urlDisabled" (click)="makeLink()"> add  </button>
+        <button mat-button [disabled]="urlDisabled" (click)="makeLink()" aria-label="Add URL link"> add  </button>
     </div>
 
 </div>

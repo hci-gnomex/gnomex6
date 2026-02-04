@@ -1,0 +1,23 @@
+<div role="toolbar" aria-label="Data track actions">
+    <button mat-button [disabled]="newDTisDisabled || this.disableAll" (click)="makeNewDataTrack()" aria-label="Create new data track">
+        <img class="icon" [src]="this.constantsService.ICON_DATATRACK_NEW" alt="" aria-hidden="true">New Data Track
+    </button>
+    <button mat-button [disabled]="newGenomeBuildisDisabled || this.disableAll" (click)="makeNewFolder()" aria-label="Create new folder">
+        <img class="icon" [src]="this.constantsService.ICON_FOLDER_NEW" alt="" aria-hidden="true">New Folder
+    </button>
+    <button *ngIf="showMenuItemNewGenomeBuild" [disabled]="this.disableAll" mat-button (click)="makeNewGenomeBuild()" aria-label="Create new genome build">
+        <img class="icon" [src]="this.constantsService.ICON_GENOME_BUILD_NEW" alt="" aria-hidden="true">New Genome Build
+    </button>
+    <button *ngIf="showMenuItemNewOrganism" [disabled]="this.disableAll" mat-button (click)="makeNewOrganism()" aria-label="Create new organism">
+        <img class="icon" [src]="this.constantsService.ICON_ORGANISM_NEW" alt="" aria-hidden="true">New Organism
+    </button>
+    <button mat-button [disabled]="duplicateDTisDisabled || this.disableAll" (click)="doDuplicate()" aria-label="Duplicate selected">
+        <img class="icon" [src]="this.constantsService.ICON_DUPLICATE" alt="" aria-hidden="true">Duplicate
+    </button>
+    <button mat-button [disabled]="removeDisabled || this.disableAll" (click)="doRemove()" aria-label="Remove selected">
+        <img class="icon" [src]="this.constantsService.ICON_CROSSOUT" alt="" aria-hidden="true">Remove
+    </button>
+    <button mat-button [disabled]="this.disableAll" (click)="this.doDownload()" aria-label="Download selected">
+        <img [src]="this.constantsService.ICON_DOWNLOAD" class="icon" alt="" aria-hidden="true">Download
+    </button>
+</div>

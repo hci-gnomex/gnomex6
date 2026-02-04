@@ -11,16 +11,16 @@ import {IGnomexErrorResponse} from "./interfaces/gnomex-error.response.model";
 @Component({
     selector: "edit-institutions",
     template: `
-        <div class="content-div">
-            <div class="flex-container-row align-center">
-                <button mat-button (click)="this.addInstitution()">
-                    <img [src]="this.constantsService.PAGE_ADD" class="icon">Add Institution
+        <div class="content-div" role="dialog" aria-label="Edit institutions">
+            <div class="flex-container-row align-center" role="toolbar" aria-label="Institution actions">
+                <button mat-button (click)="this.addInstitution()" aria-label="Add new institution">
+                    <img [src]="this.constantsService.PAGE_ADD" class="icon" alt="" aria-hidden="true">Add Institution
                 </button>
-                <button mat-button [disabled]="!this.selectedInstitution" (click)="this.removeInstitution()">
-                    <img [src]="this.constantsService.PAGE_REMOVE" class="icon">Remove Institution
+                <button mat-button [disabled]="!this.selectedInstitution" (click)="this.removeInstitution()" aria-label="Remove selected institution">
+                    <img [src]="this.constantsService.PAGE_REMOVE" class="icon" alt="" aria-hidden="true">Remove Institution
                 </button>
             </div>
-            <div class="flex-grow">
+            <div class="flex-grow" role="region" aria-label="Institutions list">
                 <ag-grid-angular class="full-height full-width ag-theme-balham"
                                  [stopEditingWhenGridLosesFocus]="true"
                                  [singleClickEdit]="true"
@@ -28,7 +28,8 @@ import {IGnomexErrorResponse} from "./interfaces/gnomex-error.response.model";
                                  [rowSelection]="'single'"
                                  (cellValueChanged)="this.onCellValueChanged()"
                                  (rowSelected)="this.onGridRowSelected($event)"
-                                 (gridReady)="this.onGridReady($event)">
+                                 (gridReady)="this.onGridReady($event)"
+                                 aria-label="Institutions grid">
                 </ag-grid-angular>
             </div>
         </div>

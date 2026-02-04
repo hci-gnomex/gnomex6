@@ -8,19 +8,19 @@ import {first} from "rxjs/operators";
 
 @Component({
     template: `
-        <div class="full-height full-width flex-container-col">
-            <div class="full-height full-width flex-container-col padded">
-                <div>
+        <div class="full-height full-width flex-container-col" role="dialog" aria-label="Download options">
+            <div class="full-height full-width flex-container-col padded" role="region" aria-label="Download information">
+                <div id="download-size-info">
                     Ready to download approximately {{this.downloadSizeLabel}}.
                 </div>
                 <div *ngIf="this.isFDTSupported">
                     Which download mechanism do you want to use?
                 </div>
-                <div *ngIf="this.isFDTSupported">
+                <div *ngIf="this.isFDTSupported" role="note">
                     (FDT download is required for downloads > 2 TB)
                 </div>
             </div>
-            <mat-dialog-actions class="justify-flex-end no-margin no-padding generic-dialog-footer-colors">
+            <mat-dialog-actions class="justify-flex-end no-margin no-padding generic-dialog-footer-colors" role="group" aria-label="Download options">
                 <save-footer (saveClicked)="selectNormalDownload()" name="Normal Download"></save-footer>
                 <save-footer *ngIf="this.isFDTSupported" (saveClicked)="selectFDTDownload()" name="FDT Download"></save-footer>
                 <save-footer [actionType]="actionType.SECONDARY"(saveClicked)="onClose()" name="Cancel"></save-footer>

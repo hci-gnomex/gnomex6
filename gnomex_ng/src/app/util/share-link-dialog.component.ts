@@ -6,8 +6,8 @@ import {WINDOW} from "../services/window.service";
 
 @Component({
     template: `
-        <div class="full-width full-height flex-container-col padded">
-            <input disabled [(ngModel)]="link"/>
+        <div class="full-width full-height flex-container-col padded" role="dialog" aria-label="Share link">
+            <input disabled [(ngModel)]="link" aria-label="Shareable link URL" aria-readonly="true"/>
         </div>
     `,
     styles: [`

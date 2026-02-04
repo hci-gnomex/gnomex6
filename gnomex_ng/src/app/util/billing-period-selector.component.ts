@@ -8,16 +8,18 @@ import {PropertyService} from "../services/property.service";
 @Component({
     selector: 'billing-period-selector',
     template: `
-        
-        <div class="full-height full-width double-padded align-baseline">
-            <label class="double-padded-right">
+
+        <div class="full-height full-width double-padded align-baseline" role="group" aria-label="Billing period selector">
+            <label id="billing-period-label" class="double-padded-right">
                 Billing Period :
-            </label> 
-            <button mat-raised-button type="button" class="minimize" (click)="this.showPopup()">
+            </label>
+            <button mat-raised-button type="button" class="minimize" (click)="this.showPopup()"
+                    aria-labelledby="billing-period-label"
+                    [attr.aria-label]="'Selected billing period: ' + label">
                 {{this.label}}
             </button>
         </div>
-        
+
     `,
     styles: [``]
 })

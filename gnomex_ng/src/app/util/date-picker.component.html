@@ -5,10 +5,12 @@
            placeholder="{{ placeholder }}"
            required="{{ required }}"
            (dateChange)="onChange()"
-           [disabled]="textInputDisabled">
-    <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+           [disabled]="textInputDisabled"
+           [attr.aria-label]="placeholder"
+           [attr.aria-required]="required">
+    <mat-datepicker-toggle matSuffix [for]="datePicker" aria-label="Open date picker"></mat-datepicker-toggle>
     <mat-datepicker #datePicker [disabled]="datePickerDisabled"></mat-datepicker>
-    <mat-error  *ngIf="this.innerDateFC.hasError('required')">
+    <mat-error *ngIf="this.innerDateFC.hasError('required')" role="alert">
         '{{  placeholder }}' is required
     </mat-error>
 

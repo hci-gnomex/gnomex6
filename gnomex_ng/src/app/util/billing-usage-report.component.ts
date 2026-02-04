@@ -8,15 +8,15 @@ import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog"
 @Component({
     selector: 'billing-usage-report',
     template: `
-        <div class="flex-container-row align-center double-padded-left-right">
-            <billing-period-selector (onChange)="this.onStartChange($event)" class="margin-right"></billing-period-selector>
-            <label class="margin-right">through</label>
-            <billing-period-selector (onChange)="this.onEndChange($event)"></billing-period-selector>
+        <div class="flex-container-row align-center double-padded-left-right" role="group" aria-label="Date range selection">
+            <billing-period-selector (onChange)="this.onStartChange($event)" class="margin-right" aria-label="Start billing period"></billing-period-selector>
+            <label class="margin-right" aria-hidden="true">through</label>
+            <billing-period-selector (onChange)="this.onEndChange($event)" aria-label="End billing period"></billing-period-selector>
         </div>
-        <div *ngIf="showIsExternalRadioGroup" class="full-width double-padded-left-right">
-            <input [(ngModel)]="isExternalString" id="radioInternal" value="N" type="radio" name="isExternalRadio">
+        <div *ngIf="showIsExternalRadioGroup" class="full-width double-padded-left-right" role="radiogroup" aria-label="Account type">
+            <input [(ngModel)]="isExternalString" id="radioInternal" value="N" type="radio" name="isExternalRadio" aria-label="Internal accounts">
             <label for="radioInternal" class="margin-right">Internal</label>
-            <input [(ngModel)]="isExternalString" id="radioExternal" value="Y" type="radio" name="isExternalRadio">
+            <input [(ngModel)]="isExternalString" id="radioExternal" value="Y" type="radio" name="isExternalRadio" aria-label="External accounts">
             <label for="radioExternal">External</label>
         </div>
     `,

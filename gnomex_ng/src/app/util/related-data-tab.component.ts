@@ -9,13 +9,15 @@ import {DialogsService, DialogType} from "./popup/dialogs.service";
 @Component({
     selector:'related-data-tab',
     template: `
-        <div style="display:flex; height:100%;">
+        <div style="display:flex; height:100%;" role="region" aria-label="Related data">
             <ng-container *ngFor="let key of relatedKeys">
-                <div class="flex-item-tree" [matTooltip]="this.treeNameLookup[key]" *ngIf="this.relatedObjects[key]?.length > 0">
-                    <tree-root [nodes]="this.relatedObjects[key]" [options]="options" (activate)="onActivateTree($event)">
+                <div class="flex-item-tree" [matTooltip]="this.treeNameLookup[key]" *ngIf="this.relatedObjects[key]?.length > 0"
+                     role="region" [attr.aria-label]="treeNameLookup[key] + ' tree'">
+                    <tree-root [nodes]="this.relatedObjects[key]" [options]="options" (activate)="onActivateTree($event)"
+                               role="tree" [attr.aria-label]="treeNameLookup[key]">
                         <ng-template #treeNodeTemplate let-node >
-                            <div class="tree-node-font">
-                                <img src="{{node?.data?.icon}}" class="tree-node-icon icon">
+                            <div class="tree-node-font" role="treeitem" [attr.aria-label]="node?.data?.label">
+                                <img src="{{node?.data?.icon}}" class="tree-node-icon icon" alt="" aria-hidden="true">
                                 <span>{{ node?.data?.label }}</span>
                             </div>
                         </ng-template>

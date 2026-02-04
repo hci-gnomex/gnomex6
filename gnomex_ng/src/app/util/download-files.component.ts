@@ -18,10 +18,10 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 
 @Component({
     template: `
-        <div class="full-height full-width flex-container-col">
-            <div class="full-height full-width flex-container-col padded">
+        <div class="full-height full-width flex-container-col" role="dialog" aria-label="Download files">
+            <div class="full-height full-width flex-container-col padded" role="main">
                 <div class="flex-container-row align-center justify-space-between">
-                    <label>
+                    <label id="download-instructions">
                         Drag files or folders that you want to download. Hold CTRL or SHIFT key to select multiple.
                     </label>
                     <context-help name="downloadhelp"
@@ -30,21 +30,23 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                                   [hasEditPermission]="this.securityAdvisor.isAdmin">
                     </context-help>
                 </div>
-                <div class="trees-container">
+                <div class="trees-container" role="region" aria-labelledby="download-instructions">
                     <as-split class="white-split-gutter silver-bordered-gutter">
                         <as-split-area size="50">
-                            <div class="full-width full-height flex-container-col padded">
-                                <label>
+                            <div class="full-width full-height flex-container-col padded" role="region" aria-labelledby="available-files-label">
+                                <label id="available-files-label">
                                     Available Files
                                 </label>
                                 <div class="flex-grow" ondrop="permitDrop($event)" (dragover)="onRemoveFromDownload($event)">
                                     <tree-root #availableFilesTreeComponent
                                                [nodes]="availableFilesNodes"
                                                [options]="filesOptions"
-                                               (initialized)="initOrganizeTree($event)">
+                                               (initialized)="initOrganizeTree($event)"
+                                               role="tree"
+                                               aria-label="Available files tree">
                                         <ng-template #treeNodeTemplate let-node draggable="true">
-                                            <div class="flex-container-row tree-node-font">
-                                                <img [src]="node.data.icon" alt="" class="icon tree-node-icon">
+                                            <div class="flex-container-row tree-node-font" role="treeitem" [attr.aria-label]="node.data.displayName">
+                                                <img [src]="node.data.icon" alt="" aria-hidden="true" class="icon tree-node-icon">
                                                 <div>
                                                     {{ node.data.displayName }}
                                                 </div>
@@ -55,17 +57,19 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                             </div>
                         </as-split-area>
                         <as-split-area size="50">
-                            <div class="full-width full-height flex-container-col padded">
-                                <label>
+                            <div class="full-width full-height flex-container-col padded" role="region" aria-labelledby="files-to-download-label">
+                                <label id="files-to-download-label">
                                     Files to Download
                                 </label>
                                 <div class="flex-grow" ondrop="permitDrop($event)" (dragover)="onDropInDownload($event)">
                                     <tree-root #filesToDownloadTreeComponent
                                                [nodes]="filesToDownloadNodes"
-                                               [options]="filesOptions">
+                                               [options]="filesOptions"
+                                               role="tree"
+                                               aria-label="Files to download tree">
                                         <ng-template #treeNodeTemplate let-node draggable="true">
-                                            <div class="flex-container-row tree-node-font">
-                                                <img [src]="node.data.icon" alt="" class="icon tree-node-icon">
+                                            <div class="flex-container-row tree-node-font" role="treeitem" [attr.aria-label]="node.data.displayName">
+                                                <img [src]="node.data.icon" alt="" aria-hidden="true" class="icon tree-node-icon">
                                                 <div>
                                                     {{ node.data.displayName }}
                                                 </div>
@@ -77,40 +81,45 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                         </as-split-area>
                     </as-split>
                 </div>
-                <div class="flex-container-row justify-space-between">
-                    <label>
+                <div class="flex-container-row justify-space-between" role="status" aria-live="polite">
+                    <label aria-label="Available files count">
                         {{ availableFilesCount }} file(s)
                     </label>
-                    <label>
+                    <label aria-label="Files to download count and size">
                         {{ filesToDownloadCount }} file(s) ({{ filesToDownloadSizeLabel }})
                     </label>
                 </div>
             </div>
             <mat-dialog-actions
-                    class="justify-flex-end no-margin no-padding generic-dialog-footer-colors">
+                    class="justify-flex-end no-margin no-padding generic-dialog-footer-colors"
+                    role="group"
+                    aria-label="Download actions">
                 <div class="double-padded-right">
                     <button mat-raised-button
                             color="primary"
                             class="primary-action"
                             [disabled]="filesToDownloadCount < 1 || filesToDownloadSize > maxsize"
-                            (click)="download()">
-                        <img [src]="constantsService.ICON_DOWNLOAD" alt="" class="icon">
+                            (click)="download()"
+                            aria-label="Download selected files">
+                        <img [src]="constantsService.ICON_DOWNLOAD" alt="" aria-hidden="true" class="icon">
                         Download
                     </button>
                     <button mat-raised-button
                             color="primary"
                             class="primary-action"
                             [disabled]="filesToDownloadCount < 1 || !isFDTSupported"
-                            (click)="downloadFDTCommandLine()">
-                        <img [src]="constantsService.ICON_DOWNLOAD_LARGE" alt="" class="icon">
+                            (click)="downloadFDTCommandLine()"
+                            aria-label="Download using FDT command line">
+                        <img [src]="constantsService.ICON_DOWNLOAD_LARGE" alt="" aria-hidden="true" class="icon">
                         FDT Command Line
                     </button>
                     <button mat-raised-button
                             color="primary"
                             class="primary-action"
                             [disabled]="filesToDownloadCount < 1 || !isFDTSupported || true"
-                            (click)="downloadFDT()">
-                        <img [src]="constantsService.ICON_DOWNLOAD_LARGE" alt="" class="icon">
+                            (click)="downloadFDT()"
+                            aria-label="Download using FDT">
+                        <img [src]="constantsService.ICON_DOWNLOAD_LARGE" alt="" aria-hidden="true" class="icon">
                         FDT Download
                     </button>
                     <button mat-raised-button
@@ -118,14 +127,16 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                             class="primary-action"
                             *ngIf="showCreateSoftLinks"
                             [disabled]="filesToDownloadCount < 1 || true"
-                            (click)="createSoftLinks()">
-                        <img [src]="constantsService.ICON_DOWNLOAD" alt="" class="icon">
+                            (click)="createSoftLinks()"
+                            aria-label="Create soft links">
+                        <img [src]="constantsService.ICON_DOWNLOAD" alt="" aria-hidden="true" class="icon">
                         Create Soft Links
                     </button>
                     <button mat-raised-button
                             mat-dialog-close
                             color="accent"
-                            class="secondary-action">
+                            class="secondary-action"
+                            aria-label="Cancel download">
                         Cancel
                     </button>
                 </div>

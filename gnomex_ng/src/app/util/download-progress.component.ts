@@ -8,8 +8,13 @@ import {UtilService} from "../services/util.service";
 
 @Component({
     template: `
-        <div class="flex-container-row full-height full-width double-padded">
-            <mat-progress-bar mode="determinate" [value]="this.progressValue"></mat-progress-bar>
+        <div class="flex-container-row full-height full-width double-padded" role="dialog" aria-label="Download progress">
+            <mat-progress-bar mode="determinate" [value]="this.progressValue"
+                              role="progressbar"
+                              [attr.aria-valuenow]="progressValue"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                              [attr.aria-label]="'Download progress: ' + progressValue + '%'"></mat-progress-bar>
         </div>
     `,
     styles:[`

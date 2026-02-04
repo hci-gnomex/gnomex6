@@ -16,45 +16,45 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: "new-organism",
     template: `
-        <form [formGroup]="organismForm" class="full-height full-width flex-container-col double-padded-left-right">
+        <form [formGroup]="organismForm" class="full-height full-width flex-container-col double-padded-left-right" role="form" aria-label="New organism form">
             <div class="flex-container-row full-width align-center padded">
                 <mat-form-field class="full-width padded">
-                    <input matInput placeholder="Common Name" formControlName="commonName">
+                    <input matInput placeholder="Common Name" formControlName="commonName" aria-label="Common name" aria-required="true">
                     <mat-hint align="end">Example: Human</mat-hint>
-                    <mat-error *ngIf="organismForm.get('commonName').hasError('required')">
+                    <mat-error *ngIf="organismForm.get('commonName').hasError('required')" role="alert">
                         Common Name is required
                     </mat-error>
-                    <mat-error *ngIf="organismForm.get('commonName').hasError('maxlength')">
+                    <mat-error *ngIf="organismForm.get('commonName').hasError('maxlength')" role="alert">
                         Common Name exceeded the 50 character limit
                     </mat-error>
                 </mat-form-field>
             </div>
             <div class="flex-container-row full-width align-center padded">
                 <mat-form-field class="full-width padded">
-                    <input matInput placeholder="Binomial Name" formControlName="binomialName">
+                    <input matInput placeholder="Binomial Name" formControlName="binomialName" aria-label="Binomial name" aria-required="true">
                     <mat-hint align="end">Example: Homo sapiens</mat-hint>
-                    <mat-error *ngIf="organismForm.get('binomialName').hasError('required')">
+                    <mat-error *ngIf="organismForm.get('binomialName').hasError('required')" role="alert">
                         Binomial Name is required
                     </mat-error>
-                    <mat-error *ngIf="organismForm.get('binomialName').hasError('maxlength')">
+                    <mat-error *ngIf="organismForm.get('binomialName').hasError('maxlength')" role="alert">
                         Binomial Name exceeded the 200 character limit
                     </mat-error>
                 </mat-form-field>
             </div>
             <div class="flex-container-row full-width align-center padded">
                 <mat-form-field class="full-width padded">
-                    <input matInput placeholder="DAS2 Name" formControlName="das2Name">
+                    <input matInput placeholder="DAS2 Name" formControlName="das2Name" aria-label="DAS2 name" aria-required="true">
                     <mat-hint align="end">Example: H_sapiens</mat-hint>
-                    <mat-error *ngIf="organismForm.get('das2Name').hasError('required')">
+                    <mat-error *ngIf="organismForm.get('das2Name').hasError('required')" role="alert">
                         DAS2 Name is required
                     </mat-error>
-                    <mat-error *ngIf="organismForm.get('das2Name').hasError('maxlength')">
+                    <mat-error *ngIf="organismForm.get('das2Name').hasError('maxlength')" role="alert">
                         DAS2 Name exceeded the 200 character limit
                     </mat-error>
                 </mat-form-field>
             </div>
             <div class="flex-container-row align-center padded">
-                <mat-checkbox formControlName="activeFlag">Active</mat-checkbox>
+                <mat-checkbox formControlName="activeFlag" aria-label="Active status">Active</mat-checkbox>
             </div>
         </form>
     `,
