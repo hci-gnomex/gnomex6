@@ -92,6 +92,20 @@ export class ExperimentsService {
         return this._usePreviousURLParams;
     }
 
+    setExperimentPanelParam(key: string, value: string | number | boolean | null | undefined): void {
+      const params = this.browsePanelParams || new HttpParams();
+
+      if (value === null || value === undefined) {
+        this.browsePanelParams = params.delete(key);
+      } else {
+        this.browsePanelParams = params.set(key, String(value));
+      }
+    }
+
+    getExperimentPanelParam(key: string): string | null {
+      return (this.browsePanelParams || new HttpParams()).get(key);
+    }
+
     getExperimentsObservable(): Observable<any> {
         return this.experimentOrdersSubject.asObservable();
     }

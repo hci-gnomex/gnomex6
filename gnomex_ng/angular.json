@@ -29,8 +29,7 @@
             "scripts": [
               "node_modules/jquery/dist/jquery.min.js",
               "node_modules/popper.js/dist/umd/popper.min.js"
-            ],
-            "es5BrowserSupport": true
+            ]
           },
           "configurations": {
             "production": {
@@ -179,5 +178,5 @@
       }
     }
   },
-  "defaultProject": "gnomex-ng-cli"
+  "defaultProject": "gnomex-ng"
 }

@@ -13,10 +13,10 @@ export class DataTrackService {
     public datatracksList: any[];
     private datatracksListSubject: Subject<any[]> = new Subject();
     private _haveLoadedDatatracksList: boolean = false;
-    private _previousURLParams: HttpParams = null;
     private _datatrackListTreeNode: BehaviorSubject<any> = new BehaviorSubject<any>(null);
     private _labList: any[] = [];
     private _activeNodeToSelect: any = {};
+    private _previousURLParams: HttpParams = new HttpParams();
 
     public static readonly ORGANISM: string = 'organism';
     public static readonly GENOME_BUILD:string = 'genomebuild';
@@ -60,6 +60,20 @@ export class DataTrackService {
     }
     get activeNodeToSelect(): any {
         return this._activeNodeToSelect;
+    }
+
+    setPreviousURLParams(key: string, value: string | number | boolean | null | undefined): void {
+      const params = this._previousURLParams || new HttpParams();
+
+      if (value === null || value === undefined) {
+        this._previousURLParams = params.delete(key);
+      } else {
+        this._previousURLParams = params.set(key, String(value));
+      }
+    }
+
+    getPreviousURLParams(key: string): string | null {
+      return (this._previousURLParams || new HttpParams()).get(key);
     }
 
     getDataTrack(params: HttpParams): Observable<any> {
@@ -180,6 +194,21 @@ export class DataTrackService {
                 return throwError(err);
             }));
 
+    }
+
+    setPreviousURLParam(key: string, value: string | number | boolean | null | undefined): void {
+      if (value === null || value === undefined) {
+        this._previousURLParams = (this._previousURLParams || new HttpParams()).delete(key);
+      } else {
+        this._previousURLParams = (this._previousURLParams || new HttpParams()).set(key, String(value));
+      }
+    }
+
+    /**
+     * Convenience helper: read one param
+     */
+    getPreviousURLParam(key: string): string | null {
+      return (this._previousURLParams || new HttpParams()).get(key);
     }
 
     public saveGenomeBuild(params: HttpParams): Observable<any> {

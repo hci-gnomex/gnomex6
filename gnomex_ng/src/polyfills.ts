@@ -1,3 +1,4 @@
+import { environment } from "./environments/environment";
 /**
  * This file includes polyfills needed by Angular and is loaded before the app.
  * You can add your own extra polyfills to this file.
@@ -68,11 +69,11 @@ import "zone.js/dist/zone";
 // Note: core-js@3 uses a different import structure than core-js@2
 // The old "core-js/es6" and "core-js/es7/reflect" are no longer needed
 // as Angular 8 with TypeScript 3.5 targets ES2015+ which includes these features
-import "hammerjs/hammer";
+import "hammerjs";
 
-if (process.env.ENV === "production") {
-    // Production
-} else {
-    Error["stackTraceLimit"] = Infinity;
-    require("zone.js/dist/long-stack-trace-zone");
+// Optional: enable long stack traces in development only.
+// Warning: this has a performance impact.
+if (!environment.production) {
+  (Error as any).stackTraceLimit = Infinity;
+  import("zone.js/dist/long-stack-trace-zone");
 }

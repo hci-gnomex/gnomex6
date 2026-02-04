@@ -42,22 +42,22 @@ import {NavigationService} from "../services/navigation.service";
         .t  { display: table;      }
         .tr { display: table-row;  }
         .td { display: table-cell; }
-        
+
         .padded { padding: 0.3em; }
-        
+
         .left-right-padded {
             padding-left:  0.3em;
             padding-right: 0.3em;
         }
-        
+
         .major-left-right-padded {
             padding-left: 1em;
             padding-right: 0.3em;
         }
-        
+
         .no-word-wrap { white-space: nowrap; }
         .no-overflow  { overflow: hidden;    }
-        
+
         .foreground { background-color: white;   }
         .background { background-color: #EEEEEE; }
 
@@ -65,7 +65,7 @@ import {NavigationService} from "../services/navigation.service";
             height: 0.3em;
             min-height: 0.3em;
         }
-        
+
         .border { border: #C8C8C8 solid thin; }
         .major-border {
             border-radius: 0.3em;
@@ -91,6 +91,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
     @ViewChild("analysisTree", {static: false}) treeComponent: TreeComponent;
 
+
     public readonly DRAG_AND_DROP_HINT: string = "Drag-and-drop to move analyses to another lab and/or group. Hold Ctrl while dragging-and-dropping to assign to multiple groups";
     public showDragDropHint: boolean = false;
     public options: ITreeOptions;
@@ -109,7 +110,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     public disableDelete: boolean = true;
     public disableNewAnalysisGroup: boolean = true;
     public disableAll: boolean = false;
-    private treeModel: TreeModel;
     private billingAccounts: any;
     private selectedItem: ITreeNode;
     private analysisGroupListSubscription: Subscription;
@@ -122,13 +122,20 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     private labListSubscription: Subscription;
     private qParamMap: ParamMap;
     private paramMap: ParamMap;
+    private _treeModel: TreeModel | null = null;
+
+    public get treeModel(): TreeModel | null {
+      if (!this._treeModel && this.treeComponent) {
+        this._treeModel = this.treeComponent.treeModel;
+      }
+      return this._treeModel;
+    }
 
 
     ngOnInit() {
         this.navService.navMode = this.navService.navMode !== NavigationService.USER ? NavigationService.URL : NavigationService.USER;
 
         this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
-        this.treeModel = this.treeComponent.treeModel;
         this.options = {
             idField: "analysisTreeId",
             displayField: "label",
@@ -192,7 +199,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             }
 
 
-            if (this.analysisService.analysisPanelParams && this.analysisService.analysisPanelParams["refreshParams"]) { // If user is searching or removing from grid
+            if (this.analysisService.getAnalysisPanelParam('refreshParams')) { // If user is searching or removing from grid
                 if (this.treeModel && this.treeModel.getActiveNode()) {
                     if (this.analysisService.isDeleteFromGrid) { // When removing analysis from a selected group, remain in the group after removed
                         this.analysisService.setActiveNodeId = this.treeModel.getActiveNode().data.id;
@@ -209,55 +216,57 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                     this.disableDelete = true;
                 }
 
-                this.analysisService.analysisPanelParams["refreshParams"] = false;
+                this.analysisService.setAnalysisPanelParam("refreshParams", false);
 
             }
 
 
             setTimeout(() => {
-                this.treeModel.expandAll();
-                if(this.navService.navMode === NavigationService.URL) { // this is if component is being navigated to by url
-                    let activatedRoute = this.navService.getChildActivateRoute(this.route);
-                    if(activatedRoute){
-                        this.paramMap =  activatedRoute.snapshot.paramMap;
-                        this.qParamMap = activatedRoute.snapshot.queryParamMap;
-                        // activatedRoute.queryParamMap.subscribe((qParam)=>{this.qParamMap = qParam });
-                        // activatedRoute.paramMap.subscribe((param)=>{ this.paramMap = param });
-                    }
-                    let idName = "";
-                    let idVal = "";
-                    if (this.paramMap.get("idAnalysis") ){
-                        idName = "idAnalysis";
-                        idVal = this.paramMap.get("idAnalysis")
-                    }else if(this.qParamMap.get("idAnalysisGroup")){
-                        idName = "idAnalysisGroup";
-                        idVal = this.qParamMap.get("idAnalysisGroup")
-                    }else if(this.qParamMap.get("idLab")){
-                        idName = "idLab";
-                        idVal = this.qParamMap.get("idLab");
-                    }
 
+              const model = this.treeComponent ? this.treeComponent.treeModel : null;
+              if (!model) {
+                // view not ready yet; skip
+                this.dialogsService.stopAllSpinnerDialogs();
+                return;
+              }
 
-                    if(this.treeModel) {
-                        let node = UtilService.findTreeNode(this.treeModel, idName, idVal);
-                        if(node) {
-                            node.setIsActive(true);
-                            node.scrollIntoView();
-                        }
-                    }
-                } else if(this.analysisService.setActiveNodeId) {
-                    let node: TreeNode;
-                    node = this.findNodeById(this.analysisService.setActiveNodeId);
-                    this.analysisService.setActiveNodeId = null;
-
-                    if (node) {
-                        node.setIsActive(true);
-                        node.scrollIntoView();
-                    }
+              if (this.navService.navMode === NavigationService.URL) {
+                const activatedRoute = this.navService.getChildActivateRoute(this.route);
+                if (activatedRoute) {
+                  this.paramMap = activatedRoute.snapshot.paramMap;
+                  this.qParamMap = activatedRoute.snapshot.queryParamMap;
                 }
 
-                this.dialogsService.stopAllSpinnerDialogs();
-            });
+                let idName = "";
+                let idVal = "";
+                if (this.paramMap && this.paramMap.get("idAnalysis")) {
+                  idName = "idAnalysis";
+                  idVal = this.paramMap.get("idAnalysis");
+                } else if (this.qParamMap && this.qParamMap.get("idAnalysisGroup")) {
+                  idName = "idAnalysisGroup";
+                  idVal = this.qParamMap.get("idAnalysisGroup");
+                } else if (this.qParamMap && this.qParamMap.get("idLab")) {
+                  idName = "idLab";
+                  idVal = this.qParamMap.get("idLab");
+                }
+
+                const node = UtilService.findTreeNode(model, idName, idVal);
+                if (node) {
+                  node.setIsActive(true);
+                  node.scrollIntoView();
+                }
+              } else if (this.analysisService.setActiveNodeId) {
+                const node = this.findNodeById(this.analysisService.setActiveNodeId);
+                this.analysisService.setActiveNodeId = null;
+
+                if (node) {
+                  node.setIsActive(true);
+                  node.scrollIntoView();
+                }
+              }
+
+              this.dialogsService.stopAllSpinnerDialogs();
+          });
         });
 
 
@@ -277,8 +286,16 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             });
     }
 
-    ngAfterViewInit() {
+  ngAfterViewInit() {
+    // ViewChild is now available
+    // (static:false means AFTER view init)
+    // Prefer direct access to avoid stale references
+    if (this.treeComponent) {
+      // Optional: trigger initial expand if desired
+      this.treeComponent.treeModel.expandAll();
     }
+    this.changeDetectorRef.detectChanges();
+  }
 
     constructor(private analysisService: AnalysisService, private router: Router,
                 private dialog: MatDialog,

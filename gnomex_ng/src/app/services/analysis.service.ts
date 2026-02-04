@@ -57,12 +57,26 @@ export class AnalysisService {
     set analysisList(data: Array<any>) {
         this._analysisList = data;
     }
-
     get analysisPanelParams(): HttpParams {
-        return this._analysisPanelParams;
+      return this._analysisPanelParams;
     }
     set analysisPanelParams(data: HttpParams) {
-        this._analysisPanelParams = data;
+      this._analysisPanelParams = data;
+    }
+
+
+    setAnalysisPanelParam(key: string, value: string | number | boolean | null | undefined): void {
+      const params = this._analysisPanelParams || new HttpParams();
+
+      if (value === null || value === undefined) {
+        this._analysisPanelParams = params.delete(key);
+      } else {
+        this._analysisPanelParams = params.set(key, String(value));
+      }
+    }
+
+    getAnalysisPanelParam(key: string): string | null {
+      return (this._analysisPanelParams || new HttpParams()).get(key);
     }
 
     getAnalysis(params: HttpParams): Observable<any> {

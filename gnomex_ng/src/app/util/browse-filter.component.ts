@@ -297,7 +297,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                         //all though there could be a race condition with getLabList the idLab was already set so the search with use that id.
                         this.preselectOnBrowseFilter()
                     })
-                },(err:IGnomexErrorResponse) =>{});
+                },(err: IGnomexErrorResponse) =>{});
 
 
             }
@@ -1007,7 +1007,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
             this.dataTrackService.previousURLParams = params;
             this.dataTrackService.previousURLParams["refreshParams"] = true;
             this.dataTrackService.getDatatracksList_fromBackend(params);
-            this.setURLFromParams(requiredParams,params );
+            this.setURLFromParams(requiredParams, params );
         }
     }
 

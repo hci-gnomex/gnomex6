@@ -5,38 +5,38 @@ import {
     OnDestroy,
     OnInit,
     ViewChild,
-} from "@angular/core";
+} from '@angular/core';
 
-import {ExperimentsService} from "./experiments.service";
-import {ITreeOptions, ITreeState, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
-import {BrowseFilterComponent} from "../util/browse-filter.component";
-import * as _ from "lodash";
-import {Subscription} from "rxjs";
-import {ActivatedRoute, NavigationEnd, NavigationExtras, ParamMap, Router} from "@angular/router";
-import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
-import {CreateProjectComponent} from "./create-project.component";
-import {MatDialogConfig} from "@angular/material";
-import {LabListService} from "../services/lab-list.service";
-import {DialogsService, DialogType} from "../util/popup/dialogs.service";
-import {DeleteProjectComponent} from "./delete-project.component";
-import {ReassignExperimentComponent} from "./reassign-experiment.component";
-import {DeleteExperimentComponent} from "./delete-experiment.component";
-import {DictionaryService} from "../services/dictionary.service";
-import {PropertyService} from "../services/property.service";
-import {GnomexService} from "../services/gnomex.service";
-import {HttpParams} from "@angular/common/http";
-import {UtilService} from "../services/util.service";
-import {filter} from "rxjs/operators";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
-import {ActionType} from "../util/interfaces/generic-dialog-action.model";
-import {ConstantsService} from "../services/constants.service";
-import {NavigationService} from "../services/navigation.service";
+import {ExperimentsService} from './experiments.service';
+import {ITreeOptions, ITreeState, TreeComponent, TreeModel, TreeNode} from 'angular-tree-component';
+import {BrowseFilterComponent} from '../util/browse-filter.component';
+import * as _ from 'lodash';
+import {Subscription} from 'rxjs';
+import {ActivatedRoute, NavigationEnd, NavigationExtras, ParamMap, Router} from '@angular/router';
+import {CreateSecurityAdvisorService} from '../services/create-security-advisor.service';
+import {CreateProjectComponent} from './create-project.component';
+import {MatDialogConfig} from '@angular/material';
+import {LabListService} from '../services/lab-list.service';
+import {DialogsService, DialogType} from '../util/popup/dialogs.service';
+import {DeleteProjectComponent} from './delete-project.component';
+import {ReassignExperimentComponent} from './reassign-experiment.component';
+import {DeleteExperimentComponent} from './delete-experiment.component';
+import {DictionaryService} from '../services/dictionary.service';
+import {PropertyService} from '../services/property.service';
+import {GnomexService} from '../services/gnomex.service';
+import {HttpParams} from '@angular/common/http';
+import {UtilService} from '../services/util.service';
+import {filter} from 'rxjs/operators';
+import {ITreeNode} from 'angular-tree-component/dist/defs/api';
+import {ActionType} from '../util/interfaces/generic-dialog-action.model';
+import {ConstantsService} from '../services/constants.service';
+import {NavigationService} from '../services/navigation.service';
 
-const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
+const VIEW_LIMIT_EXPERIMENTS = 'view_limit_experiments';
 
 @Component({
-    selector: "experiments",
-    templateUrl: "./browse-experiments.component.html",
+    selector: 'experiments',
+    templateUrl: './browse-experiments.component.html',
     styles: [`
 
 
@@ -91,8 +91,8 @@ const VIEW_LIMIT_EXPERIMENTS: string = "view_limit_experiments";
 
 export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewInit {
 
-    @ViewChild("tree", {static: false}) treeComponent: TreeComponent;
-    toggleButton: string = "Expand Projects";
+    @ViewChild('tree', {static: false}) treeComponent: TreeComponent;
+    toggleButton = 'Expand Projects';
 
     @ViewChild(BrowseFilterComponent, {static: false})
 
@@ -101,21 +101,19 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      */
     public options: ITreeOptions;
     public state: ITreeState;
-    public showEmptyFolders: boolean = false;
+    public showEmptyFolders = false;
     public items: any;
-    public responseMsg: string = "";
-    public experimentCount: string = "0";
-    public experimentCountMessage: string = "";
-    public disableNewProject: boolean = true;
-    public disableDeleteProject: boolean = true;
-    public disableDeleteExperiment: boolean = true;
-    public disableAll: boolean = false;
-    public lookupLab: string = "";
+    public responseMsg = '';
+    public experimentCount = '0';
+    public experimentCountMessage = '';
+    public disableNewProject = true;
+    public disableDeleteProject = true;
+    public disableDeleteExperiment = true;
+    public disableAll = false;
+    public lookupLab = '';
 
-    public readonly DRAG_DROP_HINT: string = "Drag-and-drop to move object to another group";
-    public showDragDropHint: boolean = false;
-
-    private treeModel: TreeModel;
+    public readonly DRAG_DROP_HINT: string = 'Drag-and-drop to move object to another group';
+    public showDragDropHint = false;
     private currentItem: any;
     private targetItem: any;
     private labs: any;
@@ -123,7 +121,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private billingAccounts: any;
     private dragEndItems: any;
     private selectedItem: any;
-    private showBillingCombo: boolean = false;
+    private showBillingCombo = false;
     private labList: any[] = [];
     private selectedExperiment: any;
     private projectRequestListSubscription: Subscription;
@@ -134,6 +132,14 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     private canDeleteProjectSubscription: Subscription;
     private qParamMap: ParamMap;
     private paramMap: ParamMap;
+    private _treeModel: TreeModel | null = null;
+
+    public get treeModel(): TreeModel | null {
+      if (!this._treeModel && this.treeComponent) {
+        this._treeModel = this.treeComponent.treeModel;
+      }
+      return this._treeModel;
+    }
 
     constructor(public experimentsService: ExperimentsService,
                 private changeDetectorRef: ChangeDetectorRef,
@@ -146,7 +152,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 private propertyService: PropertyService,
                 private route: ActivatedRoute,
                 private router: Router,
-                private navService:NavigationService,
+                private navService: NavigationService,
                 public constantsService: ConstantsService) {
 
     }
@@ -172,22 +178,30 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
         this.projectRequestListSubscription = this.experimentsService.getProjectRequestListObservable().subscribe(response => {
 
-            this.lookupLab = "";
-            this.experimentCount = response.experimentCount ? response.experimentCount : "0";
-            this.experimentCountMessage = response.message ? "(" + response.message + ")" : "";
+            this.lookupLab = '';
+            this.experimentCount = response.experimentCount ? response.experimentCount : '0';
+            this.experimentCountMessage = response.message ? '(' + response.message + ')' : '';
 
-            if(this.experimentCount === "0" && !response.Lab) {
+            if (this.experimentCount === '0' && !response.Lab) {
                 this.dialogsService.stopAllSpinnerDialogs();
-                this.dialogsService.error("Insufficient permission to access this request or this lab.", "INVALID");
+                this.dialogsService.error('Insufficient permission to access this request or this lab.', 'INVALID');
                 return;
             }
 
             this.buildTree(response.Lab);
             this.onShowEmptyFolders(this.showEmptyFolders);
 
-            if (this.experimentsService.browsePanelParams && this.experimentsService.browsePanelParams["refreshParams"]) {
+            // console.log(`the amount of roots ${this.treeModel ? this.treeModel.roots.length : '0'}`);
+            // let firstChild = Array.isArray(this.treeModel.roots) &&  this.treeModel.roots.length > 0
+            //   ? this.treeModel.roots[this.treeModel.roots.length - 1] : null;
+            // if(firstChild) {
+            //   console.log(`the root has children ${firstChild.hasChildren}`);
+            //   console.log(`the root has this many children ${firstChild.children ? firstChild.children.length : '0'}`);
+            // }
+
+            if (this.experimentsService.getExperimentPanelParam('refreshParams')) {
                 this.experimentsService.emitExperimentOverviewList(response.Lab);
-                this.experimentsService.browsePanelParams["refreshParams"] = false;
+                this.experimentsService.setExperimentPanelParam('refreshParams', false);
 
                 if (this.treeModel && this.treeModel.getActiveNode()) {// Refresh to initial state when search button clicked
                     this.treeModel.getActiveNode().setIsActive(false);
@@ -200,11 +214,18 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
 
             setTimeout(() => {
-                this.toggleButton = "Collapse Projects";
-                this.treeModel.expandAll();
-                if(this.navService.navMode === NavigationService.URL) {
-                    let activatedRoute = this.navService.getChildActivateRoute(this.route);
-                    if(activatedRoute){
+                this.toggleButton = 'Collapse Projects';
+                const model = this.treeComponent ? this.treeComponent.treeModel : null;
+                if (!model) {
+                  // view not ready yet; skip
+                  this.dialogsService.stopAllSpinnerDialogs();
+                  return;
+                }
+
+                model.expandAll();
+                if (this.navService.navMode === NavigationService.URL) {
+                    const activatedRoute = this.navService.getChildActivateRoute(this.route);
+                    if (activatedRoute) {
                         this.paramMap =  activatedRoute.snapshot.paramMap;
                         this.qParamMap = activatedRoute.snapshot.queryParamMap;
                         // activatedRoute.queryParamMap.subscribe((qParam)=>{this.qParamMap = qParam });
@@ -212,31 +233,31 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                     }
 
 
-                    let idName = "";
-                    let idVal = "";
-                   if (this.paramMap.get("idRequest") ){
-                       idName = "idRequest";
-                       idVal = this.paramMap.get("idRequest")
-                   }else if(this.qParamMap.get("idProject")){
-                       idName = "idProject";
-                       idVal = this.qParamMap.get("idProject")
-                   }else if(this.qParamMap.get("idLab")){
-                       idName = "idLab";
-                       idVal = this.qParamMap.get("idLab");
+                    let idName = '';
+                    let idVal = '';
+                    if (this.paramMap.get('idRequest') ) {
+                       idName = 'idRequest';
+                       idVal = this.paramMap.get('idRequest');
+                   } else if (this.qParamMap.get('idProject')) {
+                       idName = 'idProject';
+                       idVal = this.qParamMap.get('idProject');
+                   } else if (this.qParamMap.get('idLab')) {
+                       idName = 'idLab';
+                       idVal = this.qParamMap.get('idLab');
                    }
 
-                    if(this.treeModel) {
-                        let node = UtilService.findTreeNode(this.treeModel, idName, idVal);
-                        if(node) {
+                    if (this.treeModel) {
+                        const node = UtilService.findTreeNode(this.treeModel, idName, idVal);
+                        if (node) {
                             node.setIsActive(true);
                             node.scrollIntoView();
                         }
                     }
-                } else if(this.setActiveNodeId) {
+                } else if (this.setActiveNodeId) {
                     let node: TreeNode;
                     node = this.findNodeById(this.setActiveNodeId);
-                    this.setActiveNodeId = "";
-                    if(node) {
+                    this.setActiveNodeId = '';
+                    if (node) {
                         node.setIsActive(true);
                         node.scrollIntoView();
                     }
@@ -247,14 +268,13 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
 
         this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
-        this.treeModel = this.treeComponent.treeModel;
         this.options = {
-            displayField: "label",
-            childrenField: "items",
+            displayField: 'label',
+            childrenField: 'items',
             useVirtualScroll: true,
             nodeHeight: 22,
             nodeClass: (node: TreeNode) => {
-                return "icon-" + node.data.icon;
+                return 'icon-' + node.data.icon;
             },
             allowDrop: (element, { parent, index }) => {
                 this.dragEndItems = _.cloneDeep(this.items);
@@ -286,11 +306,11 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         // to avoid calling get request multiple times gets the request off of route after it has been resolved.
         this.navEndSubscription = this.router.events.pipe(filter(event => event instanceof NavigationEnd))
             .subscribe((event: NavigationEnd) => {
-                if(this.route.snapshot.firstChild) {
-                    let data = this.route.snapshot.firstChild.data;
+                if (this.route.snapshot.firstChild) {
+                    const data = this.route.snapshot.firstChild.data;
                     if (data.experiment && data.experiment.Request) {
                         this.selectedExperiment = data.experiment.Request;
-                        if (this.selectedExperiment.canDelete === "Y") {
+                        if (this.selectedExperiment.canDelete === 'Y') {
                             this.disableDeleteExperiment = false;
                         } else {
                             this.disableDeleteExperiment = true;
@@ -301,9 +321,13 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
     }
 
-    ngAfterViewInit() {}
-
-
+    ngAfterViewInit() {
+      if (this.treeComponent) {
+        // Optional: trigger initial expand if desired
+        this.treeComponent.treeModel.expandAll();
+      }
+      this.changeDetectorRef.detectChanges();
+    }
 
 
     go(event: any) {
@@ -324,15 +348,15 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             } else {
                 this.items = response;
             }
-            (<any[]>this.items).sort(UtilService.sortObjectAlphabetically("labName"));
+            (this.items as any[]).sort(UtilService.sortObjectAlphabetically('labName'));
 
             this.labs = this.labs.concat(this.items);
             this.experimentsService.filteredLabs = this.labs;
-            for (var lab of this.items) {
-                lab.id = "l" + lab.idLab;
+            for (const lab of this.items) {
+                lab.id = 'l' + lab.idLab;
                 lab.parentid = -1;
 
-                lab.icon = "assets/group.png";
+                lab.icon = 'assets/group.png';
                 // If there is a lab with no Project skip
                 if (lab.Project) {
                     if (!this.isArray(lab.Project)) {
@@ -341,10 +365,10 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                         lab.items = lab.Project;
                     }
 
-                    for (var project of lab.items) {
-                        project.icon = "assets/folder.png";
+                    for (const project of lab.items) {
+                        project.icon = 'assets/folder.png';
                         project.labId = lab.labId;
-                        project.id = "p" + project.idProject;
+                        project.id = 'p' + project.idProject;
                         project.parentid = lab.id;
                         if (project.Request) {
                             project.isEmptyFolder = false;
@@ -353,24 +377,24 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                             } else {
                                 project.items = project.Request;
                             }
-                            (<any[]>project.items).sort(UtilService.sortOrderIDNumerically("requestNumber"));
+                            (project.items as any[]).sort(UtilService.sortOrderIDNumerically('requestNumber'));
 
-                            for (var request of project.items) {
+                            for (const request of project.items) {
                                 if (request) {
                                     if (request.label) {
                                         if (request.name) {
-                                            request.label = request.requestNumber + "-" + request.name;
+                                            request.label = request.requestNumber + '-' + request.name;
                                         } else {
                                             request.label = request.requestNumber;
                                         }
 
-                                        request.id = "r" + request.idRequest;
+                                        request.id = 'r' + request.idRequest;
                                         request.parentid = project.id;
                                     } else {
-                                        console.log("label not defined");
+                                        console.log('label not defined');
                                     }
                                 } else {
-                                    console.log("r is undefined");
+                                    console.log('r is undefined');
                                 }
                             }
                         } else {
@@ -401,11 +425,11 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      */
     onMoveNode($event) {
         console.log(
-            "Moved",
+            'Moved',
             $event.node.name,
-            "to",
+            'to',
             $event.to.parent.name,
-            "at index",
+            'at index',
             $event.to.index);
         this.currentItem = $event.node;
         this.targetItem = $event.to.parent;
@@ -417,18 +441,18 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      @param what
      */
     isArray(what) {
-        return Object.prototype.toString.call(what) === "[object Array]";
+        return Object.prototype.toString.call(what) === '[object Array]';
     }
 
     detailFn(): (keywords: string) => void {
         return (keywords) => {
-            window.location.href = "http://localhost/gnomex/experiments/" + keywords;
+            window.location.href = 'http://localhost/gnomex/experiments/' + keywords;
         };
     }
 
     showReassignWindow() {
-        let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.width = "40em";
+        const configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = '40em';
         configuration.autoFocus = false;
         configuration.data = {
             labMembers:         this.labMembers,
@@ -439,12 +463,12 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         };
 
         this.dialogsService.genericDialogContainer(ReassignExperimentComponent,
-            "Reassignment", this.constantsService.ICON_FOLDER_ADD, configuration,
+            'Reassignment', this.constantsService.ICON_FOLDER_ADD, configuration,
             {actions: [
-                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "reassignYesButtonClicked"},
-                    {type: ActionType.SECONDARY, name: "No", internalAction: "onClose"}
+                    {type: ActionType.PRIMARY, name: 'Yes', internalAction: 'reassignYesButtonClicked'},
+                    {type: ActionType.SECONDARY, name: 'No', internalAction: 'onClose'}
                 ]}).subscribe((result: any) => {
-            if(!result) {
+            if (!result) {
                 this.resetTree();
             }
         });
@@ -457,15 +481,15 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      * @param event
      */
     getLabUsers(event: any) {
-        if (event.node.isExternal === "N" && event.node.idLab === event.to.parent.idLab) {
+        if (event.node.isExternal === 'N' && event.node.idLab === event.to.parent.idLab) {
             this.showBillingCombo = false;
         } else {
             this.showBillingCombo = true;
         }
-        let params: HttpParams = new HttpParams()
-            .set("idLab", event.to.parent.idLab);
+        const params: HttpParams = new HttpParams()
+            .set('idLab', event.to.parent.idLab);
 
-        let lPromise = this.experimentsService.getLab(params).toPromise();
+        const lPromise = this.experimentsService.getLab(params).toPromise();
         lPromise.then(response => {
             this.buildLabMembers(response, event);
         });
@@ -480,23 +504,23 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     buildLabMembers(response: any, event: any) {
         this.labMembers = [];
         this.billingAccounts = [];
-        var requestCategoryCoreFacility: any =
+        const requestCategoryCoreFacility: any =
             this.dictionaryService.getEntry(DictionaryService.REQUEST_CATEGORY, this.currentItem.codeRequestCategory).idCoreFacility;
 
-        var i: number = 0;
+        let i = 0;
         if (!this.createSecurityAdvisorService.isArray(response.possibleCollaborators)) {
             response.possibleCollaborators = [response.possibleCollaborators.AppUser];
         }
-        for (let user of response.possibleCollaborators) {
-            if (user.isActive === "Y") {
+        for (const user of response.possibleCollaborators) {
+            if (user.isActive === 'Y') {
                 this.labMembers[i] = user;
                 user.label = user.firstLastDisplayName;
                 i++;
             }
         }
 
-        for (let billingAccount of response.billingAccounts) {
-            if (billingAccount.isApproved === "Y" && billingAccount.isActive === "Y" && billingAccount.idCoreFacility === requestCategoryCoreFacility) {
+        for (const billingAccount of response.billingAccounts) {
+            if (billingAccount.isApproved === 'Y' && billingAccount.isActive === 'Y' && billingAccount.idCoreFacility === requestCategoryCoreFacility) {
                 billingAccount.label = billingAccount.accountName;
                 this.billingAccounts.push(billingAccount);
             }
@@ -505,10 +529,10 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             response.managers = [response.managers.AppUser];
         }
 
-        for (let manager of response.managers) {
-            var found = false;
+        for (const manager of response.managers) {
+            let found = false;
 
-            for (let firstLastName of this.labMembers) {
+            for (const firstLastName of this.labMembers) {
                 if (manager.firstLastDisplayName.indexOf(firstLastName.firstLastDisplayName) > 0 ) {
                     found = true;
                     break;
@@ -516,7 +540,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
             }
             if (!found) {
-                if(manager.isActive === "Y") {
+                if (manager.isActive === 'Y') {
                     manager.label = manager.firstLastDisplayName;
                     this.labMembers.push(manager);
                 }
@@ -524,8 +548,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         }
         if (this.labMembers.length < 1) {
             this.dialogsService
-                .alert("Sorry, in order to reassign this experiment you must change its owner to a member of the new lab group. However," +
-                    "you do not have permission to access the member list for this lab. Please contact an administrator.", null, DialogType.FAILED)
+                .alert('Sorry, in order to reassign this experiment you must change its owner to a member of the new lab group. However,' +
+                    'you do not have permission to access the member list for this lab. Please contact an administrator.', null, DialogType.FAILED)
                 .subscribe(
                     res => {
                         this.resetTree();
@@ -550,22 +574,22 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      */
     newProjectClicked(event: any) {
         if (this.items.length > 0 ) {
-            var useThisLabList: any[];
+            let useThisLabList: any[];
             if (this.createSecurityAdvisorService.isSuperAdmin) {
                 useThisLabList = this.labList;
             } else {
                 useThisLabList = this.labs;
             }
 
-            let selectedLab: string = "";
-            if(this.selectedItem.data.idLab) {
+            let selectedLab = '';
+            if (this.selectedItem.data.idLab) {
                 selectedLab = this.selectedItem.data.idLab;
             } else if (this.selectedItem.parent.data.idLab) {
                 selectedLab = this.selectedItem.parent.data.idLab;
             }
 
-            let configuration: MatDialogConfig = new MatDialogConfig();
-            configuration.width = "45em";
+            const configuration: MatDialogConfig = new MatDialogConfig();
+            configuration.width = '45em';
             configuration.autoFocus = false;
             configuration.data = {
                 labList:            useThisLabList,
@@ -573,13 +597,13 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 selectedLabItem:    selectedLab
             };
 
-            this.dialogsService.genericDialogContainer(CreateProjectComponent, "New Project", this.constantsService.ICON_FOLDER_ADD, configuration,
+            this.dialogsService.genericDialogContainer(CreateProjectComponent, 'New Project', this.constantsService.ICON_FOLDER_ADD, configuration,
                 {actions: [
-                        {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: "Save", internalAction: "save"},
-                        {type: ActionType.SECONDARY, name: "Cancel", internalAction: "cancel"}
+                        {type: ActionType.PRIMARY, icon: this.constantsService.ICON_SAVE, name: 'Save', internalAction: 'save'},
+                        {type: ActionType.SECONDARY, name: 'Cancel', internalAction: 'cancel'}
                     ]}).subscribe((result: any) => {
-                if(result) {
-                    this.setActiveNodeId = "p" + result;
+                if (result) {
+                    this.setActiveNodeId = 'p' + result;
                 }
             });
         }
@@ -590,41 +614,41 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      * @param event
      */
     deleteProjectClicked(event: any) {
-        if(!this.selectedItem.data.isEmptyFolder) {
-            this.dialogsService.alert("Project cannot be deleted because it has experiments. <br>Please reassign experiments to another project before deleting.", "", DialogType.WARNING);
+        if (!this.selectedItem.data.isEmptyFolder) {
+            this.dialogsService.alert('Project cannot be deleted because it has experiments. <br>Please reassign experiments to another project before deleting.', '', DialogType.WARNING);
             return;
         }
-        let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.width = "30em";
-        configuration.height = "15em";
+        const configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = '30em';
+        configuration.height = '15em';
         configuration.disableClose = true;
         configuration.data = { selectedItem: this.selectedItem };
 
-        this.dialogsService.genericDialogContainer(DeleteProjectComponent, "Warning: Delete Project",
+        this.dialogsService.genericDialogContainer(DeleteProjectComponent, 'Warning: Delete Project',
             this.constantsService.ICON_EXCLAMATION, configuration,
             {actions: [
-                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "deleteProject"},
-                    {type: ActionType.SECONDARY, name: "No", internalAction: "cancel"}
+                    {type: ActionType.PRIMARY, name: 'Yes', internalAction: 'deleteProject'},
+                    {type: ActionType.SECONDARY, name: 'No', internalAction: 'cancel'}
                 ]}).subscribe((result: any) => {
-            if(result && this.parentProject) {
+            if (result && this.parentProject) {
                 this.setActiveNodeId = this.parentProject.data.id;
             }
         });
     }
 
     deleteExperimentClicked() {
-        let configuration: MatDialogConfig = new MatDialogConfig();
-        configuration.width = "30em";
-        configuration.height = "15em";
+        const configuration: MatDialogConfig = new MatDialogConfig();
+        configuration.width = '30em';
+        configuration.height = '15em';
         configuration.disableClose = true;
         configuration.data = { selectedExperiment: this.selectedExperiment };
 
-        this.dialogsService.genericDialogContainer(DeleteExperimentComponent, "Warning: Delete Experiment", this.constantsService.ICON_EXCLAMATION, configuration,
+        this.dialogsService.genericDialogContainer(DeleteExperimentComponent, 'Warning: Delete Experiment', this.constantsService.ICON_EXCLAMATION, configuration,
             {actions: [
-                    {type: ActionType.PRIMARY, name: "Yes", internalAction: "deleteExperiment"},
-                    {type: ActionType.SECONDARY, name: "No", internalAction: "cancel"}
+                    {type: ActionType.PRIMARY, name: 'Yes', internalAction: 'deleteExperiment'},
+                    {type: ActionType.SECONDARY, name: 'No', internalAction: 'cancel'}
                 ]}).subscribe((result: any) => {
-            if(result && this.parentProject) {
+            if (result && this.parentProject) {
                 this.setActiveNodeId = this.parentProject.data.id;
             }
         });
@@ -635,41 +659,41 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      */
     treeOnSelect(event: any) {
         this.selectedItem = event.node;
-        let idLab = this.selectedItem.data.idLab;
-        let idProject = this.selectedItem.data.idProject;
-        let idRequest = this.selectedItem.data.idRequest;
+        const idLab = this.selectedItem.data.idLab;
+        const idProject = this.selectedItem.data.idProject;
+        const idRequest = this.selectedItem.data.idRequest;
 
-        let projectRequestListNode: Array<any> = _.cloneDeep(this.selectedItem.data);
+        const projectRequestListNode: Array<any> = _.cloneDeep(this.selectedItem.data);
         this.experimentsService.emitExperimentOverviewList(projectRequestListNode);
         let navArray: Array<any> = [];
         let navExtras: NavigationExtras = {};
         this.disableDeleteProject = true;
 
-        if(this.navService.navMode === NavigationService.USER){
+        if (this.navService.navMode === NavigationService.USER) {
 
-            //Lab
+            // Lab
             if (this.selectedItem.level === 1) {
 
                 this.disableNewProject = !this.gnomexService.canSubmitRequests(idLab);
                 this.disableDeleteExperiment = true;
 
-                navArray = ["/experiments",  "overview"];
-                navExtras = {queryParams: { idLab: idLab, idProject: null}};
-                //Project
+                navArray = ['/experiments',  'overview'];
+                navExtras = {queryParams: { idLab, idProject: null}};
+                // Project
             } else if (this.selectedItem.level === 2) {
                 this.parentProject = event.node.parent;
                 this.disableNewProject = !this.gnomexService.canSubmitRequests(idLab);
                 this.disableDeleteExperiment = true;
 
-                navArray = ["/experiments", "overview"]; //["/experiments" , {outlets: {"browsePanel": ["overview", {"idLab": idLab, "idProject": idProject}]}}];
-                navExtras = {queryParams: { idLab: idLab, idProject: idProject}};
+                navArray = ['/experiments', 'overview']; // ["/experiments" , {outlets: {"browsePanel": ["overview", {"idLab": idLab, "idProject": idProject}]}}];
+                navExtras = {queryParams: { idLab, idProject}};
 
-                //Experiment
+                // Experiment
             } else {
-                navArray = ["/experiments", "detail" , idRequest]; //["/experiments",  {outlets: {"browsePanel": [idRequest]}}];
+                navArray = ['/experiments', 'detail' , idRequest]; // ["/experiments",  {outlets: {"browsePanel": [idRequest]}}];
                 this.parentProject = event.node.parent;
                 this.disableNewProject = true;
-                navExtras = {queryParams: { idLab: idLab, idProject: this.parentProject.data.idProject}};
+                navExtras = {queryParams: { idLab, idProject: this.parentProject.data.idProject}};
 
             }
 
@@ -678,9 +702,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             this.dialogsService.startDefaultSpinnerDialog();
             this.router.navigate(navArray, navExtras);
 
-        }else{
-            this.navService.emitResetNavModeSubject("detail");
-            this.navService.emitResetNavModeSubject("overview");
+        } else {
+            this.navService.emitResetNavModeSubject('detail');
+            this.navService.emitResetNavModeSubject('overview');
             this.dialogsService.removeSpinnerWorkItem();
         }
 
@@ -691,11 +715,11 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
      * The expand collapse toggle is selected.
      */
     expandCollapseClicked(): void {
-        if (this.toggleButton === "Collapse Projects") {
-            this.toggleButton = "Expand Projects"
+        if (this.toggleButton === 'Collapse Projects') {
+            this.toggleButton = 'Expand Projects';
             this.treeModel.collapseAll();
         } else {
-            this.toggleButton = "Collapse Projects";
+            this.toggleButton = 'Collapse Projects';
             this.treeModel.expandAll();
         }
 
@@ -720,9 +744,9 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     onShowEmptyFolders(event: any): void {
         const hiddenNodeIds = {};
 
-        if(!this.showEmptyFolders) {
+        if (!this.showEmptyFolders) {
             this.items.forEach((data) => {
-                if(data && data.items) {
+                if (data && data.items) {
                     data.items.forEach((node) => {
                         if (node.isEmptyFolder) {
                             hiddenNodeIds[node.id] = true;
@@ -742,21 +766,21 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
     private findNodeById(id: string): TreeNode {
         if (this.treeModel && this.treeModel.roots) {
-            for (let lab of this.treeModel.roots) {
-                if(id.substr(0, 1) === "l") {
-                    if(lab.data.id === id) {
+            for (const lab of this.treeModel.roots) {
+                if (id.substr(0, 1) === 'l') {
+                    if (lab.data.id === id) {
                         return lab;
                     }
                 } else {
                     if (lab.hasChildren) {
-                        for (let project of lab.children) {
-                            if(id.substr(0, 1) === "p") {
+                        for (const project of lab.children) {
+                            if (id.substr(0, 1) === 'p') {
                                 if (project.data.id === id) {
                                     return project;
                                 }
-                            } else if (id.substr(0, 1) === "r") {
+                            } else if (id.substr(0, 1) === 'r') {
                                 if (project.hasChildren) {
-                                    for (let experiment of project.children) {
+                                    for (const experiment of project.children) {
                                         if (experiment.data.id === id) {
                                             return experiment;
                                         }

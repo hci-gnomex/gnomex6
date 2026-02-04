@@ -46,13 +46,14 @@
                                         <ng-template #treeNodeTemplate let-node let-index="index">
                                             <div class="full-width no-word-wrap tree-node-font" role="treeitem" [attr.aria-label]="node.data.label">
                                                 <img src="{{ node?.data?.icon ? node.data.icon : 'assets/flask.png' }}" alt="" aria-hidden="true" class="tree-node-icon icon">
-                                                <span>{{ node.data.label }}</span>
-                                            </div>
-                                        </ng-template>
+                                          <span>{{ node.data.label }}</span>
+                                        </div>
+                                      </ng-template>
                                         <ng-template #loadingTemplate></ng-template>
                                     </tree-root>
                                 </div>
                             </div>
+                          <div> sanity check</div>
                             <div class="full-width padding" role="toolbar" aria-label="Tree actions">
                                 <div class="flex-container-row align-center justify-space-between">
                                     <div>
