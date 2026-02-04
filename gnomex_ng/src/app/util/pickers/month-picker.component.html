@@ -1,4 +1,4 @@
-<div>
+<div role="group" aria-label="Month picker">
     <mat-form-field>
         <mat-label>{{label}}</mat-label>
         <input matInput
@@ -7,7 +7,8 @@
                [formControl]="_inputCtrl"
                [matDatepickerFilter]="_customFilter"
                (click)="_openDatepickerOnClick(datepicker)"
-               readonly>
+               readonly
+               [attr.aria-label]="label">
     </mat-form-field>
     <mat-datepicker #datepicker
                     startView="multi-year"

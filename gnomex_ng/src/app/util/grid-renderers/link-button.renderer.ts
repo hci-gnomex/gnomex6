@@ -4,10 +4,10 @@ import {ICellRendererAngularComp} from "ag-grid-angular";
 @Component({
     selector: 'two-button',
     template: `
-        <div class="full-width full-height">
+        <div class="full-width full-height" role="gridcell">
             <div class="full-width full-height flex-container-row align-center">
-                <div class="flex-grow horizontal-center" (click)="invokeParentMethod()">
-                    <button class="link-button"><div class="message inline-block">{{buttonName}}</div></button>
+                <div class="flex-grow horizontal-center" (click)="invokeParentMethod()" role="button" tabindex="0" [attr.aria-label]="buttonName" (keydown.enter)="invokeParentMethod()">
+                    <button class="link-button" [attr.aria-label]="buttonName"><div class="message inline-block">{{buttonName}}</div></button>
                 </div>
             </div>
         </div>

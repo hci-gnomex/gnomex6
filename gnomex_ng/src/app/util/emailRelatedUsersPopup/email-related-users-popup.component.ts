@@ -11,16 +11,19 @@ import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-edito
 @Component({
 	selector: "emailRelatedUsersPopup",
 	template: `
-        <div class="full-height full-width padded">
+        <div class="full-height full-width padded" role="dialog" aria-label="Email composition">
             <mat-form-field class="full-width">
                 <input matInput
                        class="full-width"
                        [(ngModel)]="subject"
-                       placeholder="Subject"/>
+                       placeholder="Subject"
+                       aria-label="Email subject"
+                       aria-required="true"/>
             </mat-form-field>
-			<label class="label" for="emailEditor">Email Body:</label>
+			<label class="label" for="emailEditor" id="email-body-label">Email Body:</label>
 			<angular-editor #emailEditorRef class="full-width" [(ngModel)]="body"
-							[config]="editorConfig" id="emailEditor">
+							[config]="editorConfig" id="emailEditor"
+							aria-labelledby="email-body-label">
 			</angular-editor>
         </div>
 	`,

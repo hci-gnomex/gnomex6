@@ -12,11 +12,11 @@ import {ActionType} from "../interfaces/generic-dialog-action.model";
 @Component({
     selector: 'menu-header-topics',
     template: `
-        <div>
-            <label style="width: 7rem; margin: 0 0 0 0.5rem"><img [src]="'./assets/topic_tag.png'" class="icon">Topics</label>
-            <button mat-button [disabled]="!showNewTopic || this.disableAll" (click)="makeNewTopic()"><img [src]="'./assets/topic_tag_new.png'" class="icon">New Topic</button>
-            <button [disabled]="(!showDelete && !showRemoveLink) || this.disableAll" mat-button (click)="doDelete()"><img [src]="'./assets/crossout.png'" class="icon">{{showRemoveLink ? 'Remove link' : 'Delete'}}</button>
-            <button mat-button [disabled]="this.disableAll" (click)="doLinkToData()"><img [src]="'./assets/link.png'" class="icon">Link to Data</button>
+        <div role="toolbar" aria-label="Topics toolbar">
+            <label style="width: 7rem; margin: 0 0 0 0.5rem"><img [src]="'./assets/topic_tag.png'" class="icon" alt="" aria-hidden="true">Topics</label>
+            <button mat-button [disabled]="!showNewTopic || this.disableAll" (click)="makeNewTopic()" aria-label="Create new topic"><img [src]="'./assets/topic_tag_new.png'" class="icon" alt="" aria-hidden="true">New Topic</button>
+            <button [disabled]="(!showDelete && !showRemoveLink) || this.disableAll" mat-button (click)="doDelete()" [attr.aria-label]="showRemoveLink ? 'Remove link' : 'Delete topic'"><img [src]="'./assets/crossout.png'" class="icon" alt="" aria-hidden="true">{{showRemoveLink ? 'Remove link' : 'Delete'}}</button>
+            <button mat-button [disabled]="this.disableAll" (click)="doLinkToData()" aria-label="Link to data"><img [src]="'./assets/link.png'" class="icon" alt="" aria-hidden="true">Link to Data</button>
         </div>
     `
 })

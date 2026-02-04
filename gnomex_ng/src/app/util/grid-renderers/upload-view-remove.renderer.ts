@@ -5,27 +5,27 @@ import {DialogsService, DialogType} from "../popup/dialogs.service";
 
 @Component({
     template: `
-        <div class="full-width full-height">
+        <div class="full-width full-height" role="gridcell">
             <div class="t full-width full-height cursor">
                 <div class="tr">
-                    <div class="td vertical-center button-container">
-                        <input type="file" class="hidden" (change)="selectFile($event)" #fileInput>
-                        <button *ngIf="!disableEdit" class="link-button" (click)="onClickUpload()">
-                            <img [src]="'./assets/upload.png'" alt=""/>
+                    <div class="td vertical-center button-container" role="group" aria-label="File actions">
+                        <input type="file" class="hidden" (change)="selectFile($event)" #fileInput aria-label="File upload input">
+                        <button *ngIf="!disableEdit" class="link-button" (click)="onClickUpload()" aria-label="Upload file">
+                            <img [src]="'./assets/upload.png'" alt="" aria-hidden="true"/>
                             <div class="name inline-block">
                                 Upload
                             </div>
                         </button>
                         <button *ngIf="hasPoForm" class="link-button"
-                                (click)="onClickView()">
-                            <img [src]="'./assets/page_find.gif'" alt=""/>
+                                (click)="onClickView()" aria-label="View file">
+                            <img [src]="'./assets/page_find.gif'" alt="" aria-hidden="true"/>
                             <div class="name inline-block">
                                 View
                             </div>
                         </button>
                         <button *ngIf="hasPoForm && !disableEdit" class="link-button"
-                                (click)="onClickRemove()">
-                            <img [src]="'./assets/page_cross.gif'" alt=""/>
+                                (click)="onClickRemove()" aria-label="Remove file">
+                            <img [src]="'./assets/page_cross.gif'" alt="" aria-hidden="true"/>
                             <div class="name inline-block">
                                 Remove
                             </div>

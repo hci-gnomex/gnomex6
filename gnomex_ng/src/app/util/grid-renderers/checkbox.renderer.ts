@@ -3,11 +3,11 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 
 @Component({
 	template: `
-		<div class="full-width full-height">
+		<div class="full-width full-height" role="gridcell">
 			<div class="t full-width full-height">
 				<div class="tr">
 					<div class="td vertical-center center-align">
-						<input type="checkbox" [checked]="checked" [disabled]="!editable" (change)="onChange($event)">
+						<input type="checkbox" [checked]="checked" [disabled]="!editable" (change)="onChange($event)" [attr.aria-checked]="checked" aria-label="Toggle selection">
 					</div>
 				</div>
 			</div>

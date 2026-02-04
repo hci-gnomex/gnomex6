@@ -1,13 +1,13 @@
 <div mat-dialog-title class="not-rendered">
 <!--<div mat-dialog-title>-->
 </div>
-<div mat-dialog-content class="full-height padded">
+<div mat-dialog-content class="full-height padded" role="alert" aria-live="polite" aria-busy="true">
     <div class="full-width full-height t">
         <div class="tr">
             <div class="td vertical-center">
-                <mat-spinner [hidden]="false" strokeWidth="{{strokeWidth}}" [diameter]="diameter"></mat-spinner>
+                <mat-spinner [hidden]="false" strokeWidth="{{strokeWidth}}" [diameter]="diameter" aria-label="Loading"></mat-spinner>
             </div>
-            <div class="td vertical-center">
+            <div class="td vertical-center" aria-label="Loading status">
                 {{message}}
             </div>
         </div>

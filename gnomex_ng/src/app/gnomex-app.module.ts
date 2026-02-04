@@ -67,9 +67,9 @@ export function JwtModuleConfigFactory() {
 }
 
 // Function to retrieve the token from local storage
-export function tokenGetter() {
-    return localStorage.getItem("access_token");
-}
+//export function tokenGetter() {
+//    return localStorage.getItem("access_token");
+//}
 
 /**
  * @since 1.0.0
@@ -81,7 +81,7 @@ export function tokenGetter() {
         HttpClientModule,
         JwtModule.forRoot({
             config: {
-                tokenGetter: JwtModuleConfigFactory // good to go!
+                tokenGetter: JwtModuleConfigFactory
             }
         }),
         RouterModule,

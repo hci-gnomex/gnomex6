@@ -5,9 +5,9 @@ import {SpinnerDialogComponent} from "../popup/spinner-dialog.component";
 
 @Component({
     template: `
-        <div class="full-width full-height flex-column-container">
+        <div class="full-width full-height flex-column-container" role="gridcell">
             <div class="full-height flex-stretch flex-row {{ isInactiveOption(value) ? ' inactive' : '' }}">
-                <select class="full-width full-height" [(value)]="value" [autofocus]="true" (change)="onChange($event)">
+                <select class="full-width full-height" [(value)]="value" [autofocus]="true" (change)="onChange($event)" aria-label="Select option">
                     <option *ngFor="let option of options"
                             class="{{ isInactiveOption(value) ? ' inactive' : '' }}"
                             value="{{option.hasOwnProperty(optionsValueField) ? option[optionsValueField] : (option.value) ? option.value : option }}">
@@ -16,7 +16,7 @@ import {SpinnerDialogComponent} from "../popup/spinner-dialog.component";
                 </select>
             </div>
             <div *ngIf="showFillButton" class="full-height flex-row button-container">
-                <button class="full-height" (click)="onFillButtonClicked()">Fill</button>
+                <button class="full-height" (click)="onFillButtonClicked()" aria-label="Fill selection to other cells">Fill</button>
             </div>
         </div>
     `,

@@ -9,18 +9,18 @@ import {DialogsService} from "../popup/dialogs.service";
 
 @Component({
 	template: `
-        <div class="full-width full-height flex-row-container">
+        <div class="full-width full-height flex-row-container" role="gridcell">
             <div class="full-width full-height flex-stretch">
-                <div class="t full-width full-height" (click)="onClick()">
+                <div class="t full-width full-height" (click)="onClick()" role="button" tabindex="0" aria-label="Click to open date picker" (keydown.enter)="onClick()">
                     <div class="tr">
                         <div  class="td vertical-center">
                             <div class="invisible">
                                 <mat-form-field>
-                                    <input matInput [matDatepicker]="picker" (dateChange)="stopEditing()"  [(ngModel)]="date">
-                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <input matInput [matDatepicker]="picker" (dateChange)="stopEditing()"  [(ngModel)]="date" aria-label="Date input">
+                                    <mat-datepicker-toggle matSuffix [for]="picker" aria-label="Toggle date picker"></mat-datepicker-toggle>
                                 </mat-form-field>
                             </div>
-                            <div class="full-width right-align">
+                            <div class="full-width right-align" aria-live="polite">
                                 {{ display }}
                             </div>
                             <mat-datepicker  #picker></mat-datepicker>
@@ -29,7 +29,7 @@ import {DialogsService} from "../popup/dialogs.service";
                 </div>
             </div>
             <div *ngIf="showFillButton" class="full-height button-container">
-                <button class="full-height" (click)="onFillButtonClicked()">Fill</button>
+                <button class="full-height" (click)="onFillButtonClicked()" aria-label="Fill date to other cells">Fill</button>
             </div>
         </div>
 	`,

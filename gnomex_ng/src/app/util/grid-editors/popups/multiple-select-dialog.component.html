@@ -1,10 +1,10 @@
-<div class="full-width full-height flex-vertical-container">
+<div class="full-width full-height flex-vertical-container" role="dialog" aria-labelledby="dialog-title">
     <div mat-dialog-title style="margin: 0; padding: 0.5em;">
-        <h3 class="no-margin">
+        <h3 class="no-margin" id="dialog-title">
             {{optionName}}
         </h3>
     </div>
-    <div mat-dialog-content class="full-width full-height stretch" style="margin: 0; padding: 0;">
+    <div mat-dialog-content class="full-width full-height stretch" style="margin: 0; padding: 0;" role="region" aria-label="Selection options">
         <div class="full-width full-height">
             <div class="full-height full-width" style="padding: .5em 2em;">
                 <ag-grid-angular
@@ -17,17 +17,18 @@
                         [enableSorting]="true"
                         [enableColResize]="true"
                         (gridSizeChanged)="onGridSizeChanged()"
-                        (gridReady)="onGridReady($event)">
+                        (gridReady)="onGridReady($event)"
+                        aria-label="Options selection grid">
                 </ag-grid-angular>
             </div>
         </div>
     </div>
-    <div mat-dialog-actions style="margin: 0; display: block;">
+    <div mat-dialog-actions style="margin: 0; display: block;" role="group" aria-label="Dialog actions">
         <div class="t full-width">
             <div class="tr">
                 <div class="td right-align horizontal-padding">
-                    <button mat-button cdkFocusInitial (click)="updateButtonClicked()">Update</button>
-                    <button mat-button (click)="cancelButtonClicked()">Cancel</button>
+                    <button mat-button cdkFocusInitial (click)="updateButtonClicked()" aria-label="Update selection">Update</button>
+                    <button mat-button (click)="cancelButtonClicked()" aria-label="Cancel">Cancel</button>
                 </div>
             </div>
         </div>

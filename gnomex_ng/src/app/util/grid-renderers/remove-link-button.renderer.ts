@@ -3,11 +3,11 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 
 @Component({
 	template: `
-		<div class="full-width full-height">
-			<div *ngIf="showRemoveButton" class="t full-width full-height cursor" (click)="invokeParentMethod()">
+		<div class="full-width full-height" role="gridcell">
+			<div *ngIf="showRemoveButton" class="t full-width full-height cursor" (click)="invokeParentMethod()" role="button" tabindex="0" aria-label="Remove item" (keydown.enter)="invokeParentMethod()">
 				<div class="tr">
 					<div class="td vertical-center button-container">
-						<button class="link-button">Remove</button>
+						<button class="link-button" aria-label="Remove item">Remove</button>
 					</div>
 				</div>
 			</div>
