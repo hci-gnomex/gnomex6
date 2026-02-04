@@ -67,9 +67,9 @@ export function JwtModuleConfigFactory() {
 }
 
 // Function to retrieve the token from local storage
-//export function tokenGetter() {
-//    return localStorage.getItem("access_token");
-//}
+export function tokenGetter() {
+    return localStorage.getItem("access_token");
+}
 
 /**
  * @since 1.0.0
@@ -79,11 +79,6 @@ export function JwtModuleConfigFactory() {
         BrowserModule,
         APP_ROUTING,
         HttpClientModule,
-        JwtModule.forRoot({
-            config: {
-                tokenGetter: JwtModuleConfigFactory
-            }
-        }),
         RouterModule,
         FormsModule,
         HeaderModule,
@@ -111,7 +106,12 @@ export function JwtModuleConfigFactory() {
         ProductsModule,
         BillingModule,
         AngularSplitModule,
-        RegisterUserModule
+        RegisterUserModule,
+        JwtModule.forRoot({
+            config: {
+                tokenGetter: tokenGetter
+            }
+        }),
    ],
     declarations: [GnomexAppComponent],
     bootstrap: [GnomexAppComponent],
