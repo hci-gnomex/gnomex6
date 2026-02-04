@@ -18,24 +18,29 @@ import {MatSelect} from "@angular/material";
 @Component({
     selector: "custom-multi-combo-box",
     template: `
-        <div class="full-height full-width flex-container-row align-center">
+        <div class="full-height full-width flex-container-row align-center" role="group" [attr.aria-label]="placeholder">
             <mat-form-field class="flex-grow" [matTooltip]="this.tooltip">
                 <input #input matInput name="customMultiComboBoxFilter" class="ellipsis"
                        (focus)="this.onInputFocus()"
                        autocomplete="off"
                        [placeholder]="this.temporaryPlaceholder ? (this.outerControl.value && this.outerControl.value.length ? '' : this.placeholder) : this.placeholder"
-                       [formControl]="this.innerControl">
+                       [formControl]="this.innerControl"
+                       [attr.aria-label]="placeholder + ' filter'"
+                       role="combobox"
+                       aria-haspopup="listbox"
+                       [attr.aria-expanded]="isSelectOpen">
             </mat-form-field>
             <div>
                 <mat-select #select [multiple]="true"
                             (selectionChange)="this.selectOptions($event.value)"
                             (openedChange)="this.onOpenedChange($event)"
                             [(ngModel)]="selectedListItems"
-                            [compareWith]="compareByID">
+                            [compareWith]="compareByID"
+                            [attr.aria-label]="placeholder + ' selection'">
                     <mat-option *ngFor="let opt of this.loadedOptions" [value]="opt">
                         {{this.displayField ? opt[this.displayField] : opt}}
                     </mat-option>
-                    <mat-option *ngIf="this.includeLoadingOption">Loading...</mat-option>
+                    <mat-option *ngIf="this.includeLoadingOption" aria-live="polite">Loading...</mat-option>
                     <mat-option *ngIf="!this.includeLoadingOption && !this.options.length">None</mat-option>
                 </mat-select>
             </div>

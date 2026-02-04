@@ -6,13 +6,16 @@ import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog"
 
 @Component({
     template: `
-        <div class="full-height full-width flex-container-col padded">
+        <div class="full-height full-width flex-container-col padded" role="dialog" aria-label="Download terms and conditions">
             <div class="full-height padding-small-force no-margin-force flex-container-col-force justify-space-between align-center">
-                <div>
+                <div id="terms-content" role="document">
                     {{ this.terms }}
                 </div>
                 <mat-form-field class="full-width">
-                    <input matInput placeholder="Email Address" [formControl]="this.emailFC">
+                    <input matInput placeholder="Email Address" [formControl]="this.emailFC"
+                           aria-label="Email address"
+                           aria-required="true"
+                           aria-describedby="terms-content">
                 </mat-form-field>
             </div>
         </div>

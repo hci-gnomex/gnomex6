@@ -15,7 +15,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: 'new-genome-build',
     template: `
-        <form [formGroup]="genomeBuildForm" class="full-height full-width flex-container-col double-padded-left-right">
+        <form [formGroup]="genomeBuildForm" class="full-height full-width flex-container-col double-padded-left-right" role="form" aria-label="New genome build form">
             <div class="flex-container-row align-center padded full-width">
                 <custom-combo-box class="full-width padded" [options]="this.das2OrganismList"
                                   placeholder="Organism"
@@ -27,19 +27,19 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
             </div>
             <div class="flex-container-row full-width align-center padded">
                 <mat-form-field class="full-width padded">
-                    <input matInput placeholder="Name" formControlName="name">
+                    <input matInput placeholder="Name" formControlName="name" aria-label="Genome build name" aria-required="true">
                     <mat-hint align="end">Example: H_sapiens_Mar_2006</mat-hint>
                 </mat-form-field>
             </div>
             <div class="flex-container-row full-width align-center padded">
                 <mat-form-field class="full-width padded">
-                    <input matInput [matDatepicker]="buildDatepicker" placeholder="Build Date" (dateChange)="buildDateChange($event)" formControlName="buildDate">
-                    <mat-datepicker-toggle matSuffix [for]="buildDatepicker"></mat-datepicker-toggle>
+                    <input matInput [matDatepicker]="buildDatepicker" placeholder="Build Date" (dateChange)="buildDateChange($event)" formControlName="buildDate" aria-label="Build date" aria-required="true">
+                    <mat-datepicker-toggle matSuffix [for]="buildDatepicker" aria-label="Open date picker"></mat-datepicker-toggle>
                     <mat-datepicker #buildDatepicker></mat-datepicker>
                 </mat-form-field>
             </div>
             <div class="flex-container-row full-width align-center padded">
-                <mat-checkbox formControlName="activeFlag">Active</mat-checkbox>
+                <mat-checkbox formControlName="activeFlag" aria-label="Active status">Active</mat-checkbox>
             </div>
         </form>
     `,

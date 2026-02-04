@@ -5,16 +5,16 @@ import {SpinnerDialogComponent} from "../popup/spinner-dialog.component";
 
 @Component({
     template: `
-		<div class="full-width full-height flex-row-container">
+		<div class="full-width full-height flex-row-container" role="gridcell">
 			<div class="t flex-stretch full-height">
 				<div class="tr">
 					<div class="td vertical-center right-align">
-						<input #theInput [(ngModel)]="value" type="text" class="full-width full-height right-align padded"/>
+						<input #theInput [(ngModel)]="value" type="text" class="full-width full-height right-align padded" aria-label="Text input"/>
 					</div>
 				</div>
 			</div>
             <div *ngIf="showFillButton" class="full-height button-container">
-                <button class="full-height" (click)="onFillButtonClicked()">Fill</button>
+                <button class="full-height" (click)="onFillButtonClicked()" aria-label="Fill value to other cells">Fill</button>
             </div>
 		</div>
 	`,

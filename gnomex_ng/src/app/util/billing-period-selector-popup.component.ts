@@ -5,21 +5,21 @@ import {BillingPeriod} from "./billing-period-selector.component";
 @Component({
     selector: 'billing-period-selector-popup',
     template: `
-        <h6 mat-dialog-title>Billing Period Picker</h6>
-        <mat-dialog-content>
-            <div class="flex-container-col align-center">
+        <h6 mat-dialog-title id="billing-picker-title">Billing Period Picker</h6>
+        <mat-dialog-content role="dialog" aria-labelledby="billing-picker-title">
+            <div class="flex-container-col align-center" role="navigation" aria-label="Year navigation">
                 <div>
-                    <button mat-button [hidden]="this.currentYear - 1 < this.minYear" (click)="this.changeYear(-1)"><img [src]="'./assets/arrow_left.png'"></button>
-                    <label>{{this.currentYear}}</label>
-                    <button mat-button [hidden]="this.currentYear + 1 > this.maxYear" (click)="this.changeYear(1)"><img [src]="'./assets/arrow_right.png'"></button>
+                    <button mat-button [hidden]="this.currentYear - 1 < this.minYear" (click)="this.changeYear(-1)" aria-label="Previous year"><img [src]="'./assets/arrow_left.png'" alt="" aria-hidden="true"></button>
+                    <label aria-live="polite">{{this.currentYear}}</label>
+                    <button mat-button [hidden]="this.currentYear + 1 > this.maxYear" (click)="this.changeYear(1)" aria-label="Next year"><img [src]="'./assets/arrow_right.png'" alt="" aria-hidden="true"></button>
                 </div>
             </div>
-            <div class="flex-container-row flex-wrap">
-                <button mat-button *ngFor="let bp of this.currentBillingPeriods" (click)="this.selectBillingPeriod(bp)">{{bp.display.substring(0,3)}}</button>
+            <div class="flex-container-row flex-wrap" role="group" aria-label="Billing periods">
+                <button mat-button *ngFor="let bp of this.currentBillingPeriods" (click)="this.selectBillingPeriod(bp)" [attr.aria-label]="bp.display">{{bp.display.substring(0,3)}}</button>
             </div>
         </mat-dialog-content>
-        <mat-dialog-actions>
-            <button mat-button (click)="this.clear()">Clear</button>
+        <mat-dialog-actions role="group" aria-label="Dialog actions">
+            <button mat-button (click)="this.clear()" aria-label="Clear selection">Clear</button>
         </mat-dialog-actions>
     `,
     styles: [`

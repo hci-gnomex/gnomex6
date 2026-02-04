@@ -24,7 +24,11 @@ import {debounceTime} from "rxjs/operators";
                    name="customComboBoxFilter"
                    autocomplete="off"
                    [placeholder]="this.temporaryPlaceholder ? (this.innerControl.value ? '' : this.placeholder) : this.placeholder"
-                   [matAutocomplete]="auto" [formControl]="this.innerControl">
+                   [matAutocomplete]="auto" [formControl]="this.innerControl"
+                   [attr.aria-label]="placeholder"
+                   role="combobox"
+                   aria-haspopup="listbox"
+                   [attr.aria-expanded]="isOpen">
             <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete"
                               (optionSelected)="this.selectOption($event.option.value)"
                               (opened)="this.onOpened()" (closed)="this.onClosed()" [displayWith]="this.displayFn">
@@ -32,9 +36,9 @@ import {debounceTime} from "rxjs/operators";
                 <mat-option [classList]="customOptionClasses" *ngFor="let opt of this.loadedOptions" [value]="opt">
                     {{ displayField ? opt[displayField] : opt}}
                 </mat-option>
-                <mat-option [classList]="customOptionClasses" *ngIf="this.includeLoadingOption">Loading...</mat-option>
+                <mat-option [classList]="customOptionClasses" *ngIf="this.includeLoadingOption" aria-live="polite">Loading...</mat-option>
             </mat-autocomplete>
-            <mat-error *ngIf="this.innerControl.hasError('required')">{{ placeholder }} is required</mat-error>
+            <mat-error *ngIf="this.innerControl.hasError('required')" role="alert">{{ placeholder }} is required</mat-error>
         </mat-form-field>
     `,
     providers: [{

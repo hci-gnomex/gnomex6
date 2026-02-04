@@ -14,10 +14,11 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: "context-help-popup",
     template: `
-        <div class="flex-container-col full-width full-height double-padded">
-            <div class="editor-grid">
+        <div class="flex-container-col full-width full-height double-padded" role="dialog" aria-label="Context help editor">
+            <div class="editor-grid" role="region" aria-label="Help text editor">
                 <angular-editor #descEditorRef id="descEditor" [formControl]="descriptionControl"
-                                [config]="editorConfig">
+                                [config]="editorConfig"
+                                aria-label="Help text content">
                 </angular-editor>
             </div>
             <div class="flex-container-row align-center">
@@ -27,20 +28,22 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                               [formControl]="this.tooltipControl"
                               matTextareaAutosize
                               matAutosizeMinRows="3"
-                              matAutosizeMaxRows="3">
+                              matAutosizeMaxRows="3"
+                              aria-label="Tooltip text">
                     </textarea>
                 </mat-form-field>
                 <div *ngIf="hasEditPermission" class="padded">
                     <button mat-raised-button
                             class="minimize"
                             [disabled]="!hasEditPermission"
-                            (click)="onClickEdit()">
+                            (click)="onClickEdit()"
+                            [attr.aria-label]="editorConfig.editable ? 'Switch to view mode' : 'Switch to edit mode'">
                         {{ editorConfig.editable ? 'View' : 'Edit' }}
                     </button>
                 </div>
             </div>
         </div>
-        <div class="flex-container-row justify-flex-end generic-dialog-footer-colors">
+        <div class="flex-container-row justify-flex-end generic-dialog-footer-colors" role="group" aria-label="Dialog actions">
             <save-footer *ngIf="hasEditPermission"
                          name="Save"
                          [icon]="constService.ICON_SAVE"

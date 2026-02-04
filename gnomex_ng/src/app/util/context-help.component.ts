@@ -7,8 +7,8 @@ import {DialogsService} from "./popup/dialogs.service";
 @Component({
     selector: "context-help",
     template: `
-        <button mat-button [matTooltip]="tooltip" [matTooltipPosition]="tooltipPosition" (click)="showPopup()">
-            <img [src]="'./assets/information.png'" alt="" class="icon">
+        <button mat-button [matTooltip]="tooltip" [matTooltipPosition]="tooltipPosition" (click)="showPopup()" [attr.aria-label]="label ? label + ' help' : 'Context help'">
+            <img [src]="'./assets/information.png'" alt="" aria-hidden="true" class="icon">
             {{ label }}
         </button>
     `,

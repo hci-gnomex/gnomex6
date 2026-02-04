@@ -14,25 +14,25 @@ import {ConstantsService} from "../../services/constants.service";
 @Component({
     selector: "custom-dialog",
     template: `
-        <div class="full-height full-width flex-container-col">
+        <div class="full-height full-width flex-container-col" role="dialog" [attr.aria-labelledby]="title ? 'custom-dialog-title' : null">
             <div *ngIf="this.title" class="full-width generic-dialog-header-colors no-margin no-padding">
                 <div #topmostLeftmost mat-dialog-title (mousedown)="onMouseDownHeader($event)"
                      class="force-flex-container-row align-center full-width padding   {{ movingDialog ? 'grabbed' : 'grabbable' }}">
                     <div class="flex-container-row align-center padded">
-                        <img  *ngIf="icon" class="icon" [src]="this.icon">
-                        <div *ngIf="icon && icon.substr(0, 2) === '<i'" class="i-class" [innerHTML]="icon" ></div>
-                        <h3 style="margin:0;">{{this.title}}</h3>
+                        <img  *ngIf="icon" class="icon" [src]="this.icon" alt="" aria-hidden="true">
+                        <div *ngIf="icon && icon.substr(0, 2) === '<i'" class="i-class" [innerHTML]="icon" aria-hidden="true"></div>
+                        <h3 id="custom-dialog-title" style="margin:0;">{{this.title}}</h3>
                     </div>
                     <div class="flex-grow"></div>
                     <div class="padded" (click)="onClose()">
-                        <img class="exit" [src]="this.constService.ICON_BLUE_EXIT">
+                        <img class="exit" [src]="this.constService.ICON_BLUE_EXIT" alt="Close dialog" role="button" tabindex="0" (keydown.enter)="onClose()" aria-label="Close dialog">
                     </div>
                 </div>
             </div>
-            <mat-dialog-content class="flex-grow no-margin no-padding" style="min-height: 6em;">
+            <mat-dialog-content class="flex-grow no-margin no-padding" style="min-height: 6em;" role="document">
                 <div #anchor></div>
             </mat-dialog-content>
-            <mat-dialog-actions class="flex-container-row justify-center no-margin no-padding generic-dialog-footer-colors">
+            <mat-dialog-actions class="flex-container-row justify-center no-margin no-padding generic-dialog-footer-colors" role="group" aria-label="Dialog actions">
                 <save-footer [actionType]="actionType.SECONDARY" class="centered-text" (saveClicked)="onClose()" name="Close"></save-footer>
             </mat-dialog-actions>
         </div>

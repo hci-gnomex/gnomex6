@@ -13,13 +13,13 @@ import {DialogType} from "./dialogs.service";
 @Component({
     selector: "alert-dialog",
     template: `
-        <div class="full-height full-width flex-container-col">
+        <div class="full-height full-width flex-container-col" role="alertdialog" [attr.aria-labelledby]="'alert-title'" [attr.aria-describedby]="'alert-message'">
             <div class="full-width dialog-header-colors no-margin no-padding">
                 <div #topmostLeftmost mat-dialog-title (mousedown)="onMouseDownHeader($event)"
                      class="force-flex-container-row align-center full-width padding   {{ movingDialog ? 'grabbed' : 'grabbable' }}">
                     <div class="flex-container-row align-center padded">
-                        <img *ngIf="icon" class="icon" [src]="this.icon">
-                        <div *ngIf="!icon">
+                        <img *ngIf="icon" class="icon" [src]="this.icon" alt="" aria-hidden="true">
+                        <div *ngIf="!icon" aria-hidden="true">
                             <i *ngIf="dialogType === type.ALERT" class="fa fa-exclamation fa-2x i-margin i-color-blue"></i>
                             <i *ngIf="dialogType === type.SUCCESS" class="fa fa-check-circle fa-2x i-margin i-color-blue"></i>
                             <i *ngIf="dialogType === type.FAILED || dialogType === type.ERROR" class="fa fa-exclamation-triangle fa-2x i-margin i-color-red"></i>
@@ -27,23 +27,23 @@ import {DialogType} from "./dialogs.service";
                             <i *ngIf="dialogType === type.INFO" class="fa fa-info-circle fa-2x i-margin i-color-blue"></i>
                             <i *ngIf="dialogType === type.CONFIRM" class="fa fa-check fa-2x i-margin i-color-blue"></i>
                         </div>
-                        <h1 *ngIf="dialogType !== type.ERROR"
+                        <h1 *ngIf="dialogType !== type.ERROR" id="alert-title"
                             style="margin:0;">{{this.title ? this.title : defaultTitle}}</h1>
-                        <h1 *ngIf="dialogType === type.ERROR"
+                        <h1 *ngIf="dialogType === type.ERROR" id="alert-title"
                             style="margin:0; color: Red">{{this.title ? this.title : defaultTitle}}</h1>
                     </div>
                 </div>
             </div>
-            <mat-dialog-content class="flex-grow no-margin no-padding">
-                <hr>
-                <div class="flex-grow full-width extra-padded message">
+            <mat-dialog-content class="flex-grow no-margin no-padding" role="document">
+                <hr aria-hidden="true">
+                <div id="alert-message" class="flex-grow full-width extra-padded message" role="alert" aria-live="polite">
                     <div *ngFor="let line of message" class="full-width"
                         [innerHTML]="line" style="white-space: pre-line">
                     </div>
                 </div>
                 <br>
             </mat-dialog-content>
-            <mat-dialog-actions class="flex-container-row justify-center no-margin no-padding">
+            <mat-dialog-actions class="flex-container-row justify-center no-margin no-padding" role="group" aria-label="Dialog actions">
                 <save-footer *ngIf="dialogType !== type.CONFIRM" class="centered-text large-size"
                              (saveClicked)="onClickOk()" name="Ok"></save-footer>
                 <save-footer *ngIf="dialogType === type.CONFIRM" class="centered-text large-size"

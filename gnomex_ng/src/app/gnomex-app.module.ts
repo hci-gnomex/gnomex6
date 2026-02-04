@@ -76,11 +76,6 @@ export function tokenGetter() {
         BrowserModule,
         APP_ROUTING,
         HttpClientModule,
-        JwtModule.forRoot({
-            config: {
-                tokenGetter: JwtModuleConfigFactory // good to go!
-            }
-        }),
         RouterModule,
         FormsModule,
         HeaderModule,
@@ -108,7 +103,12 @@ export function tokenGetter() {
         ProductsModule,
         BillingModule,
         AngularSplitModule,
-        RegisterUserModule
+        RegisterUserModule,
+        JwtModule.forRoot({
+            config: {
+                tokenGetter: tokenGetter
+            }
+        }),
    ],
     declarations: [GnomexAppComponent],
     bootstrap: [GnomexAppComponent],
