@@ -71,9 +71,3 @@ import "zone.js/dist/zone";
 // as Angular 8 with TypeScript 3.5 targets ES2015+ which includes these features
 import "hammerjs";
 
-// Optional: enable long stack traces in development only.
-// Warning: this has a performance impact.
-if (!environment.production) {
-  (Error as any).stackTraceLimit = Infinity;
-  import("zone.js/dist/long-stack-trace-zone");
-}

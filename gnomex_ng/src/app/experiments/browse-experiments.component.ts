@@ -94,8 +94,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     @ViewChild('tree', {static: false}) treeComponent: TreeComponent;
     toggleButton = 'Expand Projects';
 
-    @ViewChild(BrowseFilterComponent, {static: false})
-
     /**
      angular2-tree options
      */
@@ -166,6 +164,26 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         this.billingAccounts = [];
         this.labs = [];
 
+        this.options = {
+          displayField: 'label',
+          childrenField: 'items',
+          useVirtualScroll: true,
+          nodeHeight: 22,
+          nodeClass: (node: TreeNode) => {
+            return 'icon-' + node.data.icon;
+          },
+          allowDrop: (element, { parent, index }) => {
+            this.dragEndItems = _.cloneDeep(this.items);
+            if (parent.data.labName) {
+              return false;
+            } else {
+              return true;
+            }
+          },
+
+          allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && node.isLeaf && node.data.idRequest,
+      };
+
         this.navService.navMode = this.navService.navMode !== NavigationService.USER ? NavigationService.URL : NavigationService.USER;
 
 
@@ -190,14 +208,13 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
             this.buildTree(response.Lab);
             this.onShowEmptyFolders(this.showEmptyFolders);
+          // tslint:disable-next-line:max-line-length
+            setTimeout(() => {
+              if (this.treeComponent && this.treeComponent.treeModel) {
+                this.treeComponent.treeModel.update();
+              }
+            });
 
-            // console.log(`the amount of roots ${this.treeModel ? this.treeModel.roots.length : '0'}`);
-            // let firstChild = Array.isArray(this.treeModel.roots) &&  this.treeModel.roots.length > 0
-            //   ? this.treeModel.roots[this.treeModel.roots.length - 1] : null;
-            // if(firstChild) {
-            //   console.log(`the root has children ${firstChild.hasChildren}`);
-            //   console.log(`the root has this many children ${firstChild.children ? firstChild.children.length : '0'}`);
-            // }
 
             if (this.experimentsService.getExperimentPanelParam('refreshParams')) {
                 this.experimentsService.emitExperimentOverviewList(response.Lab);
@@ -268,25 +285,6 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
 
         this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
-        this.options = {
-            displayField: 'label',
-            childrenField: 'items',
-            useVirtualScroll: true,
-            nodeHeight: 22,
-            nodeClass: (node: TreeNode) => {
-                return 'icon-' + node.data.icon;
-            },
-            allowDrop: (element, { parent, index }) => {
-                this.dragEndItems = _.cloneDeep(this.items);
-                if (parent.data.labName) {
-                    return false;
-                } else {
-                    return true;
-                }
-            },
-
-            allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && node.isLeaf && node.data.idRequest,
-        };
 
         this.labListService.getLabList_FromBackEnd();
         this.labListSubscription =  this.labListService.getLabListSubject().subscribe((response: any[]) => {
@@ -325,6 +323,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
       if (this.treeComponent) {
         // Optional: trigger initial expand if desired
         this.treeComponent.treeModel.expandAll();
+
       }
       this.changeDetectorRef.detectChanges();
     }
@@ -794,5 +793,26 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
         }
         return null;
     }
+
+  getChildrenField(): string {
+    if (!this.options) return 'NO_OPTIONS';
+    const cf = (this.options as any).childrenField;
+    if (cf === undefined) return 'UNDEFINED';
+    if (cf === null) return 'NULL';
+    if (cf === '') return 'EMPTY_STRING';
+    return String(cf);
+  }
+
+  getItemsLen(node: any): any {
+    const items = node && node.data ? node.data.items : null;
+    return Array.isArray(items) ? items.length : (items == null ? 'null' : `not-array(${typeof items})`);
+  }
+
+  getFieldLen(node: any): any {
+    const field = this.getChildrenField();
+    if (!node || !node.data) { return 'no-node'; }
+    const val = (node.data as any)[field];
+    return Array.isArray(val) ? val.length : (val == null ? 'null' : `not-array(${typeof val})`);
+  }
 
 }

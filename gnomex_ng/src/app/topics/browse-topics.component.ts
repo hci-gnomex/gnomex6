@@ -92,7 +92,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
         this.TIME_FRAME_ALL,
     ];
 
-    private treeModel: TreeModel;
     private dataTreeModel: TreeModel;
     public pickerLabs: any[] = [];
     public genomeBuildList: any[] = [];
@@ -124,6 +123,14 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
     private paramMap: ParamMap;
 
     private topicListSubscription: Subscription;
+    private _treeModel: TreeModel | null = null;
+
+    public get treeModel(): TreeModel | null {
+      if (!this._treeModel && this.treeComponent) {
+        this._treeModel = this.treeComponent.treeModel;
+      }
+      return this._treeModel;
+    }
 
     public options: ITreeOptions = {
         displayField: "label",
@@ -202,8 +209,6 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
         this.utilService.registerChangeDetectorRef(this.changeDetector);
 
         this.navService.navMode = this.navService.navMode ?  this.navService.navMode :  NavigationService.URL;
-
-        this.treeModel = this.treeComponent.treeModel;
         this.dataTreeModel = this.dataTreeComponent.treeModel;
 
         this.onModeChange();

@@ -1,22 +1,8 @@
-const TARGET = "https://hci-bio-app-old.hci.utah.edu:8445";
-
-module.exports = [
 {
-// only proxy backend endpoints (NOT your bundles)
-context: [
-'/gnomex/api',
-/^\/gnomex\/.*\.gx$/,
-/^\/gnomex\/.*\.jsp$/
-],
-target: TARGET,
-secure: false,
-changeOrigin: true,
-logLevel: 'debug',
-
-onProxyReq(proxyReq, req, res) {
-// Tomcat/XSRF filters often validate these
-proxyReq.setHeader('Origin', TARGET);
-proxyReq.setHeader('Referer', `${TARGET}/gnomex/`);
+  "/gnomex": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
 }
-}
-];
