@@ -25,18 +25,18 @@ import {ConstantsService} from "../../services/constants.service";
     selector: 'advanced-search-component',
     templateUrl: 'advanced-search.component.html',
     styles: [`
-        
+
         .inline-block { display: inline-block; }
-        
+
         .padding-top { padding-top: 0.6em; }
-        
+
         .no-margin  { margin:  0; }
         .no-padding { padding: 0; }
-        
+
         .t  { display: table;      }
         .tr { display: table-row;  }
         .td { display: table-cell; }
-        
+
         .flex-container {
             display: flex;
             flex-direction: column;
@@ -44,12 +44,12 @@ import {ConstantsService} from "../../services/constants.service";
         .flex-fill {
             flex: 1;
         }
-        
+
         .body-size {
             min-height: 25em;
             margin: 0.4em 0.4em 0 0.4em;
         }
-        
+
         .label {
             padding: 0 3em 0 0.5em;
             vertical-align: top;
@@ -60,7 +60,7 @@ import {ConstantsService} from "../../services/constants.service";
             vertical-align: center;
             color: darkblue;
         }
-        
+
         .horizontal-rule-container {
             padding: 2px 2px 2px 0;
         }
@@ -75,14 +75,14 @@ import {ConstantsService} from "../../services/constants.service";
             height: 1px;
             background-color: #ebeae8;
         }
-        
+
         .row-vertical-spacing-a {
             height: 0.6em;
         }
         .row-vertical-spacing-b {
             height: 0.2em;
         }
-        
+
         .button-container {
             text-align:left;
             padding:0.4em;
@@ -105,17 +105,17 @@ import {ConstantsService} from "../../services/constants.service";
             margin: 0 2em 0 0;
             padding: 0;
         }
-        
+
         .grid-container {
             width:  100%;
         }
-        
+
         .fixed-height {
             min-height: 35em;
             max-height: 35em;
             height: 35em;
         }
-        
+
         .grabbable {
             cursor: move;
             cursor: -webkit-grab;
@@ -124,25 +124,25 @@ import {ConstantsService} from "../../services/constants.service";
             cursor: move;
             cursor: -webkit-grabbing;
         }
-        
+
         .small-as-possible {
             min-width:  0;
             min-height: 0;
         }
-        
+
         .vertical-align-center { vertical-align: middle; }
-        
+
         .font-large { font-size: large; }
-        
+
         .box-border {
             border-style: inset;
             border-color: lightgrey;
             border-width: 2px;
-            
+
             overflow: auto;
             object-fit: none;
         }
-        
+
         .maximum-size {
             overflow: auto;
             object-fit: none;
@@ -232,9 +232,6 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
 
     treeNodes: any[] = [];
     treeOptions: ITreeOptions = { };
-
-    private treeModel: TreeModel;
-
     private nodeIndex: number = 0;
 
     private searchAfterLoad: boolean = false;
@@ -246,6 +243,14 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
     private gotDataTrackSearchList : boolean   = false;
     private gotTopicSearchList : boolean       = false;
     private gotDictionaryMap : boolean         = false;
+    private _treeModel: TreeModel | null = null;
+
+    public get treeModel(): TreeModel | null {
+      if (!this._treeModel && this.treeComponent) {
+        this._treeModel = this.treeComponent.treeModel;
+      }
+      return this._treeModel;
+    }
 
     constructor(private dialogRef: MatDialogRef<AdvancedSearchComponent>,
                 private dialogService: DialogsService,
@@ -316,7 +321,6 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
     }
 
     ngOnInit() {
-        this.treeModel = this.treeComponent.treeModel;
     }
 
     ngOnDestroy() {

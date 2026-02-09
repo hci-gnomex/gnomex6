@@ -27,15 +27,15 @@ import {EditProtocolComponent} from "./edit-protocol.component";
         .t  { display: table; }
         .tr { display: table-row; }
         .td { display: table-cell; }
-        
+
         .inline-block { display: inline-block; }
-        
+
         .vertical-center { vertical-align: middle; }
-        
+
         .padded { padding: 0.4em; }
-        
+
         .padded-right { padding-right: 0.4em; }
-        
+
         .padded-left-right {
             padding-left: 0.4em;
             padding-right: 0.4em;
@@ -44,30 +44,30 @@ import {EditProtocolComponent} from "./edit-protocol.component";
             padding-top: 0.4em;
             padding-bottom: 0.4em;
         }
-        
+
         .border { border: 1px lightgray solid; }
 
         .no-overflow { overflow: hidden; }
         .right-align { text-align: right; }
-        
+
         .checkbox-container {
             display: inline-block;
             vertical-align: middle;
             width: fit-content;
             padding: 0.2em 0.6em 0 0.6em;
         }
-        
+
         .minimize {
             width: fit-content;
         }
-        
+
         .special-checkbox-text-alignment-padding {
             padding: 1.6em 0.6em 0 0;
         }
         .special-button-text-alignment-padding {
             padding: 1.1em 0.6em 0 0.6em;
         }
-        
+
         .warning-block {
             background: yellow;
             border: 1px lightgray solid;
@@ -101,12 +101,18 @@ export class ManageProtocolsComponent extends BaseGenericContainerDialog impleme
         childrenField: "Protocol"
     };
 
-    private treeModel: TreeModel;
 
     private mostRecentlySelectedTreeItem: any;
 
     private mostRecentlyDisplayedProtocolId: string;
     private mostRecentlyDisplayedProtocolProtocolClassName: string;
+    private _treeModel: TreeModel | null = null;
+    public get treeModel(): TreeModel | null {
+      if (!this._treeModel && this.treeComponent) {
+        this._treeModel = this.treeComponent.treeModel;
+      }
+      return this._treeModel;
+    }
 
     public disableDelete: boolean = true;
     public disableNew: boolean = true;
@@ -132,7 +138,6 @@ export class ManageProtocolsComponent extends BaseGenericContainerDialog impleme
     }
 
     ngOnInit(): void {
-        this.treeModel = this.treeComponent.treeModel;
 
         if (!this.protocolSubscription) {
             this.protocolSubscription = this.protocolService.getProtocolObservable().subscribe((result) => {

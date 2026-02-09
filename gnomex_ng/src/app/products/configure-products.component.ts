@@ -58,11 +58,17 @@ export class ConfigureProductsComponent implements OnInit {
     private static CURRENCY_REGEX: RegExp = /^[0-9]*(?:\.[0-9]{0,2})?$/;
 
     @ViewChild(TreeComponent, {static: false}) private treeComponent: TreeComponent;
-    private treeModel: TreeModel;
     public options: ITreeOptions;
     public nodes: ITreeNode[];
     private productTypes: any[];
     private products: any[];
+    private _treeModel: TreeModel | null = null;
+    public get treeModel(): TreeModel | null {
+      if (!this._treeModel && this.treeComponent) {
+        this._treeModel = this.treeComponent.treeModel;
+      }
+      return this._treeModel;
+    }
     public selectedProduct: any;
     public productForm: FormGroup;
     public showSpinner: boolean;
@@ -95,7 +101,6 @@ export class ConfigureProductsComponent implements OnInit {
         this.options = {
             displayField: 'display',
         };
-        this.treeModel = this.treeComponent.treeModel;
         this.loadProducts();
     }
 

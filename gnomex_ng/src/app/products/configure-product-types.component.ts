@@ -63,13 +63,20 @@ export class ConfigureProductTypesComponent extends BaseGenericContainerDialog i
     public selectedProductType;
     public showSpinner: boolean;
     @ViewChild(TreeComponent, {static: false}) private treeComponent: TreeComponent;
-    private treeModel: TreeModel;
     public options: ITreeOptions;
     public nodes: ITreeNode[];
     public coreFacilities: any[];
     public vendors: any[];
     public priceCategories: any[];
     public showNewPriceCategoryInput: boolean;
+    private _treeModel: TreeModel | null = null;
+
+    public get treeModel(): TreeModel | null {
+      if (!this._treeModel && this.treeComponent) {
+        this._treeModel = this.treeComponent.treeModel;
+      }
+      return this._treeModel;
+    }
 
     constructor(private dictionaryService: DictionaryService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
@@ -94,7 +101,6 @@ export class ConfigureProductTypesComponent extends BaseGenericContainerDialog i
         this.options = {
             displayField: 'display',
         };
-        this.treeModel = this.treeComponent.treeModel;
 
         this.loadProductTypes(this.dictionaryService.getEntriesExcludeBlank(DictionaryService.PRODUCT_TYPE));
         this.coreFacilities = this.createSecurityAdvisorService.coreFacilitiesICanManage;

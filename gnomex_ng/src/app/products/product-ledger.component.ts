@@ -79,12 +79,18 @@ export class ProductLedgerComponent implements OnInit {
     public productList: any[];
 
     @ViewChild(TreeComponent, {static: false}) private treeComponent: TreeComponent;
-    private treeModel: TreeModel;
     public treeOptions: ITreeOptions;
     public treeNodes: ITreeNode[];
     public selectedProduct: any;
 
     private gridApi: GridApi;
+    private _treeModel: TreeModel | null = null;
+    public get treeModel(): TreeModel | null {
+      if (!this._treeModel && this.treeComponent) {
+        this._treeModel = this.treeComponent.treeModel;
+      }
+      return this._treeModel;
+    }
     private gridColumnApi: ColumnApi;
     public gridColumnDefs: any[];
     public gridRowData: any[];
@@ -119,7 +125,6 @@ export class ProductLedgerComponent implements OnInit {
         this.treeOptions = {
             displayField: "display",
         };
-        this.treeModel = this.treeComponent.treeModel;
 
         this.filterForm.valueChanges.subscribe(() => {
             this.loadLedger();

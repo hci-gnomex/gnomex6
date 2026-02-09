@@ -20,7 +20,7 @@ import {PropertyService} from "../services/property.service";
 import {BehaviorSubject, Subscription} from "rxjs/index";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {NavigationService} from "../services/navigation.service";
-import * as html2canvas from "html2canvas";
+import html2canvas from 'html2canvas';
 import {ReportProblemComponent} from "./reportProblem/report-problem.component";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../services/constants.service";
