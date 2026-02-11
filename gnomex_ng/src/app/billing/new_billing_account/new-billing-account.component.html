@@ -1,4 +1,4 @@
-<form [formGroup]="formGroup" class="flex-container-col full-width full-height double-padded-left-right">
+<form [formGroup]="formGroup" class="flex-container-col full-width full-height double-padded-left-right" aria-label="New billing account form">
 	<div class="full-width padded">
 		<div style="position:relative; width:calc(100% - 1.6em); margin:0.4em 0.8em;">
 			<div class="flex-container-col full-width">
@@ -44,7 +44,8 @@
 					<div class="flex-grow">
 						<mat-radio-group  [(ngModel)]="showField"
 										  (ngModelChange)="onAccountTypeChange($event)"
-										  [ngModelOptions]="{standalone: true}">
+										  [ngModelOptions]="{standalone: true}"
+										  aria-label="Account type">
 							<mat-radio-button class="radio-button" [value]="CHARTFIELD">Chartfield</mat-radio-button>
 							<mat-radio-button class="radio-button" [value]="PO">PO</mat-radio-button>
 							<mat-radio-button *ngIf="showCreditCard" class="radio-button" [value]="CREDIT_CARD">Credit Card</mat-radio-button>
@@ -56,7 +57,7 @@
 	</div>
 	<div class="full-width background" style="width: calc(100% - 8px); margin: 3px 4px;">
 		<div style="position:relative; width:calc(100% - 1.6em); margin:0.4em 0.8em;">
-			<div *ngIf="showField === CHARTFIELD" class="flex-container-col full-width">
+			<div *ngIf="showField === CHARTFIELD" class="flex-container-col full-width" role="group" aria-label="Chartfield account details">
 				<div class="flex-container-row align-center">
 					<div class="label"> Account Name </div>
 					<div class="flex-grow">
@@ -458,7 +459,7 @@
 				</div>
 			</div>
 			<!-- PO START -->
-			<div *ngIf="showField === PO" class="t full-width">
+			<div *ngIf="showField === PO" class="t full-width" role="group" aria-label="Purchase order account details">
 				<div class="flex-container-row align-center">
 					<div class="label">
 						Account Name
@@ -583,7 +584,7 @@
 				</div>
 			</div>
 			<!-- Credit Card Start -->
-			<div *ngIf="showField === CREDIT_CARD" class="t full-width">
+			<div *ngIf="showField === CREDIT_CARD" class="t full-width" role="group" aria-label="Credit card account details">
 				<div class="flex-container-row align-center">
 					<div class="label">
 						Last four digits of <br/> Credit Card Number
@@ -724,17 +725,19 @@
 		</div>
 	</div>
 	<div class="full-width padded">
-		<div class="full-width" style="position: relative; padding: 0.4em 1.2em 0 1.2em;">
-			<div style="font-size: small;">
+		<div class="full-width" style="position: relative; padding: 0.4em 1.2em 0 1.2em;" role="region" aria-label="Authorization agreement">
+			<div style="font-size: small;" id="billingAgreementText">
 				As the Principal Investigator (P.I.) or authorized personnel of the account listed
 				above I authorize the Core Facility to charge the account for work performed on my
-				laboratory’s behalf during the dates indicated, not to exceed the dollar amount.
+				laboratory's behalf during the dates indicated, not to exceed the dollar amount.
 				I understand that this account will be billed automatically and that I will receive
 				a detailed statement of services for any month in which my account was charged.
 			</div>
 			<div style="text-align: center; margin: 0.5em;">
 				<mat-checkbox formControlName="agreement"
-							  required>I agree
+							  required
+							  aria-label="I agree to the billing authorization terms"
+							  aria-describedby="billingAgreementText">I agree
 				</mat-checkbox>
 			</div>
 		</div>

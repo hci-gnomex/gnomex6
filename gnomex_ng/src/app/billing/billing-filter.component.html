@@ -1,6 +1,6 @@
-<div class="full-width flex-container-row padded overflow-auto foreground bordered small-font">
+<div class="full-width flex-container-row padded overflow-auto foreground bordered small-font" role="region" aria-label="Billing filters">
     <label class="padded medium-font min-width">
-        <img [src]="'./assets/money.png'" class="icon">
+        <img [src]="'./assets/money.png'" class="icon" alt="Billing">
         Billing
     </label>
     <div class="flex-grow">
@@ -19,12 +19,14 @@
             </div>
             <mat-form-field class="padded-left experiment-width">
                 <input matInput placeholder="Experiment #"
+                       aria-label="Filter by experiment number"
                        [(ngModel)]="this.requestNumberModel"
                        [ngModelOptions]="{standalone: true}"
                        (change)="this.onRequestNumberChange()">
             </mat-form-field>
             <mat-form-field class="padded-left experiment-width">
                 <input matInput placeholder="Invoice #"
+                       aria-label="Filter by invoice number"
                        [(ngModel)]="this.invoiceNumberModel"
                        [ngModelOptions]="{standalone: true}"
                        (change)="this.onInvoiceNumberChange()">

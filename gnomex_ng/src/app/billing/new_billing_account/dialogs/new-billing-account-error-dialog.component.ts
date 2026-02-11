@@ -5,11 +5,11 @@ import {BaseGenericContainerDialog} from "../../../util/popup/base-generic-conta
 @Component({
 	selector: "new-billing-account-error-dialog",
 	template: `
-		<div class="flex-container-col full-width full-height double-padded">
+		<div class="flex-container-col full-width full-height double-padded" role="alertdialog" aria-label="Billing account form errors">
             <h3>
                 Please fix the following errors with this form before proceeding:
             </h3>
-			<div class="padded-left-right">
+			<div class="padded-left-right" aria-live="assertive">
                 <pre>{{errorMessage}}</pre>
 			</div>
 		</div>

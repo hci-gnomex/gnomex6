@@ -1,4 +1,4 @@
-<div class="full-height full-width background background-border padded small-font">
+<div class="full-height full-width background background-border padded small-font" role="main" aria-label="Billing management">
     <div class="full-height full-width flex-container-col">
         <billing-filter [selectedItem]="billingItemsTreeSelectedNode"
                         [totalPrice]="totalPrice"
@@ -13,12 +13,12 @@
             <as-split>
                 <as-split-area [size]="19">
                     <div class="full-height bordered overflow-auto">
-                        <mat-tab-group class="full-height">
+                        <mat-tab-group class="full-height" aria-label="Billing navigation tabs">
                             <mat-tab label="Billing Items">
                                 <div class="full-height full-width overflow-auto">
                                     <div class="full-height full-width flex-container-col overflow-auto">
                                         <div [hidden]="!showFilterByOrderType" class="padded-left-right-top">
-                                            <mat-radio-group [(ngModel)]="filterByOrderType" (change)="onFilterByOrderTypeChange()">
+                                            <mat-radio-group [(ngModel)]="filterByOrderType" (change)="onFilterByOrderTypeChange()" aria-label="Filter by order type">
                                                 <mat-radio-button class="filter-by-order-type-opt" [value]="FILTER_ALL">Show All</mat-radio-button>
                                                 <mat-radio-button [hidden]="!showFilterByExp" class="filter-by-order-type-opt" [value]="FILTER_EXP">Experiments</mat-radio-button>
                                                 <mat-radio-button [hidden]="!showFilterByDsk" class="filter-by-order-type-opt" [value]="FILTER_DSK">Disk</mat-radio-button>
@@ -27,21 +27,21 @@
                                         </div>
                                         <div [hidden]="!showJumpToPending && !showJumpToCompleted && !showJumpToApproved" class="padded-left-right-top">
                                             <div class="inline-block padded-right">
-                                                <button mat-raised-button class="minimize smaller-font" [hidden]="!showJumpToPending" (click)="jumpTo(STATUS_PENDING)">Pending</button>
+                                                <button mat-raised-button class="minimize smaller-font" [hidden]="!showJumpToPending" (click)="jumpTo(STATUS_PENDING)" aria-label="Jump to pending items">Pending</button>
                                             </div>
                                             <div class="inline-block padded-right">
-                                                <button mat-raised-button class="minimize smaller-font" [hidden]="!showJumpToCompleted" (click)="jumpTo(STATUS_COMPLETED)">Completed</button>
+                                                <button mat-raised-button class="minimize smaller-font" [hidden]="!showJumpToCompleted" (click)="jumpTo(STATUS_COMPLETED)" aria-label="Jump to completed items">Completed</button>
                                             </div>
                                             <div class="inline-block">
-                                                <button mat-raised-button class="minimize smaller-font" [hidden]="!showJumpToApproved" (click)="jumpTo(STATUS_APPROVED)">Approved</button>
+                                                <button mat-raised-button class="minimize smaller-font" [hidden]="!showJumpToApproved" (click)="jumpTo(STATUS_APPROVED)" aria-label="Jump to approved items">Approved</button>
                                             </div>
                                         </div>
                                         <div class="flex-grow overflow-auto padded">
                                             <div class="full-height full-width overflow-auto bordered">
-                                                <tree-root #tree [nodes]="billingItemsTreeNodes" [options]="billingItemsTreeOptions" (activate)="onBillingItemsTreeActivate($event)">
+                                                <tree-root #tree [nodes]="billingItemsTreeNodes" [options]="billingItemsTreeOptions" (activate)="onBillingItemsTreeActivate($event)" role="tree" aria-label="Billing items tree">
                                                     <ng-template #treeNodeTemplate  let-node>
-                                                        <div class="flex-container-row tree-node-font ellipsis">
-                                                            <img [src]="node?.data?.icon" alt="" class="icon tree-node-icon">
+                                                        <div class="flex-container-row tree-node-font ellipsis" role="treeitem" [attr.aria-label]="node?.data?.display">
+                                                            <img [src]="node?.data?.icon" [attr.alt]="node?.data?.display ? node.data.display + ' icon' : ''" class="icon tree-node-icon">
                                                             <div [ngStyle]="{'background-color': node.data?.expiring ? '#ff4d4d' : 'transparent' }"
                                                                  [matTooltip]="node.data?.expiring"
                                                                  [matTooltipDisabled]="!node.data?.expiring"
@@ -55,12 +55,13 @@
                                         </div>
                                         <div class="flex-container-row padded-left-right-bottom overflow-hidden align-center smaller-font">
                                             <div class="flex-container-row padded-left-right align-center">
-                                                <button mat-raised-button class="minimize smaller-font" (click)="toggleExpandLabs()">
+                                                <button mat-raised-button class="minimize smaller-font" (click)="toggleExpandLabs()"
+                                                        [attr.aria-label]="expandLabs ? 'Expand all labs' : 'Collapse all labs'">
                                                     {{ expandLabs ? 'Expand Labs' : 'Collapse Labs' }}
                                                 </button>
                                             </div>
                                             <div class="flex-container-row padded-left-right align-center">
-                                                <mat-checkbox [(ngModel)]="hideEmptyRequests" (change)="onHideEmptyRequestsChange($event)">
+                                                <mat-checkbox [(ngModel)]="hideEmptyRequests" (change)="onHideEmptyRequestsChange($event)" aria-label="Hide requests with no billing items">
                                                     Hide if no billing items
                                                 </mat-checkbox>
                                             </div>
@@ -77,7 +78,7 @@
                                         <label class="small-font padding-left no-margin smaller-font"
                                                matTooltip="Drag-and-drop price category to reorder or attach to another price sheet"
                                                [matTooltipPosition]="'right'">
-                                            <img class="icon" [src]="'./assets/information.png'" alt="">
+                                            <img class="icon" [src]="'./assets/information.png'" alt="Information">
                                             Drag-and-drop hint
                                         </label>
                                         <button mat-button
@@ -85,14 +86,16 @@
                                                 class="minimize smaller-font"
                                                 [matTooltipPosition]="'right'"
                                                 [disabled]="disableAddBillingItemButton"
-                                                (click)="addNewBillingItem()">
-                                            <img class="icon" [src]="'./assets/add.png'" alt="">
+                                                (click)="addNewBillingItem()"
+                                                aria-label="Create new billing item">
+                                            <img class="icon" [src]="'./assets/add.png'" alt="Add">
                                             Create new billing item
                                         </button>
                                     </div>
                                     <div class="flex-grow padded">
                                         <div class="full-height full-width min-grid-width">
                                             <ag-grid-angular class="ag-theme-fresh full-height full-width small-font"
+                                                             aria-label="Price sheets and categories"
                                                              [getNodeChildDetails]="getPriceNodeChildDetails"
                                                              [enableColResize]="true"
                                                              [rowData]="priceTreeGridData"
@@ -105,32 +108,32 @@
                                         </div>
                                     </div>
                                     <div class="flex-container-row overflow-hidden">
-                                        <mat-checkbox [(ngModel)]="showPricesCheckbox" (change)="refreshPricingGrid()" class="padding-left smaller-font">Show prices</mat-checkbox>
-                                        <mat-checkbox [(ngModel)]="showPriceCriteriaCheckbox" (change)="refreshPricingGrid()" class="padding-left smaller-font">Show price criteria</mat-checkbox>
-                                        <mat-checkbox [(ngModel)]="showInactivePricesCheckbox" (change)="refreshPricingGrid()" class="padding-left smaller-font">Show inactive prices</mat-checkbox>
+                                        <mat-checkbox [(ngModel)]="showPricesCheckbox" (change)="refreshPricingGrid()" class="padding-left smaller-font" aria-label="Show prices">Show prices</mat-checkbox>
+                                        <mat-checkbox [(ngModel)]="showPriceCriteriaCheckbox" (change)="refreshPricingGrid()" class="padding-left smaller-font" aria-label="Show price criteria">Show price criteria</mat-checkbox>
+                                        <mat-checkbox [(ngModel)]="showInactivePricesCheckbox" (change)="refreshPricingGrid()" class="padding-left smaller-font" aria-label="Show inactive prices">Show inactive prices</mat-checkbox>
                                     </div>
                                     <div class="flex-container-row">
                                         <div class="padded-right">
-                                            <button mat-button (click)="openNewSheetWindow()" class="smaller-font minimize">
-                                                <img [src]="'./assets/pricesheet_add.png'" alt="" class="icon">
+                                            <button mat-button (click)="openNewSheetWindow()" class="smaller-font minimize" aria-label="Create new price sheet">
+                                                <img [src]="'./assets/pricesheet_add.png'" alt="New sheet" class="icon">
                                                 New sheet
                                             </button>
                                         </div>
                                         <div class="padded-right">
-                                            <button mat-button (click)="openNewCategoryWindow()" class="smaller-font minimize">
-                                                <img [src]="'./assets/folder_money_add.png'" alt="" class="icon">
+                                            <button mat-button (click)="openNewCategoryWindow()" class="smaller-font minimize" aria-label="Create new price category">
+                                                <img [src]="'./assets/folder_money_add.png'" alt="New category" class="icon">
                                                 New category
                                             </button>
                                         </div>
                                         <div class="padded-right">
-                                            <button mat-button (click)="openNewPriceWindow()" class="smaller-font minimize">
-                                                <img [src]="'./assets/money_add.png'" alt="" class="icon">
+                                            <button mat-button (click)="openNewPriceWindow()" class="smaller-font minimize" aria-label="Create new price">
+                                                <img [src]="'./assets/money_add.png'" alt="New price" class="icon">
                                                 New price
                                             </button>
                                         </div>
                                         <div>
-                                            <button mat-button [disabled]="!selectedPriceTreeGridItem" (click)="removeFromPriceTree()" class="smaller-font minimize">
-                                                <img [src]="'./assets/delete.png'" alt="" class="icon">
+                                            <button mat-button [disabled]="!selectedPriceTreeGridItem" (click)="removeFromPriceTree()" class="smaller-font minimize" aria-label="Remove selected price item">
+                                                <img [src]="'./assets/delete.png'" alt="Remove" class="icon">
                                                 Remove
                                             </button>
                                         </div>
@@ -195,6 +198,7 @@
                                 <div #oneEmWidth class="no-height single-em">
                                 </div>
                                 <ag-grid-angular class="ag-theme-fresh full-height full-width small-font"
+                                                 aria-label="Billing items detail table"
                                                  stopEditingWhenGridLosesFocus="true"
                                                  [getNodeChildDetails]="getBillingItemNodeChildDetails"
                                                  [enableColResize]="true"
@@ -210,12 +214,12 @@
                                 </ag-grid-angular>
                             </div>
                             <div class="full-width flex-container-row align-baseline">
-                                <button mat-button [disabled]="disableSplitButton" (click)="openSplitWindow()">
-                                    <img class="icon" [src]="'./assets/account_split.png'" alt="">
+                                <button mat-button [disabled]="disableSplitButton" (click)="openSplitWindow()" aria-label="Reassign or split billing items">
+                                    <img class="icon" [src]="'./assets/account_split.png'" alt="Reassign/Split">
                                     Reassign/Split
                                 </button>
-                                <button mat-button [disabled]="selectedBillingItems.length < 1" (click)="removeBillingItems()">
-                                    <img class="icon" [src]="'./assets/delete.png'" alt="">
+                                <button mat-button [disabled]="selectedBillingItems.length < 1" (click)="removeBillingItems()" aria-label="Remove selected billing items">
+                                    <img class="icon" [src]="'./assets/delete.png'" alt="Remove">
                                     Remove
                                 </button>
                                 <div class="flex-grow">

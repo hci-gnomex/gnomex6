@@ -15,11 +15,13 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
         <div class="email-address-box double-padded">
             <mat-form-field class="full-width">
                 <textarea matInput placeholder="Email Address(es)" [formControl]="this.addressFC"
+                          aria-label="Email addresses for invoice"
+                          aria-describedby="emailAddressHint"
                           matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
             </mat-form-field>
-            <label>*Please separate multiple email addresses with a comma</label>
+            <label id="emailAddressHint">*Please separate multiple email addresses with a comma</label>
         </div>
-        <div *ngIf="this.emailSent" class="email-sent-box double-padded">
+        <div *ngIf="this.emailSent" class="email-sent-box double-padded" role="status" aria-live="polite">
             <div>
                 <label class="underline" *ngIf="this.controllerResponse?.note">Email Sent</label>
             </div>
@@ -30,7 +32,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                 <label *ngIf="this.controllerResponse?.note">({{this.controllerResponse?.note}})</label>
             </div>
         </div>
-        <label class="error-warning double-padded" *ngIf="this.showError">***Email address(es) are malformed***</label>
+        <label class="error-warning double-padded" *ngIf="this.showError" role="alert" aria-live="assertive">***Email address(es) are malformed***</label>
     `,
     styles: [`
         div.email-address-box {

@@ -38,7 +38,7 @@ import {BrowseDictionaryComponent} from "../configuration/browse-dictionary.comp
 
         .red {
             /*font-weight: bold;*/
-            color: #fc0026;
+            color: #ff1e27;
         }
 
         .no-padding-dialog .mat-dialog-container {
@@ -80,7 +80,7 @@ import {BrowseDictionaryComponent} from "../configuration/browse-dictionary.comp
         }
 
         .problem {
-            color: #fc0026 !important;
+            color: #ff1e27 !important;
             text-decoration: underline !important;
         }
 

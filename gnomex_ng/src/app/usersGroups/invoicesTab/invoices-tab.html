@@ -1,4 +1,4 @@
-<div class="full-width full-height flex-container-col padded">
+<div class="full-width full-height flex-container-col padded" role="region" aria-label="Invoices">
     <div class="flex-container-row align-baseline">
         <div class="flex-grow padded">
             <custom-combo-box class="full-width"
@@ -42,8 +42,8 @@
         </div>
     </div>
     <div class="padded">
-        <button mat-button [disabled]="this.selectedAccounts.length<=0" (click)="run()">
-            <mat-icon aria-label="New...">picture_as_pdf</mat-icon>
+        <button mat-button [disabled]="this.selectedAccounts.length<=0" (click)="run()" aria-label="Show printable invoice as PDF">
+            <mat-icon aria-label="PDF icon">picture_as_pdf</mat-icon>
             Show Printable Invoice</button>
     </div>
 </div>

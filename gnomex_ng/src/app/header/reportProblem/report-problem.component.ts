@@ -11,24 +11,24 @@ import {UtilService} from "../../services/util.service";
 @Component({
     selector: "report-problem",
     template: `
-        <div class="flex-container-col full-width full-height double-padded">
+        <div class="flex-container-col full-width full-height double-padded" role="dialog" aria-label="Report a Problem">
             <div>
                 <mat-form-field class="dialogFormField">
-                    <input matInput [(ngModel)]="emailAddress" placeholder="Email Address" [formControl]="fromFormControl">
+                    <input matInput [(ngModel)]="emailAddress" placeholder="Email Address" aria-label="Email address" [formControl]="fromFormControl" aria-describedby="emailHint">
                     <mat-error *ngIf="fromFormControl.hasError('email') && emailAddress">Please enter a valid email address</mat-error>
-                    <mat-hint align="end">Leave blank to submit feedback anonomously</mat-hint>
+                    <mat-hint id="emailHint" align="end">Leave blank to submit feedback anonomously</mat-hint>
                 </mat-form-field>
             </div>
             <div style="height: 15em">
                 <mat-form-field class="full-width" >
-                    <textarea matInput rows="7" columns="120" [(ngModel)]="feedback" name="feedback" placeholder="Enter feedback here"> </textarea>
-                    <mat-hint align="end">Please enter your feedback. A member of the GNomEx help team will respond right away.</mat-hint>
+                    <textarea matInput rows="7" columns="120" [(ngModel)]="feedback" name="feedback" placeholder="Enter feedback here" aria-label="Feedback" aria-describedby="feedbackHint"> </textarea>
+                    <mat-hint id="feedbackHint" align="end">Please enter your feedback. A member of the GNomEx help team will respond right away.</mat-hint>
                 </mat-form-field>
             </div>
             <div class="padded" style="width: 100%; height: 20em; margin-bottom:.7em;border: 1px solid #333">
-                <img [src]="smallImgData" />
+                <img [src]="smallImgData" alt="Screenshot of the reported issue" />
             </div>
-            <div style="font-size:.79em">
+            <div style="font-size:.79em" aria-live="polite">
                 All information will be encripted to protect health information and proprietary research data.
             </div>
         </div>

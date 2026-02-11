@@ -12,18 +12,18 @@ import {LaunchPropertiesService} from "../services/launch-properites.service";
 
 @Component({
     template: `
-        <div class="full-height full-width flex-container-col justify-center align-center">
-            
+        <div class="full-height full-width flex-container-col justify-center align-center" role="status" aria-live="polite" aria-label="Logging out">
+
             <div class="flex-container-col full-height full-width justify-center align-center">
                 <div class="padded">
-                    <img [src]="site_logo" alt="">
+                    <img [src]="site_logo" alt="GNomEx logo">
                 </div>
 
                 <h1 >
                     Logging out...
                 </h1>
             </div>
-            
+
         </div>
 
 
