@@ -3,12 +3,12 @@
      class="full-width header-one small-font align-center overflow-auto animation"
      role="banner"
      (mouseenter)="onMouseIn($event)"
-     (mouseleave)="onMouseOut($event)">
+     (mouseleave)="onMouseOut($event)" xmlns:color="http://www.w3.org/1999/xhtml">
     <div class="flex-container-row align-center foreground">
         <div class="flex-grow flex-container-row">
             <a [routerLink]="['/home']" aria-label="GNomEx home">
                 <img [src]="'./assets/gnomex_logo_big.png'" alt="GNomEx logo - navigate to home">
-                <p><sup><sup style="color: #001cc2;"  6.rev8.12</sup></p>
+                <p><sup 6.rev8.13 style="color: #001cc2"/> </p>
             </a>
             <div class="flex-container-row flex-grow align-center">
                 <div class="flex-grow">
@@ -45,7 +45,7 @@
             <div class="flex-container-row flex-grow align-center">
                 <div class="flex-grow">
                 </div>
-                <div class="large-font #FF1E27" role="alert" aria-label="Research use disclaimer">
+                <div class="large-font" style="color: #FF1E27" role="alert" aria-label="Research use disclaimer">
                     FOR RESEARCH ONLY
                 </div>
                 <div class="flex-grow">
