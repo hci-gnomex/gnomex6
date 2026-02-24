@@ -60,7 +60,6 @@ public class UserSessionResource {
         try {
             SecurityUtils.getSubject().login(token);
         } catch (Exception e) {
-            e.printStackTrace();
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
