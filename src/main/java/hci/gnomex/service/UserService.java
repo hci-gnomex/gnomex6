@@ -55,19 +55,22 @@ public class UserService implements hci.ri.auth.service.UserService, Serializabl
 	 * 
 	 * @return AuthenticationInfo - SimpleAuthenticationInfo - This just wraps up the user's principal and credentials
 	 */
-	public AuthenticationInfo getAuthenticationInfo(String userLogin, String realmName) {
-		log.debug("getUser " + userLogin);
-		
-		AppUser user =  getAppUser(userLogin, realmName);
-		
-		SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo();
-		SimplePrincipalCollection principalCollection = new SimplePrincipalCollection();
-		principalCollection.add(userLogin, realmName);
-		principalCollection.add(user, realmName);
-		authenticationInfo.setPrincipals(principalCollection);
-		authenticationInfo.setCredentials(user.getPasswordExternal());
-		return authenticationInfo;
-	}
+    public AuthenticationInfo getAuthenticationInfo(String userLogin, String realmName) {
+        log.debug("getAuthenticationInfo called with userLogin: " + userLogin + " and realmName: " + realmName);
+
+        AppUser user = getAppUser(userLogin, realmName);
+
+
+        // Proceed with creating AuthenticationInfo
+        SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo();
+        SimplePrincipalCollection principalCollection = new SimplePrincipalCollection();
+        principalCollection.add(userLogin, realmName);
+        principalCollection.add(user, realmName);
+
+        authenticationInfo.setPrincipals(principalCollection);
+        authenticationInfo.setCredentials(user.getPasswordExternal());
+        return authenticationInfo;
+    }
 
 	/**
 	 * Looks up the roles in the Auth model for the specified principal (user)
@@ -108,38 +111,38 @@ public class UserService implements hci.ri.auth.service.UserService, Serializabl
 	  
 	  return idUser;
 	}
-	
-	private AppUser getAppUser(String userLogin, String realmName) {
-	  AppUser appUser = null;
-	  
-	  String hql = "FROM AppUser WHERE " + (realmName.equals("localRealm")?"userNameExternal":"uNID") + " = :userLogin";
-	 
-	  try {
-      Session sess = HibernateSession.currentReadOnlySession(userLogin);
-      
-      List<AppUser> appUsers = (List<AppUser>) sess.createQuery(hql).setString("userLogin", userLogin).list();
-      
-      //AppUser exists
-      if (! appUsers.isEmpty()) {
-        appUser = appUsers.get(0);
-      }   
-	  } catch (Exception e) {
-      log.error("An exception has occurred in UserService ", e);
-      HibernateSession.rollback();
-    } finally {
-      try {
-        HibernateSession.closeSession();
-      } catch (Exception e) {
-        log.error("An exception has occurred in UserService ", e);
-      }
+
+    private AppUser getAppUser(String userLogin, String realmName) {
+        System.out.println("getAppUser called with userLogin: " + userLogin + " and realmName: " + realmName);
+
+        AppUser appUser = null;
+        String hql = "FROM AppUser WHERE " + (realmName.equals("localRealm") ? "userNameExternal" : "uNID") + " = :userLogin";
+
+        try {
+            Session sess = HibernateSession.currentReadOnlySession(userLogin);
+
+            List<AppUser> appUsers = (List<AppUser>) sess.createQuery(hql).setString("userLogin", userLogin).list();
+
+            // Check if the AppUser exists in the database
+            if (!appUsers.isEmpty()) {
+                appUser = appUsers.get(0);
+            }
+        } catch (Exception e) {
+            log.error("An exception has occurred in UserService ", e);
+            HibernateSession.rollback();
+        } finally {
+            try {
+                HibernateSession.closeSession();
+            } catch (Exception e) {
+                log.error("An exception has occurred in UserService ", e);
+            }
+        }
+
+        if (appUser == null) {
+            appUser = new AppUser();
+            appUser.setIdAppUser(-1);
+        }
+
+        return appUser;
     }
-	  
-    //AppUser not present (ok for UNID only login - no user)
-	  if (appUser == null) {
-      appUser = new AppUser();
-      appUser.setIdAppUser(-1); 
-	  }
-	  
-	  return appUser;
-	}
 }

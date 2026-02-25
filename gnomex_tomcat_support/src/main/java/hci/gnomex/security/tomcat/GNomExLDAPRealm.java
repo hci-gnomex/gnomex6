@@ -60,16 +60,19 @@ public class GNomExLDAPRealm extends RealmBase {
 	}
 
 	@Override
-	public Principal authenticate(String username, String credentials) {
-		this.username = username;
-		this.password = credentials;
+    public Principal authenticate(String username, String credentials) {
+        this.username = username;
+        this.password = credentials;
+        System.out.println("Attempting to authenticate user: " + username);
 
-		if (isAuthenticated()) {
-			return getPrincipal(username);
-		} else {
-			return null;
-		}
-	}
+        if (isAuthenticated()) {
+            System.out.println("User authenticated successfully: " + username);
+            return getPrincipal(username);
+        } else {
+            LOG.error("Authentication failed for user: " + username);
+            return null;
+        }
+    }
 
 	@Override
 	protected Principal getPrincipal(String username) {
@@ -216,72 +219,66 @@ public class GNomExLDAPRealm extends RealmBase {
 		this.datasource_lookup_name = datasource_lookup_name;
 	}
 
-	private boolean isAuthenticated() {
-		boolean isAuthenticated = false;
+    private boolean isAuthenticated() {
+        boolean isAuthenticated = false;
 
-		if (this.isGNomExUniversityUser()) {
-			// If this is a GNomEx user with a uNID, check the credentials
-			// against the Univ of Utah LDAP. If not found there,
-			// try HCI directory services.
-			if (this.ldap_provider_url != null && !this.ldap_provider_url.equals("")) {
-				isAuthenticated = checkLDAPCredentials();
-			}
-			if (!isAuthenticated) {
-				if (this.alt_ldap_provider_url != null && !this.alt_ldap_provider_url.equals("")) {
-					isAuthenticated = this.checkAlternateLDAPCredentials();
-				}
-			}
-		} else if (this.isAuthenticatedGNomExExternalUser()) {
-			// If this is a GNomEx external user, check credentials
-			// against the GNomEx encrypted password
-			isAuthenticated = true;
-		} else {
-			// Otherwise, if this is not a GNomEx user, check the credentials
-			// against the Univ of Utah LDAP
-			isAuthenticated = checkLDAPCredentials();
-		}
-		return isAuthenticated;
-	}
+        if (this.isGNomExUniversityUser()) {
+            System.out.println("User " + username + " is a GNomEx university user. Attempting LDAP authentication...");
+            if (this.ldap_provider_url != null && !this.ldap_provider_url.equals("")) {
+                isAuthenticated = checkLDAPCredentials();
+            }
+            if (!isAuthenticated) {
+                if (this.alt_ldap_provider_url != null && !this.alt_ldap_provider_url.equals("")) {
+                    System.out.println("Attempting alternate LDAP authentication...");
+                    isAuthenticated = this.checkAlternateLDAPCredentials();
+                }
+            }
+        } else if (this.isAuthenticatedGNomExExternalUser()) {
+            System.out.println("User " + username + " is an external GNomEx user. Skipping LDAP and authenticating using GNomEx credentials.");
+            isAuthenticated = true;  // External user is authenticated directly
+        } else {
+            System.out.println("User " + username + " is not a recognized GNomEx user. Attempting LDAP authentication...");
+            isAuthenticated = checkLDAPCredentials();
+        }
 
-	private boolean checkLDAPCredentials() {
+        return isAuthenticated;
+    }
+    private boolean checkLDAPCredentials() {
+        if (username == null || password == null || ldap_provider_url == null || ldap_provider_url.length() == 0) {
+            System.out.println("LDAP credentials or provider URL are missing.");
+            return false;
+        }
 
-		if (username == null || password == null || ldap_provider_url == null || ldap_provider_url.length() == 0) {
-			return false;
-		}
+        boolean isAuthenticated = false;
+        String localPrincipal = ldap_sec_principal;
 
-		boolean isAuthenticated = false;
+        // Adjust the principal if needed (based on template replacements)
+        if (localPrincipal != null && localPrincipal.contains("<")) {
+            localPrincipal = localPrincipal.replace("<uid>", username);
+        }
 
-		// Change local copy since GNomExLDAPRealm is apparently static in tomcat
-		String localPrincipal = ldap_sec_principal;
-		if (localPrincipal != null && localPrincipal.contains("<")) {
-			localPrincipal = localPrincipal.replace("<uid>", username);
-		} else if (localPrincipal != null && localPrincipal.contains("[")) {
-			// Need brackets if provided in a property because <> messes up parsing of context (xml) file
-			localPrincipal = localPrincipal.replace("[uid]", username);
-		}
+        try {
+            ActiveDirectory ad = new ActiveDirectory(username, password, ldap_init_context_factory, ldap_provider_url, ldap_protocol, ldap_auth_meth, localPrincipal);
 
-		try {
-			ActiveDirectory ad = new ActiveDirectory(username, password, ldap_init_context_factory, ldap_provider_url, ldap_protocol, ldap_auth_meth,
-					localPrincipal);
+            if (ldap_domain != null && ldap_user_attribute_map != null && !ldap_user_attribute_map.isEmpty()) {
+                NamingEnumeration<SearchResult> answer = ad.searchUser(username, ldap_domain, keysToArray(ldap_user_attribute_map));
+                isAuthenticated = ad.doesMatchUserAttribute(answer, ldap_user_attribute_map);
+                if (isAuthenticated) {
+                    System.out.println("LDAP authentication for user " + username + " succeeded.");
+                } else {
+                    LOG.error("LDAP authentication for user " + username + " failed.");
+                }
+            } else {
+                isAuthenticated = true;
+            }
 
-			// If user attributes are property is present, then check the user attributes
-			// to see if they match the expected value.
-			if (ldap_domain != null && ldap_user_attribute_map != null && !ldap_user_attribute_map.isEmpty()) {
-				NamingEnumeration<SearchResult> answer = ad.searchUser(username, ldap_domain, keysToArray(ldap_user_attribute_map));
-				isAuthenticated = ad.doesMatchUserAttribute(answer, ldap_user_attribute_map);
-			} else {
-				// If no user attributes property present, we have passed authentication at this point.
-				isAuthenticated = true;
-			}
+        } catch (Exception e) {
+            LOG.error("Error during LDAP authentication: ", e);
+            isAuthenticated = false;
+        }
+        return isAuthenticated;
+    }
 
-		} catch (Exception e) {
-			LOG.error("ERROR in checkLDAPCredentials: ", e);
-			isAuthenticated = false;
-		}
-		return isAuthenticated;
-
-	}
-	
 	 /*
    * return the key set of the Map as an array of Strings.
    */
@@ -395,58 +392,61 @@ public class GNomExLDAPRealm extends RealmBase {
 		return isGNomExUser;
 	}
 
-	private boolean isAuthenticatedGNomExExternalUser() {
+    private boolean isAuthenticatedGNomExExternalUser() {
+        boolean isAuthenticated = false;
+        System.out.println("Checking if " + username + " is an external GNomEx user...");
 
-		boolean isAuthenticated = false;
+        Connection con = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        EncryptionUtility passwordEncrypter = new EncryptionUtility();
 
-		Connection con = null;
-		PreparedStatement stmt = null;
-		ResultSet rs = null;
-		EncryptionUtility passwordEncrypter = new EncryptionUtility();
+        try {
+            con = this.getConnection();
+            stmt = con.prepareStatement("SELECT isActive, userNameExternal, passwordExternal, salt FROM AppUser WHERE userNameExternal = ?");
+            stmt.setString(1, username);
 
-		try {
-			con = this.getConnection();
-			stmt = con.prepareStatement("SELECT isActive, userNameExternal, passwordExternal, salt FROM AppUser WHERE userNameExternal = ?");
-			stmt.setString(1, username);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                String isActive = rs.getString("isActive");
+                String gnomexPasswordEncrypted = rs.getString("passwordExternal");
+                String salt = rs.getString("salt");
+                String thePasswordEncryptedNew = "";
 
-			rs = stmt.executeQuery();
+                // Check if the user is active
+                if (isActive != null && isActive.equalsIgnoreCase("Y")) {
+                    if (salt != null) {
+                        thePasswordEncryptedNew = passwordEncrypter.createPassword(password, salt);
+                    }
+                    String thePasswordEncryptedOld = EncrypterService.getInstance().encrypt(password);
+                    if (thePasswordEncryptedNew.equals(gnomexPasswordEncrypted)) {
+                        isAuthenticated = true;
+                    } else if (thePasswordEncryptedOld.equals(gnomexPasswordEncrypted)) {
+                        isAuthenticated = true;
+                    }
+                } else {
+                    LOG.warn("External user " + username + " is inactive.");
+                }
+            }
 
-			while (rs.next()) {
-				String isActive = rs.getString("isActive");
-				String gnomexPasswordEncrypted = rs.getString("passwordExternal");
-				String salt = rs.getString("salt");
-				String thePasswordEncryptedNew = "";
+        } catch (NamingException ne) {
+            LOG.error("Error during external user authentication: " + ne.getMessage());
+        } catch (ClassNotFoundException cnfe) {
+            LOG.error("JDBC driver not found: " + cnfe.getMessage());
+        } catch (SQLException ex) {
+            LOG.error("SQL error during external user authentication: " + ex.getMessage());
+        } finally {
+            this.closeConnection(con);
+        }
 
-				// Uncomment this conditional if you want to prevent inactive users from logging in
-				// if (isActive != null && isActive.equalsIgnoreCase("Y")) {
-				if (salt != null) {
-					thePasswordEncryptedNew = passwordEncrypter.createPassword(password, salt);
-				}
-				String thePasswordEncryptedOld = EncrypterService.getInstance().encrypt(password);
-				if (thePasswordEncryptedNew.equals(gnomexPasswordEncrypted)) {
-					isAuthenticated = true;
-				} else if (thePasswordEncryptedOld.equals(gnomexPasswordEncrypted)) {
-					isAuthenticated = true;
-				}
-				// }
-			}
+        if (!isAuthenticated) {
+            LOG.error("External user " + username + " authentication failed.");
+        } else {
+            System.out.println("External user " + username + " authenticated successfully.");
+        }
 
-		} catch (NamingException ne) {
-			System.out.println("FATAL: Naming exception while trying to get connection \n" + ne.getMessage());
-			return false;
-		} catch (ClassNotFoundException cnfe) {
-			System.out.println("FATAL: The JDBC driver was not found on the classpath \n" + cnfe.getMessage());
-			return false;
-		} catch (SQLException ex) {
-			System.out.println("FATAL: Unable to initialize hci.gnomex.security.tomcat.SecurityManagerLocal");
-			System.out.println(ex.toString());
-			return false;
-		} finally {
-			this.closeConnection(con);
-		}
-
-		return isAuthenticated;
-	}
+        return isAuthenticated;
+    }
 
 	protected Connection getConnection() throws SQLException, ClassNotFoundException, NamingException {
 		Context initCtx = new InitialContext();

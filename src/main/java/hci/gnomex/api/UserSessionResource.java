@@ -48,18 +48,29 @@ public class UserSessionResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     public Response login(final UserSessionDTO.Builder userSessionDTOBuilder) {
+        // Build the user session DTO from the request
         UserSessionDTO userSessionDTO = userSessionDTOBuilder.build();
 
+        // Check if the username or password is null and log an error if true
         if (userSessionDTO.getUsername() == null || userSessionDTO.getPassword() == null) {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
 
-        UsernamePasswordToken token =
-                new UsernamePasswordToken(userSessionDTO.getUsername(), userSessionDTO.getPassword());
+
+        UsernamePasswordToken token = new UsernamePasswordToken(userSessionDTO.getUsername(), userSessionDTO.getPassword());
 
         try {
             SecurityUtils.getSubject().login(token);
+
+            // Check if the session was successfully created and log the result
+            Subject subject = SecurityUtils.getSubject();
+            if (subject.isAuthenticated()) {
+                System.out.println("Session created for user: " + userSessionDTO.getUsername());
+            } else {
+                System.out.println("Session creation failed for user: " + userSessionDTO.getUsername());
+            }
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 

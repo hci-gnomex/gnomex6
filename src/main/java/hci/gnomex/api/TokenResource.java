@@ -1,24 +1,32 @@
 package hci.gnomex.api;
 
 import hci.gnomex.model.AppUser;
+import hci.gnomex.model.PropertyDictionary;
+import hci.gnomex.security.DuoPolicy;
+import hci.gnomex.utility.HibernateSession;
+import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.ri.auth.util.JwtGenerator;
 import hci.ri.auth.util.KeystoreRSASignatureConfiguration;
 import io.buji.pac4j.subject.Pac4jPrincipal;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.env.IniWebEnvironment;
 import org.apache.shiro.web.util.WebUtils;
+import org.hibernate.Session;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.jwt.JwtClaims;
 import org.pac4j.jwt.profile.JwtProfile;
 
+import javax.naming.NamingException;
 import javax.servlet.ServletContext;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.sql.SQLException;
 import java.util.Collection;
 import java.util.Date;
 //import org.pac4j.saml.credentials.authenticator.SAML2Authenticator;
@@ -47,59 +55,123 @@ public class TokenResource {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAuthenticatedUser(@Context ServletContext context) throws Exception {
+    public Response getAuthenticatedUser(@Context ServletContext context, @Context HttpServletRequest request) {
+        try {
+            // ===============================
+            // 1. Shiro Subject
+            // ===============================
+            Subject subject = SecurityUtils.getSubject();
+            if (subject == null) {
+                return error(500, "Shiro Subject is null (Shiro not initialized)");
+            }
 
-        //Get the keystore-based signing config out of the INI Web Environment, so we don't have to hard-code the keystore parameters or put them somewhere else
-        IniWebEnvironment iwe = (IniWebEnvironment) WebUtils.getWebEnvironment(context);
-        KeystoreRSASignatureConfiguration sigConfig = (KeystoreRSASignatureConfiguration) iwe.getObject("signingConfig", KeystoreRSASignatureConfiguration.class);
+            PrincipalCollection principals = subject.getPrincipals();
+            if (principals == null || principals.isEmpty()) {
+                return error(401, "No principals found (user not authenticated or Shiro filter not applied)");
+            }
 
-        PrincipalCollection principals = SecurityUtils.getSubject().getPrincipals();
+            // ===============================
+            // 2. Shiro Web Environment
+            // ===============================
+            Object envObj = WebUtils.getWebEnvironment(context);
+            if (envObj == null) {
+                return error(500, "WebEnvironment is null (EnvironmentLoaderListener missing?)");
+            }
+            if (!(envObj instanceof IniWebEnvironment)) {
+                return error(500, "WebEnvironment is not IniWebEnvironment: " + envObj.getClass().getName());
+            }
 
-        //Create the JWT based on a JWT profile, rather than the SAML2Profile, to keep it more useful and concise.
+            IniWebEnvironment iwe = (IniWebEnvironment) envObj;
+
+            // ===============================
+            // 3. Signing config
+            // ===============================
+            KeystoreRSASignatureConfiguration sigConfig =
+                    (KeystoreRSASignatureConfiguration)
+                            iwe.getObject("signingConfig", KeystoreRSASignatureConfiguration.class);
+
+            if (sigConfig == null) {
+                return error(500, "signingConfig not found in shiro.ini environment");
+            }
+
+            // ===============================
+            // 4. Duo Gate Check (with exception for External Users)
+            // ===============================
+            if (DuoPolicy.isDuoEnabled()) {
+                AppUser appUser = getAppUserFromPrincipal(principals); // Retrieve the user from principals
+
+                // If the user is not external, enforce Duo authentication
+                if (!"Y".equals(appUser.getIsExternalUser())) {
+                    // Check if Duo authentication is already completed
+                    org.apache.shiro.session.Session shiroSession = subject.getSession(false);
+                    Object duoOk = (shiroSession != null) ? shiroSession.getAttribute("DUO_OK") : null;
+
+                    if (!Boolean.TRUE.equals(duoOk)) {
+                        return error(403, "Duo verification required (DUO_OK missing or false)");
+                    }
+                }
+            }
+
+            // ===============================
+            // 5. Build JWT Profile
+            // ===============================
             JwtProfile profile = new JwtProfile();
-
-        //Tokens and SAML will be Pac4j principals. Direct Shiro logins will be whatever the UserService creates as a principal
             Pac4jPrincipal pjp = principals.oneByType(Pac4jPrincipal.class);
             if (pjp != null) {
                 profile.addAttribute("sub", getAttributeFromProfile(pjp.getProfile(), "uid"));
                 profile.addAttribute("name", getAttributeFromProfile(pjp.getProfile(), "displayName"));
-        }
-        else {
+            } else {
                 String login = principals.oneByType(String.class);
                 AppUser appUser = principals.oneByType(AppUser.class);
 
                 if (login != null) {
                     profile.addAttribute("sub", login);
-
+                } else {
+                    return error(500, "No principal suitable for JWT subject (sub)");
                 }
 
-            if(appUser != null) {
-                if (appUser.getIdAppUser() != -1) {
+                if (appUser != null && appUser.getIdAppUser() != -1) {
                     profile.addAttribute("name", appUser.getDisplayName());
-                }
-                else {
+                } else {
                     profile.addAttribute("name", "University User");
                 }
             }
-                }
 
-        //Not using notOnOrAfter from SAML2, because it's set once for 5 minutes and is meant for the initial handshake
-        //We want a new token each time one is requested
+            // ===============================
+            // 6. Expiration
+            // ===============================
+            long expSeconds = (System.currentTimeMillis() / 1000) + (TOKEN_EXP_IN_MINUTES * 60);
+            profile.addAttribute(JwtClaims.EXPIRATION_TIME, expSeconds);
 
-        //15 minutes seems to be an agreed upon length for tokens to last (minimize replay attacks)
-        Date exp = new Date(System.currentTimeMillis());
-        Long seconds = (exp.getTime() / 1000) + (TOKEN_EXP_IN_MINUTES * 60);
-
-        profile.addAttribute(JwtClaims.EXPIRATION_TIME, seconds);
-
-
-        //Build the token, which will be signed by RSA
-        final JwtGenerator<CommonProfile> generator = new JwtGenerator<CommonProfile>(sigConfig);
+            // ===============================
+            // 7. Generate Token
+            // ===============================
+            JwtGenerator<CommonProfile> generator = new JwtGenerator<>(sigConfig);
             String token = generator.generate(profile);
-        String response = "{\"auth_token\":\"" + token + "\"}";
 
-        //Return the token (JWTs are BASE64 encoded JSON)
-        return Response.ok(response).build();
+            return Response.ok("{\"auth_token\":\"" + token + "\"}").build();
+        } catch (Exception e) {
+            // Last-resort catch — ensures you ALWAYS see the cause
+            return Response.status(500)
+                    .entity("{\"error\":\"Unhandled exception\",\"exception\":\""
+                            + e.getClass().getName()
+                            + "\",\"message\":\""
+                            + safe(e.getMessage())
+                            + "\"}")
+                    .build();
+        }
+    }
+
+    private AppUser getAppUserFromPrincipal(PrincipalCollection principals) {
+        // Attempt to retrieve the AppUser from the principals
+        AppUser appUser = principals.oneByType(AppUser.class);
+
+        if (appUser == null) {
+            // Handle the case where the AppUser is not found in the principals
+            throw new WebApplicationException("User not found in the principals", Response.Status.UNAUTHORIZED);
+        }
+
+        return appUser;
     }
 
     private Object getAttributeFromProfile(CommonProfile profile, String attributeName) {
@@ -112,4 +184,14 @@ public class TokenResource {
             return attribute;
         }
     }
+
+    private Response error(int status, String message) {
+        return Response.status(status)
+                .entity("{\"error\":\"" + message + "\"}")
+                .build();
     }
+
+    private String safe(String msg) {
+        return msg == null ? "" : msg.replace("\"", "'");
+    }
+}
