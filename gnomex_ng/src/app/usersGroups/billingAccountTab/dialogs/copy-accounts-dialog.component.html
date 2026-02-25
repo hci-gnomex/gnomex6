@@ -1,9 +1,10 @@
-<div class="flex-container-col full-width fixed-height">
+<div class="flex-container-col full-width fixed-height" role="dialog" aria-label="Copy accounts from other core facilities">
     <div class="full-width full-height padded">
         <div class="flex-container-col full-width full-height">
             <div class="full-width flex-grow small-font">
                 <ag-grid-angular
                         class="ag-theme-fresh small-font full-width full-height"
+                        aria-label="Chartfield accounts to copy"
                         [context]="context"
                         [singleClickEdit]="true"
                         [rowSelection]="'multiple'"
@@ -19,6 +20,7 @@
             <div class="full-width flex-grow small-font">
                 <ag-grid-angular
                         class="ag-theme-fresh small-font full-width full-height"
+                        aria-label="Purchase order accounts to copy"
                         [context]="context"
                         [singleClickEdit]="true"
                         [rowSelection]="'multiple'"
@@ -34,6 +36,7 @@
             <div class="full-width flex-grow small-font">
                 <ag-grid-angular
                         class="ag-theme-fresh small-font full-width full-height"
+                        aria-label="Credit card accounts to copy"
                         [context]="context"
                         [singleClickEdit]="true"
                         [rowSelection]="'multiple'"

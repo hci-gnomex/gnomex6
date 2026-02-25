@@ -17,7 +17,7 @@ import {ManageFilesDialogComponent} from "./manage-files-dialog.component";
 import {OrganizeFilesComponent} from "./organize-files.component";
 import {NameFileDialogComponent} from "./name-file-dialog.component";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {TreeModule} from "angular-tree-component";
+import {TreeModule} from "@circlon/angular-tree-component";
 import {AngularSplitModule} from "angular-split";
 import {UtilModule} from "../util.module";
 import {LinkedSampleFileComponent} from "./linked-sample-file.component";
@@ -32,7 +32,7 @@ import {LinkedSampleFileComponent} from "./linked-sample-file.component";
         MatInputModule,
         HttpClientModule,
         MatTooltipModule,
-        TreeModule.forRoot(),
+        TreeModule,
         AgGridModule,
         AngularSplitModule,
         MatFormFieldModule,

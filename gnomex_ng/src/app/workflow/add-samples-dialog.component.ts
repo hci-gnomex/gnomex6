@@ -13,7 +13,7 @@ import {UserPreferencesService} from "../services/user-preferences.service";
 import {AnalysisService} from "../services/analysis.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {ConstantsService} from "../services/constants.service";
-import {ITreeNode, ITreeOptions} from "angular-tree-component/dist/defs/api";
+import {ITreeNode, ITreeOptions} from "@circlon/angular-tree-component/lib/defs/api";
 import {UtilService} from "../services/util.service";
 import * as _ from "lodash";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";

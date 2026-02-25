@@ -4,7 +4,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {LabListService} from "../services/lab-list.service";
 import {GetLabService} from "../services/get-lab.service";
 import {BillingPeriod} from "../util/billing-period-selector.component";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {BillingService} from "../services/billing.service";
 import {UserPreferencesService} from "../services/user-preferences.service";
 
@@ -18,31 +18,31 @@ import {UserPreferencesService} from "../services/user-preferences.service";
             padding: 0.3em;
             font-size: small;
         }
-        
-        
+
+
         .min-width { min-width: 10em; }
-        
+
         .experiment-width {
             width: 8em;
             min-width: 8em;
         }
-        
+
         .core-facility-width {
             width: 16em;
             min-width: 16em;
         }
-        
+
         .lab-display-width {
             width: 20em;
             min-width: 20em;
         }
-        
+
         .account-display-width {
             width: 25em;
             min-width: 25em;
         }
-        
-        
+
+
     `]
 })
 

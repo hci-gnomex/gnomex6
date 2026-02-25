@@ -6,7 +6,7 @@ import {ServicesModule} from "../services/services.module";
 import {UtilModule} from "../util/util.module";
 import {NgModule} from "@angular/core";
 import {ConfigureProductsComponent} from "./configure-products.component";
-import {TreeModule} from "angular-tree-component";
+import {TreeModule} from "@circlon/angular-tree-component";
 import {ConfigureProductTypesComponent} from "./configure-product-types.component";
 import {ProductLedgerComponent} from "./product-ledger.component";
 import {AgGridModule} from "ag-grid-angular";
@@ -30,7 +30,7 @@ import {DialogsModule} from "../util/popup/dialogs.module";
         ServicesModule,
         UtilModule,
         ReactiveFormsModule,
-        TreeModule.forRoot(),
+        TreeModule,
         NewBillingAccountModule,
         AgGridModule.withComponents([])
     ],

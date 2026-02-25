@@ -16,10 +16,10 @@ import {
     TreeComponent,
     TreeModel,
     TreeNode,
-} from "angular-tree-component";
+} from "@circlon/angular-tree-component";
 import {ConstantsService} from "../../services/constants.service";
 import {first} from "rxjs/operators";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {TabChangeEvent} from "../tabs/index";
 import {MatDialogConfig} from "@angular/material";
@@ -61,7 +61,7 @@ import {ActionType} from "../interfaces/generic-dialog-action.model";
             color: var(--bluewarmvivid-medlight);
             border: var(--bluewarmvivid-medlight)  solid 1px;
         }
-        
+
         .no-height { height: 0;  }
         .single-em { width: 1em; }
 

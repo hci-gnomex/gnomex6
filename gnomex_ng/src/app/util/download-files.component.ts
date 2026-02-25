@@ -1,7 +1,7 @@
 import {ChangeDetectorRef, ChangeDetectionStrategy, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {ConstantsService} from "../services/constants.service";
-import {ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
+import {ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode} from "@circlon/angular-tree-component";
 import {PropertyService} from "../services/property.service";
 import {FileService} from "../services/file.service";
 import {Observable} from "rxjs";
@@ -14,7 +14,6 @@ import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
 import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";
 import {ActionType} from "./interfaces/generic-dialog-action.model";
 import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
-//import {TreeOptions} from "angular-tree-component/dist/models/tree-options.model";
 
 @Component({
     template: `
@@ -261,10 +260,10 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
             this.selectFilesRecursively(this.data.downloadListSource, 'N');
             this.data.downloadListSource.isSelected = 'Y';
             this.filesToDownloadNodes = [this.data.downloadListSource];
-    
+
 setTimeout(() => {
             this.updateFilesToDownloadTree();
-    
+
             this.changeDetector.markForCheck();
 });
         }  // end if (this.data)
@@ -292,7 +291,7 @@ setTimeout(() => {
                     }
                 });
             }
-});       
+});
  }
     }
 
@@ -411,7 +410,7 @@ setTimeout(() => {
         setTimeout(() => {
         this.changeDetector.markForCheck();
         this.moveNode(this.filesToDownloadTreeComponent.treeModel, null, event, {from: this.availableFilesTreeComponent, to: this.filesToDownloadTreeComponent});
-    
+
 });
 }
 

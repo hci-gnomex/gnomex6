@@ -4,7 +4,7 @@ import {NewTopicComponent} from "../new-topic.component";
 import {DeleteTopicComponent} from "../../topics/delete-topic.component";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {Router} from "@angular/router";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {DialogsService} from "../popup/dialogs.service";
 import {ConstantsService} from "../../services/constants.service";
 import {ActionType} from "../interfaces/generic-dialog-action.model";

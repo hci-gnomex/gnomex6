@@ -1,4 +1,4 @@
-<div class="full-width full-height flex-container-col padded-left-right-top">
+<div class="full-width full-height flex-container-col padded-left-right-top" role="region" aria-label="Billing accounts">
 	<div class="full-width flex-container-row">
 		<div class="flex-container-col full-width">
 			<div class="flex-container-row align-center">
@@ -11,16 +11,16 @@
 					</custom-combo-box>
 				</div>
 				<div class="padded-left">
-					<button mat-raised-button *ngIf="!showAddAccountBox" class="same-size-button" (click)="onAddAccountBeginClicked()">Add account</button>
-					<button mat-raised-button *ngIf="showAddAccountBox" class="same-size-button" (click)="onHideClicked()">Hide Add Account</button>
+					<button mat-raised-button *ngIf="!showAddAccountBox" class="same-size-button" (click)="onAddAccountBeginClicked()" aria-label="Add a new billing account">Add account</button>
+					<button mat-raised-button *ngIf="showAddAccountBox" class="same-size-button" (click)="onHideClicked()" aria-label="Hide add account form">Hide Add Account</button>
 				</div>
 				<div class="padded-left">
-					<button mat-raised-button (click)="onCopyAccountsClicked()">Copy Accounts From Other Cores</button>
+					<button mat-raised-button (click)="onCopyAccountsClicked()" aria-label="Copy accounts from other core facilities">Copy Accounts From Other Cores</button>
 				</div>
 				<div class="flex-grow">
 				</div>
 				<div class="padded">
-					<mat-radio-group [(ngModel)]="gridFilterRadioValue" class="flex-container-col padded" (change)="onGridFilterChange($event)">
+					<mat-radio-group [(ngModel)]="gridFilterRadioValue" class="flex-container-col padded" (change)="onGridFilterChange($event)" aria-label="Filter accounts by status">
 						<mat-radio-button [value]="ALL" class="padded-left-right">All accounts</mat-radio-button>
 						<mat-radio-button [value]="ACTIVE" class="padded-left-right">Show active accounts only</mat-radio-button>
 						<mat-radio-button [value]="PENDING" class="padded-left-right">Show pending accounts only</mat-radio-button>
@@ -44,7 +44,7 @@
 							Payment Method
 						</div>
 						<div class="inline-block flex-grow">
-							<mat-radio-group [(ngModel)]="accountType">
+							<mat-radio-group [(ngModel)]="accountType" aria-label="Payment method">
 								<mat-radio-button class="radio-button padded" [value]="CHARTFIELD">Chartfield</mat-radio-button>
 								<mat-radio-button class="radio-button padded" [value]="PO">PO</mat-radio-button>
 								<mat-radio-button *ngIf="showCreditCard" class="radio-button padded" [value]="CREDIT_CARD">Credit Card</mat-radio-button>
@@ -68,6 +68,7 @@
 			<div class="full-width flex-grow small-font">
 				<ag-grid-angular
 						class="ag-theme-fresh small-font full-width full-height"
+						aria-label="Chartfield accounts table"
 						[context]="context"
 						[singleClickEdit]="true"
 						[enableSorting]="true"
@@ -83,6 +84,7 @@
 			<div class="full-width flex-grow small-font">
 				<ag-grid-angular
 						class="ag-theme-fresh small-font full-width full-height"
+						aria-label="Purchase order accounts table"
 						[context]="context"
 						[singleClickEdit]="true"
 						[enableSorting]="true"
@@ -97,6 +99,7 @@
 			<div *ngIf="showCreditCard" class="full-width flex-grow small-font">
 				<ag-grid-angular
 						class="ag-theme-fresh small-font full-width full-height"
+						aria-label="Credit card accounts table"
 						[context]="context"
 						[singleClickEdit]="true"
 						[enableSorting]="true"

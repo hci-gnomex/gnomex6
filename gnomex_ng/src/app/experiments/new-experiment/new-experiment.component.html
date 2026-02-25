@@ -18,7 +18,7 @@
                        aria-label="New experiment steps">
             <mat-tab label="Setup" class="full-width full-height" aria-label="Initial setup step">
                 <new-experiment-setup #setupTab
-                                      [experiment]="inputs?.experiment"
+                                      [experiment]="this.inputs?.experiment"
                                       [idCoreFacility]="inputs?.idCoreFacility"
                                       (onChangeLab)="onChangeLab($event)"
                                       (onChangeRequestCategory)="outputs?.onChangeRequestCategory($event)">
@@ -78,7 +78,7 @@
                 </button>
             </div>
             <div *ngIf="onSubmitTab" class="padded-right">
-                <mat-checkbox [(ngModel)]="isCheckboxChecked" disabled="{{ disable_agreeCheckbox ? 'true' : 'false' }}" aria-label="Agreement confirmation">
+                <mat-checkbox [(ngModel)]="Checked" disabled="{{ disable_agreeCheckbox ? 'true' : 'false' }}" aria-label="Agreement confirmation">
                     <div class="highlight-agreement">
                         {{ agreeCheckboxLabel }}
                     </div>

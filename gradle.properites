@@ -1,1 +1,6 @@
 org.gradle.java.home=C:\\Program Files\\Microsoft\\jdk-17.0.16.8-hotspot
+tomcatDir=c:/users/u0974549/apache-tomcat-9.0.10
+gnomexServerHome=c:/users/u0974549/apache-tomcat-9.0.10
+gnomexDeployDir=webapps
+tomcat.dir=c:/users/u0974549/apache-tomcat-9.0.10
+

@@ -5,11 +5,11 @@ import {BaseGenericContainerDialog} from "../../../util/popup/base-generic-conta
 @Component({
 	selector: "new-billing-account-success-dialog",
 	template: `
-		<div class="flex-container-col full-width full-height double-padded">
+		<div class="flex-container-col full-width full-height double-padded" role="dialog" aria-label="Billing account created successfully">
             <h3>
                 Billing Account Added
             </h3>
-            <p>{{successMessage}}</p>
+            <p aria-live="polite">{{successMessage}}</p>
             <p>
                 After the account information is reviewed and approved, you will be notified by email when
                 experiment requests may be submitted using this account.

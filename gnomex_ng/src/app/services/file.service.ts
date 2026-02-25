@@ -10,7 +10,7 @@ import {DOCUMENT} from "@angular/common";
 import {FormGroup} from "@angular/forms";
 import {UtilService} from "./util.service";
 import {ConstantsService} from "./constants.service";
-import {TreeModel, TreeNode} from "angular-tree-component";
+import {TreeModel, TreeNode} from "@circlon/angular-tree-component";
 import * as _ from "lodash";
 import {HttpUriEncodingCodec} from "./interceptors/http-uri-encoding-codec";
 

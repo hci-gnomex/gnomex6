@@ -1,8 +1,8 @@
 import {Component, Inject, OnInit, ViewChild} from "@angular/core";
-import {ITreeOptions, TreeComponent, TreeModel} from "angular-tree-component";
+import {ITreeOptions, TreeComponent, TreeModel} from "@circlon/angular-tree-component";
 import {ProductsService} from "../services/products.service";
 import {DictionaryService} from "../services/dictionary.service";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";

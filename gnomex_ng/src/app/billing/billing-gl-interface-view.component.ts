@@ -8,7 +8,7 @@ import {GDAction} from "../util/interfaces/generic-dialog-action.model";
     selector: 'billing-gl-interface-view',
     template: `
         <mat-form-field class="full-width double-padded">
-            <input matInput placeholder="Journal Entry Revision" [formControl]="this.revisionFC">
+            <input matInput placeholder="Journal Entry Revision" [formControl]="this.revisionFC" aria-label="Journal entry revision number" aria-required="true">
         </mat-form-field>
     `,
     styles: [``]

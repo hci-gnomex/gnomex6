@@ -10,8 +10,9 @@ import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-d
 @Component({
     selector: 'notes-to-core',
     template: `
-        <div class="grid-div padded">
+        <div class="grid-div padded" role="region" aria-label="Notes to core facility">
             <ag-grid-angular class="ag-theme-balham full-height full-width font-small"
+                             aria-label="Core comments table"
                              (gridReady)="this.onNotesGridReady($event)"
                              (rowClicked)="this.onNotesGridSelection($event)"
                              [enableColResize]="true"

@@ -2,7 +2,7 @@ import {Component, Inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatDialogConfig} from "@angular/material";
 import {ActivatedRoute, Router} from "@angular/router";
 
-import {ITreeOptions, TreeComponent, TreeModel} from "angular-tree-component";
+import {ITreeOptions, TreeComponent, TreeModel} from "@circlon/angular-tree-component";
 
 import {Subscription} from "rxjs";
 

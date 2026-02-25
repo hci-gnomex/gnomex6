@@ -14,13 +14,14 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
 
 @Component({
     template: `
-        <div class="flex-container-col full-height full-width padded">
-            <div class="flex-container-row justify-flex-end padded-top-bottom">
-                <button mat-button (click)="new()"><img class="icon" [src]="this.constService.ICON_GREEN_BULLET">New</button>
-                <button mat-button [disabled]="selectedRow.length === 0" (click)="delete()"><img class="icon" [src]="this.constService.ICON_RED_BULLET">Delete</button>
+        <div class="flex-container-col full-height full-width padded" role="dialog" aria-label="Manage Links">
+            <div class="flex-container-row justify-flex-end padded-top-bottom" role="toolbar" aria-label="Link actions">
+                <button mat-button (click)="new()" aria-label="Add new link"><img class="icon" [src]="this.constService.ICON_GREEN_BULLET" alt="New">New</button>
+                <button mat-button [disabled]="selectedRow.length === 0" (click)="delete()" aria-label="Delete selected link"><img class="icon" [src]="this.constService.ICON_RED_BULLET" alt="Delete">Delete</button>
             </div>
             <div class="full-width full-height">
                 <ag-grid-angular style="width: 100%; height: 40em;" class="ag-theme-fresh"
+                                 aria-label="Links table"
                                  [gridOptions]="gridOptions"
                                  [rowData]="rowData"
                                  [columnDefs]="columnDefs"

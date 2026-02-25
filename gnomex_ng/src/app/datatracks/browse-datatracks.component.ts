@@ -9,10 +9,10 @@ import {
   TreeComponent,
   TreeModel,
   TreeNode,
-} from "angular-tree-component";
+} from "@circlon/angular-tree-component";
 import {Subscription} from "rxjs";
 import {ActivatedRoute, NavigationExtras, ParamMap, Router, UrlSegment} from "@angular/router";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {LabListService} from "../services/lab-list.service";
 import {DataTrackService} from "../services/data-track.service";
 import {MoveDataTrackComponent} from "./move-datatrack.component";

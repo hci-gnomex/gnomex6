@@ -13,7 +13,7 @@ import {AngularMaterialModule} from "../../../modules/angular-material.module";
 import {UtilModule} from "../../util/util.module";
 import {RelatedDataModule} from "../../util/related-data.module";
 import {AngularSplitModule} from "angular-split";
-import {TreeModule} from "angular-tree-component";
+import {TreeModule} from "@circlon/angular-tree-component";
 import {AnalysisInfoTabComponent} from "./analysis-info-tab.component";
 import {AnalysisFilesTabComponent} from "./analysis-files-tab.component";
 import {ViewerLinkRenderer} from "../../util/grid-renderers/viewer-link.renderer";
@@ -35,7 +35,7 @@ import {DistributeDatatrackDialogComponent} from "./distribute-datatrack-dialog.
         ]),
         AngularMaterialModule,
         FormsModule,
-        TreeModule.forRoot(),
+        TreeModule,
         ReactiveFormsModule,
         UtilModule,
         RelatedDataModule,

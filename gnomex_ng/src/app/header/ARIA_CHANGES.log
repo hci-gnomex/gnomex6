@@ -1,0 +1,69 @@
+ARIA Accessibility Changes Log - Header Module
+================================================
+Date: 2026-02-11
+
+1. header.component.html
+   ---------------------
+   - Added role="banner" to the main header container div
+   - Added aria-label="GNomEx home" to the logo anchor link
+   - Improved logo img alt text to "GNomEx logo - navigate to home"
+   - Added aria-label, aria-pressed to the pin/unpin header toggle button
+   - Added role="search" and aria-label="Header search" to the search area container
+   - Added aria-label="Lookup by experiment number" to the number search input
+   - Added aria-label="Search by number" to the number search button; improved alt text
+   - Added aria-label="Search by text" to the text search input
+   - Added aria-label="Submit text search" to the text search button; improved alt text
+   - Added role="alert" and aria-label="Research use disclaimer" to the "FOR RESEARCH ONLY" text
+   - Added aria-haspopup="menu" and dynamic aria-label to linkNavItems dropdown buttons
+   - Added dynamic [attr.aria-label] to linkNavItems leaf buttons
+   - Added dynamic [attr.alt] to all navigation icon images (linkNavItems and navItems)
+   - Changed secondary nav bar <div> to <nav> with role="navigation" and aria-label="Main navigation"
+   - Added aria-haspopup="menu" and dynamic aria-label to navItems dropdown buttons
+   - Added dynamic [attr.aria-label] to navItems leaf buttons
+
+2. menu-item/menu-item.component.html
+   -----------------------------------
+   - Added role="menu" to the mat-menu element
+   - Added aria-haspopup="menu" and dynamic aria-label to branch node submenu buttons
+   - Added dynamic [attr.alt] to all menu item icon images
+   - Added role="menuitem" and dynamic [attr.aria-label] to leaf node buttons (both callback and routerLink variants)
+   - Added role="separator" to the mat-divider element
+
+3. advanced_search/advanced-search.component.html
+   -----------------------------------------------
+   - Added role="dialog" and aria-label="Advanced Search" to the root container
+   - Added aria-label="Search tabs" to the mat-tab-group
+   - Added aria-label="General keywords search" to the keywords text input
+   - Added aria-label="Search category" to the search type radio group
+   - Added aria-label="Field search criteria" to the field search ag-grid
+   - Added aria-label="Match type" to the match type radio group
+   - Added role="toolbar", aria-label="Filter search results", and aria-live="polite" to the grid results button bar
+   - Added dynamic [attr.aria-label] with hit counts to all 6 grid result filter buttons
+   - Added aria-label="Search results table" to the search results ag-grid
+   - Added role="toolbar", aria-label="Filter tree results", and aria-live="polite" to the tree results button bar
+   - Added dynamic [attr.aria-label] with hit counts to all 5 tree result filter buttons
+   - Added role="treeitem" and dynamic [attr.aria-label] to tree node template divs
+   - Added dynamic [attr.alt] to tree node icon images
+
+4. manageLinks/manage-links.component.ts (inline template)
+   -------------------------------------------------------
+   - Added role="dialog" and aria-label="Manage Links" to the root container
+   - Added role="toolbar" and aria-label="Link actions" to the button row
+   - Added aria-label="Add new link" to the New button; added alt="New" to its icon
+   - Added aria-label="Delete selected link" to the Delete button; added alt="Delete" to its icon
+   - Added aria-label="Links table" to the ag-grid element
+
+5. reportProblem/report-problem.component.ts (inline template)
+   -----------------------------------------------------------
+   - Added role="dialog" and aria-label="Report a Problem" to the root container
+   - Added aria-label="Email address" and aria-describedby="emailHint" to the email input
+   - Added id="emailHint" to the email mat-hint for aria-describedby linkage
+   - Added aria-label="Feedback" and aria-describedby="feedbackHint" to the feedback textarea
+   - Added id="feedbackHint" to the feedback mat-hint for aria-describedby linkage
+   - Added alt="Screenshot of the reported issue" to the screenshot image
+   - Added aria-live="polite" to the encryption disclaimer text
+
+6. logout-loader-component.ts (inline template)
+   ---------------------------------------------
+   - Added role="status", aria-live="polite", and aria-label="Logging out" to the root container
+   - Changed empty alt="" on the logo image to alt="GNomEx logo"

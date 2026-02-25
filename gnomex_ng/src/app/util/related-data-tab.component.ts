@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, Input, OnInit} from "@angular/core";
-import {ITreeOptions, TreeModel} from "angular-tree-component";
+import {ITreeOptions, TreeModel} from "@circlon/angular-tree-component";
 import {ConstantsService} from "../services/constants.service";
 import {GnomexService} from "../services/gnomex.service";
 import {IRelatedObject} from "./interfaces/related-objects.model";

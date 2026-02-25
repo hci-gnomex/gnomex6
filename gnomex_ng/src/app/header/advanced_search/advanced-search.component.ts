@@ -1,6 +1,6 @@
 import {Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
-import {ITreeOptions, TreeComponent, TreeModel} from "angular-tree-component";
+import {ITreeOptions, TreeComponent, TreeModel} from "@circlon/angular-tree-component";
 
 import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
 import {AdvancedSearchService} from "./advanced-search.service";
@@ -118,11 +118,11 @@ import {ConstantsService} from "../../services/constants.service";
 
         .grabbable {
             cursor: move;
-            cursor: -webkit-grab;
+            cursor: grab;
         }
         .grabbed {
             cursor: move;
-            cursor: -webkit-grabbing;
+            cursor: grabbing;
         }
 
         .small-as-possible {

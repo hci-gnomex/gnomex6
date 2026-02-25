@@ -3,7 +3,7 @@ import {MatDialog, MatDialogConfig} from '@angular/material';
 
 import {BillingUsageReportComponent} from "../billing-usage-report.component";
 import {DialogsService, DialogType} from "../popup/dialogs.service";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {InvoiceEmailWindowComponent} from "../../billing/invoice-email-window.component";
 import {BillingGlInterfaceViewComponent} from "../../billing/billing-gl-interface-view.component";
 import {NotesToCoreComponent} from "../../billing/notes-to-core.component";

@@ -2,7 +2,7 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {DataTrackService} from "../services/data-track.service";
 import {LabListService} from "../services/lab-list.service";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {ConstantsService} from "../services/constants.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";

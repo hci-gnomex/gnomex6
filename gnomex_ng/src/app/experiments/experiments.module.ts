@@ -4,7 +4,7 @@ import {FormsModule,ReactiveFormsModule} from "@angular/forms";
 
 import {EXPERIMENTS_ROUTING} from "./experiments.routes";
 
-import { TreeModule } from "angular-tree-component";
+import { TreeModule } from "@circlon/angular-tree-component";
 
 import { AngularMaterialModule } from "../../modules/angular-material.module";
 import { EmailRelatedUsersPopupModule } from "../util/emailRelatedUsersPopup/email-related-users-popup.module";
@@ -85,7 +85,7 @@ import {ImprovedSelectEditor} from "../util/grid-editors/improved-select.editor"
       EmailRelatedUsersPopupModule,
         FormsModule,
         ServicesModule,
-        TreeModule.forRoot(),
+        TreeModule,
         UtilModule,
         RelatedDataModule,
         ManageFilesModule,

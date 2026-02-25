@@ -41,12 +41,12 @@ import {DialogsService} from "../util/popup/dialogs.service";
                                 <span>{{coreInfo.labPhone}}</span>
                             </div>
                         </div>
-                        <a [href]="'mailto:' + coreInfo.contactEmail">{{coreInfo.contactEmail}}</a>
+                        <a [href]="'mailto:' + coreInfo.contactEmail" style="color: #004C9E;">{{coreInfo.contactEmail}}</a>
                         <span class="divider-top-small">
                             Submit an
-                            <a [routerLink]="['/newExperiment', coreInfo.idCoreFacility]"> experiment order </a>
+                            <a class="experiment-link" [routerLink]="['/newExperiment', coreInfo.idCoreFacility]">experiment order</a>
                             or
-                            <a [routerLink]="['', {outlets: {modal: ['NewBillingAccountModal']}}]"> billing account </a>
+                            <a class="experiment-link" [routerLink]="['', {outlets: {modal: ['NewBillingAccountModal']}}]">billing account </a>
                             to {{coreInfo.facilityName}}
                         </span>
                         <div class="flex-grow white-background padding-small" [innerHtml]="coreInfo.description"></div>
@@ -93,7 +93,9 @@ import {DialogsService} from "../util/popup/dialogs.service";
         .multiline { white-space: pre-line; }
 
         .major-padded-right { padding-right: 1em; }
-        
+
+        .experiment-link { color: #004C9E; text-decoration: none; }
+
 
         .progress-bar-container {
             width: 90%;
@@ -109,7 +111,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
             position: relative;
             background-repeat: no-repeat;
         }
-        
+
         .info-pane {
             background: #EEEEEE;
             border: 0.1em solid #B7BABC;

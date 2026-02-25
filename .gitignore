@@ -20,3 +20,9 @@ classes/
 /node_modules/
 
 *.map
+
+gradle.properites
+build.gradle
+
+
+

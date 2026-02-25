@@ -13,10 +13,10 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
 import {DialogsService, DialogType} from "../popup/dialogs.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {AnalysisService} from "../../services/analysis.service";
-import {IActionMapping, ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode} from "angular-tree-component";
+import {IActionMapping, ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode} from "@circlon/angular-tree-component";
 import {ConstantsService} from "../../services/constants.service";
 import {first} from "rxjs/operators";
-import {ITreeModel, ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeModel,ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {TabChangeEvent} from "../tabs/index";
 import {MatDialogConfig} from "@angular/material";

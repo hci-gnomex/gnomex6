@@ -1,5 +1,6 @@
-/* You can add global styles to this file, and also import other style files */
-@import '~angular-tree-component/dist/angular-tree-component.css';
+/* You can add global styles to this file, and also import other style files
+@import '~angular-tree-component/dist/angular-tree-component.css'; */
+@import '~@circlon/angular-tree-component/css/angular-tree-component.css';
 @import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
 @import '~ag-grid-community/dist/styles/ag-grid.css';
 @import '~ag-grid-community/dist/styles/ag-theme-fresh.css';
