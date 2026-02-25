@@ -1,8 +1,8 @@
 import {ChangeDetectorRef, Injectable} from "@angular/core";
 import {FormControl, FormGroup} from "@angular/forms";
-import {ITreeModel, ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeModel, ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {Subscription} from "rxjs";
-import {TreeModel, TreeNode} from "angular-tree-component";
+import {TreeModel, TreeNode} from "@circlon/angular-tree-component";
 import * as _ from "lodash";
 
 @Injectable()

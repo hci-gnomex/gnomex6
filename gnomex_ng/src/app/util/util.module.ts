@@ -36,7 +36,7 @@ import {DownloadPickerComponent} from "./download-picker.component";
 import {DownloadProgressComponent} from "./download-progress.component";
 import {DownloadFilesComponent} from "./download-files.component";
 import {AngularSplitModule} from "angular-split";
-import {TreeModule} from "angular-tree-component";
+import {TreeModule} from "@circlon/angular-tree-component";
 import {EditInstitutionsComponent} from "./edit-institutions.component";
 import {CustomComboBoxComponent} from "./custom-combo-box.component";
 import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";

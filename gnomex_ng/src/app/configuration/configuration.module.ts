@@ -5,7 +5,7 @@ import {AngularMaterialModule} from '../../modules/angular-material.module'
 import {CommonModule} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ServicesModule} from "../services/services.module";
-import {TreeModule} from "angular-tree-component";
+import {TreeModule} from "@circlon/angular-tree-component";
 
 import {AgGridModule} from "ag-grid-angular";
 import {AngularSplitModule} from "angular-split";
@@ -37,7 +37,7 @@ import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from "@angular/material/
         CommonModule,
         FormsModule,
         ServicesModule,
-        TreeModule.forRoot(),
+        TreeModule,
         AgGridModule.withComponents([
             CheckboxRenderer,
             DateEditor,

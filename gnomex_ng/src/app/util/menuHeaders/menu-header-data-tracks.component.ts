@@ -10,7 +10,7 @@ import {DataTrackService} from "../../services/data-track.service";
 import {NewDataTrackComponent} from "../../datatracks/new-datatrack.component";
 import {DeleteDataTrackComponent} from "../../datatracks/delete-datatrack.component";
 import {ConstantsService} from "../../services/constants.service";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {DownloadPickerComponent} from "../download-picker.component";
 import {DOCUMENT} from "@angular/common";
 import {DownloadProgressComponent} from "../download-progress.component";

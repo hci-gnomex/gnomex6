@@ -1,7 +1,7 @@
 import {Component, Inject} from "@angular/core";
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {DataTrackService} from "../services/data-track.service";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {HttpParams} from "@angular/common/http";

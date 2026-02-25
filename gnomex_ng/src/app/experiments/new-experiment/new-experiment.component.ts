@@ -38,14 +38,14 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
     selector: 'new-experiment',
     templateUrl: "./new-experiment.component.html",
     styles: [`
-        
+
         .bordered { border: 1px solid silver; }
-        
+
         .highlight-agreement {
             color: green;
             font-style: italic;
         }
-        
+
         .padded-right-large { padding-right: 1em; }
 
     `]
@@ -261,6 +261,7 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
 
                     let experiment: Experiment = Experiment.createExperimentObjectFromAny(this.dictionaryService, this.gnomexService, this.propertyService, this.securityAdvisor, response.Request);
                     experiment.idCoreFacility = this.inputs.idCoreFacility;
+                    this.inputs.experiment = experiment;
 
                     this.annotations = experiment.RequestProperties.filter((annotation: any) => {
                         return annotation

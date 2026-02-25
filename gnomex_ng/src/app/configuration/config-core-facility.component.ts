@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild} from "@angular/core";
 
 import {DictionaryService} from "../services/dictionary.service";
 
-import {TreeComponent, ITreeOptions, TreeModel} from "angular-tree-component";
+import {TreeComponent, ITreeOptions, TreeModel} from "@circlon/angular-tree-component";
 import {GridOptions} from "ag-grid-community/main";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {ConfigurationService} from "../services/configuration.service";
@@ -10,7 +10,7 @@ import {ConstantsService} from "../services/constants.service";
 //assets/page_add.png
 
 @Component({
-    template: `        
+    template: `
         <div style="display:flex; flex-direction: column; height:100%; width:100%;">
             <div *ngIf="secAdvisor.isSuperAdmin" style="margin-bottom: 0.5em">
                 <button mat-button color="primary" type="button" (click)="addCore($event)">
@@ -45,9 +45,9 @@ import {ConstantsService} from "../services/constants.service";
                 </as-split>
 
             </div>
-            
+
         </div>
-        
+
         `,
     styles:[`
         .active-item {

@@ -2,7 +2,7 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
 import {DataTrackService} from "../services/data-track.service";
 import {LabListService} from "../services/lab-list.service";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {DictionaryService} from "../services/dictionary.service";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";

@@ -7,7 +7,7 @@ import {ActivatedRoute} from "@angular/router";
 import {GridOptions} from "ag-grid-community/main";
 import {GnomexService} from "../../services/gnomex.service";
 import {AnalysisService} from "../../services/analysis.service";
-import {ITreeOptions} from "angular-tree-component";
+import {ITreeOptions} from "@circlon/angular-tree-component";
 import {HttpParams} from "@angular/common/http";
 import {ConstantsService} from "../../services/constants.service";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";

@@ -4,7 +4,7 @@ import {GetLabService} from "../services/get-lab.service";
 import {TopicService} from "../services/topic.service";
 import {LabListService} from "../services/lab-list.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "./popup/dialogs.service";

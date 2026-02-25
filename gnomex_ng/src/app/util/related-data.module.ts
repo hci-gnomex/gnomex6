@@ -1,7 +1,7 @@
 import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {FormsModule} from "@angular/forms";
-import {TreeModule} from "angular-tree-component";
+import {TreeModule} from "@circlon/angular-tree-component";
 import {RelatedDataTabComponent} from "./related-data-tab.component";
 import {ServicesModule} from "../services/services.module";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
@@ -18,7 +18,7 @@ import {AngularMaterialModule} from "../../modules/angular-material.module";
         CommonModule,
         FormsModule,
         ServicesModule,
-        TreeModule.forRoot(),
+        TreeModule,
         AngularMaterialModule
 
     ],

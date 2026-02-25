@@ -2,7 +2,7 @@ import {Component, Inject, OnInit} from "@angular/core";
 import {MAT_DIALOG_DATA} from "@angular/material";
 import {BillingService} from "../services/billing.service";
 import {FormControl, Validators} from "@angular/forms";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {ConstantsService} from "../services/constants.service";
 import {HttpParams} from "@angular/common/http";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";

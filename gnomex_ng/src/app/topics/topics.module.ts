@@ -2,7 +2,7 @@ import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
-import {TreeModule} from "angular-tree-component";
+import {TreeModule} from "@circlon/angular-tree-component";
 import {EmailRelatedUsersPopupModule} from "../util/emailRelatedUsersPopup/email-related-users-popup.module";
 import {ServicesModule} from "../services/services.module";
 import {AngularSplitModule} from 'angular-split';
@@ -30,7 +30,7 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         EmailRelatedUsersPopupModule,
         FormsModule,
         ServicesModule,
-        TreeModule.forRoot(),
+        TreeModule,
         UtilModule,
         ReactiveFormsModule,
         AngularSplitModule,

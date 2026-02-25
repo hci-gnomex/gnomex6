@@ -69,13 +69,13 @@
                                 <div class="flex-container-col" role="group" aria-label="Project and experiment actions">
                                     <div class="flex-container-row justify-space-between">
                                         <div>
-                                            <button mat-button [disabled]="disableNewProject || this.disableAll" (click)="newProjectClicked()" aria-label="Create new project">
+                                            <button mat-button [disabled]="disableNewProject || this.disableAll" (click)="newProjectClicked($event)" aria-label="Create new project">
                                                 <img [src]="'./assets/folder_add.png'" alt="" aria-hidden="true">
                                                 New Project
                                             </button>
                                         </div>
                                         <div>
-                                            <button mat-button [disabled]="disableDeleteProject || this.disableAll" (click)="deleteProjectClicked()" aria-label="Delete selected project">
+                                            <button mat-button [disabled]="disableDeleteProject || this.disableAll" (click)="deleteProjectClicked($event)" aria-label="Delete selected project">
                                                 <img [src]="'./assets/folder_delete.png'" alt="" aria-hidden="true">
                                                 Delete Project
                                             </button>

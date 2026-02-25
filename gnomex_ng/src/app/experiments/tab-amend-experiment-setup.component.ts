@@ -10,7 +10,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {AmendExperimentService} from "../services/amend-experiment.service";
 import {HttpParams} from "@angular/common/http";
 import {ExperimentsService} from "./experiments.service";
-import {ITreeOptions, TreeComponent} from "angular-tree-component";
+import {ITreeOptions, TreeComponent} from "@circlon/angular-tree-component";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {ConstantsService} from "../services/constants.service";
 import {Experiment} from "../util/models/experiment.model";

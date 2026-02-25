@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 
 import {ExperimentsService} from './experiments.service';
-import {ITreeOptions, ITreeState, TreeComponent, TreeModel, TreeNode} from 'angular-tree-component';
+import {ITreeOptions, ITreeState, TreeComponent, TreeModel, TreeNode} from '@circlon/angular-tree-component';
 import {BrowseFilterComponent} from '../util/browse-filter.component';
 import * as _ from 'lodash';
 import {Subscription} from 'rxjs';
@@ -27,7 +27,7 @@ import {GnomexService} from '../services/gnomex.service';
 import {HttpParams} from '@angular/common/http';
 import {UtilService} from '../services/util.service';
 import {filter} from 'rxjs/operators';
-import {ITreeNode} from 'angular-tree-component/dist/defs/api';
+import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {ActionType} from '../util/interfaces/generic-dialog-action.model';
 import {ConstantsService} from '../services/constants.service';
 import {NavigationService} from '../services/navigation.service';

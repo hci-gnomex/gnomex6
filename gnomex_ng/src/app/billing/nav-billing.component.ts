@@ -7,8 +7,8 @@ import {
     ViewChild
 } from "@angular/core";
 import {BillingFilterEvent} from "./billing-filter.component";
-import {ITreeOptions, TreeComponent} from "angular-tree-component";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeOptions, TreeComponent} from "@circlon/angular-tree-component";
+import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {HttpParams} from "@angular/common/http";
 import {BillingService} from "../services/billing.service";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
@@ -50,6 +50,7 @@ import {BillingPeriod} from "../util/billing-period-selector.component";
 import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";
 import {Validators} from "@angular/forms";
 import {formatCurrency} from "@angular/common";
+import {TreeOptions} from "@circlon/angular-tree-component/lib/models/tree-options.model";
 
 @Component({
     selector: 'nav-billing',
@@ -58,16 +59,16 @@ import {formatCurrency} from "@angular/common";
 
         .no-height { height: 0;  }
         .single-em { width: 1em; }
-        
+
         .min-grid-width {
             min-width: 27em;
         }
-        
-        
+
+
         mat-radio-button.filter-by-order-type-opt {
             margin-right: 0.5em;
         }
-        
+
         .padding-left {
             padding-left: 1em;
         }
@@ -75,7 +76,7 @@ import {formatCurrency} from "@angular/common";
         .vertical-spacer {
             height: 0.3em;
         }
-        
+
         button.price-sheet-link {
             margin: 0 1em;
             padding: 0;
@@ -97,6 +98,8 @@ export class NavBillingComponent implements OnInit, OnDestroy {
     public billingItemsTreeNodes: ITreeNode[] = [];
     public billingItemsTreeSelectedNode: ITreeNode;
     public billingItemsTreeLastResult: any;
+
+    public why: TreeOptions;
 
     public readonly FILTER_ALL: string = "All";
     public readonly FILTER_EXP: string = "Experiment";

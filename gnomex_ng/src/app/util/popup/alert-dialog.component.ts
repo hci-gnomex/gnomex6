@@ -84,14 +84,14 @@ import {DialogType} from "./dialogs.service";
         .grabbable {
             cursor: move;
             cursor: grab;
-            cursor: -moz-grab;
-            cursor: -webkit-grab;
+            cursor: grab;
+            cursor: grab;
         }
         .grabbed {
             cursor: move;
             cursor: grabbing;
-            cursor: -moz-grabbing;
-            cursor: -webkit-grabbing;
+            cursor: grabbing;
+            cursor: grabbing;
         }
 
         .force-flex-container-row{

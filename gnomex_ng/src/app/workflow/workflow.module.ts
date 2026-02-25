@@ -39,7 +39,7 @@ import { DynamicModule } from 'ng-dynamic-component';
 import {PipelineWorkflowComponent} from "./pipeline-workflow.component";
 import {FlowcellWorkflowComponent} from "./flowcell-workflow.component";
 import {EditFlowcellDialogComponent} from "./edit-flowcell-dialog.component";
-import { TreeModule } from "angular-tree-component";
+import { TreeModule } from "@circlon/angular-tree-component";
 import {AddSamplesDialogComponent} from "./add-samples-dialog.component";
 
 /**
@@ -77,7 +77,7 @@ import {AddSamplesDialogComponent} from "./add-samples-dialog.component";
         ServicesModule,
         UtilModule,
         ReactiveFormsModule,
-        TreeModule.forRoot(),
+        TreeModule,
         DynamicModule.withComponents([QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
             FlowcellAssemblyWorkflowComponent,  FinalizeWorkflowComponent])
     ],

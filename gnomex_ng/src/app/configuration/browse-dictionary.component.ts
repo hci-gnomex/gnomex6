@@ -1,10 +1,9 @@
 import {ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {DictionaryService} from "../services/dictionary.service";
-
-import {ITreeOptions, TreeComponent, TreeNode} from "angular-tree-component";
+import {ITreeOptions, TreeComponent, TreeNode} from "@circlon/angular-tree-component";
 import {Dictionary} from "./dictionary.interface";
 import {DictionaryEntry} from "./dictionary-entry.type";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {DateFilter, GridReadyEvent, NumberFilter, SelectionChangedEvent} from "ag-grid-community";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
@@ -58,7 +57,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                     <tree-root #treeComponent
                                (activate)="this.selectTreeItem($event)"
                                [nodes]="this.dictionaries"
-                               [options]="this.treeOptions">
+                               [options]="treeOptions">
                         <ng-template #treeNodeTemplate let-node>
                             <div class="tree-node-font">
                                 <img src="{{node.data.icon}}" class="tree-node-icon icon">

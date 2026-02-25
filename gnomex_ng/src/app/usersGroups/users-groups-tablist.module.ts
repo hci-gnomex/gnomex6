@@ -10,7 +10,7 @@ import {AgGridRendererModule} from "../util/grid-renderers/ag-grid-renderer.modu
 
 import {AngularSplitModule} from 'angular-split';
 
-import {TreeModule} from "angular-tree-component";
+import {TreeModule} from "@circlon/angular-tree-component";
 
 import {AngularMaterialModule} from "../../modules/angular-material.module";
 import {BrowserAnimationsModule} from "@angular/platform-browser/animations";
@@ -83,7 +83,7 @@ import {CopyAccountsDialogComponent} from "./billingAccountTab/dialogs/copy-acco
         FormsModule,
         ReactiveFormsModule,
         ServicesModule,
-        TreeModule.forRoot(),
+        TreeModule,
         USERS_GROUPS_ROUTING,
         UtilModule
     ],

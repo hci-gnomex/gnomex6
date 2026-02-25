@@ -28,14 +28,14 @@ import {ConstantsService} from "../../services/constants.service";
         .grabbable {
             cursor: move;
             cursor: grab;
-            cursor: -moz-grab;
-            cursor: -webkit-grab;
+            cursor: grab;
+            cursor: grab;
         }
         .grabbed {
             cursor: move;
             cursor: grabbing;
-            cursor: -moz-grabbing;
-            cursor: -webkit-grabbing;
+            cursor: grabbing;
+            cursor: grabbing;
         }
         .exit{
             max-width: 20px;

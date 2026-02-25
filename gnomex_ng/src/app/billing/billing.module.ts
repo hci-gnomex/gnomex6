@@ -4,7 +4,7 @@ import {AngularMaterialModule} from '../../modules/angular-material.module'
 import {CommonModule} from "@angular/common";
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {ServicesModule} from "../services/services.module";
-import {TreeModule} from "angular-tree-component";
+import {TreeModule} from "@circlon/angular-tree-component";
 
 import {AgGridModule} from "ag-grid-angular";
 import {UtilModule} from "../util/util.module";
@@ -31,7 +31,7 @@ import {AngularSplitModule} from "angular-split";
         FormsModule,
         AngularMaterialModule,
         ServicesModule,
-        TreeModule.forRoot(),
+        TreeModule,
         AgGridModule.withComponents([
             DateEditor,
             DateRenderer,

@@ -1,11 +1,11 @@
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild,} from "@angular/core";
 
-import {ITreeOptions, TreeComponent, TreeModel, TreeNode,} from "angular-tree-component";
+import {ITreeOptions, TreeComponent, TreeModel, TreeNode,} from "@circlon/angular-tree-component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
 import {ActivatedRoute, NavigationExtras, ParamMap, Router} from "@angular/router";
 import {MatDialogConfig} from "@angular/material";
-import {ITreeNode} from "angular-tree-component/dist/defs/api";
+import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {TopicService} from "../services/topic.service";
 import {GnomexService} from "../services/gnomex.service";
