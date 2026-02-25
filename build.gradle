@@ -263,7 +263,7 @@ task copyTomcatJars(type: Copy) {
     dependsOn ':gnomex_tomcat_support:jar', ':gnomex_crypt:jar'
     from 'gnomex_tomcat_support/build/libs'
     from 'gnomex_crypt/build/libs'
-    into "c:/users/u0974549/apache-tomcat-9.0.10/lib"
+    into "${gnomexServerHome}/lib"
 }
 
 war {
@@ -412,7 +412,7 @@ task copyWar(type: Copy) {
     from ("build/libs") {
         include "${warName}"
     }
-    into "c:/users/u0974549/apache-tomcat-9.0.10/${gnomexDeployDir}"
+    into "${gnomexServerHome}/${gnomexDeployDir}"
 }
 
 task createOpenSourceZip(type: Zip) {
