@@ -32,7 +32,7 @@ export class DatatracksFolderComponent implements OnInit, OnDestroy {
     private folderFormGroup: FormGroup;
     private labList: Array<string> = [];
     private datatracksTreeNodeSubscription : Subscription;
-    @ViewChild("descEditorRef", {static: false}) descEditor: AngularEditorComponent;
+    @ViewChild("descEditorRef", {static: true}) descEditor: AngularEditorComponent;
     // todo need a toggle for editable for datatracks overview detail
     @Input() editable;
 

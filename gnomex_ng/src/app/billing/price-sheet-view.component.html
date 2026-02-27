@@ -20,7 +20,7 @@
             <button mat-button (click)="this.addExperimentPlatform()" aria-label="Add experiment platform"><img [src]="'./assets/add.png'" class="icon" alt="Add">Add</button>
             <button mat-button [disabled]="!this.selectedExperimentPlatform" (click)="this.removeExperimentPlatform()" aria-label="Remove selected experiment platform"><img [src]="'./assets/delete.png'" class="icon" alt="Remove">Remove</button>
         </div>
-        <div class="grid-div">
+        <div class="grid-div" appAgGridHeaderA11yFix>
             <ag-grid-angular class="ag-theme-balham full-height full-width"
                              aria-label="Experiment platforms table"
                              (gridReady)="this.onGridReady($event)"

@@ -46,7 +46,7 @@
         <button mat-button (click)="this.addStep()" aria-label="Add workflow step"><img [src]="'./assets/add.png'" class="icon" alt="Add">Add</button>
         <button mat-button [disabled]="!this.selectedStep" (click)="this.removeStep()" aria-label="Remove selected workflow step"><img [src]="'./assets/delete.png'" class="icon" alt="Remove">Remove</button>
     </div>
-    <div class="grid-div">
+    <div class="grid-div" appAgGridHeaderA11yFix>
         <ag-grid-angular class="ag-theme-balham full-height full-width"
                          aria-label="Workflow steps table"
                          (gridReady)="this.onGridReady($event)"

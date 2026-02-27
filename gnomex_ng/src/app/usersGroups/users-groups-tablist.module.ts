@@ -49,6 +49,7 @@ import {AccountFieldsConfigurationService} from "../services/account-fields-conf
 import {TextAlignLeftMiddleEditor} from "../util/grid-editors/text-align-left-middle.editor";
 import {TextAlignRightMiddleEditor} from "../util/grid-editors/text-align-right-middle.editor";
 import {CopyAccountsDialogComponent} from "./billingAccountTab/dialogs/copy-accounts-dialog.component";
+import {AccessibilityModule} from "../util/accessibility/accessibility.module";
 
 /**
  * @author jdewell
@@ -85,7 +86,8 @@ import {CopyAccountsDialogComponent} from "./billingAccountTab/dialogs/copy-acco
         ServicesModule,
         TreeModule,
         USERS_GROUPS_ROUTING,
-        UtilModule
+        UtilModule,
+        AccessibilityModule
     ],
     declarations: [
         BillingAccountTabComponent,

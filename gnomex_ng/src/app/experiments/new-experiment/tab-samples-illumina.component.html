@@ -51,7 +51,7 @@
                 </button>
                 <mat-checkbox *ngIf="this.showCcCheckbox" #ccCheckbox class="double-left-padded" (change)="toggleCC($event)" aria-label="Enter CC Numbers">Enter CC Numbers</mat-checkbox>
             </div>
-            <div class="full-width flex-grow">
+            <div class="full-width flex-grow" appAgGridHeaderA11yFix>
                 <div #oneEmWidth class="no-height single-em" aria-hidden="true"></div>
                 <ag-grid-angular class="ag-theme-fresh full-height full-width"
                                  role="grid"

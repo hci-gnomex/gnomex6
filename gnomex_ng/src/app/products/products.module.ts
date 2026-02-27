@@ -18,6 +18,7 @@ import {WorkAuthorizationTypeSelectorDialogComponent} from "./work-authorization
 import {RouterModule} from "@angular/router";
 import {NewBillingAccountModule} from "../billing/new_billing_account/new-billing-account.module";
 import {DialogsModule} from "../util/popup/dialogs.module";
+import {AccessibilityModule} from "../util/accessibility/accessibility.module";
 
 @NgModule({
     imports: [
@@ -32,7 +33,8 @@ import {DialogsModule} from "../util/popup/dialogs.module";
         ReactiveFormsModule,
         TreeModule,
         NewBillingAccountModule,
-        AgGridModule.withComponents([])
+        AgGridModule.withComponents([]),
+        AccessibilityModule
     ],
     declarations: [
         AddLedgerEntryComponent,

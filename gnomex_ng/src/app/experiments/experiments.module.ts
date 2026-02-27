@@ -77,6 +77,7 @@ import {AddAdditionalAccountsComponent} from "./new-experiment/add-additional-ac
 import {CoreSampleSelectorComponent} from "./new-experiment/core-sample-selector.component";
 import {ImprovedSelectRenderer} from "../util/grid-renderers/improved-select.renderer";
 import {ImprovedSelectEditor} from "../util/grid-editors/improved-select.editor";
+import {AccessibilityModule} from "../util/accessibility/accessibility.module";
 
 @NgModule({
     imports: [
@@ -120,7 +121,8 @@ import {ImprovedSelectEditor} from "../util/grid-editors/improved-select.editor"
             CheckboxRenderer,
         ]),
         UploadModule,
-        AngularEditorModule
+        AngularEditorModule,
+        AccessibilityModule
     ],
     declarations: [
         BrowseExperimentsComponent,

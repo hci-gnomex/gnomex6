@@ -93,7 +93,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                         </button>
                     </div>
                 </div>
-                <div [hidden]="!this.selectedDictionary"
+                <div appAgGridHeaderA11yFix [hidden]="!this.selectedDictionary"
                      class="flex-one {{dicGridEditable ? '' : 'extra-padded-top' }}">
                     <ag-grid-angular class="ag-theme-balham full-height full-width"
                                      (gridReady)="this.onGridReady($event)"

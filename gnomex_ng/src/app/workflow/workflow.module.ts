@@ -41,6 +41,7 @@ import {FlowcellWorkflowComponent} from "./flowcell-workflow.component";
 import {EditFlowcellDialogComponent} from "./edit-flowcell-dialog.component";
 import { TreeModule } from "@circlon/angular-tree-component";
 import {AddSamplesDialogComponent} from "./add-samples-dialog.component";
+import {AccessibilityModule} from "../util/accessibility/accessibility.module";
 
 /**
  * @author jdewell
@@ -78,6 +79,7 @@ import {AddSamplesDialogComponent} from "./add-samples-dialog.component";
         UtilModule,
         ReactiveFormsModule,
         TreeModule,
+        AccessibilityModule,
         DynamicModule.withComponents([QcWorkflowComponent, LibprepWorkflowComponent, LibprepQcWorkflowComponent,
             FlowcellAssemblyWorkflowComponent,  FinalizeWorkflowComponent])
     ],

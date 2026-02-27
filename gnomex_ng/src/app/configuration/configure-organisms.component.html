@@ -4,7 +4,7 @@
         <button mat-button (click)="this.addOrganism()"><img class="icon" [src]="'./assets/page_add.png'">Add</button>
         <button mat-button [disabled]="!this.selectedOrganism || !this.canDeleteSelectedOrganism" (click)="this.removeOrganism()"><img class="icon" [src]="'./assets/page_remove.png'">Remove</button>
     </div>
-    <div class="full-width flex-container-row flex-twenty">
+    <div class="full-width flex-container-row flex-twenty" appAgGridHeaderA11yFix>
         <ag-grid-angular class="ag-theme-balham full-height quarter-width margin-right"
                          (gridReady)="this.onOrganismGridReady($event)"
                          [rowSelection]="'single'"
@@ -56,7 +56,7 @@
                     <mat-error *ngIf="this.mageDefFC.hasError('maxlength')">Exceeds max length</mat-error>
                 </mat-form-field>
             </div>
-            <div class="full-width flex-container-col flex-three align-center">
+            <div class="full-width flex-container-col flex-three align-center" appAgGridHeaderA11yFix>
                 <div class="full-width flex-container-row flex-one align-center">
                     <label class="margin-right">Genome Builds</label>
                     <button mat-button [disabled]="!this.canUpdateSelectedOrganism" (click)="this.addGenomeBuild()"><img class="icon" [src]="'./assets/add.png'">Add</button>

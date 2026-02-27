@@ -25,7 +25,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                 <button mat-button (click)="this.editBillingTemplate()" [disabled]="!this.canUpdate || !this.experimentsService.getEditMode()" aria-label="Edit billing template">Edit Billing Template</button>
                 <label class="small-font" aria-live="polite"><span class="italic">Current Account(s):</span> {{this.currentAccountsLabel}}</label>
             </div>
-            <div class="flex-grow">
+            <div class="flex-grow" appAgGridHeaderA11yFix>
                 <div #oneEmWidth class="no-height single-em" aria-hidden="true"></div>
                 <ag-grid-angular class="ag-theme-balham full-height full-width"
                                  role="grid"

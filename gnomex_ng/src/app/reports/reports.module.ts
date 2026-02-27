@@ -14,6 +14,7 @@ import {EmailAllUsersComponent} from "./email-all-users.component";
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {AngularSplitModule} from "angular-split";
 import {TrackUsageDetailComponent} from "./track-usage-detail.component";
+import {AccessibilityModule} from "../util/accessibility/accessibility.module";
 
 @NgModule({
     imports: [
@@ -27,6 +28,7 @@ import {TrackUsageDetailComponent} from "./track-usage-detail.component";
         ReactiveFormsModule,
         AngularEditorModule,
         AngularSplitModule,
+        AccessibilityModule
     ],
     declarations: [
         AnnotationProgressReportComponent,

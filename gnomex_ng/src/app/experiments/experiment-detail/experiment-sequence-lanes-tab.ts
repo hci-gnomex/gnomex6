@@ -26,7 +26,7 @@ import {Experiment} from "../../util/models/experiment.model";
                 <as-split-area [size]="this.sampleGridSplitSize">
                     <div class="flex-container-col full-height padded">
                         <label>Samples</label>
-                        <div class="flex-grow">
+                        <div class="flex-grow" appAgGridHeaderA11yFix>
                             <ag-grid-angular class="ag-theme-balham full-height full-width"
                                              (gridReady)="this.onSamplesGridReady($event)"
                                              (gridSizeChanged)="this.onGridSizeChanged($event)"
@@ -47,7 +47,7 @@ import {Experiment} from "../../util/models/experiment.model";
                             <button mat-button [disabled]="!editMode || !this.canEdit || this.selectedLanes.length < 1" (click)="this.copySequenceLane()"><img [src]="this.constantsService.ICON_TABLE_MULTIPLE" class="icon">Copy sequence lane</button>
                             <button mat-button [disabled]="!editMode || !this.canEdit || this.selectedLanes.length < 1" (click)="this.promptToDeleteSequenceLane()"><img [src]="this.constantsService.ICON_DELETE" class="icon">Delete sequence lane(s)</button>
                         </div>
-                        <div class="flex-grow">
+                        <div class="flex-grow" appAgGridHeaderA11yFix>
                             <ag-grid-angular #lanesGrid
                                              class="ag-theme-balham full-height full-width"
                                              stopEditingWhenGridLosesFocus="true"
@@ -71,7 +71,7 @@ import {Experiment} from "../../util/models/experiment.model";
 })
 export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
     @ViewChild("lanesGrid", {static: false}) lanesGrid: AgGridAngular;
-    
+
     @Input() editMode: boolean;
     @Input() experiment: Experiment;
 
@@ -96,7 +96,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
     private valueChanging = (params): boolean => {
         let rowData = params.data;
         let field = params.colDef.field;
-        
+
         if (params.newValue !== params.oldValue) {
             rowData.isDirty = "Y";
             rowData[field] = params.newValue;
@@ -107,7 +107,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
             return false;
         }
     }
-    
+
     constructor(public constantsService: ConstantsService,
                 private route: ActivatedRoute,
                 private fb: FormBuilder,
@@ -226,7 +226,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
         this.lanesGridApi = event.api;
         this.setEditMode();
     }
-    
+
     setEditMode() {
         this.label = 'Sequence Lanes';
         if (this.editMode) {
@@ -253,7 +253,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
             this.lanesGridApi.sizeColumnsToFit();
         }
     }
-    
+
     ngOnChanges(changes: SimpleChanges): void {
         if(changes["editMode"] && !changes["editMode"].isFirstChange()) {
             this.setEditMode();

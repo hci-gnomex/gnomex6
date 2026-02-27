@@ -19,6 +19,7 @@ import {AngularMaterialModule} from "../../../modules/angular-material.module";
 import {DATATRACKS_ROUTING} from "../datatracks.routes";
 import {UtilModule} from "../../util/util.module";
 import {AngularEditorModule} from "@kolkov/angular-editor";
+import {AccessibilityModule} from "../../util/accessibility/accessibility.module";
 
 
 @NgModule({
@@ -31,7 +32,8 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         FormsModule,
         ReactiveFormsModule,
         AngularEditorModule,
-        UtilModule
+        UtilModule,
+        AccessibilityModule
     ],
 
     declarations: [

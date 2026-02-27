@@ -23,6 +23,7 @@ import {InvoiceEmailWindowComponent} from "./invoice-email-window.component";
 import {BillingGlInterfaceViewComponent} from "./billing-gl-interface-view.component";
 import {NotesToCoreComponent} from "./notes-to-core.component";
 import {AngularSplitModule} from "angular-split";
+import {AccessibilityModule} from "../util/accessibility/accessibility.module";
 
 @NgModule({
     imports: [
@@ -42,6 +43,7 @@ import {AngularSplitModule} from "angular-split";
         UtilModule,
         ReactiveFormsModule,
         AngularSplitModule,
+        AccessibilityModule
     ],
     declarations: [
         BillingFilterComponent,

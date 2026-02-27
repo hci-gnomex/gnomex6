@@ -20,7 +20,7 @@ import {FormControl} from "@angular/forms";
                     <label>{{this.gridData.length}} file(s)</label>
                 </div>
             </div>
-            <div class="flex-grow">
+            <div class="flex-grow" appAgGridHeaderA11yFix>
                 <div #oneEmWidth class="no-height single-em"></div>
                 <ag-grid-angular class="ag-theme-balham full-height full-width"
                                  (gridReady)="this.onGridReady($event)"
@@ -38,7 +38,7 @@ import {FormControl} from "@angular/forms";
 
         .no-height { height: 0;  }
         .single-em { width: 1em; }
-        
+
     `]
 })
 export class DatatracksFilesTabComponent implements OnInit {

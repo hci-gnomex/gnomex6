@@ -42,7 +42,7 @@
                             Clear All
                         </button>
                     </div>
-                    <div class="full-width flex-grow left-right-padded overflow-auto">
+                    <div class="full-width flex-grow left-right-padded overflow-auto" appAgGridHeaderA11yFix>
                         <ag-grid-angular class="ag-theme-balham full-height full-width"
                                          (gridReady)="onGridReady($event)"
                                          [columnDefs]="columnDefs"

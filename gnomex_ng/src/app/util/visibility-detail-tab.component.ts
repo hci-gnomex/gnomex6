@@ -50,7 +50,7 @@ import {HttpParams} from "@angular/common/http";
                     </button>
                 </div>
             </div>
-            <div style="flex:3" *ngIf="showCollaboratorBlock" >
+            <div style="flex:3" *ngIf="showCollaboratorBlock" appAgGridHeaderA11yFix>
                 <ag-grid-angular style="width: 50%; height:100% "
                                  class="ag-theme-fresh"
                                  [rowDeselection]="true"

@@ -19,6 +19,7 @@ import {TopicsPanelComponent} from "./topics-panel.component"
 import {BasicEmailDialogComponent} from "../util/basic-email-dialog.component";
 import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
 import {AngularEditorModule} from "@kolkov/angular-editor";
+import {AccessibilityModule} from "../util/accessibility/accessibility.module";
 
 @NgModule({
     imports: [
@@ -35,6 +36,7 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         ReactiveFormsModule,
         AngularSplitModule,
         AngularEditorModule,
+        AccessibilityModule
     ],
     declarations: [
         BrowseTopicsComponent,

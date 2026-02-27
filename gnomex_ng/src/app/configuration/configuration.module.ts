@@ -27,6 +27,7 @@ import {OverviewProtocolComponent} from "./overview-protocol.component";
 import {ExperimentPlatformModule} from "./experiment-platform/experiment-platform.module";
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from "@angular/material/dialog";
+import {AccessibilityModule} from "../util/accessibility/accessibility.module";
 
 
 @NgModule({
@@ -48,7 +49,8 @@ import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from "@angular/material/
         AngularSplitModule,
         ExperimentPlatformModule,
         AngularEditorModule,
-        MatDialogModule
+        MatDialogModule,
+        AccessibilityModule
     ],
     declarations: [
         BrowseDictionaryComponent,

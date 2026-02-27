@@ -33,6 +33,7 @@ import {ServicesModule} from "../services/services.module";
 import {UploadModule} from "../upload/upload.module";
 import {LogoutLoaderComponent} from "./logout-loader-component";
 import {UtilModule} from "../util/util.module";
+import {AccessibilityModule} from "../util/accessibility/accessibility.module";
 
 @NgModule({
     imports: [
@@ -57,7 +58,8 @@ import {UtilModule} from "../util/util.module";
         TreeModule,
         ServicesModule,
         UploadModule,
-        UtilModule
+        UtilModule,
+        AccessibilityModule
     ],
     providers: [
        AdvancedSearchService,

@@ -46,7 +46,7 @@ export const FONT_FAMILY = [
         :host /deep/ angular-editor#adminNotesEditor #editor {
             resize: none;
         }
-        
+
         :host /deep/ angular-editor#descEditor .angular-editor-button[title="Insert Image"] {
             display: none;
         }
@@ -69,7 +69,7 @@ export const FONT_FAMILY = [
         :host /deep/ angular-editor#notesEditor #customClassSelector-notesEditor {
             display: none;
         }
-        
+
         :host /deep/ angular-editor#projectDescEditor .angular-editor-button[title="Insert Image"],
         :host /deep/ angular-editor#projectDescEditor .angular-editor-button[title="Unlink"],
         :host /deep/ angular-editor#projectDescEditor .angular-editor-button[title="Horizontal Line"],
@@ -88,7 +88,7 @@ export const FONT_FAMILY = [
         :host /deep/ angular-editor#projectDescEditor #customClassSelector-projectDescEditor {
             display: none;
         }
-        
+
         :host /deep/ angular-editor#adminNotesEditor .angular-editor-button[title="Insert Image"],
         :host /deep/ angular-editor#adminNotesEditor .angular-editor-button[title="Unlink"],
         :host /deep/ angular-editor#adminNotesEditor .angular-editor-button[title="Horizontal Line"],
@@ -124,23 +124,23 @@ export const FONT_FAMILY = [
 
 })
 export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges {
-    
+
     @Input() editMode: boolean;
-    
-    @ViewChild("descEditorRef", {static: false}) descEditor: AngularEditorComponent;
-    @ViewChild("notesEditorRef", {static: false}) notesEditor: AngularEditorComponent;
-    @ViewChild("projectDescEditorRef", {static: false}) projectDescEditor: AngularEditorComponent;
-    @ViewChild("adminNotesEditorRef", {static: false}) adminNotesEditor: AngularEditorComponent;
-    
+
+    @ViewChild("descEditorRef", {static: true}) descEditor: AngularEditorComponent;
+    @ViewChild("notesEditorRef", {static: true}) notesEditor: AngularEditorComponent;
+    @ViewChild("projectDescEditorRef", {static: true}) projectDescEditor: AngularEditorComponent;
+    @ViewChild("adminNotesEditorRef", {static: true}) adminNotesEditor: AngularEditorComponent;
+
     private _showProjectDesc: boolean = false;
     public showCorePrepInstructions: boolean = false;
     public showAdminNotes: boolean = false;
     public get showProjectDesc(): boolean {
         return this._showProjectDesc && !this.editMode;
     }
-    
+
     descriptionForm:FormGroup;
-    
+
     descEditorConfig: AngularEditorConfig = {
         spellcheck: true,
         height: "100%",
@@ -153,7 +153,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
         defaultFontSize: "2",
         fonts: FONT_FAMILY,
     };
-    
+
     notesEditorConfig: AngularEditorConfig = {
         spellcheck: true,
         height: "100%",
@@ -166,7 +166,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
         defaultFontSize: "2",
         fonts: FONT_FAMILY,
     };
-    
+
     projectDescEditorConfig: AngularEditorConfig = {
         spellcheck: true,
         height: "100%",
@@ -192,11 +192,11 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
         defaultFontSize: "2",
         fonts: FONT_FAMILY,
     };
-    
+
     private experiment:any;
     private editorHeight: string = "";
     private editorMinorHeight: string = "";
-    
+
 
     constructor(private fb: FormBuilder,
                 public constantsService:ConstantsService,
@@ -231,32 +231,31 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
                     this.showCorePrepInstructions = true;
                     this.descriptionForm.get("corePrepInstructions").setValue( this.experiment.corePrepInstructions);
                 }
-    
+
                 this._showProjectDesc = false;
                 if(this.experiment.projectDescription && this.experiment.projectDescription !== "") {
                     this._showProjectDesc = true;
                     this.descriptionForm.get("projectDescription").setValue(this.experiment.projectDescription);
                 }
-    
+
                 let showAdminNotesOnRequest = this.gnomexService.getCoreFacilityProperty(this.experiment.idCoreFacility, PropertyService.SHOW_ADMIN_NOTES_ON_REQUEST);
                 this.showAdminNotes = this.secAdvisor.isAdmin && showAdminNotesOnRequest === "Y";
                 if (this.showAdminNotes) {
                     this.descriptionForm.get("adminNotes").setValue( this.experiment.adminNotes);
                 }
-                
 
-                setTimeout( () => {
-                    this.updateForm();
-                });
-                
+
             }
-    
+
         });
     }
 
-    ngAfterViewInit(){
+    ngAfterViewInit() {
+      setTimeout( () => {
+        this.updateForm();
+      });
     }
-    
+
     ngOnChanges(changes: SimpleChanges): void {
         if (this.experimentService.modeChangedExperiment && this.experiment && this.experimentService.modeChangedExperiment.number === this.experiment.number) {
             if (!changes["editMode"].isFirstChange()) {
@@ -264,15 +263,15 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
             }
         }
     }
-    
+
     ngOnDestroy() {
         this.experimentService.modeChangedExperiment = undefined;
         this.experimentService.setEditMode(false);
     }
-    
+
     updateForm() {
         this.getEditorHeight();
-        
+
         if (this.editMode) {
             this.descriptionForm.get("name").enable();
             this.descriptionForm.get("description").enable();
@@ -280,7 +279,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
             this.descEditorConfig.editable = true;
             this.descEditorConfig.height = this.editorHeight;
             this.descEditorConfig.maxHeight = this.editorHeight;
-            
+
             if(this.showCorePrepInstructions) {
                 this.descriptionForm.get("corePrepInstructions").enable();
                 this.notesEditor.editorToolbar.showToolbar = true;
@@ -288,7 +287,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
                 this.notesEditorConfig.height = this.editorMinorHeight;
                 this.notesEditorConfig.maxHeight = this.editorMinorHeight;
             }
-            
+
             if(this.showAdminNotes) {
                 this.descriptionForm.get("adminNotes").enable();
                 this.adminNotesEditor.editorToolbar.showToolbar = true;
@@ -296,24 +295,24 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
                 this.adminNotesEditorConfig.height = this.editorMinorHeight;
                 this.adminNotesEditorConfig.maxHeight = this.editorMinorHeight;
             }
-            
+
         } else {
             this.descriptionForm.get("name").setValue( this.experiment.name);
             this.descriptionForm.get("description").setValue(this.experiment.description);
-            
+
             this.descriptionForm.get("name").disable();
             this.descriptionForm.get("description").disable();
-            
+
             this.descEditor.editorToolbar.showToolbar = false;
             this.descEditorConfig.editable = false;
             this.descEditorConfig.height = this.editorHeight;
             this.descEditorConfig.maxHeight = this.editorHeight;
-            
+
             if(this._showProjectDesc) {
                 this.projectDescEditorConfig.height = this.editorMinorHeight;
                 this.projectDescEditorConfig.maxHeight = this.editorMinorHeight;
             }
-            
+
             if(this.showCorePrepInstructions) {
                 this.descriptionForm.get("corePrepInstructions").setValue( this.experiment.corePrepInstructions);
                 this.descriptionForm.get("corePrepInstructions").disable();
@@ -322,7 +321,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
                 this.notesEditorConfig.height = this.editorMinorHeight;
                 this.notesEditorConfig.maxHeight = this.editorMinorHeight;
             }
-            
+
             if(this.showAdminNotes) {
                 this.descriptionForm.get("adminNotes").setValue(this.experiment.adminNotes);
                 this.descriptionForm.get("adminNotes").disable();
@@ -333,7 +332,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
             }
         } // else if editMode
     }
-    
+
     private getShowEditors(): number {
         let editorNum: number = 1;
         if (this.showCorePrepInstructions) {
@@ -347,7 +346,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
         }
         return editorNum;
     }
-    
+
     private getEditorHeight(): void {
         this.editorHeight = "";
         this.editorMinorHeight = "";

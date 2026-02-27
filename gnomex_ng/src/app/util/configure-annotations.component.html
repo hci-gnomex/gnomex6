@@ -49,7 +49,7 @@
     <div class="flex-container-row flex-grow full-height overflow-auto foreground grid-min-height">
         <as-split>
             <as-split-area [size]="this.gridSplitSize">
-                <div class="full-height full-width flex-grow">
+                <div class="full-height full-width flex-grow" appAgGridHeaderA11yFix>
                     <ag-grid-angular style="width: 100%; height: 100%;"
                          class="ag-theme-fresh"
                          (gridReady)="this.onAnnotGridReady($event)"
@@ -120,8 +120,11 @@
                                             <mat-radio-button [value]="TYPE_OPTION">Dropdown (single selection)</mat-radio-button>
                                             <mat-radio-button [value]="TYPE_MULTI_OPTION">Dropdown (multiple selection)</mat-radio-button>
                                         </mat-radio-group>
-                                        <div style="height: 100%; width: 100%; display: flex; flex-direction: column;  margin-left: 2%;" *ngIf="this.propertyTypeFC.value === this.TYPE_OPTION || this.propertyTypeFC.value === this.TYPE_MULTI_OPTION">
-                                            <div style="display: flex; flex-direction: row;">
+                                        <div style="height: 100%; width: 100%; display: flex; flex-direction: column;
+                                          margin-left: 2%;"
+                                             *ngIf="this.propertyTypeFC.value === this.TYPE_OPTION || this.propertyTypeFC.value === this.TYPE_MULTI_OPTION"
+                                             appAgGridHeaderA11yFix>
+                                            <div style="display: flex; flex-direction: row;" >
                                                 <button mat-button [disabled]="!this.canUpdateSelectedProperty" (click)="this.addOption()"><img class="icon" [src]="'./assets/add.png'">Add option</button>
                                                 <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedOptionIndex == null" (click)="this.deleteOption()"><img class="icon" [src]="'./assets/delete.png'">Delete option</button>
                                             </div>
@@ -144,7 +147,7 @@
                             </mat-tab>
                             <mat-tab label="Applies To">
                                 <div class="tabContent">
-                                    <div class="appliesToGroup" *ngIf="!experimentPlatformMode || this.listFilteredApplication.length > 0">
+                                    <div class="appliesToGroup" *ngIf="!experimentPlatformMode || this.listFilteredApplication.length > 0" appAgGridHeaderA11yFix>
                                         <label class="leadingLabel">Only show for these platforms/experiment types:</label>
                                         <div class="justify-space-between" style="display: flex; flex-direction: row;">
                                             <custom-combo-box class="appliesToField" *ngIf="!experimentPlatformMode"
@@ -172,7 +175,7 @@
                                                          [enableColResize]="true">
                                         </ag-grid-angular>
                                     </div>
-                                    <div class="appliesToGroup">
+                                    <div class="appliesToGroup" appAgGridHeaderA11yFix>
                                         <div class="full-width justify-space-between align-center" style="display: flex; flex-direction: row;">
                                             <label class="leadingLabel" style="width: 40%; margin-right: 2%;">Only show for these organisms: </label>
                                             <custom-combo-box class="appliesToField"
@@ -195,7 +198,7 @@
                                                          [enableColResize]="true">
                                         </ag-grid-angular>
                                     </div>
-                                    <div class="appliesToGroup" *ngIf="!experimentPlatformMode">
+                                    <div class="appliesToGroup" *ngIf="!experimentPlatformMode" appAgGridHeaderA11yFix>
                                         <div class="full-width justify-space-between align-center" style="display: flex; flex-direction: row;">
                                             <label class="leadingLabel" style="width: 40%; margin-right: 2%;">Only show for these analysis types:</label>
                                             <custom-combo-box class="appliesToField"

@@ -61,7 +61,7 @@
     <div class="formRow">
         <label>Select labs for which you would like to receive upload notifications</label>
     </div>
-    <div class="formRow">
+    <div class="formRow" appAgGridHeaderA11yFix>
         <ag-grid-angular style="width: 550px; height: 350px;"
                          class="ag-theme-fresh"
                          (gridReady)="this.onNotifyGridReady($event)"
