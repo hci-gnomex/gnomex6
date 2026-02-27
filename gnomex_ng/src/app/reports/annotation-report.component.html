@@ -48,7 +48,8 @@
 <div>
     <label>Check the annotations you want to see on the report.</label>
 </div>
-<div appAgGridHeaderA11yFix>
+<div>
+  <div appAgGridHeaderA11yFix appFocusManager>
     <ag-grid-angular style="width: 550px; height: 500px;"
                      class="ag-theme-fresh"
                      (gridReady)="onAnnotationGridReady($event)"
@@ -57,6 +58,8 @@
                      [rowData]="annotationRowData"
                      [columnDefs]="annotationColumnDefs">
     </ag-grid-angular>
+  </div>
+  <div appAgGridHeaderA11yFix appFocusManager>
     <ag-grid-angular *ngIf="annotationsFor === FOR_SAMPLES"
                      style="width: 550px; height: 500px;"
                      class="ag-theme-fresh"
@@ -65,5 +68,6 @@
                      [rowData]="customColumnsRowData"
                      [columnDefs]="customColumnsColumnDefs">
     </ag-grid-angular>
+  </div>
 </div>
 <button mat-button (click)="run()"><img [src]="'./assets/accept.png'" style="margin: 0 0.2rem 0 0">Run</button>

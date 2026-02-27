@@ -5,6 +5,7 @@ import {TreeModule} from "@circlon/angular-tree-component";
 import {RelatedDataTabComponent} from "./related-data-tab.component";
 import {ServicesModule} from "../services/services.module";
 import {AngularMaterialModule} from "../../modules/angular-material.module";
+import {AccessibilityModule} from "./accessibility/accessibility.module";
 
 
 
@@ -14,14 +15,15 @@ import {AngularMaterialModule} from "../../modules/angular-material.module";
 
 
 @NgModule({
-    imports: [
-        CommonModule,
-        FormsModule,
-        ServicesModule,
-        TreeModule,
-        AngularMaterialModule
+  imports: [
+    CommonModule,
+    FormsModule,
+    ServicesModule,
+    TreeModule,
+    AngularMaterialModule,
+    AccessibilityModule
 
-    ],
+  ],
     declarations: [
         RelatedDataTabComponent
     ],

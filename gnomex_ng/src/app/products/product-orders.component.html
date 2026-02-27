@@ -32,7 +32,7 @@
         </div>
     </div>
     <div class="flex-container-row flex-ten padding-top" [hidden]="this.displayMode !== this.DISPLAY_DETAIL">
-        <div class="full-height flex-one border">
+        <div appFocusManager class="full-height flex-one border">
             <tree-root #tree [nodes]="this.productOrderList" [options]="this.treeOptions" (activate)="this.onTreeActivate($event)">
                 <ng-template #treeNodeTemplate  let-node>
                     <div class="tree-node-font">
@@ -47,7 +47,7 @@
                 <div class="flex-one">
                     <label *ngIf="this.selectedTreeNode">Product Orders for {{this.selectedTreeNode.data.display}}</label>
                 </div>
-                <div class="flex-thirteen" appAgGridHeaderA11yFix>
+                <div class="flex-thirteen" appAgGridHeaderA11yFix appFocusManager>
                     <ag-grid-angular class="ag-theme-fresh full-height full-width"
                                      (gridReady)="this.onLabGridReady($event)"
                                      (gridSizeChanged)="this.onGridSizeChanged($event)"
@@ -91,7 +91,7 @@
                         </table>
                     </mat-tab>
                     <mat-tab label="Line Items">
-                        <div class="full-height full-width padded" appAgGridHeaderA11yFix>
+                        <div class="full-height full-width padded" appAgGridHeaderA11yFix appFocusManager>
                             <ag-grid-angular class="ag-theme-fresh full-height full-width"
                                              (gridReady)="this.onProductOrderGridReady($event)"
                                              (gridSizeChanged)="this.onGridSizeChanged($event)"
@@ -106,7 +106,7 @@
             </div>
         </div>
     </div>
-    <div class="flex-ten padding-top" [hidden]="this.displayMode !== this.DISPLAY_OVERVIEW" appAgGridHeaderA11yFix>
+    <div class="flex-ten padding-top" [hidden]="this.displayMode !== this.DISPLAY_OVERVIEW" appAgGridHeaderA11yFix appFocusManager>
         <ag-grid-angular class="ag-theme-fresh full-height full-width"
                          (gridReady)="this.onOverviewGridReady($event)"
                          (gridSizeChanged)="this.onGridSizeChanged($event)"

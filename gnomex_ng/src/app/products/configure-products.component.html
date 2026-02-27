@@ -2,8 +2,8 @@
     <button mat-button (click)="this.addProduct()"><img class="icon" [src]="'./assets/page_add.png'">Add Product</button>
     <button mat-button [disabled]="this.selectedProduct == null || this.selectedProduct.canDelete != 'Y'" (click)="this.removeProduct()"><img class="icon" [src]="'./assets/page_remove.png'">Remove Product</button>
 </div>
-<div class="flex-container-row padded">
-    <tree-root #tree class="flex-one margin-right border-right" [nodes]="this.nodes" [options]="this.options" (activate)="this.onActivate($event)"></tree-root>
+<div appFocusManager class="flex-container-row padded">
+    <tree-root  #tree class="flex-one margin-right border-right" [nodes]="this.nodes" [options]="this.options" (activate)="this.onActivate($event)"></tree-root>
     <div [hidden]="this.selectedProduct" class="flex-three">{{''}}</div>
     <form [formGroup]="this.productForm" class="flex-three flex-container-col" [hidden]="!this.selectedProduct">
         <div class="flex-container-row full-width align-center">

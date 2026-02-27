@@ -19,7 +19,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
                 <button mat-button (click)="new()" aria-label="Add new link"><img class="icon" [src]="this.constService.ICON_GREEN_BULLET" alt="New">New</button>
                 <button mat-button [disabled]="selectedRow.length === 0" (click)="delete()" aria-label="Delete selected link"><img class="icon" [src]="this.constService.ICON_RED_BULLET" alt="Delete">Delete</button>
             </div>
-            <div class="full-width full-height" appAgGridHeaderA11yFix>
+            <div class="full-width full-height" appAgGridHeaderA11yFix appFocusManager>
                 <ag-grid-angular style="width: 100%; height: 40em;" class="ag-theme-fresh"
                                  aria-label="Links table"
                                  [gridOptions]="gridOptions"

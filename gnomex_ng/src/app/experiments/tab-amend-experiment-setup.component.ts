@@ -67,7 +67,7 @@ import {PropertyService} from "../services/property.service";
                 </li>
             </ol>
             <div class="flex-grow border">
-                <tree-root #candidateRequestTree [nodes]="this.candidateRequestList" [options]="this.treeOptions" (activate)="this.onTreeActivate($event)">
+                <tree-root appFocusManager #candidateRequestTree [nodes]="this.candidateRequestList" [options]="this.treeOptions" (activate)="this.onTreeActivate($event)">
                     <ng-template #treeNodeTemplate let-node>
                         <div class="tree-node-font">
                             <img src="{{node.data.icon}}" class="icon tree-node-icon">

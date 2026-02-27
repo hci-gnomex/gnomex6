@@ -9,7 +9,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 @Component({
     selector: 'lab-membership-request',
     template: `
-        <div class="double-padded full-width" appAgGridHeaderA11yFix>
+        <div class="double-padded full-width" appAgGridHeaderA11yFix appFocusManager>
             <ag-grid-angular style="width: 460px; height: 400px;"
                              class="ag-theme-fresh"
                              [enableFilter]="true"

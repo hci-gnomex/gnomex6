@@ -28,7 +28,7 @@ import {ActionType} from "../../../util/interfaces/generic-dialog-action.model";
                     <img [src]="this.removePage"> Remove file(s)
                 </button>
             </div>
-            <div style="flex:1; display:flex; width:100%; padding-top: 1em;" appAgGridHeaderA11yFix>
+            <div style="flex:1; display:flex; width:100%; padding-top: 1em;" appAgGridHeaderA11yFix appFocusManager>
                 <ag-grid-angular style="width: 100%;" class="ag-theme-fresh"
                                  [rowData]="rowData"
                                  [columnDefs]="columnDefs"

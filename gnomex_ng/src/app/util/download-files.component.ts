@@ -36,7 +36,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                                 <label id="available-files-label">
                                     Available Files
                                 </label>
-                                <div class="flex-grow" ondrop="permitDrop($event)" (dragover)="onRemoveFromDownload($event)">
+                                <div appFocusManager class="flex-grow" ondrop="permitDrop($event)" (dragover)="onRemoveFromDownload($event)">
                                     <tree-root #availableFilesTreeComponent
                                                [nodes]="availableFilesNodes"
                                                [options]="filesOptions"
@@ -60,7 +60,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                                 <label id="files-to-download-label">
                                     Files to Download
                                 </label>
-                                <div class="flex-grow" ondrop="permitDrop($event)" (dragover)="onDropInDownload($event)">
+                                <div appFocusManager class="flex-grow" ondrop="permitDrop($event)" (dragover)="onDropInDownload($event)">
                                     <tree-root #filesToDownloadTreeComponent
                                                [nodes]="filesToDownloadNodes"
                                                [options]="filesOptions"

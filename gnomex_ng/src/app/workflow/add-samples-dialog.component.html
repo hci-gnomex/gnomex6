@@ -15,7 +15,7 @@
                         </custom-combo-box>
                     </div>
                     <div class="full-width flex-grow left-right-padded overflow-auto">
-                        <div class="full-height full-width border-subtle">
+                        <div appFocusManager class="full-height full-width border-subtle">
                             <tree-root (activate)="onTreeSelected($event)"
                                        [nodes]="itemList" [options]="options">
                                 <ng-template #treeNodeTemplate let-node let-index="index">
@@ -42,7 +42,7 @@
                             Clear All
                         </button>
                     </div>
-                    <div class="full-width flex-grow left-right-padded overflow-auto" appAgGridHeaderA11yFix>
+                    <div class="full-width flex-grow left-right-padded overflow-auto" appAgGridHeaderA11yFix appFocusManager>
                         <ag-grid-angular class="ag-theme-balham full-height full-width"
                                          (gridReady)="onGridReady($event)"
                                          [columnDefs]="columnDefs"

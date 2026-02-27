@@ -16,8 +16,8 @@
             <div *ngIf="this.isAdminState" class="five-percent-height flex-container-row justify-end">
                 <button mat-button color="accent" (click)="this.addProduct()"><img [src]="'./assets/add.png'" class="icon">Add Product</button>
             </div>
-            <div class="ninety-five-percent-height">
-                <tree-root #tree [nodes]="this.treeNodes" [options]="this.treeOptions" (activate)="this.onActivate($event)"></tree-root>
+            <div  appFocusManager class="ninety-five-percent-height">
+                <tree-root  #tree [nodes]="this.treeNodes" [options]="this.treeOptions" (activate)="this.onActivate($event)"></tree-root>
             </div>
         </div>
         <div class="full-height flex-container-col flex-three padded">
@@ -25,7 +25,7 @@
                 <label><img class="icon" [src]="'./assets/review.png'">Product Total: {{this.selectedProduct && this.selectedProduct.qty ? this.selectedProduct.qty : ''}}</label>
                 <button [disabled]="!this.selectedProduct" *ngIf="this.isAdminState" mat-button color="accent" (click)="this.addRow()"><img [src]="'./assets/add.png'" class="icon">Add Row</button>
             </div>
-            <div class="ninety-percent-height" appAgGridHeaderA11yFix>
+            <div class="ninety-percent-height" appAgGridHeaderA11yFix appFocusManager>
                 <ag-grid-angular class="ag-theme-fresh full-height full-width"
                                  (gridReady)="this.onGridReady($event)"
                                  (cellValueChanged)="this.onGridCellValueChanged()"

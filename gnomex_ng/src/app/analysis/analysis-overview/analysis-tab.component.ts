@@ -41,7 +41,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                         </button>
                     </div>
                 </div>
-                <div class="full-width flex-grow" role="region" aria-label="Analysis data" appAgGridHeaderA11yFix>
+                <div class="full-width flex-grow" role="region" aria-label="Analysis data" appAgGridHeaderA11yFix appFocusManager>
                     <ag-grid-angular class="full-width full-height ag-theme-fresh"
                                      [gridOptions]="gridOpt"
                                      [columnDefs]="columnDefs"

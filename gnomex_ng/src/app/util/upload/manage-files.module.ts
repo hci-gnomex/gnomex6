@@ -21,28 +21,30 @@ import {TreeModule} from "@circlon/angular-tree-component";
 import {AngularSplitModule} from "angular-split";
 import {UtilModule} from "../util.module";
 import {LinkedSampleFileComponent} from "./linked-sample-file.component";
+import {AccessibilityModule} from "../accessibility/accessibility.module";
 
 @NgModule({
-    imports: [
-        CommonModule,
-        MatButtonModule,
-        MatDialogModule,
-        MatListModule,
-        MatTabsModule,
-        MatInputModule,
-        HttpClientModule,
-        MatTooltipModule,
-        TreeModule,
-        AgGridModule,
-        AngularSplitModule,
-        MatFormFieldModule,
-        UtilModule,
-        BrowserAnimationsModule,
-        MatProgressBarModule,
-        FormsModule,
-        ReactiveFormsModule
+  imports: [
+    CommonModule,
+    MatButtonModule,
+    MatDialogModule,
+    MatListModule,
+    MatTabsModule,
+    MatInputModule,
+    HttpClientModule,
+    MatTooltipModule,
+    TreeModule,
+    AgGridModule,
+    AngularSplitModule,
+    MatFormFieldModule,
+    UtilModule,
+    BrowserAnimationsModule,
+    MatProgressBarModule,
+    FormsModule,
+    ReactiveFormsModule,
+    AccessibilityModule
 
-    ],
+  ],
     declarations: [ UploadFileComponent,
         ManageFilesDialogComponent,
         OrganizeFilesComponent,

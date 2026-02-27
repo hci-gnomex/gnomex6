@@ -84,7 +84,7 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
                         </div>
                     </div>
 
-                    <div appAgGridHeaderA11yFix *ngIf="this.formGroup.get('hasChipTypes').value"
+                    <div appAgGridHeaderA11yFix appFocusManager *ngIf="this.formGroup.get('hasChipTypes').value"
                          class="flex-container-col flex-grow">
                         <div class="flex-container-row align-center justify-space-between">
                             <div class="flex-container-row">

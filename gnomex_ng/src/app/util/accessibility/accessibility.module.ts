@@ -1,7 +1,8 @@
-import {NgModule} from "@angular/core";
-import {CommonModule} from "@angular/common";
-import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {AgGridHeaderA11yFixDirective} from "./app-ag-grid-header-a11y.directive";
+import {NgModule} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {AgGridHeaderA11yFixDirective} from './app-ag-grid-header-a11y.directive';
+import {FocusManagerDirective} from './focus-manager.directive';
 
 
 @NgModule({
@@ -11,11 +12,13 @@ import {AgGridHeaderA11yFixDirective} from "./app-ag-grid-header-a11y.directive"
     ReactiveFormsModule,
   ],
   declarations: [
-    AgGridHeaderA11yFixDirective
+    AgGridHeaderA11yFixDirective,
+    FocusManagerDirective
 
   ],
   exports: [
-    AgGridHeaderA11yFixDirective
+    AgGridHeaderA11yFixDirective,
+    FocusManagerDirective
   ]
 
 })

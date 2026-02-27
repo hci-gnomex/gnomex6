@@ -33,7 +33,7 @@
             {{ requestIds.length > 0 ? requestIds.length - 1  : 0 }} requests in worklist
         </mat-label>
     </div>
-    <div class="flex-grow padded-bottom" appAgGridHeaderA11yFix>
+    <div class="flex-grow padded-bottom" appAgGridHeaderA11yFix appFocusManager>
         <div #oneEmWidth class="no-height single-em"></div>
         <ag-grid-angular class="ag-theme-fresh full-height full-width"
                          [enableSorting]="true"

@@ -11,7 +11,7 @@ import {DialogsService, DialogType} from "./popup/dialogs.service";
     template: `
         <div style="display:flex; height:100%;" role="region" aria-label="Related data">
             <ng-container *ngFor="let key of relatedKeys">
-                <div class="flex-item-tree" [matTooltip]="this.treeNameLookup[key]" *ngIf="this.relatedObjects[key]?.length > 0"
+                <div appFocusManager class="flex-item-tree" [matTooltip]="this.treeNameLookup[key]" *ngIf="this.relatedObjects[key]?.length > 0"
                      role="region" [attr.aria-label]="treeNameLookup[key] + ' tree'">
                     <tree-root [nodes]="this.relatedObjects[key]" [options]="options" (activate)="onActivateTree($event)"
                                role="tree" [attr.aria-label]="treeNameLookup[key]">

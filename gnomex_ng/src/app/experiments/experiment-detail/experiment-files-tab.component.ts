@@ -25,7 +25,7 @@ import {UtilService} from "../../services/util.service";
                 <button mat-button (click)="this.handleManageFiles()" [disabled]="!this.canUpdate" aria-label="Manage files"><img [src]="this.constantsService.ICON_CHART_ORGANIZATION" class="icon" alt="" aria-hidden="true">Manage Files</button>
                 <button mat-button (click)="this.handleDownloadFiles()" aria-label="Download files"><img [src]="this.constantsService.ICON_DOWNLOAD" class="icon" alt="" aria-hidden="true">Download Files</button>
             </div>
-            <div class="flex-grow" appAgGridHeaderA11yFix>
+            <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager>
                 <div #oneEmWidth class="no-height single-em" aria-hidden="true"></div>
                 <ag-grid-angular class="ag-theme-balham full-height full-width"
                                  role="grid"

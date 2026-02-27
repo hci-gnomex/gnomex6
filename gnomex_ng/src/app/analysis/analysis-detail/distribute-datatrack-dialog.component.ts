@@ -21,7 +21,7 @@ import {FileService} from "../../services/file.service";
                     select all
                 </mat-checkbox>
             </div>
-            <div class="flex-grow" appAgGridHeaderA11yFix>
+            <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager>
                 <ag-grid-angular class="ag-theme-balham full-height full-width"
                                  (gridReady)="this.onGridReady($event)"
                                  (gridSizeChanged)="this.onGridSizeChanged($event)"

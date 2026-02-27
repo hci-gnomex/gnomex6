@@ -36,7 +36,7 @@
                         Upload Files
                     </div>
                     <div class="full-width flex-grow left-right-padded overflow-auto">
-                        <div class="full-height full-width border-subtle" role="tree" aria-labelledby="upload-files-heading">
+                        <div appFocusManager class="full-height full-width border-subtle" role="tree" aria-labelledby="upload-files-heading">
                             <tree-root #uploadTree
                                        *ngIf="showFileTrees && uploadFiles"
                                        (activate)="uploadTreeOnSelect($event)"
@@ -65,7 +65,7 @@
                     </div>
                     <div class="full-width flex-grow left-right-padded overflow-auto">
                         <div class="full-height full-width border-subtle" role="tree" aria-labelledby="folder-heading">
-                            <tree-root #organizeTree
+                            <tree-root appFocusManager #organizeTree
                                        *ngIf="showFileTrees && organizeFiles"
                                        (activate)="organizeTreeOnSelect($event)"
                                        (initialized)="initOrganizeTree($event)"

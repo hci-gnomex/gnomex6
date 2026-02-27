@@ -49,7 +49,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
                     <img [src]="this.constantsService.ICON_DOWNLOAD" class="icon" alt="" aria-hidden="true">Download Files
                 </button>
             </div>
-            <div class="flex-grow" role="region" aria-label="Files list" appAgGridHeaderA11yFix>
+            <div class="flex-grow" role="region" aria-label="Files list" appAgGridHeaderA11yFix appFocusManager>
                 <ag-grid-angular class="ag-theme-balham full-height full-width"
                                  (gridReady)="this.onGridReady($event)"
                                  (gridSizeChanged)="this.onGridSizeChanged($event)"

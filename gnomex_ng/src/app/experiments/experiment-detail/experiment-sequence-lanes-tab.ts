@@ -26,7 +26,7 @@ import {Experiment} from "../../util/models/experiment.model";
                 <as-split-area [size]="this.sampleGridSplitSize">
                     <div class="flex-container-col full-height padded">
                         <label>Samples</label>
-                        <div class="flex-grow" appAgGridHeaderA11yFix>
+                        <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager>
                             <ag-grid-angular class="ag-theme-balham full-height full-width"
                                              (gridReady)="this.onSamplesGridReady($event)"
                                              (gridSizeChanged)="this.onGridSizeChanged($event)"
@@ -47,7 +47,7 @@ import {Experiment} from "../../util/models/experiment.model";
                             <button mat-button [disabled]="!editMode || !this.canEdit || this.selectedLanes.length < 1" (click)="this.copySequenceLane()"><img [src]="this.constantsService.ICON_TABLE_MULTIPLE" class="icon">Copy sequence lane</button>
                             <button mat-button [disabled]="!editMode || !this.canEdit || this.selectedLanes.length < 1" (click)="this.promptToDeleteSequenceLane()"><img [src]="this.constantsService.ICON_DELETE" class="icon">Delete sequence lane(s)</button>
                         </div>
-                        <div class="flex-grow" appAgGridHeaderA11yFix>
+                        <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager>
                             <ag-grid-angular #lanesGrid
                                              class="ag-theme-balham full-height full-width"
                                              stopEditingWhenGridLosesFocus="true"

@@ -16,7 +16,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
     selector: "analysis-visiblity-tab",
     template: `
         <div class="flexbox-column">
-            <div style="flex:1; display:flex; width:100%;" appAgGridHeaderA11yFix>
+            <div style="flex:1; display:flex; width:100%;" appAgGridHeaderA11yFix appFocusManager>
                 <ag-grid-angular style="width: 100%;" class="ag-theme-fresh"
                                  [gridOptions]="gridOpt"
                                  [rowData]="rowData"

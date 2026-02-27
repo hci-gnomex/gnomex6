@@ -20,7 +20,7 @@ import {FormControl} from "@angular/forms";
                     <label>{{this.gridData.length}} file(s)</label>
                 </div>
             </div>
-            <div class="flex-grow" appAgGridHeaderA11yFix>
+            <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager>
                 <div #oneEmWidth class="no-height single-em"></div>
                 <ag-grid-angular class="ag-theme-balham full-height full-width"
                                  (gridReady)="this.onGridReady($event)"

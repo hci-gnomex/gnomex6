@@ -12,7 +12,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
     selector: "track-usage-detail",
     template: `
         <div class="full-height full-width flex-container-row">
-            <div *ngIf="this.showGrid1" class="grid-container" appAgGridHeaderA11yFix>
+            <div *ngIf="this.showGrid1" class="grid-container" appAgGridHeaderA11yFix appFocusManager>
                 <ag-grid-angular class="full-height full-width ag-theme-balham font-small"
                                  [columnDefs]="this.gridColDefs1"
                                  [enableColResize]="true"
@@ -22,7 +22,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
                                  (gridReady)="this.resizeColumns($event)">
                 </ag-grid-angular>
             </div>
-            <div *ngIf="this.showGrid2" class="grid-container margin-left" appAgGridHeaderA11yFix>
+            <div *ngIf="this.showGrid2" class="grid-container margin-left" appAgGridHeaderA11yFix appFocusManager>
                 <ag-grid-angular class="full-height full-width ag-theme-balham font-small"
                                  [columnDefs]="this.gridColDefs2"
                                  [enableColResize]="true"

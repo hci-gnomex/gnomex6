@@ -17,7 +17,7 @@ import {IGnomexErrorResponse} from "../../../util/interfaces/gnomex-error.respon
                     Select
                     <input  type="file" (change)="fileChange($event)" style="width: 70%;" accept=".bnib,.fasta" multiple>
                 </label>
-                <div style="height:25em; width:100%; margin-top:0.5em;" appAgGridHeaderA11yFix>
+                <div style="height:25em; width:100%; margin-top:0.5em;" appAgGridHeaderA11yFix appFocusManager>
                     <ag-grid-angular style="width: 100%; height: 100%;" class="ag-theme-fresh"
                                      [rowData]="rowData"
                                      [columnDefs]="columnDefs"

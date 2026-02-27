@@ -53,8 +53,8 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                         </button>
                     </div>
                 </div>
-                <div class="tree-container">
-                    <tree-root #treeComponent
+                <div appFocusManager class="tree-container">
+                    <tree-root  #treeComponent
                                (activate)="this.selectTreeItem($event)"
                                [nodes]="this.dictionaries"
                                [options]="treeOptions">
@@ -93,7 +93,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                         </button>
                     </div>
                 </div>
-                <div appAgGridHeaderA11yFix [hidden]="!this.selectedDictionary"
+                <div appAgGridHeaderA11yFix appFocusManager [hidden]="!this.selectedDictionary"
                      class="flex-one {{dicGridEditable ? '' : 'extra-padded-top' }}">
                     <ag-grid-angular class="ag-theme-balham full-height full-width"
                                      (gridReady)="this.onGridReady($event)"
