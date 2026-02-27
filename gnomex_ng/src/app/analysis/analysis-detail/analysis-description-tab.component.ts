@@ -27,7 +27,7 @@ import {AnalysisService} from "../../services/analysis.service";
 export class AnalysisDescriptionTabComponent implements OnInit, OnChanges, AfterViewInit {
 
   @Input() public isEditMode: boolean = false;
-  @ViewChild("descEditorRef", {static: false}) descEditor: AngularEditorComponent;
+  @ViewChild("descEditorRef", {static: true}) descEditor: AngularEditorComponent;
 
   public form: FormGroup;
   public editorConfig: AngularEditorConfig;

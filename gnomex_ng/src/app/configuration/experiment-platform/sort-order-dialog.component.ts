@@ -16,7 +16,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
     template: `
         <div class="flex-container-col full-width full-height">
         <div class="full-height padded" style="background-color: #eeeeeb;border:thin;">
-            <div style="height:25em; width:50em;">
+            <div style="height:25em; width:50em;" appAgGridHeaderA11yFix>
                 <ag-grid-angular style="width: 100%; height: 100%;" class="ag-theme-fresh"
                                  [rowData]="rowData"
                                  [columnDefs]="columnDefs"

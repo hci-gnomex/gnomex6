@@ -9,6 +9,7 @@ import {MyAccountComponent} from "./my-account.component";
 import {LabMembershipRequestComponent} from "./lab-membership-request.component";
 import {ResetPasswordComponent} from "./reset-password.component";
 import {ChangePasswordComponent} from "./change-password.component";
+import {AccessibilityModule} from "../util/accessibility/accessibility.module";
 
 @NgModule({
     imports: [
@@ -18,7 +19,8 @@ import {ChangePasswordComponent} from "./change-password.component";
         FormsModule,
         UtilModule,
         AgGridModule.withComponents([]),
-        ReactiveFormsModule,
+        AccessibilityModule,
+        ReactiveFormsModule
     ],
     declarations: [
         MyAccountComponent,

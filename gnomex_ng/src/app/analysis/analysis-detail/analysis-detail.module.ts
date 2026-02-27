@@ -23,6 +23,7 @@ import {ManagePedFileWindowComponent} from "./manage-ped-file-window.component";
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {AnalysisDescriptionTabComponent} from "./analysis-description-tab.component";
 import {DistributeDatatrackDialogComponent} from "./distribute-datatrack-dialog.component";
+import {AccessibilityModule} from "../../util/accessibility/accessibility.module";
 
 
 
@@ -42,6 +43,7 @@ import {DistributeDatatrackDialogComponent} from "./distribute-datatrack-dialog.
         AngularSplitModule,
         ManageFilesModule,
         AngularEditorModule,
+        AccessibilityModule
     ],
 
     declarations: [

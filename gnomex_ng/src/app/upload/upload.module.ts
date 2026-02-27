@@ -32,6 +32,7 @@ import {UrlAnnotRenderer} from "../util/grid-renderers/url-annot-renderer";
 import {CheckboxRenderer} from "../util/grid-renderers/checkbox.renderer";
 
 import {SampleUploadService} from "./sample-upload.service";
+import {AccessibilityModule} from "../util/accessibility/accessibility.module";
 
 @NgModule({
     imports: [
@@ -60,6 +61,7 @@ import {SampleUploadService} from "./sample-upload.service";
             CheckboxRenderer,
         ]),
         AngularSplitModule,
+        AccessibilityModule
     ],
     declarations: [
         BulkSampleUploadComponent,

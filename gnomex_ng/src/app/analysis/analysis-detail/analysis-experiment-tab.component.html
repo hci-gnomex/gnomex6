@@ -51,7 +51,7 @@
                         <mat-radio-button [value]="SAMPLE" class="padded-left-right" aria-label="Other experiments"> Other{{"(" + this.sampleList.length + ")"}} </mat-radio-button>
                     </mat-radio-group>
                 </div>
-                <div  class="flex-grow padded" role="region" aria-label="Experiments grid">
+                <div  class="flex-grow padded" role="region" aria-label="Experiments grid" appAgGridHeaderA11yFix>
                     <ag-grid-angular style="width: 100%; height: 100%;" class="ag-theme-fresh"
                                      [gridOptions]="gridOpt"
                                      [rowSelection]="'multiple'"

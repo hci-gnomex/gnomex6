@@ -25,7 +25,7 @@
                 <label><img class="icon" [src]="'./assets/review.png'">Product Total: {{this.selectedProduct && this.selectedProduct.qty ? this.selectedProduct.qty : ''}}</label>
                 <button [disabled]="!this.selectedProduct" *ngIf="this.isAdminState" mat-button color="accent" (click)="this.addRow()"><img [src]="'./assets/add.png'" class="icon">Add Row</button>
             </div>
-            <div class="ninety-percent-height">
+            <div class="ninety-percent-height" appAgGridHeaderA11yFix>
                 <ag-grid-angular class="ag-theme-fresh full-height full-width"
                                  (gridReady)="this.onGridReady($event)"
                                  (cellValueChanged)="this.onGridCellValueChanged()"

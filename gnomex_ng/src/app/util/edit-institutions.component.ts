@@ -20,7 +20,7 @@ import {IGnomexErrorResponse} from "./interfaces/gnomex-error.response.model";
                     <img [src]="this.constantsService.PAGE_REMOVE" class="icon" alt="" aria-hidden="true">Remove Institution
                 </button>
             </div>
-            <div class="flex-grow" role="region" aria-label="Institutions list">
+            <div class="flex-grow" role="region" aria-label="Institutions list" appAgGridHeaderA11yFix>
                 <ag-grid-angular class="full-height full-width ag-theme-balham"
                                  [stopEditingWhenGridLosesFocus]="true"
                                  [singleClickEdit]="true"

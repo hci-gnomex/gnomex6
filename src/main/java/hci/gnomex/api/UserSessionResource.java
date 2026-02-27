@@ -56,7 +56,7 @@ public class UserSessionResource {
             throw new WebApplicationException(Response.Status.BAD_REQUEST);
         }
 
-
+        // Create a Shiro authentication token with the credentials
         UsernamePasswordToken token = new UsernamePasswordToken(userSessionDTO.getUsername(), userSessionDTO.getPassword());
 
         try {
@@ -74,6 +74,7 @@ public class UserSessionResource {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
 
+        // Return a successful response if authentication is successful
         return Response.status(Response.Status.CREATED).build();
     }
 

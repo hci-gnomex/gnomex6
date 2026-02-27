@@ -16,7 +16,7 @@ import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 
         <!--- <grid dataProvider={} > -->
         <div style="height:100%; width:100%; display:flex; flex-direction: column;" role="region" aria-label="Experiments list">
-            <div style="display:flex; flex-direction:column; flex:1; width:100%;">
+            <div style="display:flex; flex-direction:column; flex:1; width:100%;" appAgGridHeaderA11yFix>
                 <ag-grid-angular class="ag-theme-fresh" style="width: 100%;  height: 100%;"
                                  role="grid"
                                  aria-label="Experiments data grid"

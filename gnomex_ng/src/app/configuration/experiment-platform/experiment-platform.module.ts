@@ -35,6 +35,7 @@ import {EpExperimentTypeQcTabComponent} from "./ep-experiment-type-qc-tab.compon
 import {QcAssayDialogComponent} from "./qc-assay-dialog.component";
 import {QcAssayChipTypeDialogComponent} from "./qc-assay-chip-type-dialog.component";
 import {AngularEditorModule} from "@kolkov/angular-editor";
+import {AccessibilityModule} from "../../util/accessibility/accessibility.module";
 
 
 
@@ -60,6 +61,7 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         AngularEditorModule,
         ReactiveFormsModule,
         AngularSplitModule,
+        AccessibilityModule,
         DynamicModule.withComponents([ExperimentPlatformTabComponent,
             EpSampleTypeTabComponent,
             ConfigureAnnotationsComponent,

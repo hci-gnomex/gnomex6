@@ -10,7 +10,7 @@ import {ConstantsService} from "../services/constants.service";
 //assets/page_add.png
 
 @Component({
-    template: `        
+    template: `
         <div style="display:flex; flex-direction: column; height:100%; width:100%;">
             <div *ngIf="secAdvisor.isSuperAdmin" style="margin-bottom: 0.5em">
                 <button mat-button color="primary" type="button" (click)="addCore($event)">
@@ -20,7 +20,7 @@ import {ConstantsService} from "../services/constants.service";
             <div style="display:flex;height:100%; width:100%;">
                 <as-split direction="horizontal" (dragEnd)="onSplitDragEnd($event)">
                     <as-split-area size="20">
-                        <div style="height:100%;width:100%;">
+                        <div style="height:100%;width:100%;" appAgGridHeaderA11yFix>
                             <ag-grid-angular style="width: 100%; height: 90%;" class="ag-theme-fresh"
                                              [gridOptions]="gridOpt"
                                              [rowData]="rowData"
@@ -45,9 +45,9 @@ import {ConstantsService} from "../services/constants.service";
                 </as-split>
 
             </div>
-            
+
         </div>
-        
+
         `,
     styles:[`
         .active-item {

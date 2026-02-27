@@ -10,7 +10,7 @@ import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-d
 @Component({
     selector: 'notes-to-core',
     template: `
-        <div class="grid-div padded">
+        <div class="grid-div padded" appAgGridHeaderA11yFix>
             <ag-grid-angular class="ag-theme-balham full-height full-width font-small"
                              (gridReady)="this.onNotesGridReady($event)"
                              (rowClicked)="this.onNotesGridSelection($event)"

@@ -58,7 +58,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 })
 
 export class CreateAnalysisGroupComponent extends BaseGenericContainerDialog implements OnInit, AfterViewInit {
-    @ViewChild("descEditorRef", {static: false}) descEditor: AngularEditorComponent;
+    @ViewChild("descEditorRef", {static: true}) descEditor: AngularEditorComponent;
 
     public createAnalysisGroupForm: FormGroup;
     public labList: any[];

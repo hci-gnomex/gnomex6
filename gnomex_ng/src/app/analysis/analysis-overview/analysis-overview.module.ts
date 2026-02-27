@@ -15,6 +15,7 @@ import {AgGridModule} from "ag-grid-angular";
 import {TabsModule} from "../../util/tabs/tabs.module";
 import {AngularMaterialModule} from "../../../modules/angular-material.module";
 import {UtilModule} from "../../util/util.module";
+import {AccessibilityModule} from "../../util/accessibility/accessibility.module";
 
 
 
@@ -27,7 +28,8 @@ import {UtilModule} from "../../util/util.module";
         AngularMaterialModule,
         FormsModule,
         ReactiveFormsModule,
-        UtilModule
+        UtilModule,
+        AccessibilityModule
     ],
 
     declarations: [

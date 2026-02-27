@@ -16,6 +16,7 @@ import {RelatedDataModule} from "../../util/related-data.module";
 import {DatatracksFilesTabComponent} from "./datatracks-files-tab.component";
 import {AgGridModule} from "ag-grid-angular";
 import {AngularEditorModule} from "@kolkov/angular-editor";
+import {AccessibilityModule} from "../../util/accessibility/accessibility.module";
 
 /**
  * @author Erik Rasmussen
@@ -36,6 +37,7 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         AngularEditorModule,
         AgGridModule.withComponents([
         ]),
+        AccessibilityModule
     ],
     declarations: [
         DatatracksDetailOverviewComponent,

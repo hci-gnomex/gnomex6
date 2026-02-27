@@ -46,7 +46,7 @@
         <button mat-button (click)="this.addStep()"><img [src]="'./assets/add.png'" class="icon">Add</button>
         <button mat-button [disabled]="!this.selectedStep" (click)="this.removeStep()"><img [src]="'./assets/delete.png'" class="icon">Remove</button>
     </div>
-    <div class="grid-div">
+    <div class="grid-div" appAgGridHeaderA11yFix>
         <ag-grid-angular class="ag-theme-balham full-height full-width"
                          (gridReady)="this.onGridReady($event)"
                          (gridSizeChanged)="this.onGridSizeChanged($event)"

@@ -56,8 +56,8 @@ export class LibraryPrepStepsDialogComponent extends BaseGenericContainerDialog 
     applyStepsFn:any;
     formGroup:FormGroup;
     rowData:any;
-    @ViewChild("csEditorRef", {static: false}) csEditor: AngularEditorComponent;
-    @ViewChild("csNoLibPrepEditorRef", {static: false}) csNoPrepEditor: AngularEditorComponent;
+    @ViewChild("csEditorRef", {static: true}) csEditor: AngularEditorComponent;
+    @ViewChild("csNoLibPrepEditorRef", {static: true}) csNoPrepEditor: AngularEditorComponent;
     public editorConfig: AngularEditorConfig;
     public editorConfigNoPrep: AngularEditorConfig;
 

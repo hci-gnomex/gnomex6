@@ -10,7 +10,7 @@
                                     <input matInput [(ngModel)]="searchText" (input)="search()" placeholder="Search by name or email...">
                                 </mat-form-field>
                             </div>
-                            <div class="full-width flex-grow padded-left-right small-font">
+                            <div class="full-width flex-grow padded-left-right small-font" appAgGridHeaderA11yFix>
                                 <ag-grid-angular id="userTable"
                                                  class="full-width full-height ag-theme-fresh"
                                                  [gridOptions]="gridOptions"
@@ -76,7 +76,7 @@
                                     </mat-expansion-panel>
                                 </mat-accordion>
                             </div>
-                            <div class="full-width flex-grow padded-left-right">
+                            <div class="full-width flex-grow padded-left-right" appAgGridHeaderA11yFix>
                                 <ag-grid-angular class="full-width full-height ag-theme-fresh"
                                                  [gridOptions]="groupsGridOptions"
                                                  [rowData]="groupsData"
@@ -278,7 +278,7 @@
                             </as-split-area>
                             <as-split-area size="25">
                                 <div class="full-height full-width flex-container-row foreground padded">
-                                    <div class="flex-grow">
+                                    <div class="flex-grow" appAgGridHeaderA11yFix>
                                         <ag-grid-angular class="full-height full-width ag-theme-fresh"
                                                          [gridOptions]="labGridOptions"
                                                          [rowData]="labs"
@@ -290,7 +290,7 @@
                                     </div>
                                     <div class="horizontal-spacer">
                                     </div>
-                                    <div class="flex-grow">
+                                    <div class="flex-grow" appAgGridHeaderA11yFix>
                                         <ag-grid-angular class="full-height full-width ag-theme-fresh"
                                                          [gridOptions]="collGridOptions"
                                                          [rowData]="collaboratingLabs"
@@ -302,7 +302,7 @@
                                     </div>
                                     <div class="horizontal-spacer">
                                     </div>
-                                    <div class="flex-grow">
+                                    <div class="flex-grow" appAgGridHeaderA11yFix>
                                         <ag-grid-angular class="full-height full-width ag-theme-fresh"
                                                          [gridOptions]="manGridOptions"
                                                          [rowData]="managingLabs"

@@ -15,7 +15,7 @@ import {DictionaryService} from "../../services/dictionary.service";
     <fieldset>
     </fieldset>
 </form>
-<div>
+<div appAgGridHeaderA11yFix>
     <ag-grid-angular class="ag-theme-fresh"
                      style="height: 500px; width: 1200px;"
                      [gridOptions]="gridOptions"

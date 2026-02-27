@@ -10,6 +10,7 @@ import {AgGridModule} from "ag-grid-angular";
 import {ConfigureAnnotationsComponent} from "./configure-annotations.component";
 import {UtilModule} from "./util.module";
 import {AngularSplitModule} from "angular-split";
+import {AccessibilityModule} from "./accessibility/accessibility.module";
 
 
 
@@ -22,7 +23,8 @@ import {AngularSplitModule} from "angular-split";
         UtilModule,
         AgGridModule.withComponents([]),
         ReactiveFormsModule,
-        AngularSplitModule
+        AngularSplitModule,
+        AccessibilityModule
     ],
     declarations: [
         ConfigureAnnotationsComponent,
