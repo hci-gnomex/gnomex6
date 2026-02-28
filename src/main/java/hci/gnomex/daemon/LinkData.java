@@ -1,0 +1,591 @@
+package hci.gnomex.daemon;
+
+// 02/07/2018	tim
+// 01/30/2019   tim     fix hardwired 2018 year
+
+
+import hci.gnomex.utility.BatchDataSource;
+import hci.gnomex.utility.PropertyDictionaryHelper;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.internal.SessionImpl;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+public class LinkData extends TimerTask {
+
+    private static long fONCE_PER_DAY = 1000 * 60 * 60 * 24; // A day in
+    // milliseconds
+    private static int fONE_DAY = 1;
+    private static int wakeupHour = 2; // Default wakupHour is 2 am
+    private static int fZERO_MINUTES = 0;
+
+    private BatchDataSource dataSource;
+    private Session sess;
+
+    private static boolean all = false;
+    private static Integer daysSince = null;
+    private static String serverName = "";
+    private static LinkData app = null;
+
+    private boolean runAsDaemon = false;
+
+    private String baseExperimentDir;
+    private String baseAnalysisDir;
+    private Calendar asOfDate;
+    private Calendar runDate; // Date program is being run.
+
+    private Boolean debug = false;
+    private Boolean testConnection = false;
+
+    private String dataType = "";
+    private int MAXREQUESTS = 5000;
+    private String[] requestList = new String[MAXREQUESTS];
+    private int nxtRequest = 0;
+
+    private boolean linkFolder= false;
+    private String errorMessageString = "Error in LinkData";
+    private boolean deleteLinks = false;
+    private String linkType;
+    private static String startAvatarPath = "/Repository/PersonData";
+
+
+    // NOTE: -requests must be the last argument
+    public LinkData(String[] args) {
+        nxtRequest = 0;
+        int i = -1;
+        while (i < args.length) {
+            i++;
+            args[i] = args[i].toLowerCase();
+            if (i >= args.length) {
+                break;
+            }
+
+            if (args[i].equals("-datasource")) {                // i.e., 2R (Foundation), 4R (Avatar), 10R (Tempus)
+                i++;
+                if (i >= args.length) {
+                    System.out.println ("-dataSource must be followed by 2R 4R or 10R.");
+                    System.exit(1);
+                }
+                dataType = args[i];
+            } else if(args[i].equals("-deletelinks")){
+                this.deleteLinks = true;
+                this.linkType = args[++i].toLowerCase().trim();
+                break;
+            } else if (args[i].equals("-debug")) {
+                debug = true;
+            } else if (args[i].equals("-requests")) {
+                // get them all
+                while (true) {
+                    i++;
+                    if (i >= args.length || i >= MAXREQUESTS) {
+                        break;
+                    }
+                    requestList[nxtRequest] = args[i];
+                    System.out.println("[LinkData] i: " + i + " request: " + requestList[nxtRequest]);
+                    nxtRequest++;
+                }
+
+                break;
+            } else if( args[i].equals("-linkfolder")){
+                linkFolder = true;
+            }
+        }
+    }
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) {
+        app = new LinkData(args);
+        app.run();
+    }
+
+    @Override
+    public void run() {
+        runDate = Calendar.getInstance();
+        errorMessageString += " on " + new SimpleDateFormat("MM-dd-yyyy_HH:mm:ss").format(runDate.getTime()) + "\n";
+
+        try {
+            Logger LOG = Logger.getLogger("org.hibernate");
+            LOG.setLevel(Level.ERROR);
+
+            dataSource = new BatchDataSource();
+            app.connect();
+
+            app.initialize();
+
+            if(!this.deleteLinks){
+                if (dataType == null) {
+                    System.out.println("-dataSource is required");
+                    System.out.println("Usage: sh ./LinkData.sh -dataSource (either 2R 4R or 10R) -requests idRequest [list as many as you want]");
+                    System.exit(1);
+                }
+
+                if (nxtRequest == 0) {
+                    System.out.println("-requests is required");
+                    System.out.println("Usage: sh ./LinkData.sh -dataSource (either 2R 4R or 10R) -requests idRequest [list as many as you want]");
+                    System.exit(1);
+                }
+
+                // do the work
+                app.linkData();
+            }else{
+                app.removeLinks(linkType);
+            }
+
+
+            app.disconnect();
+            System.out.println("Exiting...");
+            System.exit(0);
+
+        } catch (Exception e) {
+
+            String msg = "The following error occured: " + e.toString() + "\n";
+            System.out.println(msg);
+
+            StackTraceElement[] stack = e.getStackTrace();
+            for (StackTraceElement s : stack) {
+                msg = msg + s.toString() + "\n\t\t";
+            }
+
+            System.out.println(msg);
+
+            if (!errorMessageString.equals("")) {
+                errorMessageString += "\n";
+            }
+            errorMessageString += msg;
+
+            System.err.println(errorMessageString);
+
+        }
+
+        System.out.println("Exiting(2)...");
+        System.exit(0);
+
+    }
+
+    private void initialize() throws Exception {
+        PropertyDictionaryHelper ph = PropertyDictionaryHelper.getInstance(sess);
+        baseExperimentDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
+                PropertyDictionaryHelper.PROPERTY_EXPERIMENT_DIRECTORY);
+        baseAnalysisDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null,
+                PropertyDictionaryHelper.PROPERTY_ANALYSIS_DIRECTORY);
+
+    }
+
+    private String getCurrentDateString() {
+        runDate = Calendar.getInstance();
+        return new SimpleDateFormat("MM-dd-yyyy_HH:mm:ss").format(runDate.getTime());
+
+    }
+
+    public void removeLinks(String linkType){
+        System.out.print("This will delete all request symbolic links. Are you sure you want to continue? ");
+
+        Scanner scanner = new Scanner(System.in);
+        String answer = scanner.next().toLowerCase();
+        if(answer.equals("y") || answer.equals("yes")){
+            SessionImpl sessionImpl = (SessionImpl) sess;
+            Connection con = sessionImpl.connection();
+            StringBuilder strBuild = new StringBuilder();
+            Set<String> unlinkCMds = new TreeSet<>();
+
+            //todo change the project folder name as a commandline arg
+            String rquery =
+                    "SELECT Year(fe.createDate) as year, fe.idRequest, fe.number,  fe.idProject, fe.name, ef.fileName as path\n " +
+                            "FROM ( SELECT r.createDate,  r.idRequest, r.number, r.name, r.idProject\n " +
+                            "       FROM Request r JOIN Project p ON p.idProject = r.idProject\n " +
+                            "       WHERE p.name = 'HCI PERSON' ) as fe \n " +
+                            "JOIN ExperimentFile ef ON ef.idRequest = fe.idRequest;";
+            String aquery =
+                    " SELECT  Year(fa.createDate) as year, fa.idAnalysis, fa.number,  fa.idAnalysisGroup, fa.name, CONCAT( af.qualifiedFilePath,'/',af.fileName) as path\n" +
+                            "FROM (select a.createDate,  a.idAnalysis,a.number, ag.idAnalysisGroup, a.name   from Analysis a\n" +
+                            "JOIN AnalysisGroupItem agi ON agi.idAnalysis = a.idAnalysis\n" +
+                            "JOIN AnalysisGroup ag ON ag.idAnalysisGroup = agi.idAnalysisGroup\n" +
+                            "WHERE ag.idAnalysisGroup IN (11,14,22) ) as fa\n" +
+                            "JOIN AnalysisFile af ON af.idAnalysis = fa.idAnalysis\n" +
+                            " WHERE af.qualifiedFilePath like CONCAT(fa.name,'_', '%/RawData%'); ";
+
+            String query =  "";
+            if(linkType == null || linkType.equals("")){
+                System.out.println("Please specify either request or analysis for  the link type");
+                return;
+            }
+
+            if (linkType.equals("request")) {
+                query = rquery;
+            }else if (linkType.equals("analysis")){
+                startAvatarPath = "/Repository/AnalysisData";
+                query = aquery;
+            }else{
+                System.out.println("Please specify either request or analysis for  the link type");
+                return;
+            }
+
+            try(Statement stmt = con.createStatement()){
+                try(ResultSet rs = stmt.executeQuery(query)){
+                    while(rs.next()){
+                        String year = rs.getString("year");
+                        String path = rs.getString("path");
+                        String number = rs.getString("number");
+
+                        strBuild.append(startAvatarPath);
+                        strBuild.append(File.separator);
+                        strBuild.append(year);
+                        strBuild.append(File.separator);
+                        strBuild.append(linkType.equals("analysis")? number + File.separator +  path : path);
+                        String upath =  returnSymLinkInPath(strBuild.toString());
+                        strBuild.setLength(0);
+                        if(!upath.equals("")){
+                            strBuild.append("unlink ");
+                            strBuild.append(upath);
+                            unlinkCMds.add(strBuild.toString());
+                            strBuild.setLength(0);
+                        }else{
+                            System.out.println("for " + number +  " no symLink found ");
+                        }
+
+                    }
+                    // have to unlink before removing folder or the rm might try to go into a softlink
+
+                    for(String cmd : unlinkCMds){
+                        System.out.println("look " + cmd);
+                    }
+
+                    //XMLParser.executeCommands(unlinkCMds,null);
+                }
+            }catch (SQLException e){
+                e.printStackTrace();
+            }catch(Exception e){
+                e.printStackTrace();
+                System.exit(1);
+            }
+
+
+
+        }
+    }
+
+    private String returnSymLinkInPath(String pathToData) {
+        Path pData = Paths.get(pathToData);
+        // avoid unlinking root as it is commonly a link
+        if(pData.getFileName().toString().toLowerCase().equals("repository")
+                ||  pData.getParent() == null){
+            return "";
+        }
+        if(Files.isSymbolicLink(pData)){
+            return pData.toAbsolutePath().toString();
+        }
+
+        return returnSymLinkInPath(pData.getParent().toAbsolutePath().toString());
+    }
+
+    private void linkData() throws Exception {
+
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        String hciPersonID = "";
+        String startPath = "/Repository/PersonData/" + currentYear + "/";
+        startAvatarPath += "/2017";
+        StringBuilder buf = new StringBuilder();
+
+        // deal with each request
+        int nxtOne = 0;
+        while (nxtOne < nxtRequest) {
+            System.out.println("[linkData] processing request: " + requestList[nxtOne]);
+
+            Statement stmt = null;
+            ResultSet rs = null;
+
+            SessionImpl sessionImpl = (SessionImpl) sess;
+            Connection con = sessionImpl.connection();
+
+            stmt = con.createStatement();
+            buf = new StringBuilder ("select YEAR(createdate), name as hciPersonID from Request where idRequest = ");
+            buf.append(requestList[nxtOne] + ";");
+            if (debug) System.out.println("Request get year created query: " + buf.toString());
+            rs = stmt.executeQuery(buf.toString());
+            while (rs.next()) {
+                currentYear = rs.getInt(1);
+                hciPersonID = rs.getString(2);
+            }
+            rs.close();
+            stmt.close();
+
+            startPath = "/Repository/PersonData/" + currentYear + "/";
+            if (debug) System.out.println ("Date adjusted start path: " + startPath);
+
+            stmt = con.createStatement();
+            if(!linkFolder){
+                buf = new StringBuilder("select name from Sample where idRequest = ");
+
+                buf.append(requestList[nxtOne] + ";");
+                if (debug) System.out.println("ExperimentFile query: " + buf.toString());
+
+            Set<String> names = new HashSet<>();
+
+            rs = stmt.executeQuery(buf.toString());
+            while (rs.next()) {
+                names.add(rs.getString(1));
+            }
+            rs.close();
+            stmt.close();
+
+                if (debug) System.out.println("size of names: " + names.size());
+
+            // now using the list of sample 'names' see if we can find any matching experiment files
+            Iterator it = names.iterator();
+
+            while (it.hasNext()) {
+                String theName = (String) it.next();
+
+                stmt = con.createStatement();
+
+                StringBuilder buf1 = new StringBuilder("select filename from ExperimentFile where filename like '");
+                buf1.append(dataType + "%" + theName + "%';"); // case insensitive
+                if (debug) System.out.println("ExperimentFile query: " + buf1.toString());
+
+                List<String> pathnames = new ArrayList<String>();
+
+                rs = stmt.executeQuery(buf1.toString());
+                while (rs.next()) {
+                    pathnames.add(rs.getString(1));
+                }
+                rs.close();
+                stmt.close();
+
+                if (debug) System.out.println("size of pathnames: " + pathnames.size());
+                // now using the list of sample 'names' see if we can find any matching experiment files
+                Iterator itp = pathnames.iterator();
+
+                //  create the directory
+                String dirPath = startPath + requestList[nxtOne] + "R";
+                if (debug) System.out.println("dirPath: " + dirPath);
+                File f = new File(dirPath);
+                f.mkdir();
+
+                String myStartPath = dirPath;
+                while (itp.hasNext()) {
+                    String thePath = (String) itp.next();  // for example: 4R/Whole_Exome/FASTq/SL278299_2.fastq.gz
+
+                    int ipos = thePath.indexOf("/");
+                    if (ipos == -1) {
+                        // bad path
+                        // complain....
+                        continue;
+                    }
+                    int epos = thePath.lastIndexOf("/");
+                    if (epos <= ipos) {
+                        // that's weird
+                        continue;
+                    }
+
+                    String middleOfPath = "";
+                    String filename = "";
+                    String parentFolder = "";
+                    String subCommand = "";
+
+
+                        middleOfPath = thePath.substring(ipos + 1, epos);
+                        if (debug) System.out.println("middleOfPath: " + middleOfPath); // for example : Whole_Exome/FASTq
+
+                        filename = thePath.substring(epos + 1); // for example : SL278299_2.fastq.gz
+                        if (debug) System.out.println("filename or foldername : " + filename);
+                        subCommand = "-s";
+
+
+                        String myPath = dirPath + "/" + middleOfPath;
+                        if (debug) System.out.println("myPath: " + myPath);
+
+                        f = new File(myPath);
+                        if(!f.exists()){
+                            f.mkdirs();
+                        }
+
+                        //  make the soft link
+                        myPath =  myPath + "/" +  filename;
+
+                        String pathToRealData =  startAvatarPath + "/" + thePath;
+                        File target = new File(pathToRealData);
+                        File linkName = new File(myPath);
+                        if (debug) System.out.println("[LinkData] right before makeSoftLinks, target: " + pathToRealData + "\n\t\t\t\t linkName: " + linkName);
+
+                        boolean ok = makeSoftLinks(target, linkName, subCommand);
+                        if (!ok) {
+                            System.out.println("makeSoftLinks failed!");
+                        }
+                    } // end of inner while
+
+                } // end of outer while
+            } else {
+                createLinksWithWrapperFolder(hciPersonID, con, startPath, nxtOne);
+            }
+
+
+            nxtOne++;
+
+        } // end of requestList while
+        System.out.println("normal exit -- no problems!");
+        System.exit(0);
+    }
+
+    private void createLinksWithWrapperFolder(String wrapFolderName, Connection con, String startPath, Integer nxtOne)  {
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            stmt = con.createStatement();
+            StringBuilder buf1 = new StringBuilder("select filename from ExperimentFile where filename like '");
+            buf1.append(dataType + "%" + wrapFolderName + "%';"); // case insensitive
+            if (debug) System.out.println("ExperimentFile query: " + buf1.toString());
+
+            List<String> pathnames = new ArrayList<String>();
+
+            rs = stmt.executeQuery(buf1.toString());
+            while (rs.next()) {
+                pathnames.add(rs.getString(1));
+            }
+            rs.close();
+            stmt.close();
+
+            if (debug) System.out.println("size of pathnames: " + pathnames.size());
+            // now using the list of sample 'names' see if we can find any matching experiment files
+            Iterator itp = pathnames.iterator();
+
+            //  create the directory
+            String dirPath = startPath + requestList[nxtOne] + "R";
+            if (debug) System.out.println("dirPath: " + dirPath);
+            File f = new File(dirPath);
+            f.mkdir();
+
+            String myStartPath = dirPath;
+            while (itp.hasNext()) {
+                String thePath = (String) itp.next();  // for example: 4R/Whole_Exome/FASTq/SL278299_2.fastq.gz
+
+                int ipos = thePath.indexOf("/");
+                if (ipos == -1) {
+                    // bad path
+                    // complain....
+                    continue;
+                }
+                int epos = thePath.lastIndexOf("/");
+                if (epos <= ipos) {
+                    // that's weird
+                    continue;
+                }
+
+                String middleOfPath = "";
+                String filename = "";
+                String parentFolder = "";
+                String subCommand = "";
+
+                File dummyFile = new File(startAvatarPath + "/" + thePath); //absolute path to file
+                if(debug) System.out.println("the absolute path: "  + startAvatarPath + "/" + thePath);
+
+                        filename =  dummyFile.getParentFile().getName();
+
+                        try{
+                            int personID = Integer.parseInt(filename); //parent folder convention is to be hci person id for folder name
+                                                                      // when using linkFolder argument
+                        }catch(NumberFormatException nfe){
+                            System.out.println("skipping... sample data doesn't have wrapping folder");
+                            continue;
+                        }
+
+
+                        if (debug) System.out.println("filename or foldername : " + filename);
+
+                        parentFolder = dummyFile.getParent();
+                        if(debug) System.out.println("parent folder with real path" + parentFolder);
+
+                        epos =  thePath.indexOf(filename);
+                        middleOfPath = thePath.substring(ipos+ 1, epos );
+                        if (debug) System.out.println("middleOfPath: " + middleOfPath);
+                        // need to make sure if you try to run making a symlink more than once it doesn't
+                        // stick a symlink inside the src dir pointing to soft link
+                        // the T stops it from drilling into the 'pointer' that points to src dir if it already exists
+                        subCommand = "-sTf";
+
+
+                    String myPath = dirPath + "/" + middleOfPath;
+                    if (debug) System.out.println("myPath: " + myPath);
+
+                    f = new File(myPath);
+                    if(!f.exists()){
+                        f.mkdirs();
+                    }
+
+                    //  make the soft link
+                    myPath =  myPath + "/" +  filename;
+
+                File target = new File(parentFolder);
+                File linkName = new File(myPath);
+                if (debug) System.out.println("[LinkData] right before makeSoftLinks, target: " + parentFolder + "\n\t\t\t\t linkName: " + linkName);
+
+                boolean ok = makeSoftLinks(target, linkName, subCommand);
+                if (!ok) {
+                    System.out.println("makeSoftLinks failed!");
+                }
+            } // end of inner while
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+
+    }
+
+    /**
+     * Makes a soft link between the realFile and the linked File using the linux 'ln -s' command.
+     */
+    public static boolean makeSoftLinks(File realFile, File link, String subCommand) {
+        try {
+//			String[] cmd1 = { "rm", "-f", link.toString() };
+//			Runtime.getRuntime().exec(cmd1);
+            String[] cmd = {"ln", subCommand, realFile.getAbsolutePath(), link.toString()};
+            Runtime.getRuntime().exec(cmd);
+//            if(exitCode != 0){
+//                return false;
+//            }
+            return true;
+        } catch (IOException e) {
+
+        }
+        return false;
+    }
+
+    private static Date getWakeupTime() {
+        Calendar tomorrow = new GregorianCalendar();
+        tomorrow.add(Calendar.DATE, fONE_DAY);
+        Calendar result = new GregorianCalendar(tomorrow.get(Calendar.YEAR), tomorrow.get(Calendar.MONTH),
+                tomorrow.get(Calendar.DATE), wakeupHour, fZERO_MINUTES);
+        return result.getTime();
+    }
+
+    private void connect() throws Exception {
+        sess = dataSource.connect();
+        if (sess == null) {
+            System.out.println("[LinkData] ERROR: Unable to acquire session. Exiting...");
+            System.exit(1);
+        }
+    }
+
+    private void disconnect() throws Exception {
+        if (sess == null) {
+            return;
+        }
+
+        sess.close();
+    }
+}

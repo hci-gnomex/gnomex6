@@ -1,0 +1,49 @@
+<div class="full-width full-height flex-container-col padded" role="region" aria-label="Invoices">
+    <div class="flex-container-row align-baseline">
+        <div class="flex-grow padded">
+            <custom-combo-box class="full-width"
+                              placeholder="Core facility"
+                              displayField="display"
+                              valueField="idCoreFacility"
+                              [formControl]="this.coreFacilityFC"
+                              [options]="filterCores()"
+                              (optionSelected)="selectOption()">
+            </custom-combo-box>
+        </div>
+        <div class="padded">
+            <context-help name="coreFacilityHelp"
+                          label="Help me choose"
+                          popupTitle="Core Facility Information"
+                          tooltipPosition="right"
+                          [hasEditPermission]="this.secAdvisor.isSuperAdmin">
+            </context-help>
+        </div>
+        <div class="flex-grow">
+        </div>
+    </div>
+    <div class="padded">
+        <app-month-picker label="Billing period"
+                          [formControl]="monthInputCtrl"
+                          [max]="max"
+                          [min]="min">
+        </app-month-picker>
+    </div>
+    <div class="padded">
+        <div  *ngIf="billingAccounts.length>0">
+            <mat-label>Billing Accounts</mat-label>
+        </div>
+        <mat-selection-list [(ngModel)]="selectedAccounts" >
+            <mat-list-option *ngFor="let account of billingAccounts" [value]="account.idBillingAccount">
+                {{account.accountNameDisplay}}
+            </mat-list-option>
+        </mat-selection-list>
+        <div *ngIf="billingAccounts.length<=0">
+            <mat-label>No invoice available for this core and period</mat-label>
+        </div>
+    </div>
+    <div class="padded">
+        <button mat-button [disabled]="this.selectedAccounts.length<=0" (click)="run()" aria-label="Show printable invoice as PDF">
+            <mat-icon aria-label="PDF icon">picture_as_pdf</mat-icon>
+            Show Printable Invoice</button>
+    </div>
+</div>

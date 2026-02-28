@@ -1,0 +1,22 @@
+<div class="full-height full-width flex-container-col" role="dialog" aria-label="Email composition">
+        <div class="full-width full-height flex-container-col double-padded">
+            <form [formGroup]="this.emailGroup" aria-label="Email form">
+                <mat-form-field class="formField">
+                    <input matInput placeholder="Subject" formControlName="subject" aria-label="Email subject" aria-required="true">
+                    <mat-error *ngIf="this.emailGroup.get('subject').hasError('required')" role="alert">Subject is required</mat-error>
+                </mat-form-field>
+                <mat-form-field class="formField">
+                    <input matInput placeholder="From" formControlName="fromAddress" aria-label="From email address" aria-required="true">
+                    <mat-error *ngIf="this.emailGroup.get('fromAddress').hasError('required')" role="alert">From is required</mat-error>
+                    <mat-error *ngIf="this.emailGroup.get('fromAddress').hasError('email') && !this.emailGroup.hasError('required')" role="alert">Please enter a valid email address</mat-error>
+                </mat-form-field>
+                <label class="label" for="emailEditor" id="email-body-label">Body</label>
+                <angular-editor class="full-width" #emailEditorRef id="emailEditor"
+                                formControlName="body"
+                                [config]="emailEditorConfig"
+                                aria-labelledby="email-body-label">
+                </angular-editor>
+                <mat-error *ngIf="this.emailGroup.get('body').hasError('required')" role="alert">Email body is required</mat-error>
+            </form>
+        </div>
+</div>

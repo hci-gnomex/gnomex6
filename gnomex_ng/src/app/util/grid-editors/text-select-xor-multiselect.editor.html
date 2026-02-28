@@ -1,0 +1,11 @@
+<div class="full-height full-width" role="gridcell">
+    <div *ngIf="displayType === TEXT" class="full-height full-width">
+        <input [(ngModel)]="value" type="text" class="full-width full-height" aria-label="Text input"/>
+    </div>
+    <div *ngIf="displayType === SELECT" class="full-height full-width" aria-label="Selected value">
+        {{value}}
+    </div>
+    <div *ngIf="displayType === MULTISELECT" class="full-height full-width" aria-label="Multi-selected values">
+        {{value}}
+    </div>
+</div>

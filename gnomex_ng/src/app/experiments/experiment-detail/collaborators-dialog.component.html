@@ -1,0 +1,28 @@
+<div class="full-height full-width flex-container-col padded" role="dialog" aria-label="Manage Collaborators">
+    <div class="full-width flex-container-row align-center" role="group" aria-label="Add collaborator">
+        <div class="flex-grow">
+            <custom-combo-box placeholder="Possible Collaborator to Add"
+                              (optionSelected)="collaboratorDropdownChange($event)"
+                              [options]="filteredPossibleCollaborators"
+                              [displayField]="this.prefService.userDisplayField"
+                              aria-label="Select collaborator to add">
+            </custom-combo-box>
+        </div>
+        <button mat-button [disabled]="!enableAdd" type="button" (click)="addCollaborator()" aria-label="Add selected collaborator">
+            <img [src]="enableAdd ? this.constantsService.ICON_ADD : this.constantsService.ICON_ADD_DISABLE" alt="" aria-hidden="true" class="icon">
+            Add
+        </button>
+    </div>
+    <div *ngIf="showCollaboratorBlock" class="full-width flex-grow padded-top" role="region" aria-label="Current collaborators">
+        <div #oneEmWidth class="no-height single-em" aria-hidden="true"></div>
+        <ag-grid-angular class="ag-theme-fresh full-width full-height"
+                         role="grid"
+                         aria-label="Collaborators list"
+                         [context]="context"
+                         [rowSelection]="'single'"
+                         [rowDeselection]="true"
+                         (gridReady)="onCollabGridReady($event)"
+                         (gridSizeChanged)="onGridSizeChanged($event)">
+        </ag-grid-angular>
+    </div>
+</div>

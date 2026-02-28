@@ -1,0 +1,377 @@
+{
+  "hints": [
+    {
+      "command": "SaveProject",
+      "parameter": "projectXMLString",
+      "nodeheader": "",
+      "nodeprefix": "Project",
+      "elementhints": [
+        {
+          "elementname": "ExperimentDesignEntries",
+          "elementheader": "ExperimentDesignEntry"
+        },
+        {
+          "elementname": "ExperimentFactorEntries",
+          "elementheader": "ExperimentFactorEntry"
+        }
+      ]
+    },
+    {
+      "command": "DeleteRequest",
+      "parameter": "requestsToDeleteXMLString",
+      "nodeheader": "requests",
+      "nodeprefix": "Request",
+      "elementhints": [
+        {
+          "elementname": "requests",
+          "elementheader": "Request"
+        }
+      ]
+    },
+    {
+      "command": "SaveAnalysis",
+      "parameter": "genomeBuildsXMLString",
+      "nodeheader": "genomeBuilds",
+      "nodeprefix": "GenomeBuild",
+      "elementhints": [
+        {
+          "elementname": "someEntries1",
+          "elementheader": "someEntry1"
+        }
+      ]
+    },
+    {
+      "command": "SaveAnalysis",
+      "parameter": "analysisGroupsXMLString",
+      "nodeheader": "analysisGroups",
+      "nodeprefix": "analysisGroup",
+      "elementhints": [
+        {
+          "elementname": "itemsnotthere",
+          "elementheader": "itemnotthere1"
+        }
+      ]
+    },
+    {
+      "command": "SaveAppUser",
+      "parameter": "coreFacilitiesUserCanSubmitTo",
+      "nodeheader": "coreFacilitiesICanSubmitTo",
+      "nodeprefix": "coreFacility",
+      "elementhints": [
+        {
+          "elementname": "itemsnotthere",
+          "elementheader": "itemnotthere1"
+        }
+      ]
+    },
+    {
+      "command": "SaveAppUser",
+      "parameter": "userManagingCoreFacilities",
+      "nodeheader": "managingCoreFacilities",
+      "nodeprefix": "coreFacility",
+      "elementhints": [
+        {
+          "elementname": "itemsnotthere",
+          "elementheader": "itemnotthere1"
+        }
+      ]
+    },
+    {
+      "command": "SubmitWorkAuthForm",
+      "parameter": "coreFacilitiesXMLString",
+      "nodeheader": "coreFacilities",
+      "nodeprefix": "CoreFacility",
+      "elementhints": [
+        {
+          "elementname": "someEntries2",
+          "elementheader": "someEntry2"
+        }
+      ]
+    },
+    {
+      "command": "SaveVisibility",
+      "parameter": "visibilityXMLString",
+      "nodeheader": "requests",
+      "nodeprefix": "Request",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveVisibilityAnalysis",
+      "parameter": "visibilityXMLString",
+      "nodeheader": "AnalysisVisibilityList",
+      "nodeprefix": "Analysis",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveGenomeBuild",
+      "parameter": "segmentsXML",
+      "nodeheader": "segments",
+      "nodeprefix": "Segment",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveGenomeBuild",
+      "parameter": "sequenceFilesToRemoveXML",
+      "nodeheader": "sequenceFilesToRemove",
+      "nodeprefix": "File",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveFAQ",
+      "parameter": "faqXMLString",
+      "nodeheader": "FaqCollection",
+      "nodeprefix": "FAQ",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveLab",
+      "parameter": "collaboratorsXMLString",
+      "nodeheader": "collaborators",
+      "nodeprefix": "AppUser",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveLab",
+      "parameter": "managersXMLString",
+      "nodeheader": "managers",
+      "nodeprefix": "AppUser",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveLab",
+      "parameter": "membersXMLString",
+      "nodeheader": "members",
+      "nodeprefix": "AppUser",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveLab",
+      "parameter": "accountsXMLString",
+      "nodeheader": "billingAccounts",
+      "nodeprefix": "BillingAccount",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveLab",
+      "parameter": "coreFacilitiesXMLString",
+      "nodeheader": "coreFacilities",
+      "nodeprefix": "CoreFacility",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveCombinedWorkItemQualityControl",
+      "parameter": "workItemXMLString",
+      "nodeheader": "WorkItemList",
+      "nodeprefix": "WorkItem",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveWorkItemSolexaPrep",
+      "parameter": "workItemXMLString",
+      "nodeheader": "WorkItemList",
+      "nodeprefix": "WorkItem",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveWorkItemSolexaPrepQC",
+      "parameter": "workItemXMLString",
+      "nodeheader": "WorkItemList",
+      "nodeprefix": "WorkItem",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveWorkItemSolexaAssemble",
+      "parameter": "workItemXMLString",
+      "nodeheader": "WorkItemList",
+      "nodeprefix": "WorkItem",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveFlowCell",
+      "parameter": "channelsXMLString",
+      "nodeheader": "fcChannels",
+      "nodeprefix": "FlowCellChannel",
+      "elementhints": [
+        {
+          "elementname": "sequenceLanes",
+          "elementheader": "SequenceLane"
+        },
+        {
+          "elementname": "flowCell",
+          "elementheader": "FlowCell"
+        }
+      ]
+    },
+    {
+      "command": "SaveWorkItemSolexaPipeline",
+      "parameter": "workItemXMLString",
+      "nodeheader": "WorkItemList",
+      "nodeprefix": "WorkItem",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "MoveAnalysis",
+      "parameter": "analysisGroupsXMLString",
+      "nodeheader": "analysisGroups",
+      "nodeprefix": "analysisGroup",
+      "elementhints": [
+        {
+          "elementname": "notpresent",
+          "elementheader": "notpresent1"
+        }
+      ]
+    },
+    {
+      "command": "SaveDataTrack",
+      "parameter": "collaboratorsXML",
+      "nodeheader": "collaborators",
+      "nodeprefix": "AppUser",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveDataTrack",
+      "parameter": "propertiesXML",
+      "nodeheader": "DataTrackProperties",
+      "nodeprefix": "PropertyEntry",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveRequest",
+      "parameter": "propertiesXML",
+      "nodeheader": "RequestProperties",
+      "nodeprefix": "PropertyEntry",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    
+    {
+      "command": "SaveMultiRequestSampleSheet",
+      "parameter": "sampleSheetHeaderXMLString",
+      "nodeheader": "Headers",
+      "nodeprefix": "Header",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "SaveMultiRequestSampleSheet",
+      "parameter": "sampleSheetRowXMLString",
+      "nodeheader": "Rows",
+      "nodeprefix": "Row",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    },
+    {
+      "command": "DownloadSampleSheet",
+      "parameter": "names",
+      "nodeheader": "NameList",
+      "nodeprefix": "FieldItem",
+      "elementhints": [
+        {
+          "elementname": "someEntries3",
+          "elementheader": "someEntry3"
+        }
+      ]
+    }
+  ]
+}
+
+
+    
+    

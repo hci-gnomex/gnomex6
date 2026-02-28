@@ -1,0 +1,26 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'java'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly group: 'commons-codec', name: 'commons-codec', version: '1.10'
+}
+
+jar {
+    manifest {
+        attributes([
+                'Built-By'              : 'u0974549',
+                'Implementation-Version': '6.26.12'
+        ], 'gnomex_crypt')
+    }
+}

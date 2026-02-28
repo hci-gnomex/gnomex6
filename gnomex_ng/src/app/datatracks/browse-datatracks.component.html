@@ -1,0 +1,78 @@
+<div class="full-width full-height major-border padded background">
+    <div class="full-width full-height flex-container-col foreground">
+        <div class="full-width small-font">
+            <div class="full-width">
+                <menu-header-data-tracks [selectedNode]="selectedItem" [allActiveNodes]="this.allActiveNodes" (onDataTrackFolderCreated)="this.onDataTrackFolderCreated($event)"
+                                         (onDataTrackCreated)="this.onDataTrackCreated($event)"></menu-header-data-tracks>
+            </div>
+            <div class="full-width vertical-spacer">
+            </div>
+            <div>
+                <browse-filter [label]="'Data Track'"
+                               [iconSource]="'assets/datatrack.png'"
+                               [mode]="'dataTrackBrowse'">
+                </browse-filter>
+            </div>
+        </div>
+        <div class="full-width vertical-spacer background">
+        </div>
+        <div class="flex-container-row flex-grow full-height overflow-auto">
+            <as-split>
+                <as-split-area size="20">
+                <div class="full-height full-width small-font border">
+                    <div class="full-width full-height flex-container-col foreground">
+                        <div class="full-width small-font">
+                            <div class="flex-container-row align-center">
+                                <div class="flex-grow major-left-right-padded no-word-wrap">
+                                    {{datatracksCount + " data track" + (datatracksCount != 1 ? "s" : "")}}
+                                </div>
+                                <div class="align-center no-word-wrap">
+                                    <mat-form-field class="short-width padded">
+                                        <input matInput [(ngModel)]="searchText" placeholder="Enter search here...">
+                                    </mat-form-field>
+                                    <button mat-button class="minimize" (click)="search()">
+                                        <img [src]="'./assets/magnifier.png'">
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="full-width flex-grow no-overflow left-right-padded">
+                            <div class="full-width full-height border">
+                                <tree-root #datatracksTree
+                                           [nodes]="items" [options]="options"
+                                           (activate)="treeOnSelect($event)"
+                                           (changeFilter)="treeChangeFilter($event)"
+                                           (updateData)="treeUpdateData($event)">
+                                    <ng-template #treeNodeTemplate let-node let-index="index">
+                                        <div class="full-width no-word-wrap tree-node-font">
+                                            <img src="{{node.data.icon}}" class="tree-node-icon icon">
+                                            <span>{{ node.data.label }}</span>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template #loadingTemplate></ng-template>
+                                </tree-root>
+                            </div>
+                        </div>
+                        <div class="full-width">
+                            <div class="flex-container-row">
+                                <div class="padded">
+                                    <button mat-button [disabled]="!this.selectedItem" (click)="expandClicked()">Expand</button>
+                                </div>
+                                <div class="padded flex-grow">
+                                    <button mat-button [disabled]="!this.selectedItem" (click)="collapseClicked()">Collapse</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                </as-split-area>
+                <as-split-area size="80">
+                    <div  class="full-width full-height border padded">
+                        <datatracks-panel></datatracks-panel>
+                    </div>
+                </as-split-area>
+            </as-split>
+        </div>
+    </div>
+</div>
+

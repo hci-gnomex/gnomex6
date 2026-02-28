@@ -1,0 +1,104 @@
+ARIA Accessibility Changes Log - Billing Module
+=================================================
+Date: 2026-02-11
+
+1. billing-filter.component.html
+   ------------------------------
+   - Added role="region" and aria-label="Billing filters" to the root container
+   - Added alt="Billing" to the money icon image
+   - Added aria-label="Filter by experiment number" to the Experiment # input
+   - Added aria-label="Filter by invoice number" to the Invoice # input
+
+2. nav-billing.component.html
+   ---------------------------
+   - Added role="main" and aria-label="Billing management" to the root container
+   - Added aria-label="Billing navigation tabs" to the mat-tab-group
+   - Added aria-label="Filter by order type" to the filter radio group
+   - Added aria-label="Jump to pending items" to the Pending button
+   - Added aria-label="Jump to completed items" to the Completed button
+   - Added aria-label="Jump to approved items" to the Approved button
+   - Added role="tree" and aria-label="Billing items tree" to the billing items tree-root
+   - Added role="treeitem" and dynamic [attr.aria-label] to tree node templates
+   - Added dynamic [attr.alt] to tree node icon images (previously empty alt="")
+   - Added dynamic [attr.aria-label] to the Expand/Collapse Labs toggle button
+   - Added aria-label="Hide requests with no billing items" to the hide checkbox
+   - Added alt="Information" to the information icon in the Prices tab
+   - Added aria-label="Create new billing item" and alt="Add" to the create billing item button/icon
+   - Added aria-label="Price sheets and categories" to the pricing ag-grid
+   - Added aria-label to the three pricing display checkboxes (Show prices, Show price criteria, Show inactive prices)
+   - Added aria-label and alt text to New sheet, New category, New price, and Remove buttons/icons
+   - Added aria-label="Billing items detail table" to the billing items ag-grid
+   - Added aria-label="Reassign or split billing items" and alt="Reassign/Split" to the Reassign/Split button/icon
+   - Added aria-label="Remove selected billing items" and alt="Remove" to the Remove button/icon
+
+3. price-category-view.component.html
+   ------------------------------------
+   - Added aria-label="Price category details" to the form element
+   - Added aria-label="Price category name" to the Name input
+   - Added aria-label="Price category is active" to the Active checkbox
+   - Added aria-label="Price category notes" to the Notes textarea
+   - Added role="toolbar" and aria-label="Workflow step actions" to the Add/Remove button container
+   - Added aria-label="Add workflow step" and alt="Add" to the Add button/icon
+   - Added aria-label="Remove selected workflow step" and alt="Remove" to the Remove button/icon
+   - Added aria-label="Workflow steps table" to the ag-grid
+
+4. price-sheet-view.component.html
+   ---------------------------------
+   - Added aria-label="Price sheet details" to the form element
+   - Added aria-label="Price sheet name" to the Name input
+   - Added aria-label="Price sheet is active" to the Active checkbox
+   - Added aria-label="Price sheet notes" to the Notes textarea
+   - Added role="toolbar" and aria-label="Experiment platform actions" to the Add/Remove button container
+   - Added aria-label="Add experiment platform" and alt="Add" to the Add button/icon
+   - Added aria-label="Remove selected experiment platform" and alt="Remove" to the Remove button/icon
+   - Added aria-label="Experiment platforms table" to the ag-grid
+
+5. price-view.component.html
+   ---------------------------
+   - Added aria-label="Price details" to the form element
+   - Added aria-label="Price name" to the Name input
+   - Added aria-label="Price is active" to the Active checkbox
+   - Added aria-label="Price notes" to the Notes textarea
+   - Added role="group" and aria-label="Price amounts" to the price fields container
+   - Added aria-label to Unit Price, External Academic, and External Commercial inputs
+   - Added role="toolbar" and aria-label="Price criteria actions" to the Add/Remove button container
+   - Added aria-label="Add new price criteria" and alt="Add" to the New criteria button/icon
+   - Added aria-label="Remove selected price criteria" and alt="Remove" to the Remove button/icon
+   - Added aria-label="Price criteria table" to the ag-grid
+
+6. new_billing_account/new-billing-account.component.html
+   -------------------------------------------------------
+   - Added aria-label="New billing account form" to the root form element
+   - Added aria-label="Account type" to the account type radio group (Chartfield/PO/Credit Card)
+   - Added role="group" and aria-label="Chartfield account details" to the Chartfield section
+   - Added role="group" and aria-label="Purchase order account details" to the PO section
+   - Added role="group" and aria-label="Credit card account details" to the Credit Card section
+   - Added role="region" and aria-label="Authorization agreement" to the agreement section
+   - Added id="billingAgreementText" to the agreement text for aria-describedby linkage
+   - Added aria-label="I agree to the billing authorization terms" and aria-describedby="billingAgreementText" to the agreement checkbox
+
+7. billing-gl-interface-view.component.ts (inline template)
+   ---------------------------------------------------------
+   - Added aria-label="Journal entry revision number" and aria-required="true" to the revision input
+
+8. invoice-email-window.component.ts (inline template)
+   ----------------------------------------------------
+   - Added aria-label="Email addresses for invoice" and aria-describedby="emailAddressHint" to the email textarea
+   - Added id="emailAddressHint" to the hint label for aria-describedby linkage
+   - Added role="status" and aria-live="polite" to the email sent confirmation container
+   - Added role="alert" and aria-live="assertive" to the error message label
+
+9. notes-to-core.component.ts (inline template)
+   -----------------------------------------------
+   - Added role="region" and aria-label="Notes to core facility" to the grid container
+   - Added aria-label="Core comments table" to the ag-grid
+
+10. new_billing_account/dialogs/new-billing-account-error-dialog.component.ts (inline template)
+    --------------------------------------------------------------------------------------------
+    - Added role="alertdialog" and aria-label="Billing account form errors" to the root container
+    - Added aria-live="assertive" to the error message container
+
+11. new_billing_account/dialogs/new-billing-account-success-dialog.component.ts (inline template)
+    ----------------------------------------------------------------------------------------------
+    - Added role="dialog" and aria-label="Billing account created successfully" to the root container
+    - Added aria-live="polite" to the success message paragraph

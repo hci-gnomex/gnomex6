@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html style="overflow-y: hidden">
+<head>
+  <title>GNomEx</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <base href="/gnomex/">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="vendor.css" rel="stylesheet"><link href="app.css" rel="stylesheet"></head>
+<body onload="zoom()">
+<gnomex-app>
+  <div class="flex-container-col full-height full-width">
+    <div class="flex-grow">
+    </div>
+    <div class="flex-grow">
+    </div>
+    <div class="flex-container-row large-font">
+      <div class="flex-grow">
+      </div>
+      <div>
+        Loading GNomEx
+      </div>
+      <div class="flex-grow">
+      </div>
+    </div>
+    <div class="flex-grow">
+    </div>
+    <div class="flex-grow">
+    </div>
+    <div class="flex-grow">
+    </div>
+  </div>
+</gnomex-app>
+<script type="text/javascript" src="./Chart.js"></script>
+<script type="text/javascript">
+        function zoom() {
+            document.body.style.zoom = "90%"
+        }
+</script>
+<script type="text/javascript" src="polyfills.js"></script><script type="text/javascript" src="vendor.js"></script><script type="text/javascript" src="app.js"></script></body>
+</html>

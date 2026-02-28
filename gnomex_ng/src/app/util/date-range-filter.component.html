@@ -1,0 +1,13 @@
+<button mat-raised-button [matMenuTriggerFor]="topMenu" aria-label="Date range filter" aria-haspopup="true">{{this.label}}</button>
+<mat-menu #topMenu="matMenu" aria-label="Date range options">
+    <button mat-menu-item (click)="this.setRangeWithinLast(7)" aria-label="Filter by last week">Last week</button>
+    <button mat-menu-item (click)="this.setRangeWithinLast(30)" aria-label="Filter by last 30 days">Last 30 days</button>
+    <button mat-menu-item (click)="this.setRangeWithinLast(90)" aria-label="Filter by last 90 days">Last 90 days</button>
+    <button mat-menu-item (click)="this.setRangeWithinLast(365)" aria-label="Filter by last year">Last year</button>
+    <button mat-menu-item [matMenuTriggerFor]="yearMenu" aria-label="Select year" aria-haspopup="true">From year...</button>
+    <button mat-menu-item (click)="this.openPopup()" aria-label="Select custom date range">Custom dates</button>
+    <button mat-menu-item (click)="this.clear()" aria-label="Clear date filter">Clear filter</button>
+</mat-menu>
+<mat-menu #yearMenu="matMenu" aria-label="Year selection">
+    <button *ngFor="let item of this.yearMenuArray" mat-menu-item (click)="this.setRangeForYear(item.year)" [attr.aria-label]="'Filter by year ' + item.year">{{item.label}}</button>
+</mat-menu>

@@ -1,0 +1,46 @@
+    <form [formGroup]="this.form" class="full-width full-height flex-container-col double-padded" aria-label="Price details">
+        <div>
+            <mat-form-field class="full-width">
+                <input matInput placeholder="Name" [formControlName]="'name'" aria-label="Price name">
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-checkbox [formControlName]="'active'" aria-label="Price is active">Active</mat-checkbox>
+        </div>
+        <div>
+            <mat-form-field class="full-width">
+                <textarea matInput placeholder="Notes" [formControlName]="'notes'" aria-label="Price notes"
+                          matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
+            </mat-form-field>
+        </div>
+        <div class="flex-container-row" role="group" aria-label="Price amounts">
+            <mat-form-field class="flex-one">
+                <input matInput type="number" placeholder="Unit Price" [formControlName]="'unitPrice'" aria-label="Unit price">
+            </mat-form-field>
+            <mat-form-field class="flex-one">
+                <input matInput type="number" placeholder="External Academic" [formControlName]="'academicPrice'" aria-label="External academic price">
+            </mat-form-field>
+            <mat-form-field class="flex-one">
+                <input matInput type="number" placeholder="External Commercial" [formControlName]="'commercialPrice'" aria-label="External commercial price">
+            </mat-form-field>
+        </div>
+        <div>
+            <label>Price applies to</label>
+        </div>
+        <div role="toolbar" aria-label="Price criteria actions">
+            <button mat-button (click)="this.addCriteria()" aria-label="Add new price criteria"><img [src]="'./assets/attach_add.png'" class="icon" alt="Add">New criteria</button>
+            <button mat-button [disabled]="!this.selectedCriteria" (click)="this.removeCriteria()" aria-label="Remove selected price criteria"><img [src]="'./assets/delete.png'" class="icon" alt="Remove">Remove</button>
+        </div>
+        <div class="grid-div">
+            <ag-grid-angular class="ag-theme-balham full-height full-width"
+                             aria-label="Price criteria table"
+                             (gridReady)="this.onGridReady($event)"
+                             (gridSizeChanged)="this.onGridSizeChanged($event)"
+                             (selectionChanged)="this.onGridSelectionChanged($event)"
+                             [singleClickEdit]="true"
+                             [stopEditingWhenGridLosesFocus]="true"
+                             [rowSelection]="'single'"
+                             [rowData]="this.criteria">
+            </ag-grid-angular>
+        </div>
+    </form>

@@ -1,0 +1,69 @@
+<div class="full-width full-height bordered foreground small-font">
+    <input type="file" accept=".txt" class="hidden" (change)="onFileSelected($event)" #fileInput>
+    <div *ngIf="!fileParsed" class="full-height full-width flex-container-col align-center">
+        <div class="full-height full-width flex-container-row align-center">
+        </div>
+        <div class="full-width flex-container-row justify-flex-end generic-dialog-footer-colors">
+            <save-footer (saveClicked)="openFileChooser()" name="Upload"></save-footer>
+            <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="onClose()" name="Close"></save-footer>
+        </div>
+    </div>
+    <div *ngIf="fileParsed && !reportResults" class="full-width full-height flex-container-col">
+        <div class="full-width flex-container-row align-center tiny-font padded-left-right-bottom">
+            <div class="flex-grow flex-container-row align-center">
+                <mat-checkbox [(ngModel)]="firstRowIsColumnHeadings" class="checkbox-margin-evener"></mat-checkbox>
+                <div>
+                    First row contains column headings
+                </div>
+            </div>
+            <div class="flex-container-row align-center">
+                <mat-checkbox [(ngModel)]="appendSamples" class="checkbox-margin-evener"></mat-checkbox>
+                <div>
+                    Append these samples to the samples in the grid
+                </div>
+            </div>
+        </div>
+        <div class="full-width padded-left-right-bottom small-font">
+            Please indicate which sample sheet column corresponds to each field. It is not
+            necessary to select a field for a column you do not wish to populate.
+        </div>
+        <div class="full-width flex-grow padded-left-right-bottom">
+            <ag-grid-angular
+                    class="ag-theme-fresh small-font full-width full-height"
+                    [context]="context"
+                    [singleClickEdit]="true"
+                    [rowSelection]="'single'"
+                    (gridSizeChanged)="onGridSizeChanged($event)"
+                    (gridReady)="onGridReady($event)">
+            </ag-grid-angular>
+        </div>
+        <div class="full-width flex-container-row align-center padded-left-right-bottom">
+            <div class="flex-grow">
+                <button mat-button class="link-button" (click)="onFieldFormats()">
+                    (Field formats)
+                </button>
+            </div>
+        </div>
+        <div class="full-width flex-container-row justify-space-between generic-dialog-footer-colors">
+            <save-footer (saveClicked)="openFileChooser()" name="Re-Upload"></save-footer>
+            <div class="flex-container-row justify-flex-end">
+                <save-footer (saveClicked)="onPopulateFields()" name="Populate Fields"></save-footer>
+                <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="onClose()" name="Close"></save-footer>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="fileParsed && reportResults"
+         class="full-width full-height flex-container-col small-font">
+        <div class="full-width padded">
+            Errors Detected. Upload Results:
+        </div>
+        <div class="full-width flex-grow padded-left-right-bottom">
+            <div class="full-width full-height padded bordered">
+                <pre>{{reportText}}</pre>
+            </div>
+        </div>
+        <div class="full-width flex-container-row justify-flex-end generic-dialog-footer-colors">
+            <save-footer [actionType]="actionType.SECONDARY" (saveClicked)="onClose()" name="Close"></save-footer>
+        </div>
+    </div>
+</div>

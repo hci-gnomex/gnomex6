@@ -1,0 +1,780 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app id="gnomex" version="3.0"
+		 xmlns="http://java.sun.com/xml/ns/javaee"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+
+	<!--
+        <context-param>
+            <param-name>mode</param-name>
+            <param-name>mode</param-name>
+            <param-value>opensource</param-value>
+        </context-param>
+    -->
+
+	<context-param>
+		<param-name>public-paths</param-name>
+		<param-value>/api/user-session*,/ChangePassword.gx*,/PublicSaveSelfRegisteredAppUser.gx*,/ReportIssueFeedbackServlet.gx*,/CreateUserPreferences.gx*</param-value>
+	</context-param>
+
+
+	<context-param>
+		<param-name>html5-push-state-filter-target</param-name>
+		<param-value>/index.html</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>html5-push-state-filter-pass-through-patterns</param-name>
+		<param-value>/URLLinks,/IGVLinks,/api,/css,/resources,/images,/img,/assets,.js,.ttf,.eot,.woff,.svg,.woff2,favicon.ico,.css,.gx,.jsp</param-value>
+	</context-param>
+
+	<listener>
+		<listener-class>hci.gnomex.utility.HibernateAppListener</listener-class>
+	</listener>
+
+	<listener>
+		<listener-class>org.apache.shiro.web.env.EnvironmentLoaderListener</listener-class>
+	</listener>
+
+	<servlet>
+		<servlet-name>GNomExFrontController</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.GNomExFrontController
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>CheckSessionStatus</servlet-name>
+		<servlet-class>hci.gnomex.controller.CheckSessionStatus</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>DownloadChromatogramFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.DownloadChromatogramFileServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>DownloadFastaFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.DownloadFastaFileServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>DownloadABIRunFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.DownloadABIRunFileServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>DownloadFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.DownloadFileServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>DownloadPlateSampleSheetFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.DownloadPlateSampleSheetFileServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>FastDataTransferDownloadExpServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.FastDataTransferDownloadExpServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>FastDataTransferDownloadDataTrackServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.FastDataTransferDownloadDataTrackServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>FastDataTransferDownloadAnalysisServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.FastDataTransferDownloadAnalysisServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>FastDataTransferDownloadProductOrderServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.FastDataTransferDownloadProductOrderServlet
+		</servlet-class>
+	</servlet>
+
+
+	<servlet>
+		<servlet-name>FastDataTransferUploadGetJnlpServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.FastDataTransferUploadGetJnlpServlet
+		</servlet-class>
+	</servlet>
+
+
+	<servlet>
+		<servlet-name>DownloadSingleFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.DownloadSingleFileServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>DownloadAnalysisSingleFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.DownloadAnalysisSingleFileServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>DownloadAnalysisFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.DownloadAnalysisFileServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>DownloadProductOrderFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.DownloadProductOrderFileServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>DownloadProductOrderSingleFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.DownloadProductOrderSingleFileServlet
+		</servlet-class>
+	</servlet>
+
+
+	<servlet>
+		<servlet-name>DownloadDataTrackFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.DownloadDataTrackFileServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>DownloadOncoCartaFDFServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.DownloadOncoCartaFDFServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>UploadAnalysisFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.UploadAnalysisFileServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>UploadAnalysisURLServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.UploadAnalysisURLServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>UploadProductOrderFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.UploadProductOrderFileServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>UploadProductOrderURLServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.UploadProductOrderURLServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>UploadDataTrackFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.UploadDataTrackFileServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>UploadDataTrackURLServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.UploadDataTrackURLServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>UploadSequenceFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.UploadSequenceFileServlet
+		</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>GetGNomExOrderFromNumberServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.GetGNomExOrderFromNumberServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>GetNewAccountServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.GetNewAccountServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>GetLoginProperties</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.GetLoginProperties
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>CheckIsGNomExAccount</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.CheckIsGNomExAccount
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>UploadSequenceURLServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.UploadSequenceURLServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>UploadSampleSheetFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.UploadSampleSheetFileServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>UploadMultiRequestSampleSheetFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.UploadMultiRequestSampleSheetFileServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>UploadSampleSheetURLServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.UploadSampleSheetURLServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>UploadAndBroadcastEmailServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.UploadAndBroadcastEmailServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>UploadAndBroadcastEmailURLServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.UploadAndBroadcastEmailURLServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>ReportIssueFeedbackServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.ReportIssueFeedbackServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>ReportIssueFeedbackServletGetURL</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.ReportIssueFeedbackServletGetURL
+		</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>ReportIssueServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.ReportIssueServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>ReportIssueServletGetURL</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.ReportIssueServletGetURL
+		</servlet-class>
+	</servlet>
+
+
+	<servlet>
+		<servlet-name>UploadExperimentFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.UploadExperimentFileServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>UploadExperimentURLServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.UploadExperimentURLServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>UploadPurchaseOrder</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.UploadPurchaseOrder
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>GetPurchaseOrderForm</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.GetPurchaseOrderForm
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>UploadPurchaseOrderURL</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.UploadPurchaseOrderURL
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>MakeDataTrackIGVLink</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.MakeDataTrackIGVLink
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>ApproveUser</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.ApproveUser
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>ApproveLabMembership</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.ApproveLabMembership
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>ConfirmEmail</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.ConfirmEmail
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>ApproveBillingAccount</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.ApproveBillingAccount
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>CreateAnalysisServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.CreateAnalysisServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>SaveTransferLogServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.SaveTransferLogServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>SaveChromatogramFromFileServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.SaveChromatogramFromFileServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>FastDataTransferUploadStartServlet</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.FastDataTransferUploadStartServlet
+		</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>GNomExFrontController</servlet-name>
+		<url-pattern>*.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>CheckSessionStatus</servlet-name>
+		<url-pattern>/CheckSessionStatus.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>DownloadChromatogramFileServlet</servlet-name>
+		<url-pattern>/DownloadChromatogramFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>DownloadFastaFileServlet</servlet-name>
+		<url-pattern>/DownloadFastaFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>DownloadABIRunFileServlet</servlet-name>
+		<url-pattern>/DownloadABIRunFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>DownloadDataTrackFileServlet</servlet-name>
+		<url-pattern>/DownloadDataTrackFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>DownloadFileServlet</servlet-name>
+		<url-pattern>/DownloadFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>DownloadPlateSampleSheetFileServlet</servlet-name>
+		<url-pattern>/DownloadPlateSampleSheetFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>FastDataTransferDownloadExpServlet</servlet-name>
+		<url-pattern>/FastDataTransferDownloadExpServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>FastDataTransferDownloadAnalysisServlet</servlet-name>
+		<url-pattern>/FastDataTransferDownloadAnalysisServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>FastDataTransferDownloadProductOrderServlet</servlet-name>
+		<url-pattern>/FastDataTransferDownloadProductOrderServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>FastDataTransferDownloadDataTrackServlet</servlet-name>
+		<url-pattern>/FastDataTransferDownloadDataTrackServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>FastDataTransferUploadGetJnlpServlet</servlet-name>
+		<url-pattern>/FastDataTransferUploadGetJnlpServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>DownloadSingleFileServlet</servlet-name>
+		<url-pattern>/DownloadSingleFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>DownloadAnalysisSingleFileServlet</servlet-name>
+		<url-pattern>/DownloadAnalysisSingleFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>DownloadAnalysisFileServlet</servlet-name>
+		<url-pattern>/DownloadAnalysisFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>DownloadProductOrderFileServlet</servlet-name>
+		<url-pattern>/DownloadProductOrderFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>DownloadProductOrderSingleFileServlet</servlet-name>
+		<url-pattern>/DownloadProductOrderSingleFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>UploadAnalysisFileServlet</servlet-name>
+		<url-pattern>/UploadAnalysisFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>UploadProductOrderFileServlet</servlet-name>
+		<url-pattern>/UploadProductOrderFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>DownloadOncoCartaFDFServlet</servlet-name>
+		<url-pattern>/DownloadOncoCartaFDFServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>UploadDataTrackFileServlet</servlet-name>
+		<url-pattern>/UploadDataTrackFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>UploadSequenceFileServlet</servlet-name>
+		<url-pattern>/UploadSequenceFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>GetGNomExOrderFromNumberServlet</servlet-name>
+		<url-pattern>/GetGNomExOrderFromNumberServlet.gx</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>GetNewAccountServlet</servlet-name>
+		<url-pattern>/GetNewAccountServlet.gx</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>GetLoginProperties</servlet-name>
+		<url-pattern>/GetLoginProperties.gx</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>CheckIsGNomExAccount</servlet-name>
+		<url-pattern>/CheckIsGNomExAccount.gx</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>UploadSequenceURLServlet</servlet-name>
+		<url-pattern>/UploadSequenceURLServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>UploadSampleSheetFileServlet</servlet-name>
+		<url-pattern>/UploadSampleSheetFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>UploadMultiRequestSampleSheetFileServlet</servlet-name>
+		<url-pattern>/UploadMultiRequestSampleSheetFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>UploadAndBroadcastEmailServlet</servlet-name>
+		<url-pattern>/UploadAndBroadcastEmailServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>UploadAndBroadcastEmailURLServlet</servlet-name>
+		<url-pattern>/UploadAndBroadcastEmailURLServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>ReportIssueFeedbackServlet</servlet-name>
+		<url-pattern>/ReportIssueFeedbackServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>ReportIssueFeedbackServletGetURL</servlet-name>
+		<url-pattern>/ReportIssueFeedbackServletGetURL.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>ReportIssueServlet</servlet-name>
+		<url-pattern>/ReportIssueServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>ReportIssueServletGetURL</servlet-name>
+		<url-pattern>/ReportIssueServletGetURL.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>UploadAnalysisURLServlet</servlet-name>
+		<url-pattern>/UploadAnalysisURLServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>UploadProductOrderURLServlet</servlet-name>
+		<url-pattern>/UploadProductOrderURLServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>UploadDataTrackURLServlet</servlet-name>
+		<url-pattern>/UploadDataTrackURLServlet.gx</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+
+		<servlet-name>UploadSampleSheetURLServlet</servlet-name>
+		<url-pattern>/UploadSampleSheetURLServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>UploadExperimentFileServlet</servlet-name>
+		<url-pattern>/UploadExperimentFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>UploadExperimentURLServlet</servlet-name>
+		<url-pattern>/UploadExperimentURLServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>UploadPurchaseOrder</servlet-name>
+		<url-pattern>/UploadPurchaseOrder.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>UploadPurchaseOrderURL</servlet-name>
+		<url-pattern>/UploadPurchaseOrderURL.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>GetPurchaseOrderForm</servlet-name>
+		<url-pattern>/GetPurchaseOrderForm.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>MakeDataTrackIGVLink</servlet-name>
+		<url-pattern>/MakeDataTrackIGVLink.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>ApproveUser</servlet-name>
+		<url-pattern>/ApproveUser.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>ApproveLabMembership</servlet-name>
+		<url-pattern>/ApproveLabMembership.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>ConfirmEmail</servlet-name>
+		<url-pattern>/ConfirmEmail.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>ApproveBillingAccount</servlet-name>
+		<url-pattern>/ApproveBillingAccount.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>CreateAnalysisServlet</servlet-name>
+		<url-pattern>/CreateAnalysisServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>SaveTransferLogServlet</servlet-name>
+		<url-pattern>/SaveTransferLogServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>SaveChromatogramFromFileServlet</servlet-name>
+		<url-pattern>/SaveChromatogramFromFileServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>FastDataTransferUploadStartServlet</servlet-name>
+		<url-pattern>/FastDataTransferUploadStartServlet.gx</url-pattern>
+	</servlet-mapping>
+
+	<filter>
+		<filter-name>LoggingFilter</filter-name>
+		<filter-class>hci.gnomex.filters.LoggingFilter</filter-class>
+		<init-param>
+			<param-name>shouldSkipLog</param-name>
+			<param-value>skipLogging</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>LoggingFilter</filter-name>
+		<url-pattern>/CheckSessionStatus.gx</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>CorsFilter</filter-name>
+		<filter-class>hci.servlet.filter.CorsFilter</filter-class>
+		<init-param>
+			<param-name>cors.allowed.origins</param-name>
+			<param-value>http://localhost,http://localhost:8080,http://localhost:8081,http://localhost:8084,https://hci-bio-app-old.hci.utah.edu:8445</param-value>
+		</init-param>
+		<init-param>
+			<param-name>cors.support.credentials</param-name>
+			<param-value>true</param-value>
+		</init-param>
+		<init-param>
+			<param-name>cors.allowed.methods</param-name>
+			<param-value>GET, POST, PUT, DELETE, OPTIONS, HEAD</param-value>
+		</init-param>
+		<init-param>
+			<param-name>cors.allowed.headers</param-name>
+			<param-value>origin, content-type, accept, authorization</param-value>
+		</init-param>
+		<init-param>
+			<param-name>cors.max.age</param-name>
+			<param-value>10</param-value>
+		</init-param>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>CorsFilter</filter-name>
+		<url-pattern>/api/*</url-pattern>
+	</filter-mapping>
+
+	<filter>
+		<filter-name>shiroFilter</filter-name>
+		<filter-class>org.apache.shiro.web.servlet.ShiroFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>shiroFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+
+	<!-- Session timeout set to 4 hours -->
+	<session-config>
+		<session-timeout>1440</session-timeout>
+		<cookie-config>
+			<path>/gnomex</path>
+			<secure>false</secure>
+			<http-only>true</http-only>
+		</cookie-config>
+		<tracking-mode>COOKIE</tracking-mode>
+	</session-config>
+
+
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+
+	<resource-ref>
+		<description>Mail Server</description>
+		<res-ref-name>mail/MailSession</res-ref-name>
+		<res-type>jakarta.mail.Session</res-type>
+		<res-auth>Container</res-auth>
+		<res-sharing-scope>Shareable</res-sharing-scope>
+	</resource-ref>
+
+	<resource-ref>
+		<description>DB Connection</description>
+		<res-ref-name>jdbc/GNOMEX</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+	</resource-ref>
+
+	<resource-ref>
+		<description>DB Connection</description>
+		<res-ref-name>jdbc/GNOMEX_GUEST</res-ref-name>
+		<res-type>javax.sql.DataSource</res-type>
+		<res-auth>Container</res-auth>
+	</resource-ref>
+
+	<!-- Weld -->
+	<resource-env-ref>
+		<resource-env-ref-name>BeanManager</resource-env-ref-name>
+		<resource-env-ref-type>javax.enterprise.inject.spi.BeanManager</resource-env-ref-type>
+	</resource-env-ref>
+
+</web-app>

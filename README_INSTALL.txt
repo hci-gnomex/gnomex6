@@ -1,0 +1,1 @@
+Please see Installation Guide here:  http://hci-bio-dev.hci.utah.edu/gnomexDocumentation/wordpress/?page_id=980

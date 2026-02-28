@@ -1,0 +1,194 @@
+<div class="full-height full-width" role="region" aria-label="Experiment Setup">
+    <form [formGroup]="form" class="full-width full-height font-small extra-padded" role="form" aria-label="Experiment setup form">
+        <ol class="full-width three-depth-numbering" role="list" aria-label="Setup steps">
+            <li role="listitem">
+                <div class="flex-container-row" role="group" aria-label="Service category selection">
+                    <div class="heading" id="serviceCategoryLabel">
+                        Select a service category :
+                    </div>
+                    <mat-radio-group *ngIf="requestCategories.length > 0; else noPlatforms"
+                                     class="flex-container-col"
+                                     placeholder="Select a service category"
+                                     formControlName="selectedCategory"
+                                     (change)="onCategoryChange()"
+                                     aria-labelledby="serviceCategoryLabel">
+                        <div *ngFor="let category of requestCategories" class="full-width">
+                            <mat-radio-button [value]="category" [attr.aria-label]="category.display">
+                                <div class="full-width flex-container-row">
+                                    <div class="label-width">
+                                        <img src="{{ category.icon }}" alt="" aria-hidden="true">
+                                        {{ category.display }}
+                                    </div>
+                                    <div>
+                                        {{ category.notes }}
+                                    </div>
+                                </div>
+                            </mat-radio-button>
+                        </div>
+                    </mat-radio-group>
+                    <context-help name="experimentInternalSetupHelp"
+                                  label="Click for Instructions"
+                                  [idCoreFacility]="this.coreFacility.idCoreFacility"
+                                  [hasEditPermission]="this.createSecurityAdvisor.isAdmin"
+                                  popupTitle="Experiment Help">
+                    </context-help>
+                    <ng-template #noPlatforms>
+                        No experiment platforms are associated with this lab. Please contact customer support.
+                    </ng-template>
+                </div>
+            </li>
+            <li *ngIf="showLab" class="full-width align-baseline" role="listitem">
+                <div class="full-width flex-container-row align-baseline" role="group" aria-label="Lab group selection">
+                    <div class="heading" id="labGroupLabel">
+                        Verify your lab group :
+                    </div>
+                    <custom-combo-box class="moderate-width" placeholder="Select a Lab" (optionSelected)="selectLabOption($event)"
+                                      [displayField]="this.prefService.labDisplayField" [options]="this.labList"
+                                      [formControlName]="'selectLab'"
+                                      aria-labelledby="labGroupLabel">
+                    </custom-combo-box>
+                </div>
+            </li>
+            <li *ngIf="showName" class="full-width align-baseline" role="listitem">
+                <div class="full-width flex-container-row align-baseline" role="group" aria-label="Name verification">
+                    <div class="heading" id="nameLabel">
+                        Verify your name :
+                    </div>
+                    <mat-form-field class="moderate-width full-height">
+                        <mat-select class="full-width full-height"
+                                    placeholder="Your name"
+                                    [(ngModel)]="submitter"
+                                    [formControl]="form.controls['selectName']"
+                                    aria-labelledby="nameLabel">
+                            <mat-option class="" [value]="">
+                                None
+                            </mat-option>
+                            <mat-option class="" *ngFor="let opt of possibleSubmitters" [value]="opt">
+                                {{ opt[prefService.userDisplayField] }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="form.controls['selectName'].hasError('required')" role="alert">Your name is required</mat-error>
+                    </mat-form-field>
+                </div>
+            </li>
+            <li *ngIf="showBilling" class="full-width align-baseline" role="listitem">
+                <div class="full-width flex-container-row" role="group" aria-label="Payment method selection">
+                    <div class="flex-container-col">
+                        <div class="flex-container-row align-baseline">
+                            <div class="heading" id="paymentLabel">
+                                Select a payment method :
+                            </div>
+                            <mat-form-field class="moderate-width full-height">
+                                <mat-select class="full-width full-height"
+                                            placeholder="Account"
+                                            [formControl]="form.controls['selectAccount']"
+                                            (selectionChange)="onBillingAccountSelection($event.value)"
+                                            aria-labelledby="paymentLabel">
+                                    <mat-option class="" [value]="">
+                                        None
+                                    </mat-option>
+                                    <mat-option class="" *ngFor="let opt of authorizedBillingAccounts" [value]="opt">
+                                        {{ otherSelectedLab ? opt.accountNameDisplay + ' | ' + otherSelectedLab.name : opt.accountNameDisplay }}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error *ngIf="form.controls['selectAccount'].hasError('thisOrThat')" role="alert">
+                                    {{form.controls['selectAccount'].errors['thisOrThat'] }}
+                                </mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="flex-container-col" *ngIf="this.form.get('selectBillingTemplate').value && this.form.get('selectBillingTemplate').value.usingPercentSplit === 'true'">
+                            <span *ngFor="let item of this.form.get('selectBillingTemplate').value.items" class="margin-left">{{item.accountNameDisplay}} ({{item.percentSplit}}%)</span>
+                        </div>
+                        <div class="flex-container-col" *ngIf="this.form.get('selectBillingTemplate').value && this.form.get('selectBillingTemplate').value.usingPercentSplit !== 'true'">
+                            <span *ngFor="let item of this.form.get('selectBillingTemplate').value.items" class="margin-left">{{item.accountNameDisplay}} ({{item.dollarAmount | currency:"USD":"$": "1.2-2"}})</span>
+                        </div>
+                    </div>
+                    <div class="flex-column-container moderate-width major-padding-left">
+                        <div class="double-padded-left instructions">
+                            {{ workAuthInstructions }}
+                        </div>
+                        <div>
+                            <button mat-button class="link-button minimize" (click)="onClickNewAccount()" aria-label="Create new work authorization">{{ workButtonText }}</button>
+                        </div>
+                        <div *ngIf="showAccessAuthorizedAccountsLink" class="double-padded-left instructions">
+                            {{ accessAuthorizedBillingAccountInstructions }}
+                        </div>
+                        <div class="flex-container-row" role="group" aria-label="Additional billing options">
+                            <div class="padded-right">
+                                <button mat-button class="link-button minimize" [disabled]="disableShowMoreAccounts" (click)="onClickShowMoreAccounts()" aria-label="Show more billing accounts">
+                                    {{ accessAuthorizedBillingAccountLinkText }}
+                                </button>
+                            </div>
+                            <div class="padded-right">
+                                <button mat-button class="link-button minimize" (click)="onClickSplitBilling()" aria-label="Split billing between accounts">
+                                    Split Billing
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li *ngIf="showProject" class="full-width align-baseline" role="listitem">
+                <div class="full-width flex-container-row align-baseline" role="group" aria-label="Project folder selection">
+                    <div class="heading word-wrap" id="projectLabel">
+                        {{ "Select a folder : \n (for organizing experiments)" }}
+                    </div>
+                    <mat-form-field class="moderate-width full-height">
+                        <mat-select class="full-width full-height"
+                                    placeholder="Project"
+                                    [formControl]="form.controls['selectProject']"
+                                    (selectionChange)="onProjectSelection($event.value)"
+                                    aria-labelledby="projectLabel">
+                            <mat-option class="" [value]="">
+                                None
+                            </mat-option>
+                            <mat-option class="" *ngFor="let opt of filteredProjectList" [value]="opt">
+                                {{ opt.name }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="form.controls['selectProject'].hasError('required')" role="alert">Project is required</mat-error>
+                    </mat-form-field>
+                    <div class="flex-container-row major-padding-left" role="group" aria-label="Project actions">
+                        <div class="padded-right">
+                            <button mat-button class="link-button minimize" [disabled]="!this.form.get('selectProject').value" (click)="onClickEditProject()" aria-label="Edit selected project">Edit</button>
+                        </div>
+                        <div class="padded-right">
+                            <button mat-button class="link-button minimize" (click)="onClickNewProject()" aria-label="Create new project">New</button>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li *ngIf="showExperimentName" class="full-width align-baseline" role="listitem">
+                <div class="full-width flex-container-row align-baseline" role="group" aria-label="Experiment name input">
+                    <div class="heading word-wrap" id="experimentNameLabel">
+                         Provide an experiment name for the data folder ({{this._optOrReq}})
+                    </div>
+                    <mat-form-field class="moderate-width">
+                        <input matInput formControlName="experimentName" placeholder="Experiment Name for the data folder" (input)="onChangeExperimentName($event)" aria-labelledby="experimentNameLabel">
+                    </mat-form-field>
+                </div>
+            </li>
+            <li *ngIf="showExperimentTextbox" class="full-width align-baseline" role="listitem">
+                <div class="full-width" role="group" aria-label="Experimental details input">
+                    <div class="full-width flex-container-row align-baseline padding-bottom">
+                        <div class="heading word-wrap" id="experimentDetailsLabel">
+                            Document experimental details in the text field below ({{this._optOrReq}})
+                        </div>
+                    </div>
+                    <mat-form-field class="long-width">
+                        <textarea matInput
+                                  matTextareaAutosize
+                                  placeholder="Experimental Details"
+                                  formControlName="description"
+                                  matAutosizeMinRows="1"
+                                  matAutosizeMaxRows="5"
+                                  (input)="onInputExperimentalDetails($event)"
+                                  aria-labelledby="experimentDetailsLabel">
+                        </textarea>
+                        <mat-error *ngIf="form?.get('description')?.hasError('maxlength')" role="alert">Details can be at most 5000 characters</mat-error>
+                    </mat-form-field>
+                </div>
+            </li>
+        </ol>
+    </form>
+</div>

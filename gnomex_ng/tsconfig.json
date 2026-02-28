@@ -1,0 +1,31 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+
+    "sourceMap": true,
+    "declaration": false,
+
+    "target": "es2015",
+    "module": "esnext",
+    "moduleResolution": "node",
+
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+
+    "importHelpers": true,
+
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2018",
+      "dom"
+    ],
+
+    "skipLibCheck": true,
+    "downlevelIteration": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}

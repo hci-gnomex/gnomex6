@@ -1,0 +1,67 @@
+<form class="full-height full-width small-font padded" [formGroup]="descriptionForm" role="form" aria-label="Experiment description form">
+    <div class="flex-container-row align-center padded" *ngIf="editMode" role="group" aria-label="Experiment name field">
+        <div class="gx-label label-width" id="experimentNameLabel">
+            Experiment Name
+        </div>
+        <div class="flex-grow">
+            <mat-form-field class="field-width">
+                <input matInput type="text" formControlName="name" aria-labelledby="experimentNameLabel" aria-required="false">
+                <mat-error *ngIf="descriptionForm.get('name').hasError('maxlength')" role="alert">
+                    Experiment Name can be at most {{this.constantsService.MAX_LENGTH_200}}
+                    characters
+                </mat-error>
+            </mat-form-field>
+        </div>
+    </div>
+
+    <div class="full-width flex-container-col padded" role="group" aria-label="Experiment description field">
+        <label class="gx-label" for="descEditor" id="descEditorLabel">Experiment Description</label>
+        <angular-editor #descEditorRef id="descEditor"
+                        formControlName="description"
+                        [config]="descEditorConfig"
+                        aria-labelledby="descEditorLabel">
+        </angular-editor>
+        <mat-error *ngIf="descriptionForm.get('description').hasError('maxlength')" role="alert" aria-live="polite">
+            Description can be at most {{this.constantsService.MAX_LENGTH_5000}} characters
+            including HTML code formatting and styles. Character count: {{descriptionForm.get(
+            'description').value.toString().length}}
+        </mat-error>
+    </div>
+
+    <div class="full-width flex-container-col padded" *ngIf="showProjectDesc" role="group" aria-label="Project description field">
+        <label class="gx-label" for="projectDescEditor" id="projectDescEditorLabel">Project Description</label>
+        <angular-editor #projectDescEditorRef id="projectDescEditor"
+                        formControlName="projectDescription"
+                        [config]="projectDescEditorConfig"
+                        aria-labelledby="projectDescEditorLabel">
+        </angular-editor>
+    </div>
+
+    <div class="full-width flex-container-col padded" *ngIf="showCorePrepInstructions" role="group" aria-label="Core facility notes field">
+        <label class="gx-label" for="notesEditor" id="notesEditorLabel">Notes for Core Facility</label>
+        <angular-editor #notesEditorRef id="notesEditor"
+                        formControlName="corePrepInstructions"
+                        [config]="notesEditorConfig"
+                        aria-labelledby="notesEditorLabel">
+        </angular-editor>
+        <mat-error *ngIf="descriptionForm.get('corePrepInstructions').hasError('maxlength')" role="alert" aria-live="polite">
+            Summary can be at most {{this.constantsService.MAX_LENGTH_5000}} characters including
+            HTML code formatting and styles. Character count: {{descriptionForm.get(
+            'corePrepInstructions').value.toString().length}}
+        </mat-error>
+    </div>
+
+    <div class="full-width flex-container-col padded" *ngIf="showAdminNotes" role="group" aria-label="Administration notes field">
+        <label class="gx-label" for="adminNotesEditor" id="adminNotesEditorLabel">Administration Notes</label>
+        <angular-editor #adminNotesEditorRef id="adminNotesEditor"
+                        formControlName="adminNotes"
+                        [config]="adminNotesEditorConfig"
+                        aria-labelledby="adminNotesEditorLabel">
+        </angular-editor>
+        <mat-error *ngIf="descriptionForm.get('adminNotes').hasError('maxlength')" role="alert" aria-live="polite">
+            Administration Notes can be at most {{this.constantsService.MAX_LENGTH_5000}} characters
+            including HTML code formatting and styles. Character count: {{descriptionForm.get(
+            'adminNotes').value.toString().length}}
+        </mat-error>
+    </div>
+</form>

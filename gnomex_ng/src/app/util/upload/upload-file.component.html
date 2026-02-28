@@ -1,0 +1,48 @@
+<input type="file" #file style="display: none" (change)="onFilesAdded()" multiple aria-label="File selection input" />
+<div class="full-height full-width flex-container-col" role="dialog" aria-label="Upload files">
+    <!-- This is the content of the dialog, containing a list of the files to upload -->
+    <div class="flex-container-row  spaced-children-margin " style="padding: 0.5em" *ngIf="!this.manageData.isFDT" role="toolbar" aria-label="Upload file actions">
+        <button mat-button color="primary" (click)="addFile()" aria-label="Choose files to upload">
+            <img [src]="constService.ICON_ADD" alt="" aria-hidden="true"> Choose files </button>
+        <button mat-button color="primary" (click)="removeFile()" aria-label="Remove selected file">
+            <img [src]="constService.ICON_DELETE" alt="" aria-hidden="true"> Remove
+        </button>
+        <button mat-button color="primary" (click)="removeAllFiles()" aria-label="Clear all files">
+            <img [src]="constService.ICON_CROSS" alt="" aria-hidden="true"> Clear All </button>
+        <context-help class="align-items-end" name="uploadhelp" popupTitle="Upload Help" label="Upload Help"
+                      [hasEditPermission]="this.secAdvisor.isAdmin">
+        </context-help>
+
+
+    </div>
+
+
+    <div class="flex-grow full-width full-height padded" *ngIf="!manageData.isFDT; else fdtInstructions" role="region" aria-label="Files to upload">
+        <ag-grid-angular style="width: 100%; height: 36em;" class="ag-theme-balham"
+                         [columnDefs]="columnDefs"
+                         [rowSelection]="'single'"
+                         [enableSorting]="true"
+                         [enableColResize]="true"
+                         [rowDeselection]="true"
+                         (rowSelected)="selectedRow($event)"
+                         (gridReady)="onGridReady($event)"
+                         aria-label="Files list data grid">
+        </ag-grid-angular>
+    </div>
+    <ng-template #fdtInstructions>
+        <div class="flex-grow full-width full-height padded" [innerHTML]="this.constService.UPLOAD_FILE_FDT_INFO" role="region" aria-label="FDT upload instructions"> </div>
+    </ng-template>
+
+    <mat-dialog-actions class="flex-container-row justify-flex-end no-margin no-padding generic-dialog-footer-colors" role="group" aria-label="Upload actions">
+        <div class="flex-grow double-padded" *ngIf="!this.manageData.isFDT">
+            <mat-progress-bar mode="determinate" [value]="progressVal" aria-label="Upload progress" [attr.aria-valuenow]="progressVal" aria-valuemin="0" aria-valuemax="100"></mat-progress-bar>
+        </div>
+        <div class="double-padded">
+            <button mat-raised-button [disabled]="this.manageData.isFDT ? !allowFDTButton : rowData.length === 0"
+                    color="primary" class="primary-action" (click)="upload()" aria-label="Upload files">
+                <img [src]="constService.ICON_UPLOAD" alt="" aria-hidden="true"> {{primaryButtonText}}
+            </button>
+            <button mat-raised-button color="accent" class="secondary-action" mat-dialog-close aria-label="Close dialog">Close</button>
+        </div>
+    </mat-dialog-actions>
+</div>

@@ -1,0 +1,160 @@
+
+<form [formGroup]="formGroup" style=" height: calc(100% - 1em );width: calc(100% - 1em); padding: 0.5em; display:flex; flex-direction:column; font-size: small;">
+    <div class="flex-container-row">
+        <mat-form-field  class="medium-form-input">
+            <input matInput placeholder="Name" formControlName="requestCategory">
+            <mat-error *ngIf="this.formGroup?.controls['requestCategory']?.hasError('required')">
+                This field is required
+            </mat-error>
+        </mat-form-field>
+        <div class="padded-checkbox">
+            <label style="margin-right: 1em;"  > Active  </label>
+            <mat-checkbox  formControlName="isActive" > </mat-checkbox>
+        </div>
+
+    </div>
+
+
+    <div class="flex-container-row">
+        <custom-combo-box class="medium-form-input" placeholder="Type" (optionSelected)="onTypeChanged()"
+                          [options]="this.typeList" displayField="display" [formControlName]="'type'">
+        </custom-combo-box>
+        <div class="padded-checkbox" >
+            <label style="margin-right: 1em;" > Associated With Analysis  </label>
+            <mat-checkbox  formControlName="associatedWithAnalysis" > </mat-checkbox>
+        </div>
+        <div class="padded-checkbox">
+            <label style="margin-right: 1em;"  > Require Name & Description  </label>
+            <mat-checkbox  formControlName="requireNameDescription" > </mat-checkbox>
+        </div>
+
+    </div>
+    <div class="flex-container-row" >
+        <mat-form-field  class="short-input margin-right-field">
+            <input matInput placeholder="Code" formControlName="code">
+            <!--<mat-error *ngIf="this.formGroup?.controls['code']?.hasError('required')">
+                This field is required
+            </mat-error>-->
+        </mat-form-field>
+
+        <mat-form-field class="short-input">
+
+            <img style="width:16px;" [src]="formGroup.get('icon').value" >
+            <mat-select style="width:calc(100% - 16px)" placeholder="Icon" formControlName="icon">
+                <mat-option
+                        *ngFor="let icon of iconList"
+                        [value]="icon" > <img [src]="icon">
+                </mat-option>
+            </mat-select>
+
+        </mat-form-field>
+
+    </div>
+
+    <custom-combo-box class="medium-form-input" placeholder="Core Facility"
+                      (optionSelected)="onCoreChanged()" [options]="this.coreFacilityList"
+                      displayField="display" valueField="idCoreFacility" [formControlName]="'idCoreFacility'">
+    </custom-combo-box>
+
+    <mat-form-field *ngIf="showNote">
+        <textarea matInput placeholder="Notes" formControlName="notes" matTextareaAutosize matAutosizeMinRows="1" matAutosizeMaxRows="2"></textarea>
+    </mat-form-field>
+
+    <custom-combo-box *ngIf="showVendor" class="medium-form-input" placeholder="Vendor"
+                      [options]="this.vendorList" displayField="display"
+                      valueField="idVendor" [formControlName]="'idVendor'">
+    </custom-combo-box>
+
+    <div class="flex-container-row">
+        <label class="gx-label" style="margin-right: 2em;" > Available for </label>
+        <div class="flex-container-col">
+            <div>
+                <mat-checkbox  formControlName="isInternal" > </mat-checkbox>
+                <label class="gx-label" style="margin-left: 0.5em;"  > Internal Experiment Orders  </label>
+            </div>
+            <div>
+                <mat-checkbox  formControlName="isExternal" > </mat-checkbox>
+                <label class="gx-label"  style="margin-left: 0.5em;"  > Upload of Experiment Data Generated at a Third Party Facility  </label>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="flex-container-row">
+        <mat-form-field  class="short-input margin-right-field">
+            <input matInput placeholder="Sort Order" formControlName="sortOrder">
+            <mat-error *ngIf="this.formGroup?.controls['sortOrder']?.hasError('numberRange')">
+                {{this.formGroup.get('sortOrder').errors.numberRange }}
+            </mat-error>
+        </mat-form-field>
+        <button mat-button color="primary" (click)="editSortOrder()" class="margin-right-field"  > Edit Sort Order </button>
+
+        <mat-form-field *ngIf="showChannels" class="short-input margin-right-field">
+            <input type="number" min="1" [max]="channelMax" matInput [placeholder]="channelLabel" formControlName="numberOfChannels">
+        </mat-form-field>
+    </div>
+    <div class="flex-container-row">
+        <mat-form-field class="short-input margin-right-field">
+            <input matInput placeholder="Sample Batch Size" formControlName="sampleBatchSize">
+            <mat-error  *ngIf="this.formGroup?.controls['sampleBatchSize']?.hasError('numberRange')">
+                {{this.formGroup.get('sampleBatchSize').errors.numberRange }}
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field style="width:calc(99% - 12em )" *ngIf="this.formGroup?.controls['sampleBatchSize'].value">
+            <input matInput placeholder="Sample batch warning message" formControlName="customWarningMessage">
+        </mat-form-field>
+
+    </div>
+    <custom-combo-box *ngIf="showOrganism" class="medium-form-input" placeholder="Default Organism"
+                      [options]="this.organismList" displayField="display"
+                      valueField="value" [formControlName]="'idOrganism'">
+    </custom-combo-box>
+
+
+
+    <div class="flex-container-col">
+
+        <div class="flex-container-row">
+            <div class="partial-padded-checkbox"  style="flex:1" >
+                <mat-checkbox (change)="onUseProducts()" formControlName="useProduct" > </mat-checkbox>
+                <label class="gx-label" style="margin-left:0.5em;"  > Use Products  </label>
+            </div>
+            <custom-combo-box *ngIf="this.formGroup.get('useProduct')?.value" class="margin-right-field"
+                              style="flex:4" placeholder="Product Type"
+                              [options]="this.productTypeList" displayField="display"
+                              valueField="idProductType" [formControlName]="'idProductType'">
+            </custom-combo-box>
+            <mat-form-field style="flex:6" *ngIf="this.formGroup.get('useProduct')?.value;">
+                <input matInput placeholder="No Products Message" formControlName="noProductsMessage">
+            </mat-form-field>
+        </div>
+
+        <div class="flex-container-row"  *ngIf="this.formGroup.get('useProduct')?.value;">
+            <custom-combo-box placeholder="Select a Status"
+                              [options]="this.productStatusList" displayField="codeRequestStatus"
+                              valueField="codeRequestStatus" [formControlName]="'productStatus'">
+            </custom-combo-box>
+
+
+        </div>
+    </div>
+    <div class="flex-container-row" >
+
+
+        <div class="partial-padded-checkbox" >
+            <mat-checkbox formControlName="saveAndSubmit" > </mat-checkbox>
+            <label class="gx-label" style="margin-left:0.5em;" > Allow saving of request before submission </label>
+        </div>
+        <div style="margin-left:auto"
+             [ngClass]="{'warningLabelSevere':!isMinorSecurity,'warningLabelMinor':  isMinorSecurity }">
+            <label> {{ securityLabel}} </label>
+        </div>
+
+
+    </div>
+
+
+
+</form>

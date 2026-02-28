@@ -1,0 +1,71 @@
+<div class="full-width full-height flex-container-col" role="main" aria-label="Analysis detail overview">
+    <div class="flex-container-row align-center padded-left-right-bottom small-font overflow-auto" role="toolbar" aria-label="Analysis actions">
+        <div class="flex-container-row align-center label-min-width">
+            <img [src]="analysisTreeNode?.icon" alt="" class="icon" aria-hidden="true">
+            <div class="medium-font padded-left" aria-live="polite">
+                Analysis {{ analysisTreeNode?.number }}
+            </div>
+        </div>
+        <div class="flex-container-row flex-wrap child-margins">
+            <button mat-raised-button *ngIf="showEdit" class="minimize" (click)="editButtonClicked($event)"
+                    [attr.aria-label]="isEditMode ? 'Switch to view mode' : 'Switch to edit mode'">
+                <img *ngIf="!isEditMode" class="icon" [src]="constService.ICON_TAG_BLUE_EDIT" alt="" aria-hidden="true">
+                <img *ngIf="isEditMode" class="icon" [src]="constService.PAGE" alt="" aria-hidden="true">
+                {{ isEditMode ? "View" : "Edit" }}
+            </button>
+            <button mat-raised-button *ngIf="showAutoDistributeDataTracks" class="minimize" (click)="distributeDataTracks()"
+                    aria-label="Distribute data tracks">
+                <img class="icon" [src]="constService.ICON_DATATRACK_NEW" alt="" aria-hidden="true">
+                Distribute Data Tracks
+            </button>
+            <button mat-raised-button *ngIf="showManagePEDFile" class="minimize" (click)="showManagePEDFileWindow()"
+                    aria-label="Manage PED file">
+                <img class="icon" [src]="constService.ICON_CHART_ORGANIZATION" alt="" aria-hidden="true">
+                Manage Ped File
+            </button>
+            <button mat-raised-button class="minimize" (click)="shareWebLink()" aria-label="Share URL">
+                <img class="icon" [src]="constService.GLOBE_LINK" alt="" aria-hidden="true">
+                Share URL
+            </button>
+            <button *ngIf="showLinkToExp" mat-raised-button class="minimize" (click)="makeLinkToExperiment()"
+                    aria-label="Link to experiment">
+                <img class="icon" [src]="constService.ICON_LINK" alt="" aria-hidden="true">
+                Link to Experiment
+            </button>
+        </div>
+        <div class="flex-grow">
+        </div>
+    </div>
+    <div class="flex-grow padded-bottom overflow-auto" role="region" aria-label="Analysis details">
+        <mat-tab-group class="bordered full-height" (selectedTabChange)="tabChanged($event)" aria-label="Analysis detail tabs">
+            <mat-tab label="Info" aria-label="Analysis information tab">
+                <analysis-info-tab [isEditMode]="isEditMode"></analysis-info-tab>
+            </mat-tab>
+            <mat-tab label="Description" aria-label="Analysis description tab">
+                <analysis-description-tab [isEditMode]="isEditMode"></analysis-description-tab>
+            </mat-tab>
+            <mat-tab label="Annotations" aria-label="Analysis annotations tab">
+                <annotation-tab [annotations]="annotations" [disabled]="!isEditMode"
+                                [orderType]="types.ANALYSIS"
+                                [showConfigureAnnotationsButton]="isEditMode">
+                </annotation-tab>
+            </mat-tab>
+            <mat-tab label="Experiment" aria-label="Linked experiments tab">
+               <analysis-experiment-tab [tabVisible]="showExpAnalysisTab"></analysis-experiment-tab>
+            </mat-tab>
+            <mat-tab label="Related Data" *ngIf="showRelatedDataTab" aria-label="Related data tab">
+                <related-data-tab [relatedObjects]="relatedObjects" ></related-data-tab>
+            </mat-tab>
+            <mat-tab label="Files" aria-label="Analysis files tab">
+                <analysis-files-tab></analysis-files-tab>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+    <div role="contentinfo">
+        <save-footer [hidden]="fromTopic"
+                     [dirty]="analysisService.analysisOverviewForm.dirty"
+                     [disableSave]="analysisService.analysisOverviewForm.invalid || !isEditMode"
+                     (saveClicked)="save()">
+        </save-footer>
+    </div>
+</div>

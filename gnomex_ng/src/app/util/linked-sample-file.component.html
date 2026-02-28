@@ -1,0 +1,96 @@
+<div class="full-width full-height flex-container-col max-height" role="region" aria-label="Linked sample files">
+    <div class="full-width padded flex-container-row justify-space-between" role="toolbar" aria-label="File linking actions">
+        <div>
+            <button mat-button color="primary" [matTooltip]="autoToolTip" (click)="autoLinkSample()" aria-label="Auto link files">
+                <img class="icon" [src]="constService.ICON_TABLE_LINK" alt="" aria-hidden="true"> Auto Link Files
+            </button>
+        </div>
+        <div>
+            <button mat-button color="primary"
+                    [disabled]="!this.isAddActive()"
+                    (click)="add()"
+                    aria-label="Link selected files">
+                <img [src]="constService.SEGMENT_IMPORT" alt="" aria-hidden="true">
+                Link Files
+            </button>
+            <button mat-button color="primary" [disabled]="!allowMakeSeqRunFolder" class="icon"
+                    matTooltip="Create a new folder for organizing experiment files"
+                    (click)="newSeqRunFolder($event)"
+                    aria-label="Create new sequencing run folder">
+                <img [src]="constService.ICON_FOLDER_ADD" alt="" aria-hidden="true">
+                New Seq Folder
+            </button>
+            <button mat-button color="primary" class="icon"
+                    matTooltip="Create a new folder for organizing samples" (click)="newSampleGroupFolder($event)"
+                    aria-label="Create new sample folder">
+                <img [src]="constService.ICON_FOLDER_ADD" alt="" aria-hidden="true">
+                New Sample Folder
+            </button>
+            <button mat-button color="primary" class="icon"
+                    [disabled]="!this.sampleFileSelectedNode"
+                    (click)="remove()"
+                    aria-label="Remove or unlink selected">
+                <img [src]="constService.ICON_FOLDER_DELETE" alt="" aria-hidden="true">
+                Remove/Unlink
+            </button>
+        </div>
+    </div>
+    <div class="full-width flex-container-row flex-grow overflow-auto">
+        <as-split > <!-- split  mat-tabs have issues -->
+            <as-split-area [size]="this.expTreeSplitSize">
+                <div class="full-width full-height max-height flex-container-col border-subtle" role="region" aria-label="Experiment files tree"><!-- start tree container -->
+                    <div class="full-width flex-grow left-right-padded overflow-auto">
+                        <div class="full-height full-width border-subtle" role="tree" aria-label="Experiment files">
+                            <tree-root *ngIf="showTree && experimentFiles.length > 0 "  #experimentFileTree
+                                       (activate)="experimentFileTreeOnSelect($event)"
+                                       (deactivate)="experimentFileTreeOnUnselect($event)"
+                                       (moveNode)="onMove($event)"
+                                       (initialized)="onTreeInit($event)"
+                                       [nodes]="experimentFiles"
+                                       [options]="expFileOpts">
+                                <ng-template #treeNodeTemplate let-node let-index="index">
+                                    <div class="truncate tree-node-font" role="treeitem" [attr.aria-label]="node.data.displayName">
+                                        <img *ngIf="node.data.icon" class="icon tree-node-icon" src="{{ node.data.icon }}" alt="" aria-hidden="true">
+                                        <span> {{ node.data.displayName }} </span>
+                                    </div>
+                                </ng-template>
+                            </tree-root>
+                        </div>
+                    </div>
+                    <div class="full-width padded">
+                        <div class="flex-container-row full-height small-font" >
+                            <button mat-button (click)="expandFolders()" aria-label="Expand all folders"> Expand Folders </button>
+                            <button mat-button (click)="collapseFolders()" aria-label="Collapse all folders"> Collapse Folders </button>
+                        </div>
+                    </div>
+
+                </div> <!-- end tree container are you working-->
+            </as-split-area>
+            <as-split-area  [size]="100 - this.expTreeSplitSize">
+                <div class="full-width full-height max-height flex-container-col border-subtle" role="region" aria-label="Linked samples">
+                    <div class="full-width flex-grow left-right-padded overflow-auto">
+                        <div #oneEmWidth class="no-height single-em"></div>
+                        <ag-grid-angular class="ag-theme-balham full-height full-width"
+                                         (gridReady)="this.onGridReady($event)"
+                                         (gridSizeChanged)="this.onGridSizeChanged($event)"
+                                         (rowDragEnd)="onRowDragEnd($event)"
+                                         [rowDeselection]="true"
+                                         [groupDefaultExpanded]="true"
+                                         (rowClicked)="selectedGridRow($event)"
+                                         [getNodeChildDetails]="this.getNodeChildDetails"
+                                         [enableColResize]="true"
+                                         [rowData]="this.linkedSampleRowData"
+                                         aria-label="Linked samples data grid">
+                        </ag-grid-angular>
+                    </div>
+                </div>
+            </as-split-area>
+        </as-split>
+    </div>
+    <div class="flex-container-row justify-flex-end generic-dialog-footer-colors">
+        <save-footer (saveClicked)="requestSave()" [dirty]="formGroup.dirty"></save-footer>
+        <save-footer [actionType]="actionType" (saveClicked)="requestToCloseDialog()" name="Close"></save-footer>
+    </div>
+</div>
+
+

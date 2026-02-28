@@ -1,0 +1,24 @@
+<div class="full-height full-width padded flex-container-col">
+    <div class="flex-grow">
+        <div #oneEmWidth class="no-height single-em"></div>
+        <ag-grid-angular class="ag-theme-fresh full-height full-width"
+                         stopEditingWhenGridLosesFocus="true"
+                         [animateRows]="true"
+                         [enableColResize]="true"
+                         [rowSelection]="'single'"
+                         (selectionChanged)="onSelectionChanged($event)"
+                         (gridReady)="this.onGridReady($event)"
+                         (gridSizeChanged)="this.onGridSizeChanged($event)">
+        </ag-grid-angular>
+    </div>
+    <div class="flex-container-row padded-top">
+        <div class="flex-grow">
+        </div>
+        <div class="padded-left">
+            <button mat-button (click)="onClickCancel()">Cancel</button>
+        </div>
+        <div class="padded-left">
+            <button mat-raised-button (click)="onClickLink()">Link</button>
+        </div>
+    </div>
+</div>

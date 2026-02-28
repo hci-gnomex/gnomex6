@@ -1,0 +1,112 @@
+<div class="flex-container-col full-width full-height padded-left-right border">
+    <div class="full-width no-overflow padded-top-bottom">
+        {{ this.protocolService.getMainPaneTitle() }}
+    </div>
+    <div class="full-width flex-grow no-overflow">
+        <form [formGroup]="this.form" class="full-width full-height">
+        <div class="full-width full-height border">
+            <div *ngIf="!!selectedProtocol" class="full-width full-height padded overflow-auto">
+
+                <div class="full-width flex-container-row">
+                    <div class="flex-grow padded">
+                        <mat-form-field class="full-width">
+                            <input  matInput
+                                    placeholder="Account Name*"
+                                    [formControl]="this.form.get('accountName')" matTooltip="Account Name is required">
+                            <mat-error *ngIf="this.form.get('accountName').hasError('required')">
+                                Account Name is required
+                            </mat-error>
+                            <mat-error *ngIf="this.form.get('accountName').hasError('maxLength')">
+                                Account Name exceeded the 200 character limit
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="flex-grow padded">
+                        <div *ngIf="protocolClassName && protocolClassName !== 'hci.gnomex.model.AnalysisProtocol'"
+                             class="full-width full-height">
+                            <custom-combo-box class="full-width font-small" placeholder="Experiment Platform" [options]="this.experimentPlatformList"
+                                              valueField="codeRequestCategory" displayField="display"
+                                              [formControl]="this.form.get('experimentPlatform')">
+                            </custom-combo-box>
+                        </div>
+
+                        <div *ngIf="protocolClassName && protocolClassName === 'hci.gnomex.model.AnalysisProtocol'"
+                             class="full-width full-height flex-container-row">
+                            <div class="flex-grow padded-left-right">
+                                <custom-combo-box class="full-width font-small" placeholder="Analysis Type:" [options]="this.analysisTypeList"
+                                                  valueField="idAnalysisType" displayField="display"
+                                                  [formControl]="this.form.get('analysisType')">
+                                </custom-combo-box>
+                            </div>
+                            <div class="flex-grow padded-left-right">
+                                <custom-combo-box class="full-width font-small" placeholder="Owner:" [options]="this.userList"
+                                                  valueField="idAppUser" [displayField]="this.prefService.userDisplayField"
+                                                  [formControl]="this.form.get('owner')">
+                                </custom-combo-box>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="t special-checkbox-text-alignment-padding">
+                        <div class="tr">
+                            <div class="td">
+                                <div class="inline-block checkbox-container">
+                                    <mat-checkbox [formControl]="this.form.get('isActive')"></mat-checkbox>
+                                </div>
+                            </div>
+                            <div class="td">
+                                <div class="inline-block vertical-center">
+                                    <label>Active</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-container-row full-width">
+                    <div class="flex-grow padded">
+                        <mat-form-field class="full-width">
+                            <input  matInput
+                                    placeholder="URL"
+                                    (input)="checkToEnableViewURLButton($event)"
+                                    [formControl]="this.form.get('url')">
+                            <mat-error *ngIf="this.form.get('url').hasError('maxLength')">
+                                URL exceeded the 500 character limit
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div class="special-button-text-alignment-padding">
+                        <button mat-button [disabled]="disableViewURLButton" (click)="onViewURLButtonClicked()">
+                            <img *ngIf="!disableViewURLButton" [src]="'./assets/page_go.png'" alt="" />
+                            <img *ngIf="disableViewURLButton"  [src]="'./assets/page_go_disabled.png'" alt="" />
+                            View URL
+                        </button>
+                    </div>
+                </div>
+
+                <div class="full-width flex-container-row">
+                    <div class="flex-grow padded">
+                    <label class="gx-label" for="descEditor">Protocol Description</label>
+                    <angular-editor #descEditorRef id="descEditor"
+                                    formControlName="description"
+                                    [config]="editorConfig">
+                    </angular-editor>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+    <div class="full-width no-overflow padded-top-bottom right-align" *ngIf="!isDialog">
+        <div class="inline-block minimize padded-left-right ">
+            <div *ngIf="this.form.dirty" class="inline-block padded warning-block">Your changes have not been saved</div>
+        </div>
+        <div class="inline-block minimize padded-left-right">
+            <button mat-button
+                    [disabled]="!this.form.dirty || this.form.invalid"
+                    (click)="onSaveButtonClicked()">
+                <img [src]="this.form.dirty && this.form.valid ? './assets/save.png' : './assets/save_disable.png'"/>
+                Save
+            </button>
+        </div>
+    </div>
+</div>

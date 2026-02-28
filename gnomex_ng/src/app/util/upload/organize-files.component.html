@@ -1,0 +1,106 @@
+<div class="full-width full-height flex-container-col max-height" role="region" aria-label="Organize files">
+    <div class="flex-container-row full-width padded justify-space-between" role="toolbar" aria-label="File organization actions">
+        <div class="flex-container-row">
+            <button [disabled]="!this.organizeSelectedNode" mat-button color="primary" (click)="attemptAddNewFolder()"
+                    aria-label="Create new folder">
+                <img [src]="constService.ICON_FOLDER_ADD" alt="" aria-hidden="true"> New Folder
+            </button>
+            <button mat-button
+                    color="primary"
+                    [disabled]="disableRemove"
+                    (click)="attemptRemove()"
+                    aria-label="Remove selected from file system">
+                <img [src]="constService.ICON_DELETE" alt="" aria-hidden="true">
+                Remove (from file system)
+            </button>
+            <button mat-button color="primary"
+                    [disabled]="disableRename"
+                    (click)="rename()"
+                    aria-label="Rename selected file">
+                <img [src]="constService.SEGMENT_IMPORT" alt="" aria-hidden="true">
+                Rename file </button>
+            <context-help name="organizeFilesHelp" popupTitle="Organize Files Help"
+                          label="Help" [hasEditPermission]="this.secAdvisor.isAdmin"></context-help>
+        </div>
+        <button mat-button color="primary" (click)="refresh()" aria-label="Refresh file list">
+            <img [src]="constService.ICON_REFRESH" alt="" aria-hidden="true">
+            Refresh
+        </button>
+    </div>
+
+    <div class="full-width flex-container-row overflow-auto padded" style="height: 29.15em;">
+        <as-split> <!-- split  mat-tabs have issues -->
+            <as-split-area  [size]="this.splitOrgSize">
+                <div class="full-width full-height max-height flex-container-col border-subtle" role="region" aria-label="Upload files panel">
+                    <div class="full-width padded" id="upload-files-heading">
+                        Upload Files
+                    </div>
+                    <div class="full-width flex-grow left-right-padded overflow-auto">
+                        <div class="full-height full-width border-subtle" role="tree" aria-labelledby="upload-files-heading">
+                            <tree-root #uploadTree
+                                       *ngIf="showFileTrees && uploadFiles"
+                                       (activate)="uploadTreeOnSelect($event)"
+                                       (deactivate)="uploadTreeOnUnselect($event)"
+                                       [nodes]="uploadFiles"
+                                       [options]="uploadOpts">
+                                <ng-template #treeNodeTemplate let-node let-index="index">
+                                    <div class="truncate tree-node-font" role="treeitem" [attr.aria-label]="node.data.displayName">
+                                        <img *ngIf="node.data.icon" class="icon tree-node-icon" src="{{ node.data.icon }}" alt="" aria-hidden="true">
+                                        <span  [matTooltip]="node.data.displayName"
+                                                [ngStyle]="{'color': node.data.PROTECTED === 'Y' ? 'red' : 'black' }">
+                                            {{ node.data.displayName }}
+                                        </span>
+                                    </div>
+
+                                </ng-template>
+                            </tree-root>
+                        </div>
+                    </div>
+                </div>
+            </as-split-area>
+            <as-split-area [size]="100 - this.splitOrgSize">
+                <div class="full-width full-height max-height flex-container-col border-subtle" role="region" aria-label="Folder organization panel"><!-- start tree container -->
+                    <div class="full-width padded" id="folder-heading">
+                        Folder
+                    </div>
+                    <div class="full-width flex-grow left-right-padded overflow-auto">
+                        <div class="full-height full-width border-subtle" role="tree" aria-labelledby="folder-heading">
+                            <tree-root #organizeTree
+                                       *ngIf="showFileTrees && organizeFiles"
+                                       (activate)="organizeTreeOnSelect($event)"
+                                       (initialized)="initOrganizeTree($event)"
+                                       (deactivate)="organizeTreeOnUnselect($event)"
+                                       (moveNode)="onMove($event)"
+                                       [nodes]="organizeFiles"
+                                       [options]="organizeOpts">
+                                <ng-template #treeNodeTemplate let-node let-index="index">
+                                    <div class="truncate tree-node-font" role="treeitem" [attr.aria-label]="node.data.displayName">
+                                        <img *ngIf="node.data.icon" class="icon tree-node-icon" src="{{ node.data.icon }}" alt="" aria-hidden="true">
+                                        <span [ngStyle]="{'color': node.data.PROTECTED === 'Y' ? 'red' : 'black' }" >
+                                    {{ node.data.displayName }}
+                                </span>
+                                    </div>
+
+                                </ng-template>
+                            </tree-root>
+                        </div>
+                    </div>
+                    <div class="full-width padded">
+                        <div class="flex-container-row full-height small-font" >
+                            <button mat-button (click)="expandFolders()" aria-label="Expand all folders"> Expand Folders </button>
+                            <button mat-button (click)="collapseFolders()" aria-label="Collapse all folders"> Collapse Folders </button>
+                        </div>
+                    </div>
+
+                </div> <!-- end tree container are you working-->
+
+            </as-split-area>
+        </as-split>
+    </div>
+    <div class="flex-container-row justify-flex-end generic-dialog-footer-colors">
+        <save-footer (saveClicked)="requestSave()" [dirty]="formGroup.dirty"></save-footer>
+        <save-footer [actionType]="actionType" (saveClicked)="requestToCloseDialog()" [name]="'Close'"></save-footer>
+    </div>
+</div>
+
+

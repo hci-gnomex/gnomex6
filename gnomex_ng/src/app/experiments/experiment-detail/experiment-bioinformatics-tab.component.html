@@ -1,0 +1,130 @@
+<div class="full-height full-width padded small-font" role="region" aria-label="Bioinformatics Settings">
+    <div *ngIf="masterDisabled" class="full-width full-height flex-container-col" role="region" aria-label="Bioinformatics Summary">
+        <div class="full-width flex-container-row align-center" role="group" aria-labelledby="compressionLabel">
+            <div class="label label-width" id="compressionLabel">
+                Compression :
+            </div>
+            <div class="flex-grow" aria-labelledby="compressionLabel">
+                {{ oraCompression ? 'Illumina ORA' : 'gzip' }}
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center">
+            <div class="label label-width">
+                Organism(s) :
+            </div>
+            <div class="flex-grow">
+                {{ organismName }}
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center">
+            <div class="label label-width">
+                Align to Genome Build :
+            </div>
+            <div class="flex-grow">
+                {{ alignToGenomeBuild ? 'Y' : 'N'}}
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center">
+            <div class="label label-width">
+                Genome Build(s) :
+            </div>
+            <div class="flex-grow">
+                {{ experiment?.alignToGenomeBuild === 'Y' ? 'most recent' : genomeBuild }}
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center">
+            <div class="label label-width">
+                {{ experiment?.bioinformaticsAssist === 'Y' ? 'CBI Assistance Requested' : 'No CBI Assistance Desired' }}
+            </div>
+        </div>
+        <div class="full-width flex-container-row align-center">
+            <div class="label label-width">
+                Notes for CBI :
+            </div>
+        </div>
+        <div class="full-width padded bordered">
+            <textarea matInput
+                      matTextareaAutosize
+                      matAutosizeMinRows="8"
+                      matAutosizeMaxRows="8"
+                      [(ngModel)]="experiment.analysisInstructions"
+                      [disabled]="true"
+                      placeholder="Description"
+                      aria-label="Notes for CBI">
+            </textarea>
+        </div>
+    </div>
+    <div *ngIf="!masterDisabled" class="full-width full-height flex-container-col" role="form" aria-label="Bioinformatics Options">
+        <div class="full-width bold" role="heading" aria-level="2">
+            {{ header }}
+        </div>
+        <ol role="list" aria-label="Bioinformatics configuration options">
+            <li class="full-width flex-container-row">
+                <div class="flex-grow padded">
+                    <context-help name="oraCompression" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
+                                  [hasEditPermission]="this.createSecurityAdvisorService.isAdmin"
+                                  popupTitle="ORA Compression Help"
+                                  label='Use ORA instead of gzip to compress the fastq files.'>
+                    </context-help>
+                    <div class="margin-top">
+                        See <a href="https://help.ora.illumina.com/product-guides/dragen-ora-decompression/" target="_blank">Illumina ORA</a> for details. Not all species are supported.
+                    </div>
+                    <div class="flex-container-row align-center">
+                        <div class="margin-top">
+                            <mat-checkbox [(ngModel)]="oraCompression" (change)="onORACompressionChanged($event)" aria-label="Use ORA Compression">Yes, Use ORA Compression</mat-checkbox>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li *ngIf="showConsolidatedGenome && consolidatedGenomeInformation?.length > 0" class="full-width flex-container-row">
+                <div class="flex-grow padded">
+                    <context-help name="bioSequenceAligned" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
+                                  [hasEditPermission]="this.createSecurityAdvisorService.isAdmin"
+                                  popupTitle="Sequence Alignment Help"
+                                  label="Do you want the sequence data to be aligned? {{ alignmentNote }}"></context-help>
+                    <div *ngFor="let item of consolidatedGenomeInformation" class="flex-container-row align-center">
+                        <div class="label-width">
+                            {{ item.organismName }}
+                        </div>
+                        <div class="margin-top">
+                            <mat-checkbox [(ngModel)]="alignToGenomeBuild" (change)="onAlignChanged($event)" aria-label="Align and QC with the most recent genome build">Yes, Align and QC with the most recent genome build</mat-checkbox>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <li class="full-width flex-container-row">
+                <div class="flex-grow padded">
+                    <context-help name="bioAnalysisAssistance" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
+                                  [hasEditPermission]="this.createSecurityAdvisorService.isAdmin"
+                                  popupTitle="Analysis Assistance Help"
+                                  label="Would you like the {{ groupName }} to assist you with analysis?"></context-help>
+                    <div class="flex-container-row align-center">
+                        <div class="label-width margin-top">
+                            <mat-checkbox [(ngModel)]="bioinformaticsAssist" aria-label="Request analysis assistance">Yes</mat-checkbox>
+                        </div>
+                        <div>
+                            {{ analysisNote }}
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ol>
+        <div class="full-width flex-container-col padded">
+            <context-help name="bioNote" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
+                          [hasEditPermission]="this.createSecurityAdvisorService.isAdmin" popupTitle="Analysis Note Help"
+                          label="Enter a note regarding analysis. (optional)"></context-help>
+            <div class="full-width padded {{bioinformaticsAssist ? 'enable-bordered' : 'disable-bordered'}}">
+                <textarea matInput
+                          matTextareaAutosize
+                          matAutosizeMinRows="8"
+                          matAutosizeMaxRows="8"
+                          [(ngModel)]="experiment.analysisInstructions"
+                          [disabled]="!bioinformaticsAssist"
+                          placeholder="Description"
+                          aria-label="Analysis notes and instructions">
+                </textarea>
+            </div>
+        </div>
+    </div>
+</div>
