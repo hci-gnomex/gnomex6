@@ -63,7 +63,6 @@
                         [hidden]="item.hidden"
                         [matMenuTriggerFor]="menu.childMenu"
                         aria-haspopup="menu"
-                        [attr.aria-expanded]="menuTrigger.menuOpen"
                         [attr.aria-controls]="'menu-' + item.displayName"
                         class="top-menu-item full-height full-width">
                     <img *ngIf="item.iconName" [attr.alt]="item.displayName + ' icon'" [src]="item.iconName" class="icon">
@@ -103,7 +102,6 @@
             [hidden]="item.hidden"
             [matMenuTriggerFor]="menu.childMenu"
             aria-haspopup="menu"
-            [attr.aria-expanded]="menuTrigger.menuOpen"
             [attr.aria-controls]="'menu-' + item.displayName"
             class="top-menu-item full-height full-width">
         <img *ngIf="item.iconName" [attr.alt]="item.displayName + ' icon'" [src]="item.iconName" class="icon">
