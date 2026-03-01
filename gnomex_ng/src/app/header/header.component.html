@@ -56,16 +56,18 @@
             <div *ngFor="let item of linkNavItems">
                 <!-- Handle branch node buttons here -->
                 <span *ngIf="item.children && item.children.length > 0" class="full-height">
-                <button #menuTrigger="matMenuTrigger"
+                <button mat-button
+                        #menuTrigger="matMenuTrigger"
                         [attr.aria-label]="item.displayName + ' menu'"
                         [disabled]="item.disabled"
                         [hidden]="item.hidden"
                         [matMenuTriggerFor]="menu.childMenu"
                         aria-haspopup="menu"
-                        class="top-menu-item full-height full-width"
-                        mat-button>
-                        <img *ngIf="item.iconName" [attr.alt]="item.displayName + ' icon'" [src]="item.iconName" class="icon">
-                        <span> {{item.displayName}} </span>
+                        [attr.aria-expanded]="menuTrigger.menuOpen"
+                        [attr.aria-controls]="'menu-' + item.displayName"
+                        class="top-menu-item full-height full-width">
+                    <img *ngIf="item.iconName" [attr.alt]="item.displayName + ' icon'" [src]="item.iconName" class="icon">
+                    <span> {{item.displayName}} </span>
                 </button>
                 <app-menu-item #menu [items]="item.children" [menuId]="'menu-' + item.displayName"></app-menu-item>
                 </span>
@@ -94,14 +96,16 @@
         <span *ngFor="let item of navItems" [ngClass]="item.class" class="full-height">
             <!-- Handle branch node buttons here -->
         <span *ngIf="item.children && item.children.length > 0" class="full-height">
-        <button #menuTrigger="matMenuTrigger"
+        <button mat-button
+            #menuTrigger="matMenuTrigger"
             [attr.aria-label]="item.displayName + ' menu'"
             [disabled]="item.disabled"
             [hidden]="item.hidden"
             [matMenuTriggerFor]="menu.childMenu"
             aria-haspopup="menu"
-            class="top-menu-item full-height full-width"
-            mat-button>
+            [attr.aria-expanded]="menuTrigger.menuOpen"
+            [attr.aria-controls]="'menu-' + item.displayName"
+            class="top-menu-item full-height full-width">
         <img *ngIf="item.iconName" [attr.alt]="item.displayName + ' icon'" [src]="item.iconName" class="icon">
         <span> {{item.displayName}} </span>
         </button>
