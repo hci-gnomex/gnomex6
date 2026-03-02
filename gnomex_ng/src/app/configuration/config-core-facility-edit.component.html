@@ -1,5 +1,5 @@
 
-<form (ngSubmit)="save()" [formGroup]="coreFacilityForm" style="display:flex;flex-direction: column;">
+<form (ngSubmit)="save()" [formGroup]="coreFacilityForm" aria-label="Core Facility Configuration" style="display:flex;flex-direction: column;">
     <div style="width:100%;">
 
 
@@ -77,7 +77,7 @@
 
         <div style="width:80%;">
 
-            <angular-editor #descEditorRef id="descEditor" formControlName="description" [config]="this.editorConfig">
+            <angular-editor #descEditorRef id="descEditor" formControlName="description" [config]="this.editorConfig" aria-label="Core facility description">
             </angular-editor>
         </div>
         <div style="width:100%;display:flex;">

@@ -3,7 +3,7 @@
         {{ this.protocolService.getMainPaneTitle() }}
     </div>
     <div class="full-width flex-grow no-overflow">
-        <form [formGroup]="this.form" class="full-width full-height">
+        <form [formGroup]="this.form" aria-label="Edit Protocol" class="full-width full-height">
         <div class="full-width full-height border">
             <div *ngIf="!!selectedProtocol" class="full-width full-height padded overflow-auto">
 
@@ -50,12 +50,12 @@
                         <div class="tr">
                             <div class="td">
                                 <div class="inline-block checkbox-container">
-                                    <mat-checkbox [formControl]="this.form.get('isActive')"></mat-checkbox>
+                                    <mat-checkbox [formControl]="this.form.get('isActive')" aria-label="Active"></mat-checkbox>
                                 </div>
                             </div>
                             <div class="td">
                                 <div class="inline-block vertical-center">
-                                    <label>Active</label>
+                                    <label aria-hidden="true">Active</label>
                                 </div>
                             </div>
                         </div>
@@ -104,7 +104,7 @@
             <button mat-button
                     [disabled]="!this.form.dirty || this.form.invalid"
                     (click)="onSaveButtonClicked()">
-                <img [src]="this.form.dirty && this.form.valid ? './assets/save.png' : './assets/save_disable.png'"/>
+                <img [src]="this.form.dirty && this.form.valid ? './assets/save.png' : './assets/save_disable.png'" alt=""/>
                 Save
             </button>
         </div>

@@ -1,5 +1,5 @@
 
-<form [formGroup]="formGroup" style=" height: calc(100% - 1em );width: calc(100% - 1em); padding: 0.5em; display:flex; flex-direction:column; font-size: small;">
+<form [formGroup]="formGroup" aria-label="Experiment Platform" style=" height: calc(100% - 1em );width: calc(100% - 1em); padding: 0.5em; display:flex; flex-direction:column; font-size: small;">
     <div class="flex-container-row">
         <mat-form-field  class="medium-form-input">
             <input matInput placeholder="Name" formControlName="requestCategory">
@@ -8,8 +8,8 @@
             </mat-error>
         </mat-form-field>
         <div class="padded-checkbox">
-            <label style="margin-right: 1em;"  > Active  </label>
-            <mat-checkbox  formControlName="isActive" > </mat-checkbox>
+            <label style="margin-right: 1em;" aria-hidden="true"> Active  </label>
+            <mat-checkbox  formControlName="isActive" aria-label="Active"> </mat-checkbox>
         </div>
 
     </div>
@@ -20,12 +20,12 @@
                           [options]="this.typeList" displayField="display" [formControlName]="'type'">
         </custom-combo-box>
         <div class="padded-checkbox" >
-            <label style="margin-right: 1em;" > Associated With Analysis  </label>
-            <mat-checkbox  formControlName="associatedWithAnalysis" > </mat-checkbox>
+            <label style="margin-right: 1em;" aria-hidden="true"> Associated With Analysis  </label>
+            <mat-checkbox  formControlName="associatedWithAnalysis" aria-label="Associated With Analysis"> </mat-checkbox>
         </div>
         <div class="padded-checkbox">
-            <label style="margin-right: 1em;"  > Require Name & Description  </label>
-            <mat-checkbox  formControlName="requireNameDescription" > </mat-checkbox>
+            <label style="margin-right: 1em;" aria-hidden="true"> Require Name & Description  </label>
+            <mat-checkbox  formControlName="requireNameDescription" aria-label="Require Name and Description"> </mat-checkbox>
         </div>
 
     </div>
@@ -39,11 +39,11 @@
 
         <mat-form-field class="short-input">
 
-            <img style="width:16px;" [src]="formGroup.get('icon').value" >
+            <img style="width:16px;" [src]="formGroup.get('icon').value" alt="">
             <mat-select style="width:calc(100% - 16px)" placeholder="Icon" formControlName="icon">
                 <mat-option
                         *ngFor="let icon of iconList"
-                        [value]="icon" > <img [src]="icon">
+                        [value]="icon" > <img [src]="icon" alt="">
                 </mat-option>
             </mat-select>
 
@@ -66,15 +66,15 @@
     </custom-combo-box>
 
     <div class="flex-container-row">
-        <label class="gx-label" style="margin-right: 2em;" > Available for </label>
+        <label class="gx-label" style="margin-right: 2em;" aria-hidden="true"> Available for </label>
         <div class="flex-container-col">
             <div>
-                <mat-checkbox  formControlName="isInternal" > </mat-checkbox>
-                <label class="gx-label" style="margin-left: 0.5em;"  > Internal Experiment Orders  </label>
+                <mat-checkbox  formControlName="isInternal" aria-label="Available for Internal Experiment Orders"> </mat-checkbox>
+                <label class="gx-label" style="margin-left: 0.5em;" aria-hidden="true"> Internal Experiment Orders  </label>
             </div>
             <div>
-                <mat-checkbox  formControlName="isExternal" > </mat-checkbox>
-                <label class="gx-label"  style="margin-left: 0.5em;"  > Upload of Experiment Data Generated at a Third Party Facility  </label>
+                <mat-checkbox  formControlName="isExternal" aria-label="Available for Upload of Experiment Data Generated at a Third Party Facility"> </mat-checkbox>
+                <label class="gx-label"  style="margin-left: 0.5em;" aria-hidden="true"> Upload of Experiment Data Generated at a Third Party Facility  </label>
             </div>
 
         </div>
@@ -118,8 +118,8 @@
 
         <div class="flex-container-row">
             <div class="partial-padded-checkbox"  style="flex:1" >
-                <mat-checkbox (change)="onUseProducts()" formControlName="useProduct" > </mat-checkbox>
-                <label class="gx-label" style="margin-left:0.5em;"  > Use Products  </label>
+                <mat-checkbox (change)="onUseProducts()" formControlName="useProduct" aria-label="Use Products"> </mat-checkbox>
+                <label class="gx-label" style="margin-left:0.5em;" aria-hidden="true"> Use Products  </label>
             </div>
             <custom-combo-box *ngIf="this.formGroup.get('useProduct')?.value" class="margin-right-field"
                               style="flex:4" placeholder="Product Type"
@@ -144,8 +144,8 @@
 
 
         <div class="partial-padded-checkbox" >
-            <mat-checkbox formControlName="saveAndSubmit" > </mat-checkbox>
-            <label class="gx-label" style="margin-left:0.5em;" > Allow saving of request before submission </label>
+            <mat-checkbox formControlName="saveAndSubmit" aria-label="Allow saving of request before submission"> </mat-checkbox>
+            <label class="gx-label" style="margin-left:0.5em;" aria-hidden="true"> Allow saving of request before submission </label>
         </div>
         <div style="margin-left:auto"
              [ngClass]="{'warningLabelSevere':!isMinorSecurity,'warningLabelMinor':  isMinorSecurity }">
