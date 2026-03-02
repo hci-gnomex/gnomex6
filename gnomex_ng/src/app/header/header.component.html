@@ -59,7 +59,6 @@
                 <button mat-button
                         #menuTrigger="matMenuTrigger"
                         [attr.aria-label]="item.displayName + ' menu'"
-                        [attr.aria-controls]="toMenuId(item.displayName)"
                         [attr.aria-expanded]="menuTrigger.menuOpen"
                         [disabled]="item.disabled"
                         [hidden]="item.hidden"
@@ -69,7 +68,7 @@
                     <img *ngIf="item.iconName" [attr.alt]="item.displayName + ' icon'" [src]="item.iconName" class="icon">
                     <span> {{item.displayName}} </span>
                 </button>
-                <app-menu-item #menu [items]="item.children" [menuId]="toMenuId(item.displayName)"></app-menu-item>
+                <app-menu-item #menu [items]="item.children"></app-menu-item>
                 </span>
 
                 <!-- Leaf node buttons here -->
@@ -99,7 +98,6 @@
         <button mat-button
             #menuTrigger="matMenuTrigger"
             [attr.aria-label]="item.displayName + ' menu'"
-            [attr.aria-controls]="toMenuId(item.displayName)"
             [attr.aria-expanded]="menuTrigger.menuOpen"
             [disabled]="item.disabled"
             [hidden]="item.hidden"
@@ -109,7 +107,7 @@
         <img *ngIf="item.iconName" [attr.alt]="item.displayName + ' icon'" [src]="item.iconName" class="icon">
         <span> {{item.displayName}} </span>
         </button>
-    <app-menu-item #menu [items]="item.children" [menuId]="toMenuId(item.displayName)"></app-menu-item>
+    <app-menu-item #menu [items]="item.children"></app-menu-item>
         </span>
             <!-- Leaf node buttons here -->
             <span *ngIf="!item.children || item.children.length === 0" class="full-height">

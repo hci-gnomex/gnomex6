@@ -2283,10 +2283,6 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
         this.navService.navMode = NavigationService.USER;
     }
 
-    public toMenuId(displayName: string): string {
-        return 'menu-' + displayName.replace(/\s+/g, '-').toLowerCase();
-    }
-
     /**
      * Determine currentState.
      * Set the navItems.

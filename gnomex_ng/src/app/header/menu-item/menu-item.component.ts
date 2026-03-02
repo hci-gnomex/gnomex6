@@ -9,7 +9,6 @@ import {MatMenu} from "@angular/material/menu";
 })
 export class MenuItemComponent implements OnInit {
    @Input() items: any[];
-   @Input() menuId: string = '';
 
    @ViewChild('childMenu', { static: true }) public childMenu: MatMenu;
 
