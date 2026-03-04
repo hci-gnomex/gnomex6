@@ -6,7 +6,8 @@
         <div class="half-width">
             <custom-combo-box placeholder="Verify your lab group" (optionSelected)="this.onLabChange()"
                               [options]="this.labList" valueField="idLab" [displayField]="this.prefService.labDisplayField"
-                              [(ngModel)]="this.idLab">
+                              [(ngModel)]="this.idLab"
+                              aria-label="Lab group">
             </custom-combo-box>
         </div>
         <context-help name="experimentLab" [hasEditPermission]="this.isAdminState" popupTitle="Lab Help" tooltipPosition="right"></context-help>
@@ -15,7 +16,8 @@
         <div class="half-width">
             <custom-combo-box placeholder="Verify your name"
                               [options]="this.userList" valueField="idAppUser" [displayField]="this.prefService.userDisplayField"
-                              [(ngModel)]="this.idAppUser">
+                              [(ngModel)]="this.idAppUser"
+                              aria-label="Your name">
             </custom-combo-box>
         </div>
         <context-help name="experimentOwnerName" [hasEditPermission]="this.isAdminState" popupTitle="Name" tooltipPosition="right"></context-help>
@@ -24,7 +26,8 @@
         <div class="half-width">
             <custom-combo-box placeholder="Select a billing account"
                               [options]="this.billingAccountList" valueField="idBillingAccount" displayField="accountNameAndNumber"
-                              [(ngModel)]="this.idBillingAccount">
+                              [(ngModel)]="this.idBillingAccount"
+                              aria-label="Billing account">
             </custom-combo-box>
         </div>
         <context-help name="experimentBillingAccount" [hasEditPermission]="this.isAdminState"
@@ -44,7 +47,7 @@
             <li *ngFor="let item of this.billingTemplate.items">{{item.accountNumberDisplay}} ({{item.dollarAmount | currency:"USD":"$": "1.2-2"}})</li>
         </ul>
     </div>
-    <table [hidden]="!this.idLab || !this.idAppUser || (!this.idBillingAccount && !this.billingTemplate)" class="full-width">
+    <table [hidden]="!this.idLab || !this.idAppUser || (!this.idBillingAccount && !this.billingTemplate)" class="full-width" aria-label="Product order items">
         <tr>
             <th>Product</th>
             <th>Quantity</th>
@@ -55,10 +58,10 @@
         <tr *ngFor="let p of this.productList">
             <td>
                 <mat-checkbox [(ngModel)]="p.isSelected" [disabled]="true">{{p.name}} (Order Qty: {{p.orderQty}})</mat-checkbox>
-                <img class="description-icon" *ngIf="p.description" [src]="'./assets/white_information.png'" matTooltip="{{p.description}}">
+                <img class="description-icon" *ngIf="p.description" [src]="'./assets/white_information.png'" matTooltip="{{p.description}}" [attr.aria-label]="p.description" role="img">
             </td>
             <td>
-                <input matInput class="half-width user-input" type="number" [(ngModel)]="p.quantity" (change)="this.checkQuantity(p)">
+                <input matInput class="half-width user-input" type="number" [(ngModel)]="p.quantity" (change)="this.checkQuantity(p)" [attr.aria-label]="'Quantity for ' + p.name">
                 <label class="left-padding">x</label>
             </td>
             <td>
@@ -79,6 +82,6 @@
         <mat-checkbox [(ngModel)]="this.userConsent">
             As the Principal Investigator or authorized personnel of the account(s) listed above I authorize the Core Facility to charge the account for the products selected.
         </mat-checkbox>
-        <button mat-button [disabled]="!this.userConsent || !this.enableSubmit" color="primary" (click)="this.submitOrder()"><img [src]="'./assets/save.png'" class="icon">Submit</button>
+        <button mat-button [disabled]="!this.userConsent || !this.enableSubmit" color="primary" (click)="this.submitOrder()"><img [src]="'./assets/save.png'" class="icon" alt="">Submit</button>
     </div>
 </div>

@@ -7,7 +7,7 @@
                         [showRelatedCharges]="showRelatedCharges"
                         (onChange)="onFilterChange($event)">
         </billing-filter>
-        <div class="full-width vertical-spacer">
+        <div class="full-width vertical-spacer" aria-hidden="true">
         </div>
         <div class="flex-container-row flex-grow foreground padding-left-right-bottom overflow-auto min-grid-size">
             <as-split>
@@ -185,6 +185,7 @@
                                     </div>
                                     <custom-combo-box tooltip="This will update the status for all the selected items. If no items are selected, all of the displayed items' statuses will update"
                                                       placeholder="Change Status"
+                                                      aria-label="Change Status"
                                                       valueField="codeBillingStatus"
                                                       displayField="display"
                                                       [(ngModel)]="changeStatusValue"
@@ -195,7 +196,7 @@
                                 </div>
                             </div>
                             <div class="flex-grow min-grid-size">
-                                <div #oneEmWidth class="no-height single-em">
+                                <div #oneEmWidth class="no-height single-em" aria-hidden="true">
                                 </div>
                                 <ag-grid-angular class="ag-theme-fresh full-height full-width small-font"
                                                  aria-label="Billing items detail table"

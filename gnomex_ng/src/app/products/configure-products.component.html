@@ -1,11 +1,11 @@
 <div class="flex-container-row padded">
-    <button mat-button (click)="this.addProduct()"><img class="icon" [src]="'./assets/page_add.png'">Add Product</button>
-    <button mat-button [disabled]="this.selectedProduct == null || this.selectedProduct.canDelete != 'Y'" (click)="this.removeProduct()"><img class="icon" [src]="'./assets/page_remove.png'">Remove Product</button>
+    <button mat-button (click)="this.addProduct()"><img class="icon" [src]="'./assets/page_add.png'" alt="">Add Product</button>
+    <button mat-button [disabled]="this.selectedProduct == null || this.selectedProduct.canDelete != 'Y'" (click)="this.removeProduct()"><img class="icon" [src]="'./assets/page_remove.png'" alt="">Remove Product</button>
 </div>
 <div class="flex-container-row padded">
-    <tree-root #tree class="flex-one margin-right border-right" [nodes]="this.nodes" [options]="this.options" (activate)="this.onActivate($event)"></tree-root>
+    <tree-root #tree class="flex-one margin-right border-right" [nodes]="this.nodes" [options]="this.options" (activate)="this.onActivate($event)" aria-label="Products"></tree-root>
     <div [hidden]="this.selectedProduct" class="flex-three">{{''}}</div>
-    <form [formGroup]="this.productForm" class="flex-three flex-container-col" [hidden]="!this.selectedProduct">
+    <form [formGroup]="this.productForm" class="flex-three flex-container-col" [hidden]="!this.selectedProduct" aria-label="Product details">
         <div class="flex-container-row full-width align-center">
             <mat-form-field class="flex-four margin-right">
                 <input matInput placeholder="Name" [formControlName]="'name'">
@@ -16,7 +16,8 @@
             <div class="flex-four margin-right">
                 <custom-combo-box placeholder="Product Type" [options]="this.productTypes"
                                   valueField="idProductType" displayField="display"
-                                  [formControlName]="'productType'">
+                                  [formControlName]="'productType'"
+                                  aria-label="Product Type">
                 </custom-combo-box>
             </div>
             <button class="flex-one" mat-raised-button color="accent" (click)="this.openEditProductTypes()">Edit</button>
@@ -59,7 +60,7 @@
         <div class="flex-container-row full-width align-center justify-end">
             <span [hidden]="!this.productForm.dirty || this.showSpinner" class="dirty-note margin-right">Changes Have Not Been Saved</span>
             <button mat-button color="primary" [hidden]="this.showSpinner" [disabled]="!this.productForm.valid"
-                    (click)="this.saveProduct()"><img class="icon" [src]="'./assets/action_save.gif'">Save</button>
+                    (click)="this.saveProduct()"><img class="icon" [src]="'./assets/action_save.gif'" alt="">Save</button>
             <mat-spinner [hidden]="!this.showSpinner" strokeWidth="3" [diameter]="30"></mat-spinner>
         </div>
     </form>

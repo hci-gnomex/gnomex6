@@ -20,7 +20,7 @@
             <!--Find-->
         <!--</button>-->
     </div>
-    <div class="flex-container-col flex-grow bordered padded">
+    <div class="flex-container-col flex-grow bordered padded" role="region" aria-label="Flow cells">
         <div class="flex-container-row padded-bottom align-center margin-children">
             <div class="reserved-space">
                 <div *ngIf="isRowSelected" class="bold padded">
@@ -58,7 +58,7 @@
             </div>
         </div>
         <div class="flex-grow">
-            <div #oneEmWidth class="no-height single-em"></div>
+            <div #oneEmWidth class="no-height single-em" aria-hidden="true"></div>
             <ag-grid-angular class="ag-theme-fresh full-height full-width min-grid-size"
                              [enableColResize]="true"
                              [enableSorting]="true"
@@ -67,7 +67,8 @@
                              (cellValueChanged) = "onCellValueChanged($event)"
                              (rowSelected)="onRowSelected($event)"
                              (gridReady)="onGridReady($event)"
-                             (gridSizeChanged)="onGridSizeChanged($event)">
+                             (gridSizeChanged)="onGridSizeChanged($event)"
+                             aria-label="Flow cells">
             </ag-grid-angular>
         </div>
     </div>

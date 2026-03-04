@@ -1,18 +1,18 @@
 <div class="flexbox-column">
     <div class="flex-container-row">
         <div *ngIf="this.topicNode" style="margin:1em" >
-            <img [src]="this.constService.ICON_TOPIC" class="icon">
+            <img [src]="this.constService.ICON_TOPIC" class="icon" alt="">
             Topic {{'T' + this.topicNode.idTopic + ' -'}} {{(this.topicNode.name.length > 60) ? (this.topicNode.name | slice:0:60) + '...' : this.topicNode.name}}
         </div>
         <button mat-button color="primary" (click)="onShareLinkClick()" style="margin:1em">
-            <img [src]="this.constService.GLOBE_LINK" class="icon">Share URL
+            <img [src]="this.constService.GLOBE_LINK" class="icon" alt="">Share URL
         </button>
         <button mat-button color="primary" (click)="onEmailClick()" style="margin:1em">
-            <img [src]="this.constService.EMAIL_GO_LINK" class="icon">Email topic owner
+            <img [src]="this.constService.EMAIL_GO_LINK" class="icon" alt="">Email topic owner
         </button>
     </div>
     <form class="full-width" style="flex:8" [formGroup]="topicForm">
-        <mat-tab-group class="mat-tab-group-border full-height">
+        <mat-tab-group class="mat-tab-group-border full-height" aria-label="Topic details">
             <mat-tab label="Info" class="full-height">
                 <div class="flexbox-column">
                     <mat-form-field class="formField" >
@@ -23,12 +23,14 @@
                         <div class="formField">
                             <custom-combo-box placeholder="Lab" [options]="this.labList"
                                               valueField="idLab" [displayField]="this.prefService.labDisplayField"
-                                              [formControl]="this.topicForm.get('idLab')">
+                                              [formControl]="this.topicForm.get('idLab')"
+                                              aria-label="Lab">
                             </custom-combo-box>
                         </div>
                         <div class="formField">
                             <custom-combo-box placeholder="Owner" valueField="idAppUser" [displayField]="this.prefService.userDisplayField"
-                                              [options]="getLabService.labMembersSubject | async" [formControlName]="'idAppUser'">
+                                              [options]="getLabService.labMembersSubject | async" [formControlName]="'idAppUser'"
+                                              aria-label="Owner">
                             </custom-combo-box>
                         </div>
                     </div>
@@ -37,16 +39,17 @@
                         <label class="formField">Owner: {{this.topicNode?.appUser}}</label>
                     </div>
                     <div class="full-width">
-                        <angular-editor formControlName="description" [config]="this.editorConfig"></angular-editor>
+                        <label id="descriptionLabel" class="sr-only">Description</label>
+                        <angular-editor formControlName="description" [config]="this.editorConfig" aria-labelledby="descriptionLabel"></angular-editor>
                     </div>
                     <div> Created By: {{topicNode?.createdBy}} {{topicNode?.createDate}}
                     </div>
                 </div>
             </mat-tab>
             <mat-tab label="Visibility" class="full-height">
-                <mat-radio-group class="flexbox-column" formControlName="codeVisibility">
+                <mat-radio-group class="flexbox-column" formControlName="codeVisibility" aria-label="Visibility">
                     <mat-radio-button style="margin: 0.5em" *ngFor="let rad of visRadio" [value]="rad.value">
-                        <img [src]="rad.icon" class="icon">{{rad.display}}
+                        <img [src]="rad.icon" class="icon" alt="">{{rad.display}}
                     </mat-radio-button>
                 </mat-radio-group>
             </mat-tab>

@@ -17,7 +17,7 @@
     </div>
     <as-split class="white-split-gutter" unit="percent">
         <as-split-area size="50" minSize="20">
-            <div class="flex-container-col full-width full-height padded">
+            <div class="flex-container-col full-width full-height padded" role="region" aria-label="Pending sequence lanes">
                 <div class="large-max-width overflow-auto">
                     <div class="flex-container-row align-baseline">
                         <mat-label>Pending Sequence Lanes</mat-label>
@@ -65,7 +65,7 @@
                     </div>
                 </div>
                 <div class="flex-grow">
-                    <div #oneEmWidth1 class="no-height single-em"></div>
+                    <div #oneEmWidth1 class="no-height single-em" aria-hidden="true"></div>
                     <ag-grid-angular class="ag-theme-fresh full-height full-width min-grid-size"
                                      [enableColResize]="true"
                                      [enableSorting]="true"
@@ -78,13 +78,14 @@
                                      (gridReady)="onAllRequestsGridReady($event)"
                                      (gridSizeChanged)="onGridSizeChanged($event)"
                                      (rowDataChanged)="onNotifyGridRowDataChanged($event)"
-                                     (rowSelected)="onRowSelected($event)">
+                                     (rowSelected)="onRowSelected($event)"
+                                     aria-label="Pending sequence lanes">
                     </ag-grid-angular>
                 </div>
             </div>
         </as-split-area>
         <as-split-area size="*" minSize="20">
-            <form [formGroup]="allFG" class="flex-container-col full-height full-width padded">
+            <form [formGroup]="allFG" class="flex-container-col full-height full-width padded" aria-label="Flow cell assembly">
                 <div class="flex-container-row italic assembly-message">
                     <mat-label>Flow Cell to Assemble</mat-label>
                 </div>
@@ -99,7 +100,7 @@
                         </mat-form-field>
                         <date-picker  [formControl]="this.createDateFC"  placeholder="Create Date">
                         </date-picker>
-                        <mat-radio-group [formControl]="sideFC" class="flex-container-row children-margin-right" >
+                        <mat-radio-group [formControl]="sideFC" class="flex-container-row children-margin-right" aria-label="Flow cell side">
                             <mat-radio-button value="A">Side A</mat-radio-button>
                             <mat-radio-button value="B">Side B</mat-radio-button>
                         </mat-radio-group>
@@ -125,7 +126,7 @@
                     </div>
                 </div>
                 <div class="flex-grow">
-                    <div #oneEmWidth2 class="no-height single-em"></div>
+                    <div #oneEmWidth2 class="no-height single-em" aria-hidden="true"></div>
                     <ag-grid-angular class="ag-theme-fresh full-height full-width min-grid-size"
                                      [enableColResize]="true"
                                      [enableSorting]="true"
@@ -135,7 +136,8 @@
                                      (gridReady)="onAssemblyGridReady($event)"
                                      (gridSizeChanged)="onGridSizeChanged($event)"
                                      (rowDataChanged)="onNotifyGridRowDataChanged($event)"
-                                     (cellValueChanged) = "onCellValueChanged_assemblyGrid($event)">
+                                     (cellValueChanged) = "onCellValueChanged_assemblyGrid($event)"
+                                     aria-label="Flow cell assembly lanes">
                     </ag-grid-angular>
                 </div>
             </form>

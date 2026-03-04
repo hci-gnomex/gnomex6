@@ -3,13 +3,13 @@
         <div class="full-width small-font border">
             <menu-header-topics [selectedNode]="selectedItem" (messageEvent)="doLinkData()"></menu-header-topics>
         </div>
-        <div class="full-width vertical-spacer background">
+        <div class="full-width vertical-spacer background" aria-hidden="true">
         </div>
         <div class="flex-container-row flex-grow overflow-auto">
             <as-split>
                 <as-split-area [size]="20">
                     <div class="full-width full-height small-font border">
-                        <div class="full-height full-width flex-container-col foreground">
+                        <div class="full-height full-width flex-container-col foreground" role="region" aria-label="Topics tree">
                             <div class="full-width flex-grow left-right-padded top-padded small-font no-overflow">
                                 <div class="full-width full-height border">
                                     <tree-root #topicsTree
@@ -17,7 +17,8 @@
                                                [options]="options"
                                                (updateData)="onTreeUpdateData()"
                                                (moveNode)="onMoveNode($event)"
-                                               (activate)="treeOnSelect($event)">
+                                               (activate)="treeOnSelect($event)"
+                                               aria-label="Topics">
                                         <ng-template #treeNodeTemplate let-node let-index="index">
                                             <div class="full-width no-word-wrap tree-node-font">
                                                 <img *ngIf="node.data.icon" src="{{node.data.icon}}" alt="" class="tree-node-icon icon">
@@ -42,7 +43,7 @@
                     </div>
                 </as-split-area>
                 <as-split-area [size]="80">
-                    <div class="full-width full-height border padded small-font">
+                    <div class="full-width full-height border padded small-font" role="region" aria-label="Topic details">
                         <div [hidden]="!linkDataView" class="full-width full-height foreground">
                             <div class="full-width full-height flex-container-col">
                                 <div class="flex-container-row align-center">
@@ -50,7 +51,7 @@
                                     <mat-label class="padded">Add {{addLabel}} (Find and drag to topic)</mat-label>
                                     <div class="flex-grow">
                                     </div>
-                                    <mat-radio-group (change)="this.onModeChange()" [(ngModel)]="this.mode">
+                                    <mat-radio-group (change)="this.onModeChange()" [(ngModel)]="this.mode" aria-label="View mode">
                                         <mat-radio-button class="padded" *ngFor="let m of this.modes" [value]="m">
                                             {{ m }}
                                         </mat-radio-button>
@@ -64,7 +65,8 @@
                                                               [displayField]="this.prefService.labDisplayField"
                                                               valueField="idLab"
                                                               (optionSelected)="this.onLabSelect()"
-                                                              [(ngModel)]="this.selectedLab">
+                                                              [(ngModel)]="this.selectedLab"
+                                                              aria-label="Filter by Lab">
                                             </custom-combo-box>
                                         </div>
                                         <div class="formField" *ngIf="this.mode === this.MODE_DATA_TRACK">
@@ -73,7 +75,8 @@
                                                               displayField="binomialName"
                                                               valueField="idOrganism"
                                                               (optionSelected)="this.onOrganismSelect()"
-                                                              [(ngModel)]="this.selectedOrganism">
+                                                              [(ngModel)]="this.selectedOrganism"
+                                                              aria-label="Organism">
                                             </custom-combo-box>
                                         </div>
                                         <div class="formField" *ngIf="this.mode === this.MODE_DATA_TRACK && this.selectedOrganism">
@@ -82,22 +85,23 @@
                                                               displayField="genomeBuildName"
                                                               valueField="idGenomeBuild"
                                                               (optionSelected)="this.onGenomeBuildSelect()"
-                                                              [(ngModel)]="selectedGenomeBuild">
+                                                              [(ngModel)]="selectedGenomeBuild"
+                                                              aria-label="Genome Build">
                                             </custom-combo-box>
                                         </div>
                                         <mat-form-field class="formField">
                                             <input matInput [(ngModel)]="searchText" placeholder="Filter by Name" (keyup)="onSearchFilterKeyup($event)">
                                         </mat-form-field>
-                                        <button mat-button class="minimize" [hidden]="!searchText" (click)="clearSearchText()">
+                                        <button mat-button class="minimize" [hidden]="!searchText" (click)="clearSearchText()" aria-label="Clear search">
                                             <img class="small-icon" [src]="constantsService.ICON_CANCEL" alt="">
                                         </button>
-                                        <button mat-button class="minimize" (click)="searchByText()">
+                                        <button mat-button class="minimize" (click)="searchByText()" aria-label="Search by name">
                                             <img class="small-icon" [src]="constantsService.ICON_MAGNIFIER" alt="">
                                         </button>
                                         <div class="flex-grow">
                                         </div>
                                         <mat-radio-group *ngIf="this.mode === this.MODE_EXPERIMENT || this.mode === this.MODE_ANALYSIS"
-                                                         (change)="this.onTimeFrameChange()" [(ngModel)]="this.selectedTimeFrame">
+                                                         (change)="this.onTimeFrameChange()" [(ngModel)]="this.selectedTimeFrame" aria-label="Time frame">
                                             <mat-radio-button class="padded" *ngFor="let frame of this.timeFrames" [value]="frame">
                                                 {{ frame }}
                                             </mat-radio-button>
@@ -112,7 +116,8 @@
                                         <tree-root #dataTree
                                                    [nodes]="dataTreeItems"
                                                    [options]="dataTreeOptions"
-                                                   (updateData)="onDataTreeUpdateData()">
+                                                   (updateData)="onDataTreeUpdateData()"
+                                                   aria-label="Available items to drag to topic">
                                             <ng-template #treeNodeTemplate let-node let-index="index">
                                                 <div class="tree-node-font">
                                                     <img src="{{node.data.icon}}" class="tree-node-icon icon" alt="">

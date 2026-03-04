@@ -1,4 +1,4 @@
-<div class="flex-container-col full-height full-width small-font padded">
+<div class="flex-container-col full-height full-width small-font padded" role="region" aria-label="Edit Flow Cell">
     <div class="flex-container-row spaced-children-margin">
         <mat-form-field>
             <input matInput placeholder="Barcode" [formControl]="this.barcodeFC">
@@ -31,7 +31,7 @@
         </custom-combo-box>
     </div>
     <div class="flex-container-row align-baseline padded">
-        <div>
+        <div role="heading" aria-level="2">
             Flow Cell Lane
         </div>
         <div class="flex-grow">
@@ -57,7 +57,8 @@
                          (rowSelected)="selectedRow($event)"
                          [rowClassRules]="this.workflowService.assmGridRowClassRules"
                          [enableFilter]="true"
-                         [enableColResize]="true">
+                         [enableColResize]="true"
+                         aria-label="Flow cell lanes">
         </ag-grid-angular>
     </div>
 </div>

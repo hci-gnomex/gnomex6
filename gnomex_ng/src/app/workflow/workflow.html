@@ -1,11 +1,11 @@
 <div class="full-width full-height background background-border padded">
-    <div #oneEmWidth class="no-height single-em"></div>
+    <div #oneEmWidth class="no-height single-em" aria-hidden="true"></div>
     <div class="flex-container-row flex-grow full-height foreground">
         <as-split unit="pixel">
             <as-split-area [size]=sidenavSplitSize [minSize]="sidenavSplitSize">
-                <div class="full-height flex-grow bordered">
-                    <mat-tab-group [selectedIndex]="selectedTab" (selectedTabChange)="onGroupsTabChange($event)" class="flex-style">
-                        <mat-tab>
+                <div class="full-height flex-grow bordered" role="navigation" aria-label="Workflow navigation">
+                    <mat-tab-group [selectedIndex]="selectedTab" (selectedTabChange)="onGroupsTabChange($event)" class="flex-style" aria-label="Workflow type">
+                        <mat-tab aria-label="QC Worklist">
                             <ng-template mat-tab-label>
                                 <img matTooltip="QC Worklist" [src]="'./assets/data-accept.png'" alt="">
                             </ng-template>
@@ -20,7 +20,7 @@
                                 </button>
                             </div>
                         </mat-tab>
-                        <mat-tab>
+                        <mat-tab aria-label="Illumina workflow">
                             <ng-template mat-tab-label>
                                 <img matTooltip="Illumina workflow" [src]="'./assets/DNA_diag_lightening.png'" alt="">
                             </ng-template>
@@ -48,7 +48,7 @@
                                     <img class="icon"[src]="'./assets/server_go.png'" alt="">
                                     Data Pipeline
                                 </button>
-                                <div class="vertical-spacer">
+                                <div class="vertical-spacer" aria-hidden="true">
                                 </div>
                                 <button mat-button (click)="onClickFlowCells()">
                                     <img class="icon" [src]="'./assets/rectangle.png'" alt="">
@@ -56,7 +56,7 @@
                                 </button>
                             </div>
                         </mat-tab>
-                        <mat-tab [hidden]="microarrayDisabled" *ngIf="!microarrayDisabled">
+                        <mat-tab [hidden]="microarrayDisabled" *ngIf="!microarrayDisabled" aria-label="Microarray workflow">
                             <ng-template mat-tab-label>
                                 <img class="icon" matTooltip="Microarray workflow" [src]="'./assets/microarray_small.png'" alt="">
                             </ng-template>
@@ -69,7 +69,7 @@
             </as-split-area>
             <as-split-area [size]="'*'">
                 <div  class="full-width full-height bordered">
-                    <div class="flex-container-col full-width full-height padded">
+                    <div class="flex-container-col full-width full-height padded" role="region" aria-label="Workflow content">
                         <!--<div>-->
                             <!--<button mat-button [matTooltip]="showNav ? 'Minimize navigation panel' : 'Expand navigation panel'" (click)="toggle($event)">-->
                                 <!--<img *ngIf="showNav;else closedNav" [src]="'./assets/arrow_left.png'" alt="">-->

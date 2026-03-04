@@ -1,31 +1,35 @@
 <div class="flex-container-col full-height padded">
     <div class="flex-container-row justify-space-between padded align-center border flex-two">
         <form class="flex-container-row align-center" [formGroup]="this.filterForm">
-            <label class="margin-right reduced-font"><img [src]="'./assets/basket.png'" class="icon">Product Orders</label>
+            <label class="margin-right reduced-font"><img [src]="'./assets/basket.png'" class="icon" alt="">Product Orders</label>
             <div class="filter-col margin-right">
                 <custom-combo-box class="reduced-font" placeholder="Lab" [options]="this.filterLabList"
                                   valueField="idLab" [displayField]="this.prefService.labDisplayField"
-                                  [formControlName]="'lab'">
+                                  [formControlName]="'lab'"
+                                  aria-label="Lab">
                 </custom-combo-box>
                 <custom-combo-box class="reduced-font" placeholder="Core Facility" [options]="this.filterCoreFacilityList"
                                   valueField="idCoreFacility" displayField="display"
-                                  [formControlName]="'coreFacility'">
+                                  [formControlName]="'coreFacility'"
+                                  aria-label="Core Facility">
                 </custom-combo-box>
             </div>
             <div class="filter-col margin-right">
                 <custom-combo-box class="reduced-font" placeholder="Status" [options]="this.filterStatusList"
                                   valueField="codeProductOrderStatus" displayField="productOrderStatus"
-                                  [formControlName]="'status'">
+                                  [formControlName]="'status'"
+                                  aria-label="Status">
                 </custom-combo-box>
                 <custom-combo-box class="reduced-font" placeholder="Product Type" [options]="this.filterProductTypeList"
                                   valueField="idProductType" displayField="description"
-                                  [formControlName]="'productType'">
+                                  [formControlName]="'productType'"
+                                  aria-label="Product Type">
                 </custom-combo-box>
             </div>
             <date-range-filter (onChange)="this.dateRangeChange($event)"></date-range-filter>
         </form>
         <div>
-            <mat-button-toggle-group [(ngModel)]="this.displayMode" class="reduced-font">
+            <mat-button-toggle-group [(ngModel)]="this.displayMode" class="reduced-font" aria-label="Display mode">
                 <mat-button-toggle value="{{this.DISPLAY_DETAIL}}">Detail</mat-button-toggle>
                 <mat-button-toggle value="{{this.DISPLAY_OVERVIEW}}">Overview</mat-button-toggle>
             </mat-button-toggle-group>
@@ -33,10 +37,10 @@
     </div>
     <div class="flex-container-row flex-ten padding-top" [hidden]="this.displayMode !== this.DISPLAY_DETAIL">
         <div class="full-height flex-one border">
-            <tree-root #tree [nodes]="this.productOrderList" [options]="this.treeOptions" (activate)="this.onTreeActivate($event)">
+            <tree-root #tree [nodes]="this.productOrderList" [options]="this.treeOptions" (activate)="this.onTreeActivate($event)" aria-label="Product orders">
                 <ng-template #treeNodeTemplate  let-node>
                     <div class="tree-node-font">
-                        <img src="{{node?.data?.icon}}" class="icon tree-node-icon">
+                        <img src="{{node?.data?.icon}}" class="icon tree-node-icon" alt="">
                         <span>{{ node?.data?.display }}</span>
                     </div>
                 </ng-template>
@@ -51,15 +55,16 @@
                     <ag-grid-angular class="ag-theme-fresh full-height full-width"
                                      (gridReady)="this.onLabGridReady($event)"
                                      (gridSizeChanged)="this.onGridSizeChanged($event)"
-                                     [rowData]="this.labLineItems">
+                                     [rowData]="this.labLineItems"
+                                     aria-label="Lab product orders">
                     </ag-grid-angular>
                 </div>
             </div>
             <div class="full-height" [hidden]="this.detailDisplayMode !== this.DETAIL_ORDER_MODE">
-                <mat-tab-group class="full-height">
+                <mat-tab-group class="full-height" aria-label="Product order details">
                     <mat-tab label="Product Order Info">
-                        <label *ngIf="this.currentProductOrder"><img [src]="'./assets/review.png'" class="icon">Product Order {{this.currentProductOrder.productOrderNumber}}</label>
-                        <table *ngIf="this.currentProductOrder" class="half-width">
+                        <label *ngIf="this.currentProductOrder"><img [src]="'./assets/review.png'" class="icon" alt="">Product Order {{this.currentProductOrder.productOrderNumber}}</label>
+                        <table *ngIf="this.currentProductOrder" class="half-width" aria-label="Product order information">
                             <tr>
                                 <td class="italics">Submitter</td>
                                 <td>{{this.currentProductOrder.submitter}}</td>
@@ -95,7 +100,8 @@
                             <ag-grid-angular class="ag-theme-fresh full-height full-width"
                                              (gridReady)="this.onProductOrderGridReady($event)"
                                              (gridSizeChanged)="this.onGridSizeChanged($event)"
-                                             [rowData]="this.productOrderLineItems">
+                                             [rowData]="this.productOrderLineItems"
+                                             aria-label="Product order line items">
                             </ag-grid-angular>
                         </div>
                     </mat-tab>
@@ -113,7 +119,8 @@
                          (selectionChanged)="this.onOverviewGridSelectionChanged($event)"
                          [rowSelection]="'multiple'"
                          [suppressRowClickSelection]="true"
-                         [rowData]="this.productOrderLineItemList">
+                         [rowData]="this.productOrderLineItemList"
+                         aria-label="Product order overview">
         </ag-grid-angular>
     </div>
     <div class="flex-container-row flex-one padding-top justify-space-between align-center">
@@ -121,13 +128,14 @@
             <label class="margin-right" [hidden]="this.displayMode !== this.DISPLAY_OVERVIEW">{{this.changeProductOrders.length}} selected</label>
             <custom-combo-box class="reduced-font margin-right" placeholder="Change Status" [options]="this.filterStatusList"
                               valueField="codeProductOrderStatus" displayField="productOrderStatus"
-                              [(ngModel)]="this.changeStatus">
+                              [(ngModel)]="this.changeStatus"
+                              aria-label="Change Status">
             </custom-combo-box>
             <button mat-button class="margin-right" color="primary"
                     [disabled]="!this.changeStatus || !this.changeProductOrders || this.changeProductOrders.length < 1"
-                    (click)="this.promptToSave()"><img class="icon" [src]="'./assets/bullet_go.png'">Go</button>
+                    (click)="this.promptToSave()"><img class="icon" [src]="'./assets/bullet_go.png'" alt="">Go</button>
             <button mat-button color="warn" [disabled]="!this.changeProductOrders || this.changeProductOrders.length < 1"
-                    (click)="this.promptToDelete()"><img class="icon" [src]="'./assets/delete.png'">Delete</button>
+                    (click)="this.promptToDelete()"><img class="icon" [src]="'./assets/delete.png'" alt="">Delete</button>
         </div>
         <label [hidden]="this.displayMode !== this.DISPLAY_OVERVIEW">({{this.productOrderLineItemList.length}} line items)</label>
     </div>

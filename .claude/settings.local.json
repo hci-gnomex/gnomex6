@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git config --global --add safe.directory C:/temp/erik/gnomex6)",
+      "Bash(git add gnomex_ng/src/app/header/header.component.html gnomex_ng/src/app/header/header.component.ts)",
+      "Bash(git commit:*)",
+      "Bash(git push origin ng8-aria-fixes)",
+      "Bash(gh repo view hci-gnomex/gnomex6 --json defaultBranchRef --jq '.defaultBranchRef.name')",
+      "Bash(git add gnomex_ng/src/app/header/header.component.html gnomex_ng/src/app/header/header.component.ts gnomex_ng/src/app/header/menu-item/menu-item.component.html gnomex_ng/src/app/header/menu-item/menu-item.component.ts)",
+      "Bash(git add gnomex_ng/src/app/header/header.component.html gnomex_ng/src/app/header/menu-item/menu-item.component.html)",
+      "Bash(git add gnomex_ng/src/app/configuration/config-core-facility-edit.component.html gnomex_ng/src/app/configuration/configure-organisms.component.html gnomex_ng/src/app/configuration/edit-protocol.component.html gnomex_ng/src/app/configuration/experiment-platform/ep-experiment-type-tab.component.html gnomex_ng/src/app/configuration/experiment-platform/experiment-platform-overview.component.html gnomex_ng/src/app/configuration/experiment-platform/experiment-platform-tab.component.html gnomex_ng/src/app/configuration/experiment-platform/illumina-seq-dialog.component.html gnomex_ng/src/app/configuration/experiment-platform/library-prep-dialog.component.html gnomex_ng/src/app/configuration/manage-protocols.component.html gnomex_ng/src/app/header/header.component.html doc/aria-configuration-fixes.md doc/aria-header-menu-fixes.md)",
+      "Bash(git push -u origin ng8-aria-fixes)",
+      "Bash(gh pr:*)",
+      "Bash(gh auth status)",
+      "Bash(git fetch origin feat/angular-8-update)",
+      "Bash(git remote show origin --no-fetch)",
+      "Bash(gh api repos/hci-gnomex/gnomex6/branches/ng8-aria-fixes --jq '.commit.sha')",
+      "Bash(python -c \":*)"
+    ]
+  }
+}
