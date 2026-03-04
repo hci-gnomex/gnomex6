@@ -1,15 +1,15 @@
 import {
-    AfterViewInit,
-    Component,
-    ElementRef,
-    EventEmitter,
-    Injector,
-    Input,
-    OnChanges,
-    OnDestroy,
-    Output, SimpleChange,
-    SimpleChanges,
-    ViewChild
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter, HostBinding,
+  Injector,
+  Input,
+  OnChanges,
+  OnDestroy,
+  Output, SimpleChange,
+  SimpleChanges,
+  ViewChild
 } from "@angular/core";
 import {AbstractControl, ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, NgControl} from "@angular/forms";
 import {Observable, Subscription} from "rxjs";
@@ -24,12 +24,17 @@ import {debounceTime} from "rxjs/operators";
                    name="customComboBoxFilter"
                    autocomplete="off"
                    [placeholder]="this.temporaryPlaceholder ? (this.innerControl.value ? '' : this.placeholder) : this.placeholder"
+                   [attr.cdkFocusInitial]="cdkFocusInitial === undefined ? null : cdkFocusInitial"
+                   [tabindex]="tabindex"
                    [matAutocomplete]="auto" [formControl]="this.innerControl"
                    [attr.aria-label]="placeholder"
                    role="combobox"
                    aria-haspopup="listbox"
+                   [attr.aria-owns]="auto.id"
+                   [attr.aria-controls]="auto.id"
                    [attr.aria-expanded]="isOpen">
             <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete"
+                              [autoActiveFirstOption]="false"
                               (optionSelected)="this.selectOption($event.option.value)"
                               (opened)="this.onOpened()" (closed)="this.onClosed()" [displayWith]="this.displayFn">
                 <mat-option [classList]="customOptionClasses" *ngIf="this.allowNone && (this.forceShowNone || !this.innerControl.value)">None</mat-option>
@@ -56,6 +61,14 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
     @Input() public temporaryPlaceholder: boolean = false;
     @Input() public tooltip: string = "";
     @Input() public allowNone: boolean = true;
+    // tell mat-dialog to pass initial focus to the inner input
+    @HostBinding('attr.cdkFocusInitial') _cdkFocusInitial = null;
+    @Input() public cdkFocusInitial: string = undefined;
+
+    // on tab skip the host element and focus the input
+    @HostBinding('attr.tabindex') _tabindex = null;
+    @Input() public tabindex: number = 0;
+
     public forceShowNone: boolean = false;
 
     @Input() private options: any[] =[];

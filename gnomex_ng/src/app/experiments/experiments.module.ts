@@ -15,7 +15,6 @@ import { AngularSplitModule } from 'angular-split';
 import {BrowseExperimentsComponent} from "./browse-experiments.component";
 import {ExperimentOrdersComponent} from "./orders/experiment-orders.component";
 import {BrowsePanelComponent} from "./browse-panel.component";
-import {AgGridModule} from 'ag-grid-angular';
 import { DynamicModule } from 'ng-dynamic-component';
 
 import {
@@ -78,7 +77,7 @@ import {CoreSampleSelectorComponent} from "./new-experiment/core-sample-selector
 import {ImprovedSelectRenderer} from "../util/grid-renderers/improved-select.renderer";
 import {ImprovedSelectEditor} from "../util/grid-editors/improved-select.editor";
 import {AccessibilityModule} from "../util/accessibility/accessibility.module";
-import {AgGridModule} from "ag-grid-angular/src/aggrid.module";
+import { AgGridModule } from "ag-grid-angular";
 
 @NgModule({
   imports: [
@@ -123,8 +122,7 @@ import {AgGridModule} from "ag-grid-angular/src/aggrid.module";
     ]),
     UploadModule,
     AngularEditorModule,
-    AccessibilityModule,
-    AgGridModule
+    AccessibilityModule
   ],
     declarations: [
         BrowseExperimentsComponent,
