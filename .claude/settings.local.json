@@ -15,7 +15,8 @@
       "Bash(git fetch origin feat/angular-8-update)",
       "Bash(git remote show origin --no-fetch)",
       "Bash(gh api repos/hci-gnomex/gnomex6/branches/ng8-aria-fixes --jq '.commit.sha')",
-      "Bash(python -c \":*)"
+      "Bash(python -c \":*)",
+      "Bash(dir /s /b \"C:\\\\temp\\\\erik\\\\gnomex6\\\\gnomex_ng\\\\src\\\\app\\\\services\")"
     ]
   }
 }

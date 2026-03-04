@@ -507,6 +507,10 @@
                 iframe = promptElement;
                 iframe.src = generateIframeSrc();
                 iframe.height = '384px';
+                // Ensure the iframe has an accessible title for screen readers
+                if (!iframe.title) {
+                    iframe.title = 'Duo Security Authentication';
+                }
             } else {
                 // If given a container to put an iframe in, clean out any children
                 // child elements in case `init()` was called more than once.
@@ -519,6 +523,10 @@
                 iframe = document.createElement('iframe');
 
                 // Set the src and all other attributes on the new iframe.
+                // Ensure a title attribute is present for screen-reader accessibility.
+                if (!iframeAttributes['title']) {
+                    iframeAttributes['title'] = 'Duo Security Authentication';
+                }
                 iframeAttributes['src'] = generateIframeSrc();
                 for (var name in iframeAttributes) {
                     iframe.setAttribute(name, iframeAttributes[name]);
