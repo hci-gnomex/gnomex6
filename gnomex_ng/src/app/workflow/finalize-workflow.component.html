@@ -74,7 +74,7 @@
                         </mat-form-field>
                         <date-picker  [formControl]="this.createDateFC"  placeholder="Create Date" (change)="createFlowCellFileName()">
                         </date-picker>
-                        <mat-radio-group [formControl]="sideFC" class="flex-container-row children-margin-right" (change)="createFlowCellFileName()" aria-label="Flow cell side">
+                        <mat-radio-group [formControl]="sideFC" [appReadonly]="sideFCReadonly" appReadonlyType="radio" class="flex-container-row children-margin-right" (change)="createFlowCellFileName()" aria-label="Flow cell side">
                             <mat-radio-button value="A">Side A</mat-radio-button>
                             <mat-radio-button value="B">Side B</mat-radio-button>
                         </mat-radio-group>

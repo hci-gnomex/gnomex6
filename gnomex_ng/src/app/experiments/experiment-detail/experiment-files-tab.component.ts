@@ -304,7 +304,7 @@ function getDownloadGroupRenderer() {
         let tempDiv = document.createElement("div");
         let textColor: string = params.data.displayColor ? params.data.displayColor : 'black';
         if (params.data.icon) {
-            tempDiv.innerHTML = '<span style="color: ' + textColor + ';"><img src="' + params.data.icon + '" class="icon"/>' + params.value + '</span>';
+          tempDiv.innerHTML = '<span style="color: ' + textColor + ';"><img src="' + params.data.icon + '" alt="" class="icon"/>' + params.value + '</span>';
         } else {
             tempDiv.innerHTML = '<span style="color: ' + textColor + ';">' + params.value + '</span>';
         }

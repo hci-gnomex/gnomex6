@@ -93,7 +93,7 @@
                                         <mat-checkbox style="margin-right: 2%;" [formControl]="this.forSampleFC" aria-label="Annotates samples">Sample</mat-checkbox>
                                         <mat-checkbox style="margin-right: 2%;" [formControl]="this.forDataTrackFC" aria-label="Annotates data tracks">Data Track</mat-checkbox>
                                         <mat-checkbox style="margin-right: 2%;" [formControl]="this.forAnalysisFC" aria-label="Annotates analyses">Analysis</mat-checkbox>
-                                        <mat-checkbox [formControl]="this.forRequestFC" disabled="!this.canAccessAnyObject" aria-label="Annotates experiments">Experiment</mat-checkbox>
+                                        <mat-checkbox [formControl]="this.forRequestFC" [appReadonly]="!this.canAccessAnyObject" appReadonlyType="checkbox" aria-label="Annotates experiments">Experiment</mat-checkbox>
                                     </div>
                                     <div class="tabRow">
                                         <mat-checkbox [formControl]="this.requiredFC" aria-label="Required annotation">Required (Annotation must be filled in)</mat-checkbox>

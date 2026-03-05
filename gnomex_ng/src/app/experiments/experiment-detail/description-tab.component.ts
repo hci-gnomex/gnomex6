@@ -209,7 +209,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
 
     ngOnInit(){
         this.descriptionForm = this.fb.group({
-            name: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_LENGTH_200)],
+            name: ["", Validators.maxLength(this.constantsService.MAX_LENGTH_200)],
             description: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_LENGTH_5000)],
             projectDescription: [{value: "", disabled: true}],
             corePrepInstructions: [{value: "", disabled: true}, Validators.maxLength(this.constantsService.MAX_LENGTH_5000)],
@@ -273,7 +273,6 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
         this.getEditorHeight();
 
         if (this.editMode) {
-            this.descriptionForm.get("name").enable();
             this.descriptionForm.get("description").enable();
             this.descEditor.editorToolbar.showToolbar = true;
             this.descEditorConfig.editable = true;
@@ -300,7 +299,6 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
             this.descriptionForm.get("name").setValue( this.experiment.name);
             this.descriptionForm.get("description").setValue(this.experiment.description);
 
-            this.descriptionForm.get("name").disable();
             this.descriptionForm.get("description").disable();
 
             this.descEditor.editorToolbar.showToolbar = false;

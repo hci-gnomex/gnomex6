@@ -170,6 +170,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
 
 
     public showInstitutions: boolean = false;
+    public userFormReadonly: boolean = false;
     public institutionGridColDefs: ColDef[];
     public institutionGridApi: GridApi;
     public institutions: any[] = [];
@@ -678,8 +679,20 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
             this.userForm.markAsPristine();
             this.touchUserFields();
 
+            this.userFormReadonly = false;
             if (this.secAdvisor.isAdmin && !this.secAdvisor.isSuperAdmin && this.selectedUser.codeUserPermissionKind === 'SUPER') {
+                this.userFormReadonly = true;
                 this.userForm.disable();
+                if (this.userForm.contains('isActive')) { this.userForm.get('isActive').enable(); }
+                if (this.userForm.contains('userType')) { this.userForm.get('userType').enable(); }
+                if (this.userForm.contains('permissionLevel')) { this.userForm.get('permissionLevel').enable(); }
+                if (this.userForm.contains('pricing')) { this.userForm.get('pricing').enable(); }
+                (this.coreFacilitiesIManage || []).forEach((cfm: any) => {
+                    if (this.userForm.contains(cfm.mDisplay)) { this.userForm.get(cfm.mDisplay).enable(); }
+                });
+                (this.coreFacilitiesICanSubmitTo || []).forEach((cf: any) => {
+                    if (this.userForm.contains(cf.display)) { this.userForm.get(cf.display).enable(); }
+                });
             }
 
             this.dialogsService.stopAllSpinnerDialogs();
@@ -845,11 +858,7 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
                 let control: FormControl;
                 core.mDisplay = core.display + 'm';
 
-                if (core.value === this.secAdvisor.coreFacilitiesICanManage[0].value) {
-                    control = new FormControl({value: core.display + 'm', disabled: false});
-                } else {
-                    control = new FormControl({value: core.display + 'm', disabled: true});
-                }
+                control = new FormControl(core.display + 'm');
 
                 this.userForm.addControl(core.display + 'm', control);
             }
@@ -883,16 +892,6 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
         for (let myCore of myCores) {
             let control: FormControl = new FormControl(myCore.display);
             this.groupForm.addControl(myCore.display, control);
-
-            if (this.secAdvisor.isSuperAdmin) {
-                control.enable();
-            } else {
-                if (myCore.idCoreFacility === this.idCoreFacility) {
-                    control.enable();
-                } else {
-                    control.disable();
-                }
-            }
 
             myCore.isSelected = false;
             myCoreFacilities.push(myCore);

@@ -331,7 +331,7 @@ function getDownloadGroupRenderer() {
     DownloadGroupRenderer.prototype.init = function(params) {
         let tempDiv = document.createElement("div");
         if ( params.data.showRequestNumber == 'Y') {
-                tempDiv.innerHTML = '<span><img src="' + params.data.icon + '" class="icon"/>' + params.value + '</span>';
+                tempDiv.innerHTML = '<span><img src="' + params.data.icon + '" alt="" class="icon"/>' +   params.value + '</span>';
 
         } else {
             tempDiv.innerHTML = '<span >' + '' + '</span>';

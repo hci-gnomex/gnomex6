@@ -57,7 +57,7 @@
         </tr>
         <tr *ngFor="let p of this.productList">
             <td>
-                <mat-checkbox [(ngModel)]="p.isSelected" [disabled]="true">{{p.name}} (Order Qty: {{p.orderQty}})</mat-checkbox>
+                <mat-checkbox [(ngModel)]="p.isSelected" appReadonly appReadonlyType="checkbox">{{p.name}} (Order Qty: {{p.orderQty}})</mat-checkbox>
                 <img class="description-icon" *ngIf="p.description" [src]="'./assets/white_information.png'" matTooltip="{{p.description}}" [attr.aria-label]="p.description" role="img">
             </td>
             <td>

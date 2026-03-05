@@ -440,7 +440,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 			this.formGroup.addControl('chartfieldActivity', new FormControl(''));
 			this.formGroup.addControl('chartfieldProject', new FormControl(''));
 			this.formGroup.addControl('chartfieldAccountNum', new FormControl(''));
-			this.formGroup.addControl('chartfieldAccountAU', new FormControl({value: "1"  , disabled: true}));
+			this.formGroup.addControl('chartfieldAccountAU', new FormControl("1"));
 
 			this.handleConditionalValidators();
 

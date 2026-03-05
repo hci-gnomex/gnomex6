@@ -47,7 +47,7 @@
                 </div>
             </mat-tab>
             <mat-tab label="Visibility" class="full-height">
-                <mat-radio-group class="flexbox-column" formControlName="codeVisibility" aria-label="Visibility">
+                <mat-radio-group class="flexbox-column" formControlName="codeVisibility" [appReadonly]="topicFormReadonly" appReadonlyType="radio" aria-label="Visibility">
                     <mat-radio-button style="margin: 0.5em" *ngFor="let rad of visRadio" [value]="rad.value">
                         <img [src]="rad.icon" class="icon" alt="">{{rad.display}}
                     </mat-radio-button>

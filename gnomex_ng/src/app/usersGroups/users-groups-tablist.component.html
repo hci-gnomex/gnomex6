@@ -147,7 +147,7 @@
                                             </mat-form-field>
                                         </div>
                                         <div class="flex-grow min-width padded">
-                                            <mat-checkbox formControlName="isActive" (change)="onIsActiveChange($event)">
+                                            <mat-checkbox formControlName="isActive" [appReadonly]="userFormReadonly" appReadonlyType="checkbox" (change)="onIsActiveChange($event)">
                                                 User is Active
                                             </mat-checkbox>
                                         </div>
@@ -193,7 +193,7 @@
                                                     <div class="full-height flex-grow">
                                                         <div class="full-height foreground flex-container-col">
                                                             <div class="large-margin-right">
-                                                                <mat-radio-group class="flex-container-row" formControlName="userType" (change)="onUserTypeChange($event)" aria-label="User type">
+                                                                <mat-radio-group class="flex-container-row" formControlName="userType" [appReadonly]="userFormReadonly" appReadonlyType="radio" (change)="onUserTypeChange($event)" aria-label="User type">
                                                                     <mat-radio-button [value]="USER_TYPE_UNIVERSITY">University User</mat-radio-button>
                                                                     <mat-radio-button class="large-margin-left" [value]="USER_TYPE_EXTERNAL">External User</mat-radio-button>
                                                                 </mat-radio-group>
@@ -238,11 +238,11 @@
                                                                 Permission Level
                                                             </label>
                                                             <div class="full-width flex-grow">
-                                                                <mat-radio-group class="flex-container-col full-width" formControlName="permissionLevel" (change)="onPermissionLevelChange($event)" aria-label="Permission level">
+                                                                <mat-radio-group class="flex-container-col full-width" formControlName="permissionLevel" [appReadonly]="userFormReadonly" appReadonlyType="radio" (change)="onPermissionLevelChange($event)" aria-label="Permission level">
                                                                     <mat-radio-button value="LAB">Group</mat-radio-button>
                                                                     <mat-radio-button value="ADMIN">Admin</mat-radio-button>
                                                                     <mat-radio-button value="BILLING">Billing Admin</mat-radio-button>
-                                                                    <mat-radio-button value="SUPER" [disabled] = !secAdvisor.isSuperAdmin>Super Admin</mat-radio-button>
+                                                                    <mat-radio-button value="SUPER" [appReadonly]="!secAdvisor.isSuperAdmin" appReadonlyType="radio">Super Admin</mat-radio-button>
                                                                 </mat-radio-group>
                                                             </div>
                                                         </div>
@@ -253,7 +253,7 @@
                                                 <div class="full-width full-height large-padding-right">
                                                     <label class="full-width">Core facilities this user manages</label>
                                                     <div class="flex-container-col">
-                                                        <mat-checkbox *ngFor="let cfm of coreFacilitiesIManage" [checked]=cfm.isSelected [formControlName]=cfm.mDisplay>
+                                                        <mat-checkbox *ngFor="let cfm of coreFacilitiesIManage" [checked]=cfm.isSelected [formControlName]=cfm.mDisplay [appReadonly]="userFormReadonly" appReadonlyType="checkbox">
                                                             {{cfm.display}}
                                                         </mat-checkbox>
                                                     </div>
@@ -268,7 +268,7 @@
                                                                       popupTitle="Submitter Help"></context-help>
                                                     </div>
                                                     <div class="flex-container-col">
-                                                        <mat-checkbox *ngFor="let cf of coreFacilitiesICanSubmitTo" [checked]=cf.isSelected [formControlName]=cf.display>
+                                                        <mat-checkbox *ngFor="let cf of coreFacilitiesICanSubmitTo" [checked]=cf.isSelected [formControlName]=cf.display [appReadonly]="userFormReadonly" appReadonlyType="checkbox">
                                                             {{cf.display}}
                                                         </mat-checkbox>
                                                     </div>
@@ -356,7 +356,7 @@
                                                 </mat-form-field>
                                             </div>
                                             <div class="flex-grow min-width padded">
-                                                <mat-checkbox [checked]="isActive_lab" [disabled]="disable_isActive_lab" (change)="onChange_isActive($event)">
+                                                <mat-checkbox [checked]="isActive_lab" [appReadonly]="disable_isActive_lab" appReadonlyType="checkbox" (change)="onChange_isActive($event)">
                                                     Lab is Active
                                                 </mat-checkbox>
                                             </div>
@@ -393,7 +393,7 @@
                                                 <div class="full-width full-height foreground flex-container-col">
                                                     <label>Pricing</label>
                                                     <div class="full-width flex-grow">
-                                                        <mat-radio-group class="flex-container-col full-width" formControlName="pricing" aria-label="Pricing model">
+                                                        <mat-radio-group class="flex-container-col full-width" formControlName="pricing" [appReadonly]="userFormReadonly" appReadonlyType="radio" aria-label="Pricing model">
                                                             <mat-radio-button class="padded-left-right" value="INTERNAL">
                                                                 <img [src]="'./assets/group.png'" alt="Internal">
                                                                 Internal
@@ -416,7 +416,7 @@
                                                 <div class="flex-container-col full-width">
                                                     <label class="full-width">Core facilities</label>
                                                     <div *ngFor="let core of myCoreFacilities" class="padded-left-right-top">
-                                                        <mat-checkbox [formControlName]="core.display">
+                                                        <mat-checkbox [formControlName]="core.display" [appReadonly]="!secAdvisor.isSuperAdmin && core.idCoreFacility !== idCoreFacility" appReadonlyType="checkbox">
                                                             {{core.display}}
                                                         </mat-checkbox>
                                                     </div>

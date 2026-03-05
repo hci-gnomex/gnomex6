@@ -42,7 +42,7 @@ import {ImprovedSelectEditor} from "../../util/grid-editors/improved-select.edit
     styles: [`
         .no-height { height: 0;  }
         .single-em { width: 1em; }
-        
+
         .horizontal-spacer {
             height: 80%;
             width: 2px;
@@ -3201,7 +3201,7 @@ function getGroupRenderer() {
     GroupRenderer.prototype.init = function(params) {
         let tempDiv = document.createElement("div");
         if (params.data.icon) {
-            tempDiv.innerHTML = '<span><img src="' + params.data.icon + '" class="icon"/>' + params.value + '</span>';
+            tempDiv.innerHTML = '<span><img src="' + params.data.icon + '" alt="" class="icon"/>' +  params.value + '</span>';
         } else {
             tempDiv.innerHTML = '<span>' + params.value + '</span>';
         }

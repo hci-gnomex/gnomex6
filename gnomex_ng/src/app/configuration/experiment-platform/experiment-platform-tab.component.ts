@@ -77,7 +77,7 @@ export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{
             isActive: false,
             associatedWithAnalysis:'',
             requireNameDescription:'',
-            code: [{value:'', disabled:true }],
+            code: [''],
             icon: '',
             idCoreFacility: '',
             notes:'',

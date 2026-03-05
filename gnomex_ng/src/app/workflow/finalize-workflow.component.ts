@@ -23,10 +23,10 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
     selector: 'finalize-workflow',
     templateUrl: 'finalize-workflow.component.html',
     styles: [`
-        
-        
+
+
         .title-color { color: #1601db; }
-        
+
 
         .date-width {
             width: 10em;
@@ -46,7 +46,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
         .children-margin-right > *:not(:last-child) {
             margin-right: 1em;
         }
-        
+
 
     `]
 })
@@ -246,8 +246,9 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     public runFC:        FormControl;
     public createDateFC: FormControl;
     public instrumentFC: FormControl;
-    public protocolFC:   FormControl;
+    public protocolFC:  FormControl;
     public sideFC: FormControl;
+    public sideFCReadonly: boolean = true;
 
 
     constructor(public workflowService: WorkflowService,
@@ -304,7 +305,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
 
     private initialize(): void {
         this.dialogsService.startDefaultSpinnerDialog();
-        this.sideFC.disable();
+        this.sideFCReadonly = true;
         this.selectedFlowCells = [];
         this.assmFlowCellNumber = 0;
         this.flowCellNumber = "";
@@ -406,17 +407,17 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
 
             if(reqCat === 'MISEQ' || foundProtocolName.indexOf("MISEQ") != -1 ){
                 this.sideFC.setValue(null);
-                this.sideFC.disable();
+                this.sideFCReadonly = true;
                 this.sideFC.clearValidators();
                 this.sideFC.updateValueAndValidity();
             }else{
-                this.sideFC.enable();
+                this.sideFCReadonly = false;
                 this.sideFC.setValidators(Validators.required);
                 this.sideFC.updateValueAndValidity();
             }
         }else{
             this.sideFC.setValue(null);
-            this.sideFC.disable();
+            this.sideFCReadonly = true;
             this.sideFC.clearValidators();
             this.sideFC.updateValueAndValidity();
         }

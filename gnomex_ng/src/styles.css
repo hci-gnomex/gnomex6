@@ -85,12 +85,31 @@ main {
   width: 113px;
 }
 
+
+
+/*  Disabled label text — ensure sufficient contrast */
+.mat-radio-button.mat-radio-disabled .mat-radio-label-content {
+  color: var(--greywarm-darkest) !important; /* adjust if your theme differs */
+}
+
+
+input[readonly] {
+  background-color: #f0f0f0; /* light gray background to indicate it's readonly */
+  color: var(--grey-darker) !important;
+  cursor: not-allowed; /* shows a not-allowed cursor to indicate no interaction */
+}
+
+input[readonly]:focus {
+  outline: none; /* remove focus outline if you don't want it to show */
+  box-shadow: none; /* remove any box-shadow if present */
+}
+
 input.mat-input-element:disabled {
-  color: rgba(88,88,88,1);
+  color: var(--grey-darker);
 }
 
 textarea.mat-input-element:disabled {
-  color: rgba(88,88,88,1);
+  color: var(--grey-darker);
 }
 
 .mat-form-field {

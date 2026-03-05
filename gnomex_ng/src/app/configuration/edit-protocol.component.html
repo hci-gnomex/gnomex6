@@ -12,7 +12,10 @@
                         <mat-form-field class="full-width">
                             <input  matInput
                                     placeholder="Account Name*"
-                                    [formControl]="this.form.get('accountName')" matTooltip="Account Name is required">
+                                    [formControl]="this.form.get('accountName')"
+                                    [readonly]="formReadonly"
+                                    [attr.aria-readonly]="formReadonly ? 'true' : null"
+                                    matTooltip="Account Name is required">
                             <mat-error *ngIf="this.form.get('accountName').hasError('required')">
                                 Account Name is required
                             </mat-error>
@@ -50,7 +53,7 @@
                         <div class="tr">
                             <div class="td">
                                 <div class="inline-block checkbox-container">
-                                    <mat-checkbox [formControl]="this.form.get('isActive')" aria-label="Active"></mat-checkbox>
+                                    <mat-checkbox [formControl]="this.form.get('isActive')" [appReadonly]="formReadonly" appReadonlyType="checkbox" aria-label="Active"></mat-checkbox>
                                 </div>
                             </div>
                             <div class="td">
@@ -68,7 +71,9 @@
                             <input  matInput
                                     placeholder="URL"
                                     (input)="checkToEnableViewURLButton($event)"
-                                    [formControl]="this.form.get('url')">
+                                    [formControl]="this.form.get('url')"
+                                    [readonly]="formReadonly"
+                                    [attr.aria-readonly]="formReadonly ? 'true' : null">
                             <mat-error *ngIf="this.form.get('url').hasError('maxLength')">
                                 URL exceeded the 500 character limit
                             </mat-error>

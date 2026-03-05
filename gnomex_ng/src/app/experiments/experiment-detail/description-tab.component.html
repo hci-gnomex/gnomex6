@@ -5,7 +5,7 @@
         </div>
         <div class="flex-grow">
             <mat-form-field class="field-width">
-                <input matInput type="text" formControlName="name" aria-labelledby="experimentNameLabel" aria-required="false">
+                <input matInput type="text" formControlName="name" [readonly]="!editMode" [attr.aria-readonly]="!editMode ? 'true' : null" aria-labelledby="experimentNameLabel" aria-required="false">
                 <mat-error *ngIf="descriptionForm.get('name').hasError('maxlength')" role="alert">
                     Experiment Name can be at most {{this.constantsService.MAX_LENGTH_200}}
                     characters

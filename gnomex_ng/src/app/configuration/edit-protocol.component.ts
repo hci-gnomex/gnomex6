@@ -94,6 +94,7 @@ export class EditProtocolComponent implements OnInit, OnDestroy, OnChanges {
     protected userList: any[];
 
     protected disableViewURLButton: boolean = true;
+    public formReadonly: boolean = true;
 
     editorConfig: AngularEditorConfig = {
         spellcheck: true,
@@ -129,50 +130,50 @@ export class EditProtocolComponent implements OnInit, OnDestroy, OnChanges {
         this.experimentPlatformList = [];
 
         this.form = this.fb.group({
-            accountName: [{value: "", disabled: true}, [Validators.required, Validators.maxLength(200)]],
+            accountName: ["", [Validators.required, Validators.maxLength(200)]],
             experimentPlatform: [{value: "", disabled: true}],
             analysisType: [{value: "", disabled: true}],
             owner: [{value: "", disabled: true}],
-            isActive: [{value: "", disabled: true}],
-            url: [{value: "", disabled: true}, Validators.maxLength(500)],
+            isActive: [""],
+            url: ["", Validators.maxLength(500)],
             description: [{value: "", disabled: true}],
         });
 
         if (!this.protocolSubscription) {
-            this.protocolSubscription = this.protocolService.getProtocolObservable().subscribe((result) => {
-                this.selectedProtocol = result;
+          this.protocolSubscription = this.protocolService.getProtocolObservable().subscribe((result) => {
+            this.selectedProtocol = result;
 
-                this.form.get("accountName").setValue(result.name ? result.name : "");
-                this.form.get("experimentPlatform").setValue(result.codeRequestCategory ? result.codeRequestCategory : "");
-                this.form.get("isActive").setValue(result.isActive === "Y" ? true : false);
-                this.form.get("url").setValue(result.url ? result.url : "");
-                this.form.get("description").setValue(result.description ? result.description : "");
-                this.form.get("owner").setValue(result.idAppUser ? result.idAppUser : "");
-                this.form.get("analysisType").setValue(result.idAnalysisType ? result.idAnalysisType : "");
+            this.form.get("accountName").setValue(result.name ? result.name : "");
+            this.form.get("experimentPlatform").setValue(result.codeRequestCategory ? result.codeRequestCategory : "");
+            this.form.get("isActive").setValue(result.isActive === "Y" ? true : false);
+            this.form.get("url").setValue(result.url ? result.url : "");
+            this.form.get("description").setValue(result.description ? result.description : "");
+            this.form.get("owner").setValue(result.idAppUser ? result.idAppUser : "");
+            this.form.get("analysisType").setValue(result.idAnalysisType ? result.idAnalysisType : "");
 
-                if (result.url) {
-                    this.disableViewURLButton = Array.isArray(result.url) && result.url.length === 0 ? true : false;
-                } else {
-                    this.disableViewURLButton = true;
-                }
+            if (result.url) {
+              this.disableViewURLButton = Array.isArray(result.url) && result.url.length === 0 ? true : false;
+            } else {
+              this.disableViewURLButton = true;
+            }
 
-                this.form.markAsPristine();
-                this.protocolLoaded.emit(true);
+            this.form.markAsPristine();
+            this.protocolLoaded.emit(true);
 
-                setTimeout(() => {
-                    if (result.canUpdate === "Y") {
-                        this.form.enable();
-                        this.descEditor.editorToolbar.showToolbar = true;
-                        this.editorConfig.editable = true;
-                    } else {
-                        this.form.disable();
-                        this.descEditor.editorToolbar.showToolbar = false;
-                        this.editorConfig.editable = false;
-                    }
-                });
-
-                this.dialogService.stopAllSpinnerDialogs();
+            setTimeout(() => {
+              if (result.canUpdate === "Y") {
+                this.formReadonly = false;
+                this.descEditor.editorToolbar.showToolbar = true;
+                this.editorConfig.editable = true;
+              } else {
+                this.formReadonly = true;
+                this.descEditor.editorToolbar.showToolbar = false;
+                this.editorConfig.editable = false;
+              }
             });
+
+            this.dialogService.stopAllSpinnerDialogs();
+          });
         }
 
         if (!this.saveExistingProtocolSubscription) {

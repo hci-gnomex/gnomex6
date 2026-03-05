@@ -9,13 +9,13 @@
     </div>
     <div role="group" aria-label="Custom date range">
         <mat-form-field class="margin-right">
-            <input matInput [matDatepicker]="fromPicker" placeholder="From" disabled [(ngModel)]="this.fromDate" [max]="this.toDate"
+            <input matInput [matDatepicker]="fromPicker" placeholder="From" readonly aria-readonly="true" [(ngModel)]="this.fromDate" [max]="this.toDate"
                    aria-label="Start date">
             <mat-datepicker-toggle matSuffix [for]="fromPicker" aria-label="Open start date picker"></mat-datepicker-toggle>
             <mat-datepicker #fromPicker disabled="false"></mat-datepicker>
         </mat-form-field>
         <mat-form-field>
-            <input matInput [matDatepicker]="toPicker" placeholder="To" disabled [(ngModel)]="this.toDate" [min]="this.fromDate"
+            <input matInput [matDatepicker]="toPicker" placeholder="To" readonly aria-readonly="true" [(ngModel)]="this.toDate" [min]="this.fromDate"
                    aria-label="End date">
             <mat-datepicker-toggle matSuffix [for]="toPicker" aria-label="Open end date picker"></mat-datepicker-toggle>
             <mat-datepicker #toPicker disabled="false"></mat-datepicker>

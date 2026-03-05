@@ -62,7 +62,6 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
         div.inlineDiv {
             display: flex;
             align-items: center;
-            color: #A9A9A9;
         }
 
         div.labelAndIcon {

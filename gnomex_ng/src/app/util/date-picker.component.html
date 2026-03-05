@@ -5,7 +5,8 @@
            placeholder="{{ placeholder }}"
            required="{{ required }}"
            (dateChange)="onChange()"
-           [disabled]="textInputDisabled"
+           [readonly]="textInputDisabled"
+           [attr.aria-readonly]="textInputDisabled ? 'true' : null"
            [attr.aria-label]="placeholder"
            [attr.aria-required]="required">
     <mat-datepicker-toggle matSuffix [for]="datePicker" aria-label="Open date picker"></mat-datepicker-toggle>

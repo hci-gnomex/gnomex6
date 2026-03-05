@@ -78,7 +78,7 @@
                 </button>
             </div>
             <div *ngIf="onSubmitTab" class="padded-right">
-                <mat-checkbox [(ngModel)]="Checked" disabled="{{ disable_agreeCheckbox ? 'true' : 'false' }}" aria-label="Agreement confirmation">
+                <mat-checkbox [(ngModel)]="Checked" [appReadonly]="disable_agreeCheckbox" appReadonlyType="checkbox" aria-label="Agreement confirmation">
                     <div class="highlight-agreement">
                         {{ agreeCheckboxLabel }}
                     </div>

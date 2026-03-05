@@ -790,9 +790,9 @@ function getDownloadGroupRenderer() {
         let tempDiv = document.createElement("div");
         if (params.data.icon) {
             if(params.data.idSample){
-                tempDiv.innerHTML = '<span><img src="' + params.data.icon + '" class="icon"/>' + params.data.number + '</span>';
+                tempDiv.innerHTML = '<span><img src="' + params.data.icon + '" alt="" class="icon"/>' + params.data.number + '</span>';
             }else{
-                tempDiv.innerHTML = '<span><img src="' + params.data.icon + '" class="icon"/>' + params.value + '</span>';
+                tempDiv.innerHTML = '<span> ' + params.value + '</span>';
             }
         } else {
             if(params.data.idSample){

@@ -51,7 +51,7 @@ import {DictionaryService} from "../../services/dictionary.service";
             <div style="flex:5; margin-top: 1em;" class="full-width flex-container-col">
                 <div>
                     <mat-form-field  class="medium-form-input">
-                        <input id="protocolInput" matInput (change)="updateGridForProtocol($event)" [(ngModel)]="protocol" [disabled]="this.disableControl" placeholder="Protocol" maxlength="50">
+                        <input id="protocolInput" matInput (change)="updateGridForProtocol($event)" [(ngModel)]="protocol" [readonly]="this.disableControl" [attr.aria-readonly]="this.disableControl ? 'true' : null" placeholder="Protocol" maxlength="50">
                     </mat-form-field>
                     <label class="label"> (Maximum of 50 characters)</label>
                 </div>
@@ -59,11 +59,12 @@ import {DictionaryService} from "../../services/dictionary.service";
                     <textarea matInput (change)="updateGridForDescription($event)"
                               placeholder="Description"
                               [(ngModel)]="description"
-                              [disabled]="this.disableControl"
+                              [readonly]="this.disableControl"
+                              [attr.aria-readonly]="this.disableControl ? 'true' : null"
                               matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3">
                     </textarea>
                 </mat-form-field>
-                <mat-checkbox (change)="updateGridForCheckbox($event)" [(ngModel)]="isDefault" [disabled]="this.disableControl"> Default </mat-checkbox>
+                <mat-checkbox (change)="updateGridForCheckbox($event)" [(ngModel)]="isDefault" [appReadonly]="this.disableControl" appReadonlyType="checkbox"> Default </mat-checkbox>
             </div>
 
 

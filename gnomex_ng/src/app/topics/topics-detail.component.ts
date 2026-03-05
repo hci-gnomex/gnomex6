@@ -56,6 +56,7 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     public topicNode: any;
     private inInitialization: boolean = false;
     public topicForm: FormGroup;
+    public topicFormReadonly: boolean = false;
     public visRadio: Array<any>;
     private topicListNodeSubscription: Subscription;
     private topicLab: any;
@@ -132,9 +133,14 @@ export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
                 let canEdit: boolean = this.topicNode.canWrite === "Y";
                 if (canEdit) {
+                    this.topicFormReadonly = false;
                     this.topicForm.enable();
                 } else {
+                    this.topicFormReadonly = true;
                     this.topicForm.disable();
+                    if (this.topicForm.contains('codeVisibility')) {
+                        this.topicForm.get('codeVisibility').enable();
+                    }
                 }
                 this.editorConfig.editable = canEdit;
                 this.editorConfig.enableToolbar = canEdit;

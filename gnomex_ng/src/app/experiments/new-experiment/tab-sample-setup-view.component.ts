@@ -567,7 +567,7 @@ export class TabSampleSetupViewComponent implements OnInit, OnDestroy {
                 hasIsolationTypes:                 [''],
                 selectedIsolationExtractionMethod: [''],
                 selectedIsolationType:             [''],
-                sampleTypeNotes:                   [{value: '', disabled: true}],
+                sampleTypeNotes:                   [''],
                 addQubit:                          [''],
                 notifyBMP:                         [''],
                 organism:                          [''],

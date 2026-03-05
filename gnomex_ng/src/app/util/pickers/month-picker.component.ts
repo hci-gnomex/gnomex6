@@ -97,11 +97,9 @@ export class MonthPickerComponent implements ControlValueAccessor {
         this.onTouched = fn;
     }
 
-    // Allows Angular to disable the input.
+    // Allows Angular to disable the picker; input stays enabled and uses native readonly to avoid form issues.
     setDisabledState(isDisabled: boolean): void {
         isDisabled ? this._picker.disabled = true : this._picker.disabled = false;
-
-        isDisabled ? this._inputCtrl.disable() : this._inputCtrl.enable();
     }
 
     _yearSelectedHandler(chosenMonthDate: Moment, datepicker: MatDatepicker<Moment>) {
