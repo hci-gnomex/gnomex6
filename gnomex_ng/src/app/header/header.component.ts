@@ -1636,14 +1636,6 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         iconName: './assets/flask.png',
                         route: '/experiments',
                     },
-/*                    // A Billing Admin user should not have permission to create a new experiment.
-                    {
-                        displayName: 'New Experiment Order',
-                        context: "newExperimentOrder",
-                        iconName: './assets/flask_add.png',
-                        route: ''
-                    }
- */
                 ]
             },
             {
@@ -1729,21 +1721,12 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         iconName: './assets/flask.png',
                         route: '/experiments',
                     },
-/*
-                    {
-                        displayName: 'Create New Experiments and Upload Files',
-                        context: 'newExperimentOrder',
-                        iconName: './assets/flask_add.png',
-                        route: ''
-                    },
-*/
                     {
                         displayName: 'Upload Experiment data generated at third party facility',
                         context: 'newExternalExperiment',
                         iconName: './assets/experiment_register.png',
                         route: '/new-external-experiment'
                     },
-
                     {
                         displayName: 'New Project',
                         iconName: './assets/folder_add.png',

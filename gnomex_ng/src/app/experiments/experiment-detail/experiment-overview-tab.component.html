@@ -17,12 +17,12 @@
                         </div>
                         <div class="flex-grow">
                             <div [matTooltip]="_experiment?.labName">
-                                <custom-combo-box class="full-width" (optionSelected)="onChange_lab($event)" valueField="idLab"
+                                <custom-combo-box class="full-width"
+                                                  (optionSelected)="onChange_lab($event)" valueField="idLab"
                                                   [options]="filteredLabDictionary"
                                                   [displayField]="this.prefService.labDisplayField"
                                                   formControlName="idLab"
-                                                  aria-labelledby="labGroupLabel"
-                                                  aria-describedby="labGroupLabel">
+                                                  aria-labelledby="labGroupLabel">
                                 </custom-combo-box>
                             </div>
                         </div>
@@ -109,8 +109,7 @@
                                                       (ngModelChange)="onAppSelected($event)"
                                                       [options]="filteredApplicationDictionary" valueField="value"
                                                       [(ngModel)]="_experiment.codeApplication" [ngModelOptions]="{standalone: true}"
-                                                      aria-labelledby="libraryProtocolLabel"
-                                                      aria-describedby="libraryProtocolLabel">
+                                                      aria-labelledby="libraryProtocolLabel">
                                     </custom-combo-box>
                                 </div>
                             </div>
@@ -161,8 +160,7 @@
                                 <custom-combo-box class="full-width" (optionSelected)="onChange_owner($event)" valueField="idAppUser"
                                                   [options]="possibleOwnersForLabDictionary" [displayField]="this.prefService.userDisplayField"
                                                   formControlName="idAppUser"
-                                                  aria-labelledby="ownedByLabel"
-                                                  aria-describedby="ownedByLabel">
+                                                  aria-labelledby="ownedByLabel">
                                 </custom-combo-box>
                             </div>
                         </div>
@@ -177,8 +175,7 @@
                                                   [disabled]="disableSubmitter"
                                                   [options]="possibleSubmittersForLabDictionary" [displayField]="this.prefService.userDisplayField"
                                                   [(ngModel)]="_experiment.idSubmitter" [ngModelOptions]="{standalone: true}"
-                                                  aria-labelledby="submittedByLabel"
-                                                  aria-describedby="submittedByLabel">
+                                                  [attr.aria-labelledby]="'submittedByLabel'">
                                 </custom-combo-box>
                             </div>
                         </div>
@@ -210,10 +207,10 @@
                         <div *ngFor="let step of processedWorkflowSteps" class="flex-grow text-center {{ step.found ? ' highlight ' : ' '}}" [attr.aria-current]="step.found ? 'step' : null">
                             {{ step.name }}
                         </div>
-                        <div class="minor-label minor-label-width"></div>
+                        <div class="minor-label minor-label-width" aria-hidden="true"></div>
                     </div>
                     <div *ngFor="let progress of progresses" class="full-width flex-container-row align-center margin-top" role="listitem">
-                        <div class="full-height flex-grow bordered flex-container-row" role="progressbar" [attr.aria-valuenow]="progress.displayArray?.length" [attr.aria-valuemax]="processedWorkflowSteps?.length" [attr.aria-label]="'Progress for ' + progress.title">
+                        <div class="full-height flex-grow bordered flex-container-row" role="progressbar" aria-valuemin="0" [attr.aria-valuenow]="progress.displayArray?.length" [attr.aria-valuemax]="processedWorkflowSteps?.length" [attr.aria-label]="'Progress for ' + progress.title">
                             <div *ngFor="let display of progress.displayArray" class="full-height flex-grow gnomex-progress-bar" aria-hidden="true">
                             </div>
                             <div *ngFor="let undisplay of progress.undisplayArray" class="full-height flex-grow" aria-hidden="true">

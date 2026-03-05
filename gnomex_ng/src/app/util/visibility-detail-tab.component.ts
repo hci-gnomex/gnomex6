@@ -16,37 +16,38 @@ import {HttpParams} from "@angular/common/http";
 @Component({
     selector: 'visibility-detail-tab',
     template: `
-        <form [formGroup]="visibilityForm" style="display:flex;flex-direction: column; height:100%;">
+        <form [formGroup]="visibilityForm" style="display:flex;flex-direction: column; height:100%;" aria-label="Visibility settings">
             <div style="display: flex; flex-direction: column">
-                <label class="gx-label">
+                <label class="gx-label" id="visibility-level-label">
                     Select the level of visibility:
                 </label>
-                <mat-radio-group class="flexbox-column"  formControlName="codeVisibility" (change)="updateCollaborators()" >
-                    <mat-radio-button style="margin: 0.5em"  *ngFor="let rad of visRadio" [value]="rad.value" [matTooltip]="rad.tooltip">
-                        <img [src]="rad.icon">{{rad.display}}
+                <mat-radio-group class="flexbox-column"  formControlName="codeVisibility" (change)="updateCollaborators()" aria-labelledby="visibility-level-label">
+                    <mat-radio-button style="margin: 0.5em"  *ngFor="let rad of visRadio" [value]="rad.value" [matTooltip]="rad.tooltip" [attr.aria-label]="rad.display + ': ' + rad.tooltip">
+                        <img [src]="rad.icon" alt="" aria-hidden="true">{{rad.display}}
                     </mat-radio-button>
                 </mat-radio-group>
             </div>
             <mat-form-field class="short-input" *ngIf="isPrivacyExpSupported"
                             matTooltip="Public visibility date&#13;(visibility automatically changes to public on this date)">
-                <input matInput [matDatepicker]="privacyPicker" placeholder="Privacy Expiration" formControlName="privacyExp" [min]="this.today">
-                <mat-datepicker-toggle matSuffix [for]="privacyPicker"></mat-datepicker-toggle>
+                <input matInput [matDatepicker]="privacyPicker" placeholder="Privacy Expiration" formControlName="privacyExp" [min]="this.today" aria-label="Privacy expiration date">
+                <mat-datepicker-toggle matSuffix [for]="privacyPicker" aria-label="Open privacy expiration date picker"></mat-datepicker-toggle>
                 <mat-datepicker #privacyPicker disabled="false"></mat-datepicker>
             </mat-form-field>
             <div style="margin-top: 1em; display: flex; flex-direction: column;" *ngIf="showCollaboratorBlock" >
-                <label class="gx-label"> Individual collaborators allowed access to this data track  </label>
+                <label class="gx-label" id="collaborators-label"> Individual collaborators allowed access to this data track  </label>
                 <div >
                     <div style="width:30%">
                         <custom-combo-box placeholder="Collaborators" (optionSelected)="collaborDropdownChange($event)"
                                           [options]="collabDropdown" [displayField]="this.prefService.userDisplayField"
-                                          [formControlName]="'selectedCollaborator'">
+                                          [formControlName]="'selectedCollaborator'"
+                                          aria-labelledby="collaborators-label">
                         </custom-combo-box>
                     </div>
-                    <button mat-button [disabled]="!enableAdd || _disabled" type="button" (click)="addCollaborator()">
-                        <img [src]="this.constService.ICON_ADD"> add
+                    <button mat-button [disabled]="!enableAdd || _disabled" type="button" (click)="addCollaborator()" aria-label="Add collaborator">
+                        <img [src]="this.constService.ICON_ADD" alt="" aria-hidden="true"> add
                     </button>
-                    <button mat-button [disabled]="selectedCollabRow.length < 1 || _disabled" type="button" (click)="removeCollaborator()">
-                        <img [src]="this.constService.ICON_DELETE"> remove
+                    <button mat-button [disabled]="selectedCollabRow.length < 1 || _disabled" type="button" (click)="removeCollaborator()" aria-label="Remove selected collaborator">
+                        <img [src]="this.constService.ICON_DELETE" alt="" aria-hidden="true"> remove
                     </button>
                 </div>
             </div>
@@ -59,7 +60,8 @@ import {HttpParams} from "@angular/common/http";
                                  [rowSelection]="'single'"
                                  (rowSelected)="this.onCollabGridRowSelected($event)"
                                  [rowData]="this.collabGridRowData"
-                                 [columnDefs]="this.columnDefs">
+                                 [columnDefs]="this.columnDefs"
+                                 aria-label="Collaborators grid">
                 </ag-grid-angular>
             </div>
         </form>

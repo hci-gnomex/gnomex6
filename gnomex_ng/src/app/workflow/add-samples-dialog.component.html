@@ -2,7 +2,7 @@
     <div class="full-width flex-container-row flex-grow overflow-auto">
         <as-split (dragEnd)="onSplitDragEnd($event)">
             <as-split-area size="30" >
-                <div class="full-width full-height max-height flex-container-col border-subtle padded-left">
+                <div class="full-width full-height max-height flex-container-col border-subtle padded-left" role="region" aria-label="Sample browser">
                     <div style="width:20em;">
                         <label style="font-style: italic; font-size:small;"> Drag and drop samples to the flow cell </label>
                         <custom-combo-box [(ngModel)]="idLab"
@@ -11,16 +11,17 @@
                                           (optionSelected)="onLabSelected()"
                                           [placeholder]="'Lab'"
                                           [displayField]="this.preferenceService.labDisplayField"
-                                          [valueField]="'idLab'">
+                                          [valueField]="'idLab'"
+                                          aria-label="Lab">
                         </custom-combo-box>
                     </div>
                     <div class="full-width flex-grow left-right-padded overflow-auto">
-                        <div appFocusManager class="full-height full-width border-subtle">
+                        <div appFocusManager class="full-height full-width border-subtle" role="region" aria-label="Sample tree">
                             <tree-root (activate)="onTreeSelected($event)"
                                        [nodes]="itemList" [options]="options">
                                 <ng-template #treeNodeTemplate let-node let-index="index">
                                     <div class="truncate tree-node-font">
-                                        <img src="{{node.level === 3 ? this.constService.ICON_GREEN_BULLET : node.data.icon }}" class="tree-node-icon icon">
+                                        <img src="{{node.level === 3 ? this.constService.ICON_GREEN_BULLET : node.data.icon }}" class="tree-node-icon icon" alt="">
                                         <span [matTooltip]="node.data.label" >{{ node.data.label }}</span>
                                     </div>
 
@@ -31,14 +32,14 @@
                 </div>
             </as-split-area>
             <as-split-area size="70">
-                <div class="full-width full-height max-height flex-container-col border-subtle">
+                <div class="full-width full-height max-height flex-container-col border-subtle" role="region" aria-label="Flow cell lanes">
                     <div class="flex-container-row justify-flex-end">
                         <button mat-button [disabled]="this.selectedSampleFlowCell.length == 0" (click)="remove($event)">
-                            <img [src]="this.constService.ICON_DELETE" >
+                            <img [src]="this.constService.ICON_DELETE" alt="">
                             Remove
                         </button>
                         <button mat-button (click)="clearAll($event)">
-                            <img [src]="this.constService.ICON_FOLDER_DELETE" >
+                            <img [src]="this.constService.ICON_FOLDER_DELETE" alt="">
                             Clear All
                         </button>
                     </div>
@@ -51,7 +52,8 @@
                                          [enableColResize]="true"
                                          (treeDrop)="onDrop($event)"
                                          (rowSelected)="onGridRowSelected($event)"
-                                         [treeAllowDrop]="allowDrop.bind(this)">
+                                         [treeAllowDrop]="allowDrop.bind(this)"
+                                         aria-label="Flow cell lanes">
                         </ag-grid-angular>
                     </div>
                 </div>

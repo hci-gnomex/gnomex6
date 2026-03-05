@@ -9,6 +9,7 @@
 					<div class="flex-grow">
 						<custom-combo-box style="width: 100%; font-size: small;"
 										  placeholder="Select a lab..."
+										  aria-label="Lab"
 										  formControlName="lab"
 										  [displayField]="this.prefService.labDisplayField" [options]="labList"
 										  (optionSelected)="onLabListSelection($event)">

@@ -1,10 +1,12 @@
-<mat-menu #childMenu="matMenu" [overlapTrigger]="false" class="no-max-width" role="menu">
+<mat-menu #childMenu="matMenu">
   <span *ngFor="let child of items">
     <!-- Handle branch node menu items -->
     <span *ngIf="child.children && child.children.length > 0">
       <button mat-menu-item
-              color="primary" [hidden]="child.hidden" [matMenuTriggerFor]="menu.childMenu"
-              aria-haspopup="menu"
+              color="primary"
+              [hidden]="child.hidden"
+              [matMenuTriggerFor]="menu.childMenu"
+              [attr.aria-haspopup]="'menu'"
               [attr.aria-label]="child.displayName + ' submenu'">
         <img class="icon" *ngIf="child.iconName" src="{{child.iconName}}" [attr.alt]="child.displayName + ' icon'">
         <span>{{child.displayName}}</span>
@@ -15,7 +17,8 @@
     <span *ngIf="!child.children || child.children.length === 0">
       <span *ngIf="child.divider===undefined;else divider">
         <button *ngIf="child.callback" mat-menu-item
-                class="child.class" [hidden]="child.hidden"
+                class="child.class"
+                [hidden]="child.hidden"
                 (click)="child.callback(child?.params)"
                 role="menuitem"
                 [attr.aria-label]="child.displayName">
@@ -23,7 +26,8 @@
           <span>{{child.displayName}}</span>
         </button>
         <button *ngIf="!child.callback" mat-menu-item
-                class="child.class" [hidden]="child.hidden"
+                class="child.class"
+                [hidden]="child.hidden"
                 (click)="setNavModeType()"
                 [routerLink]="child.route" [queryParams]="{id:child.idCoreFacility}"
                 role="menuitem"

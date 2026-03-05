@@ -24,27 +24,27 @@ import {LinkedSampleFileComponent} from "./linked-sample-file.component";
 import {AccessibilityModule} from "../accessibility/accessibility.module";
 
 @NgModule({
-  imports: [
-    CommonModule,
-    MatButtonModule,
-    MatDialogModule,
-    MatListModule,
-    MatTabsModule,
-    MatInputModule,
-    HttpClientModule,
-    MatTooltipModule,
-    TreeModule,
-    AgGridModule,
-    AngularSplitModule,
-    MatFormFieldModule,
-    UtilModule,
-    BrowserAnimationsModule,
-    MatProgressBarModule,
-    FormsModule,
-    ReactiveFormsModule,
-    AccessibilityModule
+    imports: [
+        CommonModule,
+        MatButtonModule,
+        MatDialogModule,
+        MatListModule,
+        MatTabsModule,
+        MatInputModule,
+        HttpClientModule,
+        MatTooltipModule,
+        TreeModule,
+        AgGridModule,
+        AngularSplitModule,
+        MatFormFieldModule,
+        UtilModule,
+        BrowserAnimationsModule,
+        MatProgressBarModule,
+        FormsModule,
+      ReactiveFormsModule,
+      AccessibilityModule
 
-  ],
+    ],
     declarations: [ UploadFileComponent,
         ManageFilesDialogComponent,
         OrganizeFilesComponent,

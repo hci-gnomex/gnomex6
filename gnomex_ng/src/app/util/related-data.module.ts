@@ -15,15 +15,15 @@ import {AccessibilityModule} from "./accessibility/accessibility.module";
 
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    ServicesModule,
-    TreeModule,
+    imports: [
+        CommonModule,
+        FormsModule,
+        ServicesModule,
+        TreeModule,
     AngularMaterialModule,
     AccessibilityModule
 
-  ],
+    ],
     declarations: [
         RelatedDataTabComponent
     ],

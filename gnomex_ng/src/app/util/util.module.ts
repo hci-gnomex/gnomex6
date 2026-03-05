@@ -44,21 +44,21 @@ import {CustomMultiComboBoxComponent} from "./custom-multi-combo-box.component";
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {AccessibilityModule} from "./accessibility/accessibility.module";
 @NgModule({
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    AngularMaterialModule,
-    AgGridModule.withComponents([
-      CheckboxRenderer,
-    ]),
-    AngularEditorModule,
-    AngularSplitModule,
-    TreeModule,
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        CommonModule,
+        FormsModule,
+        ReactiveFormsModule,
+        AngularMaterialModule,
+        AgGridModule.withComponents([
+            CheckboxRenderer,
+        ]),
+        AngularEditorModule,
+        AngularSplitModule,
+        TreeModule,
     AccessibilityModule,
-  ],
+    ],
     declarations: [
         BillingUsageReportComponent,
         BrowseFilterComponent,

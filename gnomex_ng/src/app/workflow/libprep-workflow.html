@@ -14,7 +14,8 @@
                               [customOptionClasses]="'small-font padded inline-block full-width'"
                               [options]="this.requestIds"
                               [allowNone]="false"
-                              (optionSelected)="selectRequestOption()">
+                              (optionSelected)="selectRequestOption()"
+                              aria-label="Request #">
             </custom-combo-box>
         </div>
         <div class="experiment-type-width padded">
@@ -24,7 +25,8 @@
                               [(ngModel)]="codeStepNext"
                               [customOptionClasses]="'small-font padded inline-block full-width'"
                               [options]="this.codeStepArray"
-                              (optionSelected)="selectExperimentType()">
+                              (optionSelected)="selectExperimentType()"
+                              aria-label="Experiment Type">
             </custom-combo-box>
         </div>
         <div class="flex-grow">
@@ -34,7 +36,7 @@
         </mat-label>
     </div>
     <div class="flex-grow padded-bottom" appAgGridHeaderA11yFix appFocusManager>
-        <div #oneEmWidth class="no-height single-em"></div>
+        <div #oneEmWidth class="no-height single-em" aria-hidden="true"></div>
         <ag-grid-angular class="ag-theme-fresh full-height full-width grid-min-height"
                          [enableColResize]="true"
                          [enableSorting]="true"
@@ -44,7 +46,8 @@
                          (cellValueChanged)="onCellValueChanged($event)"
                          (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
                          (gridReady)="onGridReady($event)"
-                         (gridSizeChanged)="onGridSizeChanged($event)">
+                         (gridSizeChanged)="onGridSizeChanged($event)"
+                         aria-label="Library prep work items">
         </ag-grid-angular>
     </div>
     <div class="flex-container-row align-baseline">

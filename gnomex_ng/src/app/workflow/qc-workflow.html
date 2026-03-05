@@ -14,7 +14,8 @@
                               [customOptionClasses]="'small-font padded inline-block full-width'"
                               [options]="requestIds"
                               [allowNone]="false"
-                              (optionSelected)="selectRequestOption()">
+                              (optionSelected)="selectRequestOption()"
+                              aria-label="Request #">
             </custom-combo-box>
         </div>
         <div class="core-facility-width padded">
@@ -24,7 +25,8 @@
                               [customOptionClasses]="'small-font padded inline-block full-width'"
                               [options]="cores"
                               [disabled]="cores.length === 1"
-                              (optionSelected)="selectCoreOption()">
+                              (optionSelected)="selectCoreOption()"
+                              aria-label="Core facility">
             </custom-combo-box>
         </div>
         <div class="flex-grow">
@@ -44,7 +46,8 @@
                          (cellValueChanged)="onCellValueChanged($event)"
                          (gridReady)="onGridReady($event)"
                          (gridSizeChanged)="onGridSizeChanged($event)"
-                         (rowDataChanged)="onNotifyGridRowDataChanged($event)">
+                         (rowDataChanged)="onNotifyGridRowDataChanged($event)"
+                         aria-label="QC work items">
         </ag-grid-angular>
     </div>
     <div class="flex-container-row align-baseline">

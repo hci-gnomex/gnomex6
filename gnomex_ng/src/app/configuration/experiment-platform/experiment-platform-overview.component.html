@@ -8,6 +8,7 @@
                     </div>
                     <div class="flex-grow padded-left-right" appAgGridHeaderA11yFix appFocusManager>
                         <ag-grid-angular class="ag-theme-fresh full-height full-width"
+                                         aria-label="Experiment Platforms"
                                          [gridOptions]="gridOpt"
                                          [columnDefs]="columnDefs"
                                          [rowSelection]="rowSelection"
@@ -19,10 +20,10 @@
                     </div>
                     <div *ngIf="secAdvisor.isSuperAdmin" class="flex-container-row padded">
                         <button mat-button color="primary" type="button" (click)="addPlatform($event)">
-                            <img class="icon" [src]="constService.ICON_ADD"> Add Platform
+                            <img class="icon" [src]="constService.ICON_ADD" alt=""> Add Platform
                         </button>
                         <button [disabled]="selectedPlatformList.length === 0" mat-button color="primary" type="button" (click)="removePlatform($event)">
-                            <img class="icon" [src]="constService.ICON_DELETE"> Remove Platform
+                            <img class="icon" [src]="constService.ICON_DELETE" alt=""> Remove Platform
                         </button>
                     </div>
                 </div>
@@ -40,7 +41,7 @@
                     <div class="flex-container-row">
                         <div *ngIf="secAdvisor.isSuperAdmin" class="padded">
                             <button mat-button color="primary" (click)="refresh()" >
-                                <img class="icon" [src]="constService.ICON_REFRESH"> Refresh
+                                <img class="icon" [src]="constService.ICON_REFRESH" alt=""> Refresh
                             </button>
                         </div>
                         <save-footer *ngIf="!removeSave && selectedPlatformList.length > 0" style="width: 100%"

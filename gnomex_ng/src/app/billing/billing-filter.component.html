@@ -35,6 +35,7 @@
         <div class="flex-container-row align-center">
             <custom-combo-box class="core-facility-width padded-left-right"
                               placeholder="Core Facility"
+                              aria-label="Core Facility"
                               [customOptionClasses]="'small-font padded inline-block full-width'"
                               [allowNone]="false"
                               [options]="this.coreFacilityList"
@@ -48,6 +49,7 @@
             </div>
             <custom-combo-box class="lab-display-width padded-left-right"
                               placeholder="Lab Group"
+                              aria-label="Lab Group"
                               [options]="this.filteredLabList"
                               [customOptionClasses]="'small-font padded inline-block full-width'"
                               valueField="idLab"
@@ -56,6 +58,7 @@
             </custom-combo-box>
             <custom-combo-box class="account-display-width padded-left-right"
                               placeholder="Account"
+                              aria-label="Account"
                               [options]="this.billingAccountList"
                               [customOptionClasses]="'small-font padded inline-block full-width'"
                               displayField="accountNameDisplay"

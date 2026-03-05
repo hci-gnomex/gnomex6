@@ -31,16 +31,16 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
 @Component({
     templateUrl: './experiment-platform-overview.component.html',
     styles:[`
-        
+
         .active-item {
             /*color: #636c72;*/
             background-color: #c8c8c8;
         }
-        
+
         .background {
             background-color: whitesmoke;
         }
-        
+
         .foreground {
             background-color: white;
         }

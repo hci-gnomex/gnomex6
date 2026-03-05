@@ -37,9 +37,9 @@ import {BillingModule} from "./billing/billing.module";
 import {CustomRouteReuseStrategy} from "./custom-route-reuse-strategy";
 import {AuthenticationModule} from "./auth/authentication.module";
 import {
-  AUTHENTICATION_DIRECT_ENDPOINT,
-  AUTHENTICATION_LOGOUT_PATH, AUTHENTICATION_MAX_INACTIVITY_MINUTES,
-  AUTHENTICATION_ROUTE, AUTHENTICATION_TOKEN_ENDPOINT, AuthenticationService
+    AUTHENTICATION_DIRECT_ENDPOINT,
+    AUTHENTICATION_LOGOUT_PATH, AUTHENTICATION_MAX_INACTIVITY_MINUTES,
+    AUTHENTICATION_ROUTE, AUTHENTICATION_TOKEN_ENDPOINT, AuthenticationService
 } from "./auth/authentication.service";
 import {AUTHENTICATION_TOKEN_KEY} from "./auth/authentication.provider";
 import {UserModule} from "./hci-user/user.module";
@@ -53,87 +53,87 @@ import {MatDialogModule} from "@angular/material";
 import { TreeDraggedElement } from '@circlon/angular-tree-component';
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {
-  prefix: "gnomex",
-  storageType: "localStorage"
+    prefix: "gnomex",
+    storageType: "localStorage"
 };
 
 // Create a Factory for our JwtModule config since Angular doesn't allow functions in decorators.
 // Also, we have to add the export keyword, otherwise Angular complains again
 export function JwtModuleConfigFactory() {
-  return localStorage.getItem('access_token');
+    return localStorage.getItem('access_token');
 }
 
 // Function to retrieve the token from local storage
 export function tokenGetter() {
-  return localStorage.getItem("access_token");
+    return localStorage.getItem("access_token");
 }
 
 /**
  * @since 1.0.0
  */
 @NgModule({
-  imports: [
-    BrowserModule,
-    APP_ROUTING,
-    HttpClientModule,
-    RouterModule,
-    FormsModule,
-    HeaderModule,
-    HomeModule,
-    UserModule,
-    ExperimentsModule,
-    ConfigurationModule,
-    AboutModule,
-    NewBillingAccountModule,
-    ServicesModule,
-    LocalStorageModule.withConfig(localStorageServiceConfig),
-    AuthenticationModule.forRoot(),
-    CommonModule,
-    BrowserAnimationsModule,
-    AnalysisModule,
-    DatatracksModule,
-    TopicsModule,
-    MatIconModule,
-    MatDialogModule,
-    ReportsModule,
-    TestPageModule,
-    AccountModule,
-    UsersGroupsTablistModule,
-    WorkflowModule,
-    ProductsModule,
-    BillingModule,
-    AngularSplitModule,
-    RegisterUserModule,
-    JwtModule.forRoot({
-      config: {
-        tokenGetter: tokenGetter
-      }
-    }),
-  ],
-  declarations: [GnomexAppComponent],
-  bootstrap: [GnomexAppComponent],
-  providers: [
-    {provide: BROWSE_EXPERIMENTS_ENDPOINT, useValue: "/gnomex/GetExperimentOverviewList.gx"},
-    {provide: AUTHENTICATED_USER_ENDPOINT, useValue: "/gnomex/api/user/authenticated"},
-    {provide: AUTHENTICATION_DIRECT_ENDPOINT, useValue: "/gnomex/api/user-session"},
-    {provide: AUTHENTICATION_TOKEN_ENDPOINT, useValue: "/gnomex/api/token"},
-    {provide: AUTHENTICATION_LOGOUT_PATH, useValue: "/gnomex/logout"},
-    {provide: AUTHENTICATION_ROUTE, useValue: "/authenticate"},
-    // {provide: AUTHENTICATION_TOKEN_KEY, useValue: "core-jwt"},
-    {provide: AUTHENTICATION_TOKEN_KEY, useValue: "gnomex-jwt"},
-    {provide: AUTHENTICATION_MAX_INACTIVITY_MINUTES, useValue: 1440},
-    {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy},
-    {provide: HTTP_INTERCEPTORS, useClass: ErrorHandlerInterceptor, multi: true },
-    {provide: Window, useValue: window},
-    ...WINDOW_PROVIDERS,
+    imports: [
+        BrowserModule,
+        APP_ROUTING,
+        HttpClientModule,
+        RouterModule,
+        FormsModule,
+        HeaderModule,
+        HomeModule,
+        UserModule,
+        ExperimentsModule,
+        ConfigurationModule,
+        AboutModule,
+        NewBillingAccountModule,
+        ServicesModule,
+        LocalStorageModule.withConfig(localStorageServiceConfig),
+        AuthenticationModule.forRoot(),
+        CommonModule,
+        BrowserAnimationsModule,
+        AnalysisModule,
+        DatatracksModule,
+        TopicsModule,
+        MatIconModule,
+        MatDialogModule,
+        ReportsModule,
+        TestPageModule,
+        AccountModule,
+        UsersGroupsTablistModule,
+        WorkflowModule,
+        ProductsModule,
+        BillingModule,
+        AngularSplitModule,
+        RegisterUserModule,
+        JwtModule.forRoot({
+            config: {
+                tokenGetter: tokenGetter
+            }
+        }),
+   ],
+    declarations: [GnomexAppComponent],
+    bootstrap: [GnomexAppComponent],
+    providers: [
+        {provide: BROWSE_EXPERIMENTS_ENDPOINT, useValue: "/gnomex/GetExperimentOverviewList.gx"},
+        {provide: AUTHENTICATED_USER_ENDPOINT, useValue: "/gnomex/api/user/authenticated"},
+        {provide: AUTHENTICATION_DIRECT_ENDPOINT, useValue: "/gnomex/api/user-session"},
+        {provide: AUTHENTICATION_TOKEN_ENDPOINT, useValue: "/gnomex/api/token"},
+        {provide: AUTHENTICATION_LOGOUT_PATH, useValue: "/gnomex/logout"},
+        {provide: AUTHENTICATION_ROUTE, useValue: "/authenticate"},
+        // {provide: AUTHENTICATION_TOKEN_KEY, useValue: "core-jwt"},
+        {provide: AUTHENTICATION_TOKEN_KEY, useValue: "gnomex-jwt"},
+        {provide: AUTHENTICATION_MAX_INACTIVITY_MINUTES, useValue: 1440},
+        {provide: RouteReuseStrategy, useClass: CustomRouteReuseStrategy},
+        {provide: HTTP_INTERCEPTORS, useClass: ErrorHandlerInterceptor, multi: true },
+        {provide: Window, useValue: window},
+        ...WINDOW_PROVIDERS,
 
-    UserService,
-    AuthenticationService,
-    ExperimentsService,
-    ProgressService,
-    CookieService,
-    TreeDraggedElement,
-  ]
+        UserService,
+        AuthenticationService,
+        ExperimentsService,
+        ProgressService,
+        CookieService,
+        TreeDraggedElement,
+    ]
 })
 export class GnomexAppModule {
 }

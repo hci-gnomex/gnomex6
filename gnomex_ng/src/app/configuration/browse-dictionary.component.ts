@@ -54,7 +54,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                     </div>
                 </div>
                 <div appFocusManager class="tree-container">
-                    <tree-root  #treeComponent
+                    <tree-root #treeComponent
                                (activate)="this.selectTreeItem($event)"
                                [nodes]="this.dictionaries"
                                [options]="treeOptions">

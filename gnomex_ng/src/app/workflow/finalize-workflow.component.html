@@ -13,7 +13,7 @@
     </div>
     <as-split class="white-split-gutter" unit="percent">
         <as-split-area size="50" minSize="20">
-            <div class="flex-container-col full-height full-width padded">
+            <div class="flex-container-col full-height full-width padded" role="region" aria-label="Assembled flow cells">
                 <div #growToMatch class="flex-container-col full-width overflow-auto">
                     <div class="flex-grow">
                     </div>
@@ -39,13 +39,14 @@
                                      (gridReady)="onSelectionGridReady($event)"
                                      (gridSizeChanged)="onGridSizeChanged($event)"
                                      (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
-                                     (rowSelected)="onRowSelected($event)">
+                                     (rowSelected)="onRowSelected($event)"
+                                     aria-label="Assembled flow cells">
                     </ag-grid-angular>
                 </div>
             </div>
         </as-split-area>
         <as-split-area size="*" minSize="20">
-            <form [formGroup]="this.allFG" class="flex-container-col full-height full-width padded">
+            <form [formGroup]="this.allFG" class="flex-container-col full-height full-width padded" aria-label="Finalize flow cell">
                 <div #heightToMatch class="full-width overflow-auto">
                     <div class="flex-container-row">
                         <div class="italic title-color">
@@ -73,7 +74,7 @@
                         </mat-form-field>
                         <date-picker  [formControl]="this.createDateFC"  placeholder="Create Date" (change)="createFlowCellFileName()">
                         </date-picker>
-                        <mat-radio-group [formControl]="sideFC" class="flex-container-row children-margin-right" (change)="createFlowCellFileName()">
+                        <mat-radio-group [formControl]="sideFC" class="flex-container-row children-margin-right" (change)="createFlowCellFileName()" aria-label="Flow cell side">
                             <mat-radio-button value="A">Side A</mat-radio-button>
                             <mat-radio-button value="B">Side B</mat-radio-button>
                         </mat-radio-group>
@@ -109,8 +110,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager>
-                    <div #oneEmWidth2 class="no-height single-em"></div>
+                <div class="flex-grow">
+                    <div #oneEmWidth2 class="no-height single-em" aria-hidden="true"></div>
                     <ag-grid-angular class="ag-theme-fresh full-height full-width min-grid-size"
                                      [enableColResize]="true"
                                      [enableSorting]="true"
@@ -121,7 +122,8 @@
                                      [stopEditingWhenGridLosesFocus]="true"
                                      (cellValueChanged) = "onCellValueChanged($event)"
                                      (gridReady)="onDetailGridReady($event)"
-                                     (rowDataChanged)="this.onNotifyGridRowDataChanged($event)">
+                                     (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
+                                     aria-label="Flow cell lanes">
                     </ag-grid-angular>
                 </div>
             </form>

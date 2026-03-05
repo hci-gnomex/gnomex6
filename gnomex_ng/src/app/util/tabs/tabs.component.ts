@@ -12,10 +12,15 @@ import {Form, FormGroup} from "@angular/forms";
     selector: 'tabs',
 
     template: `
-        <ul #container class="tabs-nav">
+        <ul #container class="tabs-nav" role="tablist" aria-label="Navigation tabs">
                 <li class="tab-item"  [ngClass]="{  'disable-tab':!tab.enable, 'active-tab':tab.active, 'error':!tab.valid}"
-                    *ngFor="let tab of tabs" (click)="selectTab(tab)" >
-                    <a class="tab-link" >
+                    *ngFor="let tab of tabs" (click)="selectTab(tab)"
+                    role="tab"
+                    [attr.aria-selected]="tab.active"
+                    [attr.aria-disabled]="!tab.enable"
+                    [attr.aria-label]="tab.title"
+                    [attr.tabindex]="tab.active ? 0 : -1">
+                    <a class="tab-link" aria-hidden="true">
                         {{tab.title}}</a>
                 </li>
         </ul>

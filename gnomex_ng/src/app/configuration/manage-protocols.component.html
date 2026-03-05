@@ -1,13 +1,13 @@
 <div class="full-width full-height" style="max-height: 100%;">
     <as-split>
         <as-split-area [size]="25">
-            <div class="flex-container-col full-width full-height padded-left-right border">
-                <div class="full-width no-overflow padded-top-bottom">
+            <div class="flex-container-col full-width full-height padded-left-right border" role="region" aria-label="Protocols">
+                <div class="full-width no-overflow padded-top-bottom" aria-hidden="true">
                     Protocols
                 </div>
                 <div class="full-width flex-grow no-overflow">
                     <div appFocusManager class="full-width full-height border no-overflow">
-                        <tree-root  #navigationTree
+                        <tree-root #navigationTree
                                    [nodes]="protocolList"
                                    [options]="treeOptions"
                                    (activate)="treeOnSelect($event)">

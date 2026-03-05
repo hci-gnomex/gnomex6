@@ -1,15 +1,15 @@
 import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  EventEmitter, HostBinding,
-  Injector,
-  Input,
-  OnChanges,
-  OnDestroy,
-  Output, SimpleChange,
-  SimpleChanges,
-  ViewChild
+    AfterViewInit,
+    Component,
+    ElementRef,
+    EventEmitter, HostBinding,
+    Injector,
+    Input,
+    OnChanges,
+    OnDestroy,
+    Output, SimpleChange,
+    SimpleChanges,
+    ViewChild
 } from "@angular/core";
 import {AbstractControl, ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, NgControl} from "@angular/forms";
 import {Observable, Subscription} from "rxjs";

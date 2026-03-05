@@ -64,8 +64,8 @@
                         Folder
                     </div>
                     <div class="full-width flex-grow left-right-padded overflow-auto">
-                        <div class="full-height full-width border-subtle" role="tree" aria-labelledby="folder-heading">
-                            <tree-root appFocusManager #organizeTree
+                        <div appFocusManager class="full-height full-width border-subtle" role="tree" aria-labelledby="folder-heading">
+                            <tree-root #organizeTree
                                        *ngIf="showFileTrees && organizeFiles"
                                        (activate)="organizeTreeOnSelect($event)"
                                        (initialized)="initOrganizeTree($event)"

@@ -1,28 +1,31 @@
 <!--<h6 mat-dialog-title>Configure Product Types</h6>-->
 <div class="flex-container-col full-width full-height padded">
     <div class="flex-container-row margin-bottom">
-        <button mat-button (click)="this.addProductType()"><img class="icon" [src]="'./assets/page_add.png'">Add Product Type</button>
-        <button mat-button [disabled]="this.selectedProductType == null || this.selectedProductType.canDelete != 'Y'" (click)="this.removeProductType()"><img class="icon" [src]="'./assets/page_remove.png'">Remove Product Type</button>
+        <button mat-button (click)="this.addProductType()"><img class="icon" [src]="'./assets/page_add.png'" alt="">Add Product Type</button>
+        <button mat-button [disabled]="this.selectedProductType == null || this.selectedProductType.canDelete != 'Y'" (click)="this.removeProductType()"><img class="icon" [src]="'./assets/page_remove.png'" alt="">Remove Product Type</button>
     </div>
     <div appFocusManager class="flex-container-row">
         <tree-root  #tree class="flex-one margin-right border-right" [nodes]="this.nodes" [options]="this.options" (activate)="this.onActivate($event)"></tree-root>
         <div [hidden]="this.selectedProductType" class="flex-three">{{''}}</div>
-        <form [formGroup]="this.form" class="flex-three flex-container-col" [hidden]="!this.selectedProductType">
+        <form [formGroup]="this.form" class="flex-three flex-container-col" [hidden]="!this.selectedProductType" aria-label="Product type details">
             <custom-combo-box class="full-width" placeholder="General - Core Facility"
                               [options]="this.coreFacilities"
                               valueField="idCoreFacility" displayField="display"
-                              [formControlName]="'coreFacility'">
+                              [formControlName]="'coreFacility'"
+                              aria-label="Core Facility">
             </custom-combo-box>
             <custom-combo-box class="full-width" placeholder="General - Vendor"
                               [options]="this.vendors"
                               valueField="idVendor" displayField="display"
-                              [formControlName]="'vendor'">
+                              [formControlName]="'vendor'"
+                              aria-label="Vendor">
             </custom-combo-box>
             <div class="flex-container-row full-width">
                 <custom-combo-box class="flex-one margin-right" placeholder="Price Category"
                                   [options]="this.priceCategories"
                                   valueField="idPriceCategory" displayField="display"
-                                  [formControlName]="'priceCategory'">
+                                  [formControlName]="'priceCategory'"
+                                  aria-label="Price Category">
                 </custom-combo-box>
                 <button class="flex-one margin-right" mat-button color="accent" (click)="this.toggleNewPriceCategory()">{{this.showNewPriceCategoryInput ? 'Close' : 'New'}}</button>
                 <mat-form-field [hidden]="!this.showNewPriceCategoryInput" class="flex-one margin-right">

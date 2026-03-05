@@ -1,4 +1,4 @@
-<form [formGroup]="formGroup">
+<form [formGroup]="formGroup" aria-label="Library Prep Protocol">
     <div class="flex-container-col full-height full-width">
         <div style="margin: 0.5em;">
             <div class="flex-container-row spaced-children-margin align-center">
@@ -27,8 +27,8 @@
                               valueField="value" displayField="display"
                               [formControlName]="'idApplicationTheme'">
             </custom-combo-box>
-            <div class="flex-container-col">
-                <label class="gx-label"> Experiment Platform Compatibility </label>
+            <div class="flex-container-col" role="group" aria-labelledby="ep-compat-label">
+                <label class="gx-label" id="ep-compat-label"> Experiment Platform Compatibility </label>
                 <ng-container *ngFor="let app of reqCategoryAppList">
                     <mat-checkbox *ngIf="showReqCategoryCheckbox(app)" [formControlName]="app.value">
                         {{app.requestCategory}}
@@ -51,7 +51,7 @@
             <div class="flex-container-row spaced-children-margin" style="font-size: small">
                 <div class="flex-container-col " style="flex:2">
                     <label class="gx-label"> Availability </label>
-                    <mat-radio-group class="flex-container-col"  formControlName="onlyForLabPrepped">
+                    <mat-radio-group class="flex-container-col" aria-label="Availability" formControlName="onlyForLabPrepped">
                         <mat-radio-button  value="N">
                             Always Available
                         </mat-radio-button>

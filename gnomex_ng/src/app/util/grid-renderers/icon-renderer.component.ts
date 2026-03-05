@@ -4,8 +4,8 @@ import {ICellRendererParams} from "ag-grid-community";
 
 @Component({
     template: `
-        <div>
-            <img [src]="iconSource" alt=""/>
+        <div role="gridcell" aria-label="Icon">
+            <img [src]="iconSource" alt="" aria-hidden="true"/>
         </div>
     `,
     styles: [`        

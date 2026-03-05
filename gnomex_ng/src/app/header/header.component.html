@@ -1,43 +1,45 @@
 <div #headerRef
+     (mouseenter)="onMouseIn($event)"
+     (mouseleave)="onMouseOut($event)"
      *ngIf="showHeader"
      class="full-width header-one small-font align-center overflow-auto animation"
-     role="banner"
-     (mouseenter)="onMouseIn($event)"
-     (mouseleave)="onMouseOut($event)" xmlns:color="http://www.w3.org/1999/xhtml">
+     role="banner">
     <div class="flex-container-row align-center foreground">
         <div class="flex-grow flex-container-row">
             <a [routerLink]="['/home']" aria-label="GNomEx home">
                 <img [src]="'./assets/gnomex_logo_big.png'" alt="GNomEx logo - navigate to home">
-              <p><sup style="color: #004C9E;">  6.rev8.15</sup></p>
+                <p><sup style="color: #004C9E;"> 6.rev8.19</sup></p>
             </a>
             <div class="flex-container-row flex-grow align-center">
                 <div class="flex-grow">
                 </div>
-                <button mat-raised-button class="minimize" (click)="togglePinned()"
-                        [attr.aria-label]="headerIsPinned ? 'Unpin header' : 'Pin header'"
-                        [attr.aria-pressed]="headerIsPinned">
-                    <img *ngIf="headerIsPinned"  [src]="'./assets/Collapse.png'" alt="Header is pinned">
+                <button (click)="togglePinned()" [attr.aria-label]="headerIsPinned ? 'Unpin header' : 'Pin header'" [attr.aria-pressed]="headerIsPinned"
+                        class="minimize"
+                        mat-raised-button>
+                    <img *ngIf="headerIsPinned" [src]="'./assets/Collapse.png'" alt="Header is pinned">
                     <img *ngIf="!headerIsPinned" [src]="'./assets/Pushpin.png'" alt="Header is not pinned">
                 </button>
                 <div class="flex-grow">
                 </div>
             </div>
         </div>
-        <div class="flex-container-row padded-left-right align-center" role="search" aria-label="Header search">
-            <mat-form-field class="padded-left-right"
+        <div aria-label="Header search" class="flex-container-row padded-left-right align-center" role="search">
+            <mat-form-field [floatLabel]="options.value.floatPlaceholder"
                             [hideRequiredMarker]="options.value.hideRequired"
-                            [floatLabel]="options.value.floatPlaceholder">
-                <input matInput type="text" [(ngModel)]="objNumber" placeholder="Lookup by #" aria-label="Lookup by experiment number" (keyup)="ifPressEnterSearchByNumber($event)">
+                            class="padded-left-right">
+                <input (keyup)="ifPressEnterSearchByNumber($event)" [(ngModel)]="objNumber" aria-label="Lookup by experiment number" matInput
+                       placeholder="Lookup by #" type="text">
             </mat-form-field>
-            <button mat-raised-button class="minimize" (click)="searchNumber()" aria-label="Search by number">
+            <button (click)="searchNumber()" aria-label="Search by number" class="minimize" mat-raised-button>
                 <img [src]="'./assets/arrow_right.png'" alt="Search by number">
             </button>
             <div class="horizontal-spacer">
             </div>
             <mat-form-field class="padded-left-right" floatLabel='auto'>
-                <input matInput class="flex-grow" [(ngModel)]="searchText" placeholder="Search" aria-label="Search by text" (keyup)="ifPressEnterSearchByText($event)">
+                <input (keyup)="ifPressEnterSearchByText($event)" [(ngModel)]="searchText" aria-label="Search by text" class="flex-grow"
+                       matInput placeholder="Search">
             </mat-form-field>
-            <button mat-raised-button class="minimize" (click)="searchByText()" aria-label="Submit text search">
+            <button (click)="searchByText()" aria-label="Submit text search" class="minimize" mat-raised-button>
                 <img [src]="'./assets/magnifier.png'" alt="Submit text search">
             </button>
         </div>
@@ -45,7 +47,7 @@
             <div class="flex-container-row flex-grow align-center">
                 <div class="flex-grow">
                 </div>
-                <div class="large-font" style="color: #ED0000" role="alert" aria-label="Research use disclaimer">
+                <div aria-label="Research use disclaimer" class="large-font" role="alert" style="color: #ED0000">
                     FOR RESEARCH ONLY
                 </div>
                 <div class="flex-grow">
@@ -53,28 +55,35 @@
             </div>
             <div *ngFor="let item of linkNavItems">
                 <!-- Handle branch node buttons here -->
-                <span *ngIf="item.children && item.children.length > 0">
-                    <button mat-button
-                            [ngClass]="item.class"
-                            [matMenuTriggerFor]="menu.childMenu"
-                            [disabled]="item.disabled"
-                            aria-haspopup="menu"
-                            [attr.aria-label]="item.displayName + ' menu'">
-                        <img class="icon" *ngIf="item?.iconName" [src]="item.iconName" [attr.alt]="item.displayName + ' icon'">
-                        {{ item.displayName }}
-                    </button>
-                    <app-menu-item #menu [items]="item.children"></app-menu-item>
+                <span *ngIf="item.children && item.children.length > 0" class="full-height">
+                <button mat-button
+                        #menuTrigger="matMenuTrigger"
+                        [attr.aria-label]="item.displayName + ' menu'"
+                        [attr.aria-expanded]="menuTrigger.menuOpen"
+                        [attr.aria-haspopup]="'menu'"
+                        [disabled]="item.disabled"
+                        [hidden]="item.hidden"
+                        [matMenuTriggerFor]="menu.childMenu"
+                        class="top-menu-item full-height full-width">
+                    <img *ngIf="item.iconName" [attr.alt]="item.displayName + ' icon'" [src]="item.iconName" class="icon">
+                    <span> {{item.displayName}} </span>
+                </button>
+                <app-menu-item #menu [items]="item.children"></app-menu-item>
                 </span>
+
                 <!-- Leaf node buttons here -->
                 <span *ngIf="!item.children || item.children.length === 0">
-                    <button *ngIf="item.callback" [ngClass]="item.class" mat-button (click)="item.callback(item?.params)"
-                            [attr.aria-label]="item.displayName">
-                        <img class="icon" *ngIf="item?.iconName" [src]="item.iconName" [attr.alt]="item.displayName + ' icon'">
+                    <button (click)="item.callback(item?.params)" *ngIf="item.callback" [attr.aria-label]="item.displayName"
+                            [ngClass]="item.class"
+                            mat-button>
+                        <img *ngIf="item?.iconName" [attr.alt]="item.displayName + ' icon'" [src]="item.iconName"
+                             class="icon">
                         {{ item.displayName }}
                     </button>
-                    <button *ngIf="!item.callback" [ngClass]="item.class" mat-button [routerLink]="item.route"
-                            [attr.aria-label]="item.displayName">
-                        <img class="icon" *ngIf="item?.iconName" [src]="item.iconName" [attr.alt]="item.displayName + ' icon'">
+                    <button *ngIf="!item.callback" [attr.aria-label]="item.displayName" [ngClass]="item.class" [routerLink]="item.route"
+                            mat-button>
+                        <img *ngIf="item?.iconName" [attr.alt]="item.displayName + ' icon'" [src]="item.iconName"
+                             class="icon">
                         {{ item.displayName }}
                     </button>
                 </span>
@@ -82,29 +91,32 @@
         </div>
         <!--<mat-list></mat-list>-->
     </div>
-    <nav class="flex-container-row header-two" role="navigation" aria-label="Main navigation">
-        <span *ngFor="let item of navItems" class="full-height" [ngClass]="item.class">
+    <nav aria-label="Main navigation" class="flex-container-row header-two" role="navigation">
+        <span *ngFor="let item of navItems" [ngClass]="item.class" class="full-height">
             <!-- Handle branch node buttons here -->
-            <span *ngIf="item.children && item.children.length > 0" class="full-height">
-                <button mat-button
-                        class="top-menu-item full-height full-width"
-                        [hidden]="item.hidden"
-                        [matMenuTriggerFor]="menu.childMenu"
-                        [disabled]="item.disabled"
-                        aria-haspopup="menu"
-                        [attr.aria-label]="item.displayName + ' menu'">
-                    <img class="icon" *ngIf="item.iconName" [src]="item.iconName" [attr.alt]="item.displayName + ' icon'">
-                    <span> {{item.displayName}} </span>
-                </button>
-                <app-menu-item #menu [items]="item.children"></app-menu-item>
-            </span>
+        <span *ngIf="item.children && item.children.length > 0" class="full-height">
+        <button mat-button
+            #menuTrigger="matMenuTrigger"
+            [attr.aria-label]="item.displayName + ' menu'"
+            [attr.aria-expanded]="menuTrigger.menuOpen"
+            [attr.aria-haspopup]="'menu'"
+            [disabled]="item.disabled"
+            [hidden]="item.hidden"
+            [matMenuTriggerFor]="menu.childMenu"
+            class="top-menu-item full-height full-width">
+        <img *ngIf="item.iconName" [attr.alt]="item.displayName + ' icon'" [src]="item.iconName" class="icon">
+        <span> {{item.displayName}} </span>
+        </button>
+    <app-menu-item #menu [items]="item.children"></app-menu-item>
+        </span>
             <!-- Leaf node buttons here -->
             <span *ngIf="!item.children || item.children.length === 0" class="full-height">
-                <button mat-button class="top-menu-item full-height full-width" [hidden]="item.hidden"
+                <button (click)="setNavModeType()" [attr.aria-label]="item.displayName" [hidden]="item.hidden"
                         [routerLink]="item.route"
-                        (click)="setNavModeType()"
-                        [attr.aria-label]="item.displayName">
-                    <img class="icon" *ngIf="item.iconName" [src]="item.iconName" [attr.alt]="item.displayName + ' icon'">
+                        class="top-menu-item full-height full-width"
+                        mat-button>
+                    <img *ngIf="item.iconName" [attr.alt]="item.displayName + ' icon'" [src]="item.iconName"
+                         class="icon">
                     <span>{{item.displayName}}</span>
                 </button>
             </span>
