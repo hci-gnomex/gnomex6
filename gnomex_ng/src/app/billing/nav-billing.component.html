@@ -70,7 +70,7 @@
                                 </div>
                             </mat-tab>
                             <mat-tab label="Prices">
-                                <div class="full-height full-width flex-container-col overflow-auto">
+                                <div class="full-height full-width flex-container-col overflow-auto" appFocusManager [toolbarSelector]="'price-toolbar'" >
                                     <div>
                                         <button *ngFor="let sheet of priceTreeGridData" mat-button class="minimize smaller-font price-sheet-link" (click)="jumpToPriceSheet(sheet.idPriceSheet)">{{sheet.display}}</button>
                                     </div>
