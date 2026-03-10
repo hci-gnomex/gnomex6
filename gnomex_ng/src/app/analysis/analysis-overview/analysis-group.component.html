@@ -17,7 +17,7 @@
                   aria-label="Analysis group description"
                   aria-describedby="description-error">
         </textarea>
-        <div id="description-error" style="color:red" role="alert" *ngIf="projectBrowseForm.get('description').hasError('maxlength')
+        <div id="description-error" style="color:#C62828" role="alert" *ngIf="projectBrowseForm.get('description').hasError('maxlength')
                                         && projectBrowseForm.get('description').touched">
             Description exceeded the 500 character limit
         </div>

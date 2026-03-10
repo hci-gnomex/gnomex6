@@ -8,7 +8,7 @@
                type="{{type}}"
                placeholder="{{ placeholder }}"
                required>
-        <div #myLabel *ngIf="showLabel" class="flex-container-row align-center invisible-background" [ngStyle]="labelStyle" (click)="onClick($event)">
+        <div #myLabel *ngIf="showLabel" class="flex-container-row align-center invisible-background" [ngStyle]="labelStyle" (click)="onClick($event)" role="button" tabindex="0" (keydown.enter)="onClick($event)" (keydown.space)="onClick($event)">
             <div class="label invisible-background">
                 <label for="theInput" class="invisible-background">{{ label }}</label>
             </div>

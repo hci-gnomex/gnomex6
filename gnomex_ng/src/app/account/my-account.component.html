@@ -2,31 +2,38 @@
     <h3>My Account</h3>
     <div class="formRow">
         <mat-form-field class="formField">
-            <input matInput placeholder="First Name" [formControl]="this.firstNameFC">
+            <mat-label>First Name</mat-label>
+            <input matInput placeholder="First Name" [formControl]="this.firstNameFC" autocomplete="given-name">
             <mat-error *ngIf="this.firstNameFC.hasError('required')">Required</mat-error>
         </mat-form-field>
         <mat-form-field class="formField">
-            <input matInput placeholder="Last Name" [formControl]="this.lastNameFC">
+            <mat-label>Last Name</mat-label>
+            <input matInput placeholder="Last Name" [formControl]="this.lastNameFC" autocomplete="family-name">
             <mat-error *ngIf="this.lastNameFC.hasError('required')">Required</mat-error>
         </mat-form-field>
         <mat-form-field class="formField">
-            <input matInput placeholder="Email" [formControl]="this.emailFC">
+            <mat-label>Email</mat-label>
+            <input matInput placeholder="Email" [formControl]="this.emailFC" autocomplete="email">
             <mat-error *ngIf="this.emailFC.hasError('required')">Required</mat-error>
             <mat-error *ngIf="this.emailFC.hasError('email') && !this.emailFC.hasError('required')">Valid Email Required</mat-error>
         </mat-form-field>
         <mat-form-field class="formField">
-            <input matInput placeholder="Phone" [formControl]="this.phoneFC">
+            <mat-label>Phone</mat-label>
+            <input matInput placeholder="Phone" [formControl]="this.phoneFC" autocomplete="tel">
         </mat-form-field>
     </div>
     <div class="formRow">
         <mat-form-field class="formField">
-            <input matInput placeholder="Institution (Optional)" [formControl]="this.institutionFC">
+            <mat-label>Institution (Optional)</mat-label>
+            <input matInput placeholder="Institution (Optional)" [formControl]="this.institutionFC" autocomplete="organization">
         </mat-form-field>
         <mat-form-field class="formField">
-            <input matInput placeholder="Department (Optional)" [formControl]="this.departmentFC">
+            <mat-label>Department (Optional)</mat-label>
+            <input matInput placeholder="Department (Optional)" [formControl]="this.departmentFC" autocomplete="off">
         </mat-form-field>
         <mat-form-field class="formField">
-            <input matInput placeholder="UCSC URL" [formControl]="this.urlFC">
+            <mat-label>UCSC URL</mat-label>
+            <input matInput placeholder="UCSC URL" [formControl]="this.urlFC" autocomplete="url">
         </mat-form-field>
     </div>
     <div class="formRow">
@@ -37,21 +44,25 @@
     </div>
     <div class="formRow" *ngIf="this.userType === this.USER_TYPE_UNIVERSITY">
         <mat-form-field class="formField">
-            <input matInput placeholder="uNID" [formControl]="this.unidFC">
+            <mat-label>uNID</mat-label>
+            <input matInput placeholder="uNID" [formControl]="this.unidFC" autocomplete="off">
             <mat-error *ngIf="this.unidFC.hasError('required') || this.unidFC.hasError('pattern')">Invalid uNID</mat-error>
         </mat-form-field>
     </div>
     <div class="formRow" *ngIf="this.userType === this.USER_TYPE_EXTERNAL">
         <mat-form-field class="formField">
-            <input matInput placeholder="User Name" [formControl]="this.usernameFC">
+            <mat-label>User Name</mat-label>
+            <input matInput placeholder="User Name" [formControl]="this.usernameFC" autocomplete="username">
             <mat-error *ngIf="this.usernameFC.hasError('required')">Required</mat-error>
         </mat-form-field>
         <mat-form-field class="formField">
-            <input matInput type="password" placeholder="Password" [formControl]="this.passwordFC">
+            <mat-label>Password</mat-label>
+            <input matInput type="password" placeholder="Password" [formControl]="this.passwordFC" autocomplete="new-password">
             <mat-error *ngIf="this.passwordFC.hasError('validatePassword')">{{this.passwordUtilService.PASSWORD_COMPLEXITY_ERROR}}</mat-error>
         </mat-form-field>
         <mat-form-field class="formField">
-            <input matInput type="password" placeholder="Confirm Password" [formControl]="this.passwordConfirmFC">
+            <mat-label>Confirm Password</mat-label>
+            <input matInput type="password" placeholder="Confirm Password" [formControl]="this.passwordConfirmFC" autocomplete="new-password">
             <mat-error *ngIf="this.passwordConfirmFC.hasError('validatePasswordConfirm')">{{this.passwordUtilService.PASSWORD_MATCH_ERROR}}</mat-error>
         </mat-form-field>
     </div>

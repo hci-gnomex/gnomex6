@@ -17,6 +17,7 @@
         <div *ngIf="this.selectedOrganism" class="three-quarters-width flex-container-col">
             <div class="full-width flex-container-row flex-one align-center">
                 <mat-form-field class="forty-percent-width margin-right">
+                    <mat-label>Name</mat-label>
                     <input matInput placeholder="Name" [formControl]="this.nameFC">
                     <mat-error *ngIf="this.nameFC.hasError('maxlength')">Exceeds max length</mat-error>
                 </mat-form-field>
@@ -24,34 +25,41 @@
             </div>
             <div class="full-width flex-container-row flex-one align-center">
                 <mat-form-field class="forty-percent-width margin-right">
+                    <mat-label>das2Name</mat-label>
                     <input matInput placeholder="das2Name" [formControl]="this.das2NameFC">
                     <mat-error *ngIf="this.das2NameFC.hasError('maxlength')">Exceeds max length</mat-error>
                 </mat-form-field>
                 <mat-form-field class="forty-percent-width">
+                    <mat-label>Binomial Name</mat-label>
                     <input matInput placeholder="Binomial Name" [formControl]="this.binomialNameFC">
                     <mat-error *ngIf="this.binomialNameFC.hasError('maxlength')">Exceeds max length</mat-error>
                 </mat-form-field>
             </div>
             <div class="full-width flex-container-row flex-one align-center">
                 <mat-form-field class="twenty-percent-width margin-right">
+                    <mat-label>Abbreviation</mat-label>
                     <input matInput placeholder="Abbreviation" [formControl]="this.abbreviationFC">
                     <mat-error *ngIf="this.abbreviationFC.hasError('maxlength')">Exceeds max length</mat-error>
                 </mat-form-field>
                 <mat-form-field class="twenty-percent-width margin-right">
+                    <mat-label>Mage Code</mat-label>
                     <input matInput placeholder="Mage Code" [formControl]="this.mageCodeFC">
                     <mat-error *ngIf="this.mageCodeFC.hasError('maxlength')">Exceeds max length</mat-error>
                 </mat-form-field>
                 <mat-form-field class="twenty-percent-width margin-right">
+                    <mat-label>Taxonomy I.D.</mat-label>
                     <input matInput placeholder="Taxonomy I.D." [formControl]="this.taxIdFC">
                     <mat-error *ngIf="this.taxIdFC.hasError('maxlength')">Exceeds max length</mat-error>
                 </mat-form-field>
                 <mat-form-field class="twenty-percent-width">
+                    <mat-label>Sort Order</mat-label>
                     <input matInput placeholder="Sort Order" [formControl]="this.sortOrderFC">
                     <mat-error *ngIf="this.sortOrderFC.hasError('pattern')">Must be a number less than or equal to 99999</mat-error>
                 </mat-form-field>
             </div>
             <div class="full-width flex-container-row flex-one align-center">
                 <mat-form-field class="eighty-percent-width">
+                    <mat-label>Mage Definition</mat-label>
                     <textarea matInput placeholder="Mage Definition" [formControl]="this.mageDefFC" matTextareaAutosize
                               matAutosizeMinRows="3" matAutosizeMaxRows="3"></textarea>
                     <mat-error *ngIf="this.mageDefFC.hasError('maxlength')">Exceeds max length</mat-error>

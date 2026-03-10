@@ -2,12 +2,14 @@
   <form [formGroup]="form" class="flex-container-row full-height full-width" aria-label="Analysis information form">
     <div class="flex-container-col column-width" role="group" aria-label="Primary analysis details">
       <mat-form-field>
+        <mat-label>Lab Group</mat-label>
         <input matInput placeholder="Lab Group" [formControlName]="'labName'"
                [readonly]="true"
                aria-readonly="true"
                aria-label="Lab group name">
       </mat-form-field>
       <mat-form-field>
+        <mat-label>Name</mat-label>
         <input matInput placeholder="Name" [formControlName]="'name'"
                [readonly]="isReadonly || null"
                [attr.aria-readonly]="isReadonly"
@@ -143,12 +145,14 @@
                         aria-label="Select analysis owner">
       </custom-combo-box>
       <mat-form-field>
+        <mat-label>Submitter</mat-label>
         <input matInput placeholder="Submitter" [formControlName]="'submitterName'"
                [readonly]="true"
                aria-readonly="true"
                aria-label="Submitter name">
       </mat-form-field>
       <mat-form-field>
+        <mat-label>Submit Date</mat-label>
         <input matInput placeholder="Submit Date" [formControlName]="'submitDate'"
                [readonly]="true"
                aria-readonly="true"
@@ -169,6 +173,7 @@
       <div *ngIf="propertyService.isPrivacyExpirationSupported && analysis.codeVisibility !== 'PUBLIC'" class="padded">
         <mat-form-field matTooltip="Public visibility date (visibility automatically changes to public on this date)"
                         [matTooltipPosition]="'left'">
+          <mat-label>Privacy Expiration</mat-label>
           <input matInput
                  placeholder="Privacy Expiration"
                  [formControlName]="'privacyExpirationDate'"

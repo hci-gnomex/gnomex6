@@ -5,7 +5,8 @@
 
         <div style="display:flex;">
             <mat-form-field style="margin-right: 2em; width:40%;">
-                <input matInput formControlName="contactName"  type="text" placeholder="Director Name"/>
+                <mat-label>Director Name</mat-label>
+                <input matInput formControlName="contactName"  type="text" placeholder="Director Name" autocomplete="off"/>
                 <mat-error *ngIf="coreFacilityForm.get('contactName').hasError('required')">
                     The folder name is required
                 </mat-error>
@@ -14,7 +15,8 @@
                 </mat-error>
             </mat-form-field>
             <mat-form-field style="margin-right: 2em; width:40%;">
-                <input matInput formControlName="contactEmail"  type="text" placeholder="Director Email"/>
+                <mat-label>Director Email</mat-label>
+                <input matInput formControlName="contactEmail"  type="text" placeholder="Director Email" autocomplete="off"/>
                 <mat-error *ngIf="coreFacilityForm.get('contactEmail').hasError('email')">
                     Invalid email format
                 </mat-error>
@@ -26,13 +28,15 @@
 
         <div style="display:flex;">
             <mat-form-field style="margin-right: 2em; width:40%;">
-                <input matInput formControlName="contactPhone"  type="text" placeholder="Director Phone"/>
+                <mat-label>Director Phone</mat-label>
+                <input matInput formControlName="contactPhone"  type="text" placeholder="Director Phone" autocomplete="off"/>
                 <mat-error *ngIf="coreFacilityForm.get('contactPhone').hasError('maxlength')">
                     Your field exceeds 20 characters limit
                 </mat-error>
             </mat-form-field>
             <mat-form-field style="margin-right: 2em; width:40%;">
-                <input matInput formControlName="contactRoom"  type="text" placeholder="Director Room"/>
+                <mat-label>Director Room</mat-label>
+                <input matInput formControlName="contactRoom"  type="text" placeholder="Director Room" autocomplete="off"/>
                 <mat-error *ngIf="coreFacilityForm.get('contactRoom').hasError('maxlength')">
                     Your field exceeds 200 characters limit
                 </mat-error>
@@ -41,13 +45,15 @@
         </div>
         <div style="display:flex;">
             <mat-form-field style="margin-right: 2em; width:40%;">
-                <input matInput formControlName="facilityName"  type="text" placeholder="Facility Name"/>
+                <mat-label>Facility Name</mat-label>
+                <input matInput formControlName="facilityName"  type="text" placeholder="Facility Name" autocomplete="off"/>
                 <mat-error *ngIf="coreFacilityForm.get('facilityName').hasError('maxlength')">
                     Your field exceeds 100 characters limit
                 </mat-error>
             </mat-form-field>
             <mat-form-field style="margin-right: 2em; width:40%;">
-                <input matInput formControlName="labRoom"  type="text" placeholder="Lab Room"/>
+                <mat-label>Lab Room</mat-label>
+                <input matInput formControlName="labRoom"  type="text" placeholder="Lab Room" autocomplete="off"/>
                 <mat-error *ngIf="coreFacilityForm.get('labRoom').hasError('maxlength')">
                     Your field exceeds 200 characters limit
                 </mat-error>
@@ -56,17 +62,20 @@
 
         <div style="display:flex;">
             <mat-form-field style="margin-right: 2em; width:40%;">
-                <input matInput formControlName="labPhone"  type="text" placeholder="Lab Phone"/>
+                <mat-label>Lab Phone</mat-label>
+                <input matInput formControlName="labPhone"  type="text" placeholder="Lab Phone" autocomplete="off"/>
                 <mat-error *ngIf="coreFacilityForm.get('labPhone').hasError('maxlength')">
                     Your field exceeds 20 characters limit
                 </mat-error>
             </mat-form-field>
             <mat-form-field style="margin-right: 2em; width:40%;">
-                <input matInput formControlName="contactImage"  type="text" placeholder="Contact Image File Name"/>
+                <mat-label>Contact Image File Name</mat-label>
+                <input matInput formControlName="contactImage"  type="text" placeholder="Contact Image File Name" autocomplete="off"/>
             </mat-form-field>
         </div>
 
         <mat-form-field style="margin-right: 2em; width:80%;">
+            <mat-label>Short Description</mat-label>
             <input matInput formControlName="shortDescription"  type="text" placeholder="Short Description"/>
             <mat-error *ngIf="coreFacilityForm.get('shortDescription').hasError('maxlength')">
                 Your field exceeds 1000 characters limit

@@ -2,14 +2,14 @@
 <form [formGroup]="formGroup" aria-label="Experiment Platform" style=" height: calc(100% - 1em );width: calc(100% - 1em); padding: 0.5em; display:flex; flex-direction:column; font-size: small;">
     <div class="flex-container-row">
         <mat-form-field  class="medium-form-input">
+            <mat-label>Name</mat-label>
             <input matInput placeholder="Name" formControlName="requestCategory">
             <mat-error *ngIf="this.formGroup?.controls['requestCategory']?.hasError('required')">
                 This field is required
             </mat-error>
         </mat-form-field>
         <div class="padded-checkbox">
-            <label style="margin-right: 1em;" aria-hidden="true"> Active  </label>
-            <mat-checkbox  formControlName="isActive" aria-label="Active"> </mat-checkbox>
+            <mat-checkbox formControlName="isActive" labelPosition="before" style="margin-right: 1em;">Active</mat-checkbox>
         </div>
 
     </div>
@@ -19,18 +19,17 @@
         <custom-combo-box class="medium-form-input" placeholder="Type" (optionSelected)="onTypeChanged()"
                           [options]="this.typeList" displayField="display" [formControlName]="'type'">
         </custom-combo-box>
-        <div class="padded-checkbox" >
-            <label style="margin-right: 1em;" aria-hidden="true"> Associated With Analysis  </label>
-            <mat-checkbox  formControlName="associatedWithAnalysis" aria-label="Associated With Analysis"> </mat-checkbox>
+        <div class="padded-checkbox">
+            <mat-checkbox formControlName="associatedWithAnalysis" labelPosition="before" style="margin-right: 1em;">Associated With Analysis</mat-checkbox>
         </div>
         <div class="padded-checkbox">
-            <label style="margin-right: 1em;" aria-hidden="true"> Require Name & Description  </label>
-            <mat-checkbox  formControlName="requireNameDescription" aria-label="Require Name and Description"> </mat-checkbox>
+            <mat-checkbox formControlName="requireNameDescription" labelPosition="before" style="margin-right: 1em;">Require Name & Description</mat-checkbox>
         </div>
 
     </div>
     <div class="flex-container-row" >
         <mat-form-field  class="short-input margin-right-field">
+            <mat-label>Code</mat-label>
             <input matInput placeholder="Code" formControlName="code" readonly aria-readonly="true">
             <!--<mat-error *ngIf="this.formGroup?.controls['code']?.hasError('required')">
                 This field is required
@@ -38,7 +37,7 @@
         </mat-form-field>
 
         <mat-form-field class="short-input">
-
+            <mat-label>Icon</mat-label>
             <img style="width:16px;" [src]="formGroup.get('icon').value" alt="">
             <mat-select style="width:calc(100% - 16px)" placeholder="Icon" formControlName="icon">
                 <mat-option
@@ -57,6 +56,7 @@
     </custom-combo-box>
 
     <mat-form-field *ngIf="showNote">
+        <mat-label>Notes</mat-label>
         <textarea matInput placeholder="Notes" formControlName="notes" matTextareaAutosize matAutosizeMinRows="1" matAutosizeMaxRows="2"></textarea>
     </mat-form-field>
 
@@ -65,16 +65,14 @@
                       valueField="idVendor" [formControlName]="'idVendor'">
     </custom-combo-box>
 
-    <div class="flex-container-row">
-        <label class="gx-label" style="margin-right: 2em;" aria-hidden="true"> Available for </label>
+    <div class="flex-container-row" role="group" aria-labelledby="available-for-label">
+        <label id="available-for-label" class="gx-label" style="margin-right: 2em;">Available for</label>
         <div class="flex-container-col">
             <div>
-                <mat-checkbox  formControlName="isInternal" aria-label="Available for Internal Experiment Orders"> </mat-checkbox>
-                <label class="gx-label" style="margin-left: 0.5em;" aria-hidden="true"> Internal Experiment Orders  </label>
+                <mat-checkbox formControlName="isInternal">Internal Experiment Orders</mat-checkbox>
             </div>
             <div>
-                <mat-checkbox  formControlName="isExternal" aria-label="Available for Upload of Experiment Data Generated at a Third Party Facility"> </mat-checkbox>
-                <label class="gx-label"  style="margin-left: 0.5em;" aria-hidden="true"> Upload of Experiment Data Generated at a Third Party Facility  </label>
+                <mat-checkbox formControlName="isExternal">Upload of Experiment Data Generated at a Third Party Facility</mat-checkbox>
             </div>
 
         </div>
@@ -83,6 +81,7 @@
 
     <div class="flex-container-row">
         <mat-form-field  class="short-input margin-right-field">
+            <mat-label>Sort Order</mat-label>
             <input matInput placeholder="Sort Order" formControlName="sortOrder">
             <mat-error *ngIf="this.formGroup?.controls['sortOrder']?.hasError('numberRange')">
                 {{this.formGroup.get('sortOrder').errors.numberRange }}
@@ -96,6 +95,7 @@
     </div>
     <div class="flex-container-row">
         <mat-form-field class="short-input margin-right-field">
+            <mat-label>Sample Batch Size</mat-label>
             <input matInput placeholder="Sample Batch Size" formControlName="sampleBatchSize">
             <mat-error  *ngIf="this.formGroup?.controls['sampleBatchSize']?.hasError('numberRange')">
                 {{this.formGroup.get('sampleBatchSize').errors.numberRange }}
@@ -103,6 +103,7 @@
         </mat-form-field>
 
         <mat-form-field style="width:calc(99% - 12em )" *ngIf="this.formGroup?.controls['sampleBatchSize'].value">
+            <mat-label>Sample batch warning message</mat-label>
             <input matInput placeholder="Sample batch warning message" formControlName="customWarningMessage">
         </mat-form-field>
 
@@ -118,8 +119,7 @@
 
         <div class="flex-container-row">
             <div class="partial-padded-checkbox"  style="flex:1" >
-                <mat-checkbox (change)="onUseProducts()" formControlName="useProduct" aria-label="Use Products"> </mat-checkbox>
-                <label class="gx-label" style="margin-left:0.5em;" aria-hidden="true"> Use Products  </label>
+                <mat-checkbox (change)="onUseProducts()" formControlName="useProduct">Use Products</mat-checkbox>
             </div>
             <custom-combo-box *ngIf="this.formGroup.get('useProduct')?.value" class="margin-right-field"
                               style="flex:4" placeholder="Product Type"
@@ -127,6 +127,7 @@
                               valueField="idProductType" [formControlName]="'idProductType'">
             </custom-combo-box>
             <mat-form-field style="flex:6" *ngIf="this.formGroup.get('useProduct')?.value;">
+                <mat-label>No Products Message</mat-label>
                 <input matInput placeholder="No Products Message" formControlName="noProductsMessage">
             </mat-form-field>
         </div>
@@ -144,10 +145,10 @@
 
 
         <div class="partial-padded-checkbox" >
-            <mat-checkbox formControlName="saveAndSubmit" aria-label="Allow saving of request before submission"> </mat-checkbox>
-            <label class="gx-label" style="margin-left:0.5em;" aria-hidden="true"> Allow saving of request before submission </label>
+            <mat-checkbox formControlName="saveAndSubmit">Allow saving of request before submission</mat-checkbox>
         </div>
         <div style="margin-left:auto"
+             aria-live="polite"
              [ngClass]="{'warningLabelSevere':!isMinorSecurity,'warningLabelMinor':  isMinorSecurity }">
             <label> {{ securityLabel}} </label>
         </div>

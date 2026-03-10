@@ -5,11 +5,12 @@
             <ol *ngIf="!useXeniumMode &&!useIsolationTypeMode && !useSliceMode && !useNanoGeomxMode" class="full-width three-depth-numbering">
                 <li *ngIf="showSampleQualityExperimentType" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading" id="sampleQualityExperimentTypeLabel">
                             Select a sample quality Experiment Type.
-                        </div>
+                        </h2>
                         <div>
                             <mat-radio-group class="flex-container-col"
+                                             aria-labelledby="sampleQualityExperimentTypeLabel"
                                              formControlName="selectedApp"
                                              (change)="onAppChange($event)">
                                 <div *ngFor="let app of filteredApplications">
@@ -25,11 +26,12 @@
                 </li>
                 <li *ngIf="showSequenomExperimentType" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline double-left-padded">
-                        <div class="heading">
+                        <h2 class="heading" id="experimentTypeLabel">
                             Select an Experiment Type.
-                        </div>
+                        </h2>
                         <div>
                             <mat-radio-group class="flex-container-col"
+                                             aria-labelledby="experimentTypeLabel"
                                              formControlName="selectedApp"
                                              (change)="onAppChange($event)">
                                 <div *ngFor="let app of filteredApplications">
@@ -43,28 +45,30 @@
                                     </mat-radio-button>
                                 </div>
                             </mat-radio-group>
-                            <div *ngIf="form?.get('selectedApp')?.value?.codeApplication === 'OTHER'" class="double-padded flex-container-row align-baseline">
-                                <div class="padded-left-right">
-                                    Please specify :
+                            <div aria-live="polite" aria-atomic="false">
+                                <div *ngIf="form?.get('selectedApp')?.value?.codeApplication === 'OTHER'" class="double-padded flex-container-row align-baseline">
+                                    <div class="padded-left-right">
+                                        Please specify :
+                                    </div>
+                                    <mat-form-field>
+                                        <input matInput
+                                               placeholder=""
+                                               formControlName="customSpecification"
+                                               (change)="onChange_otherSpecification($event)">
+                                        <mat-error *ngIf="form?.get('customSpecification')?.hasError('required')">
+                                            Please explain
+                                        </mat-error>
+                                    </mat-form-field>
                                 </div>
-                                <mat-form-field>
-                                    <input matInput
-                                           placeholder=""
-                                           formControlName="customSpecification"
-                                           (change)="onChange_otherSpecification($event)">
-                                    <mat-error *ngIf="form?.get('customSpecification')?.hasError('required')">
-                                        Please explain
-                                    </mat-error>
-                                </mat-form-field>
                             </div>
                         </div>
                     </div>
                 </li>
                 <li *ngIf="showDefaultSampleNumber" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             How many samples will be sequenced in this experiment order?
-                        </div>
+                        </h2>
                         <mat-form-field>
                             <input matInput
                                    placeholder="Number of samples."
@@ -80,14 +84,15 @@
                 </li>
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading" id="sampleCategoryLabel">
                             Which category best describes your samples?
-                        </div>
+                        </h2>
                         <div>
                             <div *ngIf="filteredSampleTypeListRna && filteredSampleTypeListRna?.length > 0 && filteredSampleTypeListDna && filteredSampleTypeListDna?.length > 0" class="normal-size-font title">
                                 DNA
                             </div>
                             <mat-radio-group class="flex-container-col"
+                                             aria-labelledby="sampleCategoryLabel"
                                              formControlName="selectedDna"
                                              (change)="onDnaChange($event)">
                                 <div *ngFor="let dnaCategory of filteredSampleTypeListDna">
@@ -104,6 +109,7 @@
                                 RNA
                             </div>
                             <mat-radio-group class="flex-container-col"
+                                             aria-labelledby="sampleCategoryLabel"
                                              formControlName="selectedRna"
                                              (change)="onRnaChange($event)">
                                 <div *ngFor="let rnaCategory of filteredSampleTypeListRna">
@@ -121,6 +127,7 @@
                                 Suspension
                             </div>
                             <mat-radio-group class="flex-container-col"
+                                             aria-labelledby="sampleCategoryLabel"
                                              formControlName="selectedSuspension"
                                              (change)="onSuspensionChange($event)">
                                 <div *ngFor="let suspensionCategory of filteredSampleTypeListSuspension">
@@ -137,6 +144,7 @@
                                 Tissue Section
                             </div>
                             <mat-radio-group class="flex-container-col"
+                                             aria-labelledby="sampleCategoryLabel"
                                              formControlName="selectedSection"
                                              (change)="onSectionChange($event)">
                                 <div *ngFor="let sectionCategory of filteredSampleTypeListSection">
@@ -153,9 +161,9 @@
                 </li>
                 <li *ngIf="!showDefaultSampleNumber" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             How many samples will you be submitting?
-                        </div>
+                        </h2>
                         <mat-form-field>
                             <input matInput
                                    placeholder="Number of samples."
@@ -175,9 +183,9 @@
                 <li *ngIf="showSampleNotes" class="full-width align-baseline">
                     <div class="full-width">
                         <div class="full-width flex-container-row align-baseline">
-                            <div class="heading">
+                            <h2 class="heading">
                                 Sample Type Note
-                            </div>
+                            </h2>
                         </div>
                         <mat-form-field class="long-width">
                             <textarea matInput
@@ -193,11 +201,12 @@
                 </li>
                 <li *ngIf="showSequenomExperimentType" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline double-left-padded">
-                        <div class="heading">
+                        <h2 class="heading" id="sampleContainerLabel">
                             The samples will be delivered in what container?
-                        </div>
+                        </h2>
                         <div>
                             <mat-radio-group class="flex-container-col"
+                                             aria-labelledby="sampleContainerLabel"
                                              (change)="onContainerChange($event)">
                                 <span class="padded">
                                     <mat-radio-button checked [value]="'TUBE'">
@@ -219,9 +228,9 @@
                 </li>
                 <li *ngIf="showSequenomExperimentType && showNumberPlatesPrompt" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline double-left-padded">
-                        <div class="heading">
+                        <h2 class="heading">
                             How many source plates will you be submitting?
-                        </div>
+                        </h2>
                         <mat-form-field>
                             <input matInput
                                    placeholder="Number of plates"
@@ -241,9 +250,9 @@
                 </li>
                 <li *ngIf="allPlates && allPlates.length > 0" class="full-width align-baseline">
                     <div class="full-width double-left-padded">
-                        <div class="heading">
+                        <h2 class="heading">
                             Name your plates :
-                        </div>
+                        </h2>
                         <div class="full-width">
                             <div *ngFor="let plate of allPlates" class="inline-block padded">
                                 <div class="inline-block minwidth">
@@ -264,14 +273,14 @@
 
                 <li *ngIf="showOrganism" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             Which organism is the source for these samples?
                             <context-help name="SampleDetailsOrganism"
                                           [hasEditPermission]="this.securityAdvisor.isAdmin"
                                           [idCoreFacility]="this.idCoreFacility"
                                           popupTitle="Sample Organism Help">
                             </context-help>
-                        </div>
+                        </h2>
                         <div class="moderate-width">
                             <custom-combo-box placeholder="Organism"
                                               displayField="combinedName"
@@ -285,9 +294,9 @@
                 </li>
                 <li *ngIf="showSamplePurification" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             Please provide details on Sample Purification methods:
-                        </div>
+                        </h2>
                         <ol class="flex-grow">
                             <li class="full-width align-baseline">
                                 <div class="full-width flex-container-row align-baseline">
@@ -318,10 +327,10 @@
                 </li>
                 <li *ngIf="showKeepSample" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading" id="keepSampleLabel">
                             Would you like to retrieve leftover sample from the core facility following completion of the work?
-                        </div>
-                        <mat-radio-group class="flex-grow flex-container-col" (change)="onKeepChange($event)" formControlName="keepSample" required>
+                        </h2>
+                        <mat-radio-group class="flex-grow flex-container-col" aria-labelledby="keepSampleLabel" (change)="onKeepChange($event)" formControlName="keepSample" required>
                             <mat-radio-button value="1">Yes (leftover samples will be retained for 90 days)</mat-radio-button>
                             <mat-radio-button value="2">No (leftover samples will be discarded)</mat-radio-button>
                         </mat-radio-group>
@@ -329,9 +338,9 @@
                 </li>
                 <li *ngIf="showSamplePrepContainer" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             Specify the nucleic acid extraction method. {{ requireSamplePrepContainer ? ' (required)' : '' }}
-                        </div>
+                        </h2>
                         <mat-form-field class="moderate-width" [floatLabel]="auto">
                             <input matInput
                                    formControlName="extractionMethod"
@@ -343,9 +352,9 @@
                 </li>
                 <li *ngIf="showBioAnalyzerChipTypeGrid" class="full-width align-baseline">
                     <div class="full-width flex-container-row">
-                        <div class="heading">
+                        <h2 class="heading">
                             Select a QC Assay.
-                        </div>
+                        </h2>
                         <div style="display:grid;" class="flex-grow minimum-height-grid ">
                             <div>
                                 <div #oneEmWidth class="no-height single-em"></div>
@@ -367,9 +376,9 @@
                 <li class="full-width align-baseline">
                     <div class="full-width">
                         <div class="full-width flex-container-row align-baseline">
-                            <div class="heading">
+                            <h2 class="heading">
                                 Enter a note for the Core facility
-                            </div>
+                            </h2>
                         </div>
                         <mat-form-field class="long-width">
                             <textarea matInput
@@ -388,9 +397,9 @@
             <ol *ngIf="useIsolationTypeMode && !useSliceMode && !useNanoGeomxMode  && !useXeniumMode" class="full-width three-depth-numbering">
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             How many samples will you be submitting?
-                        </div>
+                        </h2>
                         <mat-form-field>
                             <input matInput
                                    placeholder="Number of samples."
@@ -406,10 +415,11 @@
                 </li>
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading" id="extractionTypeLabel">
                             Select the extraction type.
-                        </div>
+                        </h2>
                         <mat-radio-group class="flex-container-col"
+                                         aria-labelledby="extractionTypeLabel"
                                          formControlName="selectedIsolationExtractionMethod"
                                          (change)="onSelectedIsolationExtractionMethod($event)">
                             <mat-radio-button [value]="'DNA'">
@@ -432,19 +442,20 @@
                 </li>
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             Would you like the core to measure the concentration by Qubit Pico Green?
-                        </div>
+                        </h2>
                         <mat-checkbox formControlName="addQubit" (change)="onDnaseChanged($event)">Yes</mat-checkbox>
                     </div>
                 </li>
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading" id="isolationMethodLabel">
                             Select the isolation method.
-                        </div>
+                        </h2>
                         <mat-radio-group *ngIf="isolationTypes"
                                          class="flex-container-col"
+                                         aria-labelledby="isolationMethodLabel"
                                          formControlName="selectedIsolationType"
                                          (change)="onChangeIsolationType($event)">
                             <mat-radio-button *ngFor="let isolationType of isolationTypes" [value]="isolationType">
@@ -460,17 +471,17 @@
                 </li>
                 <li *ngIf="showNotifyBMP" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             Notify BMP to pickup samples when completed?
-                        </div>
+                        </h2>
                         <mat-checkbox formControlName="notifyBMP" (change)="onChangeBMPPickup($event)">Yes</mat-checkbox>
                     </div>
                 </li>
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             Select the sample source.
-                        </div>
+                        </h2>
                         <div class="moderate-width">
                             <custom-combo-box placeholder="Sample Source"
                                               [allowNone]="false"
@@ -484,9 +495,9 @@
                 </li>
                 <li *ngIf="showDownstreamAnalysis" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             Select downstream analysis.
-                        </div>
+                        </h2>
                         <div class="moderate-width">
                             <custom-combo-box placeholder="Downstream Analysis"
                                               [allowNone]="false"
@@ -502,9 +513,9 @@
                 <li class="full-width align-baseline">
                     <div class="full-width">
                         <div class="full-width flex-container-row align-baseline">
-                            <div class="heading">
+                            <h2 class="heading">
                                 Enter a note for the Core facility
-                            </div>
+                            </h2>
                         </div>
                         <mat-form-field class="long-width">
                             <textarea matInput
@@ -523,9 +534,9 @@
             <ol *ngIf="useSliceMode && !useNanoGeomxMode && !useXeniumMode" class="full-width three-depth-numbering">
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             How many samples will you be submitting?
-                        </div>
+                        </h2>
                         <mat-form-field>
                             <input matInput
                                    placeholder="Number of samples."
@@ -541,9 +552,9 @@
                 </li>
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             Number of slides?
-                        </div>
+                        </h2>
                         <mat-form-field>
                             <input matInput
                                    placeholder="Number of slides."
@@ -560,9 +571,9 @@
 
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             Select the sample type.
-                        </div>
+                        </h2>
                         <div class="moderate-width">
                             <custom-combo-box placeholder="Sample Type"
                                               [allowNone]="false"
@@ -576,17 +587,17 @@
                 </li>
                 <li *ngIf="showNotifyBMP" class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             Notify BMP to pickup samples when completed?
-                        </div>
+                        </h2>
                         <mat-checkbox formControlName="notifyBMP" (change)="onChangeBMPPickup($event)">Yes</mat-checkbox>
                     </div>
                 </li>
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             Select the sample source.
-                        </div>
+                        </h2>
                         <div class="moderate-width">
                             <custom-combo-box placeholder="Sample Source"
                                               [allowNone]="false"
@@ -601,9 +612,9 @@
                 <li class="full-width align-baseline">
                     <div class="full-width">
                         <div class="full-width flex-container-row align-baseline">
-                            <div class="heading">
+                            <h2 class="heading">
                                 Enter a note for the Core facility
-                            </div>
+                            </h2>
                         </div>
                         <mat-form-field class="long-width">
                             <textarea matInput
@@ -622,9 +633,9 @@
             <ol *ngIf="useNanoGeomxMode && !useXeniumMode" class="full-width three-depth-numbering">
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             How many samples will you be submitting?
-                        </div>
+                        </h2>
                         <mat-form-field>
                             <input matInput
                                    placeholder="Number of samples."
@@ -640,9 +651,9 @@
                 </li>
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             Number of slides?
-                        </div>
+                        </h2>
                         <mat-form-field>
                             <input matInput
                                    placeholder="Number of slides."
@@ -658,14 +669,14 @@
                 </li>
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             Which organism is the source for these samples?
                             <context-help name="SampleDetailsOrganism"
                                           [hasEditPermission]="this.securityAdvisor.isAdmin"
                                           [idCoreFacility]="this.idCoreFacility"
                                           popupTitle="Sample Organism Help">
                             </context-help>
-                        </div>
+                        </h2>
                         <div class="moderate-width">
                             <custom-combo-box placeholder="Organism"
                                               displayField="combinedName"
@@ -679,9 +690,9 @@
                 <li class="full-width align-baseline">
                     <div class="full-width">
                         <div class="full-width flex-container-row align-baseline">
-                            <div class="heading">
+                            <h2 class="heading">
                                 Enter a note for the Core facility
-                            </div>
+                            </h2>
                         </div>
                         <mat-form-field class="long-width">
                             <textarea matInput
@@ -701,14 +712,14 @@
             <ol *ngIf="useXeniumMode" class="full-width three-depth-numbering">
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading">
                             Which organism is the source for these samples?
                             <context-help name="SampleDetailsOrganism"
                                           [hasEditPermission]="this.securityAdvisor.isAdmin"
                                           [idCoreFacility]="this.idCoreFacility"
                                           popupTitle="Sample Xenium Organism Help">
                             </context-help>
-                        </div>
+                        </h2>
                         <div class="moderate-width">
                             <custom-combo-box placeholder="Organism"
                                               displayField="combinedName"
@@ -722,10 +733,11 @@
                 </li>
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading" id="xeniumSampleTypeLabel">
                             Select the sample type.
-                        </div>
+                        </h2>
                         <mat-radio-group class="flex-container-col"
+                                         aria-labelledby="xeniumSampleTypeLabel"
                                          formControlName="sampleType"
                                          (change)="onSelectSampleType($event)">
 
@@ -744,10 +756,11 @@
                 </li>
                 <li class="full-width align-baseline">
                     <div class="full-width flex-container-row align-baseline">
-                        <div class="heading">
+                        <h2 class="heading" id="xeniumGenePanelLabel">
                             Select gene panel.
-                        </div>
+                        </h2>
                         <mat-radio-group class="flex-container-col"
+                                         aria-labelledby="xeniumGenePanelLabel"
                                          formControlName="xeniumGenePanel"
                                          (change)="onSelectedXeniumGenePanel($event)">
 
@@ -765,9 +778,9 @@
                 <li class="full-width align-baseline">
                     <div class="full-width">
                         <div class="full-width flex-container-row align-baseline">
-                            <div class="heading">
+                            <h2 class="heading">
                                 Enter a note for the Core facility
-                            </div>
+                            </h2>
                         </div>
                         <mat-form-field class="long-width">
                             <textarea matInput

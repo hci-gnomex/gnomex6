@@ -16,6 +16,7 @@
             <mat-tab label="Info" class="full-height">
                 <div class="flexbox-column">
                     <mat-form-field class="formField" >
+                        <mat-label>Name</mat-label>
                         <input matInput formControlName="name" type="text" placeholder="Name"/>
                         <mat-error *ngIf="topicForm.get('name').hasError('required')">Name is required</mat-error>
                     </mat-form-field>

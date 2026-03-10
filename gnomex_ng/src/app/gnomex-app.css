@@ -1,0 +1,17 @@
+/* Skip navigation link — visually hidden until focused (WCAG 2.4.1) */
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    padding: 0.5rem 1rem;
+    background: #004C9E;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    z-index: 10000;
+    text-decoration: none;
+    border-radius: 0 0 4px 0;
+}
+.skip-link:focus {
+    top: 0;
+}

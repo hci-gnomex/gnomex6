@@ -6,6 +6,9 @@ import {HttpClient} from "@angular/common/http";
 import {HeaderComponent} from "./header/header.component";
 
 import {Observable} from "rxjs";
+import {filter} from "rxjs/operators";
+import {NavigationEnd, Router} from "@angular/router";
+import {Title} from "@angular/platform-browser";
 import {CreateSecurityAdvisorService} from "./services/create-security-advisor.service";
 import {ProgressService} from "./home/progress.service";
 import {DictionaryService} from "./services/dictionary.service";
@@ -32,13 +35,39 @@ export class GnomexAppComponent implements OnInit {
 
     private _primaryNavEnabled: Observable<boolean>;
 
+    // Maps route URL segments to human-readable page titles (WCAG 2.4.2)
+    private static readonly ROUTE_TITLES: {[key: string]: string} = {
+        "home":            "Home — GNomEx",
+        "authenticate":    "Sign In — GNomEx",
+        "experiments":     "Experiments — GNomEx",
+        "analysis":        "Analysis — GNomEx",
+        "datatracks":      "Data Tracks — GNomEx",
+        "topics":          "Topics — GNomEx",
+        "billing":         "Billing — GNomEx",
+        "products":        "Products — GNomEx",
+        "reports":         "Reports — GNomEx",
+        "workflow":        "Workflow — GNomEx",
+        "configuration":   "Configuration — GNomEx",
+        "usersGroups":     "Users & Groups — GNomEx",
+        "upload":          "Upload — GNomEx",
+    };
+
     constructor(private authenticationService: AuthenticationService,
                 private createSecurityAdvisorService: CreateSecurityAdvisorService,
                 private dictionaryService: DictionaryService,
                 private http: HttpClient,
                 private progressService: ProgressService,
-                private navService: NavigationService) {
+                private navService: NavigationService,
+                private router: Router,
+                private titleService: Title) {
         navService.trackNavState();
+        this.router.events
+            .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))
+            .subscribe((e: NavigationEnd) => {
+                const segment = e.urlAfterRedirects.split("/").find(s => s && !s.startsWith("?")) || "home";
+                const title = GnomexAppComponent.ROUTE_TITLES[segment] || "GNomEx";
+                this.titleService.setTitle(title);
+            });
     }
 
 

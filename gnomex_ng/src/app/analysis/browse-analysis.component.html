@@ -1,6 +1,6 @@
 <div class="full-width full-height flex-container-col background major-border padded overflow-auto" role="main" aria-label="Browse analysis">
     <div class="full-width full-height flex-container-col foreground">
-        <div class="full-width" role="search" aria-label="Analysis filter">
+        <div class="full-width" role="search" aria-label="Analysis">
             <browse-filter [label]="'Analysis'"
                            [iconSource]="'assets/map.png'"
                            [mode]="'analysisBrowse'">
@@ -21,7 +21,6 @@
                                 <div class="full-height major-left-right-padded no-word-wrap flex-container-col align-center justify-center"
                                      aria-live="polite">
                                     <label>{{analysisCount}} analyses</label>
-                                    <label class="small-font">{{analysisCountMessage}}</label>
                                 </div>
                                 <div class="flex-grow">
                                 </div>
@@ -34,7 +33,7 @@
                                 </div>
                             </div>
                             <div class="full-width flex-grow left-right-padded no-overflow" role="region" aria-label="Analysis tree">
-                                <div appFocusManager class="full-width full-height border">
+                                <div class="full-width full-height border">
                                     <tree-root #analysisTree
                                                [nodes]="items"
                                                [options]="options"

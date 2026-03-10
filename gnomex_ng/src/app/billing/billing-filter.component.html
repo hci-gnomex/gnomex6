@@ -18,6 +18,7 @@
             <div class="flex-grow">
             </div>
             <mat-form-field class="padded-left experiment-width">
+                <mat-label>Experiment #</mat-label>
                 <input matInput placeholder="Experiment #"
                        aria-label="Filter by experiment number"
                        [(ngModel)]="this.requestNumberModel"
@@ -25,6 +26,7 @@
                        (change)="this.onRequestNumberChange()">
             </mat-form-field>
             <mat-form-field class="padded-left experiment-width">
+                <mat-label>Invoice #</mat-label>
                 <input matInput placeholder="Invoice #"
                        aria-label="Filter by invoice number"
                        [(ngModel)]="this.invoiceNumberModel"

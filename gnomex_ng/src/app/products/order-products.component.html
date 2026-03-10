@@ -49,16 +49,16 @@
     </div>
     <table [hidden]="!this.idLab || !this.idAppUser || (!this.idBillingAccount && !this.billingTemplate)" class="full-width" aria-label="Product order items">
         <tr>
-            <th>Product</th>
-            <th>Quantity</th>
-            <th>Price</th>
-            <th>Total</th>
-            <th>Current Lab Inventory</th>
+            <th scope="col">Product</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Price</th>
+            <th scope="col">Total</th>
+            <th scope="col">Current Lab Inventory</th>
         </tr>
         <tr *ngFor="let p of this.productList">
             <td>
                 <mat-checkbox [(ngModel)]="p.isSelected" appReadonly appReadonlyType="checkbox">{{p.name}} (Order Qty: {{p.orderQty}})</mat-checkbox>
-                <img class="description-icon" *ngIf="p.description" [src]="'./assets/white_information.png'" matTooltip="{{p.description}}" [attr.aria-label]="p.description" role="img">
+                <img class="description-icon" *ngIf="p.description" [src]="'./assets/white_information.png'" matTooltip="{{p.description}}" [attr.aria-label]="p.description">
             </td>
             <td>
                 <input matInput class="half-width user-input" type="number" [(ngModel)]="p.quantity" (change)="this.checkQuantity(p)" [attr.aria-label]="'Quantity for ' + p.name">

@@ -10,6 +10,7 @@
                 <div class="full-width flex-container-row">
                     <div class="flex-grow padded">
                         <mat-form-field class="full-width">
+                            <mat-label>Account Name*</mat-label>
                             <input  matInput
                                     placeholder="Account Name*"
                                     [formControl]="this.form.get('accountName')"
@@ -68,6 +69,7 @@
                 <div class="flex-container-row full-width">
                     <div class="flex-grow padded">
                         <mat-form-field class="full-width">
+                            <mat-label>URL</mat-label>
                             <input  matInput
                                     placeholder="URL"
                                     (input)="checkToEnableViewURLButton($event)"

@@ -3,6 +3,7 @@
     <form [formGroup]="this.formGroup" aria-label="Illumina Sequencing Type" style="padding:1em;" >
         <div class="flex-container-row">
             <mat-form-field class="full-width">
+                <mat-label>Name</mat-label>
                 <input matInput placeholder="Name" formControlName="name">
                 <mat-error *ngIf="this.formGroup?.controls['name'].hasError('maxlength')">
                     Maximum of {{this.constService.MAX_LENGTH_100}} characters.
@@ -24,6 +25,7 @@
                       tooltipPosition="right"></context-help>
         <div style="align-items: center" class="flex-container-row">
             <mat-form-field class="medium-form-input">
+                <mat-label>Internal Pricing</mat-label>
                 <span matPrefix>$ &nbsp;</span>
                 <input matInput placeholder="Internal Pricing" formControlName="unitPriceInternal">
                 <mat-error *ngIf="this.formGroup?.controls['unitPriceInternal']?.hasError('pattern')">
@@ -31,6 +33,7 @@
                 </mat-error>
             </mat-form-field>
             <mat-form-field  class="medium-form-input">
+                <mat-label>External Academic Pricing</mat-label>
                 <span matPrefix>$ &nbsp;</span>
                 <input matInput placeholder="External Academic Pricing" formControlName="unitPriceExternalAcademic">
                 <mat-error *ngIf="this.formGroup?.controls['unitPriceInternal']?.hasError('pattern')">
@@ -38,6 +41,7 @@
                 </mat-error>
             </mat-form-field>
             <mat-form-field  class="medium-form-input">
+                <mat-label>External Commercial Pricing</mat-label>
                 <span matPrefix>$ &nbsp;</span>
                 <input matInput placeholder="External Commercial Pricing" formControlName="unitPriceExternalCommercial">
                 <mat-error *ngIf="this.formGroup?.controls['unitPriceInternal']?.hasError('pattern')">
@@ -46,6 +50,7 @@
             </mat-form-field>
         </div>
         <mat-form-field class="short-input" style="margin-right: 1em" >
+            <mat-label>Sort Order</mat-label>
             <input matInput placeholder="Sort Order" formControlName="sortOrder">
             <mat-error  *ngIf="this.formGroup?.controls['sortOrder']?.hasError('numberRange')">
                 {{this.formGroup.get('sortOrder').errors.numberRange }}
@@ -60,6 +65,7 @@
                           [formControlName]="'idSeqRunType'">
         </custom-combo-box>
         <mat-form-field class="propFormField full-width">
+            <mat-label>Protocol Description</mat-label>
             <textarea matInput placeholder="Protocol Description" formControlName="protocolDescription"
                       matTextareaAutosize matAutosizeMinRows="5" matAutosizeMaxRows="10">
             </textarea>

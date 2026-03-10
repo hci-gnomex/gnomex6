@@ -66,31 +66,31 @@
                         <label *ngIf="this.currentProductOrder"><img [src]="'./assets/review.png'" class="icon" alt="">Product Order {{this.currentProductOrder.productOrderNumber}}</label>
                         <table *ngIf="this.currentProductOrder" class="half-width" aria-label="Product order information">
                             <tr>
-                                <td class="italics">Submitter</td>
+                                <th scope="row" class="italics">Submitter</th>
                                 <td>{{this.currentProductOrder.submitter}}</td>
                             </tr>
                             <tr>
-                                <td class="italics">Lab</td>
+                                <th scope="row" class="italics">Lab</th>
                                 <td>{{this.currentProductOrder.labName}}</td>
                             </tr>
                             <tr>
-                                <td class="italics">Submit Date</td>
+                                <th scope="row" class="italics">Submit Date</th>
                                 <td>{{this.currentProductOrder.submitDate}}</td>
                             </tr>
                             <tr>
-                                <td class="italics">Order Status</td>
+                                <th scope="row" class="italics">Order Status</th>
                                 <td>{{this.currentProductOrder.orderStatus}}</td>
                             </tr>
                             <tr>
-                                <td class="italics">Billing Account</td>
+                                <th scope="row" class="italics">Billing Account</th>
                                 <td>{{this.currentProductOrder.billingAccount}}</td>
                             </tr>
                             <tr>
-                                <td class="italics">Quote Number</td>
+                                <th scope="row" class="italics">Quote Number</th>
                                 <td>{{this.currentProductOrder.quoteNumber}}</td>
                             </tr>
                             <tr>
-                                <td class="italics">Quote Received</td>
+                                <th scope="row" class="italics">Quote Received</th>
                                 <td>{{this.currentProductOrder.quoteReceivedDate}}</td>
                             </tr>
                         </table>

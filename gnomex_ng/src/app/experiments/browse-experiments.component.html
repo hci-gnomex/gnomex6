@@ -21,7 +21,7 @@
                                 <div class="flex-container-row align-center">
                                     <div class="full-height flex-grow major-left-right-padding no-word-wrap flex-container-col align-center justify-center" role="status" aria-live="polite" aria-atomic="true">
                                         <label id="experiment-count-label">{{experimentCount}} experiments</label>
-                                        <label id="experiment-count-message" style="font-size: 12px;" aria-label="Experiment Count Message" >{{experimentCountMessage}}</label>
+
                                     </div>
                                     <div class="full-height">
                                         <button mat-button aria-label="Drag-and-drop hint" (click)="onClickShowDragDropHint()"
@@ -33,7 +33,7 @@
                                 </div>
                             </div>
                             <div class="full-width flex-grow left-right-padding no-overflow">
-                                <div appFocusManager class="full-width full-height border">
+                                <div class="full-width full-height border">
                                     <tree-root #tree
                                                role="tree"
                                                aria-label="Experiments hierarchy"

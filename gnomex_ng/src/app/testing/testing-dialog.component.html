@@ -2,7 +2,7 @@
 <div mat-dialog-content>
 	<p style="background-color: yellow;">What's your favorite animal?</p>
 	<mat-form-field>
-		<input matInput tabindex="1" [(ngModel)]="data.animal">
+		<input matInput [(ngModel)]="data.animal">
 	</mat-form-field>
 	<mat-form-field>
 		<input matInput [matDatepicker]="myDatepicker" placeholder="Choose a date" readonly aria-readonly="true">
@@ -11,6 +11,6 @@
 	</mat-form-field>
 </div>
 <div mat-dialog-actions>
-	<button mat-button [mat-dialog-close]="data.animal" tabindex="2">Ok</button>
-	<button mat-button (click)="onCloseClick()" tabindex="-1">Close</button>
+	<button mat-button [mat-dialog-close]="data.animal">Ok</button>
+	<button mat-button (click)="onCloseClick()">Close</button>
 </div>

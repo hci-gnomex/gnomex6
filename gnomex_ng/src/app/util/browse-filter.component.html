@@ -156,10 +156,11 @@
             <label for="allAnalysesRadio" class="following-label">All</label>
         </div>
         <div class="inlineDiv" *ngIf="showLabMultiSelectComboBox">
-            <label class="leading-label">Group(s)</label>
+            <label id="agroups" class="leading-label">Group(s)</label>
             <custom-multi-combo-box [options]="labList"
                                     [displayField]="this.prefService.labDisplayField"
                                     [valueField]="'idLab'"
+                                    aria-labelledby="agroups"
                                     [(ngModel)]="selectedLabs"
                                     (selectionChanged)="onMultiLabChange($event)">
             </custom-multi-combo-box>

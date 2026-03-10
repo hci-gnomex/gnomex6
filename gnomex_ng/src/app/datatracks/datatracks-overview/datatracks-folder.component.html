@@ -5,6 +5,7 @@
     <div class="full-width full-height">
         <div class="flex-container-row full-width">
             <mat-form-field style="margin-right: 2em; width:60%;">
+                <mat-label>Name</mat-label>
                 <input matInput formControlName="folderName"  type="text" placeholder="Name"/>
                 <mat-error *ngIf="folderFormGroup.get('folderName').hasError('required')">
                     The folder name is required

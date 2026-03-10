@@ -63,6 +63,7 @@
 					<div class="label"> Account Name </div>
 					<div class="flex-grow">
 						<mat-form-field class="full-width">
+							<mat-label>Account Name</mat-label>
 							<input  matInput placeholder="Account Name" formControlName="accountName">
 							<mat-error *ngIf="formGroup.get('accountName').hasError('required')">
 								Account Name is required
@@ -74,6 +75,7 @@
 					<div class="label"> Short Account Name </div>
 					<div class="flex-grow">
 						<mat-form-field class="full-width">
+							<mat-label>Short Account Name</mat-label>
 							<input matInput  placeholder="Short Account Name" formControlName="shortAccountName">
 							<mat-error *ngIf="formGroup.get('shortAccountName').hasError('required')">
 								Short Account Name is required
@@ -91,6 +93,7 @@
 					<div class="flex-grow" style="font-size: small;">
 						<div class="inline-block" style="vertical-align: top; font-size: small;">
 							<mat-form-field style="width: 3rem;">
+								<mat-label>Bus</mat-label>
 								<input matInput placeholder="Bus" formControlName="chartfieldBus">
 								<mat-hint>2 digits</mat-hint>
 								<mat-error *ngIf="formGroup.get('chartfieldBus').hasError('pattern')">
@@ -106,6 +109,7 @@
 						<div class="horizontal-break"></div>
 						<div class="inline-block" style="vertical-align: top">
 							<mat-form-field style="width: 3rem;">
+								<mat-label>Org</mat-label>
 								<input matInput placeholder="Org" formControlName="chartfieldOrg">
 								<mat-hint>5 digits</mat-hint>
 								<mat-error *ngIf="formGroup.get('chartfieldOrg').hasError('pattern')">
@@ -121,6 +125,7 @@
 						<div class="horizontal-break"></div>
 						<div class="inline-block" style="vertical-align: top">
 							<mat-form-field style="width: 3rem;">
+								<mat-label>Fund</mat-label>
 								<input matInput placeholder="Fund" formControlName="chartfieldFund">
 								<mat-hint>4 digits</mat-hint>
 								<mat-error *ngIf="formGroup.get('chartfieldFund').hasError('pattern')">
@@ -136,6 +141,7 @@
 						<div class="horizontal-break"></div>
 						<div class="inline-block" style="vertical-align: top">
 							<mat-form-field style="width: 3rem;">
+								<mat-label>Activity</mat-label>
 								<input matInput formControlName="chartfieldActivity"
 									   [errorStateMatcher]="accountStateMatcher"
 									   placeholder="Activity" (input)="clearAccountNumberProject()" >
@@ -161,6 +167,7 @@
 						</div>
 						<div class="inline-block" style="vertical-align: top">
 							<mat-form-field style="width: 4.5rem;">
+								<mat-label>Project</mat-label>
 								<input matInput placeholder="Project"
 									   (input)="clearAccountNumberActivity()"
 									   [errorStateMatcher]="accountStateMatcher"
@@ -185,6 +192,7 @@
 						<div class="horizontal-break"></div>
 						<div class="inline-block" style="vertical-align: top">
 							<mat-form-field style="width: 3rem;">
+								<mat-label>Account</mat-label>
 								<input  matInput placeholder="Account" formControlName="chartfieldAccountNum">
 								<mat-hint>5 digits</mat-hint>
 								<mat-error *ngIf="formGroup.get('chartfieldAccountNum').hasError('pattern')">
@@ -201,6 +209,7 @@
 						<div *ngIf="isActivity" class="horizontal-break"></div>
 						<div *ngIf="isActivity" class="inline-block" style="vertical-align: top">
 							<mat-form-field style="width: 3rem;">
+								<mat-label>A/U</mat-label>
 								<input matInput placeholder="A/U" formControlName="chartfieldAccountAU" readonly aria-readonly="true">
 								<mat-hint>1 digits</mat-hint>
 							</mat-form-field>
@@ -408,6 +417,7 @@
 					</div>
 					<div class="flex-grow">
 						<mat-form-field style="width: 18em;">
+							<mat-label>Total Dollar Amount</mat-label>
 							<span matPrefix>$ &nbsp;</span>
 							<input matInput placeholder="Total Dollar Amount"
 								   formControlName="totalDollarAmount">
@@ -421,8 +431,9 @@
 					<div class="label">
 						Approved Users
 					</div>
-					<div class="flex-grow" (click)="onClickApprovedUsers()">
+					<div class="flex-grow" (click)="onClickApprovedUsers()" role="button" tabindex="0" aria-label="Select approved users" (keydown.enter)="onClickApprovedUsers()" (keydown.space)="onClickApprovedUsers()">
 						<mat-form-field class="full-width">
+							<mat-label>Approved Users</mat-label>
 							<input matInput
 								   placeholder="Approved Users"
 								   formControlName="approvedUsersDisplayFC"
@@ -437,6 +448,7 @@
 					</div>
 					<div class="flex-grow">
 						<mat-form-field style="width: 100%;">
+							<mat-label>Your Email Address</mat-label>
 							<input matInput placeholder="Your Email Address" formControlName="email">
 							<mat-error *ngIf="formGroup.get('email').hasError('required')">
 								Email is required
@@ -467,6 +479,7 @@
 					</div>
 					<div class="flex-grow">
 						<mat-form-field class="full-width">
+							<mat-label>Account Name</mat-label>
 							<input matInput placeholder="Account Name" formControlName="accountName">
 							<mat-error *ngIf="formGroup.get('accountName').hasError('required')">
 								Account Name is required
@@ -480,6 +493,7 @@
 					</div>
 					<div class="flex-grow">
 						<mat-form-field class="full-width">
+							<mat-label>Short Account Name</mat-label>
 							<input matInput placeholder="Short Account Name" formControlName="shortAccountName">
 							<mat-error *ngIf="formGroup.get('shortAccountName').hasError('required')">
 								Short Account Name is required
@@ -534,6 +548,7 @@
 					</div>
 					<div class="flex-grow">
 						<mat-form-field style="width: 18em;">
+							<mat-label>Total Dollar Amount</mat-label>
 							<span matPrefix>$ &nbsp;</span>
 							<input matInput placeholder="Total Dollar Amount"
 								   formControlName="totalDollarAmount">
@@ -547,8 +562,9 @@
 					<div class="label">
 						Approved Users
 					</div>
-					<div class="flex-grow full-width" (click)="onClickApprovedUsers()">
+					<div class="flex-grow full-width" (click)="onClickApprovedUsers()" role="button" tabindex="0" aria-label="Select approved users" (keydown.enter)="onClickApprovedUsers()" (keydown.space)="onClickApprovedUsers()">
 						<mat-form-field class="full-width">
+							<mat-label>Approved Users</mat-label>
 							<input matInput
 								   placeholder="Approved Users"
 								   formControlName="approvedUsersDisplayFC"
@@ -563,6 +579,7 @@
 					</div>
 					<div class="flex-grow">
 						<mat-form-field style="width: 100%;">
+							<mat-label>Your Email Address</mat-label>
 							<input matInput placeholder="Your Email Address" formControlName="email">
 							<mat-error *ngIf="formGroup.get('email').hasError('required')">
 								Email is required
@@ -592,6 +609,7 @@
 					</div>
 					<div class="flex-grow">
 						<mat-form-field class="full-width">
+							<mat-label>Last four</mat-label>
 							<input  matInput
 									placeholder="Last four"
 									formControlName="creditLastFour">
@@ -642,6 +660,7 @@
 					</div>
 					<div class="flex-grow">
 						<mat-form-field style="width: 10em;">
+							<mat-label>Zip Code</mat-label>
 							<input
 									matInput
 									placeholder="Zip Code"
@@ -674,6 +693,7 @@
 					</div>
 					<div class="flex-grow">
 						<mat-form-field style="width: 18em;">
+							<mat-label>Total Dollar Amount</mat-label>
 							<span matPrefix>$ &nbsp;</span>
 							<input matInput placeholder="Total Dollar Amount"
 								   formControlName="totalDollarAmount">
@@ -687,8 +707,9 @@
 					<div class="label">
 						Approved Users
 					</div>
-					<div class="flex-grow" (click)="onClickApprovedUsers()">
+					<div class="flex-grow" (click)="onClickApprovedUsers()" role="button" tabindex="0" aria-label="Select approved users" (keydown.enter)="onClickApprovedUsers()" (keydown.space)="onClickApprovedUsers()">
 						<mat-form-field class="full-width">
+							<mat-label>Approved Users</mat-label>
 							<input matInput
 								   placeholder="Approved Users"
 								   formControlName="approvedUsersDisplayFC"
@@ -703,6 +724,7 @@
 					</div>
 					<div class="flex-grow">
 						<mat-form-field style="width: 100%;">
+							<mat-label>Your Email Address</mat-label>
 							<input matInput placeholder="Your Email Address" formControlName="email">
 							<mat-error *ngIf="formGroup.get('email').hasError('required')">
 								Email is required

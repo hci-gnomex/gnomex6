@@ -62,6 +62,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
         div.inlineDiv {
             display: flex;
             align-items: center;
+            color: #101010;
         }
 
         div.labelAndIcon {
@@ -69,6 +70,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
             align-items: center;
             width: 11em;
             padding-left: 0.5em;
+            color: #101010;
         }
 
         div.divider {
@@ -92,10 +94,12 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 
         label.leading-label {
             margin-right: 0.3em;
+            color: #101010;
         }
 
         label.following-label {
             margin-left: 0.3em;
+            color: #101010;
         }
         .padding-right {
             padding-right: 1em;
@@ -294,7 +298,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                         .sort(this.prefService.createUserDisplaySortFunction());
 
                     setTimeout(()=>{
-                        //all though there could be a race condition with getLabList the idLab was already set so the search with use that id.
+                        //although there could be a race condition with getLabList the idLab was already set so the search wll use that id.
                         this.preselectOnBrowseFilter()
                     })
                 },(err: IGnomexErrorResponse) =>{});

@@ -8,12 +8,12 @@
                 <h3 style="margin:0;" id="dialog-title">{{this.title ? this.title : this.dialogContent.innerTitle}}</h3>
             </div>
             <div class="flex-grow"></div>
-            <div class="padded" (click)="onClose()">
-                <img class="exit" [src]="this.constService.ICON_BLUE_EXIT" alt="Close dialog" role="button" aria-label="Close dialog">
-            </div>
+            <button class="padded icon-button" (click)="onClose()" aria-label="Close dialog">
+                <img class="exit" [src]="this.constService.ICON_BLUE_EXIT" alt="" aria-hidden="true">
+            </button>
         </div>
     </div>
-    <mat-dialog-content class="flex-grow no-margin no-padding" role="region" aria-label="Dialog content">
+    <mat-dialog-content class="flex-grow no-margin no-padding">
         <div class="flex-grow full-height full-width">
             <ndc-dynamic [ndcDynamicComponent]="this.dialogContentBluePrint"
                          [ndcDynamicInputs]="this.data"
