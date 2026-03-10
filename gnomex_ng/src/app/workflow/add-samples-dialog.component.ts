@@ -18,6 +18,7 @@ import {UtilService} from "../services/util.service";
 import * as _ from "lodash";
 import {SelectRenderer} from "../util/grid-renderers/select.renderer";
 import {SelectEditor} from "../util/grid-editors/select.editor";
+import {KEYS, TREE_ACTIONS} from "@circlon/angular-tree-component";
 
 @Component({
     templateUrl: "./add-samples-dialog.component.html",
@@ -137,7 +138,14 @@ export class AddSamplesDialogComponent extends BaseGenericContainerDialog implem
         this.dirty = () => {return  this._dirty};
         this.options = {
             displayField: "label",
-            allowDrag: (node: any) => {return node.level > 1 }
+            allowDrag: (node: any) => {return node.level > 1 },
+            actionMapping: {
+              keys: {
+                [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+                [KEYS.RIGHT]: undefined,
+                [KEYS.LEFT]: undefined,
+              }
+            }
         };
 
         this.labListService.getLabList().subscribe((resp)=>{

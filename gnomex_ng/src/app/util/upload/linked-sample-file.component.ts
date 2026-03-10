@@ -11,11 +11,11 @@ import {Subscription} from "rxjs";
 import {DialogsService, DialogType} from "../popup/dialogs.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {
-    ITreeOptions,
-    TREE_ACTIONS,
-    TreeComponent,
-    TreeModel,
-    TreeNode,
+  ITreeOptions, KEYS,
+  TREE_ACTIONS,
+  TreeComponent,
+  TreeModel,
+  TreeNode,
 } from "@circlon/angular-tree-component";
 import {ConstantsService} from "../../services/constants.service";
 import {first} from "rxjs/operators";
@@ -232,7 +232,12 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
 
                         }
                     }
-                }
+                },
+              keys: {
+                [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+                [KEYS.RIGHT]: undefined,
+                [KEYS.LEFT]: undefined,
+              }
             }
         };
 

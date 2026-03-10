@@ -1,7 +1,7 @@
 import {ChangeDetectorRef, ChangeDetectionStrategy, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef} from "@angular/material";
 import {ConstantsService} from "../services/constants.service";
-import {ITreeOptions, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode} from "@circlon/angular-tree-component";
+import {ITreeOptions, KEYS, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode} from "@circlon/angular-tree-component";
 import {PropertyService} from "../services/property.service";
 import {FileService} from "../services/file.service";
 import {Observable} from "rxjs";
@@ -242,6 +242,11 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
                         }
                     }
                 },   //  mouse
+                keys: {
+                  [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+                  [KEYS.RIGHT]: undefined,
+                  [KEYS.LEFT]: undefined,
+                }
             },  // actionMapping
         };  // filesOptions
 
@@ -261,11 +266,11 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
             this.data.downloadListSource.isSelected = 'Y';
             this.filesToDownloadNodes = [this.data.downloadListSource];
 
-setTimeout(() => {
-            this.updateFilesToDownloadTree();
+            setTimeout(() => {
+                        this.updateFilesToDownloadTree();
 
-            this.changeDetector.markForCheck();
-});
+                        this.changeDetector.markForCheck();
+            });
         }  // end if (this.data)
 
         if (this.securityAdvisor.isGuest) {

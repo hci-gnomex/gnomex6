@@ -7,7 +7,7 @@ import {
     ViewChild
 } from "@angular/core";
 import {BillingFilterEvent} from "./billing-filter.component";
-import {ITreeOptions, TreeComponent} from "@circlon/angular-tree-component";
+import {ITreeOptions, KEYS, TREE_ACTIONS, TreeComponent} from "@circlon/angular-tree-component";
 import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {HttpParams} from "@angular/common/http";
 import {BillingService} from "../services/billing.service";
@@ -507,6 +507,13 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         this.billingPeriodList = this.dictionaryService.getEntriesExcludeBlank(DictionaryService.BILLING_PERIOD) as BillingPeriod[];
         this.billingItemsTreeOptions = {
             displayField: 'display',
+            actionMapping: {
+              keys: {
+                [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+                [KEYS.RIGHT]: undefined,
+                [KEYS.LEFT]: undefined,
+              }
+            }
         };
 
         this.onCoreCommentsWindowRequestSelected = this.billingService.requestSelectedFromCoreCommentsWindow.subscribe((requestNumber: string) => {

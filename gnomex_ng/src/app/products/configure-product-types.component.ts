@@ -1,6 +1,6 @@
 import {Component, Inject, OnInit, ViewChild} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {ITreeOptions, TreeComponent, TreeModel} from "@circlon/angular-tree-component";
+import {ITreeOptions, KEYS, TREE_ACTIONS, TreeComponent, TreeModel} from "@circlon/angular-tree-component";
 import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {DictionaryService} from "../services/dictionary.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
@@ -100,6 +100,13 @@ export class ConfigureProductTypesComponent extends BaseGenericContainerDialog i
     ngOnInit() {
         this.options = {
             displayField: 'display',
+            actionMapping: {
+              keys: {
+                [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+                [KEYS.RIGHT]: undefined,
+                [KEYS.LEFT]: undefined,
+              }
+            }
         };
 
         this.loadProductTypes(this.dictionaryService.getEntriesExcludeBlank(DictionaryService.PRODUCT_TYPE));

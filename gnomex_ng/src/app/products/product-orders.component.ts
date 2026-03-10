@@ -9,7 +9,7 @@ import {HttpParams} from "@angular/common/http";
 import {ProductsService} from "../services/products.service";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {MatSnackBar} from "@angular/material";
-import {ITreeOptions, TreeComponent} from "@circlon/angular-tree-component";
+import {ITreeOptions, KEYS, TREE_ACTIONS, TreeComponent} from "@circlon/angular-tree-component";
 import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {UserPreferencesService} from "../services/user-preferences.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
@@ -152,6 +152,13 @@ export class ProductOrdersComponent implements OnInit {
 
         this.treeOptions = {
             displayField: 'display',
+            actionMapping: {
+              keys: {
+                [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+                [KEYS.RIGHT]: undefined,
+                [KEYS.LEFT]: undefined,
+              }
+            },
         };
     }
 

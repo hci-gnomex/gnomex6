@@ -1,17 +1,17 @@
 import {
-    AfterViewInit,
-    ChangeDetectorRef,
-    Component,
-    OnDestroy,
-    OnInit,
-    ViewChild,
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component, ElementRef,
+  OnDestroy,
+  OnInit, Renderer2,
+  ViewChild,
 } from "@angular/core";
 import {
-    ITreeOptions,
-    TREE_ACTIONS,
-    TreeComponent,
-    TreeModel,
-    TreeNode,
+  ITreeOptions, KEYS,
+  TREE_ACTIONS,
+  TreeComponent,
+  TreeModel,
+  TreeNode,
 } from "@circlon/angular-tree-component";
 
 import * as _ from "lodash";
@@ -138,34 +138,39 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
         this.utilService.registerChangeDetectorRef(this.changeDetectorRef);
         this.options = {
-            idField: "analysisTreeId",
-            displayField: "label",
-            childrenField: "items",
-            useVirtualScroll: true,
-            nodeHeight: 22,
-            nodeClass: (node: TreeNode) => {
-                return "icon-" + node.data.icon;
-            },
-            allowDrop: (element: any, to: {parent: TreeNode, index: number}) => {
-                return !!to.parent.data.idAnalysisGroup;
-            },
-            allowDrag: (node: any) => !this.createSecurityAdvisorService.isGuest && node.isLeaf && node.data.idAnalysis,
-            actionMapping: {
-                mouse: {
-                    click: (tree, node, $event) => {
-                        $event.ctrlKey
-                            ? TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event)
-                            : TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
-                    },
-                    dragStart: (tree: TreeModel, node: TreeNode, $event) => {
-                        if (!node.isActive) {
-                            TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
-                        }
-                    },
-                    drop: this.moveNode,
+          idField: "analysisTreeId",
+          displayField: "label",
+          childrenField: "items",
+          useVirtualScroll: true,
+          nodeHeight: 22,
+          nodeClass: (node: TreeNode) => {
+            return "icon-" + node.data.icon;
+          },
+          allowDrop: (element: any, to: {parent: TreeNode, index: number}) => {
+            return !!to.parent.data.idAnalysisGroup;
+          },
+          allowDrag: (node: any) => !this.createSecurityAdvisorService.isGuest && node.isLeaf && node.data.idAnalysis,
+          actionMapping: {
+            mouse: {
+              click: (tree, node, $event) => {
+                $event.ctrlKey
+                  ? TREE_ACTIONS.TOGGLE_ACTIVE_MULTI(tree, node, $event)
+                  : TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
+              },
+              dragStart: (tree: TreeModel, node: TreeNode, $event) => {
+                if (!node.isActive) {
+                  TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
                 }
+              },
+              drop: this.moveNode,
             },
-        };
+            keys: {
+              [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+              [KEYS.RIGHT]: undefined,
+              [KEYS.LEFT]: undefined,
+            }
+          },
+      };
 
         this.labListService.getLabList_FromBackEnd();
         this.labListSubscription =  this.labListService.getLabListSubject().subscribe((resp: any[]) => {
@@ -325,6 +330,18 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         });
 
     }
+
+
+    onTreeKeydown(event: KeyboardEvent): void {
+        console.log("it doesn't fire");
+        if (event.key === 'Enter') {
+          const focusedNode = this.treeModel.getFocusedNode();
+          if (focusedNode && focusedNode.hasChildren) {
+            focusedNode.toggleExpanded();
+          }
+        }
+      }
+
 
     /*
     Build the tree data
@@ -529,71 +546,74 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     treeOnSelect(event: any) {
         // If selecting multiple analyses (for dragging-and-dropping, for example)
         // improve performance by reducing unnecessary loading
-        if (this.treeModel.getActiveNodes().length > 1) {
+      console.log('treeOnSelect event:', event);
+      console.log('treeOnSelect event.originalEvent:', event.originalEvent);
+      console.log('treeOnSelect event.$event:', event.$event);
+      if (this.treeModel.getActiveNodes().length > 1) {
             return;
-        }
+      }
 
-        this.selectedItem = event.node;
-        this.selectedIdLab = this.selectedItem.data.idLab;
-        this.selectedIdAnalysisGroup = null;
-        let idAnalysis = this.selectedItem.data.idAnalysis;
-        let idAnalysisGroup = this.selectedItem.data.idAnalysisGroup;
-        let idLab = this.selectedItem.data.idLab;
+      this.selectedItem = event.node;
+      this.selectedIdLab = this.selectedItem.data.idLab;
+      this.selectedIdAnalysisGroup = null;
+      let idAnalysis = this.selectedItem.data.idAnalysis;
+      let idAnalysisGroup = this.selectedItem.data.idAnalysisGroup;
+      let idLab = this.selectedItem.data.idLab;
 
 
-        let analysisGroupListNode: Array<any> = _.cloneDeep(this.selectedItem.data);
-        this.analysisService.emitAnalysisOverviewList(analysisGroupListNode);
-        let navArray: Array<any> = [];
-        let navExtras: NavigationExtras = {};
-        if(this.navService.navMode === NavigationService.USER){
-            //Lab
-            if (this.selectedItem.level === 1) {
-                this.analysisService.selectedNodeId = event.node.data.id;
-                this.disableNewAnalysis = false;
-                this.disableNewAnalysisGroup = false;
-                this.disableDelete = true;
-                navArray = ["/analysis", "overview"];
-                navExtras = {queryParams: {idLab: idLab, idAnalysisGroup: null}};
+      let analysisGroupListNode: Array<any> = _.cloneDeep(this.selectedItem.data);
+      this.analysisService.emitAnalysisOverviewList(analysisGroupListNode);
+      let navArray: Array<any> = [];
+      let navExtras: NavigationExtras = {};
+      if(this.navService.navMode === NavigationService.USER){
+          //Lab
+          if (this.selectedItem.level === 1) {
+              this.analysisService.selectedNodeId = event.node.data.id;
+              this.disableNewAnalysis = false;
+              this.disableNewAnalysisGroup = false;
+              this.disableDelete = true;
+              navArray = ["/analysis", "overview"];
+              navExtras = {queryParams: {idLab: idLab, idAnalysisGroup: null}};
 
-                //AnalysisGroup
-            } else if (this.selectedItem.level === 2) {
-                this.parentProject = event.node.parent;
-                this.analysisService.selectedNodeId = event.node.data.id;
-                this.selectedIdAnalysisGroup = this.selectedItem.data.idAnalysisGroup;
-                this.disableNewAnalysis = false;
-                this.disableDelete = false;
-                this.disableNewAnalysisGroup = false;
-                navArray = ["/analysis", "overview"];
-                navExtras = {queryParams: {idLab: idLab, idAnalysisGroup: idAnalysisGroup}};
+              //AnalysisGroup
+          } else if (this.selectedItem.level === 2) {
+              this.parentProject = event.node.parent;
+              this.analysisService.selectedNodeId = event.node.data.id;
+              this.selectedIdAnalysisGroup = this.selectedItem.data.idAnalysisGroup;
+              this.disableNewAnalysis = false;
+              this.disableDelete = false;
+              this.disableNewAnalysisGroup = false;
+              navArray = ["/analysis", "overview"];
+              navExtras = {queryParams: {idLab: idLab, idAnalysisGroup: idAnalysisGroup}};
 
-                //Analysis
-            } else if (this.selectedItem.level === 3) {
-                navArray = ["/analysis", "detail", idAnalysis];
-                this.parentProject = event.node.parent;
-                this.selectedIdAnalysisGroup = this.parentProject.data.idAnalysisGroup;
-                this.disableNewAnalysis = false;
-                this.disableDelete = false;
-                this.disableNewAnalysisGroup = false;
-                navExtras = {queryParams: {idLab: idLab, idAnalysisGroup: this.selectedIdAnalysisGroup}};
-            }
-            navExtras.relativeTo = this.route;
-            navExtras.queryParamsHandling = 'merge';
+              //Analysis
+          } else if (this.selectedItem.level === 3) {
+              navArray = ["/analysis", "detail", idAnalysis];
+              this.parentProject = event.node.parent;
+              this.selectedIdAnalysisGroup = this.parentProject.data.idAnalysisGroup;
+              this.disableNewAnalysis = false;
+              this.disableDelete = false;
+              this.disableNewAnalysisGroup = false;
+              navExtras = {queryParams: {idLab: idLab, idAnalysisGroup: this.selectedIdAnalysisGroup}};
+          }
+          navExtras.relativeTo = this.route;
+          navExtras.queryParamsHandling = 'merge';
 
-            this.dialogsService.startDefaultSpinnerDialog();
-            this.router.navigate(navArray,navExtras);
-        }else{
-            this.navService.emitResetNavModeSubject("detail");
-            this.navService.emitResetNavModeSubject("overview");
-            this.dialogsService.removeSpinnerWorkItem();
-        }
+          this.dialogsService.startDefaultSpinnerDialog();
+          this.router.navigate(navArray,navExtras);
+      }else{
+          this.navService.emitResetNavModeSubject("detail");
+          this.navService.emitResetNavModeSubject("overview");
+          this.dialogsService.removeSpinnerWorkItem();
+      }
 
     }
 
     ngOnDestroy(): void {
-        this.utilService.removeChangeDetectorRef(this.changeDetectorRef);
-        this.analysisGroupListSubscription.unsubscribe();
-        this.navEndSubscription.unsubscribe();
-        this.labListSubscription.unsubscribe();
+      this.utilService.removeChangeDetectorRef(this.changeDetectorRef);
+      this.analysisGroupListSubscription.unsubscribe();
+      this.navEndSubscription.unsubscribe();
+      this.labListSubscription.unsubscribe();
     }
 
     private findNodeById(id: string): TreeNode {

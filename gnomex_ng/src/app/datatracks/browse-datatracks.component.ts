@@ -4,7 +4,7 @@ import {
 
 import {
   IActionMapping,
-  ITreeOptions,
+  ITreeOptions, KEYS,
   TREE_ACTIONS,
   TreeComponent,
   TreeModel,
@@ -193,6 +193,11 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
             }
           },
           drop: this.moveNode,
+        },
+        keys: {
+          [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+          [KEYS.RIGHT]: undefined,
+          [KEYS.LEFT]: undefined,
         }
       },
     };

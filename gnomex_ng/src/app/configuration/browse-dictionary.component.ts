@@ -1,6 +1,6 @@
 import {ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {DictionaryService} from "../services/dictionary.service";
-import {ITreeOptions, TreeComponent, TreeNode} from "@circlon/angular-tree-component";
+import {ITreeOptions, KEYS, TREE_ACTIONS, TreeComponent, TreeNode} from "@circlon/angular-tree-component";
 import {Dictionary} from "./dictionary.interface";
 import {DictionaryEntry} from "./dictionary-entry.type";
 import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
@@ -216,6 +216,13 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
         childrenField: "DictionaryEntry",
         useVirtualScroll: true,
         nodeHeight: 22,
+        actionMapping: {
+          keys: {
+            [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+            [KEYS.RIGHT]: undefined,
+            [KEYS.LEFT]: undefined,
+          }
+        },
     };
 
     public dictionaries: Dictionary[] = [];

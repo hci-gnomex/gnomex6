@@ -1,15 +1,15 @@
 import {
-    AfterViewInit,
-    Component,
-    ElementRef,
-    EventEmitter, HostBinding,
-    Injector,
-    Input,
-    OnChanges,
-    OnDestroy,
-    Output, SimpleChange,
-    SimpleChanges,
-    ViewChild
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter, HostBinding,
+  Injector,
+  Input,
+  OnChanges,
+  OnDestroy,
+  Output, SimpleChange,
+  SimpleChanges,
+  ViewChild
 } from "@angular/core";
 import {AbstractControl, ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, NgControl} from "@angular/forms";
 import {Observable, Subscription} from "rxjs";
@@ -17,266 +17,285 @@ import {UtilService} from "../services/util.service";
 import {debounceTime} from "rxjs/operators";
 
 @Component({
-    selector: "custom-combo-box",
-    template: `
-        <mat-form-field [classList]="'full-width full-height ' + customFieldClasses" [matTooltip]="this.tooltip">
-            <input #input matInput class="full-width full-height"
-                   name="customComboBoxFilter"
-                   autocomplete="off"
-                   [placeholder]="this.temporaryPlaceholder ? (this.innerControl.value ? '' : this.placeholder) : this.placeholder"
-                   [attr.cdkFocusInitial]="cdkFocusInitial === undefined ? null : cdkFocusInitial"
-                   [tabindex]="tabindex"
-                   [matAutocomplete]="auto" [formControl]="this.innerControl"
-                   [attr.aria-label]="placeholder"
-                   role="combobox"
-                   aria-haspopup="listbox"
-                   [attr.aria-owns]="auto.id"
-                   [attr.aria-controls]="auto.id"
-                   [attr.aria-expanded]="isOpen">
-            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete"
-                              [autoActiveFirstOption]="false"
-                              (optionSelected)="this.selectOption($event.option.value)"
-                              (opened)="this.onOpened()" (closed)="this.onClosed()" [displayWith]="this.displayFn">
-                <mat-option [classList]="customOptionClasses" *ngIf="this.allowNone && (this.forceShowNone || !this.innerControl.value)">None</mat-option>
-                <mat-option [classList]="customOptionClasses" *ngFor="let opt of this.loadedOptions" [value]="opt">
-                    {{ displayField ? opt[displayField] : opt}}
-                </mat-option>
-                <mat-option [classList]="customOptionClasses" *ngIf="this.includeLoadingOption" aria-live="polite">Loading...</mat-option>
-            </mat-autocomplete>
-            <mat-error *ngIf="this.innerControl.hasError('required')" role="alert">{{ placeholder }} is required</mat-error>
-        </mat-form-field>
-    `,
-    providers: [{
-        provide: NG_VALUE_ACCESSOR,
-        useExisting: CustomComboBoxComponent,
-        multi: true,
-    }],
+  selector: "custom-combo-box",
+  template: `
+    <mat-form-field [classList]="'full-width full-height ' + customFieldClasses" [matTooltip]="this.tooltip">
+      <input #input matInput class="full-width full-height"
+             name="customComboBoxFilter"
+             (click)="onClick($event)"
+             (focus)="onFocus($event)"
+             autocomplete="off"
+             [placeholder]="this.temporaryPlaceholder ? (this.innerControl.value ? '' : this.placeholder) : this.placeholder"
+             [attr.cdkFocusInitial]="cdkFocusInitial === undefined ? null : cdkFocusInitial"
+             [tabindex]="tabindex"
+             [matAutocomplete]="auto" [formControl]="this.innerControl"
+             [attr.aria-label]="placeholder"
+             [readonly]="readonly"
+             [attr.aria-readonly]="readonly ? 'true' : null"
+             role="combobox"
+             aria-haspopup="listbox"
+             [attr.aria-owns]="auto.id"
+             [attr.aria-controls]="auto.id"
+             [attr.aria-expanded]="isOpen">
+      <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete"
+                        [autoActiveFirstOption]="false"
+                        (optionSelected)="this.selectOption($event.option.value)"
+                        (opened)="this.onOpened()" (closed)="this.onClosed()" [displayWith]="this.displayFn">
+        <mat-option [classList]="customOptionClasses" *ngIf="this.allowNone && (this.forceShowNone || !this.innerControl.value)">None</mat-option>
+        <mat-option [classList]="customOptionClasses" *ngFor="let opt of this.loadedOptions" [value]="opt">
+          {{ displayField ? opt[displayField] : opt}}
+        </mat-option>
+        <mat-option [classList]="customOptionClasses" *ngIf="this.includeLoadingOption" aria-live="polite">Loading...</mat-option>
+      </mat-autocomplete>
+      <mat-error *ngIf="this.innerControl.hasError('required')" role="alert">{{ placeholder }} is required</mat-error>
+    </mat-form-field>
+  `,
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: CustomComboBoxComponent,
+    multi: true,
+  }],
 })
 
 export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDestroy, ControlValueAccessor {
-    @ViewChild("input", {static: false}) inputElement: ElementRef;
+  @ViewChild("input", {static: false}) inputElement: ElementRef;
 
 
-    @Input() public placeholder: string = "";
-    @Input() public temporaryPlaceholder: boolean = false;
-    @Input() public tooltip: string = "";
-    @Input() public allowNone: boolean = true;
-    // tell mat-dialog to pass initial focus to the inner input
-    @HostBinding('attr.cdkFocusInitial') _cdkFocusInitial = null;
-    @Input() public cdkFocusInitial: string = undefined;
+  @Input() public placeholder: string = "";
+  @Input() public temporaryPlaceholder: boolean = false;
+  @Input() public tooltip: string = "";
+  @Input() public allowNone: boolean = true;
+  // tell mat-dialog to pass initial focus to the inner input
+  @HostBinding('attr.cdkFocusInitial') _cdkFocusInitial = null;
+  @Input() public cdkFocusInitial: string = undefined;
 
-    // on tab skip the host element and focus the input
-    @HostBinding('attr.tabindex') _tabindex = null;
-    @Input() public tabindex: number = 0;
+  // on tab skip the host element and focus the input
+  @HostBinding('attr.tabindex') _tabindex = null;
+  @Input() public tabindex: number = 0;
 
-    public forceShowNone: boolean = false;
+  public readonly = false;
+  public forceShowNone: boolean = false;
 
-    @Input() private options: any[] =[];
+  @Input() private options: any[] =[];
 
 
-    public isOpen: boolean = false;
-    public includeLoadingOption: boolean = true;
-    public loadedOptions: any[] = [];
+  public isOpen: boolean = false;
+  public includeLoadingOption: boolean = true;
+  public loadedOptions: any[] = [];
 
-    @Input() private valueField: string;
-    @Input() private forceEmitObject: boolean = false;
-    @Input() public displayField: string;
+  @Input() private valueField: string;
+  @Input() private forceEmitObject: boolean = false;
+  @Input() public displayField: string;
 
-    @Input() public set customFieldClasses(value: string) {
-        this._customFieldClasses = value ? value : "";
-    }
-    public get customFieldClasses(): string {
-        return !!this._customFieldClasses ? this._customFieldClasses : 'mat-form-field-should-float';
-    }
+  @Input() public set customFieldClasses(value: string) {
+    this._customFieldClasses = value ? value : "";
+  }
+  public get customFieldClasses(): string {
+    return !!this._customFieldClasses ? this._customFieldClasses : 'mat-form-field-should-float';
+  }
 
-    private _customFieldClasses: string = "";
+  private _customFieldClasses: string = "";
 
-    @Input() public set customOptionClasses(value: string) {
-        this._customOptionClasses = value ? value : "";
-    }
-    public get customOptionClasses(): string {
-        return !!this._customOptionClasses ? this._customOptionClasses : 'small-font padded inline-block full-width ellipsis';
-    }
+  @Input() public set customOptionClasses(value: string) {
+    this._customOptionClasses = value ? value : "";
+  }
+  public get customOptionClasses(): string {
+    return !!this._customOptionClasses ? this._customOptionClasses : 'small-font padded inline-block full-width ellipsis';
+  }
 
-    private _customOptionClasses: string = "";
+  private _customOptionClasses: string = "";
 
-    private outerControl: AbstractControl = new FormControl();
-    public innerControl: FormControl = new FormControl(null);
-    private ignoreInnerControlChanges: boolean = false;
-    private innerControlSubscription: Subscription;
-    private noNgControl: boolean = false;
+  private outerControl: AbstractControl = new FormControl();
+  public innerControl: FormControl = new FormControl(null);
+  private ignoreInnerControlChanges: boolean = false;
+  private innerControlSubscription: Subscription;
+  private noNgControl: boolean = false;
 
-    private onChangeFn: (val: any) => void = () => {};
-    private onTouchedFn: () => void = () => {};
+  private onChangeFn: (val: any) => void = () => {};
+  private onTouchedFn: () => void = () => {};
 
-    @Output() optionSelected: EventEmitter<any> = new EventEmitter<any>();
-    @Output() optionsLoaded: EventEmitter<any[]> = new EventEmitter<any[]>();
+  @Output() optionSelected: EventEmitter<any> = new EventEmitter<any>();
+  @Output() optionsLoaded: EventEmitter<any[]> = new EventEmitter<any[]>();
 
-    public displayFn: (opt?: any) => string | undefined = (opt?: any) => {
-        return opt ? (this.displayField ? opt[this.displayField] : opt) : undefined;
-    };
+  public displayFn: (opt?: any) => string | undefined = (opt?: any) => {
+    return opt ? (this.displayField ? opt[this.displayField] : opt) : undefined;
+  };
 
-    constructor(private injector: Injector) {
-    }
+  constructor(private injector: Injector) {
+  }
 
-    ngAfterViewInit(): void {
-        let ngControl: NgControl = this.injector.get(NgControl, null);
-        if (ngControl && ngControl.control) {
-            this.outerControl = ngControl.control;
-            this.innerControl.setValidators(this.outerControl.validator);
-            setTimeout(() => {
-                this.loadOnlyCurrentValue();
-            });
-        } else {
-            this.noNgControl = true;
-        }
-
-        this.innerControlSubscription = this.innerControl.valueChanges.pipe(debounceTime(300)).subscribe(() => {
-            if (!this.ignoreInnerControlChanges) {
-                this.filterOptions();
-            } else {
-                this.ignoreInnerControlChanges = false;
-            }
-        });
-    }
-
-    ngOnChanges(changes: SimpleChanges): void {
-        if (changes.options) {
-            let optionsChange: SimpleChange = changes.options;
-            if (!optionsChange.currentValue) {
-                this.options = [];
-            }
-            this.includeLoadingOption = true;
-            let currentOpts :any[] = <any[]>optionsChange.currentValue;
-            if(currentOpts && currentOpts.length > 0 && currentOpts !== optionsChange.previousValue  ){
-                this.optionsLoaded.emit();
-            }
-
-        }
-
-        setTimeout(() => {
-            if (this.isOpen) {
-                this.filterOptions();
-                this.includeLoadingOption = false;
-            } else {
-                this.loadOnlyCurrentValue();
-            }
-        });
-    }
-
-    writeValue(obj: any): void {
+  ngAfterViewInit(): void {
+    let ngControl: NgControl = this.injector.get(NgControl, null);
+    if (ngControl && ngControl.control) {
+      this.outerControl = ngControl.control;
+      this.innerControl.setValidators(this.outerControl.validator);
+      setTimeout(() => {
         this.loadOnlyCurrentValue();
+      });
+    } else {
+      this.noNgControl = true;
     }
 
-    registerOnChange(fn: any): void {
-        this.onChangeFn = fn;
+    this.innerControlSubscription = this.innerControl.valueChanges.pipe(debounceTime(300)).subscribe(() => {
+      if (!this.ignoreInnerControlChanges) {
+        this.filterOptions();
+      } else {
+        this.ignoreInnerControlChanges = false;
+      }
+    });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes.options) {
+      let optionsChange: SimpleChange = changes.options;
+      if (!optionsChange.currentValue) {
+        this.options = [];
+      }
+      this.includeLoadingOption = true;
+      let currentOpts :any[] = <any[]>optionsChange.currentValue;
+      if(currentOpts && currentOpts.length > 0 && currentOpts !== optionsChange.previousValue  ){
+        this.optionsLoaded.emit();
+      }
+
     }
 
-    registerOnTouched(fn: any): void {
-        this.onTouchedFn = fn;
-    }
+    setTimeout(() => {
+      if (this.isOpen) {
+        this.filterOptions();
+        this.includeLoadingOption = false;
+      } else {
+        this.loadOnlyCurrentValue();
+      }
+    });
+  }
 
-    setDisabledState(isDisabled: boolean): void {
-        if (isDisabled) {
-            this.innerControl.disable();
+  writeValue(obj: any): void {
+    this.loadOnlyCurrentValue();
+  }
+
+  registerOnChange(fn: any): void {
+    this.onChangeFn = fn;
+  }
+
+  registerOnTouched(fn: any): void {
+    this.onTouchedFn = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.readonly = isDisabled;
+  }
+
+  private loadOnlyCurrentValue(): void {
+    this.loadedOptions = [];
+    let newValue: any = null;
+    if (this.outerControl.value) {
+      let currentlySelected: any = this.options.find((opt: any) => {
+        let optValue: any = this.valueField ? opt[this.valueField] : opt;
+        if (this.forceEmitObject) {
+          let outerValue: any = this.outerControl.value ? (this.valueField ? this.outerControl.value[this.valueField] : this.outerControl.value) : null;
+          if (optValue === outerValue) {
+            return true;
+          }
         } else {
-            this.innerControl.enable();
+          return optValue === this.outerControl.value;
         }
+      });
+      if (currentlySelected) {
+        newValue = currentlySelected;
+        this.loadedOptions.push(currentlySelected);
+      }
+    }
+    // prefer to check id if it has one  vs straight against its object identity
+    if( this.innerControl.value && newValue && this.valueField){
+      if(this.innerControl.value[this.valueField] !== newValue[this.valueField]){
+        this.ignoreInnerControlChanges = true;
+        this.innerControl.setValue(newValue);
+        this.optionSelected.emit(newValue[this.valueField]);
+      }
+    } else if (this.innerControl.value !== newValue) {
+      this.ignoreInnerControlChanges = true;
+      this.innerControl.setValue(newValue);
+      let nv = newValue ? ((this.valueField && !this.forceEmitObject) ? newValue[this.valueField] : newValue) : null;
+      this.optionSelected.emit(nv);
+    }
+  }
+
+  private filterOptions(showAll: boolean = false): void {
+    if (showAll || !this.innerControl.value) {
+      this.forceShowNone = true;
+      this.loadedOptions = this.options;
+    } else {
+      let searchValue: string = "";
+      if (typeof this.innerControl.value === "string") {
+        searchValue = this.innerControl.value.toLowerCase();
+      } else if (this.displayField) {
+        searchValue = this.innerControl.value[this.displayField].toLowerCase();
+      }
+      this.loadedOptions = this.options.filter((opt: any) => {
+        let optDisplay: string = (this.displayField ? opt[this.displayField] : opt).toLowerCase();
+        return optDisplay.includes(searchValue);
+      });
+      this.forceShowNone = this.loadedOptions.length === 0;
+    }
+  }
+
+  public onOpened(): void {
+    if (this.readonly) {
+      return;
+    }
+    this.isOpen = true;
+    this.onTouchedFn();
+    this.inputElement.nativeElement.select(); // Highlights text
+
+    setTimeout(() => {
+      this.filterOptions(true);
+      this.includeLoadingOption = false;
+    });
+  }
+
+  public onClosed(): void {
+    this.isOpen = false;
+    if (!this.innerControl.value && this.outerControl.value) {
+      this.selectOption(null);
     }
 
-    private loadOnlyCurrentValue(): void {
-        this.loadedOptions = [];
-        let newValue: any = null;
-        if (this.outerControl.value) {
-            let currentlySelected: any = this.options.find((opt: any) => {
-                let optValue: any = this.valueField ? opt[this.valueField] : opt;
-                if (this.forceEmitObject) {
-                    let outerValue: any = this.outerControl.value ? (this.valueField ? this.outerControl.value[this.valueField] : this.outerControl.value) : null;
-                    if (optValue === outerValue) {
-                        return true;
-                    }
-                } else {
-                    return optValue === this.outerControl.value;
-                }
-            });
-            if (currentlySelected) {
-                newValue = currentlySelected;
-                this.loadedOptions.push(currentlySelected);
-            }
-        }
-        // prefer to check id if it has one  vs straight against its object identity
-        if( this.innerControl.value && newValue && this.valueField){
-            if(this.innerControl.value[this.valueField] !== newValue[this.valueField]){
-                this.ignoreInnerControlChanges = true;
-                this.innerControl.setValue(newValue);
-                this.optionSelected.emit(newValue[this.valueField]);
-            }
-        } else if (this.innerControl.value !== newValue) {
-            this.ignoreInnerControlChanges = true;
-            this.innerControl.setValue(newValue);
-            let nv = newValue ? ((this.valueField && !this.forceEmitObject) ? newValue[this.valueField] : newValue) : null;
-            this.optionSelected.emit(nv);
-        }
+    setTimeout(() => {
+      this.loadOnlyCurrentValue();
+      this.includeLoadingOption = true;
+    });
+  }
+
+  public selectOption(opt: any): void {
+
+    let newVal = opt ? ((this.valueField && !this.forceEmitObject) ? opt[this.valueField] : opt) : null;
+
+    if (this.noNgControl) {
+      this.outerControl.setValue(newVal);
     }
 
-    private filterOptions(showAll: boolean = false): void {
-        if (showAll || !this.innerControl.value) {
-            this.forceShowNone = true;
-            this.loadedOptions = this.options;
-        } else {
-            let searchValue: string = "";
-            if (typeof this.innerControl.value === "string") {
-                searchValue = this.innerControl.value.toLowerCase();
-            } else if (this.displayField) {
-                searchValue = this.innerControl.value[this.displayField].toLowerCase();
-            }
-            this.loadedOptions = this.options.filter((opt: any) => {
-                let optDisplay: string = (this.displayField ? opt[this.displayField] : opt).toLowerCase();
-                return optDisplay.includes(searchValue);
-            });
-            this.forceShowNone = this.loadedOptions.length === 0;
-        }
+    this.inputElement.nativeElement.blur();
+
+    this.onChangeFn(newVal);
+    this.optionSelected.emit(newVal);
+  }
+
+  public onClick(event: MouseEvent): void {
+    event.stopPropagation();
+    if (this.readonly) {
+      this.inputElement.nativeElement.blur();
     }
+  }
 
-    public onOpened(): void {
-        this.isOpen = true;
-        this.onTouchedFn();
-        this.inputElement.nativeElement.select(); // Highlights text
-
-        setTimeout(() => {
-            this.filterOptions(true);
-            this.includeLoadingOption = false;
-        });
+  public onFocus(event): void {
+    if (this.readonly) {
+      return;
     }
+    this.inputElement.nativeElement.select();
+  }
 
-    public onClosed(): void {
-        this.isOpen = false;
-        if (!this.innerControl.value && this.outerControl.value) {
-            this.selectOption(null);
-        }
+  ngOnDestroy(): void {
+    UtilService.safelyUnsubscribe(this.innerControlSubscription);
+  }
 
-        setTimeout(() => {
-            this.loadOnlyCurrentValue();
-            this.includeLoadingOption = true;
-        });
-    }
-
-    public selectOption(opt: any): void {
-
-        let newVal = opt ? ((this.valueField && !this.forceEmitObject) ? opt[this.valueField] : opt) : null;
-
-        if (this.noNgControl) {
-            this.outerControl.setValue(newVal);
-        }
-
-        this.inputElement.nativeElement.blur();
-
-        this.onChangeFn(newVal);
-        this.optionSelected.emit(newVal);
-    }
-
-    ngOnDestroy(): void {
-        UtilService.safelyUnsubscribe(this.innerControlSubscription);
-    }
 
 }

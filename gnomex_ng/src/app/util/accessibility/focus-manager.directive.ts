@@ -5,6 +5,7 @@ import { AfterViewInit, Directive, ElementRef, HostListener, Input, OnDestroy, R
 })
 export class FocusManagerDirective implements AfterViewInit, OnDestroy {
   @Input() toolbarSelector: string | null = null;
+  @Input() invokeEnter: ((event: KeyboardEvent) => void) | null = null;
 
   private containerEl: HTMLElement | null = null;
 
@@ -20,6 +21,10 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
   ) {}
 
   ngAfterViewInit(): void {
+    // Make host focusable so keydown events can be received
+    if (!this.host.nativeElement.hasAttribute('tabindex')) {
+      this.renderer.setAttribute(this.host.nativeElement, 'tabindex', '0');
+    }
     this.containerEl = this.findContainer();
     if (!this.containerEl) { return; }
 
@@ -70,33 +75,34 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
   @HostListener('keydown', ['$event'])
   onKeyDown(event: KeyboardEvent): void {
     if (!this.containerEl) { return; }
-    if (event.key !== 'Tab' && event.key !== 'F6') { return; }
+    if (event.key !== 'Tab' && event.key !== 'F6' && event.key !== 'Enter') { return; }
 
     const doc = this.host.nativeElement.ownerDocument;
     const active = doc.activeElement as HTMLElement | null;
 
     const inside = !!active && this.containerEl.contains(active);
 
+    if (event.key === 'Enter' && inside && this.invokeEnter) {
+      this.invokeEnter(event);
+    }
+
     // Only override Tab when focus is INSIDE the widget.
     if (event.key === 'Tab' && inside) {
       event.preventDefault();
 
       if (event.shiftKey) {
-        // Move to before-sentinel (its focus handler moves to previous outside control)
         if (this.beforeSentinel) {
           this.beforeSentinel.focus();
         }
       } else {
-        // Move to after-sentinel (its focus handler moves to next outside control)
         if (this.afterSentinel) {
           this.afterSentinel.focus();
         }
-
       }
       return;
     }
 
-    // Your F6 behavior (example: move focus into toolbar)
+    // F6 behavior
     if (event.key === 'F6' && inside) {
       const toolbar = this.toolbarSelector
         ? (doc.querySelector(`.${this.toolbarSelector}`) as HTMLElement | null)

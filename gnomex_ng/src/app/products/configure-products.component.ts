@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit, ViewChild} from "@angular/core";
-import {ITreeOptions, TreeComponent, TreeModel} from "@circlon/angular-tree-component";
+import {ITreeOptions, KEYS, TREE_ACTIONS, TreeComponent, TreeModel} from "@circlon/angular-tree-component";
 import {ProductsService} from "../services/products.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
@@ -100,6 +100,13 @@ export class ConfigureProductsComponent implements OnInit {
     ngOnInit() {
         this.options = {
             displayField: 'display',
+            actionMapping: {
+              keys: {
+                [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+                [KEYS.RIGHT]: undefined,
+                [KEYS.LEFT]: undefined,
+              }
+            },
         };
         this.loadProducts();
     }

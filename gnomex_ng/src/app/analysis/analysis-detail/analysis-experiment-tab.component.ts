@@ -7,7 +7,7 @@ import {ActivatedRoute} from "@angular/router";
 import {GridOptions} from "ag-grid-community/main";
 import {GnomexService} from "../../services/gnomex.service";
 import {AnalysisService} from "../../services/analysis.service";
-import {ITreeOptions} from "@circlon/angular-tree-component";
+import {ITreeOptions, KEYS, TREE_ACTIONS} from "@circlon/angular-tree-component";
 import {HttpParams} from "@angular/common/http";
 import {ConstantsService} from "../../services/constants.service";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
@@ -302,7 +302,14 @@ export class AnalysisExperimentTabComponent implements OnInit, OnDestroy {
         this.labList = this.gnomexService.labList;
         this.options = {
             displayField: "label",
-            allowDrag: (node: any) => {return node.level > 1 && this.analysisService.getEditMode(); }
+            actionMapping: {
+              keys: {
+                [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+                [KEYS.RIGHT]: undefined,
+                [KEYS.LEFT]: undefined,
+              }
+            },
+              allowDrag: (node: any) => {return node.level > 1 && this.analysisService.getEditMode(); }
         };
 
 

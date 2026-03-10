@@ -1,6 +1,6 @@
 import {ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild,} from "@angular/core";
 
-import {ITreeOptions, TreeComponent, TreeModel, TreeNode,} from "@circlon/angular-tree-component";
+import {ITreeOptions, KEYS, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode,} from "@circlon/angular-tree-component";
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
 import {ActivatedRoute, NavigationExtras, ParamMap, Router} from "@angular/router";
@@ -149,7 +149,15 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
         allowDrop: (element, {parent, index}) => {
             return parent.data.parentid !== -1;
         },
-        allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && (node.data.idDataTrack || node.data.idRequest || node.data.idAnalysis || node.data.idParentTopic),
+        allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && (node.data.idDataTrack ||
+          node.data.idRequest || node.data.idAnalysis || node.data.idParentTopic),
+        actionMapping: {
+          keys: {
+            [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+            [KEYS.RIGHT]: undefined,
+            [KEYS.LEFT]: undefined,
+          }
+        },
     };
 
     private experimentTreeOptions: ITreeOptions = {
@@ -164,6 +172,13 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
             return element.data.idTopic && element.data.linkData;
         },
         allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && node.isLeaf,
+        actionMapping: {
+          keys: {
+            [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+            [KEYS.RIGHT]: undefined,
+            [KEYS.LEFT]: undefined,
+          }
+        }
     };
 
     private analysisTreeOptions: ITreeOptions = {
@@ -178,6 +193,13 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
             return element.data.idTopic && element.data.linkData;
         },
         allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && node.isLeaf,
+        actionMapping: {
+          keys: {
+            [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+            [KEYS.RIGHT]: undefined,
+            [KEYS.LEFT]: undefined,
+          }
+        }
     };
 
     private datatrackTreeOptions: ITreeOptions = {
@@ -191,6 +213,13 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
             return element.data.idTopic && element.data.linkData;
         },
         allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && (node.data.isDataTrackFolder || node.data.idDataTrack),
+        actionMapping: {
+          keys: {
+            [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+            [KEYS.RIGHT]: undefined,
+            [KEYS.LEFT]: undefined,
+          }
+        }
     };
 
     constructor(private topicService: TopicService,

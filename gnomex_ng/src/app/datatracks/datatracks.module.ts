@@ -18,6 +18,7 @@ import {UtilModule} from "../util/util.module";
 import {MoveDataTrackComponent} from "./move-datatrack.component";
 import {DatatracksOverviewModule} from "./datatracks-overview/datatracks-overview.module"
 import {DatatracksDetailModule} from "./datatracks-detail/datatracks-detail.module";
+import {AccessibilityModule} from "../util/accessibility/accessibility.module";
 
 /**
  * @author jdewell
@@ -40,7 +41,8 @@ import {DatatracksDetailModule} from "./datatracks-detail/datatracks-detail.modu
         ReactiveFormsModule,
         AngularSplitModule,
         DatatracksOverviewModule,
-        DatatracksDetailModule
+        DatatracksDetailModule,
+        AccessibilityModule
     ],
     declarations: [
         BrowseDatatracksComponent, MoveDataTrackComponent

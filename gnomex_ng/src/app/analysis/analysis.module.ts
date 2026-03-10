@@ -17,6 +17,7 @@ import {DialogsModule} from "../util/popup/dialogs.module";
 import {AnalysisOverviewModule} from "./analysis-overview/analysis-overview.module";
 import {AnalysisDetailModule} from "./analysis-detail/analysis-detail.module";
 import {AngularEditorModule} from "@kolkov/angular-editor";
+import {AccessibilityModule} from "../util/accessibility/accessibility.module";
 
 /**
  * @author jdewell
@@ -40,7 +41,8 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         AngularSplitModule,
         AnalysisOverviewModule,
         AnalysisDetailModule,
-        AngularEditorModule
+        AngularEditorModule,
+        AccessibilityModule
     ],
     declarations: [
         BrowseAnalysisComponent,

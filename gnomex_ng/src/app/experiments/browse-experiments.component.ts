@@ -8,7 +8,15 @@ import {
 } from '@angular/core';
 
 import {ExperimentsService} from './experiments.service';
-import {ITreeOptions, ITreeState, TreeComponent, TreeModel, TreeNode} from '@circlon/angular-tree-component';
+import {
+  ITreeOptions,
+  ITreeState,
+  KEYS,
+  TREE_ACTIONS,
+  TreeComponent,
+  TreeModel,
+  TreeNode
+} from '@circlon/angular-tree-component';
 import {BrowseFilterComponent} from '../util/browse-filter.component';
 import * as _ from 'lodash';
 import {Subscription} from 'rxjs';
@@ -169,6 +177,13 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
           childrenField: 'items',
           useVirtualScroll: true,
           nodeHeight: 22,
+          actionMapping: {
+            keys: {
+              [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+              [KEYS.RIGHT]: undefined,
+              [KEYS.LEFT]: undefined,
+            }
+          },
           nodeClass: (node: TreeNode) => {
             return 'icon-' + node.data.icon;
           },

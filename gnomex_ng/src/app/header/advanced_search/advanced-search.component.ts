@@ -1,6 +1,6 @@
 import {Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
-import {ITreeOptions, TreeComponent, TreeModel} from "@circlon/angular-tree-component";
+import {ITreeOptions, KEYS, TREE_ACTIONS, TreeComponent, TreeModel} from "@circlon/angular-tree-component";
 
 import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
 import {AdvancedSearchService} from "./advanced-search.service";
@@ -321,6 +321,15 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
     }
 
     ngOnInit() {
+      this.treeOptions = {
+        actionMapping: {
+          keys: {
+            [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+            [KEYS.RIGHT]: undefined,
+            [KEYS.LEFT]: undefined,
+          }
+        }
+      };
     }
 
     ngOnDestroy() {
