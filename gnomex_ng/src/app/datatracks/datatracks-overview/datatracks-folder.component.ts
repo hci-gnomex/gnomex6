@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit, ViewChild} from "@angular/core";
+import {AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {DataTrackService} from "../../services/data-track.service";
 import {ActivatedRoute} from "@angular/router";
@@ -23,7 +23,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
         }
     `]
 })
-export class DatatracksFolderComponent implements OnInit, OnDestroy {
+export class DatatracksFolderComponent implements OnInit, AfterViewInit, OnDestroy {
     //Override
 
     public canWrite: boolean = false;
@@ -48,15 +48,12 @@ export class DatatracksFolderComponent implements OnInit, OnDestroy {
     ngOnInit(): void { // Note this hook runs once if route changes to another folder you don't recreate component
         this.labList = this.gnomexService.labList.sort(this.prefService.createLabDisplaySortFunction());
         this.editorConfig = {
-            spellcheck: true,
-            height: "25em",
-            enableToolbar: true,
-            placeholder: "Enter a description"
+          spellcheck: true,
+          height: "25em",
+          enableToolbar: true,
+          placeholder: "Enter a description",
+          editable: !this.secAdvisor.isGuest
         };
-
-
-        this.editorConfig.editable = !this.secAdvisor.isGuest;
-        this.descEditor.editorToolbar.showToolbar = !this.secAdvisor.isGuest;
 
 
         this.folderFormGroup =  this.fb.group({
@@ -75,6 +72,10 @@ export class DatatracksFolderComponent implements OnInit, OnDestroy {
                 this.folderFormGroup.markAsPristine();
             }
         });
+    }
+
+    ngAfterViewInit(): void {
+      this.descEditor.editorToolbar.showToolbar = !this.secAdvisor.isGuest;
     }
 
 
@@ -103,6 +104,7 @@ export class DatatracksFolderComponent implements OnInit, OnDestroy {
             this.showSpinner = false;
         });
     }
+
 
     ngOnDestroy(): void {
         this.datatracksTreeNodeSubscription.unsubscribe();
