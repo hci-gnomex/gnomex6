@@ -16,7 +16,8 @@ import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {LabListService} from "../services/lab-list.service";
 import {DataTrackService} from "../services/data-track.service";
 import {MoveDataTrackComponent} from "./move-datatrack.component";
-import {MatDialogConfig} from "@angular/material";
+import {MatDialog, MatDialogConfig} from "@angular/material";
+import {MoveToDialogComponent, MoveToDialogResult, MoveToTarget} from "../util/move-to-dialog/move-to-dialog.component";
 import * as _ from "lodash";
 import {GnomexService} from "../services/gnomex.service";
 import {DialogsService} from "../util/popup/dialogs.service";
@@ -24,6 +25,8 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {UtilService} from "../services/util.service";
 import {HttpParams} from "@angular/common/http";
 import {NavigationService} from "../services/navigation.service";
+import {TreeKeyboardMoveService} from "../util/accessibility/tree-keyboard-move.service";
+import {AriaAnnouncerService} from "../util/accessibility/aria-announcer.service";
 
 
 @Component({
@@ -105,7 +108,10 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
               private changeDetectorRef: ChangeDetectorRef,
               private utilService: UtilService,
               private navService: NavigationService,
-              private createSecurityAdvisorService: CreateSecurityAdvisorService) {
+              private createSecurityAdvisorService: CreateSecurityAdvisorService,
+              public treeKbMove: TreeKeyboardMoveService,
+              private ariaAnnouncer: AriaAnnouncerService,
+              private matDialog: MatDialog) {
 
     this.navService.navMode = this.navService.navMode !== NavigationService.USER ? NavigationService.URL : NavigationService.USER;
 
@@ -173,13 +179,17 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     this.options = {
       displayField: "label",
       childrenField: "items",
-      nodeClass: (node: TreeNode) => {
-        return "icon-" + node.data.icon;
-      },
       allowDrop: (element: ITreeNode, to: {parent: ITreeNode, index: number}) => {
         return to.parent.data.isDataTrackFolder && element.data.idDataTrackFolder !== to.parent.data.idDataTrackFolder;
       },
       allowDrag: (node) => !this.createSecurityAdvisorService.isGuest && (node.data.isDataTrackFolder || node.data.idDataTrack),
+      nodeClass: (node: TreeNode) => {
+        let cls = "icon-" + node.data.icon;
+        if (this.treeKbMove.isGrabbedNode(node)) { cls += " keyboard-grabbed"; }
+        if (this.isKbDropTarget(node))           { cls += " keyboard-drop-target"; }
+        else if (this._isKbDropInvalid(node))    { cls += " keyboard-drop-invalid"; }
+        return cls;
+      },
       actionMapping: {
         mouse: {
           click: (tree, node, $event) => {
@@ -195,7 +205,23 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
           drop: this.moveNode,
         },
         keys: {
-          [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+          [KEYS.ENTER]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
+            if (this.treeKbMove.isGrabbing) {
+              this._kbDrop(node);
+            } else {
+              TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
+            }
+          },
+          [KEYS.SPACE]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
+            $event.preventDefault();
+            this._kbGrab(node);
+          },
+          // Escape (keyCode 27) is not in the KEYS enum; use raw code
+          [27]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
+            if (this.treeKbMove.isGrabbing) {
+              this.treeKbMove.cancel();
+            }
+          },
           [KEYS.RIGHT]: undefined,
           [KEYS.LEFT]: undefined,
         }
@@ -214,6 +240,69 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
 
+  // ─── ARIA helpers for treeNodeTemplate (WCAG 4.1 + 4.5) ───────────────────
+
+  public nodeRoleDesc(node: TreeNode): string | null {
+    const canDrag = !this.createSecurityAdvisorService.isGuest;
+    if (node.data.isDataTrackFolder) { return canDrag ? 'draggable data track folder' : 'data track folder'; }
+    if (node.data.idDataTrack)       { return canDrag ? 'draggable data track'        : 'data track'; }
+    if (node.data.isGenomeBuild)     { return 'genome build'; }
+    if (node.data.isOrganism)        { return 'organism'; }
+    return null;
+  }
+
+  public isKbDropTarget(node: TreeNode): boolean {
+    if (!this.treeKbMove.isGrabbing || !this.treeModel) { return false; }
+    const focused = this.treeModel.getFocusedNode() as TreeNode;
+    if (!focused || focused !== node) { return false; }
+    const state = this.treeKbMove.state;
+    // mirrors allowDrop: must be a folder and not the node's own current folder
+    return node.data.isDataTrackFolder
+        && state.node.data.idDataTrackFolder !== node.data.idDataTrackFolder;
+  }
+
+  private _isKbDropInvalid(node: TreeNode): boolean {
+    if (!this.treeKbMove.isGrabbing || !this.treeModel) { return false; }
+    const focused = this.treeModel.getFocusedNode() as TreeNode;
+    if (!focused || focused !== node) { return false; }
+    return !this.isKbDropTarget(node);
+  }
+
+  // ─── Keyboard drag-and-drop (WCAG 2.1.1) ──────────────────────────────────
+
+  /** Grabs the focused node when the user presses Space. */
+  private _kbGrab(node: TreeNode): void {
+    const canDrag = !this.createSecurityAdvisorService.isGuest
+        && (node.data.isDataTrackFolder || node.data.idDataTrack);
+    if (!canDrag) { return; }
+    if (!node.isActive) {
+      TREE_ACTIONS.TOGGLE_ACTIVE(this.treeModel, node, {} as any);
+    }
+    this.treeKbMove.grab(node, this.treeModel);
+  }
+
+  /**
+   * Attempts to drop the grabbed data track onto `targetNode`.
+   * Opens the same MoveDataTrackComponent dialog as mouse drag-and-drop.
+   */
+  private _kbDrop(targetNode: TreeNode): void {
+    const state = this.treeKbMove.state;
+    if (!state) { return; }
+
+    const allowDrop = (element: ITreeNode, { parent }: { parent: ITreeNode }) =>
+        parent.data.isDataTrackFolder
+        && element.data.idDataTrackFolder !== parent.data.idDataTrackFolder;
+
+    const dropped = this.treeKbMove.tryDrop(targetNode, allowDrop);
+    if (dropped) {
+      // Reuse the existing mouse drop handler with a synthetic event object
+      this.moveNode(this.treeModel, targetNode, {} as any, {
+        from: state.node,
+        to: { parent: targetNode, index: 0 }
+      });
+    }
+  }
+
   private moveNode: (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => void = (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => {
     let currentItem: any = from.data;
     let targetItem: any = node.data;
@@ -230,6 +319,11 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
 
     this.dialogsService.genericDialogContainer(MoveDataTrackComponent, title, currentItem.icon, configuration).subscribe((result) => {
       if (result) {
+        // WCAG 4.1.3: announce the confirmed move to screen readers.
+        const srcLabel = currentItem.label || "Data track";
+        const tgtLabel = targetItem.label  || "folder";
+        this.ariaAnnouncer.announce(`${srcLabel} moved to ${tgtLabel}.`);
+
         if (currentItem.isDataTrack && currentItem.idDataTrack) {
           this.datatracksService.activeNodeToSelect = {
             attribute: "idDataTrack",
@@ -252,7 +346,91 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
   treeChangeFilter(event) {
   }
 
+  // ─── Phase 5: Focus management after drop ─────────────────────────────────
+
+  /**
+   * After a backend refresh triggered by a move/create operation,
+   * `datatracksService.activeNodeToSelect` holds the attribute+value of the
+   * node that should receive focus.  Consume it here and clear it so it only
+   * fires once per refresh cycle.
+   */
   treeUpdateData(event) {
+    const sel = this.datatracksService.activeNodeToSelect;
+    if (sel) {
+      const node = UtilService.findTreeNode(this.treeModel, sel.attribute, sel.value);
+      if (node) {
+        this.datatracksService.activeNodeToSelect = null;
+        node.setIsActive(true);
+        node.ensureVisible();
+        node.scrollIntoView();
+      }
+    }
+  }
+
+  // ─── Phase 3: Single-pointer "Move to…" alternative (WCAG 2.5.7) ──────────
+
+  /**
+   * Collects all data-track folders in the tree that are valid drop targets
+   * for `sourceNode` (i.e. folders other than the source node's own folder).
+   */
+  private _collectDtMoveTargets(sourceNode: TreeNode): MoveToTarget[] {
+    const targets: MoveToTarget[] = [];
+    const srcFolderId: string = sourceNode.data.idDataTrackFolder;
+
+    const walk = (nodes: TreeNode[], breadcrumb: string) => {
+      for (const n of nodes || []) {
+        if (n.data.isDataTrackFolder) {
+          // Exclude the source node's current parent folder
+          if (n.data.idDataTrackFolder !== srcFolderId) {
+            targets.push({ label: n.data.label, path: breadcrumb || undefined, data: n.data });
+          }
+          walk(n.children || [], n.data.label);
+        } else {
+          walk(n.children || [], breadcrumb);
+        }
+      }
+    };
+
+    if (this.treeModel) { walk(this.treeModel.roots as TreeNode[], ''); }
+    return targets;
+  }
+
+  /**
+   * Opens the "Move to…" dialog for a draggable data-track node.
+   * Satisfies WCAG 2.5.7 by providing a single-pointer alternative to drag.
+   */
+  public openMoveDialog(node: TreeNode, $event: MouseEvent): void {
+    $event.stopPropagation();
+    const canDrag = !this.createSecurityAdvisorService.isGuest
+        && (node.data.isDataTrackFolder || node.data.idDataTrack);
+    if (!canDrag) { return; }
+
+    const targets = this._collectDtMoveTargets(node);
+    const config = new MatDialogConfig();
+    config.width = '35em';
+    config.data = { sourceLabel: node.data.label, targets, allowCopy: false };
+
+    this.matDialog.open(MoveToDialogComponent, config)
+        .afterClosed()
+        .subscribe((result: MoveToDialogResult | null) => {
+            if (!result) { return; }
+            this.moveNode(this.treeModel, this._findTreeNode(result.target.data), {} as any, {
+                from: node,
+                to: { parent: this._findTreeNode(result.target.data), index: 0 }
+            });
+        });
+  }
+
+  /** Helper to find a live TreeNode from a data object via idDataTrackFolder or idDataTrack. */
+  private _findTreeNode(data: any): TreeNode {
+    if (!this.treeModel) { return null; }
+    if (data.idDataTrackFolder) {
+      return UtilService.findTreeNode(this.treeModel, 'idDataTrackFolder', data.idDataTrackFolder) as TreeNode;
+    }
+    if (data.idDataTrack) {
+      return UtilService.findTreeNode(this.treeModel, 'idDataTrack', data.idDataTrack) as TreeNode;
+    }
+    return null;
   }
 
   search() {

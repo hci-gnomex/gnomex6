@@ -42,14 +42,12 @@ import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.com
                     <div>
                         <button mat-raised-button (click)="this.back()" aria-label="Go to previous step"
                                 [disabled]="this.selectedTabIndex === 0 || this.checkTabDisabled(this.selectedTabIndex - 1)">
-                            <mat-icon aria-hidden="true">arrow_left</mat-icon>
                             Back
                         </button>
                     </div>
                     <div>
                         <button mat-raised-button (click)="this.next()" aria-label="Go to next step"
                                 [disabled]="this.selectedTabIndex === this.tabs.length - 1 || this.checkTabDisabled(this.selectedTabIndex + 1)">
-                            <mat-icon aria-hidden="true">arrow_right</mat-icon>
                             Next
                         </button>
                     </div>

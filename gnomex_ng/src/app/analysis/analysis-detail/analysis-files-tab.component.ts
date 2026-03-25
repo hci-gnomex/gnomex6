@@ -24,8 +24,6 @@ import {PropertyService} from "../../services/property.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {UtilService} from "../../services/util.service";
 import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
-import { DOCUMENT } from '@angular/common';
-
 
 @Component({
     selector: 'analysis-files-tab',
@@ -70,7 +68,7 @@ import { DOCUMENT } from '@angular/common';
     styles: [``]
 })
 export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
-    private document = inject(DOCUMENT);
+
     public getNodeChildDetails;
     private gridApi: GridApi;
     private gridColDefs: any[];

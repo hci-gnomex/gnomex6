@@ -54,7 +54,6 @@
                         [disabled]="selectedIndex === 0"
                         (click)="goBack()"
                         aria-label="Go to previous step">
-                    <mat-icon aria-hidden="true">arrow_left</mat-icon>
                     Back
                 </button>
             </div>
@@ -63,7 +62,6 @@
                         [disabled]="!formOfCurrentlySelectedTab || formOfCurrentlySelectedTab.invalid || onSubmitTab"
                         (click)="goNext()"
                         aria-label="Go to next step">
-                    <mat-icon aria-hidden="true">arrow_right</mat-icon>
                     Next
                 </button>
             </div>

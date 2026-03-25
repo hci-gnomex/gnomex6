@@ -27,12 +27,15 @@ import {first} from "rxjs/operators";
 import {ITreeModel,ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {TabChangeEvent} from "../tabs/index";
-import {MatDialogConfig} from "@angular/material";
+import {MatDialog, MatDialogConfig} from "@angular/material";
+import {MoveToDialogComponent, MoveToDialogResult, MoveToTarget} from "../move-to-dialog/move-to-dialog.component";
 import {NameFileDialogComponent} from "./name-file-dialog.component";
 import {FileService} from "../../services/file.service";
 import {IFileParams} from "../interfaces/file-params.model";
 import {ActionType} from "../interfaces/generic-dialog-action.model";
 import {UtilService} from "../../services/util.service";
+import {TreeKeyboardMoveService} from "../accessibility/tree-keyboard-move.service";
+import {AriaAnnouncerService} from "../accessibility/aria-announcer.service";
 import * as _ from "lodash";
 //import {changesFromRecord} from "ng-dynamic-component/dynamic/util";
 
@@ -93,6 +96,74 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     public readonly organizeHelp :string =  "Drag uploaded file into one of the folders on the right." +
         "Protected files (red) cannot be moved or deleted.";
 
+    // ─── Keyboard drag-and-drop (WCAG 2.1.1) ──────────────────────────────────
+
+    /**
+     * Initiates a keyboard grab on `node`.
+     * Draggability rules differ between the upload tree (PROTECTED !== 'Y')
+     * and the organize tree (PROTECTED !== 'Y' && level > 1).
+     */
+    private _kbGrab(tree: TreeModel, node: TreeNode): void {
+        const isOrg = this.organizeTree && tree === this.organizeTree.treeModel;
+        const isProtected = node.data.PROTECTED === 'Y';
+        if (isProtected) { return; }
+        if (isOrg && node.level <= 1) { return; } // root of organize tree is not draggable
+
+        this.isLastSelectOrgTree = isOrg;
+        if (!node.isActive) {
+            TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, {} as any);
+        }
+        this.treeKbMove.grab(node, tree);
+    }
+
+    /**
+     * Attempts to drop the grabbed file/folder onto `targetNode` in the organize tree.
+     * Only the organize tree accepts drops; dragging back to the upload tree is not permitted.
+     */
+    private _kbDrop(targetTree: TreeModel, targetNode: TreeNode): void {
+        const state = this.treeKbMove.state;
+        if (!state) { return; }
+
+        // Only allow dropping into the organize tree
+        const organizeModel = this.organizeTree ? this.organizeTree.treeModel : null;
+        if (!organizeModel || targetTree !== organizeModel) {
+            this.treeKbMove.cancel();
+            return;
+        }
+
+        // Check allowDrop: must be root or a directory node
+        const isRootOrDir =
+            (organizeModel.roots[0] && organizeModel.roots[0].id === targetNode.id)
+            || targetNode.data.type === 'dir';
+
+        const dropped = this.treeKbMove.tryDrop(targetNode, () => isRootOrDir);
+        if (!dropped) { return; }
+
+        // Prevent dropping a folder into itself
+        if (state.node === targetNode) { return; }
+
+        const fromTree: TreeModel = state.tree;
+        const cloneNodes = UtilService.getFileNodesToMove(fromTree);
+
+        if (targetNode.data.FileDescriptor) {
+            targetNode.data.FileDescriptor.push(...cloneNodes);
+        } else {
+            targetNode.data.FileDescriptor = cloneNodes;
+        }
+
+        // Remove the grabbed node(s) from their source tree
+        this.isLastSelectOrgTree = fromTree === organizeModel;
+        this.attemptRemove(true);
+
+        organizeModel.update();
+        this.formGroup.markAsDirty();
+
+        // Phase 5: focus the destination folder after the tree re-renders.
+        setTimeout(() => {
+            if (targetNode) { targetNode.setActiveAndVisible(); }
+        }, 0);
+    }
+
     private moveNode: (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => void = (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => {
         let fromTree: TreeModel = from.treeModel;
 
@@ -117,8 +188,145 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
             this.organizeTree.treeModel.update();
             this.formGroup.markAsDirty();
 
+            // WCAG 4.1.3: announce the move to screen readers.
+            const movedNames  = cloneNodes
+                .map((n: any) => n.displayName || n.label || 'file')
+                .join(', ');
+            const targetLabel = to.parent.data.displayName || to.parent.data.label || 'folder';
+            this.ariaAnnouncer.announce(`${movedNames} moved to ${targetLabel}.`);
         }
     };
+
+    // ─── Phase 4: ARIA markup helpers ─────────────────────────────────────────
+
+    /**
+     * Returns a human-readable role description for `aria-roledescription`.
+     * `isUploadTree` distinguishes the left "Upload Files" panel (where all
+     * items may be draggable) from the right "Folder" panel (where only
+     * items at level > 1 are draggable).
+     */
+    public nodeRoleDesc(node: TreeNode, isUploadTree: boolean = false): string | null {
+        const isDir = node.data.type === 'dir';
+        const isProtected = node.data.PROTECTED === 'Y';
+        if (isUploadTree) {
+            if (isProtected) { return isDir ? 'protected folder' : 'protected file'; }
+            return isDir ? 'draggable folder' : 'draggable file';
+        }
+        // Organize (right) tree
+        if (node.level <= 1) { return isDir ? 'root folder' : null; }
+        if (isProtected) { return isDir ? 'protected folder' : 'protected file'; }
+        return isDir ? 'draggable folder' : 'draggable file';
+    }
+
+    /**
+     * Returns true when keyboard grab is active and `node` is the focused
+     * node in the organize tree (the only tree that accepts drops).
+     */
+    public isKbDropTarget(node: TreeNode): boolean {
+        if (!this.treeKbMove.isGrabbing || !this.organizeTree) { return false; }
+        const organizeModel = this.organizeTree.treeModel;
+        const focused = organizeModel.getFocusedNode() as TreeNode;
+        if (focused !== node) { return false; }
+        // Must be root or a directory to accept a drop
+        return (organizeModel.roots[0] && organizeModel.roots[0].id === node.id)
+            || node.data.type === 'dir';
+    }
+
+    /** Shared nodeClass function applied to both uploadOpts and organizeOpts. */
+    private _nodeClass = (node: TreeNode): string => {
+        let cls = node.data.type === 'dir' ? 'icon-folder' : 'icon-file';
+        if (this.treeKbMove.isGrabbedNode(node)) { cls += ' keyboard-grabbed'; }
+        if (this.isKbDropTarget(node))           { cls += ' keyboard-drop-target'; }
+        return cls;
+    };
+
+    // ─── Phase 3: Single-pointer "Move to…" alternative (WCAG 2.5.7) ──────────
+
+    /**
+     * Collects all valid destination folders from the organize tree:
+     * the root node and any sub-directory nodes.
+     */
+    private _collectOrganizeMoveTargets(): MoveToTarget[] {
+        const targets: MoveToTarget[] = [];
+        if (!this.organizeTree) { return targets; }
+        const organizeModel = this.organizeTree.treeModel;
+
+        const walk = (nodes: TreeNode[], parentLabel?: string) => {
+            for (const n of nodes || []) {
+                if ((organizeModel.roots[0] && organizeModel.roots[0].id === n.id) || n.data.type === 'dir') {
+                    targets.push({
+                        label: n.data.displayName || n.data.label,
+                        path: parentLabel || undefined,
+                        data: n.data,
+                    });
+                    walk(n.children || [], n.data.displayName || n.data.label);
+                }
+            }
+        };
+
+        walk(organizeModel.roots as TreeNode[], '');
+        return targets;
+    }
+
+    /**
+     * Opens the "Move to…" dialog for a node in the upload tree.
+     * Satisfies WCAG 2.5.7 by providing a single-pointer alternative to drag.
+     */
+    public openMoveDialog(node: TreeNode, $event: MouseEvent): void {
+        $event.stopPropagation();
+        if (node.data.PROTECTED === 'Y') { return; }
+
+        const targets = this._collectOrganizeMoveTargets();
+        const config = new MatDialogConfig();
+        config.width = '35em';
+        config.data = { sourceLabel: node.data.displayName || node.data.label, targets, allowCopy: false };
+
+        this.matDialog.open(MoveToDialogComponent, config)
+            .afterClosed()
+            .subscribe((result: MoveToDialogResult | null) => {
+                if (!result || !this.organizeTree) { return; }
+                const organizeModel = this.organizeTree.treeModel;
+                // Locate the live target node in the organize tree
+                const targetNode = UtilService.findTreeNode(
+                    organizeModel,
+                    'idTreeNode',
+                    result.target.data.idTreeNode
+                ) as TreeNode;
+                if (!targetNode) { return; }
+
+                const cloneNodes = UtilService.getFileNodesToMove(
+                    this.uploadTree ? this.uploadTree.treeModel : null
+                );
+                if (!cloneNodes || cloneNodes.length === 0) {
+                    // No active nodes — use the node passed to openMoveDialog
+                    const clone = Object.assign({}, node.data);
+                    if (targetNode.data.FileDescriptor) {
+                        targetNode.data.FileDescriptor.push(clone);
+                    } else {
+                        targetNode.data.FileDescriptor = [clone];
+                    }
+                } else {
+                    if (targetNode.data.FileDescriptor) {
+                        targetNode.data.FileDescriptor.push(...cloneNodes);
+                    } else {
+                        targetNode.data.FileDescriptor = cloneNodes;
+                    }
+                }
+
+                this.isLastSelectOrgTree = false;
+                this.attemptRemove(true);
+                organizeModel.update();
+                this.formGroup.markAsDirty();
+
+                const names = (cloneNodes && cloneNodes.length > 0)
+                    ? cloneNodes.map((n: any) => n.displayName || 'file').join(', ')
+                    : (node.data.displayName || 'file');
+                const targetLabel = result.target.label;
+                this.ariaAnnouncer.announce(`${names} moved to ${targetLabel}.`);
+
+                setTimeout(() => { targetNode.setActiveAndVisible(); }, 0);
+            });
+    }
 
     private  actionMapping: IActionMapping = {
         mouse: {
@@ -143,9 +351,27 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
             }
         },
         keys: {
-          [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
-          [KEYS.RIGHT]: undefined,
-          [KEYS.LEFT]: undefined,
+            [KEYS.ENTER]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
+                if (this.treeKbMove.isGrabbing) {
+                    this._kbDrop(tree, node);
+                } else {
+                    TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
+                }
+            },
+            [KEYS.SPACE]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
+                $event.preventDefault();
+                if (!this.treeKbMove.isGrabbing) {
+                    this._kbGrab(tree, node);
+                }
+            },
+            // Escape (keyCode 27) is not in the KEYS enum; use raw code
+            [27]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
+                if (this.treeKbMove.isGrabbing) {
+                    this.treeKbMove.cancel();
+                }
+            },
+            [KEYS.RIGHT]: undefined,
+            [KEYS.LEFT]: undefined,
         }
     };
 
@@ -159,7 +385,10 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                 private fileService: FileService,
                 public constService:ConstantsService,
                 private changeDetector: ChangeDetectorRef,
-                private dialogService: DialogsService) {
+                private dialogService: DialogsService,
+                public treeKbMove: TreeKeyboardMoveService,
+                private ariaAnnouncer: AriaAnnouncerService,
+                private matDialog: MatDialog) {
     }
 
     ngOnInit(){
@@ -179,6 +408,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
             allowDrop: (element, item: {parent: any, index}) => {
                 return false;
             },
+            nodeClass: this._nodeClass,
             actionMapping : this.actionMapping
 
         };
@@ -204,6 +434,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
                 }
 
             },
+            nodeClass: this._nodeClass,
             actionMapping : this.actionMapping
         };
 

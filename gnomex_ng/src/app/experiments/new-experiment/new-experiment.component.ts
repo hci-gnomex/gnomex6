@@ -172,6 +172,10 @@ export class NewExperimentComponent implements OnDestroy, OnInit {
             return null;
         }
 
+        if (!(this.setupTab && this.setupTab.form)) {
+          return null;
+        }
+
         if (this.selectedIndex === 0) {
             return this.setupTab.form;
         } else if (this.tabs

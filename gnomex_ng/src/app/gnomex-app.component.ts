@@ -14,6 +14,7 @@ import {ProgressService} from "./home/progress.service";
 import {DictionaryService} from "./services/dictionary.service";
 import {AuthenticationService} from "./auth/authentication.service";
 import {NavigationService} from "./services/navigation.service";
+import {AriaAnnouncerService} from "./util/accessibility/aria-announcer.service";
 
 /**
  * The gnomex application component.
@@ -59,7 +60,11 @@ export class GnomexAppComponent implements OnInit {
                 private progressService: ProgressService,
                 private navService: NavigationService,
                 private router: Router,
-                private titleService: Title) {
+                private titleService: Title,
+                // Injected here to ensure the aria-live region is created at app
+                // startup (before any drag-and-drop component is loaded).
+                // The service self-wires to TreeKeyboardMoveService.announcement$.
+                private ariaAnnouncer: AriaAnnouncerService) {
         navService.trackNavState();
         this.router.events
             .pipe(filter((e): e is NavigationEnd => e instanceof NavigationEnd))

@@ -43,6 +43,7 @@ import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
 import {CustomMultiComboBoxComponent} from "./custom-multi-combo-box.component";
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {AccessibilityModule} from "./accessibility/accessibility.module";
+import {MoveToDialogComponent} from "./move-to-dialog/move-to-dialog.component";
 @NgModule({
     imports: [
         BrowserModule,
@@ -92,6 +93,7 @@ import {AccessibilityModule} from "./accessibility/accessibility.module";
         CustomComboBoxComponent,
         CustomMultiComboBoxComponent,
         GuestTermsDialogComponent,
+        MoveToDialogComponent,
     ],
     entryComponents: [
         BillingUsageReportComponent,
@@ -110,6 +112,7 @@ import {AccessibilityModule} from "./accessibility/accessibility.module";
         DownloadFilesComponent,
         EditInstitutionsComponent,
         GuestTermsDialogComponent,
+        MoveToDialogComponent,
     ],
     exports: [
         BrowseFilterComponent,
@@ -143,6 +146,7 @@ import {AccessibilityModule} from "./accessibility/accessibility.module";
         CustomComboBoxComponent,
         CustomMultiComboBoxComponent,
         GuestTermsDialogComponent,
+        MoveToDialogComponent,
     ]
 })
 export class UtilModule {

@@ -14,7 +14,7 @@
                     <div class="full-height flex-grow border" role="navigation" aria-label="Experiments tree navigation"> <!-- start tree container -->
                         <div class="full-height flex-container-col foreground">
                             <div class="full-width padding">
-                                <div *ngIf="showDragDropHint" class="full-width padded" role="alert" aria-live="polite">
+                                <div *ngIf="showDragDropHint" class="full-width padded" role="status" aria-live="polite">
                                     <div class="background-lightyellow allow-line-breaks padded">{{this.DRAG_DROP_HINT}}
                                     </div>
                                 </div>
@@ -34,9 +34,11 @@
                             </div>
                             <div class="full-width flex-grow left-right-padding no-overflow">
                                 <div class="full-width full-height border">
+                                    <p id="exp-tree-kb-instructions" class="sr-only">{{KB_MOVE_INSTRUCTIONS}}</p>
                                     <tree-root #tree
                                                role="tree"
                                                aria-label="Experiments hierarchy"
+                                               aria-describedby="exp-tree-kb-instructions"
                                                (moveNode)="onMoveNode($event)"
                                                (updateData)="treeUpdateData($event)"
                                                (activate)="treeOnSelect($event)"
@@ -44,11 +46,19 @@
                                                [nodes]="items"
                                                [options]="options">
                                         <ng-template #treeNodeTemplate let-node let-index="index">
-                                            <div class="full-width no-word-wrap tree-node-font" role="treeitem" [attr.aria-label]="node.data.label">
+                                            <div class="full-width no-word-wrap tree-node-font"
+                                                 role="treeitem"
+                                                 [attr.aria-label]="node.data.label"
+                                                 [attr.aria-roledescription]="nodeRoleDesc(node)"
+                                                 [attr.aria-selected]="isKbDropTarget(node) ? 'true' : null">
                                                 <img src="{{ node?.data?.icon ? node.data.icon : 'assets/flask.png' }}" alt="" aria-hidden="true" class="tree-node-icon icon">
-                                          <span>{{ node.data.label }}</span>
-                                        </div>
-                                      </ng-template>
+                                                <span>{{ node.data.label }}</span>
+                                                <button *ngIf="node.isLeaf && node.data.idRequest && !createSecurityAdvisorService.isGuest"
+                                                        class="sr-only-focusable"
+                                                        [attr.aria-label]="'Move ' + node.data.label"
+                                                        (click)="openMoveDialog(node, $event)">Move…</button>
+                                            </div>
+                                        </ng-template>
                                         <ng-template #loadingTemplate></ng-template>
                                     </tree-root>
                                 </div>

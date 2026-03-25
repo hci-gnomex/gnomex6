@@ -1,5 +1,7 @@
 import {ChangeDetectorRef, ChangeDetectionStrategy, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef} from "@angular/material";
+import {TreeKeyboardMoveService} from "./accessibility/tree-keyboard-move.service";
+import {AriaAnnouncerService} from "./accessibility/aria-announcer.service";
 import {ConstantsService} from "../services/constants.service";
 import {ITreeOptions, KEYS, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode} from "@circlon/angular-tree-component";
 import {PropertyService} from "../services/property.service";
@@ -22,6 +24,8 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                 <div class="flex-container-row align-center justify-space-between">
                     <label id="download-instructions">
                         Drag files or folders that you want to download. Hold CTRL or SHIFT key to select multiple.
+                        Keyboard: navigate with arrow keys, press Space to grab a file,
+                        navigate to the other panel, then press Enter to move it. Press Escape to cancel.
                     </label>
                     <context-help name="downloadhelp"
                                   label="Download Help"
@@ -44,11 +48,18 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                                                role="tree"
                                                aria-label="Available files tree">
                                         <ng-template #treeNodeTemplate let-node draggable="true">
-                                            <div class="flex-container-row tree-node-font" role="treeitem" [attr.aria-label]="node.data.displayName">
+                                            <div class="flex-container-row tree-node-font"
+                                                 role="treeitem"
+                                                 [attr.aria-label]="node.data.displayName"
+                                                 [attr.aria-roledescription]="nodeRoleDesc(node)"
+                                                 [attr.aria-selected]="isKbDropTarget(node) ? 'true' : null">
                                                 <img [src]="node.data.icon" alt="" aria-hidden="true" class="icon tree-node-icon">
                                                 <div>
                                                     {{ node.data.displayName }}
                                                 </div>
+                                                <button class="sr-only-focusable"
+                                                        [attr.aria-label]="'Add ' + node.data.displayName + ' to download list'"
+                                                        (click)="addToDownloadList(node, $event)">Add to download list</button>
                                             </div>
                                         </ng-template>
                                     </tree-root>
@@ -67,11 +78,18 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                                                role="tree"
                                                aria-label="Files to download tree">
                                         <ng-template #treeNodeTemplate let-node draggable="true">
-                                            <div class="flex-container-row tree-node-font" role="treeitem" [attr.aria-label]="node.data.displayName">
+                                            <div class="flex-container-row tree-node-font"
+                                                 role="treeitem"
+                                                 [attr.aria-label]="node.data.displayName"
+                                                 [attr.aria-roledescription]="nodeRoleDesc(node)"
+                                                 [attr.aria-selected]="isKbDropTarget(node) ? 'true' : null">
                                                 <img [src]="node.data.icon" alt="" aria-hidden="true" class="icon tree-node-icon">
                                                 <div>
                                                     {{ node.data.displayName }}
                                                 </div>
+                                                <button class="sr-only-focusable"
+                                                        [attr.aria-label]="'Remove ' + node.data.displayName + ' from download list'"
+                                                        (click)="removeFromDownloadList(node, $event)">Remove from download list</button>
                                             </div>
                                         </ng-template>
                                     </tree-root>
@@ -208,7 +226,9 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
                 private utilService: UtilService,
                 private fileService: FileService,
                 private dialogsService: DialogsService,
-                public securityAdvisor: CreateSecurityAdvisorService) {
+                public securityAdvisor: CreateSecurityAdvisorService,
+                public treeKbMove: TreeKeyboardMoveService,
+                private ariaAnnouncer: AriaAnnouncerService) {
         super();
     }
 
@@ -222,6 +242,12 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
             childrenField: 'FileDescriptor',
             allowDrag: true,
             allowDrop: true,
+            nodeClass: (node: TreeNode) => {
+                let cls = node.data.type === 'dir' ? 'icon-folder' : 'icon-file';
+                if (this.treeKbMove.isGrabbedNode(node)) { cls += ' keyboard-grabbed'; }
+                if (this.isKbDropTarget(node))           { cls += ' keyboard-drop-target'; }
+                return cls;
+            },
             actionMapping: {
                 mouse: {
                     click: (tree:TreeModel, node, $event) => {
@@ -243,9 +269,27 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
                     }
                 },   //  mouse
                 keys: {
-                  [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
-                  [KEYS.RIGHT]: undefined,
-                  [KEYS.LEFT]: undefined,
+                    [KEYS.ENTER]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
+                        if (this.treeKbMove.isGrabbing) {
+                            this._kbDrop(tree, node);
+                        } else {
+                            TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
+                        }
+                    },
+                    [KEYS.SPACE]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
+                        $event.preventDefault();
+                        if (!this.treeKbMove.isGrabbing) {
+                            this.treeKbMove.grab(node, tree);
+                        }
+                    },
+                    // Escape (keyCode 27) is not in the KEYS enum; use raw code
+                    [27]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
+                        if (this.treeKbMove.isGrabbing) {
+                            this.treeKbMove.cancel();
+                        }
+                    },
+                    [KEYS.RIGHT]: undefined,
+                    [KEYS.LEFT]: undefined,
                 }
             },  // actionMapping
         };  // filesOptions
@@ -379,6 +423,92 @@ setTimeout(() => {
         return true;
     }
 
+    // ─── ARIA helpers for treeNodeTemplate (WCAG 4.1 + 4.5) ───────────────────
+
+    /** aria-roledescription: "draggable folder" or "draggable file". */
+    public nodeRoleDesc(node: TreeNode): string {
+        return node.data.type === 'dir' ? 'draggable folder' : 'draggable file';
+    }
+
+    /**
+     * Returns true when a keyboard grab is active and this node is the currently
+     * focused node in EITHER tree (i.e. the user has navigated to it as a drop target).
+     */
+    public isKbDropTarget(node: TreeNode): boolean {
+        if (!this.treeKbMove.isGrabbing) { return false; }
+        if (this.availableFilesTreeComponent) {
+            const f = this.availableFilesTreeComponent.treeModel.getFocusedNode();
+            if (f === node) { return true; }
+        }
+        if (this.filesToDownloadTreeComponent) {
+            const f = this.filesToDownloadTreeComponent.treeModel.getFocusedNode();
+            if (f === node) { return true; }
+        }
+        return false;
+    }
+
+    // ─── Phase 3: Single-pointer actions (WCAG 2.5.7) ─────────────────────────
+
+    /**
+     * Adds `node` to the download list via a single button click.
+     * Satisfies WCAG 2.5.7 by providing a non-drag alternative.
+     */
+    public addToDownloadList(node: TreeNode, $event: MouseEvent): void {
+        $event.stopPropagation();
+        this.selectFilesRecursively(node.data, 'Y');
+        let ancestor: TreeNode = node.parent;
+        while (ancestor && ancestor.data) {
+            ancestor.data.isSelected = 'Y';
+            ancestor = ancestor.parent;
+        }
+        this.updateFilesToDownloadTree();
+        this.ariaAnnouncer.announce(`${node.data.displayName || 'File'} added to download list.`);
+    }
+
+    /**
+     * Removes `node` from the download list via a single button click.
+     * Satisfies WCAG 2.5.7 by providing a non-drag alternative.
+     */
+    public removeFromDownloadList(node: TreeNode, $event: MouseEvent): void {
+        $event.stopPropagation();
+        this.selectFilesRecursively(node.data, 'N');
+        this.updateFilesToDownloadTree();
+        this.ariaAnnouncer.announce(`${node.data.displayName || 'File'} removed from download list.`);
+    }
+
+    // ─── Keyboard drag-and-drop (WCAG 2.1.1) ──────────────────────────────────
+
+    /**
+     * Handles Enter-key drops.  The direction (select for download vs de-select)
+     * is determined by which tree the user is currently navigating.
+     *
+     * Dropping into "Files to Download" → marks the grabbed file as selected.
+     * Dropping into "Available Files"   → de-selects the grabbed file.
+     */
+    private _kbDrop(targetTree: TreeModel, targetNode: TreeNode): void {
+        const state = this.treeKbMove.state;
+        if (!state) { return; }
+
+        const dropped = this.treeKbMove.tryDrop(targetNode, () => true);
+        if (!dropped) { return; }
+
+        if (targetTree === this.filesToDownloadTreeComponent.treeModel) {
+            // Moving into the "files to download" tree — mark as selected
+            this.selectFilesRecursively(state.node.data, 'Y');
+            // Also mark every ancestor as selected so the tree filter shows them
+            let ancestor: TreeNode = state.node.parent;
+            while (ancestor && ancestor.data) {
+                ancestor.data.isSelected = 'Y';
+                ancestor = ancestor.parent;
+            }
+            this.updateFilesToDownloadTree();
+        } else if (targetTree === this.availableFilesTreeComponent.treeModel) {
+            // Moving back to "available files" — de-select
+            this.selectFilesRecursively(state.node.data, 'N');
+            this.updateFilesToDownloadTree();
+        }
+    }
+
     private moveNode: (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => void = (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => {
 
         // File selected to be downloaded
@@ -399,6 +529,10 @@ setTimeout(() => {
             }
 
             this.updateFilesToDownloadTree();
+
+            // WCAG 4.1.3: announce selection to screen readers.
+            const names = files.map(f => f.data.displayName || 'file').join(', ');
+            this.ariaAnnouncer.announce(`${names} added to download list.`);
         }
         // File de-selected to be downloaded
         else if (tree === this.availableFilesTreeComponent.treeModel && from === this.filesToDownloadTreeComponent) {
@@ -407,6 +541,10 @@ setTimeout(() => {
                 this.selectFilesRecursively(file.data, 'N');
             }
             this.updateFilesToDownloadTree();
+
+            // WCAG 4.1.3: announce de-selection to screen readers.
+            const names = files.map(f => f.data.displayName || 'file').join(', ');
+            this.ariaAnnouncer.announce(`${names} removed from download list.`);
         }
     };
 

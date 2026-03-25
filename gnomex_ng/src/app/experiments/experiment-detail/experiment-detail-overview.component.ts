@@ -582,7 +582,7 @@ export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, Aft
                     .set("idAppUser", data.idAppUser)
                     .set("subject", data.subject);
 
-                return this.experimentService.emailServlet(params).pipe(map((result) => {
+                return this.experimentService.emailServlet(params).pipe(map((result: any) => {
                     return result && result.result === "SUCCESS";
                 }));
             };

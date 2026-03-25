@@ -34,6 +34,9 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../services/constants.service";
 import {filter, first} from "rxjs/operators";
 import {NavigationService} from "../services/navigation.service";
+import {TreeKeyboardMoveService} from "../util/accessibility/tree-keyboard-move.service";
+import {AriaAnnouncerService} from "../util/accessibility/aria-announcer.service";
+import {MoveToDialogComponent, MoveToDialogResult, MoveToTarget} from "../util/move-to-dialog/move-to-dialog.component";
 
 
 @Component({
@@ -93,7 +96,18 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     @ViewChild("analysisTree", {static: false}) treeComponent: TreeComponent;
 
 
-    public readonly DRAG_AND_DROP_HINT: string = "Drag-and-drop to move analyses to another lab and/or group. Hold Ctrl while dragging-and-dropping to assign to multiple groups";
+    public readonly DRAG_AND_DROP_HINT: string =
+        "Drag and drop to move analyses to another lab and/or group. " +
+        "Hold Ctrl while dragging to copy to multiple groups. " +
+        "Keyboard alternative: navigate with arrow keys, press Space to grab an item, " +
+        "navigate to the destination group, then press Enter to drop " +
+        "(hold Ctrl+Enter to copy). Press Escape to cancel.";
+
+    public readonly KB_MOVE_INSTRUCTIONS: string =
+        "To move an analysis without dragging: navigate to it with arrow keys, " +
+        "press Space to grab, navigate to the destination group, " +
+        "then press Enter to drop. Hold Ctrl and press Enter to copy instead. " +
+        "Press Escape to cancel.";
     public showDragDropHint: boolean = false;
     public options: ITreeOptions;
 
@@ -124,6 +138,8 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
     private qParamMap: ParamMap;
     private paramMap: ParamMap;
     private _treeModel: TreeModel | null = null;
+    /** Set before refreshAnalysisGroupList_fromBackend(); consumed in treeUpdateData (Phase 5). */
+    private _focusIdAfterRefresh: string | null = null;
 
     public get treeModel(): TreeModel | null {
       if (!this._treeModel && this.treeComponent) {
@@ -143,13 +159,17 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
           childrenField: "items",
           useVirtualScroll: true,
           nodeHeight: 22,
-          nodeClass: (node: TreeNode) => {
-            return "icon-" + node.data.icon;
-          },
           allowDrop: (element: any, to: {parent: TreeNode, index: number}) => {
             return !!to.parent.data.idAnalysisGroup;
           },
           allowDrag: (node: any) => !this.createSecurityAdvisorService.isGuest && node.isLeaf && node.data.idAnalysis,
+          nodeClass: (node: TreeNode) => {
+            let cls = "icon-" + node.data.icon;
+            if (this.treeKbMove.isGrabbedNode(node)) { cls += " keyboard-grabbed"; }
+            if (this.isKbDropTarget(node))           { cls += " keyboard-drop-target"; }
+            else if (this._isKbDropInvalid(node))    { cls += " keyboard-drop-invalid"; }
+            return cls;
+          },
           actionMapping: {
             mouse: {
               click: (tree, node, $event) => {
@@ -165,7 +185,23 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
               drop: this.moveNode,
             },
             keys: {
-              [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+              [KEYS.ENTER]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
+                if (this.treeKbMove.isGrabbing) {
+                  this._kbDrop(node, $event.ctrlKey);
+                } else {
+                  TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
+                }
+              },
+              [KEYS.SPACE]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
+                $event.preventDefault();
+                this._kbGrab(node);
+              },
+              // Escape (keyCode 27) is not in the KEYS enum; use raw code
+              [27]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
+                if (this.treeKbMove.isGrabbing) {
+                  this.treeKbMove.cancel();
+                }
+              },
               [KEYS.RIGHT]: undefined,
               [KEYS.LEFT]: undefined,
             }
@@ -313,7 +349,9 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 private labListService: LabListService,
                 private changeDetectorRef: ChangeDetectorRef,
                 private navService: NavigationService,
-                public createSecurityAdvisorService: CreateSecurityAdvisorService) {
+                public createSecurityAdvisorService: CreateSecurityAdvisorService,
+                public treeKbMove: TreeKeyboardMoveService,
+                private ariaAnnouncer: AriaAnnouncerService) {
 
 
         this.items = [];
@@ -418,6 +456,82 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             this.analysisService.startSearchSubject.next(false);
             this.changeDetectorRef.detectChanges();
         }
+        // Phase 5: focus the moved analysis after a backend-triggered tree rebuild.
+        if (this._focusIdAfterRefresh) {
+            const node = UtilService.findTreeNode(this.treeModel, 'idAnalysis', this._focusIdAfterRefresh);
+            if (node) {
+                this._focusIdAfterRefresh = null;
+                node.setIsActive(true);
+                node.ensureVisible();
+                node.scrollIntoView();
+            }
+        }
+    }
+
+    // ─── Phase 3: Single-pointer "Move to…" alternative (WCAG 2.5.7) ──────────
+
+    /**
+     * Collects all analysis-group nodes that are valid drop targets for the
+     * given analysis node.
+     */
+    private _collectAnalysisMoveTargets(sourceNode: TreeNode): MoveToTarget[] {
+        const targets: MoveToTarget[] = [];
+        const srcGroupId: string = sourceNode.parent ? sourceNode.parent.data.idAnalysisGroup : null;
+
+        const walk = (nodes: TreeNode[], labLabel?: string) => {
+            for (const n of nodes || []) {
+                if (n.data.idAnalysisGroup) {
+                    targets.push({
+                        label: n.data.name || n.data.label,
+                        path: labLabel || undefined,
+                        data: n.data,
+                    });
+                    walk(n.children || [], labLabel);
+                } else if (n.data.labName || n.data.idLab) {
+                    walk(n.children || [], n.data.labName || n.data.name || n.data.label);
+                } else {
+                    walk(n.children || [], labLabel);
+                }
+            }
+        };
+
+        if (this.treeModel) { walk(this.treeModel.roots as TreeNode[], ''); }
+        return targets;
+    }
+
+    /**
+     * Opens the "Move to…" dialog for a draggable analysis node.
+     * Satisfies WCAG 2.5.7 by providing a single-pointer alternative to drag.
+     * The "Copy instead of move" checkbox mirrors Ctrl+drag copy behaviour.
+     */
+    public openMoveDialog(node: TreeNode, $event: MouseEvent): void {
+        $event.stopPropagation();
+        if (!node.isLeaf || !node.data.idAnalysis) { return; }
+        if (this.createSecurityAdvisorService.isGuest) { return; }
+
+        const targets = this._collectAnalysisMoveTargets(node);
+        const config = new MatDialogConfig();
+        config.width = '35em';
+        config.data = { sourceLabel: node.data.label, targets, allowCopy: true };
+
+        this.dialog.open(MoveToDialogComponent, config)
+            .afterClosed()
+            .subscribe((result: MoveToDialogResult | null) => {
+                if (!result) { return; }
+                const targetNode = UtilService.findTreeNode(
+                    this.treeModel, 'idAnalysisGroup', result.target.data.idAnalysisGroup
+                ) as TreeNode;
+                if (!targetNode) { return; }
+
+                if (!node.isActive) {
+                    TREE_ACTIONS.TOGGLE_ACTIVE(this.treeModel, node, {} as any);
+                }
+                const fakeEvent = { ctrlKey: result.copy };
+                this.moveNode(this.treeModel, targetNode, fakeEvent, {
+                    from: node,
+                    to: { parent: targetNode, index: 0 }
+                });
+            });
     }
 
     /*
@@ -647,6 +761,75 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         return null;
     }
 
+    // ─── ARIA helpers for treeNodeTemplate (WCAG 4.1 + 4.5) ─────────────────
+
+    public nodeRoleDesc(node: TreeNode): string | null {
+        if (node.data.idAnalysis) {
+            const draggable = !this.createSecurityAdvisorService.isGuest && node.isLeaf;
+            return draggable ? 'draggable analysis' : 'analysis';
+        }
+        if (node.data.idAnalysisGroup) { return 'analysis group folder'; }
+        if (node.data.idLab)           { return 'lab group'; }
+        return null;
+    }
+
+    public isKbDropTarget(node: TreeNode): boolean {
+        if (!this.treeKbMove.isGrabbing || !this.treeModel) { return false; }
+        const focused = this.treeModel.getFocusedNode() as TreeNode;
+        if (!focused || focused !== node) { return false; }
+        return !!node.data.idAnalysisGroup; // mirrors allowDrop
+    }
+
+    private _isKbDropInvalid(node: TreeNode): boolean {
+        if (!this.treeKbMove.isGrabbing || !this.treeModel) { return false; }
+        const focused = this.treeModel.getFocusedNode() as TreeNode;
+        if (!focused || focused !== node) { return false; }
+        return !node.data.idAnalysisGroup; // lab and individual analysis nodes
+    }
+
+    // ─── Keyboard drag-and-drop (WCAG 2.1.1) ────────────────────────────────
+
+    /**
+     * Initiates a keyboard grab on `node` if the node is draggable.
+     * Called when the user presses Space on a tree node.
+     */
+    private _kbGrab(node: TreeNode): void {
+        const canDrag = !this.createSecurityAdvisorService.isGuest
+            && node.isLeaf
+            && node.data.idAnalysis;
+        if (!canDrag) { return; }
+        if (!node.isActive) {
+            TREE_ACTIONS.TOGGLE_ACTIVE(this.treeModel, node, {} as any);
+        }
+        this.treeKbMove.grab(node, this.treeModel);
+    }
+
+    /**
+     * Attempts to drop the grabbed analysis onto `targetNode`.
+     * Mirrors the business logic in the private `moveNode` drop handler.
+     * Called when the user presses Enter (or Ctrl+Enter for copy) while grabbing.
+     */
+    private _kbDrop(targetNode: TreeNode, ctrlKey: boolean): void {
+        const state = this.treeKbMove.state;
+        if (!state) { return; }
+
+        const allowDrop = (element: any, { parent }: { parent: TreeNode }) =>
+            !!parent.data.idAnalysisGroup;
+
+        const dropped = this.treeKbMove.tryDrop(targetNode, allowDrop, ctrlKey);
+        if (dropped) {
+            // Ensure only the grabbed node is active so moveNode acts on it alone
+            if (!state.node.isActive) {
+                TREE_ACTIONS.TOGGLE_ACTIVE(this.treeModel, state.node, {} as any);
+            }
+            const fakeEvent = { ctrlKey };
+            this.moveNode(this.treeModel, targetNode, fakeEvent, {
+                from: state.node,
+                to: { parent: targetNode, index: 0 }
+            });
+        }
+    }
+
     private moveNode: (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => void = (tree: TreeModel, node: TreeNode, $event: any, {from, to}) => {
         this.dialogsService.confirm("Are you sure you want to move this analysis to " + node.data.name + " Folder?").pipe(first())
             .subscribe(action =>{
@@ -661,6 +844,18 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
 
                     this.analysisService.moveAnalysis(idLab, idAnalysisGroup, analyses, isCopyMode).subscribe((result: any) => {
                         if (result && result.result === "SUCCESS") {
+                            // WCAG 4.1.3: announce move/copy result to screen readers.
+                            const targetLabel = node.data.name || node.data.label || "group";
+                            const verb        = isCopyMode ? "copied" : "moved";
+                            const srcLabel    = analyses.length === 1
+                                ? (analyses[0].label || "Analysis")
+                                : `${analyses.length} analyses`;
+                            this.ariaAnnouncer.announce(`${srcLabel} ${verb} to ${targetLabel}.`);
+
+                            // Phase 5: focus the moved analysis after the tree rebuilds.
+                            if (!isCopyMode && analyses.length === 1) {
+                                this._focusIdAfterRefresh = analyses[0].idAnalysis;
+                            }
                             this.analysisService.refreshAnalysisGroupList_fromBackend();
                             if (result.invalidPermission) {
                                 this.dialogsService.alert(result.invalidPermission, null, DialogType.WARNING);

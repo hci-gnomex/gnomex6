@@ -37,6 +37,11 @@
                     </div>
                     <div class="full-width flex-grow left-right-padded overflow-auto">
                         <div appFocusManager class="full-height full-width border-subtle" role="tree" aria-labelledby="upload-files-heading">
+                            <p id="upload-tree-kb-instructions" class="sr-only">
+                                To move a file without dragging: navigate to it with arrow keys,
+                                press Space to grab, navigate to a folder in the Folder panel on the right,
+                                then press Enter to drop. Press Escape to cancel.
+                            </p>
                             <tree-root #uploadTree
                                        *ngIf="showFileTrees && uploadFiles"
                                        (activate)="uploadTreeOnSelect($event)"
@@ -44,12 +49,19 @@
                                        [nodes]="uploadFiles"
                                        [options]="uploadOpts">
                                 <ng-template #treeNodeTemplate let-node let-index="index">
-                                    <div class="truncate tree-node-font" role="treeitem" [attr.aria-label]="node.data.displayName">
+                                    <div class="truncate tree-node-font"
+                                         role="treeitem"
+                                         [attr.aria-label]="node.data.displayName"
+                                         [attr.aria-roledescription]="nodeRoleDesc(node, true)">
                                         <img *ngIf="node.data.icon" class="icon tree-node-icon" src="{{ node.data.icon }}" alt="" aria-hidden="true">
                                         <span  [matTooltip]="node.data.displayName"
                                                 [ngStyle]="{'color': node.data.PROTECTED === 'Y' ? 'red' : 'black' }">
                                             {{ node.data.displayName }}
                                         </span>
+                                        <button *ngIf="node.data.PROTECTED !== 'Y'"
+                                                class="sr-only-focusable"
+                                                [attr.aria-label]="'Move ' + node.data.displayName + ' to folder'"
+                                                (click)="openMoveDialog(node, $event)">Move…</button>
                                     </div>
 
                                 </ng-template>
@@ -65,6 +77,12 @@
                     </div>
                     <div class="full-width flex-grow left-right-padded overflow-auto">
                         <div appFocusManager class="full-height full-width border-subtle" role="tree" aria-labelledby="folder-heading">
+                            <p id="organize-tree-kb-instructions" class="sr-only">
+                                To move a file without dragging: navigate to the Upload Files panel,
+                                press Space on a file to grab, navigate here with Tab,
+                                use arrow keys to reach a destination folder,
+                                then press Enter to drop. Press Escape to cancel.
+                            </p>
                             <tree-root #organizeTree
                                        *ngIf="showFileTrees && organizeFiles"
                                        (activate)="organizeTreeOnSelect($event)"
@@ -74,7 +92,11 @@
                                        [nodes]="organizeFiles"
                                        [options]="organizeOpts">
                                 <ng-template #treeNodeTemplate let-node let-index="index">
-                                    <div class="truncate tree-node-font" role="treeitem" [attr.aria-label]="node.data.displayName">
+                                    <div class="truncate tree-node-font"
+                                         role="treeitem"
+                                         [attr.aria-label]="node.data.displayName"
+                                         [attr.aria-roledescription]="nodeRoleDesc(node, false)"
+                                         [attr.aria-selected]="isKbDropTarget(node) ? 'true' : null">
                                         <img *ngIf="node.data.icon" class="icon tree-node-icon" src="{{ node.data.icon }}" alt="" aria-hidden="true">
                                         <span [ngStyle]="{'color': node.data.PROTECTED === 'Y' ? 'red' : 'black' }" >
                                     {{ node.data.displayName }}

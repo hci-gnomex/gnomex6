@@ -6,6 +6,8 @@ import {
     OnInit,
     ViewChild,
 } from '@angular/core';
+import {TreeKeyboardMoveService} from '../util/accessibility/tree-keyboard-move.service';
+import {AriaAnnouncerService} from '../util/accessibility/aria-announcer.service';
 
 import {ExperimentsService} from './experiments.service';
 import {
@@ -23,7 +25,8 @@ import {Subscription} from 'rxjs';
 import {ActivatedRoute, NavigationEnd, NavigationExtras, ParamMap, Router} from '@angular/router';
 import {CreateSecurityAdvisorService} from '../services/create-security-advisor.service';
 import {CreateProjectComponent} from './create-project.component';
-import {MatDialogConfig} from '@angular/material';
+import {MatDialog, MatDialogConfig} from '@angular/material';
+import {MoveToDialogComponent, MoveToDialogResult, MoveToTarget} from '../util/move-to-dialog/move-to-dialog.component';
 import {LabListService} from '../services/lab-list.service';
 import {DialogsService, DialogType} from '../util/popup/dialogs.service';
 import {DeleteProjectComponent} from './delete-project.component';
@@ -118,7 +121,15 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
     public disableAll = false;
     public lookupLab = '';
 
-    public readonly DRAG_DROP_HINT: string = 'Drag-and-drop to move object to another group';
+    public readonly DRAG_DROP_HINT: string =
+        'Drag and drop to move an experiment to another group. ' +
+        'Keyboard alternative: navigate with arrow keys, press Space to grab an item, ' +
+        'navigate to the destination folder, then press Enter to drop. Press Escape to cancel.';
+
+    public readonly KB_MOVE_INSTRUCTIONS: string =
+        'To move an experiment without dragging: navigate to it with arrow keys, ' +
+        'press Space to grab, navigate to the destination folder, ' +
+        'then press Enter to drop. Press Escape to cancel.';
     public showDragDropHint = false;
     private currentItem: any;
     private targetItem: any;
@@ -159,7 +170,10 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 private route: ActivatedRoute,
                 private router: Router,
                 private navService: NavigationService,
-                public constantsService: ConstantsService) {
+                public constantsService: ConstantsService,
+                public treeKbMove: TreeKeyboardMoveService,
+                private ariaAnnouncer: AriaAnnouncerService,
+                private matDialog: MatDialog) {
 
     }
 
@@ -179,13 +193,38 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
           nodeHeight: 22,
           actionMapping: {
             keys: {
-              [KEYS.ENTER]: TREE_ACTIONS.TOGGLE_EXPANDED,
+              [KEYS.ENTER]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
+                if (this.treeKbMove.isGrabbing) {
+                  this._kbDrop(node, $event.ctrlKey);
+                } else {
+                  TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
+                }
+              },
+              [KEYS.SPACE]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
+                $event.preventDefault();
+                if (this.treeKbMove.isGrabbing) {
+                  // Second Space press: replace grab with the current node
+                  this._kbGrab(node);
+                } else {
+                  this._kbGrab(node);
+                }
+              },
+              // Escape (keyCode 27) is absent from the KEYS enum; use raw code
+              [27]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
+                if (this.treeKbMove.isGrabbing) {
+                  this.treeKbMove.cancel();
+                }
+              },
               [KEYS.RIGHT]: undefined,
               [KEYS.LEFT]: undefined,
             }
           },
           nodeClass: (node: TreeNode) => {
-            return 'icon-' + node.data.icon;
+            let cls = 'icon-' + node.data.icon;
+            if (this.treeKbMove.isGrabbedNode(node))    { cls += ' keyboard-grabbed'; }
+            if (this.isKbDropTarget(node))              { cls += ' keyboard-drop-target'; }
+            else if (this._isKbDropInvalid(node))       { cls += ' keyboard-drop-invalid'; }
+            return cls;
           },
           allowDrop: (element, { parent, index }) => {
             this.dragEndItems = _.cloneDeep(this.items);
@@ -447,6 +486,15 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
             $event.to.index);
         this.currentItem = $event.node;
         this.targetItem = $event.to.parent;
+
+        // WCAG 4.1.3: announce the drag-drop action to screen readers.
+        // The reassignment dialog that opens next will further confirm the move.
+        const expLabel  = $event.node.label  || $event.node.requestNumber || 'Experiment';
+        const projLabel = $event.to.parent.label || $event.to.parent.name  || 'project';
+        this.ariaAnnouncer.announce(
+            `Moving ${expLabel} to ${projLabel}. A reassignment confirmation dialog has opened.`
+        );
+
         this.getLabUsers($event);
     }
 
@@ -741,6 +789,135 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
     onClickShowDragDropHint(): void {
         this.showDragDropHint = !this.showDragDropHint;
+    }
+
+    // ─── ARIA helpers for treeNodeTemplate (WCAG 4.1 + 4.5) ─────────────────
+
+    /**
+     * Returns a human-readable `aria-roledescription` for the tree node,
+     * indicating its type and (where applicable) that it is draggable.
+     * Returning `null` lets Angular omit the attribute so the default role
+     * description ("treeitem") is preserved for non-special nodes.
+     */
+    public nodeRoleDesc(node: TreeNode): string | null {
+        if (node.data.idRequest) {
+            const draggable = !this.createSecurityAdvisorService.isGuest && node.isLeaf;
+            return draggable ? 'draggable experiment' : 'experiment';
+        }
+        if (node.data.idProject) { return 'project folder'; }
+        if (node.data.idLab)     { return 'lab group'; }
+        return null;
+    }
+
+    /**
+     * Returns true when a keyboard grab is active AND this node is the
+     * currently focused node AND it is a valid drop target.
+     * Used by the template for `aria-selected` and by `nodeClass` for CSS.
+     */
+    public isKbDropTarget(node: TreeNode): boolean {
+        if (!this.treeKbMove.isGrabbing || !this.treeModel) { return false; }
+        const focused = this.treeModel.getFocusedNode() as TreeNode;
+        if (!focused || focused !== node) { return false; }
+        return !node.data.labName; // mirrors the allowDrop condition
+    }
+
+    /** Returns true when focused during a grab but NOT a valid drop target. */
+    private _isKbDropInvalid(node: TreeNode): boolean {
+        if (!this.treeKbMove.isGrabbing || !this.treeModel) { return false; }
+        const focused = this.treeModel.getFocusedNode() as TreeNode;
+        if (!focused || focused !== node) { return false; }
+        return !!node.data.labName; // opposite of allowDrop — only lab nodes are invalid
+    }
+
+    // ─── Keyboard drag-and-drop (WCAG 2.1.1) ────────────────────────────────
+
+    /**
+     * Initiates a keyboard grab on `node` if the node is draggable.
+     * Called when the user presses Space on a tree node.
+     */
+    private _kbGrab(node: TreeNode): void {
+        const canDrag = !this.createSecurityAdvisorService.isGuest
+            && node.isLeaf
+            && node.data.idRequest;
+        if (!canDrag) { return; }
+        this.treeKbMove.grab(node, this.treeModel);
+    }
+
+    /**
+     * Attempts to drop the grabbed experiment onto `targetNode`.
+     * Mirrors the business logic triggered by the native drag-drop `onMoveNode` handler.
+     * Called when the user presses Enter while a grab is active.
+     */
+    private _kbDrop(targetNode: TreeNode, ctrlKey: boolean): void {
+        const state = this.treeKbMove.state;
+        if (!state) { return; }
+
+        const allowDrop = (element: any, { parent }: { parent: TreeNode }) =>
+            !parent.data.labName;
+
+        const dropped = this.treeKbMove.tryDrop(targetNode, allowDrop, ctrlKey);
+        if (dropped) {
+            // Reuse the existing onMoveNode handler with a synthetic event object
+            this.onMoveNode({
+                node: state.node.data,
+                to: { parent: targetNode.data, index: 0 }
+            });
+        }
+    }
+
+    // ─── Phase 3: Single-pointer "Move to…" alternative (WCAG 2.5.7) ──────────
+
+    /**
+     * Collects all project nodes that are valid drop targets for the given
+     * experiment node (all projects in the tree, grouped under their lab).
+     */
+    private _collectExpMoveTargets(sourceNode: TreeNode): MoveToTarget[] {
+        const targets: MoveToTarget[] = [];
+
+        const walk = (nodes: TreeNode[], labLabel?: string) => {
+            for (const n of nodes || []) {
+                if (n.data.labName) {
+                    walk(n.children || [], n.data.labName);
+                } else if (n.data.idProject) {
+                    targets.push({
+                        label: n.data.label,
+                        path: labLabel || undefined,
+                        data: n.data,
+                    });
+                }
+                // Skip experiment leaf nodes
+            }
+        };
+
+        if (this.treeModel) { walk(this.treeModel.roots as TreeNode[], ''); }
+        return targets;
+    }
+
+    /**
+     * Opens the "Move to…" dialog for a draggable experiment node.
+     * Satisfies WCAG 2.5.7 by providing a single-pointer alternative to drag.
+     * On selection, delegates to the existing `onMoveNode` handler which opens
+     * the reassignment confirmation dialog.
+     */
+    public openMoveDialog(node: TreeNode, $event: MouseEvent): void {
+        $event.stopPropagation();
+        if (!node.isLeaf || !node.data.idRequest) { return; }
+        if (this.createSecurityAdvisorService.isGuest) { return; }
+
+        const targets = this._collectExpMoveTargets(node);
+        const config = new MatDialogConfig();
+        config.width = '35em';
+        config.data = { sourceLabel: node.data.label, targets, allowCopy: false };
+
+        this.matDialog.open(MoveToDialogComponent, config)
+            .afterClosed()
+            .subscribe((result: MoveToDialogResult | null) => {
+                if (!result) { return; }
+                this.onMoveNode({
+                    node: node.data,
+                    to: { parent: result.target.data, index: 0 }
+                });
+            });
     }
 
     ngOnDestroy(): void {
