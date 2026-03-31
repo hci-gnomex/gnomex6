@@ -412,23 +412,24 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
 }
 
 function getDownloadGroupRenderer() {
-    function DownloadGroupRenderer() {
+  function DownloadGroupRenderer() {
+  }
+
+  DownloadGroupRenderer.prototype.init = function(params) {
+    let tempDiv = document.createElement("div");
+    let textColor: string = params.data.displayColor ? params.data.displayColor : 'black';
+    if (params.data.icon) {
+      const altText: string = params.data.iconAlt ? params.data.iconAlt : '';
+      tempDiv.innerHTML = '<span style="color: ' + textColor + ';"><img src="' + params.data.icon + '" class="icon" alt="' + altText + '" aria-hidden="true"/>' + params.value + '</span>';
+    } else {
+      tempDiv.innerHTML = '<span style="color: ' + textColor + ';">' + params.value + '</span>';
     }
+    this.eGui = tempDiv.firstChild;
+  };
 
-    DownloadGroupRenderer.prototype.init = function(params) {
-        let tempDiv = document.createElement("div");
-        let textColor: string = params.data.displayColor ? params.data.displayColor : 'black';
-        if (params.data.icon) {
-            tempDiv.innerHTML = '<span style="color: ' + textColor + ';"><img src="' + params.data.icon + '" class="icon"/>' + params.value + '</span>';
-        } else {
-            tempDiv.innerHTML = '<span style="color: ' + textColor + ';">' + params.value + '</span>';
-        }
-        this.eGui = tempDiv.firstChild;
-    };
+  DownloadGroupRenderer.prototype.getGui = function() {
+    return this.eGui;
+  };
 
-    DownloadGroupRenderer.prototype.getGui = function() {
-        return this.eGui;
-    };
-
-    return DownloadGroupRenderer;
+  return DownloadGroupRenderer;
 }

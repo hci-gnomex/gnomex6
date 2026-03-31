@@ -1,15 +1,13 @@
-<a href="#main-content"  color="#004C9E">Skip to main content</a>
+<button *ngIf="isLoggedIn" class="skip-link" (click)="skipToMain()">Skip to main content</button>
 <timeout-notification></timeout-notification>
-<main id="main-content">
-    <div class="full-height full-width flex-container-col">
-        <div class="full-width">
-            <gnomex-header></gnomex-header>
-        </div>
-        <div class="full-width flex-grow main-display-area">
-            <div class="full-width full-height" style="display: block; max-height: 100%; max-width: 100%;">
-                <router-outlet></router-outlet>
-                <router-outlet name="modal"></router-outlet>
-            </div>
-        </div>
+<div class="full-height full-width flex-container-col">
+  <div class="full-width">
+    <gnomex-header></gnomex-header>
+  </div>
+  <main id="main-content" class="full-width flex-grow main-display-area">
+    <div class="full-width full-height" style="display: block; max-height: 100%; max-width: 100%;">
+      <router-outlet></router-outlet>
+      <router-outlet name="modal"></router-outlet>
     </div>
-</main>
+  </main>
+</div>

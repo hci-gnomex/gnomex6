@@ -1014,3 +1014,21 @@ template {
   background-color: #fce8e6;
 }
 
+button.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 9999;
+  background: #004C9E;
+  color: white;
+  padding: 8px 16px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+button.skip-link:focus {
+  top: 0;
+}
+

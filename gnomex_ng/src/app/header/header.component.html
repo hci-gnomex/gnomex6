@@ -91,7 +91,7 @@
         </div>
         <!--<mat-list></mat-list>-->
     </div>
-    <nav aria-label="Main navigation" class="flex-container-row header-two" role="navigation">
+    <nav id="main-nav" aria-label="Main navigation" class="flex-container-row header-two" role="navigation">
         <span *ngFor="let item of navItems" [ngClass]="item.class" class="full-height">
             <!-- Handle branch node buttons here -->
         <span *ngIf="item.children && item.children.length > 0" class="full-height">

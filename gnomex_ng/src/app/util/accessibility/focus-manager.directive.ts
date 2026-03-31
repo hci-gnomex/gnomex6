@@ -55,12 +55,16 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.unlistenBeforeFocus();
-    this.unlistenAfterFocus();
-    this.unlistenBeforeFocus = null;
-    this.unlistenAfterFocus = null;
+    if (this.unlistenBeforeFocus) {
+      this.unlistenBeforeFocus();
+      this.unlistenBeforeFocus = null;
+    }
+    if (this.unlistenAfterFocus) {
+      this.unlistenAfterFocus();
+      this.unlistenAfterFocus = null;
+    }
 
-    if (this.beforeSentinel && this.beforeSentinel.parentElement) {
+    if (this.beforeSentinel &&  this.beforeSentinel.parentElement) {
       this.renderer.removeChild(this.beforeSentinel.parentElement, this.beforeSentinel);
     }
     if (this.afterSentinel && this.afterSentinel.parentElement) {
@@ -266,7 +270,10 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     // Hidden
     if (el.getAttribute('aria-hidden') === 'true') { return false; }
 
-    const style = this.host.nativeElement.ownerDocument.defaultView.getComputedStyle(el);
+    const view = this.host.nativeElement.ownerDocument ? this.host.nativeElement.ownerDocument.defaultView : null;
+    if (!view) { return false; }
+
+    const style = view.getComputedStyle(el);
     if (!style) { return false; }
 
     if (style.display === 'none' || style.visibility === 'hidden') { return false; }
