@@ -11,7 +11,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
     template: `
         <div class="flex-container-col padded align-center container">
             <div class="flex-container-row justify-space-between full-width header">
-                <img [src]="'./assets/gnomex_logo.png'">
+                <img [src]="'./assets/gnomex_logo.png'" alt="Site logo">
                 <div class="spaced-children">
                     <a [routerLink]="['/authenticate']">Sign in</a>
                     <span *ngIf="!this.gnomexService.disableUserSignup">|</span>

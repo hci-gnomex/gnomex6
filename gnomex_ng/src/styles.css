@@ -1,6 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
 @import '../node_modules/@circlon/angular-tree-component/css/angular-tree-component.css';
-@import '../node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css';
 @import '../node_modules/ag-grid-community/dist/styles/ag-grid.css';
 @import '../node_modules/ag-grid-community/dist/styles/ag-theme-fresh.css';
 @import '../node_modules/ag-grid-community/dist/styles/ag-theme-balham.css';
@@ -523,13 +522,13 @@ img.tree-node-icon {
 
 .warningLabelMinor {
   color: #17871C;
-  fontWeight: normal;
+  font-weight: normal;
 }
 
 .warningLabelSevere {
   color: #EE2525;
-  fontWeight: bold;
-  fontSize: 10;
+  font-weight: bold;
+  font-size: 10px;
 }
 
 button.mat-button.minimize {
@@ -642,7 +641,7 @@ body {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.125;
-  color: #212529;
+  color: var(--grey-darker);
   text-align: left;
   background-color: #fff;
 }
