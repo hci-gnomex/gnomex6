@@ -20,6 +20,7 @@ import {ViewerLinkRenderer} from "../../util/grid-renderers/viewer-link.renderer
 import {ManageFilesModule} from "../../util/upload/manage-files.module";
 import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
 import {ManagePedFileWindowComponent} from "./manage-ped-file-window.component";
+import { HttpClientModule} from '@angular/common/http';
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {AnalysisDescriptionTabComponent} from "./analysis-description-tab.component";
 import {DistributeDatatrackDialogComponent} from "./distribute-datatrack-dialog.component";
@@ -42,6 +43,7 @@ import {AccessibilityModule} from "../../util/accessibility/accessibility.module
         RelatedDataModule,
         AngularSplitModule,
         ManageFilesModule,
+        HttpClientModule,
         AngularEditorModule,
         AccessibilityModule
     ],

@@ -18,6 +18,7 @@ import {TabsModule} from "../../util/tabs/tabs.module";
 import {AngularMaterialModule} from "../../../modules/angular-material.module";
 import {DATATRACKS_ROUTING} from "../datatracks.routes";
 import {UtilModule} from "../../util/util.module";
+import { HttpClientModule} from '@angular/common/http';
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {AccessibilityModule} from "../../util/accessibility/accessibility.module";
 
@@ -31,6 +32,7 @@ import {AccessibilityModule} from "../../util/accessibility/accessibility.module
         AngularMaterialModule,
         FormsModule,
         ReactiveFormsModule,
+        HttpClientModule,
         AngularEditorModule,
         UtilModule,
         AccessibilityModule

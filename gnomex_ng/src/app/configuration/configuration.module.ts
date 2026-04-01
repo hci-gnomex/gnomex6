@@ -25,6 +25,7 @@ import {ManageProtocolsComponent} from "./manage-protocols.component";
 import {ConfigurationBrowsePanelComponent} from "./configuration-browse-panel.component";
 import {OverviewProtocolComponent} from "./overview-protocol.component";
 import {ExperimentPlatformModule} from "./experiment-platform/experiment-platform.module";
+import { HttpClientModule} from '@angular/common/http';
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from "@angular/material/dialog";
 import {AccessibilityModule} from "../util/accessibility/accessibility.module";
@@ -48,6 +49,7 @@ import {AccessibilityModule} from "../util/accessibility/accessibility.module";
         ReactiveFormsModule,
         AngularSplitModule,
         ExperimentPlatformModule,
+        HttpClientModule,
         AngularEditorModule,
         MatDialogModule,
         AccessibilityModule

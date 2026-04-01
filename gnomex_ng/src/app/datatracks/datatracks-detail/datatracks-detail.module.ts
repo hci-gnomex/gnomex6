@@ -15,6 +15,7 @@ import {ConfigureAnnotationsModule} from "../../util/configure-annotations.modul
 import {RelatedDataModule} from "../../util/related-data.module";
 import {DatatracksFilesTabComponent} from "./datatracks-files-tab.component";
 import {AgGridModule} from "ag-grid-angular";
+import { HttpClientModule} from '@angular/common/http';
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {AccessibilityModule} from "../../util/accessibility/accessibility.module";
 
@@ -34,6 +35,7 @@ import {AccessibilityModule} from "../../util/accessibility/accessibility.module
         ReactiveFormsModule,
         ConfigureAnnotationsModule,
         RelatedDataModule,
+        HttpClientModule,
         AngularEditorModule,
         AgGridModule.withComponents([
         ]),

@@ -35,7 +35,6 @@
     "@angularclass/hmr-loader": "~3.0.4",
     "@auth0/angular-jwt": "2.1.x",
     "@circlon/angular-tree-component": "^9.0.1",
-    "@gjax/angular-tree-component": "^11.0.4",
     "@kolkov/angular-editor": "^1.0.0",
     "ag-grid-angular": "^21.2.2",
     "ag-grid-community": "^21.2.2",

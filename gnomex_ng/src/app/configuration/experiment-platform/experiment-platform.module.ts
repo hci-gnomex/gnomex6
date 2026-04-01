@@ -34,6 +34,7 @@ import {LibraryPrepStepsDialogComponent} from "./library-prep-steps-dialog.compo
 import {EpExperimentTypeQcTabComponent} from "./ep-experiment-type-qc-tab.component";
 import {QcAssayDialogComponent} from "./qc-assay-dialog.component";
 import {QcAssayChipTypeDialogComponent} from "./qc-assay-chip-type-dialog.component";
+import { HttpClientModule} from '@angular/common/http';
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {AccessibilityModule} from "../../util/accessibility/accessibility.module";
 
@@ -58,6 +59,7 @@ import {AccessibilityModule} from "../../util/accessibility/accessibility.module
             IconTextRendererComponent
         ]),
         UtilModule,
+        HttpClientModule,
         AngularEditorModule,
         ReactiveFormsModule,
         AngularSplitModule,

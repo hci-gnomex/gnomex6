@@ -64,6 +64,7 @@ import {ExperimentSequenceLanesTab} from "./experiment-detail/experiment-sequenc
 import {ManageFilesDialogComponent} from "../util/upload/manage-files-dialog.component";
 import {RelatedDataModule} from "../util/related-data.module";
 import {ManageFilesModule} from "../util/upload/manage-files.module";
+import { HttpClientModule} from '@angular/common/http';
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {ExperimentBillingTabComponent} from "./experiment-detail/experiment-billing-tab.component";
 import {LinkButtonRenderer} from "../util/grid-renderers/link-button.renderer";
@@ -121,6 +122,7 @@ import { AgGridModule } from "ag-grid-angular";
             CheckboxRenderer,
         ]),
         UploadModule,
+        HttpClientModule,
         AngularEditorModule,
         AccessibilityModule
     ],
