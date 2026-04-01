@@ -10,12 +10,13 @@ import {BrowseAnalysisComponent} from "./browse-analysis.component";
 import {ANALYSIS_ROUTING} from "./analysis.routes";
 import {DeleteAnalysisComponent} from "./delete-analysis.component";
 import { AngularMaterialModule} from "../../modules/angular-material.module";
-import {MatAutocompleteModule} from "@angular/material";
+import {MatAutocompleteModule} from '@angular/material';
 import {CreateAnalysisComponent} from "./create-analysis.component";
 import {CreateAnalysisGroupComponent} from "./create-analysis-group.component";
 import {DialogsModule} from "../util/popup/dialogs.module";
 import {AnalysisOverviewModule} from "./analysis-overview/analysis-overview.module";
 import {AnalysisDetailModule} from "./analysis-detail/analysis-detail.module";
+import { HttpClientModule} from '@angular/common/http';
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {AccessibilityModule} from "../util/accessibility/accessibility.module";
 
@@ -40,6 +41,7 @@ import {AccessibilityModule} from "../util/accessibility/accessibility.module";
         ReactiveFormsModule,
         AngularSplitModule,
         AnalysisOverviewModule,
+        HttpClientModule,
         AnalysisDetailModule,
         AngularEditorModule,
         AccessibilityModule

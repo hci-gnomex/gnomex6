@@ -18,6 +18,7 @@ import {TopicDetailComponent} from "./topics-detail.component";
 import {TopicsPanelComponent} from "./topics-panel.component"
 import {BasicEmailDialogComponent} from "../util/basic-email-dialog.component";
 import {ShareLinkDialogComponent} from "../util/share-link-dialog.component";
+import { HttpClientModule} from '@angular/common/http';
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {AccessibilityModule} from "../util/accessibility/accessibility.module";
 
@@ -35,6 +36,7 @@ import {AccessibilityModule} from "../util/accessibility/accessibility.module";
         UtilModule,
         ReactiveFormsModule,
         AngularSplitModule,
+        HttpClientModule,
         AngularEditorModule,
         AccessibilityModule
     ],

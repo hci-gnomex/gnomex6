@@ -11,6 +11,7 @@ import {AgGridModule} from "ag-grid-angular";
 import {TrackUsageComponent} from "./track-usage.component";
 import {ChartsModule} from "ng2-charts";
 import {EmailAllUsersComponent} from "./email-all-users.component";
+import { HttpClientModule} from '@angular/common/http';
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {AngularSplitModule} from "angular-split";
 import {TrackUsageDetailComponent} from "./track-usage-detail.component";
@@ -26,6 +27,7 @@ import {AccessibilityModule} from "../util/accessibility/accessibility.module";
         AgGridModule.withComponents([]),
         ChartsModule,
         ReactiveFormsModule,
+        HttpClientModule,
         AngularEditorModule,
         AngularSplitModule,
         AccessibilityModule

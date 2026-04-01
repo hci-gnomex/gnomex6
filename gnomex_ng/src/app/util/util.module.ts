@@ -41,6 +41,7 @@ import {EditInstitutionsComponent} from "./edit-institutions.component";
 import {CustomComboBoxComponent} from "./custom-combo-box.component";
 import {GuestTermsDialogComponent} from "./guest-terms-dialog.component";
 import {CustomMultiComboBoxComponent} from "./custom-multi-combo-box.component";
+import { HttpClientModule} from '@angular/common/http';
 import {AngularEditorModule} from "@kolkov/angular-editor";
 import {AccessibilityModule} from "./accessibility/accessibility.module";
 import {MoveToDialogComponent} from "./move-to-dialog/move-to-dialog.component";
@@ -55,6 +56,7 @@ import {MoveToDialogComponent} from "./move-to-dialog/move-to-dialog.component";
         AgGridModule.withComponents([
             CheckboxRenderer,
         ]),
+        HttpClientModule,
         AngularEditorModule,
         AngularSplitModule,
         TreeModule,

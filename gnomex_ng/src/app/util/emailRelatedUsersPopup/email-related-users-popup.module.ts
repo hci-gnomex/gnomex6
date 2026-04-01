@@ -6,6 +6,7 @@ import { AngularMaterialModule } from "../../../modules/angular-material.module"
 
 import { EmailRelatedUsersPopupComponent } from "./email-related-users-popup.component";
 import { EmailRelatedUsersService } 			 from "./email-related-users.service";
+import { HttpClientModule} from '@angular/common/http';
 import {AngularEditorModule} from "@kolkov/angular-editor";
 
 @NgModule({
@@ -13,6 +14,7 @@ import {AngularEditorModule} from "@kolkov/angular-editor";
         AngularMaterialModule,
 		CommonModule,
 		FormsModule,
+    HttpClientModule,
         AngularEditorModule
 	],
 	declarations: [
