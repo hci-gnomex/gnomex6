@@ -116,12 +116,6 @@ let nextId = 0;
       transition: all .3s;
     }
 
-    input:valid+div>div>label {
-      color: green;
-      border-bottom: solid green 1px;
-
-      transition: all .3s;
-    }
 
     input:invalid:not:focus~div>div>label {
       color: #800;

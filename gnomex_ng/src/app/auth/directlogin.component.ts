@@ -146,8 +146,8 @@ import {DialogsService, DialogType} from '../util/popup/dialogs.service';
     .secondary-button {
       font-family: "Arial", Helvetica, sans-serif;
       font-size: 12pt;
-
-            color: grey;
+        --greywarm-dark ;
+      color: var(--grey-darkest);
       background-color: #C6CCBE;
       border-radius: 4px
     }
@@ -282,12 +282,6 @@ import {DialogsService, DialogType} from '../util/popup/dialogs.service';
       background-repeat:no-repeat;
       background-position:3px 16px;
       background-size:16px 16px;
-      transition: all .3s;
-    }
-
-    input:valid+label {
-      color: green;
-      border-bottom: solid green 1px;
       transition: all .3s;
     }
 

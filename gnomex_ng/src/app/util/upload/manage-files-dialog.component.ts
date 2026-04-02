@@ -1,4 +1,4 @@
-import {Component, Inject, NgZone, OnInit, ViewChild} from "@angular/core";
+import {Component, ElementRef, Inject, NgZone, OnInit, ViewChild} from "@angular/core";
 import {MAT_DIALOG_DATA, MatDialogRef, MatTabChangeEvent} from "@angular/material";
 import * as _ from "lodash";
 import {ConstantsService} from "../../services/constants.service";
@@ -85,8 +85,8 @@ export class ManageFilesDialogComponent extends BaseGenericContainerDialog imple
               private dialogService: DialogsService,
               public constService:ConstantsService,
               private fb:FormBuilder,
-              private ngZone: NgZone,
-              @Inject(MAT_DIALOG_DATA) private data,private propertyService: PropertyService) {
+              private elementRef: ElementRef,
+  @Inject(MAT_DIALOG_DATA) private data,private propertyService: PropertyService) {
     super();
   }
 
@@ -157,18 +157,18 @@ export class ManageFilesDialogComponent extends BaseGenericContainerDialog imple
     this.orgFileTab.prepareView(activeOrganize);
 
     setTimeout(() => {
-      const activePanel = document.querySelector('.mat-tab-body-active');
+      const activePanel = this.elementRef.nativeElement.querySelector('.mat-tab-body-active');
       if (activePanel) {
-        const firstFocusable = activePanel.querySelector<HTMLElement>(
+        const firstFocusable = activePanel.querySelector(
           'button:not([disabled]), [href], input:not([disabled]), ' +
           'select:not([disabled]), textarea:not([disabled]), ' +
           '[tabindex]:not([tabindex="-1"])'
-        );
+        ) as HTMLElement;
         if (firstFocusable) {
           firstFocusable.focus();
         }
       }
-    }, 200);
+    });
   }
   tabNavigateTo(index){
     this.selectedTabIndex = index;

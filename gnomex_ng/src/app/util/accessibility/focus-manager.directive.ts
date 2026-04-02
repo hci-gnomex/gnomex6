@@ -153,7 +153,7 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     // Screen reader hint text
     const label =
       which === 'before'
-        ? 'Start of grid or tree region. Press Tab to skip past this region, or Shift+Tab to move to the previous control. Use keyboard arrows to navigate grid'
+        ? 'Start of grid or tree region. Press Tab to skip past this region, or Shift+Tab to move to the previous control. Use keyboard arrows to navigate'
         : 'End of grid or tree region. Press Tab to move to the next control, or Shift+Tab to move back into the region.';
 
     this.renderer.setAttribute(el, 'role', 'note');
