@@ -1,0 +1,69 @@
+@import '~@angular/material/theming';
+
+@include mat-core();
+
+// Match the prebuilt deeppurple-amber theme palette choices, but with a darker
+// foreground so labels/hints/secondary text have better contrast on non-white surfaces.
+$primary: mat-palette($mat-deep-purple);
+$accent: mat-palette($mat-amber, A200, A100, A400);
+
+// Custom warn palette based on --red-darker (#990f0f).
+// mat-palette() expects a color map; we override the key hues used by Material
+// for error/warn states (500 = default, 100 = lighter background tint).
+$custom-warn-map: (
+  50:  #fde8e8,
+  100: #f9b3b3,   // lighter tint — used for error underline/ripple in some themes
+  200: #f48080,
+  300: #ee4d4d,
+  400: #c41212,
+  500: #990f0f,   // --red-darker — primary error color
+  600: #840d0d,
+  700: #6e0b0b,
+  800: #590808,
+  900: #440606,
+  A100: #ff8a80,
+  A200: #ff5252,
+  A400: #ff1744,
+  A700: #d50000,
+  contrast: (
+    50:  rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: white,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: white,
+    A400: white,
+    A700: white,
+  )
+);
+$warn: mat-palette($custom-warn-map);
+
+$base-theme: mat-light-theme($primary, $accent, $warn);
+
+// Material v8 uses these foreground tokens for form-field labels, hints, etc.
+// Default secondary/hint text is fairly low-opacity and can fail contrast when the
+// component background isn't pure white.
+$base-foreground: map-get($base-theme, foreground);
+$strong-foreground: map-merge(
+    $base-foreground,
+    (
+      // Used for floating labels and many "secondary" UI texts.
+      secondary-text: rgba(0, 0, 0, 0.74),
+      // Used for mat-hint and some placeholder-like texts.
+      hint-text: rgba(0, 0, 0, 0.74),
+      // Keep disabled reasonably distinct but still readable.
+      disabled-text: rgba(0, 0, 0, 0.54),
+      // Icons often follow this token.
+      icon: rgba(0, 0, 0, 0.74)
+    )
+);
+
+$theme: map-merge($base-theme, (foreground: $strong-foreground));
+
+@include angular-material-theme($theme)

@@ -20,6 +20,24 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     private renderer: Renderer2
   ) {}
 
+  @HostListener('focus', ['$event'])
+  onHostFocus(event: FocusEvent): void {
+    if (!this.containerEl) { return; }
+
+    // Only intercept when focus lands directly on the host
+    // (not bubbling up from inside the container)
+    if (event.target !== this.host.nativeElement) { return; }
+
+    // Find the roving-tabindex active node (tabindex="0") inside the tree/grid,
+    // which is the node that was last active. If none, fall back to first tabbable.
+    const activeNode = this.containerEl.querySelector<HTMLElement>('[tabindex="0"]');
+    const target = activeNode ? activeNode : this.findFirstFocusable(this.containerEl);
+
+    if (target) {
+      target.focus();
+    }
+  }
+
   ngAfterViewInit(): void {
     // Make host focusable so keydown events can be received
     if (!this.host.nativeElement.hasAttribute('tabindex')) {
@@ -41,7 +59,17 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
 
     // Listen for sentinel focus (when user tabs onto them, jump OUTSIDE the widget)
     this.unlistenBeforeFocus = this.renderer.listen(this.beforeSentinel, 'focus', () => {
-      this.focusOutsideWidget('prev');
+      const activeNode = this.containerEl
+        ? this.containerEl.querySelector<HTMLElement>('[tabindex="0"]')
+        : null;
+      const target = activeNode
+        ? activeNode
+        : (this.containerEl ? this.findFirstFocusable(this.containerEl) : null);
+      if (target) {
+        target.focus();
+      } else {
+        this.focusOutsideWidget('prev');
+      }
     });
 
     this.unlistenAfterFocus = this.renderer.listen(this.afterSentinel, 'focus', () => {
@@ -53,6 +81,8 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     //   this.renderer.setAttribute(this.containerEl, 'tabindex', '0');
     // }
   }
+
+
 
   ngOnDestroy(): void {
     if (this.unlistenBeforeFocus) {
@@ -153,7 +183,7 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     // Screen reader hint text
     const label =
       which === 'before'
-        ? 'Start of grid or tree region. Press Tab to skip past this region, or Shift+Tab to move to the previous control. Use keyboard arrows to navigate grid'
+        ? 'Start of grid or tree region. Press Tab to skip past this region, or Shift+Tab to move to the previous control. Use keyboard arrows to navigate'
         : 'End of grid or tree region. Press Tab to move to the next control, or Shift+Tab to move back into the region.';
 
     this.renderer.setAttribute(el, 'role', 'note');
