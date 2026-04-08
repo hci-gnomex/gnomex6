@@ -189,21 +189,18 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 if (this.treeKbMove.isGrabbing) {
                   this._kbDrop(node, $event.ctrlKey);
                 } else {
-                  TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
+                  TREE_ACTIONS.ACTIVATE(tree, node, $event);
                 }
               },
               [KEYS.SPACE]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
                 $event.preventDefault();
                 this._kbGrab(node);
               },
-              // Escape (keyCode 27) is not in the KEYS enum; use raw code
               [27]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
                 if (this.treeKbMove.isGrabbing) {
                   this.treeKbMove.cancel();
                 }
-              },
-              [KEYS.RIGHT]: undefined,
-              [KEYS.LEFT]: undefined,
+              }
             }
           },
       };

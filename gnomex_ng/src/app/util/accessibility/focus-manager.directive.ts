@@ -20,69 +20,84 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     private renderer: Renderer2
   ) {}
 
-  @HostListener('focus', ['$event'])
-  onHostFocus(event: FocusEvent): void {
-    if (!this.containerEl) { return; }
-
-    // Only intercept when focus lands directly on the host
-    // (not bubbling up from inside the container)
-    if (event.target !== this.host.nativeElement) { return; }
-
-    // Find the roving-tabindex active node (tabindex="0") inside the tree/grid,
-    // which is the node that was last active. If none, fall back to first tabbable.
-    const activeNode = this.containerEl.querySelector<HTMLElement>('[tabindex="0"]');
-    const target = activeNode ? activeNode : this.findFirstFocusable(this.containerEl);
-
-    if (target) {
-      target.focus();
-    }
-  }
-
   ngAfterViewInit(): void {
-    // Make host focusable so keydown events can be received
-    if (!this.host.nativeElement.hasAttribute('tabindex')) {
-      this.renderer.setAttribute(this.host.nativeElement, 'tabindex', '0');
-    }
+    this.renderer.setAttribute(this.host.nativeElement, 'tabindex', '-1');
+
     this.containerEl = this.findContainer();
     if (!this.containerEl) { return; }
 
     const parent = this.containerEl.parentElement;
     if (!parent) { return; }
 
-    // Create sentinels
     this.beforeSentinel = this.createSentinel('before');
     this.afterSentinel = this.createSentinel('after');
 
-    // Insert as siblings around the widget
     this.renderer.insertBefore(parent, this.beforeSentinel, this.containerEl);
     this.renderer.insertBefore(parent, this.afterSentinel, this.containerEl.nextSibling);
 
-    // Listen for sentinel focus (when user tabs onto them, jump OUTSIDE the widget)
-    this.unlistenBeforeFocus = this.renderer.listen(this.beforeSentinel, 'focus', () => {
-      const activeNode = this.containerEl
-        ? this.containerEl.querySelector<HTMLElement>('[tabindex="0"]')
-        : null;
-      const target = activeNode
-        ? activeNode
-        : (this.containerEl ? this.findFirstFocusable(this.containerEl) : null);
-      if (target) {
-        target.focus();
-      } else {
+    this.unlistenBeforeFocus = this.renderer.listen(this.beforeSentinel, 'focus', (e: FocusEvent) => {
+      if (!this.containerEl) { return; }
+
+      const relatedTarget = e.relatedTarget as HTMLElement | null;
+      const isGrid = !!this.containerEl.querySelector('.ag-root');
+
+      // If relatedTarget is inside the container the user shift-tabbed
+      // backward out of the widget — exit backward
+      if (relatedTarget && this.containerEl.contains(relatedTarget)) {
         this.focusOutsideWidget('prev');
+        return;
+      }
+
+      // For grid — do nothing, let the browser's natural Tab advance
+      // into the grid cell that ag-grid has already set tabindex="0" on
+      if (isGrid) {
+        return;
+      }
+
+      // For tree — must programmatically enter because tree nodes are
+      // not naturally reachable by Tab (all have tabindex="-1" by default)
+      let target: HTMLElement | null = null;
+
+      const treeNode = this.containerEl.querySelector<HTMLElement>('.node-content-wrapper[tabindex="0"]');
+      if (treeNode) {
+        target = treeNode;
+      }
+
+      if (!target) {
+        const firstTreeNode = this.containerEl.querySelector<HTMLElement>('.node-content-wrapper');
+        if (firstTreeNode) {
+          firstTreeNode.setAttribute('tabindex', '0');
+          target = firstTreeNode;
+        }
+      }
+
+      if (target) {
+        const focusTarget = target;
+        setTimeout(() => {
+          focusTarget.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }));
+          focusTarget.dispatchEvent(new MouseEvent('click', { bubbles: false, cancelable: true }));
+          focusTarget.focus();
+        }, 0);
       }
     });
 
-    this.unlistenAfterFocus = this.renderer.listen(this.afterSentinel, 'focus', () => {
-      this.focusOutsideWidget('next');
+    // After-sentinel: if user tabbed forward out of the widget just let
+    // the browser handle the next Tab naturally from the sentinel.
+    // If user shift-tabbed backward from below, exit backward.
+    this.unlistenAfterFocus = this.renderer.listen(this.afterSentinel, 'focus', (e: FocusEvent) => {
+      const relatedTarget = e.relatedTarget as HTMLElement | null;
+
+      // relatedTarget is inside container — user tabbed forward out of widget
+      // do nothing, let browser advance naturally on next Tab press
+      if (relatedTarget && this.containerEl && this.containerEl.contains(relatedTarget)) {
+        return;
+      }
+
+      // relatedTarget is outside container — user shift-tabbed backward
+      // from a button below the tree — exit backward
+      this.focusOutsideWidget('prev');
     });
-
-    // Optional (later): make the container tabbable so users can enter it
-    // if (!this.containerEl.hasAttribute('tabindex')) {
-    //   this.renderer.setAttribute(this.containerEl, 'tabindex', '0');
-    // }
   }
-
-
 
   ngOnDestroy(): void {
     if (this.unlistenBeforeFocus) {
@@ -94,7 +109,7 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
       this.unlistenAfterFocus = null;
     }
 
-    if (this.beforeSentinel &&  this.beforeSentinel.parentElement) {
+    if (this.beforeSentinel && this.beforeSentinel.parentElement) {
       this.renderer.removeChild(this.beforeSentinel.parentElement, this.beforeSentinel);
     }
     if (this.afterSentinel && this.afterSentinel.parentElement) {
@@ -113,20 +128,30 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
 
     const doc = this.host.nativeElement.ownerDocument;
     const active = doc.activeElement as HTMLElement | null;
-
     const inside = !!active && this.containerEl.contains(active);
+    const isGrid = !!this.containerEl.querySelector('.ag-root');
 
     if (event.key === 'Enter' && inside && this.invokeEnter) {
       this.invokeEnter(event);
     }
 
-    // Only override Tab when focus is INSIDE the widget.
+    // For the tree, intercept Tab to prevent browser tabbing through
+    // every internal node — send directly to sentinels instead.
+    // For the grid, ag-grid manages its own internal Tab behavior so
+    // we only intercept Tab to send to the after-sentinel.
     if (event.key === 'Tab' && inside) {
       event.preventDefault();
 
       if (event.shiftKey) {
-        if (this.beforeSentinel) {
-          this.beforeSentinel.focus();
+        if (isGrid) {
+          // Send to before-sentinel so screen reader announces "Start of region"
+          // before-sentinel relatedTarget check will then exit backward
+          if (this.beforeSentinel) {
+            this.beforeSentinel.focus();
+          }
+        } else {
+          // Tree: exit backward directly
+          this.focusOutsideWidget('prev');
         }
       } else {
         if (this.afterSentinel) {
@@ -136,7 +161,6 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
       return;
     }
 
-    // F6 behavior
     if (event.key === 'F6' && inside) {
       const toolbar = this.toolbarSelector
         ? (doc.querySelector(`.${this.toolbarSelector}`) as HTMLElement | null)
@@ -153,9 +177,6 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     }
   }
 
-  // ----------------------------
-  // Finding grid/tree container
-  // ----------------------------
   private findContainer(): HTMLElement | null {
     const hostEl = this.host.nativeElement;
 
@@ -168,33 +189,28 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     return null;
   }
 
-  // ----------------------------
-  // Sentinels
-  // ----------------------------
   private createSentinel(which: 'before' | 'after'): HTMLElement {
     const doc = this.host.nativeElement.ownerDocument;
-
-    // Use a real element (button or span). Button is reliably focusable; span needs tabindex.
     const el = doc.createElement('span');
 
     this.renderer.setAttribute(el, 'tabindex', '0');
     this.renderer.addClass(el, 'sr-only');
 
-    // Screen reader hint text
     const label =
       which === 'before'
-        ? 'Start of grid or tree region. Press Tab to skip past this region, or Shift+Tab to move to the previous control. Use keyboard arrows to navigate'
-        : 'End of grid or tree region. Press Tab to move to the next control, or Shift+Tab to move back into the region.';
+        ? 'Start of tree or grid region. Press Tab to enter and navigate with arrow keys.'
+        : 'End of tree or grid region. Press Tab to move to the next control.';
 
-    this.renderer.setAttribute(el, 'role', 'note');
+    //this.renderer.setAttribute(el, 'role', 'note');
     this.renderer.setAttribute(el, 'aria-label', label);
 
     return el;
   }
 
-  // ----------------------------
-  // Moving focus outside widget
-  // ----------------------------
+  private isSentinel(el: HTMLElement): boolean {
+    return el === this.beforeSentinel || el === this.afterSentinel;
+  }
+
   private focusOutsideWidget(dir: 'next' | 'prev'): void {
     if (!this.containerEl) { return; }
 
@@ -209,10 +225,6 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     }
   }
 
-  /**
-   * Finds the first focusable element AFTER the widget, skipping anything inside it.
-   * This avoids scanning "every tabbable on the page" by using TreeWalker and stopping early.
-   */
   private findNextFocusableOutside(anchor: HTMLElement): HTMLElement | null {
     const doc = this.host.nativeElement.ownerDocument;
 
@@ -224,6 +236,7 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
           const el = node as HTMLElement;
           if (!el) { return NodeFilter.FILTER_SKIP; }
           if (anchor.contains(el)) { return NodeFilter.FILTER_REJECT; }
+          if (this.isSentinel(el)) { return NodeFilter.FILTER_SKIP; }
           return this.isActuallyTabbable(el) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
         }
       }
@@ -233,10 +246,6 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     return walker.nextNode() as HTMLElement | null;
   }
 
-  /**
-   * Finds the first focusable element BEFORE the widget.
-   * TreeWalker has no prevNode, so we walk backwards via DOM relationships and test candidates.
-   */
   private findPrevFocusableOutside(anchor: HTMLElement): HTMLElement | null {
     const doc = this.host.nativeElement.ownerDocument;
 
@@ -247,12 +256,11 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
       if (prev) {
         node = prev;
 
-        // dive to the deepest last child
         while (node.lastChild) { node = node.lastChild; }
 
         if (node instanceof HTMLElement) {
           const el = node as HTMLElement;
-          if (!anchor.contains(el) && this.isActuallyTabbable(el)) { return el; }
+          if (!anchor.contains(el) && !this.isSentinel(el) && this.isActuallyTabbable(el)) { return el; }
         }
         continue;
       }
@@ -261,11 +269,10 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
 
       if (node && node instanceof HTMLElement) {
         const el = node as HTMLElement;
-        if (!anchor.contains(el) && this.isActuallyTabbable(el)) { return el; }
+        if (!anchor.contains(el) && !this.isSentinel(el) && this.isActuallyTabbable(el)) { return el; }
       }
     }
 
-    // If we hit the start, nothing to focus
     return null;
   }
 
@@ -280,14 +287,9 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     return null;
   }
 
-  // ----------------------------
-  // Focusable checks
-  // ----------------------------
   private isActuallyTabbable(el: HTMLElement): boolean {
-    // Removed from tab order
     if (el.getAttribute('tabindex') === '-1') { return false; }
 
-    // Disabled controls
     if (
       el instanceof HTMLButtonElement ||
       el instanceof HTMLInputElement ||
@@ -297,7 +299,6 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
       if (el.disabled) { return false; }
     }
 
-    // Hidden
     if (el.getAttribute('aria-hidden') === 'true') { return false; }
 
     const view = this.host.nativeElement.ownerDocument ? this.host.nativeElement.ownerDocument.defaultView : null;
@@ -311,10 +312,8 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     const rect = el.getBoundingClientRect();
     if (rect.width === 0 && rect.height === 0) { return false; }
 
-    // Anchors must have href to be tabbable
     if (el instanceof HTMLAnchorElement && !el.href) { return false; }
 
-    // tabindex >= 0 or natively focusable are OK
     return el.tabIndex >= 0;
   }
 }

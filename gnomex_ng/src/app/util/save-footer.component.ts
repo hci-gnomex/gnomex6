@@ -32,8 +32,8 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
         .secondary-action{
             background-color: var(--sidebar-footer-background-color);
             font-weight: bolder;
-            color: var(--bluewarmvivid-medlight);
-            border: var(--bluewarmvivid-medlight)  solid 1px;
+            color: var(--bluewarmvivid-meddark);
+            border: var(--bluewarmvivid-meddark)  solid 1px;
         }
 
         .padded { padding: 0.3em; }

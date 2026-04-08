@@ -197,7 +197,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 if (this.treeKbMove.isGrabbing) {
                   this._kbDrop(node, $event.ctrlKey);
                 } else {
-                  TREE_ACTIONS.TOGGLE_EXPANDED(tree, node, $event);
+                  TREE_ACTIONS.ACTIVATE(tree, node, $event);
                 }
               },
               [KEYS.SPACE]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
@@ -214,9 +214,7 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
                 if (this.treeKbMove.isGrabbing) {
                   this.treeKbMove.cancel();
                 }
-              },
-              [KEYS.RIGHT]: undefined,
-              [KEYS.LEFT]: undefined,
+              }
             }
           },
           nodeClass: (node: TreeNode) => {

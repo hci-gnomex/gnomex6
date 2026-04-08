@@ -64,8 +64,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
     `]
 })
 export class BrowseOverviewComponent implements OnInit, OnDestroy {
-    @ViewChild(MatTabGroup, {static: false}) tabs: MatTabGroup;
-    @ViewChild(TabContainer, {static: false}) tabView: TabContainer;
+    @ViewChild(MatTabGroup, {static: true}) tabs: MatTabGroup;
     state: string = TabContainer.VIEW;
     public project: any;
     public nodeTitle: string = "";
@@ -99,9 +98,6 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
         if(this.navService.navMode === NavigationService.URL){
             this.navService.emitResetNavModeSubject("overview");
         }
-
-
-
         this.refreshOverviewData();
 
     }
@@ -145,9 +141,11 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
 
 
     refreshOnSearch(data?: any): void {
-        if( this.tabs.selectedIndex === this.PROGRESS_INDEX) {
-            this.refreshProgress(data);
+      setTimeout(() => {
+        if (this.tabs.selectedIndex === this.PROGRESS_INDEX) {
+          this.refreshProgress(data);
         }
+      });
 
     }
 
