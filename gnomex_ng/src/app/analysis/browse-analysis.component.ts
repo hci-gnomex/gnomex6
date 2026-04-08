@@ -272,6 +272,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
                 return;
               }
 
+              model.expandAll();
               if (this.navService.navMode === NavigationService.URL) {
                 const activatedRoute = this.navService.getChildActivateRoute(this.route);
                 if (activatedRoute) {

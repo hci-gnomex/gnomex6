@@ -3,9 +3,9 @@
         <ol class="full-width three-depth-numbering" role="list" aria-label="Setup steps">
             <li role="listitem">
                 <div class="flex-container-row" role="group" aria-label="Service category selection">
-                    <h2 class="heading" id="serviceCategoryLabel">
+                    <div class="heading" id="serviceCategoryLabel">
                         Select a service category :
-                    </h2>
+                    </div>
                     <mat-radio-group *ngIf="requestCategories.length > 0; else noPlatforms"
                                      class="flex-container-col"
                                      placeholder="Select a service category"
@@ -39,9 +39,9 @@
             </li>
             <li *ngIf="showLab" class="full-width align-baseline" role="listitem">
                 <div class="full-width flex-container-row align-baseline" role="group" aria-label="Lab group selection">
-                    <h2 class="heading" id="labGroupLabel">
+                    <div class="heading" id="labGroupLabel">
                         Verify your lab group :
-                    </h2>
+                    </div>
                     <custom-combo-box class="moderate-width" placeholder="Select a Lab" (optionSelected)="selectLabOption($event)"
                                       [displayField]="this.prefService.labDisplayField" [options]="this.labList"
                                       [formControlName]="'selectLab'"
@@ -51,9 +51,9 @@
             </li>
             <li *ngIf="showName" class="full-width align-baseline" role="listitem">
                 <div class="full-width flex-container-row align-baseline" role="group" aria-label="Name verification">
-                    <h2 class="heading" id="nameLabel">
+                    <div class="heading" id="nameLabel">
                         Verify your name :
-                    </h2>
+                    </div>
                     <mat-form-field class="moderate-width full-height">
                         <mat-select class="full-width full-height"
                                     placeholder="Your name"
@@ -75,9 +75,9 @@
                 <div class="full-width flex-container-row" role="group" aria-label="Payment method selection">
                     <div class="flex-container-col">
                         <div class="flex-container-row align-baseline">
-                            <h2 class="heading" id="paymentLabel">
+                            <div class="heading" id="paymentLabel">
                                 Select a payment method :
-                            </h2>
+                            </div>
                             <mat-form-field class="moderate-width full-height">
                                 <mat-select class="full-width full-height"
                                             placeholder="Account"
@@ -130,9 +130,9 @@
             </li>
             <li *ngIf="showProject" class="full-width align-baseline" role="listitem">
                 <div class="full-width flex-container-row align-baseline" role="group" aria-label="Project folder selection">
-                    <h2 class="heading word-wrap" id="projectLabel">
+                    <div class="heading word-wrap" id="projectLabel">
                         {{ "Select a folder : \n (for organizing experiments)" }}
-                    </h2>
+                    </div>
                     <mat-form-field class="moderate-width full-height">
                         <mat-select class="full-width full-height"
                                     placeholder="Project"
@@ -160,9 +160,9 @@
             </li>
             <li *ngIf="showExperimentName" class="full-width align-baseline" role="listitem">
                 <div class="full-width flex-container-row align-baseline" role="group" aria-label="Experiment name input">
-                    <h2 class="heading word-wrap" id="experimentNameLabel">
+                    <div class="heading word-wrap" id="experimentNameLabel">
                          Provide an experiment name for the data folder ({{this._optOrReq}})
-                    </h2>
+                    </div>
                     <mat-form-field class="moderate-width">
                         <input matInput formControlName="experimentName" placeholder="Experiment Name for the data folder" (input)="onChangeExperimentName($event)" aria-labelledby="experimentNameLabel">
                     </mat-form-field>
@@ -171,9 +171,9 @@
             <li *ngIf="showExperimentTextbox" class="full-width align-baseline" role="listitem">
                 <div class="full-width" role="group" aria-label="Experimental details input">
                     <div class="full-width flex-container-row align-baseline padding-bottom">
-                        <h2 class="heading word-wrap" id="experimentDetailsLabel">
+                        <div class="heading word-wrap" id="experimentDetailsLabel">
                             Document experimental details in the text field below ({{this._optOrReq}})
-                        </h2>
+                        </div>
                     </div>
                     <mat-form-field class="long-width">
                         <textarea matInput

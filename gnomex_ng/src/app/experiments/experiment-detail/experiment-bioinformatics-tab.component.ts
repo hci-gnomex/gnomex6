@@ -15,52 +15,52 @@ import {NewExperimentService} from "../../services/new-experiment.service";
     selector: 'experiment-bioinformatics-tab',
     templateUrl: 'experiment-bioinformatics-tab.component.html',
     styles: [`
-        
+
         .margin-top { margin-top: 0.5rem; }
-        
-        
+
+
         .label {
             color: darkblue;
             font-style: italic;
-            
+
             padding: 0.3em;
         }
-        
+
         .label-width {
             min-width: 12em;
         }
-        
-        
+
+
         .medium-width { width: 24em; }
-        
-        
+
+
         .min-size { width: fit-content; }
-        
-        
+
+
         .margin { margin: 0 2em; }
-        
-        
+
+
         .bold { font-weight: bold; }
-        
+
         .small-font { font-size: small; }
-        
-        
+
+
         .disabled-color { color: #646464; }
-        
-        
+
+
         .highlight { background-color: #FFFEB3; }
-        
-        
+
+
         .bordered { border: 1px solid silver; }
-        
+
         .disable-bordered { border: 1px solid #E0E0E0; }
         .enable-bordered  { border: 1px solid #A0A0A0; }
-        
+
         .link-button {
             color: blue;
             text-decoration: underline;
         }
-        
+
     `]
 })
 export class ExperimentBioinformaticsTabComponent implements OnDestroy {
@@ -112,7 +112,7 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
 
         this.requireReconfirmation();
     }
-    
+
     @Input("editMode") set editMode (isEditMode: boolean) {
         this.masterDisabled = !isEditMode;
     }
@@ -224,6 +224,14 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
         }
     }
 
+    public onAssistChanged(event): void {
+        if (event.checked) {
+            this._experiment.bioinformaticsAssist = 'Y';
+        } else {
+            this._experiment.bioinformaticsAssist = 'N';
+        }
+    }
+
     public onORACompressionChanged(event): void {
         if (event.checked) {
             this._experiment.oraCompression = 'Y';
@@ -279,15 +287,15 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
         if(this._experiment.requestCategory
             && this._experiment.requestCategory.isIlluminaType
             && this._experiment.requestCategory.isIlluminaType === 'Y' ) {
-    
+
             if (this._experiment.sequenceLanes
                 && Array.isArray(this._experiment.sequenceLanes)
                 && !this.flag_isANewExperiment) {
-        
+
                 for (let sequenceLane of this._experiment.sequenceLanes) {
                     let idGenomeBuildAlignTo: string = '';
                     let idOrganism: string = '';
-            
+
                     if (sequenceLane && sequenceLane.idGenomeBuildAlignTo) {
                         consolidatedGenomeBuildIds.add(sequenceLane.idGenomeBuildAlignTo);
                         idGenomeBuildAlignTo = sequenceLane.idGenomeBuildAlignTo;
@@ -296,7 +304,7 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
                         consolidatedOrganismIds.add(sequenceLane.idOrganism);
                         idOrganism = sequenceLane.idOrganism;
                     }
-            
+
                     let temp: any = {
                         idGenomeBuildAlignTo: idGenomeBuildAlignTo,
                         idOrganism: idOrganism,
@@ -305,7 +313,7 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
                         dictionary: [],
                         sequenceLane: sequenceLane
                     };
-            
+
                     for (let info of this.consolidatedGenomeInformation) {
                         if (temp.idOrganism === info.idOrganism && info.alignToGenomeBuild === 'Y')  {
                             info.idGenomeBuildAlignTo = temp.idGenomeBuildAlignTo;
@@ -316,52 +324,52 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
                             info.sequenceLane = temp.sequenceLane;
                         }
                     }
-            
+
                     let checkForExisting: any[] = this.consolidatedGenomeInformation.filter((a) => {
                         return temp.idGenomeBuildAlignTo === a.idGenomeBuildAlignTo
                             && temp.idOrganism === a.idOrganism
                             && temp.organismName === a.organismName
                             && temp.alignToGenomeBuild === a.alignToGenomeBuild;
                     });
-            
+
                     if (checkForExisting.length === 0) {
                         let checkForOrganism: any[] = this.consolidatedGenomeInformation.filter((a) => {
                             return temp.idOrganism === a.idOrganism
                                 && temp.alignToGenomeBuild === 'N'
                                 && a.alignToGenomeBuild === 'Y';
                         });
-                
+
                         if (checkForOrganism.length === 0) {
                             this.consolidatedGenomeInformation.push(temp);
                         }
                     }
                 }
-        
+
                 for (let id of consolidatedGenomeBuildIds) {
                     if (this.genomeBuild) {
                         this.genomeBuild = this.genomeBuild + ' --- ';
                     }
-            
+
                     let entry: any = this.dictionaryService.getEntry('hci.gnomex.model.GenomeBuildLite', id);
-            
+
                     if (entry) {
                         this.genomeBuild = this.genomeBuild + entry.display;
                     }
                 }
             } else {
                 this._experiment.sequenceLanes = [];
-        
+
                 for (let sample of this._experiment.samples) {
                     let idOrganism: string = '';
-            
+
                     if (sample.idOrganism) {
                         consolidatedOrganismIds.add(sample.idOrganism);
                         idOrganism = sample.idOrganism;
                     }
-            
+
                     let lanePlus: number = parseInt(sample.multiplexGroupNumber) + 100000;
                     let laneStr: string = lanePlus.toString().substr(1);
-            
+
                     if (sample.numberSequencingLanes) {
                         for (let i: number = 0; i < sample.numberSequencingLanes; i++) {
                             let laneObj = {
@@ -374,7 +382,7 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
                                 idOrganism: sample.idOrganism,
                                 idGenomeBuildAlignTo: ''
                             };
-                    
+
                             this._experiment.sequenceLanes.push(laneObj);
                         }
                     } else {
@@ -388,11 +396,11 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
                             idOrganism: sample.idOrganism,
                             idGenomeBuildAlignTo: ''
                         };
-                
+
                         this._experiment.sequenceLanes.push(laneObj);
                     }
-            
-            
+
+
                     let temp: any = {
                         alignToGenomeBuild: 'N',
                         dictionary: [],
@@ -400,7 +408,7 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
                         idOrganism: idOrganism,
                         organismName: ''
                     };
-            
+
                     for (let info of this.consolidatedGenomeInformation) {
                         if (temp.idOrganism === info.idOrganism && info.alignToGenomeBuild === 'Y') {
                             info.idGenomeBuildAlignTo = temp.idGenomeBuildAlignTo;
@@ -411,21 +419,21 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
                             info.sequenceLane = temp.sequenceLane;
                         }
                     }
-            
+
                     let checkForExisting: any[] = this.consolidatedGenomeInformation.filter((a) => {
                         return temp.idGenomeBuildAlignTo === a.idGenomeBuildAlignTo
                             && temp.idOrganism === a.idOrganism
                             && temp.organismName === a.organismName
                             && temp.alignToGenomeBuild === a.alignToGenomeBuild;
                     });
-            
+
                     if (checkForExisting.length === 0) {
                         let checkForOrganism: any[] = this.consolidatedGenomeInformation.filter((a) => {
                             return temp.idOrganism === a.idOrganism
                                 && temp.alignToGenomeBuild === 'N'
                                 && a.alignToGenomeBuild === 'Y';
                         });
-                
+
                         if (checkForOrganism.length === 0) {
                             this.consolidatedGenomeInformation.push(temp);
                         }

@@ -101,7 +101,7 @@
                                   label="Would you like the {{ groupName }} to assist you with analysis?"></context-help>
                     <div class="flex-container-row align-center">
                         <div class="label-width margin-top">
-                            <mat-checkbox [(ngModel)]="bioinformaticsAssist" aria-label="Request analysis assistance">Yes</mat-checkbox>
+                            <mat-checkbox [(ngModel)]="bioinformaticsAssist" (change)="onAssistChanged($event)"  aria-label="Request analysis assistance">Yes</mat-checkbox>
                         </div>
                         <div>
                             {{ analysisNote }}
@@ -110,10 +110,10 @@
                 </div>
             </li>
         </ol>
-        <div class="full-width flex-container-col padded">
+        <div *ngIf="bioinformaticsAssist"    class="full-width flex-container-col padded">
             <context-help name="bioNote" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
                           [hasEditPermission]="this.createSecurityAdvisorService.isAdmin" popupTitle="Analysis Note Help"
-                          label="Enter a note regarding analysis. (optional)"></context-help>
+                          label="Provide a brief description of the requested assistance (required)."></context-help>
             <div class="full-width padded {{bioinformaticsAssist ? 'enable-bordered' : 'disable-bordered'}}">
                 <textarea matInput
                           matTextareaAutosize

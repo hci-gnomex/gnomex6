@@ -10,7 +10,7 @@ import {
 } from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms"
 import {ActivatedRoute} from "@angular/router";
-
+import { HttpClientModule} from '@angular/common/http';
 import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
 import {ConstantsService} from "../../services/constants.service";
 import {GnomexService} from "../../services/gnomex.service";
@@ -148,7 +148,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
         maxHeight: "100%",
         width: "100%",
         minWidth: "5em",
-        enableToolbar: true,
+        enableToolbar: false,
         defaultFontName: "Arial",
         defaultFontSize: "2",
         fonts: FONT_FAMILY,
@@ -161,7 +161,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
         maxHeight: "100%",
         width: "100%",
         minWidth: "5em",
-        enableToolbar: true,
+        enableToolbar: false,
         defaultFontName: "Arial",
         defaultFontSize: "2",
         fonts: FONT_FAMILY,
@@ -187,7 +187,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
         maxHeight: "100%",
         width: "100%",
         minWidth: "5em",
-        enableToolbar: true,
+        enableToolbar: false,
         defaultFontName: "Arial",
         defaultFontSize: "2",
         fonts: FONT_FAMILY,

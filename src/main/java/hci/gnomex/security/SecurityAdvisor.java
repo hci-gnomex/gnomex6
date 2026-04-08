@@ -1057,7 +1057,7 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
     }
 
     // Used to scrub list of requests being shown to user. CanRead makes sure even
-// if this scrubbing is not done they don't see details.
+    // if this scrubbing is not done they don't see details.
     public Map<Integer, Integer> getBSTXSecurityIdsToExclude(Session sess, DictionaryHelper dh, List rows,
                                                              Integer idRequestIdx, Integer codeRequestCategoryIdx) throws NamingException, SQLException {
         Map<Integer, Integer> idsToSkip = new HashMap<Integer, Integer>();
@@ -1097,7 +1097,7 @@ public class SecurityAdvisor extends DetailObject implements Serializable, hci.f
                 boolean[] perms = secMap.get(ccNumber);
                 boolean hasPermission = false;
                 // perms of null means ccNumber doesn't exist in BST
-                // In that case we show experiment to super users but no one else
+                // In that case we show experiment to superusers but no one else
                 if (perms == null) {
                     if (hasPermission(CAN_ADMINISTER_ALL_CORE_FACILITIES)) {
                         hasPermission = true;

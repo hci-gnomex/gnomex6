@@ -364,9 +364,9 @@ export class TabSamplesIlluminaComponent implements OnInit {
 
         let showExternalCCNumber = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_SHOW_CCNUMBER_EXTERNAL_EXPERIMENTS);
 
-        if (this.experiment && this.experiment.isExternal === "Y") {
-            return showExternalCCNumber
-        }
+//        if (this.experiment && this.experiment.isExternal === "Y") {
+//            return showExternalCCNumber
+//        }
 
         let isBSTLinkageSupported: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CORE_LINKAGE_SUPPORTED);
         let canAccessBSTX: boolean = this.propertyService.getPropertyAsBoolean(PropertyService.PROPERTY_CAN_ACCESS_CORE);
