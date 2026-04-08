@@ -21,7 +21,7 @@ classes/
 
 *.map
 
-gradle.properites
+gradle.properties
 
 
 
