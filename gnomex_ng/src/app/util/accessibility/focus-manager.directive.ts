@@ -6,8 +6,10 @@ import { AfterViewInit, Directive, ElementRef, HostListener, Input, OnDestroy, R
 export class FocusManagerDirective implements AfterViewInit, OnDestroy {
   @Input() toolbarSelector: string | null = null;
   @Input() invokeEnter: ((event: KeyboardEvent) => void) | null = null;
+  @Input() focusManagerDescribedBy: string | null = null;
 
   private containerEl: HTMLElement | null = null;
+  private isGrid: boolean = false;
 
   private beforeSentinel: HTMLElement | null = null;
   private afterSentinel: HTMLElement | null = null;
@@ -26,6 +28,9 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     this.containerEl = this.findContainer();
     if (!this.containerEl) { return; }
 
+    // Determine type once and store — used by sentinels and onKeyDown
+    this.isGrid = !!this.containerEl.querySelector('.ag-root');
+
     const parent = this.containerEl.parentElement;
     if (!parent) { return; }
 
@@ -39,7 +44,6 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
       if (!this.containerEl) { return; }
 
       const relatedTarget = e.relatedTarget as HTMLElement | null;
-      const isGrid = !!this.containerEl.querySelector('.ag-root');
 
       // If relatedTarget is inside the container the user shift-tabbed
       // backward out of the widget — exit backward
@@ -50,7 +54,7 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
 
       // For grid — do nothing, let the browser's natural Tab advance
       // into the grid cell that ag-grid has already set tabindex="0" on
-      if (isGrid) {
+      if (this.isGrid) {
         return;
       }
 
@@ -129,28 +133,20 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     const doc = this.host.nativeElement.ownerDocument;
     const active = doc.activeElement as HTMLElement | null;
     const inside = !!active && this.containerEl.contains(active);
-    const isGrid = !!this.containerEl.querySelector('.ag-root');
 
     if (event.key === 'Enter' && inside && this.invokeEnter) {
       this.invokeEnter(event);
     }
 
-    // For the tree, intercept Tab to prevent browser tabbing through
-    // every internal node — send directly to sentinels instead.
-    // For the grid, ag-grid manages its own internal Tab behavior so
-    // we only intercept Tab to send to the after-sentinel.
     if (event.key === 'Tab' && inside) {
       event.preventDefault();
 
       if (event.shiftKey) {
-        if (isGrid) {
-          // Send to before-sentinel so screen reader announces "Start of region"
-          // before-sentinel relatedTarget check will then exit backward
+        if (this.isGrid) {
           if (this.beforeSentinel) {
             this.beforeSentinel.focus();
           }
         } else {
-          // Tree: exit backward directly
           this.focusOutsideWidget('prev');
         }
       } else {
@@ -196,13 +192,18 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     this.renderer.setAttribute(el, 'tabindex', '0');
     this.renderer.addClass(el, 'sr-only');
 
+    const regionType = this.isGrid ? 'grid' : 'tree';
+
     const label =
       which === 'before'
-        ? 'Start of tree or grid region. Press Tab to enter and navigate with arrow keys.'
-        : 'End of tree or grid region. Press Tab to move to the next control.';
+        ? `${regionType}. Tab to enter, arrows to navigate.`
+        : `End of ${regionType}.`;
 
-    //this.renderer.setAttribute(el, 'role', 'note');
     this.renderer.setAttribute(el, 'aria-label', label);
+
+    if (which === 'before' && this.focusManagerDescribedBy) {
+      this.renderer.setAttribute(el, 'aria-describedby', this.focusManagerDescribedBy);
+    }
 
     return el;
   }
