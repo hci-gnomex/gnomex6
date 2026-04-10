@@ -33,7 +33,7 @@
                                 </div>
                             </div>
                             <div  class="full-width flex-grow left-right-padded no-overflow" role="region" aria-label="Analysis tree">
-                                <div appFocusManager  class="full-width full-height border">
+                                <div appFocusManager [focusManagerTree]="analysisTree"  class="full-width full-height border">
                                     <p id="analysis-tree-kb-instructions" class="sr-only">{{KB_MOVE_INSTRUCTIONS}}</p>
                                     <tree-root #analysisTree
                                                [nodes]="items"
