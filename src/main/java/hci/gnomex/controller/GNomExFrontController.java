@@ -562,13 +562,16 @@ private void sendRedirect(HttpServletResponse response, String url) {
 		if (requestName == null || httpRequest == null) {
 		return "";
 	}
-
-	String out = requestName + "/" ;
+		Date d = new Date(System.currentTimeMillis());
+	String out = requestName + " (" +d.toString() + ") /" ;
 
 	Enumeration params = httpRequest.getParameterNames();
     while (params.hasMoreElements()) {
 		String paramName = (String) params.nextElement();
 		String parameterValue = (String) httpRequest.getParameter(paramName);
+		if (parameterValue != null && parameterValue.length() > 400) {
+			parameterValue = parameterValue.substring(0, 400) + "...";
+		}
 		out = out + paramName + "=" + parameterValue + "/\n";
 //      System.out.println("[RequestToString] paramName: " + paramName + " parameterValue: " + parameterValue);
 	} // end of while

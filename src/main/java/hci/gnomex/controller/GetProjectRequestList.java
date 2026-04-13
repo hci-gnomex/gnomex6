@@ -112,7 +112,7 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
           isLite = "N";
         }
 
-//        System.out.println ("[GetProjectRequestlist] isLite: " + isLite);
+        System.out.println ("[GetProjectRequestlist] isLite: " + isLite);
 
         HashMap myLabMap = new HashMap();
         if (showMyLabsAlways.equals("Y")) {

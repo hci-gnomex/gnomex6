@@ -10,7 +10,7 @@ import {
 } from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms"
 import {ActivatedRoute} from "@angular/router";
-
+import { HttpClientModule} from '@angular/common/http';
 import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";
 import {ConstantsService} from "../../services/constants.service";
 import {GnomexService} from "../../services/gnomex.service";
@@ -127,10 +127,10 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
 
     @Input() editMode: boolean;
 
-    @ViewChild("descEditorRef", {static: true}) descEditor: AngularEditorComponent;
-    @ViewChild("notesEditorRef", {static: true}) notesEditor: AngularEditorComponent;
-    @ViewChild("projectDescEditorRef", {static: true}) projectDescEditor: AngularEditorComponent;
-    @ViewChild("adminNotesEditorRef", {static: true}) adminNotesEditor: AngularEditorComponent;
+    @ViewChild("descEditorRef", {static: false}) descEditor: AngularEditorComponent;
+    @ViewChild("notesEditorRef", {static: false}) notesEditor: AngularEditorComponent;
+    @ViewChild("projectDescEditorRef", {static: false}) projectDescEditor: AngularEditorComponent;
+    @ViewChild("adminNotesEditorRef", {static: false}) adminNotesEditor: AngularEditorComponent;
 
     private _showProjectDesc: boolean = false;
     public showCorePrepInstructions: boolean = false;
@@ -148,7 +148,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
         maxHeight: "100%",
         width: "100%",
         minWidth: "5em",
-        enableToolbar: true,
+        enableToolbar: false,
         defaultFontName: "Arial",
         defaultFontSize: "2",
         fonts: FONT_FAMILY,
@@ -161,7 +161,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
         maxHeight: "100%",
         width: "100%",
         minWidth: "5em",
-        enableToolbar: true,
+        enableToolbar: false,
         defaultFontName: "Arial",
         defaultFontSize: "2",
         fonts: FONT_FAMILY,
@@ -187,7 +187,7 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
         maxHeight: "100%",
         width: "100%",
         minWidth: "5em",
-        enableToolbar: true,
+        enableToolbar: false,
         defaultFontName: "Arial",
         defaultFontSize: "2",
         fonts: FONT_FAMILY,

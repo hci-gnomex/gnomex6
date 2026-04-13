@@ -18,7 +18,7 @@
             </div>
             <div *ngIf="showGenerateQuote">
                 <div class="padded">
-                    <button mat-raised-button (click)="onClickPriceQuote($event)">
+                    <button mat-raised-button (click)="onClickPriceQuote()" aria-label="Generate price quote">
                         <img class="padded" [alt]="" [src]="constantService.ICON_MONEY">
                         <span>
                             Generate Price Quote
