@@ -36,7 +36,12 @@
                         Upload Files
                     </div>
                     <div class="full-width flex-grow left-right-padded overflow-auto">
-                        <div appFocusManager class="full-height full-width border-subtle" role="tree" aria-labelledby="upload-files-heading">
+                        <div appFocusManager
+                             [focusManagerTree]="uploadTree"
+                             [focusManagerDescribedBy]="'upload-tree-kb-instructions'"
+                             class="full-height full-width border-subtle"
+                             role="tree"
+                             aria-labelledby="upload-files-heading">
                             <p id="upload-tree-kb-instructions" class="sr-only">
                                 To move a file without dragging: navigate to it with arrow keys,
                                 press Space to grab, navigate to a folder in the Folder panel on the right,
@@ -76,7 +81,12 @@
                         Folder
                     </div>
                     <div class="full-width flex-grow left-right-padded overflow-auto">
-                        <div appFocusManager class="full-height full-width border-subtle" role="tree" aria-labelledby="folder-heading">
+                        <div appFocusManager
+                             [focusManagerTree]="organizeTree"
+                             [focusManagerDescribedBy]="'organize-tree-kb-instructions'"
+                             class="full-height full-width border-subtle"
+                             role="tree"
+                             aria-labelledby="folder-heading">
                             <p id="organize-tree-kb-instructions" class="sr-only">
                                 To move a file without dragging: navigate to the Upload Files panel,
                                 press Space on a file to grab, navigate here with Tab,

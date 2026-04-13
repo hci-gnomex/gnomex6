@@ -43,8 +43,8 @@
             </button>
         </div>
     </div>
-    <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager>
-        <ag-grid-angular class="ag-theme-balham full-width full-height"
+    <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="flowcellLanesGrid">
+        <ag-grid-angular #flowcellLanesGrid class="ag-theme-balham full-width full-height"
                          [rowData]="flowCellChannels"
                          [columnDefs]="flowCellColDefs"
                          [rowSelection]="'single'"

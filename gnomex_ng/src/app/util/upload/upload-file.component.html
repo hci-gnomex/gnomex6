@@ -17,8 +17,8 @@
     </div>
 
 
-    <div appAgGridHeaderA11yFix appFocusManager class="flex-grow full-width full-height padded" *ngIf="!manageData.isFDT; else fdtInstructions" role="region" aria-label="Files to upload">
-        <ag-grid-angular style="width: 100%; height: 36em;" class="ag-theme-balham"
+    <div appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="uploadFilesGrid" class="flex-grow full-width full-height padded" *ngIf="!manageData.isFDT; else fdtInstructions" role="region" aria-label="Files to upload">
+        <ag-grid-angular #uploadFilesGrid style="width: 100%; height: 36em;" class="ag-theme-balham"
                          [columnDefs]="columnDefs"
                          [rowSelection]="'single'"
                          [enableSorting]="true"

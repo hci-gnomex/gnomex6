@@ -10,8 +10,8 @@
                                   popupTitle="Annotation Help">
                     </context-help>
                 </div>
-                <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager>
-                    <ag-grid-angular class="ag-theme-fresh full-height min-height moderate-width"
+                <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="addAnnotationGrid">
+                    <ag-grid-angular #addAnnotationGrid class="ag-theme-fresh full-height min-height moderate-width"
                                      [rowSelection]="'multiple'"
                                      [rowMultiSelectWithClick]="true"
                                      (gridReady)="onAddAnnotationGridReady($event)"
@@ -28,8 +28,8 @@
                         Selected characteristics
                     </div>
                 </div>
-                <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager>
-                    <ag-grid-angular class="ag-theme-fresh full-height min-height moderate-width"
+                <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="removeAnnotationGrid">
+                    <ag-grid-angular #removeAnnotationGrid class="ag-theme-fresh full-height min-height moderate-width"
                                      [rowSelection]="'single'"
                                      (gridReady)="onRemoveAnnotationGridReady($event)"
                                      (gridSizeChanged)="onGridSizeChanged($event)"

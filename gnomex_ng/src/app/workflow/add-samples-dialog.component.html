@@ -16,8 +16,8 @@
                         </custom-combo-box>
                     </div>
                     <div class="full-width flex-grow left-right-padded overflow-auto">
-                        <div appFocusManager class="full-height full-width border-subtle" role="region" aria-label="Sample tree">
-                            <tree-root (activate)="onTreeSelected($event)"
+                        <div appFocusManager [focusManagerTree]="sampleTree" class="full-height full-width border-subtle" role="region" aria-label="Sample tree">
+                            <tree-root #sampleTree (activate)="onTreeSelected($event)"
                                        [nodes]="itemList" [options]="options">
                                 <ng-template #treeNodeTemplate let-node let-index="index">
                                     <div class="truncate tree-node-font">
@@ -43,8 +43,8 @@
                             Clear All
                         </button>
                     </div>
-                    <div class="full-width flex-grow left-right-padded overflow-auto" appAgGridHeaderA11yFix appFocusManager>
-                        <ag-grid-angular class="ag-theme-balham full-height full-width"
+                    <div class="full-width flex-grow left-right-padded overflow-auto" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="flowcellGrid">
+                        <ag-grid-angular #flowcellGrid class="ag-theme-balham full-height full-width"
                                          (gridReady)="onGridReady($event)"
                                          [columnDefs]="columnDefs"
                                          [rowSelection]="'single'"

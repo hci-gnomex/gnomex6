@@ -57,9 +57,9 @@
                 {{ workItemList.length }} Flow Cells
             </div>
         </div>
-        <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager>
+        <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="flowcellsGrid">
             <div #oneEmWidth class="no-height single-em" aria-hidden="true"></div>
-            <ag-grid-angular class="ag-theme-fresh full-height full-width min-grid-size"
+            <ag-grid-angular #flowcellsGrid class="ag-theme-fresh full-height full-width min-grid-size"
                              [enableColResize]="true"
                              [enableSorting]="true"
                              [rowSelection]="'single'"

@@ -38,7 +38,10 @@
                 </div>
               </div>
               <div class="full-width flex-grow no-overflow left-right-padded" role="region" aria-label="Data track tree">
-                <div appFocusManager class="full-width full-height border">
+                <div appFocusManager
+                     [focusManagerTree]="datatracksTree"
+                     [focusManagerDescribedBy]="'datatracks-tree-kb-instructions'"
+                     class="full-width full-height border">
                   <p id="datatracks-tree-kb-instructions" class="sr-only">
                     To move a data track without dragging: navigate to it with arrow keys,
                     press Space to grab, navigate to the destination folder,
@@ -50,8 +53,7 @@
                              (changeFilter)="treeChangeFilter($event)"
                              (updateData)="treeUpdateData($event)"
                              role="tree"
-                             aria-label="Data track folders and tracks"
-                             aria-describedby="datatracks-tree-kb-instructions">
+                             aria-label="Data track folders and tracks">
                     <ng-template #treeNodeTemplate let-node let-index="index">
                       <div class="full-width no-word-wrap tree-node-font"
                            role="treeitem"

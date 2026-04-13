@@ -122,8 +122,8 @@
           </button>
         </div>
       </div>
-      <div class="flex-grow" role="region" aria-label="Genome builds list" appAgGridHeaderA11yFix appFocusManager>
-        <ag-grid-angular class="ag-theme-balham full-height full-width min-grid-height"
+      <div class="flex-grow" role="region" aria-label="Genome builds list" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="analysisGenomeBuildsGrid">
+        <ag-grid-angular #analysisGenomeBuildsGrid class="ag-theme-balham full-height full-width min-grid-height"
                          [rowData]="form.controls['genomeBuildsJSONString'].value"
                          [rowSelection]="'single'"
                          [suppressMovableColumns]="true"

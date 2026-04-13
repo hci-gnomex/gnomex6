@@ -10,9 +10,10 @@
 	</div>
 	<div class="full-width flex-stretch lower-panel" role="region" aria-label="Orders list">
 		<div class="full-width full-height flex-column-container">
-			<div class="full-width flex-stretch small-font" appAgGridHeaderA11yFix appFocusManager>
+			<div class="full-width flex-stretch small-font" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="experimentOrdersGrid">
 				<div #oneEmWidth class="no-height single-em" aria-hidden="true"></div>
 				<ag-grid-angular
+						#experimentOrdersGrid
 						class="ag-theme-fresh full-width full-height small-font"
 						role="grid"
 						aria-label="Orders data grid"

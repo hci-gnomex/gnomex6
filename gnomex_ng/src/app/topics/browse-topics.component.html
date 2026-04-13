@@ -11,7 +11,7 @@
                     <div class="full-width full-height small-font border">
                         <div class="full-height full-width flex-container-col foreground" role="region" aria-label="Topics tree">
                             <div class="full-width flex-grow left-right-padded top-padded small-font no-overflow">
-                                <div appFocusManager class="full-width full-height border">
+                                <div appFocusManager [focusManagerTree]="topicsTree" class="full-width full-height border">
                                     <tree-root #topicsTree
                                                [nodes]="items"
                                                [options]="options"
@@ -112,7 +112,7 @@
                                     <div>
                                         <mat-label class="left-right-padded">{{countLabel}}</mat-label>
                                     </div>
-                                    <div appFocusManager class="full-width flex-grow overflow-auto">
+                                    <div appFocusManager [focusManagerTree]="dataTree" class="full-width flex-grow overflow-auto">
                                         <tree-root #dataTree
                                                    [nodes]="dataTreeItems"
                                                    [options]="dataTreeOptions"

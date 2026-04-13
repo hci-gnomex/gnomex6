@@ -19,8 +19,8 @@
                             Fatal errors detected
                         </div>
                     </div>
-                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager>
-                        <ag-grid-angular
+                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="fatalErrorsGrid">
+                        <ag-grid-angular #fatalErrorsGrid
                                 class="ag-theme-fresh small-font full-width full-height"
                                 [context]="context"
                                 [singleClickEdit]="true"
@@ -50,8 +50,8 @@
                             </button>
                         </div>
                     </div>
-                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager>
-                        <ag-grid-angular
+                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="importableExperimentsGrid">
+                        <ag-grid-angular #importableExperimentsGrid
                                 class="ag-theme-fresh small-font full-width full-height"
                                 [context]="context"
                                 [singleClickEdit]="true"
@@ -80,8 +80,8 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager>
-                                        <ag-grid-angular
+                                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="errorsTopGrid">
+                                        <ag-grid-angular #errorsTopGrid
                                                 class="ag-theme-fresh small-font full-width full-height"
                                                 [context]="context"
                                                 [singleClickEdit]="true"
@@ -102,8 +102,8 @@
                                             {{ selectedAll ? "All Samples" : "Samples for selected error"}}
                                         </div>
                                     </div>
-                                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager>
-                                        <ag-grid-angular
+                                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="samplesBottomGrid">
+                                        <ag-grid-angular #samplesBottomGrid
                                                 class="ag-theme-fresh small-font full-width full-height"
                                                 [context]="context"
                                                 [singleClickEdit]="true"
@@ -133,8 +133,8 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager>
-                                        <ag-grid-angular
+                                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="samplesTopGrid">
+                                        <ag-grid-angular #samplesTopGrid
                                                 class="ag-theme-fresh small-font full-width full-height"
                                                 [context]="context"
                                                 [singleClickEdit]="true"
@@ -155,8 +155,8 @@
                                             {{ selectedAll ? "All Errors and Warnings" : "Errors and Warnings for Experiment"}}
                                         </div>
                                     </div>
-                                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager>
-                                        <ag-grid-angular
+                                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="errorsBottomGrid">
+                                        <ag-grid-angular #errorsBottomGrid
                                                 class="ag-theme-fresh small-font full-width full-height"
                                                 [context]="context"
                                                 [singleClickEdit]="true"
@@ -196,8 +196,8 @@
                                 <div class="full-width padded">
                                     Import Errors
                                 </div>
-                                <div class="full-width flex-grow" appAgGridHeaderA11yFix appFocusManager>
-                                    <ag-grid-angular
+                                <div class="full-width flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="finalErrorsGrid">
+                                    <ag-grid-angular #finalErrorsGrid
                                             class="ag-theme-fresh small-font full-width full-height"
                                             [context]="context"
                                             [singleClickEdit]="true"

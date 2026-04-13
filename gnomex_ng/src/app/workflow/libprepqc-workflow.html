@@ -35,9 +35,9 @@
             {{ requestIds.length > 0 ? requestIds.length - 1  : 0 }} requests in worklist
         </mat-label>
     </div>
-    <div class="flex-grow padded-bottom" appAgGridHeaderA11yFix appFocusManager>
+    <div class="flex-grow padded-bottom" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="libprepQcGrid">
         <div #oneEmWidth class="no-height single-em" aria-hidden="true"></div>
-        <ag-grid-angular class="ag-theme-fresh full-height full-width"
+        <ag-grid-angular #libprepQcGrid class="ag-theme-fresh full-height full-width"
                          [enableSorting]="true"
                          [enableColResize]="true"
                          [rowClassRules]="workflowService.assmGridRowClassRules"

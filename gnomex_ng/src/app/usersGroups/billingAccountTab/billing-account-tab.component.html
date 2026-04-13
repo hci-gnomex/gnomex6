@@ -65,8 +65,8 @@
 	<div class="flex-grow full-width">
 		<div #oneEmWidth class="no-height single-em"></div>
 		<div class="flex-container-col full-width full-height">
-			<div class="full-width flex-grow small-font" appAgGridHeaderA11yFix appFocusManager>
-				<ag-grid-angular
+			<div class="full-width flex-grow small-font" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="chartfieldAccountsGrid">
+				<ag-grid-angular #chartfieldAccountsGrid
 						class="ag-theme-fresh small-font full-width full-height"
 						aria-label="Chartfield accounts table"
 						[context]="context"
@@ -81,8 +81,8 @@
 			</div>
 			<div class="vertical-spacer full-width">
 			</div>
-			<div class="full-width flex-grow small-font" appAgGridHeaderA11yFix appFocusManager>
-				<ag-grid-angular
+			<div class="full-width flex-grow small-font" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="poAccountsGrid">
+				<ag-grid-angular #poAccountsGrid
 						class="ag-theme-fresh small-font full-width full-height"
 						aria-label="Purchase order accounts table"
 						[context]="context"
@@ -96,8 +96,8 @@
 			</div>
 			<div *ngIf="showCreditCard" class="vertical-spacer full-width">
 			</div>
-			<div *ngIf="showCreditCard" class="full-width flex-grow small-font">
-				<ag-grid-angular
+			<div *ngIf="showCreditCard" class="full-width flex-grow small-font" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="creditCardAccountsGrid">
+				<ag-grid-angular #creditCardAccountsGrid
 						class="ag-theme-fresh small-font full-width full-height"
 						aria-label="Credit card accounts table"
 						[context]="context"

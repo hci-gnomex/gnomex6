@@ -64,9 +64,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager>
+                <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="pendingSequenceLanesGrid">
                     <div #oneEmWidth1 class="no-height single-em" aria-hidden="true"></div>
-                    <ag-grid-angular class="ag-theme-fresh full-height full-width min-grid-size"
+                    <ag-grid-angular #pendingSequenceLanesGrid class="ag-theme-fresh full-height full-width min-grid-size"
                                      [enableColResize]="true"
                                      [enableSorting]="true"
                                      [rowClassRules]="workflowService.assmGridRowClassRules"
@@ -125,9 +125,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager>
+                <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="flowcellAssemblyGrid">
                     <div #oneEmWidth2 class="no-height single-em" aria-hidden="true"></div>
-                    <ag-grid-angular class="ag-theme-fresh full-height full-width min-grid-size"
+                    <ag-grid-angular #flowcellAssemblyGrid class="ag-theme-fresh full-height full-width min-grid-size"
                                      [enableColResize]="true"
                                      [enableSorting]="true"
                                      [rowClassRules]="workflowService.assmGridRowClassRules"

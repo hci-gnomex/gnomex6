@@ -57,8 +57,8 @@
                         <div class="tr full-width full-height small-font">
                             <div class="td label">Field Search</div>
                             <div class="td" appAgGridHeaderA11yFix>
-                                <div class="grid-container full-height" appAgGridHeaderA11yFix appFocusManager>
-                                    <ag-grid-angular
+                                <div class="grid-container full-height" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="fieldSearchGrid">
+                                    <ag-grid-angular #fieldSearchGrid
                                             style="font-size:x-small; width:100%; height:100%;"
                                             class="ag-theme-fresh"
                                             aria-label="Field search criteria"
@@ -129,8 +129,8 @@
                             </button>
                         </div>
                         <div class="flex-fill full-width">
-                            <div class="grid-container full-width full-height" appAgGridHeaderA11yFix appFocusManager>
-                                <ag-grid-angular
+                            <div class="grid-container full-width full-height" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="searchResultsGrid">
+                                <ag-grid-angular #searchResultsGrid
                                         style="font-size:x-small; width:100%; height:100%;"
                                         class="ag-theme-fresh"
                                         aria-label="Search results table"

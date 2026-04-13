@@ -6,7 +6,7 @@
                     Protocols
                 </div>
                 <div class="full-width flex-grow no-overflow">
-                    <div appFocusManager class="full-width full-height border no-overflow">
+                    <div appFocusManager [focusManagerTree]="navigationTree" class="full-width full-height border no-overflow">
                         <tree-root #navigationTree
                                    [nodes]="protocolList"
                                    [options]="treeOptions"

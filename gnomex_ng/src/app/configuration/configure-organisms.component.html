@@ -4,8 +4,8 @@
         <button mat-button (click)="this.addOrganism()"><img class="icon" [src]="'./assets/page_add.png'" alt="">Add</button>
         <button mat-button [disabled]="!this.selectedOrganism || !this.canDeleteSelectedOrganism" (click)="this.removeOrganism()"><img class="icon" [src]="'./assets/page_remove.png'" alt="">Remove</button>
     </div>
-    <div class="full-width flex-container-row flex-twenty" appAgGridHeaderA11yFix appFocusManager>
-        <ag-grid-angular class="ag-theme-balham full-height quarter-width margin-right"
+    <div class="full-width flex-container-row flex-twenty" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="organismsGrid">
+        <ag-grid-angular #organismsGrid class="ag-theme-balham full-height quarter-width margin-right"
                          aria-label="Organisms"
                          (gridReady)="this.onOrganismGridReady($event)"
                          [rowSelection]="'single'"
@@ -65,13 +65,13 @@
                     <mat-error *ngIf="this.mageDefFC.hasError('maxlength')">Exceeds max length</mat-error>
                 </mat-form-field>
             </div>
-            <div class="full-width flex-container-col flex-three align-center" appAgGridHeaderA11yFix appFocusManager>
+            <div class="full-width flex-container-col flex-three align-center" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="genomeBuildsGrid">
                 <div class="full-width flex-container-row flex-one align-center">
                     <label class="margin-right">Genome Builds</label>
                     <button mat-button [disabled]="!this.canUpdateSelectedOrganism" (click)="this.addGenomeBuild()"><img class="icon" [src]="'./assets/add.png'" alt="">Add</button>
                     <button mat-button [disabled]="!this.canUpdateSelectedOrganism || this.genomeBuildSelectedIndex == null" (click)="this.removeGenomeBuild()"><img class="icon" [src]="'./assets/delete.png'" alt="">Remove</button>
                 </div>
-                <ag-grid-angular class="ag-theme-balham flex-two full-width"
+                <ag-grid-angular #genomeBuildsGrid class="ag-theme-balham flex-two full-width"
                                  aria-label="Genome Builds"
                                  (gridReady)="this.onGenomeBuildGridReady($event)"
                                  [rowSelection]="'single'"

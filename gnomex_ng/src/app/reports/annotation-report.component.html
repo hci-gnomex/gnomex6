@@ -49,8 +49,8 @@
     <label>Check the annotations you want to see on the report.</label>
 </div>
 <div>
-  <div appAgGridHeaderA11yFix appFocusManager>
-    <ag-grid-angular style="width: 550px; height: 500px;"
+  <div appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="annotationSelectGrid">
+    <ag-grid-angular #annotationSelectGrid style="width: 550px; height: 500px;"
                      class="ag-theme-fresh"
                      (gridReady)="onAnnotationGridReady($event)"
                      (rowDataChanged)="onAnnotationGridRowDataChanged($event)"
@@ -59,8 +59,8 @@
                      [columnDefs]="annotationColumnDefs">
     </ag-grid-angular>
   </div>
-  <div appAgGridHeaderA11yFix appFocusManager>
-    <ag-grid-angular *ngIf="annotationsFor === FOR_SAMPLES"
+  <div appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="customColumnsGrid">
+    <ag-grid-angular #customColumnsGrid *ngIf="annotationsFor === FOR_SAMPLES"
                      style="width: 550px; height: 500px;"
                      class="ag-theme-fresh"
                      (gridReady)="onCustomColumnsGridReady($event)"

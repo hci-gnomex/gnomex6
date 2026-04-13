@@ -27,8 +27,8 @@ import {IconRendererComponent} from "../../util/grid-renderers";
                     </div>
                 </div>
                 <div class="flex-container-col full-width flex-grow">
-                    <div class="flex-container-col flex-grow full-width" appAgGridHeaderA11yFix appFocusManager>
-                        <ag-grid-angular class="ag-theme-balham full-height full-width"
+                    <div class="flex-container-col flex-grow full-width" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="grid">
+                        <ag-grid-angular #grid class="ag-theme-balham full-height full-width"
                                          role="grid"
                                          aria-label="Progress data grid"
                                          (gridReady)="this.onGridReady($event)"

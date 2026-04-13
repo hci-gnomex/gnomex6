@@ -1,7 +1,7 @@
 <div class="full-height full-width padded flex-container-col">
-    <div class="flex-grow">
-        <div #oneEmWidth class="no-height single-em" appAgGridHeaderA11yFix appFocusManager></div>
-        <ag-grid-angular class="ag-theme-fresh full-height full-width"
+    <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="coreSampleSelectorGrid">
+        <div #oneEmWidth class="no-height single-em"></div>
+        <ag-grid-angular #coreSampleSelectorGrid class="ag-theme-fresh full-height full-width"
                          stopEditingWhenGridLosesFocus="true"
                          [animateRows]="true"
                          [enableColResize]="true"

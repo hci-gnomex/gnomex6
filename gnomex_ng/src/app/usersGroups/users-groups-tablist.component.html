@@ -10,8 +10,8 @@
                                     <input matInput [(ngModel)]="searchText" (input)="search()" placeholder="Search by name or email..." aria-label="Search users by name or email">
                                 </mat-form-field>
                             </div>
-                            <div class="full-width flex-grow padded-left-right small-font" appAgGridHeaderA11yFix appFocusManager>
-                                <ag-grid-angular id="userTable"
+                            <div class="full-width flex-grow padded-left-right small-font" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="usersGrid">
+                                <ag-grid-angular #usersGrid id="userTable"
                                                  class="full-width full-height ag-theme-fresh"
                                                  aria-label="Users list"
                                                  [gridOptions]="gridOptions"
@@ -77,8 +77,8 @@
                                     </mat-expansion-panel>
                                 </mat-accordion>
                             </div>
-                            <div class="full-width flex-grow padded-left-right" appAgGridHeaderA11yFix appFocusManager>
-                                <ag-grid-angular class="full-width full-height ag-theme-fresh"
+                            <div class="full-width flex-grow padded-left-right" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="groupsGrid">
+                                <ag-grid-angular #groupsGrid class="full-width full-height ag-theme-fresh"
                                                  aria-label="Groups list"
                                                  [gridOptions]="groupsGridOptions"
                                                  [rowData]="groupsData"
@@ -280,8 +280,8 @@
                             </as-split-area>
                             <as-split-area size="25">
                                 <div class="full-height full-width flex-container-row foreground padded">
-                                    <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager>
-                                        <ag-grid-angular class="full-height full-width ag-theme-fresh"
+                                    <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="labMembershipsGrid">
+                                        <ag-grid-angular #labMembershipsGrid class="full-height full-width ag-theme-fresh"
                                                          aria-label="User lab memberships"
                                                          [gridOptions]="labGridOptions"
                                                          [rowData]="labs"
@@ -293,8 +293,8 @@
                                     </div>
                                     <div class="horizontal-spacer">
                                     </div>
-                                    <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager>
-                                        <ag-grid-angular class="full-height full-width ag-theme-fresh"
+                                    <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="collaboratingLabsGrid">
+                                        <ag-grid-angular #collaboratingLabsGrid class="full-height full-width ag-theme-fresh"
                                                          aria-label="User collaborating labs"
                                                          [gridOptions]="collGridOptions"
                                                          [rowData]="collaboratingLabs"
@@ -306,8 +306,8 @@
                                     </div>
                                     <div class="horizontal-spacer">
                                     </div>
-                                    <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager>
-                                        <ag-grid-angular class="full-height full-width ag-theme-fresh"
+                                    <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="managingLabsGrid">
+                                        <ag-grid-angular #managingLabsGrid class="full-height full-width ag-theme-fresh"
                                                          aria-label="User managing labs"
                                                          [gridOptions]="manGridOptions"
                                                          [rowData]="managingLabs"

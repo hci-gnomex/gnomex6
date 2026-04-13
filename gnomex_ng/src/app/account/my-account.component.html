@@ -72,8 +72,8 @@
     <div class="formRow">
         <label>Select labs for which you would like to receive upload notifications</label>
     </div>
-    <div class="formRow" appAgGridHeaderA11yFix appFocusManager>
-        <ag-grid-angular style="width: 550px; height: 350px;"
+    <div class="formRow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="uploadNotificationsLabsGrid">
+        <ag-grid-angular #uploadNotificationsLabsGrid style="width: 550px; height: 350px;"
                          class="ag-theme-fresh"
                          (gridReady)="this.onNotifyGridReady($event)"
                          (rowDataChanged)="this.onNotifyGridRowDataChanged()"

@@ -133,9 +133,9 @@
         <div class="top-margin font-bold">
             Experiment Design :
         </div>
-        <div class="full-height full-width small-font minheight" appAgGridHeaderA11yFix appFocusManager>
+        <div class="full-height full-width small-font minheight" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="experimentDesignGrid">
             <div #oneEmWidth class="no-height single-em"></div>
-            <ag-grid-angular class="ag-theme-fresh full-height full-width"
+            <ag-grid-angular #experimentDesignGrid class="ag-theme-fresh full-height full-width"
                              [columnDefs]="this.samplesGridConfirmColumnDefs"
                              [enableColResize]="true"
                              [suppressDragLeaveHidesColumns]="true"

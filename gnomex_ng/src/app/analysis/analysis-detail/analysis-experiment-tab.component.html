@@ -12,7 +12,7 @@
                     </custom-combo-box>
                 </div>
                 <div class="flex-grow padded no-overflow">
-                    <div appFocusManager class="full-height full-width border-subtle" role="tree" aria-label="Experiments tree">
+                    <div appFocusManager [focusManagerTree]="tree" class="full-height full-width border-subtle" role="tree" aria-label="Experiments tree">
                         <tree-root #tree
                                    (activate)="treeOnSelect($event)"
                                    [nodes]="items" [options]="options">
@@ -51,8 +51,8 @@
                         <mat-radio-button [value]="SAMPLE" class="padded-left-right" aria-label="Other experiments"> Other{{"(" + this.sampleList.length + ")"}} </mat-radio-button>
                     </mat-radio-group>
                 </div>
-                <div  class="flex-grow padded" role="region" aria-label="Experiments grid" appAgGridHeaderA11yFix appFocusManager>
-                    <ag-grid-angular style="width: 100%; height: 100%;" class="ag-theme-fresh"
+                <div  class="flex-grow padded" role="region" aria-label="Experiments grid" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="linkedExperimentsGrid">
+                    <ag-grid-angular #linkedExperimentsGrid style="width: 100%; height: 100%;" class="ag-theme-fresh"
                                      [gridOptions]="gridOpt"
                                      [rowSelection]="'multiple'"
                                      [rowDeselection]="true"

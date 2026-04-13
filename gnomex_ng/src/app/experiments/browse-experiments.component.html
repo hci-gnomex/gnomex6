@@ -32,13 +32,15 @@
                                     </div>
                                 </div>
                             </div>
-                            <div appFocusManager class="full-width flex-grow left-right-padding no-overflow">
+                            <div appFocusManager
+                                 [focusManagerTree]="tree"
+                                 [focusManagerDescribedBy]="'exp-tree-kb-instructions'"
+                                 class="full-width flex-grow left-right-padding no-overflow">
                                 <div class="full-width full-height border">
                                     <p id="exp-tree-kb-instructions" class="sr-only">{{KB_MOVE_INSTRUCTIONS}}</p>
                                     <tree-root #tree
                                                role="tree"
                                                aria-label="Experiments hierarchy"
-                                               aria-describedby="exp-tree-kb-instructions"
                                                (moveNode)="onMoveNode($event)"
                                                (updateData)="treeUpdateData($event)"
                                                (activate)="treeOnSelect($event)"

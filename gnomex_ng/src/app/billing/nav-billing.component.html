@@ -37,7 +37,7 @@
                                             </div>
                                         </div>
                                         <div class="flex-grow overflow-auto padded">
-                                            <div appFocusManager class="full-height full-width overflow-auto bordered">
+                                            <div appFocusManager [focusManagerTree]="tree" class="full-height full-width overflow-auto bordered">
                                                 <tree-root #tree [nodes]="billingItemsTreeNodes" [options]="billingItemsTreeOptions" (activate)="onBillingItemsTreeActivate($event)" role="tree" aria-label="Billing items tree">
                                                     <ng-template #treeNodeTemplate  let-node>
                                                         <div class="flex-container-row tree-node-font ellipsis" role="treeitem" [attr.aria-label]="node?.data?.display">
@@ -93,8 +93,8 @@
                                         </button>
                                     </div>
                                     <div class="flex-grow padded">
-                                        <div class="full-height full-width min-grid-width" appAgGridHeaderA11yFix appFocusManager>
-                                            <ag-grid-angular class="ag-theme-fresh full-height full-width small-font"
+                                        <div class="full-height full-width min-grid-width" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="priceTreeGrid">
+                                            <ag-grid-angular #priceTreeGrid class="ag-theme-fresh full-height full-width small-font"
                                                              aria-label="Price sheets and categories"
                                                              [getNodeChildDetails]="getPriceNodeChildDetails"
                                                              [enableColResize]="true"
@@ -195,10 +195,10 @@
                                     </custom-combo-box>
                                 </div>
                             </div>
-                            <div class="flex-grow min-grid-size" appAgGridHeaderA11yFix appFocusManager>
+                            <div class="flex-grow min-grid-size" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="billingItemsGrid">
                                 <div #oneEmWidth class="no-height single-em" aria-hidden="true">
                                 </div>
-                                <ag-grid-angular class="ag-theme-fresh full-height full-width small-font"
+                                <ag-grid-angular #billingItemsGrid class="ag-theme-fresh full-height full-width small-font"
                                                  aria-label="Billing items detail table"
                                                  stopEditingWhenGridLosesFocus="true"
                                                  [getNodeChildDetails]="getBillingItemNodeChildDetails"

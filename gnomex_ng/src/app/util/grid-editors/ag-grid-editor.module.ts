@@ -21,6 +21,7 @@ import {UrlAnnotDialogComponent} from "./popups/url-annot-dialog.component";
 import {UtilModule} from "../util.module";
 import {AgGridRendererModule} from "../grid-renderers";
 import {ImprovedSelectEditor} from "./improved-select.editor";
+import {AccessibilityModule} from "../accessibility/accessibility.module";
 
 
 @NgModule({
@@ -36,7 +37,8 @@ import {ImprovedSelectEditor} from "./improved-select.editor";
         FormsModule,
         ReactiveFormsModule,
         UtilModule,
-        AgGridRendererModule
+        AgGridRendererModule,
+        AccessibilityModule
     ],
     declarations: [
         BarcodeSelectEditor,

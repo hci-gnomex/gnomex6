@@ -6,8 +6,8 @@
                     <div class="double-padded">
                         <mat-checkbox [(ngModel)]="showInactive" (change)="filterExperimentPlatform()" > Show Inactive Platforms </mat-checkbox>
                     </div>
-                    <div class="flex-grow padded-left-right" appAgGridHeaderA11yFix appFocusManager>
-                        <ag-grid-angular class="ag-theme-fresh full-height full-width"
+                    <div class="flex-grow padded-left-right" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="experimentPlatformsGrid">
+                        <ag-grid-angular #experimentPlatformsGrid class="ag-theme-fresh full-height full-width"
                                          aria-label="Experiment Platforms"
                                          [gridOptions]="gridOpt"
                                          [columnDefs]="columnDefs"

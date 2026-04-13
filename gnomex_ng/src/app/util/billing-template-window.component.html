@@ -28,8 +28,8 @@
     </mat-radio-group>
     </div>
 </div>
-<div class="accounts-grid-div full-width padded" role="region" aria-label="Billing accounts" appAgGridHeaderA11yFix appFocusManager>
-    <ag-grid-angular class="ag-theme-fresh full-height full-width"
+<div class="accounts-grid-div full-width padded" role="region" aria-label="Billing accounts" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="billingTemplateAccountsGrid">
+    <ag-grid-angular #billingTemplateAccountsGrid class="ag-theme-fresh full-height full-width"
                      (gridReady)="this.onGridReady($event)"
                      (gridSizeChanged)="this.onGridSizeChanged($event)"
                      [rowSelection]="'single'"
