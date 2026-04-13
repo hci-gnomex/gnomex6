@@ -7,7 +7,9 @@ import {
   Renderer2
 } from '@angular/core';
 import {TreeComponent, TreeModel} from '@circlon/angular-tree-component';
-import {ColumnApi, GridApi} from "ag-grid-community";
+import {ColumnApi, GridApi} from 'ag-grid-community';
+import {GridOptions} from "ag-grid-community/main";
+
 
 /**
  * Manages keyboard focus for ag-grid and angular-tree-component widgets.
@@ -42,8 +44,12 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
   /** Pass the TreeComponent reference so we can extract its TreeModel. */
   @Input() focusManagerTree: TreeComponent | null = null;
 
-  /** Pass the ag-grid component reference so we can extract GridApi / ColumnApi. */
-  @Input() focusManagerGrid: { api: GridApi; columnApi: ColumnApi } | null = null;
+  /**
+   * Pass the ag-grid component reference (the #templateRef on ag-grid-angular).
+   * We extract GridApi / ColumnApi from it, and install tabToNextCell to
+   * let Tab navigate headers but exit the grid once it reaches cells.
+   */
+  @Input() focusManagerGrid: { api: GridApi; columnApi: ColumnApi; gridOptions?: GridOptions } | null = null;
 
   // --- internal state ---
   private containerEl: HTMLElement | null = null;
@@ -83,6 +89,7 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
       this.gridApi = this.focusManagerGrid.api;
       this.gridColumnApi = this.focusManagerGrid.columnApi;
       this.isGrid = true;
+      this.installGridTabExit();
     } else {
       // Fallback: auto-detect from DOM
       this.isGrid = !!this.containerEl.querySelector('.ag-root');
@@ -124,6 +131,18 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
         }
 
         // --- Tree entry ---
+        // When relatedTarget is null, focus likely arrived via a screen
+        // reader's virtual cursor (e.g. Narrator scan mode) rather than a
+        // real Tab keypress.  Calling enterTree() dispatches synthetic mouse
+        // events that can trigger router navigation and yank focus to the
+        // main content landmark — a terrible experience in scan mode.
+        // Let the sentinel stay focused so the screen reader can read its
+        // label ("tree. Tab to enter, arrows to navigate.") and the user
+        // can switch to focus mode and press Tab to enter intentionally.
+        if (!relatedTarget) {
+          return;
+        }
+
         this.enterTree();
       }
     );
@@ -209,17 +228,15 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     }
 
     // --- Tab ---
-    if (event.key === 'Tab' && inside) {
+    // For grids: don't intercept — tabToNextCell returns null to exit cells,
+    // and ag-grid's built-in header Tab navigation handles headers.
+    // Sentinels catch focus when Tab leaves the grid.
+    // For trees: intercept in capture phase to move focus out cleanly.
+    if (event.key === 'Tab' && inside && !this.isGrid) {
       event.preventDefault();
 
       if (event.shiftKey) {
-        if (this.isGrid) {
-          // For grids, go to before-sentinel so the user can Shift-Tab out
-          this.beforeSentinel.focus();
-        } else {
-          // For trees, exit backward directly
-          this.focusOutsideWidget('prev');
-        }
+        this.focusOutsideWidget('prev');
       } else {
         this.afterSentinel.focus();
       }
@@ -246,6 +263,49 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
   // ---------------------------------------------------------------------------
 
   /**
+   * Install a tabToNextCell callback on the grid that always returns null.
+   *
+   * ag-grid's header row has its own Tab navigation that does NOT go through
+   * tabToNextCell, so Tab moves naturally between header cells.  When Tab
+   * leaves the last header and would enter the first data cell, ag-grid
+   * calls tabToNextCell.  Returning null tells ag-grid to stop — the
+   * browser's default Tab takes over and focus lands on the after-sentinel
+   * (forward) or before-sentinel (backward), which our sentinel handlers
+   * already manage.
+   */
+  private installGridTabExit(): void {
+    // gridApi may not be available until gridReady fires.
+    // If we have it now, install immediately; otherwise wait for gridReady.
+    if (this.gridApi) {
+      this.setTabToNextCell();
+    } else if (this.focusManagerGrid) {
+      // AgGridAngular emits gridReady; api is set on the component ref after that.
+      // Poll briefly since we don't have a direct hook from here.
+      const interval = setInterval(() => {
+        if (this.focusManagerGrid && this.focusManagerGrid.api) {
+          this.gridApi = this.focusManagerGrid.api;
+          this.setTabToNextCell();
+          clearInterval(interval);
+        }
+      }, 100);
+      // Safety: stop polling after 5s
+      setTimeout(() => clearInterval(interval), 5000);
+    }
+  }
+
+  private setTabToNextCell(): void {
+    if (!this.gridApi) { return; }
+
+    // ag-grid ≥ 28 exposes setGridOption; older versions require
+    // mutating gridOptions directly via the component ref.
+    if (typeof (this.gridApi as any).setGridOption === 'function') {
+      (this.gridApi as any).setGridOption('tabToNextCell', () => null);
+    } else if (this.focusManagerGrid && this.focusManagerGrid.gridOptions) {
+      this.focusManagerGrid.gridOptions.tabToNextCell = () => null;
+    }
+  }
+
+  /**
    * Programmatically enter the tree so that arrow-key navigation works
    * immediately. This replicates what a real mouse click does:
    *   1. Find the node-content-wrapper to focus
@@ -254,34 +314,38 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
    *   3. Move DOM focus to the wrapper
    */
   private enterTree(): void {
-    if (!this.containerEl) { return; }
+    if (!this.containerEl || !this.treeModel) { return; }
 
-    // Prefer a wrapper that already has tabindex="0" (previously focused node),
-    // otherwise fall back to the first wrapper in the tree.
     let target: HTMLElement | null =
-      this.containerEl.querySelector<HTMLElement>('.node-content-wrapper[tabindex="0"]');
+      this.containerEl.querySelector<HTMLElement>('.node-content-wrapper[tabindex="0"]')
+      || this.containerEl.querySelector<HTMLElement>('.node-content-wrapper');
 
-    if (!target) {
-      target = this.containerEl.querySelector<HTMLElement>('.node-content-wrapper');
-      if (target) {
-        target.setAttribute('tabindex', '0');
-      }
-    }
-
+    if (target) { target.setAttribute('tabindex', '0'); }
     if (!target) { return; }
 
     const focusTarget = target;
 
+    // Temporarily suppress the activate EventEmitter by storing
+    // its observers and replacing with empty array
+    const activateEmitter = (this.treeModel as any).events.activate;
+    const savedObservers = activateEmitter.observers.slice();
+    activateEmitter.observers = [];
+
     setTimeout(() => {
-      // mousedown wakes up the tree's internal state machine
       focusTarget.dispatchEvent(
         new MouseEvent('mousedown', { bubbles: true, cancelable: true })
       );
-      // Non-bubbling click avoids triggering `activate` / treeOnSelect
       focusTarget.dispatchEvent(
         new MouseEvent('click', { bubbles: false, cancelable: true })
       );
       focusTarget.focus();
+
+      // Restore observers after the click has fully processed
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          activateEmitter.observers = savedObservers;
+        });
+      });
     }, 0);
   }
 
@@ -423,7 +487,8 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     if (el.getAttribute('aria-hidden') === 'true') { return false; }
 
     const view = this.host.nativeElement
-      && this.host.nativeElement.ownerDocument && this.host.nativeElement.ownerDocument.defaultView;
+      && this.host.nativeElement.ownerDocument &&
+      this.host.nativeElement.ownerDocument.defaultView;
     if (!view) { return false; }
 
     const style = view.getComputedStyle(el);

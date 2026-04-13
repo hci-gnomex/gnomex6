@@ -33,7 +33,9 @@
                                 </div>
                             </div>
                             <div  class="full-width flex-grow left-right-padded no-overflow" role="region" aria-label="Analysis tree">
-                                <div appFocusManager [focusManagerTree]="analysisTree"  class="full-width full-height border">
+                                <div appFocusManager [focusManagerTree]="analysisTree"
+                                     [focusManagerDescribedBy]="'analysis-tree-kb-instructions'"
+                                     class="full-width full-height border">
                                     <p id="analysis-tree-kb-instructions" class="sr-only">{{KB_MOVE_INSTRUCTIONS}}</p>
                                     <tree-root #analysisTree
                                                [nodes]="items"
@@ -41,8 +43,7 @@
                                                (activate)="treeOnSelect($event)"
                                                (updateData)="treeUpdateData($event)"
                                                role="tree"
-                                               aria-label="Analysis groups and analyses"
-                                               aria-describedby="analysis-tree-kb-instructions">
+                                               aria-label="Analysis groups and analyses">
                                         <ng-template #treeNodeTemplate let-node let-index="index">
                                             <div class="full-width no-word-wrap tree-node-font"
                                                  role="treeitem"
