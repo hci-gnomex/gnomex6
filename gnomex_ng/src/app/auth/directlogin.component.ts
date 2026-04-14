@@ -146,8 +146,7 @@ import {DialogsService, DialogType} from '../util/popup/dialogs.service';
     .secondary-button {
       font-family: "Arial", Helvetica, sans-serif;
       font-size: 12pt;
-        --greywarm-dark ;
-      color: var(--grey-darkest);
+      color: var(--black-dark);
       background-color: #C6CCBE;
       border-radius: 4px
     }
