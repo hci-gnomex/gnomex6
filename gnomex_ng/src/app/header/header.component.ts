@@ -553,7 +553,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         route: [{outlets: {modal: ['newProject']}}]
                     },
                     {
-                        displayName: 'Upload Experiment data generated at third party facility',
+                        displayName: 'Upload Experiment data',
                         context: 'newExternalExperiment',
                         iconName: './assets/experiment_register.png',
                         route: '/new-external-experiment'
@@ -691,7 +691,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         route: [{outlets: {modal: ['newProject']}}]
                     },
                     {
-                        displayName: 'Upload Experiment data generated at third party facility',
+                        displayName: 'Upload Experiment data',
                         context: 'newExternalExperiment',
                         iconName: './assets/experiment_register.png',
                         route: '/new-external-experiment'
@@ -825,7 +825,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     },
 
                     {
-                        displayName: 'Upload Experiment data generated at third party facility',
+                        displayName: 'Upload Experiment data',
                         context: 'newExternalExperiment',
                         iconName: './assets/experiment_register.png',
                         route: '/new-external-experiment'
@@ -955,7 +955,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         route: [{outlets: {modal: ['newProject']}}]
                     },
                     {
-                        displayName: 'Upload Experiment data generated at third party facility',
+                        displayName: 'Upload Experiment data',
                         context: 'newExternalExperiment',
                         iconName: './assets/experiment_register.png',
                         route: '/new-external-experiment'
@@ -1307,7 +1307,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         route: [{outlets: {modal: ['newProject']}}]
                     },
                     {
-                        displayName: 'Upload Experiment data generated at third party facility',
+                        displayName: 'Upload Experiment data',
                         context: 'newExternalExperiment',
                         iconName: './assets/experiment_register.png',
                         route: '/new-external-experiment'
@@ -1374,33 +1374,6 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                     {
                         divider: true
                     },
-/*
-                    {
-                        displayName: 'Microarray',
-                        context: 'microarray',
-                        iconName: './assets/microarray_small.png',
-                        children: [
-                            {
-                                displayName: 'Labeling',
-                                iconName: './assets/asterisk_yellow.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Hyb',
-                                iconName: './assets/basket_put.png',
-                                route: ''
-                            },
-                            {
-                                displayName: 'Extraction',
-                                iconName: './assets/microarray_small.png',
-                                route: ''
-                            },
-                        ]
-                    },
-                    {
-                        divider: true
-                    },
-*/
                     {
                         displayName: 'Workflow (all)',
                         iconName: './assets/building_go.png',
@@ -1722,7 +1695,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         route: '/experiments',
                     },
                     {
-                        displayName: 'Upload Experiment data generated at third party facility',
+                        displayName: 'Upload Experiment data',
                         context: 'newExternalExperiment',
                         iconName: './assets/experiment_register.png',
                         route: '/new-external-experiment'
@@ -1856,7 +1829,7 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
                         route: '/experiments',
                     },
                     {
-                        displayName: 'Upload Experiment data generated at third party facility',
+                        displayName: 'Upload Experiment data',
                         context: 'newExternalExperiment',
                         iconName: './assets/experiment_register.png',
                         route: '/new-external-experiment'

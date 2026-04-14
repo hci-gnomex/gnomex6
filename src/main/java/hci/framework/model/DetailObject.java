@@ -941,7 +941,8 @@ public abstract class DetailObject extends FieldInputValidator implements DirtyM
   }
   public void canUpdate(boolean canUpdate) {
     this.canUpdate = canUpdate;
-  }  public boolean canDelete() {
+  }
+  public boolean canDelete() {
     return canDelete;
   }
   public void canDelete(boolean canDelete) {
