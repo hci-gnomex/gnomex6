@@ -241,7 +241,11 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
             displayField: 'displayName',
             childrenField: 'FileDescriptor',
             allowDrag: true,
-            allowDrop: true,
+            allowDrop: (element: TreeNode, to: {parent: TreeNode, index: number}) => {
+                // Prevent same-panel drops — they have no semantic meaning in this dialog.
+                // Cross-panel drops (available → download or download → available) are allowed.
+                return element.treeModel !== to.parent.treeModel;
+            },
             nodeClass: (node: TreeNode) => {
                 let cls = node.data.type === 'dir' ? 'icon-folder' : 'icon-file';
                 if (this.treeKbMove.isGrabbedNode(node)) { cls += ' keyboard-grabbed'; }
@@ -263,9 +267,11 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
                     drop: this.moveNode,
                     dragStart : (tree:TreeModel, node, $event) => {
                         if(!node.isActive){
-                            TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event)
-                            this.treeMostRecentlySelectedFrom = tree
+                            TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
                         }
+                        // Always track the source tree — even when the node is already active —
+                        // so that onRemoveFromDownload can correctly identify where to de-select from.
+                        this.treeMostRecentlySelectedFrom = tree;
                     }
                 },   //  mouse
                 keys: {
@@ -535,16 +541,24 @@ setTimeout(() => {
             this.ariaAnnouncer.announce(`${names} added to download list.`);
         }
         // File de-selected to be downloaded
-        else if (tree === this.availableFilesTreeComponent.treeModel && from === this.filesToDownloadTreeComponent) {
-            let files : TreeNode[] = from.treeModel.getActiveNodes();
-            for(let file of files){
-                this.selectFilesRecursively(file.data, 'N');
-            }
-            this.updateFilesToDownloadTree();
+        else if (tree === this.availableFilesTreeComponent.treeModel) {
+            // `from` is a TreeComponent when called programmatically (onRemoveFromDownload),
+            // or a TreeNode when triggered by a mouse drag.  In both cases we need to confirm
+            // the source is the "files to download" tree before de-selecting.
+            const sourceModel: TreeModel = from === this.filesToDownloadTreeComponent
+                ? from.treeModel
+                : (from && from.treeModel);
+            if (sourceModel === this.filesToDownloadTreeComponent.treeModel) {
+                let files : TreeNode[] = sourceModel.getActiveNodes();
+                for(let file of files){
+                    this.selectFilesRecursively(file.data, 'N');
+                }
+                this.updateFilesToDownloadTree();
 
-            // WCAG 4.1.3: announce de-selection to screen readers.
-            const names = files.map(f => f.data.displayName || 'file').join(', ');
-            this.ariaAnnouncer.announce(`${names} removed from download list.`);
+                // WCAG 4.1.3: announce de-selection to screen readers.
+                const names = files.map(f => f.data.displayName || 'file').join(', ');
+                this.ariaAnnouncer.announce(`${names} removed from download list.`);
+            }
         }
     };
 

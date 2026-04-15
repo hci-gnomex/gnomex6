@@ -103,7 +103,7 @@ export class BrowseOverviewComponent implements OnInit, OnDestroy {
     }
 
 
-    /* The subscribe is fire in the event a tree node of lab or project is select or search button in browse filter is
+    /* The subscribe is fired in the event a tree node of lab or project is select or search button in browse filter is
         selected. This is the first subscriber called and saves experimentList in the service so subsequent subscribers
         can use it.
      */
