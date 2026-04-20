@@ -1,4 +1,4 @@
-<div *ngIf="!this.createSecurityAdvisorService.isGuest" class="form">
+<div *ngIf="!this.createSecurityAdvisorService.isGuest" class="form" role="main" aria-label="My Account">
     <h3>My Account</h3>
     <div class="formRow">
         <mat-form-field class="formField">
@@ -37,7 +37,7 @@
         </mat-form-field>
     </div>
     <div class="formRow">
-        <mat-radio-group class="radioGroup" [(ngModel)]="this.userType" (change)="this.onUserTypeChange($event)">
+        <mat-radio-group class="radioGroup" [(ngModel)]="this.userType" (change)="this.onUserTypeChange($event)" aria-label="User type">
             <mat-radio-button class="radioOption" [value]="USER_TYPE_UNIVERSITY">University User</mat-radio-button>
             <mat-radio-button class="radioOption" [value]="USER_TYPE_EXTERNAL">External User</mat-radio-button>
         </mat-radio-group>
@@ -75,6 +75,7 @@
     <div class="formRow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="uploadNotificationsLabsGrid">
         <ag-grid-angular #uploadNotificationsLabsGrid style="width: 550px; height: 350px;"
                          class="ag-theme-fresh"
+                         aria-label="Upload notification labs"
                          (gridReady)="this.onNotifyGridReady($event)"
                          (rowDataChanged)="this.onNotifyGridRowDataChanged()"
                          [rowSelection]="'multiple'"

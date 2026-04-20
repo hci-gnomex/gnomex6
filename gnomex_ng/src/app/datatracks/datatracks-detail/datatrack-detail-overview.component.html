@@ -1,7 +1,7 @@
-<div style="display:flex; flex-direction:column; height:100%; width:100%;">
-    <div class="flex-container-row">
+<div style="display:flex; flex-direction:column; height:100%; width:100%;" role="main" aria-label="Data track details">
+    <div class="flex-container-row" role="toolbar" aria-label="Data track actions">
         <label class="label label-min-width">
-            <img class="icon" [src]="dataTrackService?.datatrackListTreeNode?.icon">
+            <img class="icon" [src]="dataTrackService?.datatrackListTreeNode?.icon" alt="" aria-hidden="true">
             Data Track {{this.dataTrackService?.datatrackListTreeNode?.number}}
         </label>
 
@@ -62,7 +62,7 @@
 
     <div class="overflow-auto" style="display:flex; flex: 1;">
 
-        <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border" >
+        <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border" aria-label="Data track detail tabs">
             <mat-tab style="height:100%" label="Summary">
                 <dt-summary-tab [editable]="!fromTopic && !this.secAdvisorService.isGuest"></dt-summary-tab>
             </mat-tab>

@@ -30,7 +30,7 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
   private String               listKind = "ProjectRequestList";
   private String               showMyLabsAlways = "N";
   private Boolean              hasQcWorkItems = false;
-  private String               isLite = "N";
+  private String               isLite = "Y";
 
 
   private int                  experimentCount = 0;
@@ -171,11 +171,6 @@ public class GetProjectRequestList extends GNomExCommand implements Serializable
 
 
         Integer maxExperiments = getMaxExperiments(sess);
-//        if (isLite.equals("Y")) {
-//          if (maxExperiments < 5000) {
-//            maxExperiments = 5000;
-//         }
-//        }
 
         Map<Integer, Integer> requestsToSkip = this.getSecAdvisor().getBSTXSecurityIdsToExclude(sess, dictionaryHelper, results, 4, 15);
         for(Iterator i = results.iterator(); i.hasNext();) {

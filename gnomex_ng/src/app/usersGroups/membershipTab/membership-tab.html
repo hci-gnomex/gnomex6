@@ -9,7 +9,7 @@
         </div>
     </div>
     <div class="full-width full-height flex-container-row">
-        <div class="flex-container-col flex-grow padded">
+        <div class="flex-container-col flex-grow padded" role="region" aria-label="Members">
             <div class="full-width flex-container-row align-baseline">
                 <custom-combo-box placeholder="Member to add"
                                   class="flex-grow"
@@ -46,7 +46,7 @@
             </div>
         </div>
         <div class="flex-container-col flex-grow padded">
-            <div class="flex-container-col flex-grow">
+            <div class="flex-container-col flex-grow" role="region" aria-label="Collaborators">
                 <div class="flex-container-row align-center">
                     <custom-combo-box placeholder="Collaborator to add"
                                       class="flex-grow"
@@ -55,17 +55,17 @@
                                       [options]="this.users"
                                       [(ngModel)]="collUser">
                     </custom-combo-box>
-                    <button mat-button class="minimize" [disabled]="!collUser" (click)="addUser('collaborator')">
-                        <img *ngIf="collUser;else addDisable" [src]="'./assets/add.png'">
+                    <button mat-button class="minimize" [disabled]="!collUser" (click)="addUser('collaborator')" aria-label="Add collaborator">
+                        <img *ngIf="collUser;else addDisable" [src]="'./assets/add.png'" alt="">
                     </button>
-                    <button mat-button class="minimize" [disabled]="selectedCollRowIndex<=0" (click)="deleteUser('collaborator')">
-                        <img *ngIf="selectedCollRowIndex>0;else addDeleteDisable" [src]="'./assets/delete.png'">
+                    <button mat-button class="minimize" [disabled]="selectedCollRowIndex<=0" (click)="deleteUser('collaborator')" aria-label="Remove selected collaborator">
+                        <img *ngIf="selectedCollRowIndex>0;else addDeleteDisable" [src]="'./assets/delete.png'" alt="">
                     </button>
                     <ng-template #addDisable>
-                        <img [src]="'./assets/add_disable.png'">
+                        <img [src]="'./assets/add_disable.png'" alt="">
                     </ng-template>
                     <ng-template #addDeleteDisable>
-                        <img [src]="'./assets/delete_disable.png'">
+                        <img [src]="'./assets/delete_disable.png'" alt="">
                     </ng-template>
                 </div>
                 <div class="flex-grow">
@@ -82,7 +82,7 @@
                     </mat-table>
                 </div>
             </div>
-            <div class="flex-container-col flex-grow">
+            <div class="flex-container-col flex-grow" role="region" aria-label="Managers">
                 <div class="flex-container-row align-center">
                     <custom-combo-box placeholder="Manager to add"
                                       class="flex-grow"
@@ -91,13 +91,13 @@
                                       [options]="this.users"
                                       [(ngModel)]="manUser">
                     </custom-combo-box>
-                    <button mat-button class="minimize" [disabled]="!manUser" (click)="addUser('manager')"><img *ngIf="manUser;else addDisable" [src]="'./assets/add.png'"></button>
-                    <button mat-button class="minimize" [disabled]="selectedManRowIndex<=0" (click)="deleteUser('manager')"><img *ngIf="selectedManRowIndex>0;else addDeleteDisable" [src]="'./assets/delete.png'"></button>
+                    <button mat-button class="minimize" [disabled]="!manUser" (click)="addUser('manager')" aria-label="Add manager"><img *ngIf="manUser;else addDisable" [src]="'./assets/add.png'" alt=""></button>
+                    <button mat-button class="minimize" [disabled]="selectedManRowIndex<=0" (click)="deleteUser('manager')" aria-label="Remove selected manager"><img *ngIf="selectedManRowIndex>0;else addDeleteDisable" [src]="'./assets/delete.png'" alt=""></button>
                     <ng-template #addDisable>
-                        <img [src]="'./assets/add_disable.png'">
+                        <img [src]="'./assets/add_disable.png'" alt="">
                     </ng-template>
                     <ng-template #addDeleteDisable>
-                        <img [src]="'./assets/delete_disable.png'">
+                        <img [src]="'./assets/delete_disable.png'" alt="">
                     </ng-template>
                 </div>
                 <div class="flex-grow">
