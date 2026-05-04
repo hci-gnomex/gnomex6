@@ -15,7 +15,7 @@ import {DictionaryService} from "../../services/dictionary.service";
     <fieldset>
     </fieldset>
 </form>
-<div appAgGridHeaderA11yFix appFocusManager>
+<div appAgGridHeaderA11yFix>
     <ag-grid-angular class="ag-theme-fresh"
                      style="height: 500px; width: 1200px;"
                      [gridOptions]="gridOptions"
@@ -27,7 +27,8 @@ import {DictionaryService} from "../../services/dictionary.service";
                      suppressColumnVirtualisation="true"
                      (gridReady)="resizeColumns()"
                      (modelUpdated)="resizeColumns()"
-    ></ag-grid-angular>
+                     [suppressTabbing]="true"
+                     [ensureDomOrder]="true"></ag-grid-angular>
 </div>
 `
 })

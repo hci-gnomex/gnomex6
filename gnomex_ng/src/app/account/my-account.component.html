@@ -72,7 +72,7 @@
     <div class="formRow">
         <label>Select labs for which you would like to receive upload notifications</label>
     </div>
-    <div class="formRow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="uploadNotificationsLabsGrid">
+    <div class="formRow" appAgGridHeaderA11yFix>
         <ag-grid-angular #uploadNotificationsLabsGrid style="width: 550px; height: 350px;"
                          class="ag-theme-fresh"
                          aria-label="Upload notification labs"
@@ -82,7 +82,9 @@
                          (rowSelected)="this.onNotifyGridRowSelected($event)"
                          (selectionChanged)="this.onNotifyGridSelectionChanged()"
                          [rowData]="this.notifyGridRowData"
-                         [columnDefs]="this.notifyGridColumnDefs">
+                         [columnDefs]="this.notifyGridColumnDefs"
+                         [suppressTabbing]="true"
+                         [ensureDomOrder]="true">
         </ag-grid-angular>
     </div>
     <div class="formRow" *ngIf="this.showRequestLabMembership">

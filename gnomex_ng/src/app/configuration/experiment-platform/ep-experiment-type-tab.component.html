@@ -19,7 +19,7 @@
         </div>
     </div>
     <label style="padding: 0.5em;"> * Grid data is sortable and filterable. To sort, click the column header(sortable for asc/desc/default). To filter or search, hover the column header right side and click the filter icon.</label>
-    <div style="flex:9" class="full-width" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="libPrepTypesGrid">
+    <div style="flex:9" class="full-width" appAgGridHeaderA11yFix>
         <ag-grid-angular #libPrepTypesGrid class="full-height full-width ag-theme-balham"
                          aria-label="Library Prep Types"
                          (cellValueChanged)="onCellValueChanged($event)"
@@ -33,7 +33,9 @@
                          [rowSelection]="'single'"
                          (rowSelected)="this.onRowSelected($event)"
                          [singleClickEdit]="true"
-                         [stopEditingWhenGridLosesFocus]="true">
+                         [stopEditingWhenGridLosesFocus]="true"
+                         [suppressTabbing]="true"
+                         [ensureDomOrder]="true">
         </ag-grid-angular>
 
     </div>

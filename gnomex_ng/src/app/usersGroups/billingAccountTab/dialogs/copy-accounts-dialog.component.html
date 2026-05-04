@@ -12,7 +12,9 @@
                         [enableSorting]="true"
                         [enableColResize]="true"
                         (gridSizeChanged)="onGridSizeChanged($event)"
-                        (gridReady)="onChartfieldGridReady($event)">
+                        (gridReady)="onChartfieldGridReady($event)"
+                        [suppressTabbing]="true"
+                        [ensureDomOrder]="true">
                 </ag-grid-angular>
             </div>
             <div class="vertical-spacer full-width">
@@ -28,7 +30,9 @@
                         [enableSorting]="true"
                         [enableColResize]="true"
                         (gridSizeChanged)="onGridSizeChanged($event)"
-                        (gridReady)="onPoGridReady($event)">
+                        (gridReady)="onPoGridReady($event)"
+                        [suppressTabbing]="true"
+                        [ensureDomOrder]="true">
                 </ag-grid-angular>
             </div>
             <div class="vertical-spacer full-width">
@@ -44,7 +48,9 @@
                         [enableSorting]="true"
                         [enableColResize]="true"
                         (gridSizeChanged)="onGridSizeChanged($event)"
-                        (gridReady)="onCreditCardGridReady($event)">
+                        (gridReady)="onCreditCardGridReady($event)"
+                        [suppressTabbing]="true"
+                        [ensureDomOrder]="true">
                 </ag-grid-angular>
             </div>
         </div>

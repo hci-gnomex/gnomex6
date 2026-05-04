@@ -52,7 +52,7 @@
     <div class="flex-container-row flex-grow full-height overflow-auto foreground grid-min-height">
         <as-split>
             <as-split-area [size]="this.gridSplitSize">
-                <div class="full-height full-width flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="annotationsGrid">
+                <div class="full-height full-width flex-grow" appAgGridHeaderA11yFix>
                     <ag-grid-angular #annotationsGrid style="width: 100%; height: 100%;"
                          class="ag-theme-fresh"
                          (gridReady)="this.onAnnotGridReady($event)"
@@ -64,7 +64,9 @@
                          [enableColResize]="true"
                          (gridSizeChanged)="this.sizeColumnsToFit(this.annotGridApi)"
                          [columnDefs]="this.annotGridColumnDefs"
-                         aria-label="Annotations list">
+                         aria-label="Annotations list"
+                         [suppressTabbing]="true"
+                         [ensureDomOrder]="true">
                     </ag-grid-angular>
                 </div>
             </as-split-area>
@@ -127,7 +129,7 @@
                                             <mat-radio-button [value]="TYPE_MULTI_OPTION">Dropdown (multiple selection)</mat-radio-button>
                                         </mat-radio-group>
                                         <div style="height: 100%; width: 100%; display: flex; flex-direction: column;  margin-left: 2%;" *ngIf="this.propertyTypeFC.value === this.TYPE_OPTION || this.propertyTypeFC.value === this.TYPE_MULTI_OPTION"
-                                             appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="annotationOptionsGrid">
+                                             appAgGridHeaderA11yFix>
                                             <div style="display: flex; flex-direction: row;">
                                                 <button mat-button [disabled]="!this.canUpdateSelectedProperty" (click)="this.addOption()" aria-label="Add option"><img class="icon" [src]="'./assets/add.png'" alt="" aria-hidden="true">Add option</button>
                                                 <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedOptionIndex == null" (click)="this.deleteOption()" aria-label="Delete selected option"><img class="icon" [src]="'./assets/delete.png'" alt="" aria-hidden="true">Delete option</button>
@@ -144,7 +146,9 @@
                                                              [columnDefs]="this.optionGridColumnDefs"
                                                              [enableColResize]="true"
                                                              [singleClickEdit]="true"
-                                                             aria-label="Annotation options">
+                                                             aria-label="Annotation options"
+                                                             [suppressTabbing]="true"
+                                                             [ensureDomOrder]="true">
                                             </ag-grid-angular>
                                         </div>
                                     </div>
@@ -152,7 +156,7 @@
                             </mat-tab>
                             <mat-tab label="Applies To">
                                 <div class="tabContent">
-                                    <div class="appliesToGroup" *ngIf="!experimentPlatformMode || this.listFilteredApplication.length > 0" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="platformsGrid">
+                                    <div class="appliesToGroup" *ngIf="!experimentPlatformMode || this.listFilteredApplication.length > 0" appAgGridHeaderA11yFix>
                                         <label class="leadingLabel">Only show for these platforms/experiment types:</label>
                                         <div class="justify-space-between" style="display: flex; flex-direction: row;">
                                             <custom-combo-box class="appliesToField" *ngIf="!experimentPlatformMode"
@@ -180,10 +184,12 @@
                                                          [columnDefs]="this.platformGridColumnDefs"
                                                          (gridSizeChanged)="this.sizeColumnsToFit(this.platformGridApi)"
                                                          [enableColResize]="true"
-                                                         aria-label="Platforms list">
+                                                         aria-label="Platforms list"
+                                                         [suppressTabbing]="true"
+                                                         [ensureDomOrder]="true">
                                         </ag-grid-angular>
                                     </div>
-                                    <div class="appliesToGroup" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="organismsGrid">
+                                    <div class="appliesToGroup" appAgGridHeaderA11yFix>
                                         <div class="full-width justify-space-between align-center" style="display: flex; flex-direction: row;">
                                             <label class="leadingLabel" style="width: 40%; margin-right: 2%;">Only show for these organisms: </label>
                                             <custom-combo-box class="appliesToField"
@@ -205,10 +211,12 @@
                                                          [columnDefs]="this.organismGridColumnDefs"
                                                          (gridSizeChanged)="this.sizeColumnsToFit(this.organismGridApi)"
                                                          [enableColResize]="true"
-                                                         aria-label="Organisms list">
+                                                         aria-label="Organisms list"
+                                                         [suppressTabbing]="true"
+                                                         [ensureDomOrder]="true">
                                         </ag-grid-angular>
                                     </div>
-                                    <div class="appliesToGroup" *ngIf="!experimentPlatformMode" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="analysisTypesGrid">
+                                    <div class="appliesToGroup" *ngIf="!experimentPlatformMode" appAgGridHeaderA11yFix>
                                         <div class="full-width justify-space-between align-center" style="display: flex; flex-direction: row;">
                                             <label class="leadingLabel" style="width: 40%; margin-right: 2%;">Only show for these analysis types:</label>
                                             <custom-combo-box class="appliesToField"
@@ -230,10 +238,12 @@
                                                          [columnDefs]="this.analysisTypeGridColumnDefs"
                                                          (gridSizeChanged)="this.sizeColumnsToFit(this.analysisTypeGridApi)"
                                                          [enableColResize]="true"
-                                                         aria-label="Analysis types list">
+                                                         aria-label="Analysis types list"
+                                                         [suppressTabbing]="true"
+                                                         [ensureDomOrder]="true">
                                         </ag-grid-angular>
                                     </div>
-                                    <div class="appliesToGroup" *ngIf="!experimentPlatformMode" appFocusManager appAgGridHeaderA11yFix [focusManagerGrid]="usersGrid">
+                                    <div class="appliesToGroup" *ngIf="!experimentPlatformMode" appAgGridHeaderA11yFix>
                                         <div class="full-width justify-space-between align-center" style="display: flex; flex-direction: row;">
                                             <label class="leadingLabel" style="width: 40%; margin-right: 2%;">Only show for these users (only applies to non-required sample annotations):</label>
                                             <custom-combo-box class="appliesToField" placeholder="User" [options]="this.appUserList"
@@ -254,7 +264,9 @@
                                                          [columnDefs]="this.userGridColumnDefs"
                                                          (gridSizeChanged)="this.sizeColumnsToFit(this.userGridApi)"
                                                          [enableColResize]="true"
-                                                         aria-label="Users list">
+                                                         aria-label="Users list"
+                                                         [suppressTabbing]="true"
+                                                         [ensureDomOrder]="true">
                                         </ag-grid-angular>
                                     </div>
                                 </div>

@@ -27,14 +27,16 @@
             Please indicate which sample sheet column corresponds to each field. It is not
             necessary to select a field for a column you do not wish to populate.
         </div>
-        <div class="full-width flex-grow padded-left-right-bottom" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="sampleSheetMappingGrid">
+        <div class="full-width flex-grow padded-left-right-bottom" appAgGridHeaderA11yFix>
             <ag-grid-angular #sampleSheetMappingGrid
                     class="ag-theme-fresh small-font full-width full-height"
                     [context]="context"
                     [singleClickEdit]="true"
                     [rowSelection]="'single'"
                     (gridSizeChanged)="onGridSizeChanged($event)"
-                    (gridReady)="onGridReady($event)">
+                    (gridReady)="onGridReady($event)"
+                    [suppressTabbing]="true"
+                    [ensureDomOrder]="true">
             </ag-grid-angular>
         </div>
         <div class="full-width flex-container-row align-center padded-left-right-bottom">

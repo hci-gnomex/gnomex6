@@ -32,7 +32,7 @@ import {ActionType} from "../../../util/interfaces/generic-dialog-action.model";
                     <img [src]="this.importSegment"> Import
                 </button>
             </div>
-            <div style="flex:1; display:flex; width:100%; padding-top: 1em;" appAgGridHeaderA11yFix appFocusManager>
+            <div style="flex:1; display:flex; width:100%; padding-top: 1em;" appAgGridHeaderA11yFix>
                 <ag-grid-angular style="width: 100%;" class="ag-theme-fresh"
                                  [rowData]="rowData"
                                  [columnDefs]="columnDefs"
@@ -43,7 +43,9 @@ import {ActionType} from "../../../util/interfaces/generic-dialog-action.model";
                                  (gridSizeChanged)="adjustColumnSize($event)"
                                  (rowSelected)="selectedRow($event)"
                                  [rowDeselection]="true"
-                                 [gridOptions]="gridOpt">
+                                 [gridOptions]="gridOpt"
+                                 [suppressTabbing]="true"
+                                 [ensureDomOrder]="true">
                 </ag-grid-angular>
 
             </div>

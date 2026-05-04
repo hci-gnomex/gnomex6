@@ -27,14 +27,16 @@
                 <label><img class="icon" [src]="'./assets/review.png'" alt="">Product Total: {{this.selectedProduct && this.selectedProduct.qty ? this.selectedProduct.qty : ''}}</label>
                 <button [disabled]="!this.selectedProduct" *ngIf="this.isAdminState" mat-button color="accent" (click)="this.addRow()"><img [src]="'./assets/add.png'" class="icon" alt="">Add Row</button>
             </div>
-            <div class="ninety-percent-height" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="ledgerGrid">
+            <div class="ninety-percent-height" appAgGridHeaderA11yFix>
                 <ag-grid-angular #ledgerGrid class="ag-theme-fresh full-height full-width"
                                  (gridReady)="this.onGridReady($event)"
                                  (cellValueChanged)="this.onGridCellValueChanged()"
                                  [singleClickEdit]="true"
                                  [rowData]="this.gridRowData"
                                  [enableColResize]="true"
-                                 aria-label="Product ledger entries">
+                                 aria-label="Product ledger entries"
+                                 [suppressTabbing]="true"
+                                 [ensureDomOrder]="true">
                 </ag-grid-angular>
             </div>
             <div class="flex-container-row justify-end five-percent-height">

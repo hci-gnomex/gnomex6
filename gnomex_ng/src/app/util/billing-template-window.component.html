@@ -28,7 +28,7 @@
     </mat-radio-group>
     </div>
 </div>
-<div class="accounts-grid-div full-width padded" role="region" aria-label="Billing accounts" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="billingTemplateAccountsGrid">
+<div class="accounts-grid-div full-width padded" role="region" aria-label="Billing accounts" appAgGridHeaderA11yFix>
     <ag-grid-angular #billingTemplateAccountsGrid class="ag-theme-fresh full-height full-width"
                      (gridReady)="this.onGridReady($event)"
                      (gridSizeChanged)="this.onGridSizeChanged($event)"
@@ -38,7 +38,9 @@
                      (cellValueChanged)="this.onCellValueChanged($event)"
                      [stopEditingWhenGridLosesFocus]="true"
                      [rowData]="this.currentAccountsList"
-                     aria-label="Billing accounts data grid">
+                     aria-label="Billing accounts data grid"
+                     [suppressTabbing]="true"
+                     [ensureDomOrder]="true">
     </ag-grid-angular>
 </div>
 

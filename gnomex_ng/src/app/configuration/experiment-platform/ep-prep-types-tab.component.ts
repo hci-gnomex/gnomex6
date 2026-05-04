@@ -49,7 +49,7 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
                 </div>
             </div>
             <label style="padding: 0.5em;"> * Grid data is sortable and filterable. To sort, click the column header(sortable for asc/desc/default). To filter or search, hover the column header right side and click the filter icon.</label>
-            <div style="flex:9" class="full-width" appAgGridHeaderA11yFix appFocusManager>
+            <div style="flex:9" class="full-width" appAgGridHeaderA11yFix>
                 <ag-grid-angular class="full-height full-width ag-theme-balham"
                                  [columnDefs]="columnDefs"
                                  [rowData]="rowData"
@@ -63,7 +63,9 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
                                  [rowSelection]="'single'"
                                  (rowSelected)="this.onPrepTypeRowSelected($event)"
                                  [singleClickEdit]="true"
-                                 [stopEditingWhenGridLosesFocus]="true">
+                                 [stopEditingWhenGridLosesFocus]="true"
+                                 [suppressTabbing]="true"
+                                 [ensureDomOrder]="true">
                 </ag-grid-angular>
 
             </div>

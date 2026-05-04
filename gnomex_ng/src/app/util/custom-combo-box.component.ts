@@ -29,7 +29,7 @@ import {debounceTime} from "rxjs/operators";
              [attr.cdkFocusInitial]="cdkFocusInitial === undefined ? null : cdkFocusInitial"
              [tabindex]="tabindex"
              [matAutocomplete]="auto" [formControl]="this.innerControl"
-             [attr.aria-label]="placeholder"
+             [attr.aria-label]="placeholder || null"
              [readonly]="readonly"
              [attr.aria-readonly]="readonly ? 'true' : null"
              role="combobox"

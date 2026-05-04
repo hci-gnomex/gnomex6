@@ -4,7 +4,10 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {AgGridHeaderA11yFixDirective} from './app-ag-grid-header-a11y.directive';
 import {FocusManagerDirective} from './focus-manager.directive';
 import {AutofocusDirective} from './appAutoFocus';
-import {ReadonlyDirective} from "./app-readonly.directive";
+import {ReadonlyDirective} from './app-readonly.directive';
+import {AccessibleTreeActionDirective} from './accessible-tree-action.directive';
+import {AccessibleTreeDirective} from './accessible-tree.directive';
+import {AccessibleTreeNodeDirective} from './accessible-tree-node.directive';
 
 
 @NgModule({
@@ -14,6 +17,9 @@ import {ReadonlyDirective} from "./app-readonly.directive";
     ReactiveFormsModule,
   ],
   declarations: [
+    AccessibleTreeActionDirective,
+    AccessibleTreeDirective,
+    AccessibleTreeNodeDirective,
     AgGridHeaderA11yFixDirective,
     FocusManagerDirective,
     ReadonlyDirective,
@@ -21,6 +27,9 @@ import {ReadonlyDirective} from "./app-readonly.directive";
 
   ],
   exports: [
+    AccessibleTreeActionDirective,
+    AccessibleTreeDirective,
+    AccessibleTreeNodeDirective,
     AgGridHeaderA11yFixDirective,
     FocusManagerDirective,
     ReadonlyDirective,

@@ -18,7 +18,9 @@
                         [enableColResize]="true"
                         (gridSizeChanged)="onGridSizeChanged()"
                         (gridReady)="onGridReady($event)"
-                        aria-label="Options selection grid">
+                        aria-label="Options selection grid"
+                        [suppressTabbing]="true"
+                        [ensureDomOrder]="true">
                 </ag-grid-angular>
             </div>
         </div>

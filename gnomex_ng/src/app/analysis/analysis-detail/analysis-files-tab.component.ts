@@ -49,7 +49,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
                     <img [src]="this.constantsService.ICON_DOWNLOAD" class="icon" alt="" aria-hidden="true">Download Files
                 </button>
             </div>
-            <div class="flex-grow" role="region" aria-label="Files list" appAgGridHeaderA11yFix appFocusManager>
+            <div class="flex-grow" role="region" aria-label="Files list" appAgGridHeaderA11yFix>
                 <ag-grid-angular class="ag-theme-balham full-height full-width"
                                  (gridReady)="this.onGridReady($event)"
                                  (gridSizeChanged)="this.onGridSizeChanged($event)"
@@ -57,7 +57,9 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
                                  [getNodeChildDetails]="this.getNodeChildDetails"
                                  [enableColResize]="true"
                                  [rowData]="this.gridData"
-                                 aria-label="Analysis files data grid">
+                                 aria-label="Analysis files data grid"
+                                 [suppressTabbing]="true"
+                                 [ensureDomOrder]="true">
                 </ag-grid-angular>
             </div>
             <div class="flex-container-row justify-flex-end" aria-live="polite">

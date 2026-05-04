@@ -51,7 +51,7 @@ import {HttpParams} from "@angular/common/http";
                     </button>
                 </div>
             </div>
-            <div style="flex:3" *ngIf="showCollaboratorBlock" appAgGridHeaderA11yFix appFocusManager>
+            <div style="flex:3" *ngIf="showCollaboratorBlock" appAgGridHeaderA11yFix>
                 <ag-grid-angular style="width: 50%; height:100% "
                                  class="ag-theme-fresh"
                                  [rowDeselection]="true"
@@ -61,7 +61,9 @@ import {HttpParams} from "@angular/common/http";
                                  (rowSelected)="this.onCollabGridRowSelected($event)"
                                  [rowData]="this.collabGridRowData"
                                  [columnDefs]="this.columnDefs"
-                                 aria-label="Collaborators grid">
+                                 aria-label="Collaborators grid"
+                                 [suppressTabbing]="true"
+                                 [ensureDomOrder]="true">
                 </ag-grid-angular>
             </div>
         </form>

@@ -35,7 +35,7 @@
             {{ requestIds.length > 0 ? requestIds.length - 1  : 0 }} requests in worklist
         </mat-label>
     </div>
-    <div class="flex-grow padded-bottom" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="libprepQcGrid">
+    <div class="flex-grow padded-bottom" appAgGridHeaderA11yFix>
         <div #oneEmWidth class="no-height single-em" aria-hidden="true"></div>
         <ag-grid-angular #libprepQcGrid class="ag-theme-fresh full-height full-width"
                          [enableSorting]="true"
@@ -47,7 +47,9 @@
                          (gridReady)="onGridReady($event)"
                          (gridSizeChanged)="onGridSizeChanged($event)"
                          (rowDataChanged)="onNotifyGridRowDataChanged($event)"
-                         aria-label="Library prep QC work items">
+                         aria-label="Library prep QC work items"
+                         [suppressTabbing]="true"
+                         [ensureDomOrder]="true">
         </ag-grid-angular>
     </div>
     <div class="flex-container-row align-baseline">

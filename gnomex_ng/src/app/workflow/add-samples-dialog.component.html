@@ -43,7 +43,7 @@
                             Clear All
                         </button>
                     </div>
-                    <div class="full-width flex-grow left-right-padded overflow-auto" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="flowcellGrid">
+                    <div class="full-width flex-grow left-right-padded overflow-auto" appAgGridHeaderA11yFix>
                         <ag-grid-angular #flowcellGrid class="ag-theme-balham full-height full-width"
                                          (gridReady)="onGridReady($event)"
                                          [columnDefs]="columnDefs"
@@ -53,7 +53,9 @@
                                          (treeDrop)="onDrop($event)"
                                          (rowSelected)="onGridRowSelected($event)"
                                          [treeAllowDrop]="allowDrop.bind(this)"
-                                         aria-label="Flow cell lanes">
+                                         aria-label="Flow cell lanes"
+                                         [suppressTabbing]="true"
+                                         [ensureDomOrder]="true">
                         </ag-grid-angular>
                     </div>
                 </div>

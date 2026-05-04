@@ -4,7 +4,7 @@
         <button mat-button (click)="this.addOrganism()"><img class="icon" [src]="'./assets/page_add.png'" alt="">Add</button>
         <button mat-button [disabled]="!this.selectedOrganism || !this.canDeleteSelectedOrganism" (click)="this.removeOrganism()"><img class="icon" [src]="'./assets/page_remove.png'" alt="">Remove</button>
     </div>
-    <div class="full-width flex-container-row flex-twenty" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="organismsGrid">
+    <div class="full-width flex-container-row flex-twenty" appAgGridHeaderA11yFix>
         <ag-grid-angular #organismsGrid class="ag-theme-balham full-height quarter-width margin-right"
                          aria-label="Organisms"
                          (gridReady)="this.onOrganismGridReady($event)"
@@ -12,7 +12,9 @@
                          (rowSelected)="this.onOrganismGridRowSelected($event)"
                          (gridSizeChanged)="this.adjustColumns(this.organismGridApi)"
                          [rowData]="this.organismList"
-                         [columnDefs]="this.organismGridColumnDefs">
+                         [columnDefs]="this.organismGridColumnDefs"
+                         [suppressTabbing]="true"
+                         [ensureDomOrder]="true">
         </ag-grid-angular>
         <div *ngIf="this.selectedOrganism" class="three-quarters-width flex-container-col">
             <div class="full-width flex-container-row flex-one align-center">
@@ -65,7 +67,7 @@
                     <mat-error *ngIf="this.mageDefFC.hasError('maxlength')">Exceeds max length</mat-error>
                 </mat-form-field>
             </div>
-            <div class="full-width flex-container-col flex-three align-center" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="genomeBuildsGrid">
+            <div class="full-width flex-container-col flex-three align-center" appAgGridHeaderA11yFix>
                 <div class="full-width flex-container-row flex-one align-center">
                     <label class="margin-right">Genome Builds</label>
                     <button mat-button [disabled]="!this.canUpdateSelectedOrganism" (click)="this.addGenomeBuild()"><img class="icon" [src]="'./assets/add.png'" alt="">Add</button>
@@ -78,7 +80,9 @@
                                  (rowSelected)="this.onGenomeBuildGridRowSelected($event)"
                                  (gridSizeChanged)="this.adjustColumns(this.genomeBuildGridApi)"
                                  [rowData]="this.genomeBuildList"
-                                 [columnDefs]="this.genomeBuildGridColumnDefs">
+                                 [columnDefs]="this.genomeBuildGridColumnDefs"
+                                 [suppressTabbing]="true"
+                                 [ensureDomOrder]="true">
                 </ag-grid-angular>
             </div>
             <div class="full-width flex-container-row flex-one align-center">

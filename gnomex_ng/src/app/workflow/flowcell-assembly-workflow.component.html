@@ -64,7 +64,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="pendingSequenceLanesGrid">
+                <div class="flex-grow" appAgGridHeaderA11yFix>
                     <div #oneEmWidth1 class="no-height single-em" aria-hidden="true"></div>
                     <ag-grid-angular #pendingSequenceLanesGrid class="ag-theme-fresh full-height full-width min-grid-size"
                                      [enableColResize]="true"
@@ -79,7 +79,9 @@
                                      (gridSizeChanged)="onGridSizeChanged($event)"
                                      (rowDataChanged)="onNotifyGridRowDataChanged($event)"
                                      (rowSelected)="onRowSelected($event)"
-                                     aria-label="Pending sequence lanes">
+                                     aria-label="Pending sequence lanes"
+                                     [suppressTabbing]="true"
+                                     [ensureDomOrder]="true">
                     </ag-grid-angular>
                 </div>
             </div>
@@ -125,7 +127,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="flowcellAssemblyGrid">
+                <div class="flex-grow" appAgGridHeaderA11yFix>
                     <div #oneEmWidth2 class="no-height single-em" aria-hidden="true"></div>
                     <ag-grid-angular #flowcellAssemblyGrid class="ag-theme-fresh full-height full-width min-grid-size"
                                      [enableColResize]="true"
@@ -137,7 +139,9 @@
                                      (gridSizeChanged)="onGridSizeChanged($event)"
                                      (rowDataChanged)="onNotifyGridRowDataChanged($event)"
                                      (cellValueChanged) = "onCellValueChanged_assemblyGrid($event)"
-                                     aria-label="Flow cell assembly lanes">
+                                     aria-label="Flow cell assembly lanes"
+                                     [suppressTabbing]="true"
+                                     [ensureDomOrder]="true">
                     </ag-grid-angular>
                 </div>
             </form>

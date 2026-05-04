@@ -26,14 +26,16 @@ import {Experiment} from "../../util/models/experiment.model";
                 <as-split-area [size]="this.sampleGridSplitSize">
                     <div class="flex-container-col full-height padded">
                         <label>Samples</label>
-                        <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager>
+                        <div class="flex-grow" appAgGridHeaderA11yFix>
                             <ag-grid-angular class="ag-theme-balham full-height full-width"
                                              (gridReady)="this.onSamplesGridReady($event)"
                                              (gridSizeChanged)="this.onGridSizeChanged($event)"
                                              (selectionChanged)="this.onSamplesGridSelectionChanged($event)"
                                              [rowSelection]="'single'"
                                              [columnDefs]="this.samplesGridColDefs"
-                                             [rowData]="this.samplesGridData">
+                                             [rowData]="this.samplesGridData"
+                                             [suppressTabbing]="true"
+                                             [ensureDomOrder]="true">
                             </ag-grid-angular>
                         </div>
                     </div>
@@ -47,7 +49,7 @@ import {Experiment} from "../../util/models/experiment.model";
                             <button mat-button [disabled]="!editMode || !this.canEdit || this.selectedLanes.length < 1" (click)="this.copySequenceLane()"><img [src]="this.constantsService.ICON_TABLE_MULTIPLE" class="icon">Copy sequence lane</button>
                             <button mat-button [disabled]="!editMode || !this.canEdit || this.selectedLanes.length < 1" (click)="this.promptToDeleteSequenceLane()"><img [src]="this.constantsService.ICON_DELETE" class="icon">Delete sequence lane(s)</button>
                         </div>
-                        <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager>
+                        <div class="flex-grow" appAgGridHeaderA11yFix>
                             <ag-grid-angular #lanesGrid
                                              class="ag-theme-balham full-height full-width"
                                              stopEditingWhenGridLosesFocus="true"
@@ -58,7 +60,9 @@ import {Experiment} from "../../util/models/experiment.model";
                                              [enableColResize]="'true'"
                                              [singleClickEdit]="'true'"
                                              [columnDefs]="this.lanesGridColDefs"
-                                             [rowData]="this.lanesGridData">
+                                             [rowData]="this.lanesGridData"
+                                             [suppressTabbing]="true"
+                                             [ensureDomOrder]="true">
                             </ag-grid-angular>
                         </div>
                     </div>

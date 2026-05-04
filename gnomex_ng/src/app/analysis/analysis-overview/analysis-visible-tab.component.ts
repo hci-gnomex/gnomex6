@@ -16,7 +16,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
     selector: "analysis-visiblity-tab",
     template: `
         <div class="flexbox-column">
-            <div style="flex:1; display:flex; width:100%;" appAgGridHeaderA11yFix appFocusManager>
+            <div style="flex:1; display:flex; width:100%;" appAgGridHeaderA11yFix>
                 <ag-grid-angular style="width: 100%;" class="ag-theme-fresh"
                                  [gridOptions]="gridOpt"
                                  [rowData]="rowData"
@@ -26,7 +26,9 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
                                  (gridSizeChanged)="adjustColumnSize($event)"
                                  (cellEditingStarted)="startEditingCell($event)"
                                  [enableSorting]="true"
-                                 [enableColResize]="true">
+                                 [enableColResize]="true"
+                                 [suppressTabbing]="true"
+                                 [ensureDomOrder]="true">
                 </ag-grid-angular>
             </div>
         </div>

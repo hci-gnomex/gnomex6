@@ -12,7 +12,9 @@
 					[enableSorting]="true"
 					[enableColResize]="true"
 					(gridSizeChanged)="onGridSizeChanged()"
-					(gridReady)="onGridReady($event)">
+					(gridReady)="onGridReady($event)"
+					[suppressTabbing]="true"
+					[ensureDomOrder]="true">
 			</ag-grid-angular>
 		</div>
 		<div *ngIf="addingUser" class="full-width padded">

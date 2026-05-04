@@ -30,7 +30,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
             <div>
                 <mat-checkbox [(ngModel)]="this.onlyShowSamplesWithParents" (change)="this.refreshGrid()">Only show samples with parents</mat-checkbox>
             </div>
-            <div class="grid-container" appAgGridHeaderA11yFix appFocusManager>
+            <div class="grid-container" appAgGridHeaderA11yFix>
                 <ag-grid-angular class="ag-theme-balham full-height full-width"
                                  (gridReady)="this.onGridReady($event)"
                                  (rowSelected)="this.onGridSelected($event)"
@@ -38,7 +38,9 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
                                  [columnDefs]="this.gridColDefs"
                                  [rowSelection]="'single'"
                                  [singleClickEdit]="true"
-                                 [enableColResize]="true">
+                                 [enableColResize]="true"
+                                 [suppressTabbing]="true"
+                                 [ensureDomOrder]="true">
                 </ag-grid-angular>
             </div>
         </div>

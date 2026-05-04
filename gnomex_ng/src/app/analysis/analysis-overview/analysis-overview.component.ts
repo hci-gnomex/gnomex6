@@ -19,8 +19,9 @@ import {DialogsService} from "../../util/popup/dialogs.service";
                         {{ nodeTitle}} &nbsp;&nbsp;&nbsp;&nbsp; {{"(" + this.analysisService.analysisList.length + ((this.analysisService.analysisList.length !== 1) ? " Analyses)" : " Analysis)")}}
                     </div>
                     <div class="flex-container-row align-center right-padding">
-                        <div class="padded">Analysis #</div>
+                        <!-- <div class="padded">Analysis #</div>-->
                         <custom-combo-box [options]="this.orderedAnalysisIds"
+                                          placeholder="Analysis #"
                                           (optionSelected)="onIDSelect($event)">
                         </custom-combo-box>
                     </div>

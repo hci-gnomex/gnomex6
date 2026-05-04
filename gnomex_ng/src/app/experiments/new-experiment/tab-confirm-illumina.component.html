@@ -133,13 +133,15 @@
         <div class="top-margin font-bold">
             Experiment Design :
         </div>
-        <div class="full-height full-width small-font minheight" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="experimentDesignGrid">
+        <div class="full-height full-width small-font minheight" appAgGridHeaderA11yFix>
             <div #oneEmWidth class="no-height single-em"></div>
             <ag-grid-angular #experimentDesignGrid class="ag-theme-fresh full-height full-width"
                              [columnDefs]="this.samplesGridConfirmColumnDefs"
                              [enableColResize]="true"
                              [suppressDragLeaveHidesColumns]="true"
-                             (gridReady)="this.onGridReady($event)">
+                             (gridReady)="this.onGridReady($event)"
+                             [suppressTabbing]="true"
+                             [ensureDomOrder]="true">
             </ag-grid-angular>
         </div>
     </form>

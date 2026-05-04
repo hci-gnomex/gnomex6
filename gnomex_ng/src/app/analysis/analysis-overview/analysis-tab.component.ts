@@ -41,7 +41,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                         </button>
                     </div>
                 </div>
-                <div class="full-width flex-grow" role="region" aria-label="Analysis data" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="analysisGrid">
+                <div class="full-width flex-grow" role="region" aria-label="Analysis data" appAgGridHeaderA11yFix>
                     <ag-grid-angular #analysisGrid class="full-width full-height ag-theme-fresh"
                                      [gridOptions]="gridOpt"
                                      [columnDefs]="columnDefs"
@@ -55,7 +55,9 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                                      (rowSelected)="selectedRow($event)"
                                      (cellDoubleClicked)="forwardToAnalysis($event)"
                                      (cellEditingStarted)="startEditingCell($event)"
-                                     aria-label="Analysis data grid">
+                                     aria-label="Analysis data grid"
+                                     [suppressTabbing]="true"
+                                     [ensureDomOrder]="true">
                     </ag-grid-angular>
                 </div>
             </div>

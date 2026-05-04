@@ -43,7 +43,7 @@
             </button>
         </div>
     </div>
-    <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="flowcellLanesGrid">
+    <div class="flex-grow" appAgGridHeaderA11yFix>
         <ag-grid-angular #flowcellLanesGrid class="ag-theme-balham full-width full-height"
                          [rowData]="flowCellChannels"
                          [columnDefs]="flowCellColDefs"
@@ -58,7 +58,9 @@
                          [rowClassRules]="this.workflowService.assmGridRowClassRules"
                          [enableFilter]="true"
                          [enableColResize]="true"
-                         aria-label="Flow cell lanes">
+                         aria-label="Flow cell lanes"
+                         [suppressTabbing]="true"
+                         [ensureDomOrder]="true">
         </ag-grid-angular>
     </div>
 </div>

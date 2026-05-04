@@ -45,10 +45,9 @@
                     <!--<img [src]="this.constService.ICON_DELETE"> remove-->
                 <!--</button>-->
             <!--</div>-->
-            <div class="full-width flex-grow" *ngIf="showCollaboratorBlock" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="visibilityCollaboratorsGrid">
+            <div class="full-width flex-grow" *ngIf="showCollaboratorBlock" appAgGridHeaderA11yFix>
                 <ag-grid-angular #visibilityCollaboratorsGrid style="width: 50%;"
                                  class="ag-theme-fresh full-height"
-                                 role="grid"
                                  aria-label="Collaborators grid"
                                  aria-describedby="collaboratorsLabel"
                                  [rowDeselection]="true"
@@ -58,7 +57,9 @@
                                  [rowSelection]="'single'"
                                  (rowSelected)="this.onCollabGridRowSelected($event)"
                                  [rowData]="this.collabGridRowData"
-                                 [columnDefs]="this.columnDefs">
+                                 [columnDefs]="this.columnDefs"
+                                 [suppressTabbing]="true"
+                                 [ensureDomOrder]="true">
                 </ag-grid-angular>
             </div>
         </div>

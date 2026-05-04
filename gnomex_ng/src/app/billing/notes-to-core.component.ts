@@ -10,13 +10,15 @@ import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-d
 @Component({
     selector: 'notes-to-core',
     template: `
-        <div class="grid-div padded" role="region" aria-label="Notes to core facility"  appAgGridHeaderA11yFix appFocusManager>
+        <div class="grid-div padded" role="region" aria-label="Notes to core facility"  appAgGridHeaderA11yFix>
             <ag-grid-angular class="ag-theme-balham full-height full-width font-small"
                              aria-label="Core comments table"
                              (gridReady)="this.onNotesGridReady($event)"
                              (rowClicked)="this.onNotesGridSelection($event)"
                              [enableColResize]="true"
-                             [rowData]="this.notesGridData">
+                             [rowData]="this.notesGridData"
+                             [suppressTabbing]="true"
+                             [ensureDomOrder]="true">
             </ag-grid-angular>
         </div>
     `,

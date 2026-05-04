@@ -10,13 +10,15 @@
                                   popupTitle="Annotation Help">
                     </context-help>
                 </div>
-                <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="addAnnotationGrid">
+                <div class="flex-grow" appAgGridHeaderA11yFix>
                     <ag-grid-angular #addAnnotationGrid class="ag-theme-fresh full-height min-height moderate-width"
                                      [rowSelection]="'multiple'"
                                      [rowMultiSelectWithClick]="true"
                                      (gridReady)="onAddAnnotationGridReady($event)"
                                      (gridSizeChanged)="onGridSizeChanged($event)"
-                                     (rowSelected)="onAddAnnotationGridRowSelected($event)">
+                                     (rowSelected)="onAddAnnotationGridRowSelected($event)"
+                                     [suppressTabbing]="true"
+                                     [ensureDomOrder]="true">
                     </ag-grid-angular>
                 </div>
             </div>
@@ -28,12 +30,14 @@
                         Selected characteristics
                     </div>
                 </div>
-                <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="removeAnnotationGrid">
+                <div class="flex-grow" appAgGridHeaderA11yFix>
                     <ag-grid-angular #removeAnnotationGrid class="ag-theme-fresh full-height min-height moderate-width"
                                      [rowSelection]="'single'"
                                      (gridReady)="onRemoveAnnotationGridReady($event)"
                                      (gridSizeChanged)="onGridSizeChanged($event)"
-                                     (rowSelected)="onRemoveAnnotationGridRowSelected($event)">
+                                     (rowSelected)="onRemoveAnnotationGridRowSelected($event)"
+                                     [suppressTabbing]="true"
+                                     [ensureDomOrder]="true">
                     </ag-grid-angular>
                 </div>
             </div>

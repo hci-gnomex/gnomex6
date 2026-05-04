@@ -25,17 +25,18 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
                 <button mat-button (click)="this.editBillingTemplate()" [disabled]="!this.canUpdate || !this.experimentsService.getEditMode()" aria-label="Edit billing template">Edit Billing Template</button>
                 <label class="small-font" aria-live="polite"><span class="italic">Current Account(s):</span> {{this.currentAccountsLabel}}</label>
             </div>
-            <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager >
+            <div class="flex-grow" appAgGridHeaderA11yFix >
                 <div #oneEmWidth class="no-height single-em" aria-hidden="true"></div>
                 <ag-grid-angular class="ag-theme-balham full-height full-width"
-                                 role="grid"
                                  aria-label="Billing items grid"
                                  (gridReady)="this.onGridReady($event)"
                                  (gridSizeChanged)="this.onGridSizeChanged($event)"
                                  [getNodeChildDetails]="this.getNodeChildDetails"
                                  [columnDefs]="this.gridColDefs"
                                  [enableColResize]="true"
-                                 [rowData]="this.gridData">
+                                 [rowData]="this.gridData"
+                                 [suppressTabbing]="true"
+                                 [ensureDomOrder]="true">
                 </ag-grid-angular>
             </div>
         </div>

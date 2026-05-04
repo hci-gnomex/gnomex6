@@ -7,24 +7,26 @@ import {
   Renderer2
 } from '@angular/core';
 import {TreeComponent, TreeModel} from '@circlon/angular-tree-component';
-import {ColumnApi, GridApi} from 'ag-grid-community';
-import {GridOptions} from "ag-grid-community/main";
 
 
 /**
- * Manages keyboard focus for ag-grid and angular-tree-component widgets.
+ * Manages keyboard focus for angular-tree-component widgets.
  *
  * Creates invisible sentinels before/after the widget so Tab naturally
  * enters and exits, while arrow-key navigation works inside.
+ *
+ * For ag-grid, pass [focusManagerGrid] to opt the directive out entirely.
+ * Grid focus is managed via [suppressTabbing]="true" and [ensureDomOrder]="true"
+ * on the ag-grid-angular element itself.
  *
  * Usage (tree):
  *   <div appFocusManager [focusManagerTree]="myTreeComponent">
  *     <tree-root #myTreeComponent ...></tree-root>
  *   </div>
  *
- * Usage (grid):
+ * Usage (grid — directive is a no-op, grid manages its own focus):
  *   <div appFocusManager [focusManagerGrid]="myGrid">
- *     <ag-grid-angular #myGrid ...></ag-grid-angular>
+ *     <ag-grid-angular #myGrid [suppressTabbing]="true" [ensureDomOrder]="true" ...></ag-grid-angular>
  *   </div>
  */
 @Directive({
@@ -45,19 +47,15 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
   @Input() focusManagerTree: TreeComponent | null = null;
 
   /**
-   * Pass the ag-grid component reference (the #templateRef on ag-grid-angular).
-   * We extract GridApi / ColumnApi from it, and install tabToNextCell to
-   * let Tab navigate headers but exit the grid once it reaches cells.
+   * Pass the ag-grid component reference to signal that this directive
+   * should be a complete no-op. Focus is handled by [suppressTabbing] and
+   * [ensureDomOrder] on the ag-grid-angular element.
    */
-  @Input() focusManagerGrid: { api: GridApi; columnApi: ColumnApi; gridOptions?: GridOptions } | null = null;
+  @Input() focusManagerGrid: unknown = null;
 
   // --- internal state ---
   private containerEl: HTMLElement | null = null;
-  private isGrid = false;
-
   private treeModel: TreeModel | null = null;
-  private gridApi: GridApi | null = null;
-  private gridColumnApi: ColumnApi | null = null;
 
   private beforeSentinel: HTMLElement | null = null;
   private afterSentinel: HTMLElement | null = null;
@@ -78,21 +76,15 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.renderer.setAttribute(this.host.nativeElement, 'tabindex', '-1');
 
+    // Grid focus is fully managed by [suppressTabbing] + [ensureDomOrder].
+    // This directive has nothing to add — bail out before creating sentinels.
+    if (this.focusManagerGrid) { return; }
+
     this.containerEl = this.findContainer();
     if (!this.containerEl) { return; }
 
-    // Determine widget type and extract typed APIs
     if (this.focusManagerTree) {
       this.treeModel = this.focusManagerTree.treeModel;
-      this.isGrid = false;
-    } else if (this.focusManagerGrid) {
-      this.gridApi = this.focusManagerGrid.api;
-      this.gridColumnApi = this.focusManagerGrid.columnApi;
-      this.isGrid = true;
-      this.installGridTabExit();
-    } else {
-      // Fallback: auto-detect from DOM
-      this.isGrid = !!this.containerEl.querySelector('.ag-root');
     }
 
     const parent = this.containerEl.parentElement;
@@ -123,17 +115,9 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
           return;
         }
 
-        // --- Grid entry ---
-        // ag-grid manages its own tabindex="0" cell; just let the browser's
-        // next Tab advance naturally into it.
-        if (this.isGrid) {
-          return;
-        }
-
-        // --- Tree entry ---
         // When relatedTarget is null, focus likely arrived via a screen
         // reader's virtual cursor (e.g. Narrator scan mode) rather than a
-        // real Tab keypress.  Calling enterTree() dispatches synthetic mouse
+        // real Tab keypress. Calling enterTree() dispatches synthetic mouse
         // events that can trigger router navigation and yank focus to the
         // main content landmark — a terrible experience in scan mode.
         // Let the sentinel stay focused so the screen reader can read its
@@ -205,8 +189,6 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     this.afterSentinel = null;
     this.containerEl = null;
     this.treeModel = null;
-    this.gridApi = null;
-    this.gridColumnApi = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -228,11 +210,7 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     }
 
     // --- Tab ---
-    // For grids: don't intercept — tabToNextCell returns null to exit cells,
-    // and ag-grid's built-in header Tab navigation handles headers.
-    // Sentinels catch focus when Tab leaves the grid.
-    // For trees: intercept in capture phase to move focus out cleanly.
-    if (event.key === 'Tab' && inside && !this.isGrid) {
+    if (event.key === 'Tab' && inside) {
       event.preventDefault();
 
       if (event.shiftKey) {
@@ -259,51 +237,8 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
   }
 
   // ---------------------------------------------------------------------------
-  // Widget entry helpers
+  // Tree entry helper
   // ---------------------------------------------------------------------------
-
-  /**
-   * Install a tabToNextCell callback on the grid that always returns null.
-   *
-   * ag-grid's header row has its own Tab navigation that does NOT go through
-   * tabToNextCell, so Tab moves naturally between header cells.  When Tab
-   * leaves the last header and would enter the first data cell, ag-grid
-   * calls tabToNextCell.  Returning null tells ag-grid to stop — the
-   * browser's default Tab takes over and focus lands on the after-sentinel
-   * (forward) or before-sentinel (backward), which our sentinel handlers
-   * already manage.
-   */
-  private installGridTabExit(): void {
-    // gridApi may not be available until gridReady fires.
-    // If we have it now, install immediately; otherwise wait for gridReady.
-    if (this.gridApi) {
-      this.setTabToNextCell();
-    } else if (this.focusManagerGrid) {
-      // AgGridAngular emits gridReady; api is set on the component ref after that.
-      // Poll briefly since we don't have a direct hook from here.
-      const interval = setInterval(() => {
-        if (this.focusManagerGrid && this.focusManagerGrid.api) {
-          this.gridApi = this.focusManagerGrid.api;
-          this.setTabToNextCell();
-          clearInterval(interval);
-        }
-      }, 100);
-      // Safety: stop polling after 5s
-      setTimeout(() => clearInterval(interval), 5000);
-    }
-  }
-
-  private setTabToNextCell(): void {
-    if (!this.gridApi) { return; }
-
-    // ag-grid ≥ 28 exposes setGridOption; older versions require
-    // mutating gridOptions directly via the component ref.
-    if (typeof (this.gridApi as any).setGridOption === 'function') {
-      (this.gridApi as any).setGridOption('tabToNextCell', () => null);
-    } else if (this.focusManagerGrid && this.focusManagerGrid.gridOptions) {
-      this.focusManagerGrid.gridOptions.tabToNextCell = () => null;
-    }
-  }
 
   /**
    * Programmatically enter the tree so that arrow-key navigation works
@@ -372,12 +307,10 @@ export class FocusManagerDirective implements AfterViewInit, OnDestroy {
     this.renderer.setAttribute(el, 'tabindex', '0');
     this.renderer.addClass(el, 'sr-only');
 
-    const regionType = this.isGrid ? 'grid' : 'tree';
-
     const label =
       which === 'before'
-        ? `${regionType}. Tab to enter, arrows to navigate.`
-        : `End of ${regionType}.`;
+        ? 'tree. Tab to enter, arrows to navigate.'
+        : 'End of tree.';
 
     this.renderer.setAttribute(el, 'aria-label', label);
 

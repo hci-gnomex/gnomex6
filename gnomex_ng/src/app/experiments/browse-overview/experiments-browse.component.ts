@@ -16,12 +16,13 @@ import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 
         <!--- <grid dataProvider={} > -->
         <div style="height:100%; width:100%; display:flex; flex-direction: column;" role="region" aria-label="Experiments list">
-            <div style="display:flex; flex-direction:column; flex:1; width:100%;" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="grid">
+            <div style="display:flex; flex-direction:column; flex:1; width:100%;" appAgGridHeaderA11yFix>
                 <ag-grid-angular #grid class="ag-theme-fresh" style="width: 100%;  height: 100%;"
-                                 role="grid"
                                  aria-label="Experiments data grid"
                                  (cellDoubleClicked)="forwardToExperiment($event)"
                                  (gridSizeChanged)="adjustColumnSize($event)"
+                                 [suppressTabbing]="true"
+                                 [ensureDomOrder]="true"
                                  [gridOptions]="gridOpt"
                                  [rowData]="rowData"
                                  [columnDefs]="columnDefs"
@@ -38,7 +39,10 @@ export class ExperimentsBrowseTab extends PrimaryTab implements OnInit,OnDestroy
     private selectedTreeNodeSubscript: Subscription;
     private filteredExperimentOverviewListSubscript: Subscription;
     public readonly rowSelection: string = "single";
-    public gridOpt:GridOptions = {};
+    public gridOpt:GridOptions = {
+      suppressTabbing: true,
+      ensureDomOrder: true
+    };
 
     name:string = "Experiments";
 

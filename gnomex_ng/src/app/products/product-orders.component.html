@@ -51,12 +51,14 @@
                 <div class="flex-one">
                     <label *ngIf="this.selectedTreeNode">Product Orders for {{this.selectedTreeNode.data.display}}</label>
                 </div>
-                <div class="flex-thirteen" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="labOrdersGrid">
+                <div class="flex-thirteen" appAgGridHeaderA11yFix>
                     <ag-grid-angular #labOrdersGrid class="ag-theme-fresh full-height full-width"
                                      (gridReady)="this.onLabGridReady($event)"
                                      (gridSizeChanged)="this.onGridSizeChanged($event)"
                                      [rowData]="this.labLineItems"
-                                     aria-label="Lab product orders">
+                                     aria-label="Lab product orders"
+                                     [suppressTabbing]="true"
+                                     [ensureDomOrder]="true">
                     </ag-grid-angular>
                 </div>
             </div>
@@ -96,12 +98,14 @@
                         </table>
                     </mat-tab>
                     <mat-tab label="Line Items">
-                        <div class="full-height full-width padded" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="orderLineItemsGrid">
+                        <div class="full-height full-width padded" appAgGridHeaderA11yFix>
                             <ag-grid-angular #orderLineItemsGrid class="ag-theme-fresh full-height full-width"
                                              (gridReady)="this.onProductOrderGridReady($event)"
                                              (gridSizeChanged)="this.onGridSizeChanged($event)"
                                              [rowData]="this.productOrderLineItems"
-                                             aria-label="Product order line items">
+                                             aria-label="Product order line items"
+                                             [suppressTabbing]="true"
+                                             [ensureDomOrder]="true">
                             </ag-grid-angular>
                         </div>
                     </mat-tab>
@@ -120,7 +124,9 @@
                          [rowSelection]="'multiple'"
                          [suppressRowClickSelection]="true"
                          [rowData]="this.productOrderLineItemList"
-                         aria-label="Product order overview">
+                         aria-label="Product order overview"
+                         [suppressTabbing]="true"
+                         [ensureDomOrder]="true">
         </ag-grid-angular>
     </div>
     <div class="flex-container-row flex-one padding-top justify-space-between align-center">

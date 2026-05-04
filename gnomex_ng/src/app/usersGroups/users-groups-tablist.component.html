@@ -10,7 +10,7 @@
                                     <input matInput [(ngModel)]="searchText" (input)="search()" placeholder="Search by name or email..." aria-label="Search users by name or email">
                                 </mat-form-field>
                             </div>
-                            <div class="full-width flex-grow padded-left-right small-font" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="usersGrid">
+                            <div class="full-width flex-grow padded-left-right small-font" appAgGridHeaderA11yFix>
                                 <ag-grid-angular #usersGrid id="userTable"
                                                  class="full-width full-height ag-theme-fresh"
                                                  aria-label="Users list"
@@ -24,7 +24,9 @@
                                                  [enableSorting]="true"
                                                  (gridSizeChanged)="onGridSizeChanged($event)"
                                                  [enableFilter]="true"
-                                                 [enableColResize]="true">
+                                                 [enableColResize]="true"
+                                                 [suppressTabbing]="true"
+                                                 [ensureDomOrder]="true">
                                 </ag-grid-angular>
                             </div>
                             <div class="full-width small-font">
@@ -77,7 +79,7 @@
                                     </mat-expansion-panel>
                                 </mat-accordion>
                             </div>
-                            <div class="full-width flex-grow padded-left-right" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="groupsGrid">
+                            <div class="full-width flex-grow padded-left-right" appAgGridHeaderA11yFix>
                                 <ag-grid-angular #groupsGrid class="full-width full-height ag-theme-fresh"
                                                  aria-label="Groups list"
                                                  [gridOptions]="groupsGridOptions"
@@ -88,7 +90,9 @@
                                                  (gridSizeChanged)="onGridSizeChanged($event)"
                                                  (selectionChanged)="onGroupsSelectionChanged($event)"
                                                  [enableSorting]="true"
-                                                 [enableColResize]="true">
+                                                 [enableColResize]="true"
+                                                 [suppressTabbing]="true"
+                                                 [ensureDomOrder]="true">
                                 </ag-grid-angular>
                             </div>
                             <div class="full-width flex-container-row align-center padded">
@@ -280,7 +284,7 @@
                             </as-split-area>
                             <as-split-area size="25">
                                 <div class="full-height full-width flex-container-row foreground padded">
-                                    <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="labMembershipsGrid">
+                                    <div class="flex-grow" appAgGridHeaderA11yFix>
                                         <ag-grid-angular #labMembershipsGrid class="full-height full-width ag-theme-fresh"
                                                          aria-label="User lab memberships"
                                                          [gridOptions]="labGridOptions"
@@ -288,12 +292,14 @@
                                                          [columnDefs]="labColumnDefs"
                                                          [rowSelection]="rowSelection"
                                                          (gridReady)="onGridReady($event)"
-                                                         [enableSorting]="true">
+                                                         [enableSorting]="true"
+                                                         [suppressTabbing]="true"
+                                                         [ensureDomOrder]="true">
                                         </ag-grid-angular>
                                     </div>
                                     <div class="horizontal-spacer">
                                     </div>
-                                    <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="collaboratingLabsGrid">
+                                    <div class="flex-grow" appAgGridHeaderA11yFix>
                                         <ag-grid-angular #collaboratingLabsGrid class="full-height full-width ag-theme-fresh"
                                                          aria-label="User collaborating labs"
                                                          [gridOptions]="collGridOptions"
@@ -301,12 +307,14 @@
                                                          [columnDefs]="collColumnDefs"
                                                          [rowSelection]="rowSelection"
                                                          (gridReady)="onGridReady($event)"
-                                                         [enableSorting]="true">
+                                                         [enableSorting]="true"
+                                                         [suppressTabbing]="true"
+                                                         [ensureDomOrder]="true">
                                         </ag-grid-angular>
                                     </div>
                                     <div class="horizontal-spacer">
                                     </div>
-                                    <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="managingLabsGrid">
+                                    <div class="flex-grow" appAgGridHeaderA11yFix>
                                         <ag-grid-angular #managingLabsGrid class="full-height full-width ag-theme-fresh"
                                                          aria-label="User managing labs"
                                                          [gridOptions]="manGridOptions"
@@ -315,7 +323,9 @@
                                                          [rowSelection]="rowSelection"
                                                          (gridReady)="onGridReady($event)"
                                                          (gridSizeChanged)="onManGridSizeChanged()"
-                                                         [enableSorting]="true">
+                                                         [enableSorting]="true"
+                                                         [suppressTabbing]="true"
+                                                         [ensureDomOrder]="true">
                                         </ag-grid-angular>
                                     </div>
                                 </div>
@@ -453,7 +463,9 @@
                                                                              [rowSelection]="'single'"
                                                                              (gridSizeChanged)="onGridSizeChanged($event)"
                                                                              (rowSelected)="onInstitutionGridRowSelected($event)"
-                                                                             (gridReady)="onInstitutionGridReady($event)">
+                                                                             (gridReady)="onInstitutionGridReady($event)"
+                                                                             [suppressTabbing]="true"
+                                                                             [ensureDomOrder]="true">
                                                             </ag-grid-angular>
                                                         </div>
                                                     </div>

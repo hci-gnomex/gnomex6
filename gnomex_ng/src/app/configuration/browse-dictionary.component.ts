@@ -93,7 +93,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                         </button>
                     </div>
                 </div>
-                <div appAgGridHeaderA11yFix appFocusManager [hidden]="!this.selectedDictionary"
+                <div appAgGridHeaderA11yFix [hidden]="!this.selectedDictionary"
                      class="flex-one {{dicGridEditable ? '' : 'extra-padded-top' }}">
                     <ag-grid-angular class="ag-theme-balham full-height full-width"
                                      (gridReady)="this.onGridReady($event)"
@@ -108,7 +108,9 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                                      (cellClicked)="onCellClicked($event)"
                                      [singleClickEdit]="isEditMode ? true : false"
                                      [enableSorting]="true"
-                                     [enableColResize]="true">
+                                     [enableColResize]="true"
+                                     [suppressTabbing]="true"
+                                     [ensureDomOrder]="true">
                     </ag-grid-angular>
                 </div>
                 <form [hidden]="!this.selectedEntry" class="flex-one overflow-auto extra-padded-top" [formGroup]="this.entryForm">

@@ -57,7 +57,7 @@
                 {{ workItemList.length }} Flow Cells
             </div>
         </div>
-        <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="flowcellsGrid">
+        <div class="flex-grow" appAgGridHeaderA11yFix>
             <div #oneEmWidth class="no-height single-em" aria-hidden="true"></div>
             <ag-grid-angular #flowcellsGrid class="ag-theme-fresh full-height full-width min-grid-size"
                              [enableColResize]="true"
@@ -68,7 +68,9 @@
                              (rowSelected)="onRowSelected($event)"
                              (gridReady)="onGridReady($event)"
                              (gridSizeChanged)="onGridSizeChanged($event)"
-                             aria-label="Flow cells">
+                             aria-label="Flow cells"
+                             [suppressTabbing]="true"
+                             [ensureDomOrder]="true">
             </ag-grid-angular>
         </div>
     </div>

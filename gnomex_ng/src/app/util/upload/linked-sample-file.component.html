@@ -68,7 +68,7 @@
             </as-split-area>
             <as-split-area  [size]="100 - this.expTreeSplitSize">
                 <div class="full-width full-height max-height flex-container-col border-subtle" role="region" aria-label="Linked samples">
-                    <div class="full-width flex-grow left-right-padded overflow-auto" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="linkedSamplesGrid">
+                    <div class="full-width flex-grow left-right-padded overflow-auto" appAgGridHeaderA11yFix>
                         <div #oneEmWidth class="no-height single-em"></div>
                         <ag-grid-angular #linkedSamplesGrid class="ag-theme-balham full-height full-width"
                                          (gridReady)="this.onGridReady($event)"
@@ -80,7 +80,9 @@
                                          [getNodeChildDetails]="this.getNodeChildDetails"
                                          [enableColResize]="true"
                                          [rowData]="this.linkedSampleRowData"
-                                         aria-label="Linked samples data grid">
+                                         aria-label="Linked samples data grid"
+                                         [suppressTabbing]="true"
+                                         [ensureDomOrder]="true">
                         </ag-grid-angular>
                     </div>
                 </div>

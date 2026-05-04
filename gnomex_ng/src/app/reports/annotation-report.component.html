@@ -49,24 +49,28 @@
     <label>Check the annotations you want to see on the report.</label>
 </div>
 <div>
-  <div appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="annotationSelectGrid">
+  <div appAgGridHeaderA11yFix>
     <ag-grid-angular #annotationSelectGrid style="width: 550px; height: 500px;"
                      class="ag-theme-fresh"
                      (gridReady)="onAnnotationGridReady($event)"
                      (rowDataChanged)="onAnnotationGridRowDataChanged($event)"
                      [rowSelection]="'multiple'"
                      [rowData]="annotationRowData"
-                     [columnDefs]="annotationColumnDefs">
+                     [columnDefs]="annotationColumnDefs"
+                     [suppressTabbing]="true"
+                     [ensureDomOrder]="true">
     </ag-grid-angular>
   </div>
-  <div appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="customColumnsGrid">
+  <div appAgGridHeaderA11yFix>
     <ag-grid-angular #customColumnsGrid *ngIf="annotationsFor === FOR_SAMPLES"
                      style="width: 550px; height: 500px;"
                      class="ag-theme-fresh"
                      (gridReady)="onCustomColumnsGridReady($event)"
                      [rowSelection]="'multiple'"
                      [rowData]="customColumnsRowData"
-                     [columnDefs]="customColumnsColumnDefs">
+                     [columnDefs]="customColumnsColumnDefs"
+                     [suppressTabbing]="true"
+                     [ensureDomOrder]="true">
     </ag-grid-angular>
   </div>
 </div>

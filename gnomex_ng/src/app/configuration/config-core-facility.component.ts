@@ -20,7 +20,7 @@ import {ConstantsService} from "../services/constants.service";
             <div style="display:flex;height:100%; width:100%;">
                 <as-split direction="horizontal" (dragEnd)="onSplitDragEnd($event)">
                     <as-split-area size="20">
-                        <div style="height:100%;width:100%;" appAgGridHeaderA11yFix appFocusManager>
+                        <div style="height:100%;width:100%;" appAgGridHeaderA11yFix>
                             <ag-grid-angular style="width: 100%; height: 90%;" class="ag-theme-fresh"
                                              [gridOptions]="gridOpt"
                                              [rowData]="rowData"
@@ -29,7 +29,9 @@ import {ConstantsService} from "../services/constants.service";
                                              (gridReady)="onGridReady($event)"
                                              (rowSelected)="selectedRow($event)"
                                              [enableSorting]="true"
-                                             [enableColResize]="true" >
+                                             [enableColResize]="true"
+                                             [suppressTabbing]="true"
+                                             [ensureDomOrder]="true">
                             </ag-grid-angular>
 
                         </div>

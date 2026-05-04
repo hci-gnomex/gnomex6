@@ -57,7 +57,7 @@
                         <div class="tr full-width full-height small-font">
                             <div class="td label">Field Search</div>
                             <div class="td" appAgGridHeaderA11yFix>
-                                <div class="grid-container full-height" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="fieldSearchGrid">
+                                <div class="grid-container full-height" appAgGridHeaderA11yFix>
                                     <ag-grid-angular #fieldSearchGrid
                                             style="font-size:x-small; width:100%; height:100%;"
                                             class="ag-theme-fresh"
@@ -69,7 +69,9 @@
                                             [suppressNoRowsOverlay]="true"
                                             [stopEditingWhenGridLosesFocus]="true"
                                             (gridSizeChanged)="onGridSizeChanged($event)"
-                                            (gridReady)="onNewSearchGridReady($event)">
+                                            (gridReady)="onNewSearchGridReady($event)"
+                                            [suppressTabbing]="true"
+                                            [ensureDomOrder]="true">
                                     </ag-grid-angular>
                                 </div>
                             </div>
@@ -129,7 +131,7 @@
                             </button>
                         </div>
                         <div class="flex-fill full-width">
-                            <div class="grid-container full-width full-height" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="searchResultsGrid">
+                            <div class="grid-container full-width full-height" appAgGridHeaderA11yFix>
                                 <ag-grid-angular #searchResultsGrid
                                         style="font-size:x-small; width:100%; height:100%;"
                                         class="ag-theme-fresh"
@@ -141,7 +143,9 @@
                                         [suppressNoRowsOverlay]="true"
                                         (rowDoubleClicked)="onRowDoubleClicked($event)"
                                         (gridSizeChanged)="onGridSizeChanged($event)"
-                                        (gridReady)="onSearchResultsGridReady($event)">
+                                        (gridReady)="onSearchResultsGridReady($event)"
+                                        [suppressTabbing]="true"
+                                        [ensureDomOrder]="true">
                                 </ag-grid-angular>
                             </div>
                         </div>

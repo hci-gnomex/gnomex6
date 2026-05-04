@@ -16,10 +16,9 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
     selector: "visibility-browse-tab",
     template: `
         <div style="width:100%; height:100%; display:flex; flex-direction: column " role="region" aria-label="Visibility settings">
-            <div style="display:flex; flex-direction:column; flex:1; width:100%;" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="grid">
+            <div style="display:flex; flex-direction:column; flex:1; width:100%;" appAgGridHeaderA11yFix>
                 <ag-grid-angular #grid style="width: 100%; height: 100%;"
                                  class="ag-theme-fresh"
-                                 role="grid"
                                  aria-label="Visibility data grid"
                                  [gridOptions]="gridOpt"
                                  [rowData]="rowData"
@@ -28,7 +27,9 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
                                  (gridSizeChanged)="adjustColumnSize($event)"
                                  (cellEditingStarted)="startEditingCell($event)"
                                  [enableSorting]="true"
-                                 [enableColResize]="true">
+                                 [enableColResize]="true"
+                                 [suppressTabbing]="true"
+                                 [ensureDomOrder]="true">
                 </ag-grid-angular>
             </div>
         </div>

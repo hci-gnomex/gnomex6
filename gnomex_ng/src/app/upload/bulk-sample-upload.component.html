@@ -19,7 +19,7 @@
                             Fatal errors detected
                         </div>
                     </div>
-                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="fatalErrorsGrid">
+                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix>
                         <ag-grid-angular #fatalErrorsGrid
                                 class="ag-theme-fresh small-font full-width full-height"
                                 [context]="context"
@@ -28,7 +28,9 @@
                                 [enableColResize]="true"
                                 [rowSelection]="'single'"
                                 (gridSizeChanged)="onGridSizeChanged($event)"
-                                (gridReady)="onFatalErrorGridReady($event)">
+                                (gridReady)="onFatalErrorGridReady($event)"
+                                [suppressTabbing]="true"
+                                [ensureDomOrder]="true">
                         </ag-grid-angular>
                     </div>
                 </div>
@@ -50,7 +52,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="importableExperimentsGrid">
+                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix>
                         <ag-grid-angular #importableExperimentsGrid
                                 class="ag-theme-fresh small-font full-width full-height"
                                 [context]="context"
@@ -60,7 +62,9 @@
                                 [rowSelection]="'multiple'"
                                 [suppressRowClickSelection]="true"
                                 (gridSizeChanged)="onGridSizeChanged($event)"
-                                (gridReady)="onImportableGridReady($event)">
+                                (gridReady)="onImportableGridReady($event)"
+                                [suppressTabbing]="true"
+                                [ensureDomOrder]="true">
                         </ag-grid-angular>
                     </div>
                 </div>
@@ -80,7 +84,7 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="errorsTopGrid">
+                                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix>
                                         <ag-grid-angular #errorsTopGrid
                                                 class="ag-theme-fresh small-font full-width full-height"
                                                 [context]="context"
@@ -90,7 +94,9 @@
                                                 [rowSelection]="'single'"
                                                 (rowSelected)="selectAnError($event)"
                                                 (gridSizeChanged)="onGridSizeChanged($event)"
-                                                (gridReady)="onErrorsTopGridReady($event)">
+                                                (gridReady)="onErrorsTopGridReady($event)"
+                                                [suppressTabbing]="true"
+                                                [ensureDomOrder]="true">
                                         </ag-grid-angular>
                                     </div>
                                 </div>
@@ -102,7 +108,7 @@
                                             {{ selectedAll ? "All Samples" : "Samples for selected error"}}
                                         </div>
                                     </div>
-                                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="samplesBottomGrid">
+                                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix>
                                         <ag-grid-angular #samplesBottomGrid
                                                 class="ag-theme-fresh small-font full-width full-height"
                                                 [context]="context"
@@ -111,7 +117,9 @@
                                                 [enableColResize]="true"
                                                 [rowSelection]="'single'"
                                                 (gridSizeChanged)="onGridSizeChanged($event)"
-                                                (gridReady)="onSamplesBottomGridReady($event)">
+                                                (gridReady)="onSamplesBottomGridReady($event)"
+                                                [suppressTabbing]="true"
+                                                [ensureDomOrder]="true">
                                         </ag-grid-angular>
                                     </div>
                                 </div>
@@ -133,7 +141,7 @@
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="samplesTopGrid">
+                                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix>
                                         <ag-grid-angular #samplesTopGrid
                                                 class="ag-theme-fresh small-font full-width full-height"
                                                 [context]="context"
@@ -143,7 +151,9 @@
                                                 [rowSelection]="'single'"
                                                 (rowSelected)="selectASample($event)"
                                                 (gridSizeChanged)="onGridSizeChanged($event)"
-                                                (gridReady)="onSamplesTopGridReady($event)">
+                                                (gridReady)="onSamplesTopGridReady($event)"
+                                                [suppressTabbing]="true"
+                                                [ensureDomOrder]="true">
                                         </ag-grid-angular>
                                     </div>
                                 </div>
@@ -155,7 +165,7 @@
                                             {{ selectedAll ? "All Errors and Warnings" : "Errors and Warnings for Experiment"}}
                                         </div>
                                     </div>
-                                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="errorsBottomGrid">
+                                    <div class="full-width flex-grow padded-top" appAgGridHeaderA11yFix>
                                         <ag-grid-angular #errorsBottomGrid
                                                 class="ag-theme-fresh small-font full-width full-height"
                                                 [context]="context"
@@ -164,7 +174,9 @@
                                                 [enableColResize]="true"
                                                 [rowSelection]="'single'"
                                                 (gridSizeChanged)="onGridSizeChanged($event)"
-                                                (gridReady)="onErrorsBottomGridReady($event)">
+                                                (gridReady)="onErrorsBottomGridReady($event)"
+                                                [suppressTabbing]="true"
+                                                [ensureDomOrder]="true">
                                         </ag-grid-angular>
                                     </div>
                                 </div>
@@ -196,7 +208,7 @@
                                 <div class="full-width padded">
                                     Import Errors
                                 </div>
-                                <div class="full-width flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="finalErrorsGrid">
+                                <div class="full-width flex-grow" appAgGridHeaderA11yFix>
                                     <ag-grid-angular #finalErrorsGrid
                                             class="ag-theme-fresh small-font full-width full-height"
                                             [context]="context"
@@ -205,7 +217,9 @@
                                             [enableColResize]="true"
                                             [rowSelection]="'single'"
                                             (gridSizeChanged)="onGridSizeChanged($event)"
-                                            (gridReady)="onFinalErrorsGridReady($event)">
+                                            (gridReady)="onFinalErrorsGridReady($event)"
+                                            [suppressTabbing]="true"
+                                            [ensureDomOrder]="true">
                                     </ag-grid-angular>
                                 </div>
                             </div>

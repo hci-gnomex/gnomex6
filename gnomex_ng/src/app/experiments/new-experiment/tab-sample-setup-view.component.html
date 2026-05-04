@@ -362,7 +362,9 @@
                                                  [rowSelection]="'single'"
                                                  [enableColResize]="true"
                                                  [gridOptions]="bioanalyzerGridOptions"
-                                                 (gridReady)="this.onGridReady($event)">
+                                                 (gridReady)="this.onGridReady($event)"
+                                                 [suppressTabbing]="true"
+                                                 [ensureDomOrder]="true">
                                 </ag-grid-angular>
                             </div>
                         </div>

@@ -31,7 +31,7 @@
             <button mat-button (click)="this.addCriteria()" aria-label="Add new price criteria"><img [src]="'./assets/attach_add.png'" class="icon" alt="Add">New criteria</button>
             <button mat-button [disabled]="!this.selectedCriteria" (click)="this.removeCriteria()" aria-label="Remove selected price criteria"><img [src]="'./assets/delete.png'" class="icon" alt="Remove">Remove</button>
         </div>
-        <div class="grid-div" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="priceCriteriaGrid">
+        <div class="grid-div" appAgGridHeaderA11yFix>
             <ag-grid-angular #priceCriteriaGrid class="ag-theme-balham full-height full-width"
                              aria-label="Price criteria table"
                              (gridReady)="this.onGridReady($event)"
@@ -40,7 +40,9 @@
                              [singleClickEdit]="true"
                              [stopEditingWhenGridLosesFocus]="true"
                              [rowSelection]="'single'"
-                             [rowData]="this.criteria">
+                             [rowData]="this.criteria"
+                             [suppressTabbing]="true"
+                             [ensureDomOrder]="true">
             </ag-grid-angular>
         </div>
     </form>

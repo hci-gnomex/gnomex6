@@ -5,7 +5,7 @@
             {{ label }}
         </mat-label>
     </div>
-    <div class="flex-grow padded-bottom" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="pipelineGrid">
+    <div class="flex-grow padded-bottom" appAgGridHeaderA11yFix>
         <div #oneEmWidth class="no-height single-em"></div>
         <ag-grid-angular #pipelineGrid class="ag-theme-fresh full-height full-width"
                          [enableColResize]="true"
@@ -18,7 +18,9 @@
                          (gridReady)="onGridReady($event)"
                          (gridSizeChanged)="onGridSizeChanged($event)"
                          (rowDataChanged)="onNotifyGridRowDataChanged($event)"
-                         aria-label="Data pipeline work items">
+                         aria-label="Data pipeline work items"
+                         [suppressTabbing]="true"
+                         [ensureDomOrder]="true">
         </ag-grid-angular>
     </div>
     <div class="flex-container-row justify-center">

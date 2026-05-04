@@ -26,7 +26,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="assembledFlowCellsGrid">
+                <div class="flex-grow" appAgGridHeaderA11yFix>
                     <div #oneEmWidth1 class="no-height single-em"></div>
                     <ag-grid-angular #assembledFlowCellsGrid class="ag-theme-fresh full-height full-width min-grid-size"
                                      [enableColResize]="true"
@@ -40,7 +40,9 @@
                                      (gridSizeChanged)="onGridSizeChanged($event)"
                                      (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
                                      (rowSelected)="onRowSelected($event)"
-                                     aria-label="Assembled flow cells">
+                                     aria-label="Assembled flow cells"
+                                     [suppressTabbing]="true"
+                                     [ensureDomOrder]="true">
                     </ag-grid-angular>
                 </div>
             </div>
@@ -110,7 +112,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex-grow" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="finalizeFlowcellLanesGrid">
+                <div class="flex-grow" appAgGridHeaderA11yFix>
                     <div #oneEmWidth2 class="no-height single-em" aria-hidden="true"></div>
                     <ag-grid-angular #finalizeFlowcellLanesGrid class="ag-theme-fresh full-height full-width min-grid-size"
                                      [enableColResize]="true"
@@ -123,7 +125,9 @@
                                      (cellValueChanged) = "onCellValueChanged($event)"
                                      (gridReady)="onDetailGridReady($event)"
                                      (rowDataChanged)="this.onNotifyGridRowDataChanged($event)"
-                                     aria-label="Flow cell lanes">
+                                     aria-label="Flow cell lanes"
+                                     [suppressTabbing]="true"
+                                     [ensureDomOrder]="true">
                     </ag-grid-angular>
                 </div>
             </form>

@@ -13,16 +13,17 @@
             Add
         </button>
     </div>
-    <div *ngIf="showCollaboratorBlock" class="full-width flex-grow padded-top" role="region" aria-label="Current collaborators" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="collaboratorsGrid">
+    <div *ngIf="showCollaboratorBlock" class="full-width flex-grow padded-top" role="region" aria-label="Current collaborators" appAgGridHeaderA11yFix>
         <div #oneEmWidth class="no-height single-em" aria-hidden="true"></div>
         <ag-grid-angular #collaboratorsGrid class="ag-theme-fresh full-width full-height"
-                         role="grid"
                          aria-label="Collaborators list"
                          [context]="context"
                          [rowSelection]="'single'"
                          [rowDeselection]="true"
                          (gridReady)="onCollabGridReady($event)"
-                         (gridSizeChanged)="onGridSizeChanged($event)">
+                         (gridSizeChanged)="onGridSizeChanged($event)"
+                         [suppressTabbing]="true"
+                         [ensureDomOrder]="true">
         </ag-grid-angular>
     </div>
 </div>

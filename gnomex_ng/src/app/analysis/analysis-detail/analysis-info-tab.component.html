@@ -122,7 +122,7 @@
           </button>
         </div>
       </div>
-      <div class="flex-grow" role="region" aria-label="Genome builds list" appAgGridHeaderA11yFix appFocusManager [focusManagerGrid]="analysisGenomeBuildsGrid">
+      <div class="flex-grow" role="region" aria-label="Genome builds list" appAgGridHeaderA11yFix>
         <ag-grid-angular #analysisGenomeBuildsGrid class="ag-theme-balham full-height full-width min-grid-height"
                          [rowData]="form.controls['genomeBuildsJSONString'].value"
                          [rowSelection]="'single'"
@@ -130,7 +130,9 @@
                          (gridReady)="onGenomeBuildGridReady($event)"
                          (gridSizeChanged)="onGridSizeChanged($event)"
                          (rowClicked)="onGenomeBuildGridSelection($event)"
-                         aria-label="Genome builds data grid">
+                         aria-label="Genome builds data grid"
+                         [suppressTabbing]="true"
+                         [ensureDomOrder]="true">
         </ag-grid-angular>
       </div>
     </div>
