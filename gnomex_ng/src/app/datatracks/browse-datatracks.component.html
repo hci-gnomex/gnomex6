@@ -38,31 +38,36 @@
                 </div>
               </div>
               <div class="full-width flex-grow no-overflow left-right-padded" role="region" aria-label="Data track tree">
-                <div appFocusManager
-                     [focusManagerTree]="datatracksTree"
-                     [focusManagerDescribedBy]="'datatracks-tree-kb-instructions'"
+                <div
                      class="full-width full-height border">
                   <p id="datatracks-tree-kb-instructions" class="sr-only">
                     To move a data track without dragging: navigate to it with arrow keys,
-                    press Space to grab, navigate to the destination folder,
-                    then press Enter to drop. Press Escape to cancel.
+                    press Space to select it, then press F2 and Enter on the Move button
+                    to open the move dialog. You can also press Space to grab, navigate
+                    to the destination folder, then press Enter to drop. Press Escape to cancel.
                   </p>
-                  <tree-root #datatracksTree
+                  <tree-root appAccessibleTree
+                             #datatracksTree
                              [nodes]="items" [options]="options"
+                             [accessibleTreeIdPrefix]="'datatracks-tree'"
                              (activate)="treeOnSelect($event)"
                              (changeFilter)="treeChangeFilter($event)"
                              (updateData)="treeUpdateData($event)"
-                             role="tree"
+                             [attr.aria-describedby]="'datatracks-tree-kb-instructions'"
                              aria-label="Data track folders and tracks">
                     <ng-template #treeNodeTemplate let-node let-index="index">
-                      <div class="full-width no-word-wrap tree-node-font"
-                           role="treeitem"
-                           [attr.aria-label]="node.data.label"
-                           [attr.aria-roledescription]="nodeRoleDesc(node)"
-                           [attr.aria-selected]="isKbDropTarget(node) ? 'true' : null">
+                      <div appAccessibleTreeNode
+                           [treeNode]="node"
+                           [accessibleTreeNodeIdPrefix]="'datatracks-tree'"
+                           [accessibleTreeNodeRoleDescription]="nodeRoleDesc(node)"
+                           [accessibleTreeNodeSelected]="isKbDropTarget(node) || node.isActive"
+                           class="full-width no-word-wrap tree-node-font">
                         <img src="{{node.data.icon}}" alt="" aria-hidden="true" class="tree-node-icon icon">
                         <span>{{ node.data.label }}</span>
                         <button *ngIf="node.data.isDataTrackFolder || node.data.idDataTrack"
+                                appAccessibleTreeAction
+                                [treeNode]="node"
+                                [accessibleTreeActionIdPrefix]="'datatracks-tree'"
                                 class="sr-only-focusable"
                                 [attr.aria-label]="'Move ' + node.data.label"
                                 (click)="openMoveDialog(node, $event)">Move…</button>

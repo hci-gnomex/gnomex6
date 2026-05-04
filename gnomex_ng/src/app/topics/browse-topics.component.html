@@ -11,16 +11,21 @@
                     <div class="full-width full-height small-font border">
                         <div class="full-height full-width flex-container-col foreground" role="region" aria-label="Topics tree">
                             <div class="full-width flex-grow left-right-padded top-padded small-font no-overflow">
-                                <div appFocusManager [focusManagerTree]="topicsTree" class="full-width full-height border">
-                                    <tree-root #topicsTree
+                                <div class="full-width full-height border">
+                                    <tree-root appAccessibleTree
+                                               #topicsTree
                                                [nodes]="items"
                                                [options]="options"
+                                               [accessibleTreeIdPrefix]="'topics-tree'"
                                                (updateData)="onTreeUpdateData()"
                                                (moveNode)="onMoveNode($event)"
                                                (activate)="treeOnSelect($event)"
                                                aria-label="Topics">
                                         <ng-template #treeNodeTemplate let-node let-index="index">
-                                            <div class="full-width no-word-wrap tree-node-font">
+                                            <div appAccessibleTreeNode
+                                                 [treeNode]="node"
+                                                 [accessibleTreeNodeIdPrefix]="'topics-tree'"
+                                                 class="full-width no-word-wrap tree-node-font">
                                                 <img *ngIf="node.data.icon" src="{{node.data.icon}}" alt="" class="tree-node-icon icon">
                                                 <span>{{ node.data.label }}</span>
                                             </div>
@@ -112,14 +117,19 @@
                                     <div>
                                         <mat-label class="left-right-padded">{{countLabel}}</mat-label>
                                     </div>
-                                    <div appFocusManager [focusManagerTree]="dataTree" class="full-width flex-grow overflow-auto">
-                                        <tree-root #dataTree
+                                    <div class="full-width flex-grow overflow-auto">
+                                        <tree-root appAccessibleTree
+                                                   #dataTree
                                                    [nodes]="dataTreeItems"
                                                    [options]="dataTreeOptions"
+                                                   [accessibleTreeIdPrefix]="'topics-data-tree'"
                                                    (updateData)="onDataTreeUpdateData()"
                                                    aria-label="Available items to drag to topic">
                                             <ng-template #treeNodeTemplate let-node let-index="index">
-                                                <div class="tree-node-font">
+                                                <div appAccessibleTreeNode
+                                                     [treeNode]="node"
+                                                     [accessibleTreeNodeIdPrefix]="'topics-data-tree'"
+                                                     class="tree-node-font">
                                                     <img src="{{node.data.icon}}" class="tree-node-icon icon" alt="">
                                                     <span>{{ node.data.label }}</span>
                                                 </div>

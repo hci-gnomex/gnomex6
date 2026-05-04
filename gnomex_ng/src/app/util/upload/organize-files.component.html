@@ -36,34 +36,41 @@
                         Upload Files
                     </div>
                     <div class="full-width flex-grow left-right-padded overflow-auto">
-                        <div appFocusManager
-                             [focusManagerTree]="uploadTree"
-                             [focusManagerDescribedBy]="'upload-tree-kb-instructions'"
-                             class="full-height full-width border-subtle"
-                             role="tree"
+                        <div class="full-height full-width border-subtle"
                              aria-labelledby="upload-files-heading">
                             <p id="upload-tree-kb-instructions" class="sr-only">
                                 To move a file without dragging: navigate to it with arrow keys,
-                                press Space to grab, navigate to a folder in the Folder panel on the right,
-                                then press Enter to drop. Press Escape to cancel.
+                                press Space to select it, then press F2 and Enter on the Move button
+                                to open the move dialog. You can also press Space to grab, navigate
+                                to a folder in the Folder panel on the right, then press Enter to drop.
+                                Press Escape to cancel.
                             </p>
-                            <tree-root #uploadTree
+                            <tree-root appAccessibleTree
+                                       #uploadTree
                                        *ngIf="showFileTrees && uploadFiles"
                                        (activate)="uploadTreeOnSelect($event)"
                                        (deactivate)="uploadTreeOnUnselect($event)"
                                        [nodes]="uploadFiles"
-                                       [options]="uploadOpts">
+                                       [options]="uploadOpts"
+                                       [accessibleTreeIdPrefix]="'upload-files-tree'"
+                                       [attr.aria-describedby]="'upload-tree-kb-instructions'"
+                                       aria-label="Upload files">
                                 <ng-template #treeNodeTemplate let-node let-index="index">
-                                    <div class="truncate tree-node-font"
-                                         role="treeitem"
-                                         [attr.aria-label]="node.data.displayName"
-                                         [attr.aria-roledescription]="nodeRoleDesc(node, true)">
+                                    <div appAccessibleTreeNode
+                                         [treeNode]="node"
+                                         [accessibleTreeNodeIdPrefix]="'upload-files-tree'"
+                                         [accessibleTreeNodeLabel]="node.data.displayName"
+                                         [accessibleTreeNodeRoleDescription]="nodeRoleDesc(node, true)"
+                                         class="truncate tree-node-font">
                                         <img *ngIf="node.data.icon" class="icon tree-node-icon" src="{{ node.data.icon }}" alt="" aria-hidden="true">
                                         <span  [matTooltip]="node.data.displayName"
                                                 [ngStyle]="{'color': node.data.PROTECTED === 'Y' ? 'red' : 'black' }">
                                             {{ node.data.displayName }}
                                         </span>
                                         <button *ngIf="node.data.PROTECTED !== 'Y'"
+                                                appAccessibleTreeAction
+                                                [treeNode]="node"
+                                                [accessibleTreeActionIdPrefix]="'upload-files-tree'"
                                                 class="sr-only-focusable"
                                                 [attr.aria-label]="'Move ' + node.data.displayName + ' to folder'"
                                                 (click)="openMoveDialog(node, $event)">Move…</button>
@@ -81,11 +88,7 @@
                         Folder
                     </div>
                     <div class="full-width flex-grow left-right-padded overflow-auto">
-                        <div appFocusManager
-                             [focusManagerTree]="organizeTree"
-                             [focusManagerDescribedBy]="'organize-tree-kb-instructions'"
-                             class="full-height full-width border-subtle"
-                             role="tree"
+                        <div class="full-height full-width border-subtle"
                              aria-labelledby="folder-heading">
                             <p id="organize-tree-kb-instructions" class="sr-only">
                                 To move a file without dragging: navigate to the Upload Files panel,
@@ -93,20 +96,26 @@
                                 use arrow keys to reach a destination folder,
                                 then press Enter to drop. Press Escape to cancel.
                             </p>
-                            <tree-root #organizeTree
+                            <tree-root appAccessibleTree
+                                       #organizeTree
                                        *ngIf="showFileTrees && organizeFiles"
                                        (activate)="organizeTreeOnSelect($event)"
                                        (initialized)="initOrganizeTree($event)"
                                        (deactivate)="organizeTreeOnUnselect($event)"
                                        (moveNode)="onMove($event)"
                                        [nodes]="organizeFiles"
-                                       [options]="organizeOpts">
+                                       [options]="organizeOpts"
+                                       [accessibleTreeIdPrefix]="'organize-files-tree'"
+                                       [attr.aria-describedby]="'organize-tree-kb-instructions'"
+                                       aria-label="Folder">
                                 <ng-template #treeNodeTemplate let-node let-index="index">
-                                    <div class="truncate tree-node-font"
-                                         role="treeitem"
-                                         [attr.aria-label]="node.data.displayName"
-                                         [attr.aria-roledescription]="nodeRoleDesc(node, false)"
-                                         [attr.aria-selected]="isKbDropTarget(node) ? 'true' : null">
+                                    <div appAccessibleTreeNode
+                                         [treeNode]="node"
+                                         [accessibleTreeNodeIdPrefix]="'organize-files-tree'"
+                                         [accessibleTreeNodeLabel]="node.data.displayName"
+                                         [accessibleTreeNodeRoleDescription]="nodeRoleDesc(node, false)"
+                                         [accessibleTreeNodeSelected]="isKbDropTarget(node) || node.isActive"
+                                         class="truncate tree-node-font">
                                         <img *ngIf="node.data.icon" class="icon tree-node-icon" src="{{ node.data.icon }}" alt="" aria-hidden="true">
                                         <span [ngStyle]="{'color': node.data.PROTECTED === 'Y' ? 'red' : 'black' }" >
                                     {{ node.data.displayName }}

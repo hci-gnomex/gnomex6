@@ -2,8 +2,25 @@
     <button mat-button (click)="this.addProduct()"><img class="icon" [src]="'./assets/page_add.png'" alt="">Add Product</button>
     <button mat-button [disabled]="this.selectedProduct == null || this.selectedProduct.canDelete != 'Y'" (click)="this.removeProduct()"><img class="icon" [src]="'./assets/page_remove.png'" alt="">Remove Product</button>
 </div>
-<div appFocusManager [focusManagerTree]="tree" class="flex-container-row padded">
-    <tree-root  #tree class="flex-one margin-right border-right" [nodes]="this.nodes" [options]="this.options" (activate)="this.onActivate($event)"></tree-root>
+<div class="flex-container-row padded">
+    <tree-root appAccessibleTree
+               #tree
+               class="flex-one margin-right border-right"
+               [nodes]="this.nodes"
+               [options]="this.options"
+               [accessibleTreeIdPrefix]="'products-config-tree'"
+               (activate)="this.onActivate($event)"
+               aria-label="Products">
+        <ng-template #treeNodeTemplate let-node>
+            <div appAccessibleTreeNode
+                 [treeNode]="node"
+                 [accessibleTreeNodeIdPrefix]="'products-config-tree'"
+                 [accessibleTreeNodeLabel]="node?.data?.display"
+                 class="tree-node-font">
+                <span>{{ node?.data?.display }}</span>
+            </div>
+        </ng-template>
+    </tree-root>
     <div [hidden]="this.selectedProduct" class="flex-three">{{''}}</div>
     <form [formGroup]="this.productForm" class="flex-three flex-container-col" [hidden]="!this.selectedProduct" aria-label="Product details">
         <div class="flex-container-row full-width align-center">

@@ -36,10 +36,20 @@
         </div>
     </div>
     <div class="flex-container-row flex-ten padding-top" [hidden]="this.displayMode !== this.DISPLAY_DETAIL">
-        <div  appFocusManager [focusManagerTree]="tree" class="full-height flex-one border">
-            <tree-root #tree [nodes]="this.productOrderList" [options]="this.treeOptions" (activate)="this.onTreeActivate($event)" aria-label="Product orders">
+        <div class="full-height flex-one border">
+            <tree-root appAccessibleTree
+                       #tree
+                       [nodes]="this.productOrderList"
+                       [options]="this.treeOptions"
+                       [accessibleTreeIdPrefix]="'product-orders-tree'"
+                       (activate)="this.onTreeActivate($event)"
+                       aria-label="Product orders">
                 <ng-template #treeNodeTemplate  let-node>
-                    <div class="tree-node-font">
+                    <div appAccessibleTreeNode
+                         [treeNode]="node"
+                         [accessibleTreeNodeIdPrefix]="'product-orders-tree'"
+                         [accessibleTreeNodeLabel]="node?.data?.display"
+                         class="tree-node-font">
                         <img src="{{node?.data?.icon}}" class="icon tree-node-icon" alt="">
                         <span>{{ node?.data?.display }}</span>
                     </div>

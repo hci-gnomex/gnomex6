@@ -37,10 +37,20 @@
                                             </div>
                                         </div>
                                         <div class="flex-grow overflow-auto padded">
-                                            <div appFocusManager [focusManagerTree]="tree" class="full-height full-width overflow-auto bordered">
-                                                <tree-root #tree [nodes]="billingItemsTreeNodes" [options]="billingItemsTreeOptions" (activate)="onBillingItemsTreeActivate($event)" role="tree" aria-label="Billing items tree">
+                                            <div class="full-height full-width overflow-auto bordered">
+                                                <tree-root appAccessibleTree
+                                                           #tree
+                                                           [nodes]="billingItemsTreeNodes"
+                                                           [options]="billingItemsTreeOptions"
+                                                           [accessibleTreeIdPrefix]="'billing-items-tree'"
+                                                           (activate)="onBillingItemsTreeActivate($event)"
+                                                           aria-label="Billing items tree">
                                                     <ng-template #treeNodeTemplate  let-node>
-                                                        <div class="flex-container-row tree-node-font ellipsis" role="treeitem" [attr.aria-label]="node?.data?.display">
+                                                        <div appAccessibleTreeNode
+                                                             [treeNode]="node"
+                                                             [accessibleTreeNodeIdPrefix]="'billing-items-tree'"
+                                                             [accessibleTreeNodeLabel]="node?.data?.display"
+                                                             class="flex-container-row tree-node-font ellipsis">
                                                             <img [src]="node?.data?.icon" [attr.alt]="node?.data?.display ? node.data.display + ' icon' : ''" class="icon tree-node-icon">
                                                             <div [ngStyle]="{'background-color': node.data?.expiring ? '#ff4d4d' : 'transparent' }"
                                                                  [matTooltip]="node.data?.expiring"
@@ -70,7 +80,7 @@
                                 </div>
                             </mat-tab>
                             <mat-tab label="Prices">
-                                <div class="full-height full-width flex-container-col overflow-auto" appFocusManager [toolbarSelector]="'price-toolbar'" >
+                                <div class="full-height full-width flex-container-col overflow-auto" >
                                     <div>
                                         <button *ngFor="let sheet of priceTreeGridData" mat-button class="minimize smaller-font price-sheet-link" (click)="jumpToPriceSheet(sheet.idPriceSheet)">{{sheet.display}}</button>
                                     </div>

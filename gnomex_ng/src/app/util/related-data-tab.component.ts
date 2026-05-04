@@ -11,12 +11,20 @@ import {DialogsService, DialogType} from "./popup/dialogs.service";
     template: `
         <div style="display:flex; height:100%;" role="region" aria-label="Related data">
             <ng-container *ngFor="let key of relatedKeys">
-                <div appFocusManager class="flex-item-tree" [matTooltip]="this.treeNameLookup[key]" *ngIf="this.relatedObjects[key]?.length > 0"
+                <div class="flex-item-tree" [matTooltip]="this.treeNameLookup[key]" *ngIf="this.relatedObjects[key]?.length > 0"
                      role="region" [attr.aria-label]="treeNameLookup[key] + ' tree'">
-                    <tree-root [nodes]="this.relatedObjects[key]" [options]="options" (activate)="onActivateTree($event)"
-                               role="tree" [attr.aria-label]="treeNameLookup[key]">
+                    <tree-root appAccessibleTree
+                               [nodes]="this.relatedObjects[key]"
+                               [options]="options"
+                               (activate)="onActivateTree($event)"
+                               [accessibleTreeIdPrefix]="'related-data-' + key"
+                               [attr.aria-label]="treeNameLookup[key]">
                         <ng-template #treeNodeTemplate let-node >
-                            <div class="tree-node-font" role="treeitem" [attr.aria-label]="node?.data?.label">
+                            <div appAccessibleTreeNode
+                                 [treeNode]="node"
+                                 [accessibleTreeNodeIdPrefix]="'related-data-' + key"
+                                 [accessibleTreeNodeLabel]="node?.data?.label"
+                                 class="tree-node-font">
                                 <img src="{{node?.data?.icon}}" class="tree-node-icon icon" alt="" aria-hidden="true">
                                 <span>{{ node?.data?.label }}</span>
                             </div>

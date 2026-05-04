@@ -24,8 +24,10 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                 <div class="flex-container-row align-center justify-space-between">
                     <label id="download-instructions">
                         Drag files or folders that you want to download. Hold CTRL or SHIFT key to select multiple.
-                        Keyboard: navigate with arrow keys, press Space to grab a file,
-                        navigate to the other panel, then press Enter to move it. Press Escape to cancel.
+                        Keyboard: navigate with arrow keys and press Space to select a file.
+                        Press F2, then Enter on the Add or Remove button to move it between panels.
+                        You can also press Space to grab, navigate to the other panel, then press Enter to move it.
+                        Press Escape to cancel.
                     </label>
                     <context-help name="downloadhelp"
                                   label="Download Help"
@@ -40,24 +42,30 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                                 <label id="available-files-label">
                                     Available Files
                                 </label>
-                                <div appFocusManager class="flex-grow" ondrop="permitDrop($event)" (dragover)="onRemoveFromDownload($event)">
-                                    <tree-root #availableFilesTreeComponent
+                                <div class="flex-grow" ondrop="permitDrop($event)" (dragover)="onRemoveFromDownload($event)">
+                                    <tree-root appAccessibleTree
+                                               #availableFilesTreeComponent
                                                [nodes]="availableFilesNodes"
                                                [options]="filesOptions"
                                                (initialized)="initOrganizeTree($event)"
-                                               role="tree"
+                                               [accessibleTreeIdPrefix]="'available-files-tree'"
                                                aria-label="Available files tree">
                                         <ng-template #treeNodeTemplate let-node draggable="true">
-                                            <div class="flex-container-row tree-node-font"
-                                                 role="treeitem"
-                                                 [attr.aria-label]="node.data.displayName"
-                                                 [attr.aria-roledescription]="nodeRoleDesc(node)"
-                                                 [attr.aria-selected]="isKbDropTarget(node) ? 'true' : null">
+                                            <div appAccessibleTreeNode
+                                                 [treeNode]="node"
+                                                 [accessibleTreeNodeIdPrefix]="'available-files-tree'"
+                                                 [accessibleTreeNodeLabel]="node.data.displayName"
+                                                 [accessibleTreeNodeRoleDescription]="nodeRoleDesc(node)"
+                                                 [accessibleTreeNodeSelected]="isKbDropTarget(node) || node.isActive"
+                                                 class="flex-container-row tree-node-font">
                                                 <img [src]="node.data.icon" alt="" aria-hidden="true" class="icon tree-node-icon">
                                                 <div>
                                                     {{ node.data.displayName }}
                                                 </div>
-                                                <button class="sr-only-focusable"
+                                                <button appAccessibleTreeAction
+                                                        [treeNode]="node"
+                                                        [accessibleTreeActionIdPrefix]="'available-files-tree'"
+                                                        class="sr-only-focusable"
                                                         [attr.aria-label]="'Add ' + node.data.displayName + ' to download list'"
                                                         (click)="addToDownloadList(node, $event)">Add to download list</button>
                                             </div>
@@ -71,23 +79,29 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                                 <label id="files-to-download-label">
                                     Files to Download
                                 </label>
-                                <div appFocusManager class="flex-grow" ondrop="permitDrop($event)" (dragover)="onDropInDownload($event)">
-                                    <tree-root #filesToDownloadTreeComponent
+                                <div class="flex-grow" ondrop="permitDrop($event)" (dragover)="onDropInDownload($event)">
+                                    <tree-root appAccessibleTree
+                                               #filesToDownloadTreeComponent
                                                [nodes]="filesToDownloadNodes"
                                                [options]="filesOptions"
-                                               role="tree"
+                                               [accessibleTreeIdPrefix]="'files-to-download-tree'"
                                                aria-label="Files to download tree">
                                         <ng-template #treeNodeTemplate let-node draggable="true">
-                                            <div class="flex-container-row tree-node-font"
-                                                 role="treeitem"
-                                                 [attr.aria-label]="node.data.displayName"
-                                                 [attr.aria-roledescription]="nodeRoleDesc(node)"
-                                                 [attr.aria-selected]="isKbDropTarget(node) ? 'true' : null">
+                                            <div appAccessibleTreeNode
+                                                 [treeNode]="node"
+                                                 [accessibleTreeNodeIdPrefix]="'files-to-download-tree'"
+                                                 [accessibleTreeNodeLabel]="node.data.displayName"
+                                                 [accessibleTreeNodeRoleDescription]="nodeRoleDesc(node)"
+                                                 [accessibleTreeNodeSelected]="isKbDropTarget(node) || node.isActive"
+                                                 class="flex-container-row tree-node-font">
                                                 <img [src]="node.data.icon" alt="" aria-hidden="true" class="icon tree-node-icon">
                                                 <div>
                                                     {{ node.data.displayName }}
                                                 </div>
-                                                <button class="sr-only-focusable"
+                                                <button appAccessibleTreeAction
+                                                        [treeNode]="node"
+                                                        [accessibleTreeActionIdPrefix]="'files-to-download-tree'"
+                                                        class="sr-only-focusable"
                                                         [attr.aria-label]="'Remove ' + node.data.displayName + ' from download list'"
                                                         (click)="removeFromDownloadList(node, $event)">Remove from download list</button>
                                             </div>
@@ -284,9 +298,8 @@ export class DownloadFilesComponent extends BaseGenericContainerDialog implement
                     },
                     [KEYS.SPACE]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
                         $event.preventDefault();
-                        if (!this.treeKbMove.isGrabbing) {
-                            this.treeKbMove.grab(node, tree);
-                        }
+                        TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
+                        this.treeKbMove.grab(node, tree);
                     },
                     // Escape (keyCode 27) is not in the KEYS enum; use raw code
                     [27]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {

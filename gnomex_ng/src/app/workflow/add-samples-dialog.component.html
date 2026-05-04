@@ -16,11 +16,19 @@
                         </custom-combo-box>
                     </div>
                     <div class="full-width flex-grow left-right-padded overflow-auto">
-                        <div appFocusManager [focusManagerTree]="sampleTree" class="full-height full-width border-subtle" role="region" aria-label="Sample tree">
-                            <tree-root #sampleTree (activate)="onTreeSelected($event)"
-                                       [nodes]="itemList" [options]="options">
+                        <div class="full-height full-width border-subtle" role="region" aria-label="Sample tree">
+                            <tree-root appAccessibleTree
+                                       #sampleTree
+                                       (activate)="onTreeSelected($event)"
+                                       [nodes]="itemList"
+                                       [options]="options"
+                                       [accessibleTreeIdPrefix]="'sample-tree'"
+                                       aria-label="Samples">
                                 <ng-template #treeNodeTemplate let-node let-index="index">
-                                    <div class="truncate tree-node-font">
+                                    <div appAccessibleTreeNode
+                                         [treeNode]="node"
+                                         [accessibleTreeNodeIdPrefix]="'sample-tree'"
+                                         class="truncate tree-node-font">
                                         <img src="{{node.level === 3 ? this.constService.ICON_GREEN_BULLET : node.data.icon }}" class="tree-node-icon icon" alt="">
                                         <span [matTooltip]="node.data.label" >{{ node.data.label }}</span>
                                     </div>

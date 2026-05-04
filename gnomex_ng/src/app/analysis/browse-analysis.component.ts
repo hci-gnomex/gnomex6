@@ -94,20 +94,18 @@ import {MoveToDialogComponent, MoveToDialogResult, MoveToTarget} from "../util/m
 export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @ViewChild("analysisTree", {static: false}) treeComponent: TreeComponent;
-
+    public treeHasDomFocus = false;
 
     public readonly DRAG_AND_DROP_HINT: string =
         "Drag and drop to move analyses to another lab and/or group. " +
         "Hold Ctrl while dragging to copy to multiple groups. " +
-        "Keyboard alternative: navigate with arrow keys, press Space to grab an item, " +
-        "navigate to the destination group, then press Enter to drop " +
-        "(hold Ctrl+Enter to copy). Press Escape to cancel.";
+        "Keyboard alternative: navigate to an analysis with arrow keys, " +
+        "press F2, then press Enter on the Move button to open the move dialog.";
 
     public readonly KB_MOVE_INSTRUCTIONS: string =
         "To move an analysis without dragging: navigate to it with arrow keys, " +
-        "press Space to grab, navigate to the destination group, " +
-        "then press Enter to drop. Hold Ctrl and press Enter to copy instead. " +
-        "Press Escape to cancel.";
+        "press F2 on an analysis, " +
+        "then press Enter on the Move button to open the move dialog.";
     public showDragDropHint: boolean = false;
     public options: ITreeOptions;
 
@@ -194,6 +192,7 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
               },
               [KEYS.SPACE]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
                 $event.preventDefault();
+                TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
                 this._kbGrab(node);
               },
               // Escape (keyCode 27) is not in the KEYS enum; use raw code
@@ -369,6 +368,13 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
         });
 
     }
+
+  onTreeFocusIn() {
+    this.treeHasDomFocus = true;
+    if (this.treeModel && !this.treeModel.focusedNode) {
+      this.treeModel.focusNextNode();
+    }
+  }
 
 
     onTreeKeydown(event: KeyboardEvent): void {
@@ -799,9 +805,6 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
             && node.isLeaf
             && node.data.idAnalysis;
         if (!canDrag) { return; }
-        if (!node.isActive) {
-            TREE_ACTIONS.TOGGLE_ACTIVE(this.treeModel, node, {} as any);
-        }
         this.treeKbMove.grab(node, this.treeModel);
     }
 

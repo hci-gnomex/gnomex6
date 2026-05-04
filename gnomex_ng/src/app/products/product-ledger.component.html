@@ -18,8 +18,24 @@
             <div *ngIf="this.isAdminState" class="five-percent-height flex-container-row justify-end">
                 <button mat-button color="accent" (click)="this.addProduct()"><img [src]="'./assets/add.png'" class="icon" alt="">Add Product</button>
             </div>
-            <div appFocusManager [focusManagerTree]="tree" class="ninety-five-percent-height">
-                <tree-root #tree [nodes]="this.treeNodes" [options]="this.treeOptions" (activate)="this.onActivate($event)" aria-label="Products"></tree-root>
+            <div class="ninety-five-percent-height">
+                <tree-root appAccessibleTree
+                           #tree
+                           [nodes]="this.treeNodes"
+                           [options]="this.treeOptions"
+                           [accessibleTreeIdPrefix]="'products-tree'"
+                           (activate)="this.onActivate($event)"
+                           aria-label="Products">
+                    <ng-template #treeNodeTemplate let-node>
+                        <div appAccessibleTreeNode
+                             [treeNode]="node"
+                             [accessibleTreeNodeIdPrefix]="'products-tree'"
+                             [accessibleTreeNodeLabel]="node?.data?.display"
+                             class="tree-node-font">
+                            <span>{{ node?.data?.display }}</span>
+                        </div>
+                    </ng-template>
+                </tree-root>
             </div>
         </div>
         <div class="full-height flex-container-col flex-three padded">

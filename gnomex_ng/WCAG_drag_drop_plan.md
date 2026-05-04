@@ -45,7 +45,6 @@ Responsibilities:
 
 ### 1.2 Keyboard Interaction Pattern (per tree)
 
-Attach to each tree via the existing `appFocusManager` directive (extend it) or a new `appTreeDragKeyboard` directive.
 
 | Key | Action |
 |-----|--------|
@@ -253,5 +252,4 @@ Priority 3 (polish / correctness):
 
 - `aria-grabbed` / `aria-dropeffect` — not present, not needed (both are deprecated in ARIA 1.1)
 - `role="tree"` / `role="treeitem"` markup — already correct throughout
-- `appFocusManager` sentinel logic — works correctly, no changes needed for its Tab-escape behavior
 - The underlying `moveNode` business logic — keyboard and pointer alternatives call the same methods

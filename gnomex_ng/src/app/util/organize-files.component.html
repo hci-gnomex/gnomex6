@@ -36,15 +36,22 @@
                         Upload Files
                     </div>
                     <div class="full-width flex-grow left-right-padded overflow-auto">
-                        <div appFocusManager [focusManagerTree]="uploadTree" class="full-height full-width border-subtle" role="tree" aria-labelledby="upload-files-heading">
-                            <tree-root #uploadTree
+                        <div class="full-height full-width border-subtle" aria-labelledby="upload-files-heading">
+                            <tree-root appAccessibleTree
+                                       #uploadTree
                                        *ngIf="showFileTrees && uploadFiles"
                                        (activate)="uploadTreeOnSelect($event)"
                                        (deactivate)="uploadTreeOnUnselect($event)"
                                        [nodes]="uploadFiles"
-                                       [options]="uploadOpts">
+                                       [options]="uploadOpts"
+                                       [accessibleTreeIdPrefix]="'upload-files-tree'"
+                                       aria-label="Upload files">
                                 <ng-template #treeNodeTemplate let-node let-index="index">
-                                    <div class="truncate tree-node-font" role="treeitem" [attr.aria-label]="node.data.displayName">
+                                    <div appAccessibleTreeNode
+                                         [treeNode]="node"
+                                         [accessibleTreeNodeIdPrefix]="'upload-files-tree'"
+                                         [accessibleTreeNodeLabel]="node.data.displayName"
+                                         class="truncate tree-node-font">
                                         <img *ngIf="node.data.icon" class="icon tree-node-icon" src="{{ node.data.icon }}" alt="" aria-hidden="true">
                                         <span  [matTooltip]="node.data.displayName"
                                                 [ngStyle]="{'color': node.data.PROTECTED === 'Y' ? 'red' : 'black' }">
@@ -64,17 +71,24 @@
                         Folder
                     </div>
                     <div class="full-width flex-grow left-right-padded overflow-auto">
-                        <div appFocusManager [focusManagerTree]="organizeTree" class="full-height full-width border-subtle" role="tree" aria-labelledby="folder-heading">
-                            <tree-root #organizeTree
+                        <div class="full-height full-width border-subtle" aria-labelledby="folder-heading">
+                            <tree-root appAccessibleTree
+                                       #organizeTree
                                        *ngIf="showFileTrees && organizeFiles"
                                        (activate)="organizeTreeOnSelect($event)"
                                        (initialized)="initOrganizeTree($event)"
                                        (deactivate)="organizeTreeOnUnselect($event)"
                                        (moveNode)="onMove($event)"
                                        [nodes]="organizeFiles"
-                                       [options]="organizeOpts">
+                                       [options]="organizeOpts"
+                                       [accessibleTreeIdPrefix]="'organize-files-tree'"
+                                       aria-label="Folder">
                                 <ng-template #treeNodeTemplate let-node let-index="index">
-                                    <div class="truncate tree-node-font" role="treeitem" [attr.aria-label]="node.data.displayName">
+                                    <div appAccessibleTreeNode
+                                         [treeNode]="node"
+                                         [accessibleTreeNodeIdPrefix]="'organize-files-tree'"
+                                         [accessibleTreeNodeLabel]="node.data.displayName"
+                                         class="truncate tree-node-font">
                                         <img *ngIf="node.data.icon" class="icon tree-node-icon" src="{{ node.data.icon }}" alt="" aria-hidden="true">
                                         <span [ngStyle]="{'color': node.data.PROTECTED === 'Y' ? 'red' : 'black' }" >
                                     {{ node.data.displayName }}

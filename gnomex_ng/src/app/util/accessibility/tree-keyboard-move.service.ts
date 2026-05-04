@@ -16,7 +16,7 @@ export interface KeyboardGrabState {
  * Usage pattern in each tree component:
  *
  *   actionMapping.keys:
- *     [KEYS.SPACE] → this.treeKbMove.grab(node, tree)
+ *     [KEYS.SPACE] → TOGGLE_ACTIVE, then this.treeKbMove.grab(node, tree) when draggable
  *     [KEYS.ENTER] → if (isGrabbing) this.treeKbMove.tryDrop(…) else TOGGLE_EXPANDED
  *     [27]         → this.treeKbMove.cancel()        (Escape – not in KEYS enum)
  *

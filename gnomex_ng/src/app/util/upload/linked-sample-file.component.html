@@ -40,16 +40,24 @@
             <as-split-area [size]="this.expTreeSplitSize">
                 <div class="full-width full-height max-height flex-container-col border-subtle" role="region" aria-label="Experiment files tree"><!-- start tree container -->
                     <div class="full-width flex-grow left-right-padded overflow-auto">
-                        <div appFocusManager [focusManagerTree]="experimentFileTree" class="full-height full-width border-subtle" role="tree" aria-label="Experiment files">
-                            <tree-root *ngIf="showTree && experimentFiles.length > 0 "  #experimentFileTree
+                        <div class="full-height full-width border-subtle" role="region" aria-label="Experiment files">
+                            <tree-root appAccessibleTree
+                                       *ngIf="showTree && experimentFiles.length > 0 "
+                                       #experimentFileTree
                                        (activate)="experimentFileTreeOnSelect($event)"
                                        (deactivate)="experimentFileTreeOnUnselect($event)"
                                        (moveNode)="onMove($event)"
                                        (initialized)="onTreeInit($event)"
                                        [nodes]="experimentFiles"
-                                       [options]="expFileOpts">
+                                       [options]="expFileOpts"
+                                       [accessibleTreeIdPrefix]="'experiment-files-tree'"
+                                       aria-label="Experiment files">
                                 <ng-template #treeNodeTemplate let-node let-index="index">
-                                    <div class="truncate tree-node-font" role="treeitem" [attr.aria-label]="node.data.displayName">
+                                    <div appAccessibleTreeNode
+                                         [treeNode]="node"
+                                         [accessibleTreeNodeIdPrefix]="'experiment-files-tree'"
+                                         [accessibleTreeNodeLabel]="node.data.displayName"
+                                         class="truncate tree-node-font">
                                         <img *ngIf="node.data.icon" class="icon tree-node-icon" src="{{ node.data.icon }}" alt="" aria-hidden="true">
                                         <span> {{ node.data.displayName }} </span>
                                     </div>

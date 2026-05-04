@@ -184,12 +184,20 @@
                         </div>
                         <div class="flex-fill full-width maximum-size">
                             <div class="full-width full-height maximum-size box-border">
-                                <tree-root #searchResultsTree
+                                <tree-root appAccessibleTree
+                                           #searchResultsTree
                                            [nodes]="treeNodes"
                                            [options]="treeOptions"
+                                           [accessibleTreeIdPrefix]="'advanced-search-results-tree'"
+                                           aria-label="Search results"
                                            (activate)="treeOnSelect($event)">
                                     <ng-template #treeNodeTemplate let-node let-index="index">
-                                        <div style="display: table-cell; vertical-align: middle;" class="tree-node-font" role="treeitem" [attr.aria-label]="node.data.name">
+                                        <div appAccessibleTreeNode
+                                             [treeNode]="node"
+                                             [accessibleTreeNodeIdPrefix]="'advanced-search-results-tree'"
+                                             [accessibleTreeNodeLabel]="node.data.name"
+                                             style="display: table-cell; vertical-align: middle;"
+                                             class="tree-node-font">
                                             <img src="{{node.data.icon}}" [attr.alt]="node.data.name + ' icon'" class="tree-node-icon icon">
                                             <span style="padding-top: 0.2em;">{{ node.data.name }}</span>
                                         </div>

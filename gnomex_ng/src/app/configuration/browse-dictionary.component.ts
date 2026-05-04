@@ -53,13 +53,20 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                         </button>
                     </div>
                 </div>
-                <div appFocusManager class="tree-container">
-                    <tree-root #treeComponent
+                <div class="tree-container">
+                    <tree-root appAccessibleTree
+                               #treeComponent
                                (activate)="this.selectTreeItem($event)"
                                [nodes]="this.dictionaries"
-                               [options]="treeOptions">
+                               [options]="treeOptions"
+                               [accessibleTreeIdPrefix]="'dictionary-tree'"
+                               aria-label="Dictionaries">
                         <ng-template #treeNodeTemplate let-node>
-                            <div class="tree-node-font">
+                            <div appAccessibleTreeNode
+                                 [treeNode]="node"
+                                 [accessibleTreeNodeIdPrefix]="'dictionary-tree'"
+                                 [accessibleTreeNodeLabel]="node.data.display"
+                                 class="tree-node-font">
                                 <img src="{{node.data.icon}}" class="tree-node-icon icon">
                                 <span>{{node.data.display}}</span>
                             </div>

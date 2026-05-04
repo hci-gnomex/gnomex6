@@ -110,9 +110,6 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     if (isOrg && node.level <= 1) { return; } // root of organize tree is not draggable
 
     this.isLastSelectOrgTree = isOrg;
-    if (!node.isActive) {
-      TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, {} as any);
-    }
     this.treeKbMove.grab(node, tree);
   }
 
@@ -361,9 +358,8 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
       },
       [KEYS.SPACE]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
         $event.preventDefault();
-        if (!this.treeKbMove.isGrabbing) {
-          this._kbGrab(tree, node);
-        }
+        TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
+        this._kbGrab(tree, node);
       },
       // Escape (keyCode 27) is not in the KEYS enum; use raw code
       [27]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {

@@ -32,30 +32,34 @@
                                     </div>
                                 </div>
                             </div>
-                            <div appFocusManager
-                                 [focusManagerTree]="tree"
-                                 [focusManagerDescribedBy]="'exp-tree-kb-instructions'"
+                            <div
                                  class="full-width flex-grow left-right-padding no-overflow">
                                 <div class="full-width full-height border">
                                     <p id="exp-tree-kb-instructions" class="sr-only">{{KB_MOVE_INSTRUCTIONS}}</p>
-                                    <tree-root #tree
-                                               role="tree"
+                                    <tree-root appAccessibleTree
+                                               #tree
                                                aria-label="Experiments hierarchy"
+                                               [accessibleTreeIdPrefix]="'experiments-tree'"
                                                (moveNode)="onMoveNode($event)"
                                                (updateData)="treeUpdateData($event)"
                                                (activate)="treeOnSelect($event)"
                                                [(state)]="state"
                                                [nodes]="items"
-                                               [options]="options">
+                                               [options]="options"
+                                               [attr.aria-describedby]="'exp-tree-kb-instructions'">
                                         <ng-template #treeNodeTemplate let-node let-index="index">
-                                            <div class="full-width no-word-wrap tree-node-font"
-                                                 role="treeitem"
-                                                 [attr.aria-label]="node.data.label"
-                                                 [attr.aria-roledescription]="nodeRoleDesc(node)"
-                                                 [attr.aria-selected]="isKbDropTarget(node) ? 'true' : null">
+                                            <div appAccessibleTreeNode
+                                                 [treeNode]="node"
+                                                 [accessibleTreeNodeIdPrefix]="'experiments-tree'"
+                                                 [accessibleTreeNodeRoleDescription]="nodeRoleDesc(node)"
+                                                 [accessibleTreeNodeSelected]="isKbDropTarget(node) || node.isActive"
+                                                 class="full-width no-word-wrap tree-node-font">
                                                 <img src="{{ node?.data?.icon ? node.data.icon : 'assets/flask.png' }}" alt="" aria-hidden="true" class="tree-node-icon icon">
                                                 <span>{{ node.data.label }}</span>
                                                 <button *ngIf="node.isLeaf && node.data.idRequest && !createSecurityAdvisorService.isGuest"
+                                                        appAccessibleTreeAction
+                                                        [treeNode]="node"
+                                                        [accessibleTreeActionIdPrefix]="'experiments-tree'"
                                                         class="sr-only-focusable"
                                                         [attr.aria-label]="'Move ' + node.data.label"
                                                         (click)="openMoveDialog(node, $event)">Move…</button>

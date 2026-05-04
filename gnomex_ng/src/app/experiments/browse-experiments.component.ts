@@ -123,13 +123,14 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
 
     public readonly DRAG_DROP_HINT: string =
         'Drag and drop to move an experiment to another group. ' +
-        'Keyboard alternative: navigate with arrow keys, press Space to grab an item, ' +
-        'navigate to the destination folder, then press Enter to drop. Press Escape to cancel.';
+        'Keyboard alternative: navigate with arrow keys and press Space to select an item. ' +
+        'For experiment move options, press F2, then Enter on the Move button.';
 
     public readonly KB_MOVE_INSTRUCTIONS: string =
         'To move an experiment without dragging: navigate to it with arrow keys, ' +
-        'press Space to grab, navigate to the destination folder, ' +
-        'then press Enter to drop. Press Escape to cancel.';
+        'press Space to select it, then press F2 and Enter on the Move button ' +
+        'to open the move dialog. You can also press Space to grab, navigate ' +
+        'to the destination folder, then press Enter to drop. Press Escape to cancel.';
     public showDragDropHint = false;
     private currentItem: any;
     private targetItem: any;
@@ -202,12 +203,8 @@ export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewI
               },
               [KEYS.SPACE]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
                 $event.preventDefault();
-                if (this.treeKbMove.isGrabbing) {
-                  // Second Space press: replace grab with the current node
-                  this._kbGrab(node);
-                } else {
-                  this._kbGrab(node);
-                }
+                TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
+                this._kbGrab(node);
               },
               // Escape (keyCode 27) is absent from the KEYS enum; use raw code
               [27]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {

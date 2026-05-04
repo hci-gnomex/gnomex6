@@ -214,6 +214,7 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
           },
           [KEYS.SPACE]: (tree: TreeModel, node: TreeNode, $event: KeyboardEvent) => {
             $event.preventDefault();
+            TREE_ACTIONS.TOGGLE_ACTIVE(tree, node, $event);
             this._kbGrab(node);
           },
           // Escape (keyCode 27) is not in the KEYS enum; use raw code
@@ -275,9 +276,6 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     const canDrag = !this.createSecurityAdvisorService.isGuest
         && (node.data.isDataTrackFolder || node.data.idDataTrack);
     if (!canDrag) { return; }
-    if (!node.isActive) {
-      TREE_ACTIONS.TOGGLE_ACTIVE(this.treeModel, node, {} as any);
-    }
     this.treeKbMove.grab(node, this.treeModel);
   }
 
