@@ -1,10 +1,7 @@
 package hci.gnomex.api;
 
 import hci.gnomex.model.AppUser;
-import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.DuoPolicy;
-import hci.gnomex.utility.HibernateSession;
-import hci.gnomex.utility.PropertyDictionaryHelper;
 import hci.ri.auth.util.JwtGenerator;
 import hci.ri.auth.util.KeystoreRSASignatureConfiguration;
 import io.buji.pac4j.subject.Pac4jPrincipal;
@@ -13,22 +10,17 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.env.IniWebEnvironment;
 import org.apache.shiro.web.util.WebUtils;
-import org.hibernate.Session;
 import org.pac4j.core.profile.CommonProfile;
 import org.pac4j.core.profile.jwt.JwtClaims;
 import org.pac4j.jwt.profile.JwtProfile;
 
-import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Date;
 //import org.pac4j.saml.credentials.authenticator.SAML2Authenticator;
 
 /**
@@ -95,19 +87,22 @@ public class TokenResource {
             }
 
             // ===============================
-            // 4. Duo Gate Check (with exception for External Users)
+            // 4. Duo Gate Check (with exceptions for External Users and Duo exception users)
             // ===============================
             if (DuoPolicy.isDuoEnabled()) {
                 AppUser appUser = getAppUserFromPrincipal(principals); // Retrieve the user from principals
 
-                // If the user is not external, enforce Duo authentication
+                // For non-external users, only the exception list can bypass Duo verification.
                 if (!"Y".equals(appUser.getIsExternalUser())) {
-                    // Check if Duo authentication is already completed
-                    org.apache.shiro.session.Session shiroSession = subject.getSession(false);
-                    Object duoOk = (shiroSession != null) ? shiroSession.getAttribute("DUO_OK") : null;
+                    String authenticatedUsername = getAuthenticatedUsername(principals);
+                    if (!DuoPolicy.isDuoExceptionUser(authenticatedUsername)) {
+                        // Check if Duo authentication is already completed
+                        org.apache.shiro.session.Session shiroSession = subject.getSession(false);
+                        Object duoOk = (shiroSession != null) ? shiroSession.getAttribute("DUO_OK") : null;
 
-                    if (!Boolean.TRUE.equals(duoOk)) {
-                        return error(403, "Duo verification required (DUO_OK missing or false)");
+                        if (!Boolean.TRUE.equals(duoOk)) {
+                            return error(403, "Duo verification required (DUO_OK missing or false)");
+                        }
                     }
                 }
             }
@@ -172,6 +167,23 @@ public class TokenResource {
         }
 
         return appUser;
+    }
+
+    private String getAuthenticatedUsername(PrincipalCollection principals) {
+        Pac4jPrincipal pjp = principals.oneByType(Pac4jPrincipal.class);
+        if (pjp != null && pjp.getProfile() != null) {
+            Object uid = getAttributeFromProfile(pjp.getProfile(), "uid");
+            if (uid != null && !String.valueOf(uid).trim().isEmpty()) {
+                return String.valueOf(uid).trim();
+            }
+        }
+
+        String login = principals.oneByType(String.class);
+        if (login != null && !login.trim().isEmpty()) {
+            return login.trim();
+        }
+
+        return null;
     }
 
     private Object getAttributeFromProfile(CommonProfile profile, String attributeName) {

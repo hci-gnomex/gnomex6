@@ -19,7 +19,6 @@ import javax.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 public class DuoResource {
 
-
     @GET
     @Path("/config")
     public Response config() throws Exception {
