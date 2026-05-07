@@ -88,6 +88,16 @@
   padding-right: 4px !important;
 }
 
+.ag-theme-fresh .ag-row-selected {
+  background-color: deepskyblue !important;
+}
+
+.ag-header-cell-text {
+  text-overflow: clip !important;
+  overflow: visible !important;
+  white-space: normal !important;
+}
+
 // angular-split gutter styles
 .white-split-gutter .as-split-gutter.ng-star-inserted {
   background-color: white !important;

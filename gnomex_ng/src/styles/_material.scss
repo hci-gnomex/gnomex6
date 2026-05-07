@@ -30,3 +30,20 @@ mat-tab-group.flex-style mat-tab-header .mat-tab-label-container .mat-tab-list .
 .mat-tab-body-wrapper {
   flex-grow: 1 !important;
 }
+
+// Active tab label — compact style used across detail views
+.mat-tab-label.mat-tab-label-active {
+  min-width: 0 !important;
+  font-size: 12px !important;
+}
+
+// Compact checkboxes in grid contexts
+.mat-checkbox .mat-checkbox-layout {
+  padding: 0;
+  margin: 0;
+}
+
+.mat-checkbox .mat-checkbox-inner-container {
+  height: 15px;
+  width: 15px;
+}

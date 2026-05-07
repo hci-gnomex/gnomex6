@@ -117,13 +117,3 @@ ol.three-depth-numbering li ol li ol li::before {
 textarea.mat-input-element:disabled {
     color: rgba(88, 88, 88, 1);
 }
-
-::ng-deep .mat-checkbox .mat-checkbox-layout {
-    padding: 0;
-    margin: 0;
-}
-
-::ng-deep .mat-checkbox .mat-checkbox-inner-container {
-    height: 15px;
-    width: 15px;
-}
