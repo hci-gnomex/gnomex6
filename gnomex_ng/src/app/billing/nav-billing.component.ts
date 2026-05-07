@@ -55,34 +55,7 @@ import {TreeOptions} from "@circlon/angular-tree-component/lib/models/tree-optio
 @Component({
     selector: 'nav-billing',
     templateUrl: "./nav-billing.component.html",
-    styles: [`
-
-        .no-height { height: 0;  }
-        .single-em { width: 1em; }
-
-        .min-grid-width {
-            min-width: 27em;
-        }
-
-
-        mat-radio-button.filter-by-order-type-opt {
-            margin-right: 0.5em;
-        }
-
-        .padding-left {
-            padding-left: 1em;
-        }
-
-        .vertical-spacer {
-            height: 0.3em;
-        }
-
-        button.price-sheet-link {
-            margin: 0 1em;
-            padding: 0;
-            text-decoration: underline;
-        }
-    `]
+    styleUrls: ['./nav-billing.component.scss']
 })
 
 export class NavBillingComponent implements OnInit, OnDestroy {

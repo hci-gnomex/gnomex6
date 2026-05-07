@@ -10,14 +10,7 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
             </span>
         </div>
 	`,
-    styles: [`
-            .padding-right {padding-right: 1em} 
-            .fix-table { table-layout:fixed; }
-            .ellipsis {
-                overflow: hidden;
-                text-overflow: ellipsis;
-            }
-	`]
+    styleUrls: ['./url-annot-renderer.scss']
 }) export class UrlAnnotRenderer implements ICellRendererAngularComp {
     private params: any;
     value: string;

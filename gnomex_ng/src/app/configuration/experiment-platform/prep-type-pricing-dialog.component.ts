@@ -37,7 +37,6 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
             </form>
         </div>
     `,
-    styles: [``]
 })
 export class PrepTypePricingDialogComponent extends BaseGenericContainerDialog implements OnInit{
 

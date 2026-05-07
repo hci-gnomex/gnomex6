@@ -46,42 +46,7 @@ export const TOOLTIPS = Object.freeze({
 
 @Component({
     templateUrl: "./experiment-detail-overview.component.html",
-    styles: [`
-        .bordered {
-            border: 1px solid #e8e8e8;
-        }
-
-        .flex-container{
-            display: flex;
-            /*justify-content: space-between;*/
-            flex:1;
-            font-size:small;
-        }
-
-        .flexbox-column{
-            display:flex;
-            flex-direction:column;
-            height:100%;
-            width:100%;
-        }
-
-        .label-title{
-            margin-top: 0.2rem;
-            margin-bottom: 0;
-        }
-
-        .label-title-width {
-            width: 25rem;
-        }
-
-        .overflow {
-            overflow: auto;
-        }
-
-        .flex-grow-greater {
-            flex: 10;
-        }
-    `]
+    styleUrls: ["./experiment-detail-overview.component.scss"]
 })
 export class ExperimentDetailOverviewComponent implements OnInit, OnDestroy, AfterViewInit {
     public toolTips: any = TOOLTIPS;

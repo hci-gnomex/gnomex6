@@ -73,11 +73,7 @@ import {DictionaryService} from "../../services/dictionary.service";
 
         </div>
     `,
-    styles:[`
-        mat-form-field.medium-form-input{
-            width: 40em;
-        }
-    `]
+    styleUrls: ["./ep-pipeline-protocol-tab.component.scss"]
 })
 
 export class EpPipelineProtocolTabComponent implements OnInit, OnDestroy{

@@ -5,22 +5,7 @@ import {MatDialog} from "@angular/material/dialog";
 
 @Component({
     templateUrl: "./select.editor.html",
-    styles: [`
-        .full-width  { width:  100%; }
-        .full-height { height: 100%; }
-
-        .flex-column-container {
-            display: flex;
-            flex-direction: row;
-        }
-        .flex-row  {
-            display: flex;
-        }
-        .flex-stretch {
-            display:flex;
-            flex: 1;
-        }
-    `]
+    styleUrls: ['./seqllib-select.editor.scss']
 }) export class SeqLibSelectEditor extends SelectEditor {
     codeRequestCategory: string;
 

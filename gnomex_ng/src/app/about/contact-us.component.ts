@@ -7,15 +7,7 @@ import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-d
 @Component({
     selector: 'contact-us',
     templateUrl: "./contact-us.component.html",
-    styles: [`
-        div.flex-container-col {
-            display: flex;
-            flex-direction: column;
-        }
-        .margin-left {
-            margin-left: 3rem;
-        }
-    `]
+    styleUrls: ['./contact-us.component.scss']
 })
 export class ContactUsComponent extends BaseGenericContainerDialog implements OnInit {
     public bugContact: any;

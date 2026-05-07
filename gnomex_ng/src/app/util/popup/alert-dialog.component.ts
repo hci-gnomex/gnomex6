@@ -54,65 +54,7 @@ import {DialogType} from "./dialogs.service";
             </mat-dialog-actions>
         </div>
     `,
-    styles: [`
-        hr {
-            width: 98%;
-        }
-
-        .i-margin {
-            margin-left:  0.3em;
-            margin-right: 0.3em;
-        }
-        .i-color-blue {
-            color: var(--bluewarmvivid-medlight);
-        }
-        .i-color-red  {
-            color: red;
-        }
-
-        .centered-text { text-align: center; }
-
-        .no-padding{
-            padding:0;
-
-        }
-
-        .no-margin{
-            margin: 0;
-        }
-
-        .grabbable {
-            cursor: move;
-            cursor: grab;
-            cursor: grab;
-            cursor: grab;
-        }
-        .grabbed {
-            cursor: move;
-            cursor: grabbing;
-            cursor: grabbing;
-            cursor: grabbing;
-        }
-
-        .force-flex-container-row{
-            display:flex !important;
-        }
-        .extra-padded {
-            padding: 0.6em 0.9em 0.6em 0.9em;
-        }
-        .large-size {
-            font-size: large;
-        }
-        .primary-action {
-            font-size: large;
-        }
-        .secondary-action {
-            font-size: large;
-        }
-        .message {
-            color: var(--bluecool-darkest);
-        }
-    `]
+    styleUrls: ["./alert-dialog.component.scss"]
 }) export class AlertDialogComponent implements OnInit {
     public type: any = DialogType;
 

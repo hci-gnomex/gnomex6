@@ -1,0 +1,10 @@
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.left-right-padded {
+    padding-left:  0.3em;
+    padding-right: 0.3em;
+}

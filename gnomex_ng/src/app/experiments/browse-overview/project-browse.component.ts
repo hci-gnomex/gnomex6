@@ -16,49 +16,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
 @Component({
     selector: "project-tab",
     templateUrl: "./project-browse.component.html",
-    styles: [`
-        :host /deep/ angular-editor#descEditor #editor {
-            resize: none;
-        }
-
-        :host /deep/ angular-editor#descEditor .angular-editor-button[title="Insert Image"],
-        :host /deep/ angular-editor#descEditor .angular-editor-button[title="Unlink"],
-        :host /deep/ angular-editor#descEditor .angular-editor-button[title="Horizontal Line"],
-        :host /deep/ angular-editor#descEditor #strikeThrough-descEditor,
-        :host /deep/ angular-editor#descEditor #subscript-descEditor,
-        :host /deep/ angular-editor#descEditor #superscript-descEditor,
-        :host /deep/ angular-editor#descEditor #link-descEditor,
-        :host /deep/ angular-editor#descEditor #underline-descEditor,
-        :host /deep/ angular-editor#descEditor #justifyLeft-descEditor,
-        :host /deep/ angular-editor#descEditor #justifyCenter-descEditor,
-        :host /deep/ angular-editor#descEditor #justifyRight-descEditor,
-        :host /deep/ angular-editor#descEditor #justifyFull-descEditor,
-        :host /deep/ angular-editor#descEditor #foregroundColorPicker-descEditor,
-        :host /deep/ angular-editor#descEditor #backgroundColorPicker-descEditor,
-        :host /deep/ angular-editor#descEditor #toggleEditorMode-descEditor,
-        :host /deep/ angular-editor#descEditor #customClassSelector-descEditor {
-            display: none;
-        }
-        
-        .dirtyWithSave{
-            display: flex;
-            justify-content: space-between;
-            margin-left: auto;
-            margin-top: 1em;
-            margin-bottom:1em;
-            padding-left: 1em;
-        }
-
-        .error-message{
-            color: red;
-        }
-
-        .project-field{
-            margin: 1em 1em 1em 1em;
-            width:100%;
-            resize:none;
-        }
-    `]
+    styleUrls: ["./project-browse.component.scss"]
 })
 export class ProjectBrowseTab extends PrimaryTab implements OnInit, OnDestroy {
     name = "project";

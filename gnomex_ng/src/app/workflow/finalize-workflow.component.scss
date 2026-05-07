@@ -1,0 +1,17 @@
+.title-color { color: #1601db; }
+
+.date-width {
+    width: 10em;
+}
+
+.run-width {
+    width: 5em;
+}
+
+.min-lab-width {
+    min-width: 3em;
+}
+
+.children-margin-right > *:not(:last-child) {
+    margin-right: 1em;
+}

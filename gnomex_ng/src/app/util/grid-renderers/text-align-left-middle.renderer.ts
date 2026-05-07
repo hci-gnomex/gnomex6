@@ -17,31 +17,7 @@ import {CellRendererValidation} from "./cell-renderer-validation";
 			</div>
 		</div>
 	`,
-	styles: [`		
-		
-		.t  { display: table; }
-		.tr { display: table-row; }
-		.td { display: table-cell; }
-			
-		.vertical-center { vertical-align: middle;   }
-		.left-align      { text-align:     left;     }
-		.padded          { padding:        0 0.3rem; }
-
-		.error {
-			background: linear-gradient(rgba(255,0,0,0.25), rgba(255,0,0,0.25), rgba(255,0,0,0.25));
-			border: solid red 2px;
-		}
-		
-		.bold { font-weight: bold; }
-			
-		.fix-table { table-layout:fixed; }
-
-		.ellipsis {
-			overflow: hidden;
-			text-overflow: ellipsis;
-		}
-		
-	`]
+	styleUrls: ['./text-align-left-middle.renderer.scss']
 })
 export class TextAlignLeftMiddleRenderer extends CellRendererValidation {
     value: string;

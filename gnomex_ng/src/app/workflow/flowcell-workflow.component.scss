@@ -1,0 +1,7 @@
+.reserved-space {
+    min-width: 12em;
+}
+
+.margin-children > *:not(:last-child) {
+    margin-right: 0.3em;
+}

@@ -15,14 +15,6 @@ import {AnalysisService} from "../../services/analysis.service";
       </form>
     </div>
   `,
-  styles: [`
-    :host /deep/ angular-editor #editor {
-      resize: none;
-    }
-    :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
-      display: none;
-    }
-  `]
 })
 export class AnalysisDescriptionTabComponent implements OnInit, OnChanges, AfterViewInit {
 

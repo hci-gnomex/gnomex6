@@ -189,34 +189,7 @@ import {ConstantsService} from "../../services/constants.service";
     </div>
   `
   ,
-  styles: [`
-
-    .spaced-children > *:not(:last-child) {
-      margin-right: 1em;
-    }
-    div.container {
-      width: 1100px;
-      min-width: 900px;
-    }
-    div.header {
-      margin-bottom: 25px;
-    }
-    form.main-form {
-      width: 900px;
-      padding: 10px;
-    }
-    div.text-body {
-      padding-top: 10px;
-      text-align: center;
-    }
-    .input-field {
-      width: 20em;
-    }
-    .approval-notice {
-      color: var(--red-darker);
-      font-size: large;
-    }
-  `]
+  styleUrls: ['./register-user.component.scss']
 })
 export class RegisterUserComponent  implements OnInit, OnDestroy{
   private registerUser: IRegisterUser;

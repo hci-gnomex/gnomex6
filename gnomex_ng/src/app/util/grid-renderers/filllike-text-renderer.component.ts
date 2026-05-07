@@ -14,19 +14,7 @@ import {TextAlignLeftMiddleRenderer} from "./text-align-left-middle.renderer";
 			</div>
 		</div>
 	`,
-    styles: [`
-			
-			.full-width  { width:  100% }
-			.full-height { height: 100% }
-			
-			.t  { display: table; }
-			.tr { display: table-row; }
-			.td { display: table-cell; }
-			
-			.vertical-center { vertical-align: middle;   }
-			.left-align      { text-align:     left;     }
-			.padded          { padding:        0 0.3rem; }
-	`]
+    styleUrls: ['./filllike-text-renderer.component.scss']
 })
 export class FilllikeTextRendererComponent extends TextAlignLeftMiddleRenderer {
     fillLikeAttribute: string;

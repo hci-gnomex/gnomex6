@@ -25,8 +25,6 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             </form>
         </div>
     `,
-    styles: [`
-    `]
 })
 export class AddProductWindowComponent extends BaseGenericContainerDialog implements OnInit {
     public form: FormGroup;

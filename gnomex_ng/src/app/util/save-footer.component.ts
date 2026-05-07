@@ -23,35 +23,7 @@ import {ActionType} from "./interfaces/generic-dialog-action.model";
             </div>
         </div>
     `,
-    styles: [`
-        .primary-action{
-            background-color: var(--bluewarmvivid-medlight);
-            font-weight: bolder;
-            color: white;
-        }
-        .secondary-action{
-            background-color: var(--sidebar-footer-background-color);
-            font-weight: bolder;
-            color: var(--bluewarmvivid-meddark);
-            border: var(--bluewarmvivid-meddark)  solid 1px;
-        }
-
-        .padded { padding: 0.3em; }
-
-        .major-left-right-margin {
-            margin-left:  0.5em;
-            margin-right: 0.5em;
-        }
-
-        .right-align {
-            text-align: right;
-            justify-content: flex-end;
-        }
-
-
-        .warning-background { background:#feec89; }
-
-    `]
+    styleUrls: ["./save-footer.component.scss"]
 })
 export class SaveFooterComponent implements OnInit,OnDestroy {
 

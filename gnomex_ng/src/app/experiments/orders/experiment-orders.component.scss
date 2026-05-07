@@ -1,0 +1,62 @@
+.most-width {
+    width: 80%;
+}
+
+.background {
+    background-color: #EEEEEE;
+    padding: 0.3em;
+    border-radius: 0.3em;
+    border: 1px solid darkgrey;
+    position: relative;
+}
+
+.flex-column-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-row-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.flex-stretch {
+    flex: 1;
+}
+
+.vertical-spacer {
+    height: 0.3em;
+    width: 0;
+}
+
+.title {
+    text-align: left;
+    font-size: medium;
+    width: 12em;
+}
+
+div.filter-bar label {
+    margin-bottom: 0;
+}
+
+div.radioGroup input {
+    margin-left: 0.7rem;
+}
+
+div.lower-panel {
+    border: 1px solid darkgrey;
+    background-color: white;
+    padding: 0.3em;
+    display: block;
+}
+
+div.grid-footer {
+    display: block;
+    width: 100%;
+    margin-top: 0.3em;
+    padding: 0 0.8em;
+}
+
+div.button-container {
+    padding: 0.2em 0 0.2em 0.6em;
+}

@@ -70,8 +70,6 @@ import {Experiment} from "../../util/models/experiment.model";
             </as-split>
         </div>
     `,
-    styles: [`
-    `],
 })
 export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
     @ViewChild("lanesGrid", {static: false}) lanesGrid: AgGridAngular;

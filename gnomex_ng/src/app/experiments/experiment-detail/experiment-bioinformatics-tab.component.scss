@@ -1,0 +1,46 @@
+.margin-top {
+    margin-top: 0.5rem;
+}
+
+.label {
+    color: darkblue;
+    font-style: italic;
+    padding: 0.3em;
+}
+
+.label-width {
+    min-width: 12em;
+}
+
+.medium-width {
+    width: 24em;
+}
+
+.min-size {
+    width: fit-content;
+}
+
+.margin {
+    margin: 0 2em;
+}
+
+.disabled-color {
+    color: #646464;
+}
+
+.highlight {
+    background-color: #FFFEB3;
+}
+
+.disable-bordered {
+    border: 1px solid #E0E0E0;
+}
+
+.enable-bordered {
+    border: 1px solid #A0A0A0;
+}
+
+.link-button {
+    color: blue;
+    text-decoration: underline;
+}

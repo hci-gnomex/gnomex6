@@ -5,7 +5,6 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
 @Component({
     selector: "add-additional-accounts",
     templateUrl: "./add-additional-accounts.component.html",
-    styles: [``]
 })
 export class AddAdditionalAccountsComponent implements OnInit {
 

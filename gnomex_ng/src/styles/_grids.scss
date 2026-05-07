@@ -1,0 +1,100 @@
+// ag-Grid theme overrides and angular-split gutter styles
+
+.ag-theme-balham .annotationRequiredRow {
+  font-weight: bold !important;
+  font-style: italic !important;
+  color: black !important;
+}
+
+.ag-theme-balham .annotationActiveRow {
+  font-style: normal !important;
+  color: black !important;
+}
+
+.ag-theme-balham .annotationInactiveRow {
+  font-style: italic !important;
+  color: #647478 !important;
+}
+
+.ag-theme-balham .otherBillingItem {
+  font-style: italic !important;
+  color: grey !important;
+}
+
+.ag-theme-balham .workFlowOnColor {
+  background-color: #f1eed6 !important;
+}
+
+.ag-theme-balham .workFlowOffColor {
+  background-color: white !important;
+}
+
+.ag-theme-balham .workFlowSelectedColor {
+  background-color: deepskyblue !important;
+}
+
+.ag-theme-fresh .annotationRequiredRow {
+  font-weight: bold !important;
+  font-style: italic !important;
+  color: black !important;
+}
+
+.ag-theme-fresh .annotationActiveRow {
+  font-style: normal !important;
+  color: black !important;
+}
+
+.ag-theme-fresh .annotationInactiveRow {
+  font-style: italic !important;
+  color: #647478 !important;
+}
+
+.ag-theme-fresh .otherBillingItem {
+  font-style: italic !important;
+  color: grey !important;
+}
+
+.ag-theme-fresh .workFlowOnColor {
+  background-color: #f1eed6 !important;
+}
+
+.ag-theme-fresh .workFlowOffColor {
+  background-color: white !important;
+}
+
+.ag-theme-fresh .workFlowSelectedColor {
+  background-color: deepskyblue !important;
+}
+
+.ag-theme-fresh {
+  font: 300 10px "Arial", sans-serif !important;
+}
+
+.ag-theme-fresh .ag-cell {
+  padding-left: 2px !important;
+  padding-right: 2px !important;
+}
+
+.ag-theme-fresh .ag-header-cell-label {
+  width: 100% !important;
+}
+
+.ag-theme-fresh .ag-header {
+  font: 300 10px "Arial", sans-serif !important;
+}
+
+.ag-theme-fresh .ag-header-cell, .ag-theme-fresh .ag-header-group-cell {
+  padding-left: 4px !important;
+  padding-right: 4px !important;
+}
+
+// angular-split gutter styles
+.white-split-gutter .as-split-gutter.ng-star-inserted {
+  background-color: white !important;
+}
+
+.silver-bordered-gutter .as-split-gutter.ng-star-inserted {
+  border-style: solid !important;
+  border-color: silver !important;
+  border-width: 0 1px 0 1px !important;
+}

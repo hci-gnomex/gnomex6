@@ -35,44 +35,7 @@ import {DialogsService, DialogType} from "../popup/dialogs.service";
             </div>
         </div>
     `,
-    styles: [`
-        button.link-button {
-            background: none;
-            background-color: inherit;
-            color: #0000FF;
-            border: none;
-            padding: 0;
-            cursor: pointer;
-            margin-right: 0.6rem;
-        }
-        button.link-button:focus {
-            outline: none;
-        }
-
-        .button-container {
-            padding-left: 0.3rem;
-        }
-
-        .cursor { cursor: pointer; }
-
-        .full-width  { width:  100%; }
-        .full-height { height: 100%; }
-
-        .t  { display: table; }
-        .tr { display: table-row; }
-        .td { display: table-cell; }
-
-        .inline-block { display: inline-block; }
-        
-        .hidden { display: none; }
-
-        .vertical-center { vertical-align: middle; }
-
-        .name {
-            padding-left: 0.2rem;
-            text-decoration: underline;
-        }
-    `]
+    styleUrls: ['./upload-view-remove.renderer.scss']
 })
 export class UploadViewRemoveRenderer implements ICellRendererAngularComp {
     public params: any;

@@ -18,49 +18,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: 'product-orders',
     templateUrl: "./product-orders.component.html",
-    styles: [`
-        .flex-one {
-            flex: 1;
-        }
-        .flex-two {
-            flex: 2;
-        }
-        .flex-three {
-            flex: 3;
-        }
-        .flex-ten {
-            flex: 10;
-        }
-        .flex-thirteen {
-            flex: 13;
-        }
-        div.filter-col {
-            display: flex;
-            flex-direction: column;
-            width: 18em;
-        }
-        .padded {
-            padding: 0.5em;
-        }
-        .padding-top {
-            padding-top: 0.5em;
-        }
-        .border {
-            border: 1px gray solid;
-        }
-        .margin-right {
-            margin-right: 2em;
-        }
-        .reduced-font {
-            font-size: 13px;
-        }
-        .half-width {
-            width: 50%;
-        }
-        .italics {
-            font-style: italic;
-        }
-    `]
+    styleUrls: ['./product-orders.component.scss']
 })
 
 export class ProductOrdersComponent implements OnInit {

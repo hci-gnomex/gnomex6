@@ -7,19 +7,7 @@ import {Router} from "@angular/router";
 @Component({
     selector: 'billing-admin-tab',
     templateUrl: './billing-admin-tab.html',
-    styles: [`
-        
-        .form-width {
-            width: 45em;
-            min-width: 45em;
-            max-width: 100%;
-        }
-        
-        .edit-button {
-            color: blue;
-        }
-
-    `]
+    styleUrls: ['./billing-admin-tab.component.scss']
 })
 export class BillingAdminTabComponent implements OnInit {
     @Input()

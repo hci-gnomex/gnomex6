@@ -1,5 +1,6 @@
 /*!
- * Start of CSS styling from Mark Reynolds
+ * CSS custom properties (design tokens) — originally from gnomex-app-color.scss
+ * by Mark Reynolds
  */
 :root {
   /* ----------------------------------------- 1ST LEVEL ----------------------------------------- */
@@ -393,6 +394,3 @@
 
   --footer-background-color: var(--greycool-lighter);
 }
-/*!
- * End of CSS styling from Mark Reynolds
- */

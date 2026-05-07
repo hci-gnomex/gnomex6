@@ -18,18 +18,7 @@ import {HttpParams} from "@angular/common/http";
 @Component({
     selector: 'tab-visibility',
     templateUrl: './tab-visibility.component.html',
-    styles: [`
-
-
-        .vertical-spacer { 
-            width: 100%; 
-            height: 0.5em; 
-        }
-        
-        .extreme-left-padded { padding-left: 3em; }
-        
-        
-    `]
+    styleUrls: ["./tab-visibility.component.scss"]
 })
 export class TabVisibilityComponent implements OnInit, OnDestroy{
 

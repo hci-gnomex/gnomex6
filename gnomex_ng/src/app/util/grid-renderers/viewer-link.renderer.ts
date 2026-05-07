@@ -7,20 +7,7 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
             <button class="viewer-link-button" *ngIf="this.allow" (click)="this.onLinkClick()"><img [src]="this.icon"></button>
         </div>
 	`,
-    styles: [`
-        button.viewer-link-button {
-            height: 100%;
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            outline: none;
-        }
-	`]
+    styleUrls: ['./viewer-link.renderer.scss']
 })
 export class ViewerLinkRenderer implements ICellRendererAngularComp {
     public allow: boolean = false;

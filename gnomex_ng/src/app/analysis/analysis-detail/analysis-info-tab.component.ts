@@ -24,24 +24,7 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 @Component({
   selector: "analysis-info-tab",
   templateUrl: "analysis-info-tab.component.html",
-  styles: [`
-
-        .column-width {
-            min-width: 25em;
-            width: 35em;
-        }
-
-        .horizontal-spacer {
-            min-width: 2em;
-            max-width: 2em;
-            width: 2em;
-        }
-
-        .min-grid-height {
-            min-height: 8em;
-        }
-
-    `]
+  styleUrls: ["./analysis-info-tab.component.scss"]
 })
 export class AnalysisInfoTabComponent implements OnInit, OnDestroy, OnChanges {
   @Input() public isEditMode: boolean = false;

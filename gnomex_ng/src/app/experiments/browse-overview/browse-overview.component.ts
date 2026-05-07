@@ -52,16 +52,6 @@ import {DialogsService} from "../../util/popup/dialogs.service";
             </save-footer>
         </div>
     `,
-    styles: [`
-
-        /deep/ .mat-tab-body-wrapper {
-            flex: 1 !important;
-        }
-        .mat-tab-group-border{
-            border: 1px solid #e8e8e8;
-        }
-
-    `]
 })
 export class BrowseOverviewComponent implements OnInit, OnDestroy {
     @ViewChild(MatTabGroup, {static: true}) tabs: MatTabGroup;

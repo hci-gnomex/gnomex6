@@ -25,24 +25,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
 @Component({
     selector: "tab-annotation-view",
     templateUrl: "./tab-annotation-view.component.html",
-    styles: [`
-        
-        .short-width {
-            width: 10em;
-            min-width: 10em;
-        }
-        .moderate-width {
-            width: 40em;
-            min-width: 20em;
-        }
-        .min-height {
-            min-height: 20em;
-        }
-        .double-padded-top-bottom {
-            padding: 0.6em 0 0.6em 0;
-        }
-        
-    `]
+    styleUrls: ["./tab-annotation-view.component.scss"]
 })
 
 export class TabAnnotationViewComponent implements OnDestroy {

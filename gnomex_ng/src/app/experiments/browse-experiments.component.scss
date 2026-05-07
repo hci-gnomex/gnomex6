@@ -1,0 +1,42 @@
+.horizontal-center {
+    text-align: center;
+}
+
+.vertical-spacer {
+    height: 0.3em;
+    min-height: 0.3em;
+}
+
+.padding {
+    padding: 0.3em;
+}
+
+.left-right-padding {
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+}
+
+.major-left-right-padding {
+    padding-left: 1em;
+    padding-right: 0.3em;
+}
+
+.border {
+    border: #C8C8C8 solid thin;
+}
+
+.no-overflow {
+    overflow: hidden;
+}
+
+.no-word-wrap {
+    white-space: nowrap;
+}
+
+.allow-line-breaks {
+    white-space: pre-line;
+}
+
+.background-lightyellow {
+    background-color: lightyellow;
+}

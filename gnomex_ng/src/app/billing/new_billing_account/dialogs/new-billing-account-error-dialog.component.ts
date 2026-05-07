@@ -14,7 +14,6 @@ import {BaseGenericContainerDialog} from "../../../util/popup/base-generic-conta
 			</div>
 		</div>
 	`,
-	styles: [``]
 })
 export class NewBillingAccountErrorDialogComponent extends BaseGenericContainerDialog {
 

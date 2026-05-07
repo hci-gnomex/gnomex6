@@ -41,8 +41,6 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
             </div>
         </div>
     `,
-    styles: [`
-    `]
 })
 export class ExperimentBillingTabComponent implements OnInit {
 

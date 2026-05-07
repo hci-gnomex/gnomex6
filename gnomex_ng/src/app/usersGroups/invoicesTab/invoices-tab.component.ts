@@ -13,7 +13,6 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 @Component({
     selector: 'invoices-tab',
     templateUrl: './invoices-tab.html',
-    styles: [``],
 })
 export class InvoicesTabComponent implements OnInit {
     @Input() memberGroup: any;

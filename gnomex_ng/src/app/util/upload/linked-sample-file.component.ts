@@ -41,31 +41,7 @@ import {ActionType} from "../interfaces/generic-dialog-action.model";
 @Component({
     selector: "linked-sample-file",
     templateUrl: "./linked-sample-file.component.html",
-    styles: [`
-
-        .no-padding-dialog {
-            padding: 0;
-        }
-
-        .truncate{
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .no-overflow  { overflow: hidden; }
-
-        .secondary-action {
-            background-color: var(--sidebar-footer-background-color);
-            font-weight: bolder;
-            color: var(--bluewarmvivid-medlight);
-            border: var(--bluewarmvivid-medlight)  solid 1px;
-        }
-
-        .no-height { height: 0;  }
-        .single-em { width: 1em; }
-
-    `]
+    styleUrls: ["./linked-sample-file.component.scss"]
 })
 export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
 

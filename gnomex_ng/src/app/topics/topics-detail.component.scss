@@ -1,0 +1,17 @@
+.flex-container {
+    display: flex;
+    justify-content: space-between;
+    flex: 1;
+}
+
+.flexbox-column {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.formField {
+    width: 30%;
+    margin: 0 0.5em;
+}

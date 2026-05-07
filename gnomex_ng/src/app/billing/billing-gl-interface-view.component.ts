@@ -11,7 +11,6 @@ import {GDAction} from "../util/interfaces/generic-dialog-action.model";
             <input matInput placeholder="Journal Entry Revision" [formControl]="this.revisionFC" aria-label="Journal entry revision number" aria-required="true">
         </mat-form-field>
     `,
-    styles: [``]
 })
 
 export class BillingGlInterfaceViewComponent extends BaseGenericContainerDialog implements OnInit {

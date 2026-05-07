@@ -177,28 +177,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
             </as-split-area>
         </as-split>
     `,
-    styles: [`
-        .margin-left {
-            margin-left: 1em;
-        }
-        .margin-left-large {
-            margin-left: 2em;
-        }
-        .children-margin-bottom > *:not(:last-child) {
-            margin-bottom: 1em;
-        }
-        .children-margin-right > *:not(:last-child) {
-            margin-right: 1em;
-        }
-        .three-quarters-width {
-            width: 75%;
-        }
-        .details-note {
-            background: yellow;
-            border-radius: 0.3em;
-            padding: 0.3em;
-        }
-    `],
+    styleUrls: ['./track-usage.component.scss'],
 })
 
 export class TrackUsageComponent implements OnInit, OnDestroy {

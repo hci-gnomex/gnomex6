@@ -86,39 +86,7 @@ export interface MoveToDialogResult {
             <button mat-button (click)="cancel()" aria-label="Cancel move">Cancel</button>
         </mat-dialog-actions>
     `,
-    styles: [`
-        .move-target-list {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            max-height: 20em;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            min-width: 20em;
-        }
-        .move-target-item {
-            padding: 0.5em 1em;
-            cursor: pointer;
-            outline: none;
-        }
-        .move-target-item:hover {
-            background: rgba(0, 0, 0, 0.06);
-        }
-        .move-target-item:focus {
-            background: rgba(26, 115, 232, 0.12);
-            outline: 2px solid #1a73e8;
-            outline-offset: -2px;
-        }
-        .move-target-path {
-            color: #666;
-            font-size: 0.85em;
-        }
-        .move-copy-checkbox {
-            display: block;
-            margin-top: 1em;
-        }
-    `]
+    styleUrls: ["./move-to-dialog.component.scss"]
 })
 export class MoveToDialogComponent {
     copyMode = false;

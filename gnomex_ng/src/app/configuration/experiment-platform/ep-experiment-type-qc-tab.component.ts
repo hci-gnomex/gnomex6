@@ -68,11 +68,7 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
 
         </div>
     `,
-    styles:[`
-        .padded-checkbox{
-            padding-top: 1.25rem;
-        }
-    `]
+    styleUrls: ["./ep-experiment-type-qc-tab.component.scss"]
 })
 
 export class EpExperimentTypeQcTabComponent implements OnInit, OnDestroy{

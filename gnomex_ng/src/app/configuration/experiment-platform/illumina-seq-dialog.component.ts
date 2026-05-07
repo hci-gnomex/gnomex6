@@ -9,12 +9,7 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
 
 @Component({
     templateUrl: "illumina-seq-dialog.component.html",
-    styles: [`
-        .medium-form-input{
-            width: 20em;
-            margin-right: 1em;
-        }
-    `]
+    styleUrls: ["./illumina-seq-dialog.component.scss"]
 })
 export class IlluminaSeqDialogComponent extends BaseGenericContainerDialog implements OnInit{
 

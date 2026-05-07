@@ -25,29 +25,7 @@ export enum OrderType {
     selector: 'annotation-tab',
     templateUrl: './annotation-tab.component.html',
 
-    styles: [`
-
-
-        .annot-control {
-            width: 30%;
-            margin: 0.25em;
-            font-size: small;
-        }
-        .annot-control-editor {
-            width: 50%;
-            margin: 0.25em;
-            font-size: small;
-        }
-
-        .mat-tab-group-border {
-            border: 1px solid #e8e8e8;
-        }
-        .enable-bordered  {
-            border: 1px solid #A0A0A0;
-        }
-
-
-    `]
+    styleUrls: ["./annotation-tab.component.scss"]
 })
 export class AnnotationTabComponent implements OnInit, OnDestroy {
     private readonly TEXT: string = "TEXT";

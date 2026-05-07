@@ -5,8 +5,6 @@ import {DateRangeFilterPopupComponent} from "./date-range-filter-popup.component
 @Component({
     selector: 'date-range-filter',
     templateUrl: "./date-range-filter.component.html",
-    styles: [`
-    `],
 })
 
 export class DateRangeFilterComponent implements OnInit {

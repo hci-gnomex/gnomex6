@@ -40,20 +40,7 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
             </div>
         </div>
     `,
-    styles: [`
-        textarea {
-            resize: none;
-            background-color: white;
-        }
-
-        .label-width {
-            min-width: 8rem;
-        }
-
-        .minor-width {
-            min-width: 7rem;
-        }
-    `],
+    styleUrls: ["./protocol-dialog.component.scss"],
 })
 export class ProtocolDialogComponent extends BaseGenericContainerDialog implements OnInit, AfterViewInit {
     public protocol: any;

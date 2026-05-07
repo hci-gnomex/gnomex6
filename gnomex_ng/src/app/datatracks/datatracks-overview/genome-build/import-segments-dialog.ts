@@ -22,16 +22,7 @@ import {HttpUriEncodingCodec} from "../../../services/interceptors/http-uri-enco
             </p>
         </form>
     `,
-    styles: [`
-        .simple-textarea {
-            overflow-y: scroll;
-            height: 18em;
-            width: 30em;
-            resize: none;
-            background-color: #e4e0e0;
-        }
-    `]
-
+    styleUrls: ["./import-segments-dialog.scss"]
 })
 
 export class ImportSegmentsDialog extends BaseGenericContainerDialog implements OnInit {

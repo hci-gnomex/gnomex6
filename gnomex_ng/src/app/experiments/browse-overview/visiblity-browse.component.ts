@@ -34,15 +34,7 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
             </div>
         </div>
     `,
-    styles: [`
-        .flex-container{
-            display: flex;
-            justify-content: space-between;
-            margin-left: auto;
-            margin-top: 1em;
-            padding-left: 1em;
-        }
-    `]
+    styleUrls: ["./visiblity-browse.component.scss"]
 })
 export class VisiblityBrowseTab extends PrimaryTab implements OnInit{
     @Output() saveSuccess = new EventEmitter();

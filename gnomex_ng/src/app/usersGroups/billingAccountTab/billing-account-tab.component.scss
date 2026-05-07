@@ -1,0 +1,18 @@
+.border {
+    margin-bottom: 0.3em;
+    padding: 0.5em;
+    border: 1px solid lightgrey;
+    border-radius: 0.3em;
+}
+
+.block { display: block; }
+
+.medium-width    { width:  30em;  }
+.vertical-spacer { height: 0.3em; }
+
+.label { min-width: 10em; }
+
+.same-size-button {
+    min-width: 10.4em;
+    text-align: center;
+}

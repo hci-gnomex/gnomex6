@@ -7,7 +7,6 @@ import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align
 @Component({
     selector: "core-sample-selector",
     templateUrl: "./core-sample-selector.component.html",
-    styles: [``]
 })
 export class CoreSampleSelectorComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 

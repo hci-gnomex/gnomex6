@@ -1,0 +1,11 @@
+.cell-text-container {
+    vertical-align: middle;
+    padding-left: 0.3rem;
+}
+
+.fix-table { table-layout: fixed; }
+
+.ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

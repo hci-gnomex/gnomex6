@@ -38,18 +38,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             </div>
         </div>
     `,
-    styles: [`
-        .margin-left {
-            margin-left: 1em;
-        }
-        .grid-container {
-            height: 20em;
-            width: 35em;
-        }
-        .font-small {
-            font-size: 0.7em;
-        }
-    `]
+    styleUrls: ['./track-usage-detail.component.scss']
 })
 
 export class TrackUsageDetailComponent implements OnInit, OnDestroy {

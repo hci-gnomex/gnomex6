@@ -15,32 +15,7 @@ import {ICellRendererAngularComp} from "ag-grid-angular";
             </div>
         </div>
     `,
-    styles: [`
-
-        .half-width { width: 50%; }
-        
-        .inline-block { display: inline-block; }
-
-        .horizontal-center { text-align: center;     }
-        
-        button.link-button {
-            background: none;
-            background-color: inherit;
-            border: none;
-            padding: 0;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-
-        button.link-button:focus {
-            outline: none;
-        }
-        
-        .message {
-            text-decoration: underline;
-            color: blue;
-        }
-    `]
+    styleUrls: ['./two-button.renderer.scss']
 })
 export class TwoButtonRenderer implements ICellRendererAngularComp {
 

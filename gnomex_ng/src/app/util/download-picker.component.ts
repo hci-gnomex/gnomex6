@@ -27,14 +27,6 @@ import {first} from "rxjs/operators";
             </mat-dialog-actions>
         </div>
     `,
-    styles:[`
-        .no-margin {
-            margin: 0;
-        }
-        .no-padding {
-            padding: 0;
-        }
-    `]
 })
 export class DownloadPickerComponent implements OnInit {
 

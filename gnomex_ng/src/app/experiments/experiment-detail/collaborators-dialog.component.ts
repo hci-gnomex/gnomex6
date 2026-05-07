@@ -11,17 +11,6 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
 @Component({
     selector: 'collaborators-dialog',
     templateUrl: './collaborators-dialog.component.html',
-    styles: [`
-
-        .no-height { height: 0;   }
-        .single-em { width:  1em; }
-        
-        .no-margin  { margin:  0; }
-        .no-padding { padding: 0; }
-        
-        .title-size { font-size: large; }
-        
-    `]
 })
 export class CollaboratorsDialogComponent extends BaseGenericContainerDialog implements AfterViewInit {
 

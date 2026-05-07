@@ -51,18 +51,7 @@ import {ConstantsService} from "../services/constants.service";
         </div>
 
         `,
-    styles:[`
-        .active-item {
-            /*color: #636c72;*/
-            background-color: #c8c8c8;
-        }
-
-        .active-item:hover {
-            border: .05rem solid #bfc4c4;
-            background-color: #c8c8c8;
-            cursor: pointer;
-        }
-    `]
+    styleUrls: ["./config-core-facility.component.scss"]
 })
 
 export class ConfigCoreFacilityComponent implements OnInit{

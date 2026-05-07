@@ -1,0 +1,40 @@
+.min-width {
+    min-width: 15em;
+}
+
+div.institution-div {
+    height: 18em;
+}
+
+.color-blue {
+    color: blue;
+}
+
+label {
+    font-style: italic;
+    color: #1601db;
+}
+
+.height-auto { height: auto; }
+
+.small-width { width: 12em; }
+
+.horizontal-spacer {
+    height: 100%;
+    width: 0.3em;
+}
+
+.border-padding {
+    padding:       0.3em;
+    border-radius: 0.3em;
+    border: 1px solid darkgrey;
+}
+
+.right-align { text-align: right; }
+
+.margin-left { margin-left: 0.3em; }
+
+.large-margin-left  { margin-left:  2em; }
+.large-margin-right { margin-right: 2em; }
+
+.large-padding-right { padding-right: 2em; }

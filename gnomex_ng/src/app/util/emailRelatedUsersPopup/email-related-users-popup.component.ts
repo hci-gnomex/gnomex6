@@ -27,30 +27,6 @@ import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-edito
 			</angular-editor>
         </div>
 	`,
-	styles: [`
-        :host /deep/ angular-editor#emailEditor #editor {
-            resize: none;
-        }
-
-        :host /deep/ angular-editor#emailEditor .angular-editor-button[title="Insert Image"],
-        :host /deep/ angular-editor#emailEditor .angular-editor-button[title="Unlink"],
-        :host /deep/ angular-editor#emailEditor .angular-editor-button[title="Horizontal Line"],
-        :host /deep/ angular-editor#emailEditor #strikeThrough-emailEditor,
-        :host /deep/ angular-editor#emailEditor #subscript-emailEditor,
-        :host /deep/ angular-editor#emailEditor #superscript-emailEditor,
-        :host /deep/ angular-editor#emailEditor #link-emailEditor,
-        :host /deep/ angular-editor#emailEditor #underline-emailEditor,
-        :host /deep/ angular-editor#emailEditor #justifyLeft-emailEditor,
-        :host /deep/ angular-editor#emailEditor #justifyCenter-emailEditor,
-        :host /deep/ angular-editor#emailEditor #justifyRight-emailEditor,
-        :host /deep/ angular-editor#emailEditor #justifyFull-emailEditor,
-        :host /deep/ angular-editor#emailEditor #foregroundColorPicker-emailEditor,
-        :host /deep/ angular-editor#emailEditor #backgroundColorPicker-emailEditor,
-        :host /deep/ angular-editor#emailEditor #toggleEditorMode-emailEditor,
-        :host /deep/ angular-editor#emailEditor #customClassSelector-emailEditor {
-            display: none;
-        }
-	`]
 })
 export class EmailRelatedUsersPopupComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 

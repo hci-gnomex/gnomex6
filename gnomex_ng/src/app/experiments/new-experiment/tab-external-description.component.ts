@@ -18,14 +18,6 @@ import {Experiment} from "../../util/models/experiment.model";
             </div>
         </div>
     `,
-    styles: [`
-        :host /deep/ angular-editor #editor {
-            resize: none;
-        }
-        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
-            display: none;
-        }
-    `]
 })
 
 export class TabExternalDescriptionComponent implements OnInit, OnChanges, OnDestroy {

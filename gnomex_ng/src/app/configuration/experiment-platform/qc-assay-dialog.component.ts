@@ -130,19 +130,7 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
 
         </div>
     `,
-    styles: [`
-        .padded-outer{
-            margin:0;
-            padding:0;
-        }
-        .padded-inner{
-            padding:0.3em;
-
-        }
-        .medium-form-input{
-            width: 30em
-        }
-    `]
+    styleUrls: ["./qc-assay-dialog.component.scss"]
 })
 export class QcAssayDialogComponent extends BaseGenericContainerDialog implements OnInit{
 

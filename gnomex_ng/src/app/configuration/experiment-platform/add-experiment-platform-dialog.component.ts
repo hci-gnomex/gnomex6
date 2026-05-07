@@ -45,7 +45,6 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
 
         </div>
     `,
-    styles: [``]
 })
 export class AddExperimentPlatformDialogComponent extends BaseGenericContainerDialog implements OnInit{
 

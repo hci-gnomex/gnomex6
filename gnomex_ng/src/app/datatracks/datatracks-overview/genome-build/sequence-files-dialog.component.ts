@@ -40,44 +40,7 @@ import {IGnomexErrorResponse} from "../../../util/interfaces/gnomex-error.respon
             </div>
         </div>
     `,
-    styles: [`
-        .fileContainer {
-            overflow: hidden;
-            position: relative;
-        }
-
-        .fileContainer [type=file] {
-            cursor: inherit;
-            display: block;
-            font-size: 999px;
-            filter: alpha(opacity=0);
-            min-height: 100%;
-            min-width: 100%;
-            opacity: 0;
-            position: absolute;
-            right: 0;
-            text-align: right;
-            top: 0;
-        }
-
-        /* Example stylistic flourishes */
-
-        .fileContainer {
-            background: none;
-            border-radius: .1em;
-            padding: .5em;
-            text-decoration: underline;
-        }
-
-        .fileContainer:hover{
-            background: #F3FFFF;
-        }
-
-        .fileContainer [type=file] {
-            cursor: pointer;
-        }
-    `]
-
+    styleUrls: ["./sequence-files-dialog.component.scss"]
 })
 
 export class SequenceFilesDialog extends BaseGenericContainerDialog implements OnInit{

@@ -10,8 +10,6 @@ import {WINDOW} from "../services/window.service";
             <input readonly [(ngModel)]="link" aria-label="Shareable link URL" aria-readonly="true"/>
         </div>
     `,
-    styles: [`
-    `]
 })
 export class ShareLinkDialogComponent extends BaseGenericContainerDialog implements OnInit {
 

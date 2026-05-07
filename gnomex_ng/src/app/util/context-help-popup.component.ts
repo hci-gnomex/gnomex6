@@ -56,14 +56,6 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
             </save-footer>
         </div>
     `,
-    styles: [`
-        :host /deep/ angular-editor #editor {
-            resize: none;
-        }
-        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
-            display: none;
-        }
-    `]
 })
 
 export class ContextHelpPopupComponent extends BaseGenericContainerDialog implements OnInit {

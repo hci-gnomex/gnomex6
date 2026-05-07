@@ -17,22 +17,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: 'libprep-workflow',
     templateUrl: 'libprep-workflow.html',
-    styles: [`
-        
-        .grid-min-height {
-            min-height: 8em;
-        }
-        
-        
-        .no-height {
-            height: 0;
-        }
-        
-        .single-em {
-            width: 1em;
-        }
-        
-    `]
+    styleUrls: ['./libprep-workflow.component.scss']
 })
 
 export class LibprepWorkflowComponent {

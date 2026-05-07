@@ -1,0 +1,15 @@
+.eight-five-height { height: 85%; }
+
+.flex-column-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.flex-row {
+    display: flex;
+}
+
+.flex-stretch {
+    display: flex;
+    flex: 1;
+}

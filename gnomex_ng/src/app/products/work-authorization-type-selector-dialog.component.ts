@@ -12,24 +12,7 @@ import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-d
 @Component({
     selector: 'work-authorization-type-selector-dialog',
     templateUrl: 'work-authorization-type-selector-dialog.component.html',
-    styles: [`
-
-        .title-size { font-size: large; }
-        
-        .no-padding { padding: 0; }
-        .no-margin  { margin:  0; }
-
-        .bordered { border: 1px solid silver; }
-        
-        .foreground { background-color: white; }
-        .background { background-color: #eeeeeb; }
-
-        .link-button {
-            color: blue;
-            text-decoration: underline;
-        }
-        
-    `]
+    styleUrls: ['./work-authorization-type-selector-dialog.component.scss']
 })
 export class WorkAuthorizationTypeSelectorDialogComponent extends BaseGenericContainerDialog implements OnInit, AfterViewInit {
 

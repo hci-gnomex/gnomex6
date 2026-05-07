@@ -28,7 +28,6 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
 @Component({
 	selector: "new-billing-account-launcher",
 	template: `<div></div>`,
-	styles: [``]
 })
 export class NewBillingAccountLauncher {
 
@@ -67,69 +66,7 @@ export class NewBillingAccountStateMatcher implements ErrorStateMatcher {
 @Component({
 	selector: "new-billing-account-window",
 	templateUrl: "./new-billing-account.component.html",
-	styles: [`
-
-		p {
-			margin: 1em 0.5em;
-		}
-
-		.label {
-			min-width: 13em;
-			font-style: italic;
-			font-size: small;
-			color: #1601db;
-		}
-
-		.radio-button {
-			margin: 0 4em 0 0;
-			padding: 0;
-		}
-
-		.background {
-			display: block;
-			position: relative;
-			background-color: white;
-			border: #d2d2d2 solid 1px;
-		}
-		.background-sideless {
-			display: block;
-			position: relative;
-			background-color: white;
-			border-color: #d2d2d2;
-			border-style: solid;
-			border-top-width: 1px;
-			border-bottom-width: 1px;
-			border-left-width: 0;
-			border-right-width: 0;
-		}
-
-		.inline-block {
-			display: inline-block;
-		}
-
-		.row-spacer {
-			height: 0.7em;
-		}
-
-		.center-vertical-align {
-			vertical-align: middle;
-		}
-
-		.checkbox-container {
-			display: inline-block;
-			vertical-align: middle;
-			width: fit-content;
-		}
-
-		.horizontal-break {
-			display: inline-block;
-			vertical-align: middle;
-			height: 3em;
-			width: 1px;
-			background-color: #c4cccc;
-			margin: 0.5em 0.5em 0.5em 0.5em;
-		}
-	`]
+	styleUrls: ['./new-billing-account.component.scss']
 })
 export class NewBillingAccountComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 

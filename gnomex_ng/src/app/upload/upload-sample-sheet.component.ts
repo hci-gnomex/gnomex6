@@ -23,55 +23,7 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 @Component({
     selector: 'upload-sample-sheet',
     templateUrl: 'upload-sample-sheet.component.html',
-    styles: [`
-
-        .hidden { display: none; }
-        
-        .title {
-            background-color: #84b278;
-            color: white;
-            font-size: larger;
-        }
-        
-        .link-button {
-            color: blue;
-            text-decoration: underline;
-        }
-        
-        
-        .padded { padding: 0.3rem; }
-        
-        .padded-left-right-bottom {
-            padding-top:    0;
-            padding-left:   0.3rem;
-            padding-right:  0.3rem;
-            padding-bottom: 0.3rem;
-        }
-        
-        .bordered { border: solid silver 1px; }
-
-        .no-margin {
-            margin: 0;
-        }
-        
-        .no-max-height {
-            max-height: none;
-        }
-
-        .checkbox-margin-evener {
-            margin-top:   0.5rem;
-            margin-right: 0.5rem;
-        }
-        
-        .foreground { background-color: white;   }
-        .background { background-color: #eeeeee; }
-        
-        .small-font { font-size:    small; }
-        .tiny-font  { font-size: xx-small; }
-        
-        label.mat-checkbox-layout { margin: 0; margin-bottom: 0; }
-        
-    `]
+    styleUrls: ['./upload-sample-sheet.component.scss']
 }) export class UploadSampleSheetComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
     private readonly SUCCESS_STATUS: string = 'SUCCESS';

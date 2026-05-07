@@ -7,7 +7,6 @@ import {TestingDialogComponent} from "./testing-dialog.component";
 @Component({
 	selector: "testPage",
 	templateUrl: "./test-page.component.html",
-	styles: [``]
 }) export class TestPageComponent {
 
 	animal: string = 'dolphin';

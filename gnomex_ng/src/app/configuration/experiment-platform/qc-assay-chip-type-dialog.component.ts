@@ -103,14 +103,7 @@ import {BaseGenericContainerDialog} from "../../util/popup/base-generic-containe
             </div>
         </div>
     `,
-    styles: [`
-        .padded-inner{
-            padding:0.3em;
-        }
-        .medium-form-input{
-            width: 30em
-        }
-    `]
+    styleUrls: ["./qc-assay-chip-type-dialog.component.scss"]
 })
 export class QcAssayChipTypeDialogComponent extends BaseGenericContainerDialog implements OnInit{
 

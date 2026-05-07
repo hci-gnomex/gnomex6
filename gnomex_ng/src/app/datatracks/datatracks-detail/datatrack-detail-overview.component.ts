@@ -24,29 +24,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
 
 @Component({
     templateUrl: "./datatrack-detail-overview.component.html",
-    styles: [`
-
-        .flex-container {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        .mat-tab-group-border {
-            border: 1px solid #e8e8e8;
-        }
-
-        .label-min-width {
-            min-width: 20rem;
-            width: 20rem;
-        }
-
-        .label {
-            margin-top: 0.2rem;
-            margin-bottom: 0;
-        }
-
-    `]
+    styleUrls: ['./datatrack-detail-overview.component.scss']
 })
 export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit, OnDestroy {
 

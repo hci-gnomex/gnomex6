@@ -46,8 +46,6 @@ import {MatSelect} from "@angular/material";
             </div>
         </div>
     `,
-    styles: [`
-    `],
     providers: [{
         provide: NG_VALUE_ACCESSOR,
         useExisting: CustomMultiComboBoxComponent,

@@ -1,0 +1,39 @@
+.hidden {
+    display: none;
+}
+
+.title {
+    background-color: #84b278;
+    color: white;
+    font-size: larger;
+}
+
+.link-button {
+    color: blue;
+    text-decoration: underline;
+}
+
+.padded-left-right-bottom {
+    padding-top:    0;
+    padding-left:   0.3rem;
+    padding-right:  0.3rem;
+    padding-bottom: 0.3rem;
+}
+
+.no-max-height {
+    max-height: none;
+}
+
+.checkbox-margin-evener {
+    margin-top:   0.5rem;
+    margin-right: 0.5rem;
+}
+
+.tiny-font {
+    font-size: xx-small;
+}
+
+label.mat-checkbox-layout {
+    margin: 0;
+    margin-bottom: 0;
+}

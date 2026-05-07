@@ -37,45 +37,7 @@ import {ConstantsService} from "../../services/constants.service";
             </mat-dialog-actions>
         </div>
     `,
-    styles: [`
-        .centered-text { text-align: center; }
-
-        .no-padding{
-            padding:0;
-
-        }
-
-        .no-margin{
-            margin: 0;
-        }
-
-        .grabbable {
-            cursor: move;
-            cursor: grab;
-            cursor: grab;
-            cursor: grab;
-        }
-        .grabbed {
-            cursor: move;
-            cursor: grabbing;
-            cursor: grabbing;
-            cursor: grabbing;
-        }
-
-        .force-flex-container-row{
-            display:flex !important;
-        }
-
-        .exit{
-            max-width: 20px;
-            cursor: pointer;
-        }
-
-        .i-class {
-            margin-left:  0.3em;
-            margin-right: 0.3em;
-        }
-    `]
+    styleUrls: ["./custom-dialog.component.scss"]
 })
 
 export class CustomDialogComponent implements OnInit {

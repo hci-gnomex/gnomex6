@@ -36,67 +36,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 @Component({
     selector: 'bulk-sample-upload',
     templateUrl: 'bulk-sample-upload.component.html',
-    styles: [`
-
-        .no-height { height: 0;  }
-        .single-em { width: 1em; }
-
-        .no-max-height { max-height: none; }
-
-        .hidden { display: none; }
-
-        .blue-text { color: blue; }
-        .red-text  { color: red;  }
-
-        .underline { text-decoration: underline; }
-
-        .foreground { background-color: white;   }
-        .background { background-color: #eeeeee; }
-
-        .bordered { border: solid silver 1px; }
-
-
-
-        .small-font { font-size: x-small; }
-
-        .inline-block { display: inline-block; }
-
-        .padded { padding: 0.3em; }
-
-        .padded-top { padding-top: 0.3em; }
-
-        .padded-left-right {
-            padding-left:  0.3em;
-            padding-right: 0.3em;
-        }
-
-        .padded-left-right-bottom {
-            padding: 0;
-
-            padding-left:   0.3em;
-            padding-right:  0.3em;
-            padding-bottom: 0.3em;
-        }
-
-        .no-margin    { margin: 0; }
-        .margin-right { margin-right: 0.3em; }
-
-        .title {
-            background-color: #84b278;
-            color: white;
-            font-size: larger;
-        }
-
-        .grabbable {
-            cursor: move;
-            cursor: grab;
-        }
-        .grabbed {
-            cursor: move;
-            cursor: grabbing;
-        }
-
-    `]
+    styleUrls: ['./bulk-sample-upload.component.scss']
 }) export class BulkSampleUploadComponent extends BaseGenericContainerDialog implements OnDestroy {
 
     @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;

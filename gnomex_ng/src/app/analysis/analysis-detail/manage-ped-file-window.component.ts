@@ -54,32 +54,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
             </div>
         </mat-dialog-actions>
     `,
-    styles:[`
-        label.error-action {
-            color: red;
-        }
-        label.info-action {
-            color: blue;
-        }
-        div.grid-container {
-            width: 100%;
-            height: 21em;
-        }
-        .double-padded-left-right {
-            padding: 0.3em 0.6em 0.3em 0.6em;
-        }
-        .primary-action {
-            background-color: var(--bluewarmvivid-medlight);
-            font-weight: bolder;
-            color: white;
-        }
-        .secondary-action {
-            background-color: var(--sidebar-footer-background-color);
-            font-weight: bolder;
-            color: var(--bluewarmvivid-medlight);
-            border: var(--bluewarmvivid-medlight)  solid 1px;
-        }
-    `]
+    styleUrls: ["./manage-ped-file-window.component.scss"]
 })
 export class ManagePedFileWindowComponent extends BaseGenericContainerDialog implements OnInit {
 

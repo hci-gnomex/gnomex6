@@ -26,19 +26,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: 'flowcell-workflow',
     templateUrl: 'flowcell-workflow.html',
-    styles: [`
-        
-        
-        .reserved-space {
-            min-width: 12em;
-        }
-        
-        .margin-children > *:not(:last-child) {
-            margin-right: 0.3em;
-        }
-        
-        
-    `]
+    styleUrls: ['./flowcell-workflow.component.scss']
 })
 
 export class FlowcellWorkflowComponent implements OnInit {

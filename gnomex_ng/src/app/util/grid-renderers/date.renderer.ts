@@ -23,26 +23,7 @@ import {CellRendererValidation} from "./cell-renderer-validation";
 			</div>
 		</div>
 	`,
-	styles: [`		
-		
-		.full-width  { width:  100% }
-		.full-height { height: 100% }
-			
-		.t  { display: table; }
-		.tr { display: table-row; }
-		.td { display: table-cell; }
-		
-		.vertical-center { vertical-align: middle;   }
-		.right-align     { text-align:     right;    }
-		.padded          { padding:        0 0.3rem; }
-			
-		.cursor { cursor: pointer; }
-
-		.error {
-			background: linear-gradient(rgba(255,0,0,0.25), rgba(255,0,0,0.25), rgba(255,0,0,0.25));
-			border: solid red 2px;
-		}
-	`]
+	styleUrls: ['./date.renderer.scss']
 })
 export class DateRenderer extends CellRendererValidation{
 

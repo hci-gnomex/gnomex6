@@ -22,17 +22,7 @@ import {KEYS, TREE_ACTIONS} from "@circlon/angular-tree-component";
 
 @Component({
     templateUrl: "./add-samples-dialog.component.html",
-    styles: [`
-        .truncate{
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .left-right-padded {
-            padding-left:  0.3em;
-            padding-right: 0.3em;
-        }
-    `]
+    styleUrls: ['./add-samples-dialog.component.scss']
 })
 
 export class AddSamplesDialogComponent extends BaseGenericContainerDialog implements OnInit{

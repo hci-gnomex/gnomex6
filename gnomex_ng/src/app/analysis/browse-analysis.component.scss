@@ -1,0 +1,43 @@
+.left-right-padded {
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+}
+
+.major-left-right-padded {
+    padding-left: 1em;
+    padding-right: 0.3em;
+}
+
+.no-word-wrap {
+    white-space: nowrap;
+}
+
+.no-overflow {
+    overflow: hidden;
+}
+
+.vertical-spacer {
+    height: 0.3em;
+    min-height: 0.3em;
+}
+
+.border {
+    border: #C8C8C8 solid thin;
+}
+
+.major-border {
+    border-radius: 0.3em;
+    border: 1px solid darkgrey;
+}
+
+.small-font {
+    font-size: 12px;
+}
+
+.allow-line-breaks {
+    white-space: pre-line;
+}
+
+.background-lightyellow {
+    background-color: lightyellow;
+}

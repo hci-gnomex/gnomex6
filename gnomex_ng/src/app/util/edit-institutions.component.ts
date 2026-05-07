@@ -36,14 +36,7 @@ import {IGnomexErrorResponse} from "./interfaces/gnomex-error.response.model";
             </div>
         </div>
     `,
-    styles: [`
-        div.content-div {
-            display: flex !important;
-            flex-direction: column;
-            height: 20em;
-            width: 40em;
-        }
-    `]
+    styleUrls: ["./edit-institutions.component.scss"]
 })
 
 export class EditInstitutionsComponent extends BaseGenericContainerDialog implements OnInit {

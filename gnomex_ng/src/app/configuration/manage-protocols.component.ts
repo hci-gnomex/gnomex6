@@ -21,59 +21,7 @@ import {EditProtocolComponent} from "./edit-protocol.component";
 @Component({
     selector: 'manage-protocols',
     templateUrl: 'manage-protocols.component.html',
-    styles: [`
-        .flex-grow { flex: 1; }
-
-        .t  { display: table; }
-        .tr { display: table-row; }
-        .td { display: table-cell; }
-
-        .inline-block { display: inline-block; }
-
-        .vertical-center { vertical-align: middle; }
-
-        .padded { padding: 0.4em; }
-
-        .padded-right { padding-right: 0.4em; }
-
-        .padded-left-right {
-            padding-left: 0.4em;
-            padding-right: 0.4em;
-        }
-        .padded-top-bottom {
-            padding-top: 0.4em;
-            padding-bottom: 0.4em;
-        }
-
-        .border { border: 1px lightgray solid; }
-
-        .no-overflow { overflow: hidden; }
-        .right-align { text-align: right; }
-
-        .checkbox-container {
-            display: inline-block;
-            vertical-align: middle;
-            width: fit-content;
-            padding: 0.2em 0.6em 0 0.6em;
-        }
-
-        .minimize {
-            width: fit-content;
-        }
-
-        .special-checkbox-text-alignment-padding {
-            padding: 1.6em 0.6em 0 0;
-        }
-        .special-button-text-alignment-padding {
-            padding: 1.1em 0.6em 0 0.6em;
-        }
-
-        .warning-block {
-            background: yellow;
-            border: 1px lightgray solid;
-            border-radius: 4px;
-        }
-    `]
+    styleUrls: ["./manage-protocols.component.scss"]
 })
 export class ManageProtocolsComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 

@@ -55,19 +55,7 @@ import {ActionType} from "../../../util/interfaces/generic-dialog-action.model";
 
 
     `,
-    styles: [`
-        .form-field {
-            margin-left: 1em;
-            margin-right: 1em;
-            font-size: 1.1rem;
-            width: 30%;
-            resize: none;
-        }
-        .inline-block{
-            display: inline-block;
-        }
-    `]
-
+    styleUrls: ["./gb-segments-tab.component.scss"]
 })
 export class GBSegmentsTabComponent extends PrimaryTab implements OnInit, OnDestroy {
     //Override

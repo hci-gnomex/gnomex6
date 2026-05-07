@@ -14,14 +14,6 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
 
 @Component({
     templateUrl: "./datatracks-folder.component.html",
-    styles:[`
-        :host /deep/ angular-editor #editor {
-            resize: none;
-        }
-        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
-            display: none;
-        }
-    `]
 })
 export class DatatracksFolderComponent implements OnInit, AfterViewInit, OnDestroy {
     //Override

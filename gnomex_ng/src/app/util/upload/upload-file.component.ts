@@ -17,37 +17,7 @@ import {UtilService} from "../../services/util.service";
 @Component({
     selector: 'upload-file',
     templateUrl: './upload-file.component.html',
-    styles: [`
-        .add-files-btn {
-            float: right;
-        }
-
-        .primary-action {
-            background-color: var(--bluewarmvivid-medlight);
-            font-weight: bolder;
-            color: white;
-        }
-        .secondary-action {
-            background-color: var(--sidebar-footer-background-color);
-            font-weight: bolder;
-            color: var(--bluewarmvivid-medlight);
-            border: var(--bluewarmvivid-medlight)  solid 1px;
-        }
-
-        :host {
-            height: 100%;
-            display: flex;
-            flex: 1;
-            flex-direction: column;
-        }
-        .no-padding {
-            padding: 0;
-        }
-        .no-margin {
-            margin: 0;
-        }
-
-    `]
+    styleUrls: ["./upload-file.component.scss"]
 })
 export class UploadFileComponent implements OnInit {
     @ViewChild('file', {static: false}) file;

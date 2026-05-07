@@ -4,31 +4,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
 @Component({
     selector: 'spinner-dialog',
     templateUrl: 'spinner-dialog.component.html',
-    styles: [`
-        .t  { display: table; }
-        .tr { display: table-row; }
-        .td { display: table-cell; }
-        
-        .full-height { height: 100%; }
-        .full-width  { width:  100%; }
-        
-        .vertical-center { vertical-align: middle; }
-        
-        .padded { 
-            padding-top: 0.4em;
-            padding-bottom: 0.4em; 
-        }
-        
-        .not-rendered {
-            padding: 0;
-            margin:  0;
-            
-            min-height: 0;
-            max-height: 0;
-            height:     0;
-        }
-        
-    `]
+    styleUrls: ["./spinner-dialog.component.scss"]
 })
 export class SpinnerDialogComponent {
     @Input("strokeWidth") strokeWidth: number = 3;

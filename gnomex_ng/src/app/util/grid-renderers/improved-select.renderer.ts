@@ -17,36 +17,7 @@ import {CellRendererValidation} from "./cell-renderer-validation";
 			</div>
 		</div>
 	`,
-    styles: [`
-		.t  { display: table;      }
-		.tr { display: table-row;  }
-		.td { display: table-cell; }
-		
-		.cell-text-container { 
-			vertical-align: middle;
-			padding-left: 0.3rem;
-		}
-		
-		.full-width  { width:  100%; } 
-		.full-height { height: 100%; }
-
-		.fix-table { table-layout:fixed; }
-
-		.ellipsis {
-			overflow: hidden;
-			text-overflow: ellipsis;
-		}
-
-		.error {
-			background: linear-gradient(rgba(255,0,0,0.25), rgba(255,0,0,0.25), rgba(255,0,0,0.25));
-			border: solid red 2px;
-		}
-        
-        .inactive {
-            color: darkgrey;
-            font-style: italic;
-        }
-	`]
+    styleUrls: ['./improved-select.renderer.scss']
 }) export class ImprovedSelectRenderer extends CellRendererValidation implements ICellRendererAngularComp {
     value: string;
     display: string;

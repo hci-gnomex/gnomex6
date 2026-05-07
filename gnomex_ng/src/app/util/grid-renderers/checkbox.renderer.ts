@@ -13,18 +13,7 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 			</div>
 		</div>
 	`,
-	styles: [`
-
-      .full-width  { width:  100% }
-      .full-height { height: 100% }
-
-      .t  { display: table; }
-      .tr { display: table-row; }
-      .td { display: table-cell; }
-
-      .vertical-center { vertical-align: middle; }
-      .center-align    { text-align:     center; }
-	`]
+	styleUrls: ['./checkbox.renderer.scss']
 })
 export class CheckboxRenderer implements ICellRendererAngularComp {
 	params: any;

@@ -9,20 +9,7 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
 @Component({
     selector: 'membership-tab',
     templateUrl: './membership-tab.html',
-    styles: [`
-        
-        
-        .highlight{
-            background: deepskyblue;
-        }
-        
-        .mat-table {
-            overflow: auto;
-            max-height: 500px;
-        }
-        
-        
-    `]
+    styleUrls: ['./membership-tab.component.scss']
 })
 
 export class MembershipTabComponent implements OnInit {

@@ -1,0 +1,37 @@
+mat-radio-group.filter {
+    display: inline-flex;
+    flex-direction: row;
+    margin: 1em;
+    padding-top: 1em;
+}
+
+mat-radio-button.filterOption {
+    margin: 0 5px;
+}
+
+.flex-column-container {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    height: 100%;
+}
+
+.flex-row-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.br-exp-item {
+    flex: 1 1 auto;
+    font-size: small;
+}
+
+.datatracks-panel {
+    border: #C8C8C8 solid thin;
+}
+
+.truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

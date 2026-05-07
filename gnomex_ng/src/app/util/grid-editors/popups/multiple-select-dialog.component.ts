@@ -8,36 +8,7 @@ import * as _ from "lodash";
 @Component({
     selector: "multiple-select-dialog",
     templateUrl: "multiple-select-dialog.component.html",
-    styles: [`
-			.full-width  { width  : 100%; }
-			.full-height { height : 100%; }
-			
-			.t  { display: table;      }
-			.tr { display: table-row;  }
-			.td { display: table-cell; }
-			
-			.flex-vertical-container {
-					display: flex;
-					flex-direction: column;
-			}
-			
-			.stretch {
-					flex: 1;
-			}
-			
-			.vertical-center { vertical-align: middle; }
-			.center { text-align: center; }
-            .inline-block { display: inline-block; }
-			
-			.no-margin { margin : 0; }
-
-			.horizontal-padding { padding: 0 1em; }
-			
-			.left-align  { text-align: left;  }
-			.right-align { text-align: right; }
-			
-			.error-message { color: red; }
-	`]
+    styleUrls: ['./multiple-select-dialog.component.scss']
 })
 export class MultipleSelectDialogComponent {
 

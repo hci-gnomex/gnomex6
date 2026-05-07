@@ -22,15 +22,7 @@ import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-d
             </ag-grid-angular>
         </div>
     `,
-    styles: [`
-        div.grid-div {
-            width: 700px;
-            height: 200px;
-        }
-        .font-small {
-            font-size: 0.7em;
-        }
-    `]
+    styleUrls: ['./notes-to-core.component.scss']
 })
 
 export class NotesToCoreComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {

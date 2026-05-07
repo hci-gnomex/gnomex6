@@ -46,19 +46,7 @@ import {ActionType} from "../../../util/interfaces/generic-dialog-action.model";
             </div>
         </div>
     `,
-    styles: [`
-        .form-field{
-            margin-left: 1em;
-            margin-right: 1em;
-            font-size: 1.1rem;
-            width:30%;
-            resize:none;
-        }
-        .inline-block{
-            display: inline-block;
-        }
-    `]
-
+    styleUrls: ["./gb-sequence-files-tab.component.scss"]
 })
 export class GBSequenceFilesTabComponent extends PrimaryTab implements OnInit, OnDestroy{
     //Override

@@ -175,36 +175,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
         </div>
     `,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    styles: [`
-        div.trees-container {
-            width: 60em;
-            height: 25em;
-            border: solid silver 1px;
-        }
-        .no-margin {
-            margin: 0;
-        }
-        .no-padding {
-            padding: 0;
-        }
-        .primary-action {
-            background-color: var(--bluewarmvivid-medlight);
-            font-weight: bolder;
-            color: white;
-        }
-        .secondary-action {
-            background-color: var(--sidebar-footer-background-color);
-            font-weight: bolder;
-            color: var(--bluewarmvivid-medlight);
-            border: var(--bluewarmvivid-medlight)  solid 1px;
-        }
-        /*tree-root.tree-viewport {*/
-        /*height: 93%;*/
-        /*}*/
-        tree-viewport {
-            height: 93%;
-        }
-    `]
+    styleUrls: ["./download-files.component.scss"]
 })
 export class DownloadFilesComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 

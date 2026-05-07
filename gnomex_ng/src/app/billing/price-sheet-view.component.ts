@@ -14,12 +14,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: 'price-sheet-view',
     templateUrl: "./price-sheet-view.component.html",
-    styles: [`
-        div.grid-div {
-            height: 15em;
-            width: 100%;
-        }
-    `]
+    styleUrls: ['./price-sheet-view.component.scss']
 })
 
 export class PriceSheetViewComponent extends BaseGenericContainerDialog implements OnInit {

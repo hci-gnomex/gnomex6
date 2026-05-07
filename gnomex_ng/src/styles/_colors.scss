@@ -1,0 +1,51 @@
+// Color utility classes and semantic color assignments
+
+.login-background {
+  background-color: #ececd9;
+}
+
+.warningLabelMinor {
+  color: #17871C;
+  font-weight: normal;
+}
+
+.warningLabelSevere {
+  color: #EE2525;
+  font-weight: bold;
+  font-size: 10px;
+}
+
+.bordered {
+  border: 1px solid silver;
+}
+
+.foreground {
+  background: white;
+}
+
+.background {
+  background-color: #EEEEEE;
+}
+
+.background-border {
+  border-radius: 0.3em;
+  border: 1px solid darkgrey;
+}
+
+.border-subtle {
+  border: 1px solid #EEEEEE;
+}
+
+.dialog-header-colors {
+  background-color: white;
+  color: var(--bluewarmvivid-medlight);
+}
+
+.generic-dialog-header-colors {
+  background-color: var(--bluewarmvivid-medlight);
+  color: white;
+}
+
+.generic-dialog-footer-colors {
+  background-color: var(--sidebar-footer-background-color);
+}

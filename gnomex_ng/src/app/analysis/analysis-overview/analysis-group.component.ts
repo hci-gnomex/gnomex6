@@ -22,12 +22,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
     changeDetection: ChangeDetectionStrategy.OnPush,
     selector: "analysis-group-tab",
     templateUrl: "./analysis-group.component.html",
-    styles: [`
-        .error-message{
-            color: red;
-        }
-
-    `]
+    styleUrls: ["./analysis-group.component.scss"]
 })
 export class AnalysisGroupComponent implements OnInit, OnDestroy {
     project: any;

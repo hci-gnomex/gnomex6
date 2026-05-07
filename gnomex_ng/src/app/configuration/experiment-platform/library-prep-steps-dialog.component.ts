@@ -42,14 +42,6 @@ import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-edito
             </div>
         </form>
     `,
-    styles: [`
-        :host /deep/ angular-editor #editor {
-            resize: none;
-        }
-        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
-            display: none;
-        }
-    `]
 })
 export class LibraryPrepStepsDialogComponent extends BaseGenericContainerDialog implements OnInit{
 

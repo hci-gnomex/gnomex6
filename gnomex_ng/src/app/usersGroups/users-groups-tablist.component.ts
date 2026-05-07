@@ -47,73 +47,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: 'users-groups-tablist',
     templateUrl: './users-groups-tablist.component.html',
-    styles: [`
-
-        .min-width {
-            min-width: 15em;
-        }
-
-        div.institution-div {
-            height: 18em;
-        }
-
-        .color-blue {
-            color: blue;
-        }
-
-
-        label {
-            font-style: italic;
-            color: #1601db;
-        }
-
-        .height-auto { height: auto; }
-
-
-        .small-width { width: 12em; }
-
-        .horizontal-spacer {
-            height: 100%;
-            width: 0.3em;
-        }
-
-        .foreground { background-color: white;   }
-        .background { background-color: #EEEEEE; }
-
-        .border-padding {
-            padding:       0.3em;
-            border-radius: 0.3em;
-            border: 1px solid darkgrey;
-        }
-
-        .right-align { text-align: right; }
-
-        .small-font { font-size: small; }
-
-        .margin-left { margin-left: 0.3em; }
-
-        .large-margin-left  { margin-left:  2em; }
-        .large-margin-right { margin-right: 2em; }
-
-        .padded { padding: 0.3em; }
-
-        .padded-right  { padding-right:  0.3em; }
-        .padded-bottom { padding-bottom: 0.3em; }
-
-        .padded-left-right {
-            padding-left:   0.3em;
-            padding-right:  0.3em;
-        }
-
-        .padded-left-right-bottom {
-            padding-left:   0.3em;
-            padding-right:  0.3em;
-            padding-bottom: 0.3em;
-        }
-
-        .large-padding-right { padding-right: 2em; }
-
-    `]
+    styleUrls: ['./users-groups-tablist.component.scss']
 })
 export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, OnDestroy {
 

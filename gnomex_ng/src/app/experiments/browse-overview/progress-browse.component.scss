@@ -1,0 +1,23 @@
+input[type="radio"] + label:hover {
+    text-decoration: underline;
+}
+
+input[type="radio"]:checked + label {
+    color: #0f24e6;
+}
+
+input[type="radio"] {
+    opacity: 0;
+}
+
+span.radioLikeLink:hover {
+    cursor: hand;
+}
+
+div.divider {
+    display: inline;
+    border-left: 1px solid lightgrey;
+    height: 2rem;
+    margin-left: 1rem;
+    padding-left: 1rem;
+}

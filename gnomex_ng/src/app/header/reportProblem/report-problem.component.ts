@@ -33,7 +33,6 @@ import {UtilService} from "../../services/util.service";
             </div>
         </div>
     `,
-    styles: [``]
 })
 
 export class ReportProblemComponent extends BaseGenericContainerDialog {

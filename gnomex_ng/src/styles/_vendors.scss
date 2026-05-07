@@ -1,0 +1,22 @@
+// Third-party component deep overrides — migrated from component inline styles
+
+// angular-editor: disable resize and hide unused toolbar buttons
+angular-editor #editor                                       { resize: none; }
+angular-editor .angular-editor-button[title="Insert Image"] { display: none; }
+
+// angular-editor#descEditor: hide additional toolbar controls used in create-analysis-group
+angular-editor#descEditor .angular-editor-button[title="Unlink"],
+angular-editor#descEditor .angular-editor-button[title="Horizontal Line"],
+angular-editor#descEditor #strikeThrough-descEditor,
+angular-editor#descEditor #subscript-descEditor,
+angular-editor#descEditor #superscript-descEditor,
+angular-editor#descEditor #link-descEditor,
+angular-editor#descEditor #underline-descEditor,
+angular-editor#descEditor #justifyLeft-descEditor,
+angular-editor#descEditor #justifyCenter-descEditor,
+angular-editor#descEditor #justifyRight-descEditor,
+angular-editor#descEditor #justifyFull-descEditor,
+angular-editor#descEditor #foregroundColorPicker-descEditor,
+angular-editor#descEditor #backgroundColorPicker-descEditor,
+angular-editor#descEditor #toggleEditorMode-descEditor,
+angular-editor#descEditor #customClassSelector-descEditor { display: none; }

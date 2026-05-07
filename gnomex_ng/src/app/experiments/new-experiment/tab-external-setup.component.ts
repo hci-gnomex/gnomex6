@@ -21,17 +21,7 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 @Component({
     selector: 'tab-external-setup',
     templateUrl: "./tab-external-setup.component.html",
-    styles: [`
-        
-        .margin-right {
-            margin-right: 10em;
-        }
-        
-        .experiment-platform-label {
-            width: 20em;
-        }
-        
-    `]
+    styleUrls: ["./tab-external-setup.component.scss"]
 })
 
 export class TabExternalSetupComponent implements OnInit {

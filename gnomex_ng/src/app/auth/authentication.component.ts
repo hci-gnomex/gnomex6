@@ -20,19 +20,7 @@ import {first} from "rxjs/operators";
       </div>
     </div>
     `,
-  styles: [`
-    .container {
-      max-width: 400px;
-      margin-top: 20px;
-      padding-top: 15px;
-    }
-
-    .frame {
-      width: 400px;
-      height: 400px;
-      border: 0px;
-    }
-  `],
+  styleUrls: ['./authentication.component.scss'],
   host: {class: "mx-auto"}
 })
 export class AuthenticationComponent {

@@ -20,29 +20,7 @@ import {CellRendererValidation} from "./cell-renderer-validation";
 			</div>
 		</div>
 	`,
-	styles: [`
-			
-		.t  { display: table; }
-		.tr { display: table-row; }
-		.td { display: table-cell; }
-			
-		.vertical-center { vertical-align: middle; }
-		.right-align     { text-align: right;      }  
-		.padded          { padding:    0 0.3rem;   }
-
-        .error {
-            background: linear-gradient(rgba(255,0,0,0.25), rgba(255,0,0,0.25), rgba(255,0,0,0.25));
-            border: solid red 2px;
-		}
-		
-		.fix-table { table-layout:fixed; }
-		
-		.ellipsis {
-			overflow: hidden;
-			text-overflow: ellipsis;
-		}
-		
-	`]
+	styleUrls: ['./text-align-right-middle.renderer.scss']
 })
 export class TextAlignRightMiddleRenderer extends CellRendererValidation {
     public value: string;

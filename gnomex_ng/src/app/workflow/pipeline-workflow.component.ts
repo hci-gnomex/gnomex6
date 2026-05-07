@@ -17,7 +17,6 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: 'pipeline-workflow',
     templateUrl: 'pipeline-workflow.html',
-    styles: []
 })
 
 export class PipelineWorkflowComponent implements OnInit {

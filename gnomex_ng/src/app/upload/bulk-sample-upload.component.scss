@@ -1,0 +1,37 @@
+.no-max-height {
+    max-height: none;
+}
+
+.hidden {
+    display: none;
+}
+
+.blue-text {
+    color: blue;
+}
+.red-text {
+    color: red;
+}
+
+.underline {
+    text-decoration: underline;
+}
+
+.margin-right {
+    margin-right: 0.3em;
+}
+
+.title {
+    background-color: #84b278;
+    color: white;
+    font-size: larger;
+}
+
+.grabbable {
+    cursor: move;
+    cursor: grab;
+}
+.grabbed {
+    cursor: move;
+    cursor: grabbing;
+}

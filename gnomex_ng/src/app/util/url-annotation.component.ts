@@ -18,30 +18,7 @@ export const URL_ANNOT_VALUE_ACCESSOR: any = {
     templateUrl: './url-annotation.component.html',
     providers:[URL_ANNOT_VALUE_ACCESSOR],
 
-    styles: [`
-
-        .flex-column-container{
-            display:flex;
-            flex-direction: column;
-            
-        }
-        .annot-control{
-            width:30%;
-            margin:0.25em;
-            font-size:small;
-        }
-        .annot-border{
-            border-top: 1px solid #e8e8e8;
-            border-bottom: 1px solid #e8e8e8;
-        }
-        .annot-label{
-            align-self: center;
-            font-weight: bold;
-            margin:1em;
-        }
-
-
-    `]
+    styleUrls: ["./url-annotation.component.scss"]
 })
 export class UrlAnnotationComponent implements OnInit, OnDestroy, ControlValueAccessor{
     public annot:IAnnotation;

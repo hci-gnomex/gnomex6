@@ -1,0 +1,64 @@
+// Typography: font sizes, text decoration, image sizing
+
+.tree-node-font {
+  font-size: small;
+}
+
+.gx-label {
+  font-size: small;
+  font-style: italic;
+}
+
+.large-font {
+  font-size: large;
+}
+
+.medium-font {
+  font-size: medium;
+}
+
+.small-font {
+  font-size: small;
+}
+
+.smaller-font {
+  font-size: x-small;
+}
+
+.title-size {
+  font-size: large;
+}
+
+.underlined {
+  text-decoration: underline !important;
+}
+
+.italic {
+  font-style: italic;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.ellipsis {
+  text-overflow: ellipsis;
+}
+
+.single-line {
+  white-space: nowrap;
+}
+
+// --- Text alignment ---
+
+.text-center { text-align: center; }
+.text-right  { text-align: right; }
+
+img.icon {
+  margin-right: 0.5em;
+}
+
+img.tree-node-icon {
+  width: 16px;
+  height: 16px;
+}

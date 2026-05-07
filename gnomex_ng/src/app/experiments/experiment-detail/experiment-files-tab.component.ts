@@ -44,7 +44,6 @@ import {UtilService} from "../../services/util.service";
             </div>
         </div>
     `,
-    styles: [``]
 })
 export class ExperimentFilesTabComponent implements OnInit, OnDestroy {
 

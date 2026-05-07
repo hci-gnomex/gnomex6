@@ -87,29 +87,7 @@ import {PropertyService} from "../services/property.service";
             </div>
         </div>
     `,
-    styles: [`
-        .row-label {
-            flex: 1;
-        }
-        .row-field {
-            flex: 1;
-        }
-        .small-margin-right {
-            margin-right: 1em;
-        }
-        li {
-            margin-bottom: 1em;
-        }
-        .req-cat-icon {
-            width: 2em;
-        }
-        .req-cat-label {
-            width: 18em;
-        }
-        .border {
-            border: 1px solid black;
-        }
-    `]
+    styleUrls: ["./tab-amend-experiment-setup.component.scss"]
 })
 
 export class TabAmendExperimentSetupComponent implements OnInit, OnDestroy {

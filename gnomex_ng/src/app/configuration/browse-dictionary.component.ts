@@ -179,42 +179,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
             </div>
         </div>
     `,
-    styles: [`
-        .extra-padded {
-            padding: 1em;
-        }
-        .extra-padded-top {
-            padding-top: 1em;
-        }
-        .flex-one {
-            flex: 1;
-        }
-        .double-padded-left-right {
-            padding: 0.3em 0.6em 0.3em 0.6em;
-        }
-        img.button-image {
-            height: 16px;
-            width: 16px;
-        }
-        div.tree-row {
-            height: 3em;
-        }
-        div.tree-container {
-            height: calc(100% - 7em);
-            min-height: 10em;
-        }
-        div.panel {
-            width: 25%;
-            min-width: 23em;
-        }
-        div.detail-view {
-            width: 75%;
-            min-width: 50em;
-        }
-        .mat-input-element:disabled {
-            color: rgba(0,0,0,.78);
-        }
-    `],
+    styleUrls: ["./browse-dictionary.component.scss"]
 })
 
 export class BrowseDictionaryComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {

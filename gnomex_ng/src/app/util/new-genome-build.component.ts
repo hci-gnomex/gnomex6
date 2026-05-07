@@ -43,11 +43,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
             </div>
         </form>
     `,
-    styles: [`
-        .label-width {
-            width: 7em;
-        }
-    `]
+    styleUrls: ["./new-genome-build.component.scss"]
 })
 
 export class NewGenomeBuildComponent extends BaseGenericContainerDialog {

@@ -17,8 +17,6 @@ import {UtilService} from "../services/util.service";
                               [attr.aria-label]="'Download progress: ' + progressValue + '%'"></mat-progress-bar>
         </div>
     `,
-    styles:[`
-    `]
 })
 export class DownloadProgressComponent extends BaseGenericContainerDialog implements OnInit {
 

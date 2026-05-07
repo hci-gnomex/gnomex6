@@ -20,11 +20,7 @@ import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog"
             <label for="radioExternal">External</label>
         </div>
     `,
-    styles: [`
-        .margin-right {
-            margin-right: 1em;
-        }
-    `]
+    styleUrls: ["./billing-usage-report.component.scss"]
 })
 
 export class BillingUsageReportComponent extends BaseGenericContainerDialog {

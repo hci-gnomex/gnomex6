@@ -17,23 +17,7 @@ import {PropertyService} from "../../services/property.service";
 @Component({
     selector: 'experiment-platform-tab',
     templateUrl: './experiment-platform-tab.component.html',
-    styles:[`
-        .medium-form-input{
-            width: 30em;
-        }
-        .padded-checkbox{
-            padding: 1em;
-        }
-        .partial-padded-checkbox{
-            padding-top:1em;
-            padding-bottom:1em;
-            padding-right:1em;
-        }
-
-        .margin-right-field{
-            margin-right: 2em;
-        }
-    `]
+    styleUrls: ["./experiment-platform-tab.component.scss"]
 })
 
 export class ExperimentPlatformTabComponent implements OnInit, OnDestroy{

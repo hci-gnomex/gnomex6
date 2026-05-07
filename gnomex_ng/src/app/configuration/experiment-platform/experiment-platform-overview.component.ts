@@ -30,31 +30,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
 
 @Component({
     templateUrl: './experiment-platform-overview.component.html',
-    styles:[`
-
-        .active-item {
-            /*color: #636c72;*/
-            background-color: #c8c8c8;
-        }
-
-        .background {
-            background-color: whitesmoke;
-        }
-
-        .foreground {
-            background-color: white;
-        }
-
-        .mat-tab-group-border{
-            border: 1px solid #e8e8e8;
-        }
-
-        .active-item:hover {
-            border: .05rem solid #bfc4c4;
-            background-color: #c8c8c8;
-            cursor: pointer;
-        }
-    `]
+    styleUrls: ["./experiment-platform-overview.component.scss"]
 })
 
 export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{

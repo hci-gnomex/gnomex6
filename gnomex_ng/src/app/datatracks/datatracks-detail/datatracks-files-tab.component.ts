@@ -36,12 +36,6 @@ import {FormControl} from "@angular/forms";
             </div>
         </div>
     `,
-    styles: [`
-
-        .no-height { height: 0;  }
-        .single-em { width: 1em; }
-
-    `]
 })
 export class DatatracksFilesTabComponent implements OnInit {
 

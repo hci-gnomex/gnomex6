@@ -1,0 +1,13 @@
+.left-align { text-align: left; }
+
+.error {
+    background: linear-gradient(rgba(255,0,0,0.25), rgba(255,0,0,0.25), rgba(255,0,0,0.25));
+    border: solid red 2px;
+}
+
+.fix-table { table-layout: fixed; }
+
+.ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

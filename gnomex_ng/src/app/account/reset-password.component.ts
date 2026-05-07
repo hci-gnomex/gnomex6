@@ -35,29 +35,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
             </div>
         </div>
     `,
-    styles: [`
-        .spaced-children > *:not(:last-child) {
-            margin-right: 1em;
-        }
-        div.container {
-            width: 900px;
-            min-width: 900px;
-        }
-        div.header {
-            margin-bottom: 25px;
-        }
-        div.main-form {
-            width: 500px;
-            padding: 10px;
-        }
-        div.text-body {
-            padding-top: 10px;
-            text-align: center;
-        }
-        mat-form-field.input-field {
-            width: 250px;
-        }
-  `]
+    styleUrls: ['./reset-password.component.scss']
 })
 export class ResetPasswordComponent implements OnInit {
 

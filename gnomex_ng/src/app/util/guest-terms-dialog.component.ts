@@ -20,18 +20,7 @@ import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog"
             </div>
         </div>
     `,
-    styles:[`
-        .padding-small-force {
-            padding: 1em !important;
-        }
-        .no-margin-force {
-            margin: 0 !important;
-        }
-        .flex-container-col-force {
-            display: flex !important;
-            flex-direction: column;
-        }
-    `]
+    styleUrls: ["./guest-terms-dialog.component.scss"]
 })
 export class GuestTermsDialogComponent extends BaseGenericContainerDialog implements OnInit {
 

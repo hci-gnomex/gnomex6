@@ -43,36 +43,7 @@ import {IconRendererComponent} from "../../util/grid-renderers";
             </div>
         </div>
     `,
-    styles:[`
-
-
-        input[type="radio"] + label:hover {
-            /* hide the inputs */
-            text-decoration: underline;
-        }
-
-        input[type="radio"]:checked + label {
-            color: #0f24e6;
-        }
-
-        input[type="radio"] {
-            /* hide the inputs */
-            opacity: 0;
-        }
-
-        span.radioLikeLink:hover {
-            cursor:hand;
-        }
-
-        div.divider {
-            display: inline;
-            border-left: 1px solid lightgrey;
-            height: 2rem;
-            margin-left: 1rem;
-            padding-left: 1rem;
-        }
-
-    `]
+    styleUrls: ["./progress-browse.component.scss"]
 
 })
 export class ProgressBrowseTab extends PrimaryTab implements OnInit, OnDestroy{

@@ -17,18 +17,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
 
 @Component({
     templateUrl:'./link-to-experiment-dialog.component.html',
-    styles:[`
-        .padded-outer{
-            margin:0;
-            padding:0;
-        }
-        .padded-inner{
-            padding:0.3em;
-            
-        }
-
-
-    `]
+    styleUrls: ["./link-to-experiment-dialog.component.scss"]
 
 })
 

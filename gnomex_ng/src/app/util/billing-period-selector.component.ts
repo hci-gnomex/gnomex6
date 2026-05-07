@@ -21,7 +21,6 @@ import {PropertyService} from "../services/property.service";
         </div>
 
     `,
-    styles: [``]
 })
 
 export class BillingPeriodSelectorComponent implements OnInit {

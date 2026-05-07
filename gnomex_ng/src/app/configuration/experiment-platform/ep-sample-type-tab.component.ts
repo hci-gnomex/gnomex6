@@ -72,11 +72,7 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
             </div>
         </div>
     `,
-    styles:[`
-        .no-padding-dialog .mat-dialog-container {
-            padding: 0;
-        }
-    `]
+    styleUrls: ["./ep-sample-type-tab.component.scss"]
 })
 
 export class EpSampleTypeTabComponent implements OnInit, OnDestroy {

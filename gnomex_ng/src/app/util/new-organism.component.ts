@@ -58,7 +58,6 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
             </div>
         </form>
     `,
-    styles: [``]
 })
 
 export class NewOrganismComponent extends BaseGenericContainerDialog implements OnInit {

@@ -1,0 +1,252 @@
+// Layout utilities: flex containers, sizing, overflow, spacing, padding
+
+main {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  overflow: auto;
+}
+
+.main-display-area {
+  padding: 0.3em;
+  overflow: auto;
+}
+
+div.sidenav {
+  transition: 0.5s;
+  padding: 1% 0;
+  height: 100%;
+  width: 0; /* 0 width - change this in Typescript */
+  position: fixed;
+  left: 0;
+  overflow-x: hidden;
+  border-right: 5px solid lightgray;
+}
+
+div.mainnav {
+  transition: 0.5s;
+  padding: 1%;
+  height: 100%;
+}
+
+// --- Flex containers ---
+
+.flex-container-row {
+  display: flex;
+}
+
+.flex-container-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-grow {
+  flex: 1;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.align-baseline {
+  align-items: baseline;
+}
+
+.justify-space-between {
+  justify-content: space-between;
+}
+
+.justify-flex-end {
+  justify-content: flex-end;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+// --- Sizing ---
+
+.full-height {
+  height: 100%;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.half-width {
+  width: 50%;
+}
+
+.max-height {
+  max-height: 100%;
+}
+
+.no-height {
+  height: 0;
+  min-height: 0;
+  max-height: 0;
+}
+
+.single-em {
+  width: 1em;
+  min-width: 1em;
+  max-width: 1em;
+}
+
+.min-grid-size {
+  min-height: 8em;
+  min-width: 25em;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+// --- Overflow ---
+
+.overflow-auto {
+  overflow: auto;
+}
+
+.overflow-visible {
+  overflow: visible;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+// --- Child-distribution utilities ---
+
+.spaced-children-margin > *:not(:last-child) {
+  margin-right: 2em;
+}
+
+.children-flex-grow > * {
+  flex: 1;
+}
+
+// --- Margin / padding resets ---
+
+.no-margin {
+  margin: 0;
+}
+
+.no-padding {
+  padding: 0;
+}
+
+.no-padding-dialog {
+  padding: 0;
+}
+
+// --- Padding utilities ---
+
+.padded {
+  padding: 0.3em;
+}
+
+.padded-left {
+  padding-left: 0.3em;
+}
+
+.padded-right {
+  padding-right: 0.3em;
+}
+
+.padded-top {
+  padding-top: 0.3em;
+}
+
+.padded-bottom {
+  padding-bottom: 0.3em;
+}
+
+.padded-left-right {
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+
+.padded-top-bottom {
+  padding-top: 0.3em;
+  padding-bottom: 0.3em;
+}
+
+.padded-left-right-top {
+  padding-top: 0.3em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
+
+.padded-left-right-bottom {
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+  padding-bottom: 0.3em;
+}
+
+.double-padded {
+  padding: 0.6em;
+}
+
+.double-padded-left-right {
+  padding: 0.3em 0.6em 0.3em 0.6em;
+}
+
+.double-left-padded {
+  padding-left: 0.6em;
+}
+
+.double-padded-left {
+  padding-left: 0.6em;
+}
+
+.double-padded-right {
+  padding-right: 0.6em;
+}
+
+// --- Display: table (used by grid renderers/editors for vertical centering) ---
+
+.t  { display: table; }
+.tr { display: table-row; }
+.td { display: table-cell; }
+
+// --- Cursor ---
+
+.cursor-pointer  { cursor: pointer; }
+.cursor-grab     { cursor: grab; }
+.cursor-grabbing { cursor: grabbing; }
+
+// --- Misc display/interaction utilities ---
+
+.vertical-center { vertical-align: middle; }
+.list-unstyled   { list-style-type: none; }
+.outline-none    { outline: none; }
+.resize-none     { resize: none; }
+.rounded         { border-radius: 0.3em; }
+
+// --- Fixed-width helpers ---
+
+.request-number-width {
+  min-width: 4em;
+  width: fit-content;
+  max-width: 6em;
+}
+
+.experiment-type-width {
+  min-width: 15em;
+  width: fit-content;
+  max-width: 15em;
+}
+
+.protocol-width {
+  min-width: 25em;
+  width: fit-content;
+  max-width: 35em;
+}

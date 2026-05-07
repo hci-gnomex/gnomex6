@@ -27,7 +27,6 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 @Component({
     selector: 'new-external-experiment',
     templateUrl: "./new-external-experiment.component.html",
-    styles: [``]
 })
 export class NewExternalExperimentComponent implements OnInit, OnDestroy {
 

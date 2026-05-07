@@ -20,35 +20,7 @@ import {SpinnerDialogComponent} from "../popup/spinner-dialog.component";
             </div>
         </div>
     `,
-    styles: [`
-        .full-width {
-            width: 100%;
-        }
-
-        .full-height {
-            height: 100%;
-        }
-
-        .flex-column-container {
-            display: flex;
-            flex-direction: row;
-        }
-
-        .flex-row {
-            display: flex;
-        }
-
-        .flex-stretch {
-            display: flex;
-            flex: 1;
-        }
-        
-        
-        .inactive {
-            color: darkgrey;
-            font-style: italic;
-        }
-    `]
+    styleUrls: ['./improved-select.editor.scss']
 })
 export class ImprovedSelectEditor implements ICellEditorAngularComp, OnDestroy {
 

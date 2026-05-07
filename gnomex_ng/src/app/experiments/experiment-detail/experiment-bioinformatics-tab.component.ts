@@ -14,54 +14,7 @@ import {NewExperimentService} from "../../services/new-experiment.service";
 @Component({
     selector: 'experiment-bioinformatics-tab',
     templateUrl: 'experiment-bioinformatics-tab.component.html',
-    styles: [`
-
-        .margin-top { margin-top: 0.5rem; }
-
-
-        .label {
-            color: darkblue;
-            font-style: italic;
-
-            padding: 0.3em;
-        }
-
-        .label-width {
-            min-width: 12em;
-        }
-
-
-        .medium-width { width: 24em; }
-
-
-        .min-size { width: fit-content; }
-
-
-        .margin { margin: 0 2em; }
-
-
-        .bold { font-weight: bold; }
-
-        .small-font { font-size: small; }
-
-
-        .disabled-color { color: #646464; }
-
-
-        .highlight { background-color: #FFFEB3; }
-
-
-        .bordered { border: 1px solid silver; }
-
-        .disable-bordered { border: 1px solid #E0E0E0; }
-        .enable-bordered  { border: 1px solid #A0A0A0; }
-
-        .link-button {
-            color: blue;
-            text-decoration: underline;
-        }
-
-    `]
+    styleUrls: ["./experiment-bioinformatics-tab.component.scss"]
 })
 export class ExperimentBioinformaticsTabComponent implements OnDestroy {
 

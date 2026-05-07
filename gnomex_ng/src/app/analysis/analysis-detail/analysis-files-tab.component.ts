@@ -67,7 +67,6 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
             </div>
         </div>
     `,
-    styles: [``]
 })
 export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
 

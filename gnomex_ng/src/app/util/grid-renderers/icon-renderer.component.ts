@@ -8,8 +8,6 @@ import {ICellRendererParams} from "ag-grid-community";
             <img [src]="iconSource" alt="" aria-hidden="true"/>
         </div>
     `,
-    styles: [`        
-    `]
 })
 export class IconRendererComponent implements ICellRendererAngularComp, OnInit {
 

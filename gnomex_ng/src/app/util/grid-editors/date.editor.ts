@@ -33,32 +33,7 @@ import {DialogsService} from "../popup/dialogs.service";
             </div>
         </div>
 	`,
-	styles: [`
-		.t  { display: table;      }
-		.tr { display: table-row;  }
-		.td { display: table-cell; }
-		
-		.full-width  { width:  100%; }
-		.full-height { height: 100%; }
-		
-		.vertical-center { vertical-align: middle; }
-		
-		.invisible {
-			visibility: hidden;
-			width: 0;
-			height: 0;
-		}
-		
-		.right-align { text-align: right; }
-        
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
-        }
-        .flex-stretch {
-            flex: 1;
-        }
-	`]
+	styleUrls: ['./date.editor.scss']
 })
 export class DateEditor implements AfterViewInit, ICellEditorAngularComp {
 

@@ -24,7 +24,7 @@
             ],
             "styles": [
               "src/material-theme.scss",
-              "src/styles.css",
+              "src/styles/index.scss",
               "node_modules/font-awesome/css/font-awesome.min.css"
             ],
             "scripts": [
@@ -126,7 +126,7 @@
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
             "styles": [
-              "src/styles.css"
+              "src/styles/index.scss"
             ],
             "scripts": [],
             "assets": [

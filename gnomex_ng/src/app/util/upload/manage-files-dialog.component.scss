@@ -1,0 +1,17 @@
+.padded-outer {
+    margin: 0;
+    padding: 0;
+}
+
+.padded-inner {
+    padding: 0.3em;
+}
+
+mat-form-field.medium-form-input {
+    width: 20em;
+    margin-right: 1em;
+}
+
+.force-flex {
+    display: flex !important;
+}

@@ -54,29 +54,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
             </div>
         </div>
     `,
-    styles: [`
-
-        .padded { padding: 0.3em; }
-
-        .right-padding { padding-right: 0.5em; }
-
-        .border { border: 1px solid #e8e8e8; }
-
-        .vertical-spacer { height: 0.3em; }
-
-        .no-top-margin { margin-top: 0; }
-
-
-        .flex-container{
-            display: flex;
-            justify-content: space-between;
-            flex:1;
-        }
-        /deep/ .mat-tab-body-wrapper {
-            flex-grow: 1 !important;
-        }
-
-    `]
+    styleUrls: ["./analysis-overview.component.scss"]
 })
 export class AnalysisOverviewComponent implements OnInit, OnDestroy {
     @ViewChild(MatTabGroup, {static: false}) tabs: MatTabGroup;

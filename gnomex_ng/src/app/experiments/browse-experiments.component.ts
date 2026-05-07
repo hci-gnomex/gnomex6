@@ -48,56 +48,7 @@ const VIEW_LIMIT_EXPERIMENTS = 'view_limit_experiments';
 @Component({
     selector: 'experiments',
     templateUrl: './browse-experiments.component.html',
-    styles: [`
-
-
-        .t  { display: table;      }
-        .tr { display: table-row;  }
-        .td { display: table-cell; }
-
-        .half-width { width: 50%; }
-
-        .vertical-center { vertical-align: middle; }
-        .horizontal-center { text-align: center; }
-
-        .vertical-spacer {
-            height: 0.3em;
-            min-height: 0.3em;
-        }
-
-
-        .padding { padding: 0.3em; }
-
-        .left-right-padding {
-            padding-left:  0.3em;
-            padding-right: 0.3em;
-        }
-
-        .major-left-right-padding {
-            padding-left:  1em;
-            padding-right: 0.3em;
-        }
-
-        .foreground { background-color: white;   }
-        .background { background-color: #EEEEEE; }
-
-        .border { border: #C8C8C8 solid thin; }
-        .background-border {
-            border-radius: 0.3em;
-            border: 1px solid darkgrey;
-        }
-
-        .no-overflow  { overflow:    hidden; }
-        .no-word-wrap { white-space: nowrap; }
-
-        .allow-line-breaks {
-            white-space: pre-line;
-        }
-        .background-lightyellow {
-            background-color: lightyellow;
-        }
-
-    `]
+    styleUrls: ["./browse-experiments.component.scss"]
 })
 
 export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewInit {

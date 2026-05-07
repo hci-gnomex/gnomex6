@@ -39,33 +39,7 @@ import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
     </div>
   `
   ,
-  styles:[`
-    .mat-tab-group-border{
-      border: 1px solid #e8e8e8;
-      width:100%;
-    }
-    .spaced-children > *:not(:last-child) {
-      margin-right: 1em;
-    }
-    div.container {
-      width: 900px;
-      min-width: 900px;
-    }
-    div.header {
-      margin-bottom: 25px;
-    }
-    div.main-form {
-      width: 600px;
-      padding: 10px;
-    }
-    mat-form-field.input-field {
-      width: 250px;
-    }
-    .approval-notice {
-      color: var(--red-darker);
-      font-size: large;
-    }
-  `]
+  styleUrls: ["./select-core.component.scss"]
 })
 export class SelectCoreComponent  implements OnInit, OnDestroy{
   public coreFacilities: ISimpleCoreFacility[];

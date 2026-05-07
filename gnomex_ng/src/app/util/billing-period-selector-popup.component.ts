@@ -22,8 +22,6 @@ import {BillingPeriod} from "./billing-period-selector.component";
             <button mat-button (click)="this.clear()" aria-label="Clear selection">Clear</button>
         </mat-dialog-actions>
     `,
-    styles: [`
-    `]
 })
 
 export class BillingPeriodSelectorPopupComponent implements OnInit {

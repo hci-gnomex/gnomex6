@@ -1,0 +1,32 @@
+// Angular Material component overrides
+
+// Disabled radio button label contrast
+.mat-radio-button.mat-radio-disabled .mat-radio-label-content {
+  color: var(--greywarm-darkest) !important;
+}
+
+// Tab body fills its container height
+.mat-tab-body-wrapper {
+  height: 100%;
+}
+
+// Equal-width tabs when .flex-style is applied to mat-tab-group
+mat-tab-group.flex-style mat-tab-header .mat-tab-label-container .mat-tab-list .mat-tab-labels .mat-tab-label {
+  min-width: 48px;
+  flex: 1;
+}
+
+// Remove padding from dialog containers when .no-padding is applied to the overlay panel
+.no-padding .mat-dialog-container {
+  padding: 0 !important;
+}
+
+// Tab group border used across browse/detail views
+.mat-tab-group-border {
+  border: 1px solid #e8e8e8;
+}
+
+// Tab body stretches to fill height via flex in certain overview layouts
+.mat-tab-body-wrapper {
+  flex-grow: 1 !important;
+}

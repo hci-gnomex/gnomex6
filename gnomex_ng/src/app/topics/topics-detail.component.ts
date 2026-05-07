@@ -22,32 +22,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 
 @Component({
     templateUrl: "./topics-detail.component.html",
-    styles: [`
-        .flex-container {
-            display: flex;
-            justify-content: space-between;
-            flex:1;
-        }
-        .flexbox-column {
-            display:flex;
-            flex-direction:column;
-            height:100%;
-            width:100%;
-        }
-        .mat-tab-group-border {
-            border: 1px solid #e8e8e8;
-        }
-        .formField {
-            width: 30%;
-            margin: 0 0.5em;
-        }
-        :host /deep/ angular-editor #editor {
-            resize: none;
-        }
-        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
-            display: none;
-        }
-    `]
+    styleUrls: ["./topics-detail.component.scss"]
 })
 
 export class TopicDetailComponent implements OnInit, OnDestroy, AfterViewInit {

@@ -15,23 +15,7 @@ import {FlowcellWorkflowComponent} from "./flowcell-workflow.component";
 @Component({
     selector: 'workflow',
     templateUrl: 'workflow.html',
-    styles: [`
-        
-        .mat-tab-list .mat-tab-labels .mat-tab-label {
-            min-width: 48px;
-            flex: 1;
-        }
-        
-        .vertical-spacer {
-            height: 2em;
-            max-height: 2em;
-        }
-
-        .no-height { height: 0; }
-
-        .single-em { width: 1em; }
-        
-    `]
+    styleUrls: ['./workflow.component.scss']
 })
 export class WorkflowComponent implements OnInit, AfterViewInit {
     @ViewChild('qcWorkflow', {static: false}) qcWorkflow: QcWorkflowComponent;

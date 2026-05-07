@@ -40,12 +40,7 @@ import {DialogsService, DialogType} from "./popup/dialogs.service";
 
 
     `,
-    styles: [`
-        .flex-item-tree {
-            flex:1;
-            border:thin solid gainsboro;
-        }
-    `]
+    styleUrls: ["./related-data-tab.component.scss"]
 })
 export class RelatedDataTabComponent implements OnInit, AfterViewInit{
 

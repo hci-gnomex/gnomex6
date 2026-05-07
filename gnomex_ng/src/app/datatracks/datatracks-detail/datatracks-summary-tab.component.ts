@@ -10,14 +10,6 @@ import {Subscription} from "rxjs";
 @Component({
     selector:'dt-summary-tab',
     templateUrl:'./datatracks-summary-tab.component.html',
-    styles:[`
-        :host /deep/ angular-editor #editor {
-            resize: none;
-        }
-        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
-            display: none;
-        }
-    `]
 
 })
 export class DatatracksSummaryTabComponent implements OnInit, OnDestroy {

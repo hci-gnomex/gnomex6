@@ -24,28 +24,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: "qc-workflow",
     templateUrl: "qc-workflow.html",
-    styles: [`
-
-
-        .request-number-width {
-            min-width: 4em;
-            width: fit-content;
-            max-width: 6em;
-        }
-        .core-facility-width {
-            min-width: 15em;
-            width: fit-content;
-            max-width: 15em;
-        }
-
-        .grid-min-height { min-height: 8em; }
-        
-        .no-height { height: 0; }
-
-        .single-em { width: 1em; }
-        
-        
-    `]
+    styleUrls: ['./qc-workflow.component.scss']
 })
 
 export class QcWorkflowComponent implements OnInit, OnChanges {

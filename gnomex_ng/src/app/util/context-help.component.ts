@@ -12,14 +12,7 @@ import {DialogsService} from "./popup/dialogs.service";
             {{ label }}
         </button>
     `,
-    styles: [`
-        * {
-            max-width: 80em;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-    `]
+    styleUrls: ["./context-help.component.scss"]
 })
 export class ContextHelpComponent implements OnInit {
 

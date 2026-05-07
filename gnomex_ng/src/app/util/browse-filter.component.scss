@@ -1,0 +1,87 @@
+input.filterTextInput {
+    background: gainsboro;
+}
+
+.filter {
+    font-size: 12px;
+    width: 100%;
+    border: 1px solid grey;
+    background-color: white;
+}
+
+button.showHideButton {
+    border: none;
+    background: none;
+    border-radius: 5px;
+}
+
+button.showHideButton:hover {
+    background: deepskyblue;
+}
+
+button.searchButton {
+    border: 1px solid grey;
+    border-radius: 5px;
+    background: gainsboro;
+}
+
+button.searchButton:hover {
+    background: deepskyblue;
+}
+
+div.inlineDiv {
+    display: flex;
+    align-items: center;
+    color: #101010;
+}
+
+div.labelAndIcon {
+    display: flex;
+    align-items: center;
+    width: 11em;
+    padding-left: 0.5em;
+    color: #101010;
+}
+
+div.divider {
+    display: inline;
+    border-left: 1px solid lightgrey;
+    height: 1.5em;
+}
+
+.children-spaced > *:not(:last-child) {
+    margin-right: 1em;
+}
+
+div.filter-row-top {
+    margin: 0.5em 0;
+}
+
+div.filter-row-bottom {
+    padding-left: 12em;
+    margin: 0 0 0.5em 0;
+}
+
+label.leading-label {
+    margin-right: 0.3em;
+    color: #101010;
+}
+
+label.following-label {
+    margin-left: 0.3em;
+    color: #101010;
+}
+
+.padding-right {
+    padding-right: 1em;
+}
+
+.collapse-expand-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.collapse-expand-icon {
+    height: 1.5em;
+}

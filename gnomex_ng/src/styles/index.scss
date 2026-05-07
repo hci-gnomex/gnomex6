@@ -1,0 +1,20 @@
+// Global stylesheet entry point.
+// Third-party CSS is loaded here; all project partials are forwarded below.
+
+@import '../../node_modules/@circlon/angular-tree-component/css/angular-tree-component.css';
+@import '../../node_modules/ag-grid-community/dist/styles/ag-grid.css';
+@import '../../node_modules/ag-grid-community/dist/styles/ag-theme-fresh.css';
+@import '../../node_modules/ag-grid-community/dist/styles/ag-theme-balham.css';
+
+@forward 'variables';
+@forward 'reset';
+@forward 'navigation';
+@forward 'layout';
+@forward 'typography';
+@forward 'forms';
+@forward 'buttons';
+@forward 'colors';
+@forward 'grids';
+@forward 'material';
+@forward 'vendors';
+@forward 'accessibility';

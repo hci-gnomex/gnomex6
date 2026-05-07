@@ -71,11 +71,7 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
 
         </div>
     `,
-    styles:[`
-        .padded-checkbox{
-            padding-top: 1.25rem;
-        }
-    `]
+    styleUrls: ["./ep-illumina-seq-tab.component.scss"]
 })
 
 export class EpIlluminaSeqTabComponent implements OnInit, OnDestroy{

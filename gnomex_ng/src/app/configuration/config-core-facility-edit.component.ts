@@ -15,18 +15,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: "core-facility-edit",
     templateUrl: "./config-core-facility-edit.component.html",
-    styles: [`
-        .item{
-            margin-right: 1em;
-            flex: 1 1 0;
-        }
-        :host /deep/ angular-editor #editor {
-            resize: none;
-        }
-        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
-            display: none;
-        }
-    `]
+    styleUrls: ["./config-core-facility-edit.component.scss"]
 })
 export class ConfigCoreFacilityEditComponent implements OnInit, OnDestroy {
     @ViewChild("descEditorRef", {static: true}) descEditor: AngularEditorComponent;

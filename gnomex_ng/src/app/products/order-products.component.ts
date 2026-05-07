@@ -23,41 +23,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: 'order-products',
     templateUrl: "./order-products.component.html",
-    styles: [`
-        .padded {
-            padding: 0.5em;
-        }
-        .half-width {
-            width: 50%;
-        }
-        td > * {
-            vertical-align: middle;
-        }
-        img.description-icon {
-            padding-left: 1em;
-        }
-        .left-padding {
-            padding-left: 1em;
-        }
-        .user-input {
-            background-color: gainsboro;
-        }
-        .justify-end {
-            justify-content: flex-end;
-        }
-        .justify-space-between {
-            justify-content: space-between;
-        }
-        .bold-font {
-            font-weight: bold;
-        }
-        .padding-top {
-            padding-top: 1em;
-        }
-        .padding-bottom {
-            padding-bottom: 1em;
-        }
-    `]
+    styleUrls: ['./order-products.component.scss']
 })
 
 export class OrderProductsComponent implements OnInit {

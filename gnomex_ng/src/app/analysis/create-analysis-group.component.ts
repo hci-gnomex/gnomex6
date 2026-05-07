@@ -16,45 +16,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: "create-analysis-group-dialog",
     templateUrl: "create-analysis-group-dialog.html",
-    styles: [`
-        .inlineComboBox {
-            display: inline-block;
-        }
-        div.inlineDiv {
-            display: inline-block;
-            margin: 0.3rem 0.8rem 0.3rem 0.8rem;
-        }
-        .full-width {
-            width: 100%;
-        }
-        .label-width {
-            width: 10em;
-        }
-
-        :host /deep/ angular-editor#descEditor #editor {
-            resize: none;
-        }
-
-        :host /deep/ angular-editor#descEditor .angular-editor-button[title="Insert Image"],
-        :host /deep/ angular-editor#descEditor .angular-editor-button[title="Unlink"],
-        :host /deep/ angular-editor#descEditor .angular-editor-button[title="Horizontal Line"],
-        :host /deep/ angular-editor#descEditor #strikeThrough-descEditor,
-        :host /deep/ angular-editor#descEditor #subscript-descEditor,
-        :host /deep/ angular-editor#descEditor #superscript-descEditor,
-        :host /deep/ angular-editor#descEditor #link-descEditor,
-        :host /deep/ angular-editor#descEditor #underline-descEditor,
-        :host /deep/ angular-editor#descEditor #justifyLeft-descEditor,
-        :host /deep/ angular-editor#descEditor #justifyCenter-descEditor,
-        :host /deep/ angular-editor#descEditor #justifyRight-descEditor,
-        :host /deep/ angular-editor#descEditor #justifyFull-descEditor,
-        :host /deep/ angular-editor#descEditor #foregroundColorPicker-descEditor,
-        :host /deep/ angular-editor#descEditor #backgroundColorPicker-descEditor,
-        :host /deep/ angular-editor#descEditor #toggleEditorMode-descEditor,
-        :host /deep/ angular-editor#descEditor #customClassSelector-descEditor {
-            display: none;
-        }
-
-    `]
+    styleUrls: ["./create-analysis-group.component.scss"]
 })
 
 export class CreateAnalysisGroupComponent extends BaseGenericContainerDialog implements OnInit, AfterViewInit {

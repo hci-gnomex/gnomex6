@@ -39,31 +39,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
       </mat-tab-group>
     </div>
   `,
-  styles: [`
-
-    .padded-outer{
-      margin:0;
-      padding:0;
-    }
-    .padded-inner{
-      padding:0.3em;
-
-    }
-    mat-form-field.medium-form-input{
-      width: 20em;
-      margin-right: 1em;
-    }
-    .mat-tab-group-border{
-      border: 1px solid #e8e8e8;
-    }
-    .force-flex{
-      display:flex !important;
-    }
-
-
-
-
-  `]
+  styleUrls: ["./manage-files-dialog.component.scss"]
 })
 export class ManageFilesDialogComponent extends BaseGenericContainerDialog implements OnInit{
 

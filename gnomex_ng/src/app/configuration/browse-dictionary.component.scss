@@ -1,0 +1,39 @@
+.flex-one {
+    flex: 1;
+}
+
+.extra-padded {
+    padding: 1em;
+}
+
+.extra-padded-top {
+    padding-top: 1em;
+}
+
+img.button-image {
+    height: 16px;
+    width: 16px;
+}
+
+div.tree-row {
+    height: 3em;
+}
+
+div.tree-container {
+    height: calc(100% - 7em);
+    min-height: 10em;
+}
+
+div.panel {
+    width: 25%;
+    min-width: 23em;
+}
+
+div.detail-view {
+    width: 75%;
+    min-width: 50em;
+}
+
+.mat-input-element:disabled {
+    color: rgba(0, 0, 0, 0.78);
+}

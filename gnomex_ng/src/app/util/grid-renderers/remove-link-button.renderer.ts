@@ -13,37 +13,7 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 			</div>
 		</div>
 	`,
-	styles: [`
-			button.link-button {
-					background: none;
-					background-color: inherit;
-					color: #0a4894;
-					border: none;
-					padding: 0;
-					font: inherit;
-					text-decoration: underline;
-					cursor: pointer;
-			}
-      
-			button.link-button:focus {
-					outline: none;
-      }
-			
-      .button-container {
-					padding-left: 0.3rem;
-			}
-			
-			.cursor { cursor: pointer; }
-			
-			.full-width  { width:  100% }
-			.full-height { height: 100% }
-			
-			.t  { display: table; }
-			.tr { display: table-row; }
-			.td { display: table-cell; }
-			
-			.vertical-center { vertical-align: middle; }
-	`]
+	styleUrls: ['./remove-link-button.renderer.scss']
 })
 export class RemoveLinkButtonRenderer implements ICellRendererAngularComp {
 	public params: any;

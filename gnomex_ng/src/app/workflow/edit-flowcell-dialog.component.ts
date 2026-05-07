@@ -20,7 +20,6 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: "edit-flowcell-dialog",
     templateUrl: "./edit-flowcell-dialog.html",
-    styles: [``]
 })
 
 export class EditFlowcellDialogComponent extends BaseGenericContainerDialog implements OnInit{

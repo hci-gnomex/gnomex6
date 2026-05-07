@@ -1,0 +1,27 @@
+.centered-text {
+    text-align: center;
+}
+
+.grabbable {
+    cursor: move;
+    cursor: grab;
+}
+
+.grabbed {
+    cursor: move;
+    cursor: grabbing;
+}
+
+.force-flex-container-row {
+    display: flex !important;
+}
+
+.exit {
+    max-width: 20px;
+    cursor: pointer;
+}
+
+.i-class {
+    margin-left: 0.3em;
+    margin-right: 0.3em;
+}

@@ -25,46 +25,7 @@ import {UtilService} from "../services/util.service";
 @Component({
     selector: 'flowcell-assembly-workflow',
     templateUrl: 'flowcell-assembly-workflow.component.html',
-    styles: [`
-
-
-        .large-max-width {
-            max-width : 40em;
-        }
-
-        .assembly-message {
-            color: #1601db;
-        }
-
-
-        .date-width {
-            width: 10em;
-        }
-
-        .protocol-width {
-            width: 30em;
-        }
-
-        .run-width {
-            width: 5em;
-        }
-        .children-margin-right > *:not(:last-child) {
-            margin-right: 1em;
-        }
-
-        .min-lab-width {
-            min-width: 3em;
-        }
-
-        .min-request-category-width {
-            min-width: 3em;
-        }
-
-        :host ::ng-deep .ag-theme-fresh .ag-row-selected {
-            background-color: deepskyblue !important;
-        }
-
-    `]
+    styleUrls: ["./flowcell-assembly-workflow.component.scss"]
 })
 
 export class FlowcellAssemblyWorkflowComponent implements OnInit {

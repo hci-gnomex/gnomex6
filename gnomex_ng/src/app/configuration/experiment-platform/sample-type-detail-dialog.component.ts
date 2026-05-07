@@ -18,14 +18,6 @@ import {ConstantsService} from "../../services/constants.service";
             </mat-error>
         </div>
     `,
-    styles: [`
-        :host /deep/ angular-editor #editor {
-            resize: none;
-        }
-        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
-            display: none;
-        }
-    `]
 })
 export class SampleTypeDetailDialogComponent extends BaseGenericContainerDialog implements OnInit {
 

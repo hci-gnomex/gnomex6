@@ -13,35 +13,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: 'email-all-users',
     templateUrl: "./email-all-users.component.html",
-    styles: [`
-        :host /deep/ angular-editor #editor {
-            resize: none;
-        }
-        :host /deep/ angular-editor .angular-editor-button[title="Insert Image"] {
-            display: none;
-        }
-
-        .formField {
-            width: 100%;
-            margin: 0.25rem 0;
-        }
-        mat-radio-group.radio {
-            width: 100%;
-            margin: 0.25rem 0;
-        }
-        mat-radio-button.radioOption {
-            margin: 0 0.25rem;
-        }
-        div.formField {
-            width: 100%;
-            margin: 0.25rem 0;
-            display: flex;
-            flex-direction: row;
-        }
-        img.icon {
-            margin-right: 0.5rem;
-        }
-    `]
+    styleUrls: ["./email-all-users.component.scss"]
 })
 
 export class EmailAllUsersComponent extends BaseGenericContainerDialog implements OnInit {

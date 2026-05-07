@@ -19,20 +19,7 @@ import {DictionaryService} from "../../services/dictionary.service";
         </div>
 
     `,
-    styles: [`
-        .t  { display: table;      }
-        .tr { display: table-row;  }
-        .td { display: table-cell; }
-
-        .vertical-align { vertical-align: middle; }
-
-        .fix-table { table-layout:fixed; }
-
-        .ellipsis {
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-    `]
+    styleUrls: ['./icon-text-renderer.component.scss']
 })
 export class IconTextRendererComponent implements ICellRendererAngularComp, AfterViewInit, OnInit {
 

@@ -80,15 +80,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
         </form>
 
     `,
-    styles: [`
-        .body-footer-form{
-            display:flex;
-            flex-direction: column;
-            height:100%;
-            width:100%;
-            justify-content: space-between;
-        }
-    `]
+    styleUrls: ['./datatracks-organism.component.scss']
 })
 export class DatatracksOrganismComponent implements OnInit, OnDestroy {
     //Override

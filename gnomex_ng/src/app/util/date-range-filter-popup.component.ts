@@ -5,11 +5,7 @@ import {DateRange, DateRangeFilterComponent} from "./date-range-filter.component
 @Component({
     selector: 'date-range-filter-popup',
     templateUrl: "./date-range-filter-popup.component.html",
-    styles: [`
-        .margin-right {
-            margin-right: 2rem;
-        }
-    `]
+    styleUrls: ["./date-range-filter-popup.component.scss"]
 })
 export class DateRangeFilterPopupComponent implements OnInit {
     public fromDate: Date;

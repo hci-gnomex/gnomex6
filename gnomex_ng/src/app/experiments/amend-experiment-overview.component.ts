@@ -71,15 +71,7 @@ import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.com
             </div>
         </div>
     `,
-    styles: [`
-        .padding-light {
-            padding: 0.5em;
-        }
-        .highlight-agreement {
-            color: green;
-            font-style: italic;
-        }
-    `]
+    styleUrls: ["./amend-experiment-overview.component.scss"]
 })
 
 export class AmendExperimentOverviewComponent implements OnInit, OnDestroy {

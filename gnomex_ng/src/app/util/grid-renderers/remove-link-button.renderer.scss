@@ -1,0 +1,20 @@
+button.link-button {
+    background: none;
+    background-color: inherit;
+    color: #0a4894;
+    border: none;
+    padding: 0;
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+button.link-button:focus {
+    outline: none;
+}
+
+.button-container {
+    padding-left: 0.3rem;
+}
+
+.cursor { cursor: pointer; }

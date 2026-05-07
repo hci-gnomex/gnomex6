@@ -1,0 +1,16 @@
+.invisible {
+    visibility: hidden;
+    width: 0;
+    height: 0;
+}
+
+.right-align { text-align: right; }
+
+.flex-row-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.flex-stretch {
+    flex: 1;
+}

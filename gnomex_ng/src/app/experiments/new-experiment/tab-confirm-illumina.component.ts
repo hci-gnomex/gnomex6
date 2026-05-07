@@ -33,52 +33,7 @@ import {ImprovedSelectEditor} from "../../util/grid-editors/improved-select.edit
 @Component({
     selector: "tabConfirmIllumina",
     templateUrl: "./tab-confirm-illumina.component.html",
-    styles: [`
-        
-
-        .no-height { height: 0;  }
-        .single-em { width: 1em; }
-
-        .multiline-strings { white-space: pre-line; }
-        
-        .bordered { border: solid silver 1px; }
-        
-        .heavily-left-padded { padding-left: 1.5em; }
-        .heavily-right-padded { padding-right: 1.5em; }
-        
-        .moderate-width {
-            width: 5em;
-            min-width: 5em;
-        }
-        
-        
-        .wide-display {
-            min-width: 15em;
-            width: 15%;
-        }
-        
-        
-        .t  { display: table;      }
-        .tr { display: table-row;  }
-        .td { display: table-cell; }
-        
-        .right-align { text-align: right; }
-        
-        
-        .top-margin { margin-top: 0.3em; }
-        
-        .minimal { width: fit-content; }
-        
-        .instructions-background {
-            background-color: lightyellow;
-        }
-        
-        .minheight { min-height: 8em; }
-        
-        .font-bold { font-weight: bold; }
-        
-        
-    `]
+    styleUrls: ["./tab-confirm-illumina.component.scss"]
 })
 
 export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {

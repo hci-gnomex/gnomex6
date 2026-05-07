@@ -10,21 +10,7 @@ import {UrlAnnotRenderer} from "../grid-renderers/url-annot-renderer";
 
 @Component({
     templateUrl: "./url-annot.editor.html",
-    styles: [`
-			.eight-five-height { height: 85%; }
-			
-			.flex-column-container {
-					display: flex;
-					flex-direction: row;
-			}
-			.flex-row  {
-					display: flex;
-			}
-			.flex-stretch { 
-					display:flex; 
-					flex: 1; 
-			}
-	`]
+    styleUrls: ['./url-annot-editor.scss']
 }) export class UrlAnnotEditor implements ICellEditorAngularComp, OnDestroy {
     params: any;
     value: any;

@@ -10,35 +10,7 @@ import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-edito
 
 @Component({
     templateUrl: "./basic-email-dialog.component.html",
-    styles: [`
-        mat-form-field.formField {
-            width: 100%;
-            margin: 0.25rem 0;
-        }
-
-        :host /deep/ angular-editor#emailEditor #editor {
-            resize: none;
-        }
-
-        :host /deep/ angular-editor#emailEditor .angular-editor-button[title="Insert Image"],
-        :host /deep/ angular-editor#emailEditor .angular-editor-button[title="Unlink"],
-        :host /deep/ angular-editor#emailEditor .angular-editor-button[title="Horizontal Line"],
-        :host /deep/ angular-editor#emailEditor #strikeThrough-emailEditor,
-        :host /deep/ angular-editor#emailEditor #subscript-emailEditor,
-        :host /deep/ angular-editor#emailEditor #superscript-emailEditor,
-        :host /deep/ angular-editor#emailEditor #link-emailEditor,
-        :host /deep/ angular-editor#emailEditor #underline-emailEditor,
-        :host /deep/ angular-editor#emailEditor #justifyLeft-emailEditor,
-        :host /deep/ angular-editor#emailEditor #justifyCenter-emailEditor,
-        :host /deep/ angular-editor#emailEditor #justifyRight-emailEditor,
-        :host /deep/ angular-editor#emailEditor #justifyFull-emailEditor,
-        :host /deep/ angular-editor#emailEditor #foregroundColorPicker-emailEditor,
-        :host /deep/ angular-editor#emailEditor #backgroundColorPicker-emailEditor,
-        :host /deep/ angular-editor#emailEditor #toggleEditorMode-emailEditor,
-        :host /deep/ angular-editor#emailEditor #customClassSelector-emailEditor {
-            display: none;
-        }
-    `]
+    styleUrls: ["./basic-email-dialog.component.scss"]
 })
 export class BasicEmailDialogComponent extends BaseGenericContainerDialog implements OnInit {
 

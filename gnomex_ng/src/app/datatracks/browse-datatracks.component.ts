@@ -32,43 +32,7 @@ import {AriaAnnouncerService} from "../util/accessibility/aria-announcer.service
 @Component({
   selector: "datatracks",
   templateUrl: "./browse-datatracks.component.html",
-  styles: [`
-
-    .short-width { width: 10em; }
-
-    .padded { padding: 0.3em; }
-
-    .left-right-padded {
-      padding-left:  0.3em;
-      padding-right: 0.3em;
-    }
-    .major-left-right-padded {
-      padding-left:  1em;
-      padding-right: 1em;
-    }
-
-    .vertical-spacer {
-      height: 0.3em;
-      min-height: 0.3em;
-    }
-
-    .foreground { background-color: white;   }
-    .background { background-color: #EEEEEE; }
-
-    .border { border: #C8C8C8 solid thin; }
-
-    .major-border {
-      border-radius: 0.3em;
-      border: 1px solid darkgrey;
-    }
-
-    .small-font      { font-size: small; }
-
-    .no-overflow { overflow: hidden; }
-
-    .no-word-wrap { white-space: nowrap; }
-
-  `]
+  styleUrls: ["./browse-datatracks.component.scss"]
 })
 
 export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewInit {

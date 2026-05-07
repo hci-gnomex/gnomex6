@@ -14,19 +14,7 @@ import {BaseGenericContainerDialog} from "../../../util/popup/base-generic-conta
 @Component({
     selector: 'copy-accounts-dialog',
     templateUrl: './copy-accounts-dialog.component.html',
-    styles: [`
-        .vertical-spacer {
-            height: 0.3em;
-        }
-
-        .fixed-height {
-            height: 30em;
-        }
-
-        .small-font {
-            font-size: x-small;
-        }
-    `]
+    styleUrls: ['./copy-accounts-dialog.component.scss']
 })
 export class CopyAccountsDialogComponent extends BaseGenericContainerDialog implements OnInit {
 

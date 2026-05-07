@@ -37,18 +37,7 @@ import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.
 @Component({
     selector: 'new-experiment',
     templateUrl: "./new-experiment.component.html",
-    styles: [`
-
-        .bordered { border: 1px solid silver; }
-
-        .highlight-agreement {
-            color: green;
-            font-style: italic;
-        }
-
-        .padded-right-large { padding-right: 1em; }
-
-    `]
+    styleUrls: ["./new-experiment.component.scss"]
 
 })
 

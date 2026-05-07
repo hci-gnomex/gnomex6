@@ -11,39 +11,7 @@ import {UserPreferencesService} from "../services/user-preferences.service";
 @Component({
     selector: 'billing-filter',
     templateUrl: "./billing-filter.component.html",
-    styles: [`
-
-        .mat-autocomplete-panel > .mat-option.ng-star-inserted {
-            line-height: initial;
-            padding: 0.3em;
-            font-size: small;
-        }
-
-
-        .min-width { min-width: 10em; }
-
-        .experiment-width {
-            width: 8em;
-            min-width: 8em;
-        }
-
-        .core-facility-width {
-            width: 16em;
-            min-width: 16em;
-        }
-
-        .lab-display-width {
-            width: 20em;
-            min-width: 20em;
-        }
-
-        .account-display-width {
-            width: 25em;
-            min-width: 25em;
-        }
-
-
-    `]
+    styleUrls: ['./billing-filter.component.scss']
 })
 
 export class BillingFilterComponent implements OnInit {

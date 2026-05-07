@@ -44,24 +44,7 @@ import * as _ from "lodash";
 @Component({
   selector: "organize-file",
   templateUrl: "./organize-files.component.html",
-  styles: [`
-    .no-padding-dialog {
-      padding: 0;
-    }
-    .truncate{
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .no-overflow  { overflow: hidden; }
-
-    .secondary-action {
-      background-color: var(--sidebar-footer-background-color);
-      font-weight: bolder;
-      color: var(--bluewarmvivid-medlight);
-      border: var(--bluewarmvivid-medlight)  solid 1px;
-    }
-  `]
+  styleUrls: ["./organize-files.component.scss"]
 })
 export class OrganizeFilesComponent implements OnInit, AfterViewInit{
   private manageFileSubscript: Subscription;

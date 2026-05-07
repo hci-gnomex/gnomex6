@@ -39,26 +39,7 @@ import {ImprovedSelectEditor} from "../../util/grid-editors/improved-select.edit
 @Component({
     selector: "tab-samples-illumina",
     templateUrl: "./tab-samples-illumina.component.html",
-    styles: [`
-        .no-height { height: 0;  }
-        .single-em { width: 1em; }
-
-        .horizontal-spacer {
-            height: 80%;
-            width: 2px;
-            background-color: lightgrey;
-        }
-
-        /*For achieving wrap around column header*/
-        ::ng-deep .ag-header-cell-text {
-            text-overflow: clip !important;
-            overflow: visible !important;
-            white-space: normal !important;
-        }
-        .hidden {
-            display: none;
-        }
-    `]
+    styleUrls: ["./tab-samples-illumina.component.scss"]
 })
 
 export class TabSamplesIlluminaComponent implements OnInit {

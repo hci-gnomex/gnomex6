@@ -26,44 +26,7 @@ import {NavigationService} from "../services/navigation.service";
 @Component({
     selector: "analysis",
     templateUrl: "./browse-topics.component.html",
-    styles: [`
-        .formField {
-            margin: 0 2.0%;
-            width: 20%
-        }
-        .radio-group-container {
-            display: inline-flex;
-            flex-direction: row;
-            vertical-align: middle;
-            width: fit-content;
-            margin-top: 1.1em;
-        }
-        .absolute { position: absolute; }
-        .foreground { background-color: white;   }
-        .background { background-color: #EEEEEE; }
-        .vertical-spacer {
-            height: 0.3em;
-            min-height: 0.3em;
-        }
-        .border { border: #C8C8C8 solid thin; }
-        .major-border {
-            border-radius: 0.3em;
-            border: 1px solid darkgrey;
-        }
-        .padded { padding: 0.3em; }
-        .top-padded { padding-top: 0.3em; }
-        .left-right-padded {
-            padding-left:  0.3em;
-            padding-right: 0.3em;
-        }
-        .small-font { font-size: small; }
-        .no-overflow  { overflow:    hidden; }
-        .no-word-wrap { white-space: nowrap; }
-        img.small-icon {
-            width: 16px;
-            height: 16px;
-        }
-    `]
+    styleUrls: ["./browse-topics.component.scss"]
 })
 
 export class BrowseTopicsComponent implements OnInit, OnDestroy {

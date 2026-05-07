@@ -18,27 +18,7 @@ import {SpinnerDialogComponent} from "../popup/spinner-dialog.component";
             </div>
 		</div>
 	`,
-    styles: [`
-			
-		.full-width  { width:  100% }
-		.full-height { height: 100% }
-		
-		.t  { display: table; }
-		.tr { display: table-row; }
-		.td { display: table-cell; }
-		
-		.vertical-center { vertical-align: middle;   }
-		.left-align      { text-align:     left;     }
-		.padded          { padding:        0 0.3rem; }
-        
-        .flex-row-container {
-            display: flex;
-            flex-direction: row;
-        }
-        .flex-stretch {
-            flex: 1;
-        }
-	`]
+    styleUrls: ['./text-align-left-middle.editor.scss']
 })
 export class TextAlignLeftMiddleEditor implements ICellEditorAngularComp {
 

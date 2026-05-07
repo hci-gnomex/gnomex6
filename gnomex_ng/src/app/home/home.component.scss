@@ -1,0 +1,56 @@
+.horizontal-center { text-align: center; }
+
+.flex-grow-large { flex: 4; }
+
+.multiline { white-space: pre-line; }
+
+.major-padded-right { padding-right: 1em; }
+
+.experiment-link { color: #004C9E; text-decoration: none; }
+
+
+.progress-bar-container {
+    width: 90%;
+    position: absolute;
+    bottom: 5em;
+}
+
+.gnomex-splash {
+    background-image: url(../gnomex/assets/gnomex_splash_credits.png);
+    width: 19em;
+    height: 20em;
+    padding: 1em;
+    position: relative;
+    background-repeat: no-repeat;
+}
+
+.info-pane {
+    background: #EEEEEE;
+    border: 0.1em solid #B7BABC;
+    padding: 0.3em;
+    font-size: 0.8em;
+    width: 40em;
+}
+.white-background {
+    background: white;
+}
+.padding-small {
+    padding: 0.2em;
+}
+.children-margin-right-small > *:not(:last-child) {
+    margin-right: 0.3em;
+}
+.children-margin-right > *:not(:last-child) {
+    margin-right: 1em;
+}
+.divider-top-small {
+    border-top: 0.02em solid #D7D5D1;
+}
+.divider-span {
+    width: 1px;
+    height: 100%;
+    border-right: 0.02em solid #D7D5D1;
+}
+.children-margin-bottom-small > *:not(:last-child) {
+    margin-bottom: 0.5em;
+}

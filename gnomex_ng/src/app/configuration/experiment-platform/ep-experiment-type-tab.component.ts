@@ -15,11 +15,7 @@ import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left
 
 @Component({
     templateUrl:'./ep-experiment-type-tab.component.html',
-    styles:[`
-        .padded-checkbox{
-            padding-top: 1.25rem;
-        }
-    `]
+    styleUrls: ["./ep-experiment-type-tab.component.scss"]
 })
 
 export class EpExperimentTypeTabComponent implements OnInit, OnDestroy{

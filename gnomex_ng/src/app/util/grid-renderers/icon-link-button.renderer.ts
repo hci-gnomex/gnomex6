@@ -13,52 +13,7 @@ import { ICellRendererAngularComp } from "ag-grid-angular";
 			</div>
 		</div>
 	`,
-	styles: [`
-			button.link-button {
-					background: none;
-					background-color: inherit;
-					border: none;
-					padding: 0;
-					text-decoration: underline;
-					cursor: pointer;
-			}
-      
-			button.link-button:focus {
-					outline: none;
-      }
-			
-      .button-container {
-					padding-left: 0.3rem;
-			}
-			
-			.cursor { cursor: pointer; }
-			
-			.full-width  { width:  100% }
-			.full-height { height: 100% }
-			
-			.t  { display: table; }
-			.tr { display: table-row; }
-			.td { display: table-cell; }
-			
-			.inline-block { display: inline-block; }
-			
-			.vertical-center { vertical-align: middle; }
-			
-			.name {
-					padding-left: 0.5rem;
-          text-decoration: underline;
-			}
-			.is-active {
-					color: #0000FF;
-					font-weight: bold;
-					font-style: normal;
-			}
-      .is-not-active {
-          color: #6a6b6e;
-          font-weight: normal;
-          font-style: italic;
-      }
-	`]
+	styleUrls: ['./icon-link-button.renderer.scss']
 })
 export class IconLinkButtonRenderer implements ICellRendererAngularComp {
 	public params: any;

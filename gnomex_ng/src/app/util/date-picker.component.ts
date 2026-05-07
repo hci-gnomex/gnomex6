@@ -12,7 +12,6 @@ const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
 @Component ({
     selector: 'date-picker',
     templateUrl: 'date-picker.component.html',
-    styles: [``],
     providers: [CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR]
 }) export class DatePickerComponent implements OnInit, AfterViewInit, ControlValueAccessor {
 

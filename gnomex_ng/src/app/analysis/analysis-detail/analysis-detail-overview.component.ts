@@ -30,25 +30,8 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
 
 
 @Component({
-
-    templateUrl: "./analysis-detail-overview.component.html"
-    ,
-    styles: [`
-        .mat-tab-group-border{
-            border: 1px solid #e8e8e8;
-            width:100%;
-        }
-
-        ::ng-deep.mat-tab-label.mat-tab-label-active {
-        min-width: 0!important;
-        font-size: 12px!important;
-        }
-
-        .label-min-width {
-            min-width: 20rem;
-            width: 20rem;
-        }
-    `]
+    templateUrl: "./analysis-detail-overview.component.html",
+    styleUrls: ["./analysis-detail-overview.component.scss"]
 })
 export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, OnDestroy {
 

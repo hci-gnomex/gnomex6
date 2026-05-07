@@ -17,46 +17,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: 'configure-product-types',
     templateUrl: "./configure-product-types.component.html",
-    styles: [`
-        .margin-right {
-            margin-right: 2rem;
-        }
-        .margin-bottom {
-            margin-bottom: 2rem;
-        }
-        .justify-end {
-            justify-content: flex-end;
-        }
-        .flex-one {
-            flex: 1;
-        }
-        .flex-two {
-            flex: 2;
-        }
-        .flex-three {
-            flex: 3;
-        }
-        .flex-four {
-            flex: 4;
-        }
-        .padded {
-            padding: 1rem;
-        }
-        span.dirty-note {
-            background: yellow;
-            padding: 0.5rem;
-            margin-left: 1rem;
-        }
-        img.icon {
-            margin-right: 0.5rem;
-        }
-        .border-right {
-            border-right-style: solid;
-            border-right-color: lightgray;
-            border-right-width: 2px;
-            padding-right: 2rem;
-        }
-    `]
+    styleUrls: ['./configure-product-types.component.scss']
 })
 export class ConfigureProductTypesComponent extends BaseGenericContainerDialog implements OnInit {
     public form: FormGroup;

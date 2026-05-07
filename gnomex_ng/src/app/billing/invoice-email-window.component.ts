@@ -34,21 +34,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
         </div>
         <label class="error-warning double-padded" *ngIf="this.showError" role="alert" aria-live="assertive">***Email address(es) are malformed***</label>
     `,
-    styles: [`
-        div.email-address-box {
-            width: 500px;
-        }
-        label.error-warning {
-            color: red;
-        }
-        .underline {
-            text-decoration: underline;
-        }
-        div.email-sent-box {
-            border: 1px solid black;
-            padding: 10px;
-        }
-    `]
+    styleUrls: ['./invoice-email-window.component.scss']
 })
 
 export class InvoiceEmailWindowComponent extends BaseGenericContainerDialog implements OnInit {

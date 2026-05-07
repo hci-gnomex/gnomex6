@@ -55,8 +55,6 @@ import {GridApi, RowSelectedEvent} from "ag-grid-community";
 
         </div>
     `,
-    styles:[`
-    `]
 })
 
 export class EpLibraryPrepQCTabComponent implements OnInit, OnDestroy{

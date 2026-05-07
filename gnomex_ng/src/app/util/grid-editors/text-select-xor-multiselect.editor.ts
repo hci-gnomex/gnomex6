@@ -6,10 +6,6 @@ import {MultipleSelectDialogComponent} from "./popups/multiple-select-dialog.com
 @Component({
     selector: 'text-select-xor-multiselect-editor',
     templateUrl: 'text-select-xor-multiselect.editor.html',
-    styles : [`
-        .full-height { height: 100%; }
-        .full-width  { width:  100%; }
-    `]
 })
 export class TextSelectXorMultiselectEditor implements ICellEditorAngularComp {
 

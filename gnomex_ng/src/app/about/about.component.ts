@@ -5,18 +5,7 @@ import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-d
 @Component({
     selector: 'about',
     templateUrl: "./about.component.html",
-    styles: [`
-        div.flex-container-row {
-            display: flex;
-            flex-direction: row;
-        }
-        .justify-center {
-            justify-content: center;
-        }
-        .justify-space-evenly {
-            justify-content: space-evenly;
-        }
-    `]
+    styleUrls: ['./about.component.scss']
 })
 export class AboutComponent extends BaseGenericContainerDialog implements OnInit {
 

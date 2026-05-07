@@ -18,41 +18,7 @@ import {ConstantsService} from "../../services/constants.service";
 @Component({
     selector: 'generic-dialog-container',
     templateUrl: './generic-container-dialog.component.html',
-    styles: [`
-        .no-padding{
-            padding:0;
-        }
-        .no-margin{
-            margin: 0;
-        }
-        .grabbable {
-            cursor: move;
-            cursor: grab;
-            cursor: grab;
-            cursor: grab;
-        }
-        .grabbed {
-            cursor: move;
-            cursor: grabbing;
-            cursor: grabbing;
-            cursor: grabbing;
-        }
-        .exit{
-            max-width: 20px;
-            cursor: pointer;
-        }
-        .force-flex-container-row{
-            display:flex !important;
-        }
-        .i-class {
-            margin-left:  0.3em;
-            margin-right: 0.3em;
-        }
-        .mat-dialog-content {
-            max-height: 100vh;
-            max-width: 100vw;
-        }
-    `]
+    styleUrls: ["./generic-container-dialog.component.scss"]
 })
 export class GenericContainerDialogComponent implements OnInit, OnDestroy {
 

@@ -3,8 +3,6 @@ import {Component, OnInit} from "@angular/core";
 @Component({
     selector: "tabNotesView",
     templateUrl: "./tab-notes-view.component.html",
-    styles: [`
-    `]
 })
 
 export class TabNotesViewComponent implements OnInit {

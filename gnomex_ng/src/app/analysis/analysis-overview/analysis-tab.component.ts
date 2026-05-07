@@ -64,20 +64,6 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
         </div>
 
     `,
-    styles: [`
-
-        .padded { padding: 0.3em; }
-
-        .left-right-padded {
-            padding-left:  0.3em;
-            padding-right: 0.3em;
-        }
-
-        .no-padding-dialog {
-            padding: 0;
-        }
-
-    `]
 })
 export class AnalysisTab extends PrimaryTab implements OnInit {
     //Override

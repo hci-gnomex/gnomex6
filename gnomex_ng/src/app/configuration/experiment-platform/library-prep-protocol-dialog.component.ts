@@ -69,11 +69,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
             </div>
         </form>
     `,
-    styles: [`
-        .medium-form-input{
-            width: 30em
-        }
-    `]
+    styleUrls: ["./library-prep-protocol-dialog.component.scss"]
 })
 export class LibraryPrepProtocolDialogComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy{
 

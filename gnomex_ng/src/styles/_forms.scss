@@ -1,0 +1,52 @@
+// Form elements: inputs, selects, readonly/disabled states, mat-form-field
+
+input[readonly] {
+  background-color: #f0f0f0; /* light gray background to indicate it's readonly */
+  color: var(--grey-darker) !important;
+  cursor: not-allowed; /* shows a not-allowed cursor to indicate no interaction */
+}
+
+input[readonly]:focus {
+  outline: none; /* remove focus outline if you don't want it to show */
+  box-shadow: none; /* remove any box-shadow if present */
+}
+
+input.mat-input-element:disabled {
+  color: var(--grey-darker);
+}
+
+textarea.mat-input-element:disabled {
+  color: var(--grey-darker);
+}
+
+.mat-form-field {
+  line-height: inherit;
+  font: inherit;
+}
+
+mat-form-field.dialogFormField {
+  width: 100%;
+  margin: 0.4rem 0rem;
+}
+
+mat-form-field.moderate-input {
+  width: 10em;
+}
+
+mat-form-field.short-input {
+  width: 10em;
+}
+
+mat-tooltip-component {
+  white-space: pre-line;
+}
+
+div.dialogDiv {
+  width: 100%;
+  margin: 0.4rem 0rem;
+}
+
+label.mat-radio-label {
+  margin-top: 0.15em !important;
+  margin-bottom: 0.15em !important;
+}

@@ -22,33 +22,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: 'finalize-workflow',
     templateUrl: 'finalize-workflow.component.html',
-    styles: [`
-
-
-        .title-color { color: #1601db; }
-
-
-        .date-width {
-            width: 10em;
-        }
-
-        .protocol-width {
-            width: 30em;
-        }
-
-        .run-width {
-            width: 5em;
-        }
-
-        .min-lab-width {
-            min-width: 3em;
-        }
-        .children-margin-right > *:not(:last-child) {
-            margin-right: 1em;
-        }
-
-
-    `]
+    styleUrls: ['./finalize-workflow.component.scss']
 })
 export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
 

@@ -15,7 +15,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
 @Component({
     selector: "analysis-visiblity-tab",
     template: `
-        <div class="flexbox-column">
+        <div class="flex-container-col full-height full-width">
             <div style="flex:1; display:flex; width:100%;" appAgGridHeaderA11yFix>
                 <ag-grid-angular style="width: 100%;" class="ag-theme-fresh"
                                  [gridOptions]="gridOpt"
@@ -34,14 +34,6 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
         </div>
 
     `,
-    styles: [`
-        .flexbox-column{
-            display:flex;
-            flex-direction:column;
-            height:100%;
-            width:100%;
-        }
-    `]
 })
 export class AnalysisVisibleTabComponent implements OnInit {
     @Output() saveSuccess = new EventEmitter();

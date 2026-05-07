@@ -1,0 +1,15 @@
+.flex-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.label-min-width {
+    min-width: 20rem;
+    width: 20rem;
+}
+
+.label {
+    margin-top: 0.2rem;
+    margin-bottom: 0;
+}

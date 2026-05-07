@@ -23,29 +23,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: "create-analysis-dialog",
     templateUrl: "create-analysis-dialog.html",
-    styles: [`
-
-        .inlineComboBox {
-            display: inline-block;
-        }
-
-        .label-width {
-            width: 10em;
-        }
-
-        .no-margin {
-            margin: 0;
-        }
-
-        .no-padding {
-            padding: 0;
-        }
-
-        .example-full-width {
-            width: 450px;
-        }
-
-    `]
+    styleUrls: ["./create-analysis.component.scss"]
 })
 
 export class CreateAnalysisComponent extends BaseGenericContainerDialog implements OnInit, AfterViewInit  {

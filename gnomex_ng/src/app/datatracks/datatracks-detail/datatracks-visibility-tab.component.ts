@@ -15,15 +15,7 @@ import {UtilService} from "../../services/util.service";
 @Component({
     selector:'dt-visibility-tab',
     templateUrl:'./datatracks-visibility-tab.component.html',
-    styles: [`
-        .flexbox-column{
-            display:flex;
-            flex-direction:column;
-            height:100%;
-            width:100%;
-
-        }
-    `]
+    styleUrls: ['./datatracks-visibility-tab.component.scss']
 })
 export class DatatracksVisibilityTabComponent implements OnInit, OnDestroy{
     //Override

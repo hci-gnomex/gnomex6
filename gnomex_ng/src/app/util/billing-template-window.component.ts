@@ -16,18 +16,7 @@ import {TextAlignLeftMiddleEditor} from "./grid-editors/text-align-left-middle.e
 @Component({
     selector: 'billing-template-window',
     templateUrl: "./billing-template-window.component.html",
-    styles: [`
-        .children-margin-right > *:not(:last-child) {
-            margin-right: 1em;
-        }
-        div.accounts-grid-div {
-            height: 300px;
-        }
-        .custom-mat-radio .mat-radio-label-content {
-            padding-left: 4px;
-            padding-right: 8px;
-        }
-    `]
+    styleUrls: ["./billing-template-window.component.scss"]
 })
 
 export class BillingTemplateWindowComponent extends BaseGenericContainerDialog implements OnInit {

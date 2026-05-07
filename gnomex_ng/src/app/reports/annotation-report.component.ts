@@ -11,11 +11,7 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
 @Component({
     selector: 'annotation-report',
     templateUrl: "./annotation-report.component.html",
-    styles: [`
-        .children-margin-right > *:not(:last-child) {
-            margin-right: 0.5em;
-        }
-    `]
+    styleUrls: ['./annotation-report.component.scss']
 })
 
 export class AnnotationReportComponent {

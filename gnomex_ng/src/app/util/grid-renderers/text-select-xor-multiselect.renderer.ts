@@ -5,26 +5,7 @@ import { SplitStringToMultipleLinesRenderer } from "./split-string-to-multiple-l
 @Component ({
     selector: 'text-select-xor-multiselect-renderer',
     templateUrl: 'text-select-xor-multiselect.renderer.html',
-    styles: [`
-        .string-container {
-            padding-left: 0.3rem;
-        }
-
-        .cursor { cursor: pointer; }
-
-        .full-width  { width:  100% }
-        .full-height { height: 100% }
-
-        .t  { display: table; }
-        .tr { display: table-row; }
-        .td { display: table-cell; }
-
-        .inline-block { display: inline-block; }
-
-        .vertical-center { vertical-align: middle; }
-
-        .error { color: red; }
-    `]
+    styleUrls: ['./text-select-xor-multiselect.renderer.scss']
 })
 export class TextSelectXorMultiselectRenderer extends SplitStringToMultipleLinesRenderer {
 

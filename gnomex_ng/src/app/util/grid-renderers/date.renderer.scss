@@ -1,0 +1,8 @@
+.right-align { text-align: right; }
+
+.cursor { cursor: pointer; }
+
+.error {
+    background: linear-gradient(rgba(255,0,0,0.25), rgba(255,0,0,0.25), rgba(255,0,0,0.25));
+    border: solid red 2px;
+}

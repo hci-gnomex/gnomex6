@@ -1,0 +1,50 @@
+p {
+    margin: 1em 0.5em;
+}
+
+.label {
+    min-width: 13em;
+    font-style: italic;
+    font-size: small;
+    color: #1601db;
+}
+
+.radio-button {
+    margin: 0 4em 0 0;
+    padding: 0;
+}
+
+.background-sideless {
+    display: block;
+    position: relative;
+    background-color: white;
+    border-color: #d2d2d2;
+    border-style: solid;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 0;
+    border-right-width: 0;
+}
+
+.row-spacer {
+    height: 0.7em;
+}
+
+.center-vertical-align {
+    vertical-align: middle;
+}
+
+.checkbox-container {
+    display: inline-block;
+    vertical-align: middle;
+    width: fit-content;
+}
+
+.horizontal-break {
+    display: inline-block;
+    vertical-align: middle;
+    height: 3em;
+    width: 1px;
+    background-color: #c4cccc;
+    margin: 0.5em 0.5em 0.5em 0.5em;
+}

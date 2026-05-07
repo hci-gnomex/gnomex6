@@ -17,27 +17,7 @@ import {UserPreferencesService} from "../../services/user-preferences.service";
 @Component({
     selector: "materials-methods-tab",
     templateUrl: "./materials-methods-tab.component.html",
-    styles: [`
-        .minor-padded {
-            padding: 0.6em;
-        }
-
-        .gx-label{
-            color: darkblue;
-        }
-
-        .label-width {
-            width: 8rem;
-        }
-
-        .minor-label-width {
-            width: 7rem;
-        }
-
-        .limit-width {
-            max-width: 100%;
-        }
-    `],
+    styleUrls: ["./materials-methods-tab.component.scss"],
 })
 export class MaterialsMethodsTabComponent implements OnInit {
 

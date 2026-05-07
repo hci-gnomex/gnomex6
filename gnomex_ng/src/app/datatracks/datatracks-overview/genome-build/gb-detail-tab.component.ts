@@ -14,16 +14,7 @@ import {distinctUntilChanged} from "rxjs/operators";
 @Component({
     selector: 'gb-detail',
     templateUrl:'./gb-detail-tab.component.html',
-    styles: [`
-        .form-field{
-            margin-left: 1em;
-            margin-right: 1em;
-            font-size: 1.1rem;
-            width:30%;
-            resize:none;
-        }
-    `]
-
+    styleUrls: ["./gb-detail-tab.component.scss"]
 })
 export class GBDetailTabComponent extends PrimaryTab implements OnInit{
     //Override

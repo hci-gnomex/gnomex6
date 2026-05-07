@@ -1,0 +1,17 @@
+.active-item {
+    background-color: #c8c8c8;
+}
+
+.background {
+    background-color: whitesmoke;
+}
+
+.foreground {
+    background-color: white;
+}
+
+.active-item:hover {
+    border: 0.05rem solid #bfc4c4;
+    background-color: #c8c8c8;
+    cursor: pointer;
+}

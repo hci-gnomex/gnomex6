@@ -49,32 +49,7 @@ export class EditBillingAccountStateMatcher implements ErrorStateMatcher {
 @Component ({
 	selector: "billing-account-tab",
 	templateUrl: "./billing-account-tab.component.html",
-	styles: [`
-        
-        .border {
-            margin-bottom: 0.3em;
-            padding: 0.5em;
-            border: 1px solid lightgrey;
-            border-radius: 0.3em;
-        }
-        
-        .block        { display: block;        }
-        .inline-block { display: inline-block; }
-
-        .medium-width    { width:  30em;  }
-        .vertical-spacer { height: 0.3em; }
-
-        .no-height { height: 0;   }
-        .single-em { width:  1em; }
-        
-        .label { min-width: 10em; }
-        
-        .same-size-button {
-            min-width: 10.4em;
-            text-align: center;
-        }
-        
-	`]
+	styleUrls: ['./billing-account-tab.component.scss']
 })
 export class BillingAccountTabComponent implements OnInit, OnDestroy {
 

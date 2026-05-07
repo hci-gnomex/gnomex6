@@ -38,19 +38,7 @@ import {HttpUriEncodingCodec} from "../../../services/interceptors/http-uri-enco
 
         </div>
     `,
-    styles: [`
-        .flex-container{
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        /deep/ .mat-tab-body-wrapper {
-            flex-grow: 1 !important;
-        }
-        .mat-tab-group-border{
-            border: 1px solid #e8e8e8;
-        }
-    `]
+    styleUrls: ["./datatracks-genome-build.component.scss"]
 })
 export class DatatracksGenomeBuildComponent implements OnInit {
     //Override

@@ -1,0 +1,17 @@
+.flex-vertical-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.stretch {
+    flex: 1;
+}
+
+.center { text-align: center; }
+
+.horizontal-padding { padding: 0 1em; }
+
+.left-align  { text-align: left; }
+.right-align { text-align: right; }
+
+.error-message { color: red; }

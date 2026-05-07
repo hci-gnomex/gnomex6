@@ -16,14 +16,7 @@ import {CreateSecurityAdvisorService} from "../../services/create-security-advis
 
 @Component({
     templateUrl: "./library-prep-dialog.component.html",
-    styles: [`
-        .medium-form-input{
-            width: 30em
-        }
-        .short-input {
-            width: 8em
-        }
-    `]
+    styleUrls: ["./library-prep-dialog.component.scss"]
 })
 export class LibraryPrepDialogComponent extends BaseGenericContainerDialog implements OnInit{
 
