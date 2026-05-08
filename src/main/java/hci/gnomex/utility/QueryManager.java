@@ -55,12 +55,12 @@ public abstract class QueryManager {
 			if (parameter != null && !parameter.trim().equals("")) {
 				try {
 					if (field.getType().isAssignableFrom(Integer.class)) {
-						field.set(this, new Integer(Integer.parseInt(parameter)));
+						field.set(this, Integer.valueOf(Integer.parseInt(parameter)));
 					} else if (field.getType().isAssignableFrom(Boolean.class)) {
 						if (parameter.trim().equalsIgnoreCase("Y") || parameter.trim().equalsIgnoreCase("true")) {
-							field.set(this, new Boolean(true));
+							field.set(this, Boolean.valueOf(true));
 						} else {
-							field.set(this, new Boolean(false));
+							field.set(this, Boolean.valueOf(false));
 						}
 					} else if (field.getType().isAssignableFrom(String.class)) {
 						field.set(this, parameter);

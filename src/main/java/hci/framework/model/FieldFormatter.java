@@ -117,7 +117,7 @@ public class FieldFormatter {
    *  Converts a valid date string entry (MM/DD/YYYY, MM-DD-YYYY, or MMDDYYYY)
    *  to the desired output format (static fields of this class)
    *
-   *@param  dateString   Input java.util.Date
+   *@param  date   Input java.util.Date
    *@return              Formatted output String or an empty string if the input is not valid
    */
   public String formatDate(java.util.Date date) {
@@ -136,7 +136,7 @@ public class FieldFormatter {
    * this forces the conversion. When projects have been moved to the latest jars,
    * we should be able to remove this method signature if we want.
    *
-   *@param  dateString   Input String
+   *@param  inputDate   Input String
    *@param  outputStyle  The desired output style (static fields of this class)
    *@return              Formatted output String or an empty string if the input is not valid
    */
@@ -264,7 +264,7 @@ public class FieldFormatter {
   /**
    * Converts a timestamp entry to a typical output format (MM/dd/yyyy hh:mm:ss a)
    * !This version maintained for backward compatibility!
-   *@param  value        Input String
+   *@param  ts        Input String
    *@return              Formatted output String or an empty string if the input is not valid
    */
   public String formatTimestamp(java.sql.Timestamp ts) {
@@ -423,8 +423,8 @@ public String formatTimestamp(java.util.Date date, int outputStyle) {
      *  Parses a valid datetime entry (MM/DD/YYYY HH:MM:SS, MM-DD-YYYY HH:MM:SS,
      *  or MMDDYYYY HH:MM:SS) to java.util.Date
      *
-     *@param  dateString   Input String
-     *@param  pos          The position to begin parsing, updated to char after matched data
+     *@param  value   Input String
+//     *@param  pos          The position to begin parsing, updated to char after matched data
      *@result              java.util.Date obj or null if the input is not valid
      */
     public java.util.Date parseDateTime(String value) throws ParseException {
@@ -482,8 +482,8 @@ public String formatTimestamp(java.util.Date date, int outputStyle) {
      *  Parses a valid timestamp entry (same as java.util.Date, or JDBC escape fmt)
      *  to java.sql.Timestamp
      *
-     *@param  dateString   Input String
-     *@param  pos          The position to begin parsing, updated to char after matched data
+     *@param  value   Input String
+//     *@param  pos          The position to begin parsing, updated to char after matched data
      *@result              java.sql.Timestamp obj or null if the input is not valid
      */
     public java.sql.Timestamp parseTimestamp(String value) throws ParseException {
@@ -797,8 +797,8 @@ public String formatTimestamp(java.util.Date date, int outputStyle) {
   
   /**
    * Returns the difference of two dates in days, correct for daylight savings time
-   * @param java.sql.Date start
-   * @param java.sql.Date end
+   * @param  start
+   * @param  end
    * @return Integer
    */
   public Integer getDateDifferenceInDays(java.sql.Date start, java.sql.Date end) {
@@ -815,7 +815,7 @@ public String formatTimestamp(java.util.Date date, int outputStyle) {
       
       diff = (endMilli - startMilli)/milliesconds_per_day;
     }
-    return new Integer((int)diff);
+    return Integer.valueOf((int)diff);
   }
 
 }

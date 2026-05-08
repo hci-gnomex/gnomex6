@@ -77,7 +77,7 @@ public class AnalysisFileParser extends DetailObject implements Serializable {
 
     AnalysisFile af = null;
     if (!idAnalysisFileString.startsWith("AnalysisFile") && !idAnalysisFileString.equals("")) {
-      af = (AnalysisFile)sess.load(AnalysisFile.class, new Integer(idAnalysisFileString));
+      af = (AnalysisFile)sess.load(AnalysisFile.class, Integer.valueOf(idAnalysisFileString));
     } else {
       af = new AnalysisFile();
     }

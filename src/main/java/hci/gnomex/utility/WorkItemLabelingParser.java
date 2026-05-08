@@ -40,8 +40,8 @@ public class WorkItemLabelingParser implements Serializable {
       String idLabeledSampleString = workItemNode.getAttributeValue("idLabeledSample");
       String idWorkItemString      = workItemNode.getAttributeValue("idWorkItem");
       
-      LabeledSample labeledSample = (LabeledSample)sess.load(LabeledSample.class, new Integer(idLabeledSampleString));
-      WorkItem workItem = (WorkItem)sess.load(WorkItem.class, new Integer(idWorkItemString));
+      LabeledSample labeledSample = (LabeledSample)sess.load(LabeledSample.class, Integer.valueOf(idLabeledSampleString));
+      WorkItem workItem = (WorkItem)sess.load(WorkItem.class, Integer.valueOf(idWorkItemString));
       
       if (workItemNode.getAttributeValue("labelingStatus") != null && !workItemNode.getAttributeValue("labelingStatus").equals("")) {
         workItem.setStatus(workItemNode.getAttributeValue("labelingStatus"));
@@ -89,7 +89,7 @@ public class WorkItemLabelingParser implements Serializable {
     }
     
     if (n.getAttributeValue("idLabelingProtocol") != null && !n.getAttributeValue("idLabelingProtocol").equals("")) {
-      labeledSample.setIdLabelingProtocol(new Integer(n.getAttributeValue("idLabelingProtocol")));
+      labeledSample.setIdLabelingProtocol(Integer.valueOf(n.getAttributeValue("idLabelingProtocol")));
     } else {
       labeledSample.setIdLabelingProtocol(null);
     }
@@ -101,7 +101,7 @@ public class WorkItemLabelingParser implements Serializable {
     }
  
     if (n.getAttributeValue("numberOfReactions") != null && !n.getAttributeValue("numberOfReactions").equals("")) {
-      labeledSample.setNumberOfReactions(new Integer(n.getAttributeValue("numberOfReactions")));
+      labeledSample.setNumberOfReactions(Integer.valueOf(n.getAttributeValue("numberOfReactions")));
     } else {
       labeledSample.setNumberOfReactions(null);
     }

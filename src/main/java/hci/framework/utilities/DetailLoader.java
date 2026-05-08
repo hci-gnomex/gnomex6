@@ -99,10 +99,10 @@ public class DetailLoader extends FieldInputValidator implements Serializable {
               if (value != null) {
                 try {
                   if (value.equals("0")) {
-                    o = new java.lang.Integer(0);
+                    o = Integer.valueOf(0);
                   }
                   else {
-                    o = new java.lang.Integer(value);
+                    o = Integer.valueOf(value);
                   }
                 } catch (NumberFormatException nfe) {
                   o = null;
@@ -124,9 +124,9 @@ public class DetailLoader extends FieldInputValidator implements Serializable {
             else if (argType == java.lang.Boolean.class) {
             	  try {                     
             		  if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes") || value.equalsIgnoreCase("Y")) {
-            			  o = new java.lang.Boolean(true);
+            			  o = java.lang.Boolean.valueOf(true);
             		  } else {
-            			  o = new java.lang.Boolean(false);
+            			  o = java.lang.Boolean.valueOf(false);
             		  }            			  
                   } catch (Exception e) {
                       // we must have an invalid value

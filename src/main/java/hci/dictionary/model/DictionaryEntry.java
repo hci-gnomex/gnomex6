@@ -286,7 +286,7 @@ public abstract class DictionaryEntry extends HibernateDetailObject implements C
             // If we have a complex class, create an attribute element and put
             // class details inside
             Element attEle = new Element(fieldName);
-            Document d = (Document) meth.invoke(o, new Object[] { new Integer(dateOutputStyle) });
+            Document d = (Document) meth.invoke(o, new Object[] { Integer.valueOf(dateOutputStyle) });
             if (d != null) {
               attEle.addContent(d.getRootElement());
             }
@@ -332,7 +332,7 @@ public abstract class DictionaryEntry extends HibernateDetailObject implements C
                   } catch (NoSuchMethodException ex) {
                   }
                   if (obMeth != null) {
-                    Document obd = (Document) obMeth.invoke(ob, new Object[] { new Integer(dateOutputStyle) });
+                    Document obd = (Document) obMeth.invoke(ob, new Object[] { Integer.valueOf(dateOutputStyle) });
                     mainEle.addContent(obd.getRootElement());
                   }
                 }
@@ -354,11 +354,11 @@ public abstract class DictionaryEntry extends HibernateDetailObject implements C
               Integer max = (Integer) maxLengths.get(fieldName);
               int fieldLen = fieldValue.length();
               if (max.intValue() < fieldLen) {
-                maxLengths.put(fieldName, new Integer(fieldLen));
+                maxLengths.put(fieldName,  Integer.valueOf(fieldLen));
               }
             } else {
               int fieldLen = fieldValue.length();
-              maxLengths.put(fieldName, new Integer(fieldValue.length()));
+              maxLengths.put(fieldName,  Integer.valueOf(fieldValue.length()));
             }
           }
 
@@ -421,7 +421,7 @@ public abstract class DictionaryEntry extends HibernateDetailObject implements C
   /**
    * Formats a date object as a string, according to the specified format
    * 
-   * @param object
+   * @param o
    *          The date object to be formatted as a String
    * @param outputStyle
    *          The style in which to forat the date, as specified in DetailObject

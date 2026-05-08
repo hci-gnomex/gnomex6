@@ -214,8 +214,8 @@ public class BuildSearchIndex extends DetailObject {
         for (String key : projectRequestMap.keySet()) {
             String[] keyTokens = key.split(KEY_DELIM);
 
-            Integer idProject = new Integer(keyTokens[0]);
-            Integer idRequest = (keyTokens.length == 2 && keyTokens[1] != null) ? new Integer(keyTokens[1]) : null;
+            Integer idProject = Integer.valueOf(keyTokens[0]);
+            Integer idRequest = (keyTokens.length == 2 && keyTokens[1] != null) ? Integer.valueOf(keyTokens[1]) : null;
 
             addExperimentDocument(experimentIndexWriter, idProject, idRequest, projectRequestMap.get(key));
         }
@@ -244,7 +244,7 @@ public class BuildSearchIndex extends DetailObject {
             String key = (String) i.next();
             Object[] keyTokens = key.split(KEY_DELIM);
             String protocolType = (String) keyTokens[0];
-            Integer idProtocol = new Integer((String) keyTokens[1]);
+            Integer idProtocol = Integer.valueOf((String) keyTokens[1]);
             Object[] row = (Object[]) protocolMap.get(key);
 
             buildProtocolDocument(protocolIndexWriter, protocolType, idProtocol, row);
@@ -277,8 +277,8 @@ public class BuildSearchIndex extends DetailObject {
         for (Iterator i = analysisGroupMap.keySet().iterator(); i.hasNext(); ) {
             String key = (String) i.next();
             Object[] keyTokens = key.split(KEY_DELIM);
-            Integer idAnalysisGroup = new Integer((String) keyTokens[0]);
-            Integer idAnalysis = keyTokens.length == 2 && keyTokens[1] != null ? new Integer((String) keyTokens[1]) : null;
+            Integer idAnalysisGroup = Integer.valueOf((String) keyTokens[0]);
+            Integer idAnalysis = keyTokens.length == 2 && keyTokens[1] != null ? Integer.valueOf((String) keyTokens[1]) : null;
             Object[] row = (Object[]) analysisGroupMap.get(key);
 
             StringBuffer analysisFileComments = (StringBuffer) analysisFileCommentsMap.get(idAnalysis);
@@ -316,8 +316,8 @@ public class BuildSearchIndex extends DetailObject {
         for (Iterator i = datatrackMap.keySet().iterator(); i.hasNext(); ) {
             String key = (String) i.next();
             Object[] keyTokens = key.split(KEY_DELIM);
-            Integer idDataTrackFolder = new Integer((String) keyTokens[0]);
-            Integer idDataTrack = keyTokens.length == 2 && keyTokens[1] != null ? new Integer((String) keyTokens[1]) : null;
+            Integer idDataTrackFolder = Integer.valueOf((String) keyTokens[0]);
+            Integer idDataTrack = keyTokens.length == 2 && keyTokens[1] != null ? Integer.valueOf((String) keyTokens[1]) : null;
             Object[] row = (Object[]) datatrackMap.get(key);
 
             buildDataTrackDocument(datatrackIndexWriter, idDataTrackFolder, idDataTrack, row);
@@ -344,7 +344,7 @@ public class BuildSearchIndex extends DetailObject {
         //
         for (Object nextKey : topicMap.keySet()) {
             String key = (String) nextKey;
-            Integer idTopic = new Integer(key);
+            Integer idTopic = Integer.valueOf(key);
 
             Object[] row = (Object[]) topicMap.get(key);
 

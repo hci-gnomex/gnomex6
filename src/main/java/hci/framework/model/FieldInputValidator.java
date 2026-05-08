@@ -66,7 +66,7 @@ public class FieldInputValidator extends FieldFormatter {
       if (intString.indexOf('.') != -1) {
         return null;
       }
-      result = new Integer(intString);
+      result = Integer.valueOf(intString);
     }
 
     return result;
