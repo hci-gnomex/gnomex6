@@ -1,13 +1,13 @@
 <form [formGroup]="formGroup" class="flex-container-col full-width full-height double-padded-left-right" aria-label="New billing account form">
 	<div class="full-width padded">
-		<div style="position:relative; width:calc(100% - 1.6em); margin:0.4em 0.8em;">
+		<div class="account-section">
 			<div class="flex-container-col full-width">
 				<div class="flex-container-row align-center">
 					<div class="label">
 						Lab
 					</div>
 					<div class="flex-grow">
-						<custom-combo-box style="width: 100%; font-size: small;"
+						<custom-combo-box class="combo-small"
 										  placeholder="Select a lab..."
 										  aria-label="Lab"
 										  formControlName="lab"
@@ -26,7 +26,7 @@
 									  tooltipPosition="left"></context-help>
 					</div>
 					<div class="flex-grow">
-						<div class="full-width" style="font-size: small">
+						<div class="full-width small-font"
 							<custom-multi-combo-box placeholder="Select Core Facilities"
 													[options]="coreFacilityReducedList"
 													[disabled]="disableCoreFacilitiesSelector"
@@ -56,8 +56,8 @@
 			</div>
 		</div>
 	</div>
-	<div class="full-width background" style="width: calc(100% - 8px); margin: 3px 4px;">
-		<div style="position:relative; width:calc(100% - 1.6em); margin:0.4em 0.8em;">
+	<div class="full-width background billing-panel">
+		<div class="account-section">
 			<div *ngIf="showField === CHARTFIELD" class="flex-container-col full-width" role="group" aria-label="Chartfield account details">
 				<div class="flex-container-row align-center">
 					<div class="label"> Account Name </div>
@@ -90,9 +90,9 @@
 					<div class="label">
 						Chartfield to be charged
 					</div>
-					<div class="flex-grow" style="font-size: small;">
-						<div class="inline-block" style="vertical-align: top; font-size: small;">
-							<mat-form-field style="width: 3rem;">
+					<div class="flex-grow small-font">
+						<div class="inline-block vert-top small-font">
+							<mat-form-field class="chartfield-input">
 								<mat-label>Bus</mat-label>
 								<input matInput placeholder="Bus" formControlName="chartfieldBus">
 								<mat-hint>2 digits</mat-hint>
@@ -107,8 +107,8 @@
 							</mat-form-field>
 						</div>
 						<div class="horizontal-break"></div>
-						<div class="inline-block" style="vertical-align: top">
-							<mat-form-field style="width: 3rem;">
+						<div class="inline-block vert-top">
+							<mat-form-field class="chartfield-input">
 								<mat-label>Org</mat-label>
 								<input matInput placeholder="Org" formControlName="chartfieldOrg">
 								<mat-hint>5 digits</mat-hint>
@@ -123,8 +123,8 @@
 							</mat-form-field>
 						</div>
 						<div class="horizontal-break"></div>
-						<div class="inline-block" style="vertical-align: top">
-							<mat-form-field style="width: 3rem;">
+						<div class="inline-block vert-top">
+							<mat-form-field class="chartfield-input">
 								<mat-label>Fund</mat-label>
 								<input matInput placeholder="Fund" formControlName="chartfieldFund">
 								<mat-hint>4 digits</mat-hint>
@@ -139,8 +139,8 @@
 							</mat-form-field>
 						</div>
 						<div class="horizontal-break"></div>
-						<div class="inline-block" style="vertical-align: top">
-							<mat-form-field style="width: 3rem;">
+						<div class="inline-block vert-top">
+							<mat-form-field class="chartfield-input">
 								<mat-label>Activity</mat-label>
 								<input matInput formControlName="chartfieldActivity"
 									   [errorStateMatcher]="accountStateMatcher"
@@ -162,11 +162,11 @@
 								</mat-error>
 							</mat-form-field>
 						</div>
-						<div class="inline-block" style="vertical-align: top">
+						<div class="inline-block vert-top">
 							<p>OR</p>
 						</div>
-						<div class="inline-block" style="vertical-align: top">
-							<mat-form-field style="width: 4.5rem;">
+						<div class="inline-block vert-top">
+							<mat-form-field class="chartfield-project">
 								<mat-label>Project</mat-label>
 								<input matInput placeholder="Project"
 									   (input)="clearAccountNumberActivity()"
@@ -190,8 +190,8 @@
 							</mat-form-field>
 						</div>
 						<div class="horizontal-break"></div>
-						<div class="inline-block" style="vertical-align: top">
-							<mat-form-field style="width: 3rem;">
+						<div class="inline-block vert-top">
+							<mat-form-field class="chartfield-input">
 								<mat-label>Account</mat-label>
 								<input  matInput placeholder="Account" formControlName="chartfieldAccountNum">
 								<mat-hint>5 digits</mat-hint>
@@ -207,8 +207,8 @@
 							</mat-form-field>
 						</div>
 						<div *ngIf="isActivity" class="horizontal-break"></div>
-						<div *ngIf="isActivity" class="inline-block" style="vertical-align: top">
-							<mat-form-field style="width: 3rem;">
+						<div *ngIf="isActivity" class="inline-block vert-top">
+							<mat-form-field class="chartfield-input">
 								<mat-label>A/U</mat-label>
 								<input matInput placeholder="A/U" formControlName="chartfieldAccountAU" readonly aria-readonly="true">
 								<mat-hint>1 digits</mat-hint>
@@ -221,8 +221,8 @@
 						Chartfield to be charged
 					</div>
 					<div class="flex-grow">
-						<div *ngIf="internalAccountFieldsConfiguration[0]" class="inline-block" style="vertical-align: top; width: 15%;">
-							<mat-form-field style="width: 100%;">
+						<div *ngIf="internalAccountFieldsConfiguration[0]" class="inline-block vert-top custom-field-item">
+							<mat-form-field class="full-width">
 								<input
 										matInput
 										placeholder="{{internalAccountFieldsConfiguration[0].displayName}}"
@@ -249,8 +249,8 @@
 							</mat-form-field>
 						</div>
 						<div *ngIf="internalAccountFieldsConfiguration[1]" class="horizontal-break"></div>
-						<div *ngIf="internalAccountFieldsConfiguration[1]" class="inline-block" style="vertical-align: top; width: 15%;">
-							<mat-form-field style="width: 100%;">
+						<div *ngIf="internalAccountFieldsConfiguration[1]" class="inline-block vert-top custom-field-item">
+							<mat-form-field class="full-width">
 								<input matInput placeholder="{{internalAccountFieldsConfiguration[1].displayName}}"
 										[formControlName]="internalAccountFieldsConfiguration[4].fieldName"
 										[errorStateMatcher]="InternalCustomFieldsStateMatcher[1]">
@@ -275,8 +275,8 @@
 							</mat-form-field>
 						</div>
 						<div *ngIf="internalAccountFieldsConfiguration[2]" class="horizontal-break"></div>
-						<div *ngIf="internalAccountFieldsConfiguration[2]" class="inline-block" style="vertical-align: top; width: 15%;">
-							<mat-form-field style="width: 100%;">
+						<div *ngIf="internalAccountFieldsConfiguration[2]" class="inline-block vert-top custom-field-item">
+							<mat-form-field class="full-width">
 								<input
 										matInput
 										placeholder="{{internalAccountFieldsConfiguration[2].displayName}}"
@@ -303,8 +303,8 @@
 							</mat-form-field>
 						</div>
 						<div *ngIf="internalAccountFieldsConfiguration[3]" class="horizontal-break"></div>
-						<div *ngIf="internalAccountFieldsConfiguration[3]" class="inline-block" style="vertical-align: top; width: 15%;">
-							<mat-form-field style="width: 100%;">
+						<div *ngIf="internalAccountFieldsConfiguration[3]" class="inline-block vert-top custom-field-item">
+							<mat-form-field class="full-width">
 								<input
 										matInput
 										placeholder="{{internalAccountFieldsConfiguration[3].displayName}}"
@@ -331,8 +331,8 @@
 							</mat-form-field>
 						</div>
 						<div *ngIf="internalAccountFieldsConfiguration[4]" class="horizontal-break"></div>
-						<div *ngIf="internalAccountFieldsConfiguration[4]" class="inline-block" style="vertical-align: top; width: 15%;">
-							<mat-form-field style="width: 100%;">
+						<div *ngIf="internalAccountFieldsConfiguration[4]" class="inline-block vert-top custom-field-item">
+							<mat-form-field class="full-width">
 								<input
 										matInput
 										placeholder="{{internalAccountFieldsConfiguration[4].displayName}}"
@@ -365,7 +365,7 @@
 						Funding Agency
 					</div>
 					<div class="flex-grow">
-						<custom-combo-box style="width: 100%; font-size: small;" placeholder="Funding Agency" displayField="display"
+						<custom-combo-box class="combo-small" placeholder="Funding Agency" displayField="display"
 										  [options]="fundingAgencies" formControlName="idFundingAgency"
 										  valueField="value">
 						</custom-combo-box>
@@ -378,18 +378,18 @@
 						Start Date
 					</div>
 					<div class="flex-grow">
-						<div style="display:inline-block; overflow:visible; font-size:small;">
+						<div class="date-picker-wrap">
 							<date-picker
 									formControlName="startDate"
 									placeholder="Start Date">
 							</date-picker>
 						</div>
-						<div class="inline-block" style="width:7em;">
+						<div class="inline-block date-spacer">
 						</div>
-						<div *ngIf="!usesCustomChartfields || includeInCustomField_expirationDate" class="inline-block label" style="height: 100%;">
+						<div *ngIf="!usesCustomChartfields || includeInCustomField_expirationDate" class="inline-block label full-height">
 							Effective Until
 						</div>
-						<div *ngIf="!usesCustomChartfields || includeInCustomField_expirationDate" style="display:inline-block; overflow:visible; font-size:small;">
+						<div *ngIf="!usesCustomChartfields || includeInCustomField_expirationDate" class="date-picker-wrap">
 							<date-picker
 									formControlName="expirationDate"
 									[placeholder]="'Expiration Date'">
@@ -402,7 +402,7 @@
 						Effective Until
 					</div>
 					<div class="flex-grow">
-						<div style="display:inline-block; overflow:visible; font-size:small;">
+						<div class="date-picker-wrap">
 							<date-picker
 									formControlName="expirationDate"
 									[placeholder]="'Expiration Date'">
@@ -416,7 +416,7 @@
 						Total Dollar Amount
 					</div>
 					<div class="flex-grow">
-						<mat-form-field style="width: 18em;">
+						<mat-form-field class="dollar-amount-field">
 							<mat-label>Total Dollar Amount</mat-label>
 							<span matPrefix>$ &nbsp;</span>
 							<input matInput placeholder="Total Dollar Amount"
@@ -447,7 +447,7 @@
 						Your email address
 					</div>
 					<div class="flex-grow">
-						<mat-form-field style="width: 100%;">
+						<mat-form-field class="full-width">
 							<mat-label>Your Email Address</mat-label>
 							<input matInput placeholder="Your Email Address" formControlName="email">
 							<mat-error *ngIf="formGroup.get('email').hasError('required')">
@@ -509,7 +509,7 @@
 						Funding Agency
 					</div>
 					<div class="flex-grow">
-						<custom-combo-box style="width: 100%; font-size: small;" placeholder="Funding Agency" displayField="display"
+						<custom-combo-box class="combo-small" placeholder="Funding Agency" displayField="display"
 										  [options]="fundingAgencies" formControlName="idFundingAgency"
 										  valueField="value" >
 						</custom-combo-box>
@@ -520,7 +520,7 @@
 						Start Date
 					</div>
 					<div class="flex-grow">
-						<div style="display:inline-block; overflow:visible; font-size:small;">
+						<div class="date-picker-wrap">
 
 							<date-picker
 									formControlName="startDate"
@@ -528,12 +528,12 @@
 							</date-picker>
 
 						</div>
-						<div class="inline-block" style="width:7em;">
+						<div class="inline-block date-spacer">
 						</div>
-						<div class="inline-block label" style="height: 100%;">
+						<div class="inline-block label full-height">
 							Effective Until
 						</div>
-						<div style="display:inline-block; overflow:visible; font-size:small;">
+						<div class="date-picker-wrap">
 							<date-picker
 									formControlName="expirationDate"
 									placeholder="Expiration Date">
@@ -547,7 +547,7 @@
 						Total Dollar Amount
 					</div>
 					<div class="flex-grow">
-						<mat-form-field style="width: 18em;">
+						<mat-form-field class="dollar-amount-field">
 							<mat-label>Total Dollar Amount</mat-label>
 							<span matPrefix>$ &nbsp;</span>
 							<input matInput placeholder="Total Dollar Amount"
@@ -578,7 +578,7 @@
 						Your email address
 					</div>
 					<div class="flex-grow">
-						<mat-form-field style="width: 100%;">
+						<mat-form-field class="full-width">
 							<mat-label>Your Email Address</mat-label>
 							<input matInput placeholder="Your Email Address" formControlName="email">
 							<mat-error *ngIf="formGroup.get('email').hasError('required')">
@@ -624,7 +624,7 @@
 						Funding Agency
 					</div>
 					<div class="flex-grow">
-						<custom-combo-box style="width: 100%; font-size: small;" placeholder="Funding Agency" displayField="display"
+						<custom-combo-box class="combo-small" placeholder="Funding Agency" displayField="display"
 										  [options]="fundingAgencies" formControlName="idFundingAgency"
 										  valueField="value">
 						</custom-combo-box>
@@ -635,18 +635,18 @@
 						Start Date
 					</div>
 					<div class="flex-grow">
-						<div style="display:inline-block; overflow:visible; font-size:small;">
+						<div class="date-picker-wrap">
 							<date-picker
 									formControlName="startDate"
 									[placeholder]="'Start Date'">
 							</date-picker>
 						</div>
-						<div class="inline-block" style="width:7em;">
+						<div class="inline-block date-spacer">
 						</div>
-						<div class="inline-block label" style="height: 100%;">
+						<div class="inline-block label full-height">
 							Expiration Date
 						</div>
-						<div style="display:inline-block; overflow:visible; font-size:small;">
+						<div class="date-picker-wrap">
 							<date-picker
 									formControlName="expirationDate"
 									[placeholder]="'Expiration Date'">
@@ -659,7 +659,7 @@
 						Zip Code
 					</div>
 					<div class="flex-grow">
-						<mat-form-field style="width: 10em;">
+						<mat-form-field class="zip-code-field">
 							<mat-label>Zip Code</mat-label>
 							<input
 									matInput
@@ -679,7 +679,7 @@
 						Credit Card Company
 					</div>
 					<div class="flex-grow">
-						<custom-combo-box style="width: 40%;" placeholder="Credit Card Company" displayField="display"
+						<custom-combo-box class="credit-card-combo" placeholder="Credit Card Company" displayField="display"
 										  [options]="creditCardCompanies"
 										  formControlName="idCreditCardCompany"
 										  valueField="value">
@@ -692,7 +692,7 @@
 						Total Dollar Amount
 					</div>
 					<div class="flex-grow">
-						<mat-form-field style="width: 18em;">
+						<mat-form-field class="dollar-amount-field">
 							<mat-label>Total Dollar Amount</mat-label>
 							<span matPrefix>$ &nbsp;</span>
 							<input matInput placeholder="Total Dollar Amount"
@@ -723,7 +723,7 @@
 						Your email address
 					</div>
 					<div class="flex-grow">
-						<mat-form-field style="width: 100%;">
+						<mat-form-field class="full-width">
 							<mat-label>Your Email Address</mat-label>
 							<input matInput placeholder="Your Email Address" formControlName="email">
 							<mat-error *ngIf="formGroup.get('email').hasError('required')">
@@ -748,15 +748,15 @@
 		</div>
 	</div>
 	<div class="full-width padded">
-		<div class="full-width" style="position: relative; padding: 0.4em 1.2em 0 1.2em;" role="region" aria-label="Authorization agreement">
-			<div style="font-size: small;" id="billingAgreementText">
+		<div class="full-width agreement-section" role="region" aria-label="Authorization agreement">
+			<div class="small-font" id="billingAgreementText">
 				As the Principal Investigator (P.I.) or authorized personnel of the account listed
 				above I authorize the Core Facility to charge the account for work performed on my
 				laboratory's behalf during the dates indicated, not to exceed the dollar amount.
 				I understand that this account will be billed automatically and that I will receive
 				a detailed statement of services for any month in which my account was charged.
 			</div>
-			<div style="text-align: center; margin: 0.5em;">
+			<div class="agreement-check">
 				<mat-checkbox formControlName="agreement"
 							  required
 							  aria-label="I agree to the billing authorization terms"

@@ -1,6 +1,6 @@
 <h4>Project/Experiment Report</h4>
 <div *ngIf="isAdmin" class="flex-container-row align-center half-width">
-    <label style="width: 6rem">Core</label>
+    <label class="label-6rem">Core</label>
     <div class="flex-grow">
         <custom-combo-box [options]="this.coreList"
                           placeholder="All Cores..."
@@ -12,7 +12,7 @@
     </div>
 </div>
 <div class="flex-container-row align-center half-width">
-    <label style="width: 6rem">Lab Group</label>
+    <label class="label-6rem">Lab Group</label>
     <div class="flex-grow">
         <custom-combo-box [options]="this.labList"
                           placeholder="All Labs..."
@@ -27,4 +27,4 @@
     <img [src]="'./assets/excel_wrap_text.png'">
     <label>In Excel, select the 'Description' column and then click on 'Wrap Text' so that line breaks are shown.</label>
 </div>
-<button mat-button (click)="run()"><img [src]="'./assets/accept.png'" style="margin: 0 0.2rem 0 0">Run</button>
+<button mat-button (click)="run()"><img [src]="'./assets/accept.png'" class="run-icon">Run</button>

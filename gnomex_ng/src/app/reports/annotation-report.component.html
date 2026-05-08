@@ -1,6 +1,6 @@
 <h4>Annotation Report</h4>
 <div class="flex-container-row align-center half-width">
-    <label style="width: 6rem">Core</label>
+    <label class="label-6rem">Core</label>
     <div class="flex-grow">
         <custom-combo-box [options]="this.coreList"
                           placeholder="All Cores..."
@@ -12,7 +12,7 @@
     </div>
 </div>
 <div class="flex-container-row align-center half-width">
-    <label style="width: 6rem">Lab Group</label>
+    <label class="label-6rem">Lab Group</label>
     <div class="flex-grow">
         <custom-combo-box [options]="this.labList"
                           placeholder="All Labs..."
@@ -24,7 +24,7 @@
     </div>
 </div>
 <div class="children-margin-right">
-    <label style="width: 8rem">Annotations For</label>
+    <label class="label-8rem">Annotations For</label>
     <input [(ngModel)]="annotationsFor" id="samplesRadio" value="SAMPLE" type="radio" name="annotationsForRadio" (change)="onAnnotationsForRadioChange()">
     <label for="samplesRadio">Experiment Samples</label>
     <input [(ngModel)]="annotationsFor" id="analysesRadio" value="ANALYSIS" type="radio" name="annotationsForRadio" (change)="onAnnotationsForRadioChange()">
@@ -33,7 +33,7 @@
     <label for="dataTracksRadio">Data Tracks</label>
 </div>
 <div *ngIf="annotationsFor === FOR_SAMPLES" class="flex-container-row align-center half-width">
-    <label style="width: 11rem">Experiment Platform(s)</label>
+    <label class="label-11rem">Experiment Platform(s)</label>
     <div class="flex-grow">
         <custom-multi-combo-box [options]="this.requestCategoryList"
                                 displayField="display"
@@ -50,8 +50,7 @@
 </div>
 <div>
   <div appAgGridHeaderA11yFix>
-    <ag-grid-angular #annotationSelectGrid style="width: 550px; height: 500px;"
-                     class="ag-theme-fresh"
+    <ag-grid-angular #annotationSelectGrid class="ag-theme-fresh grid-550x500"
                      (gridReady)="onAnnotationGridReady($event)"
                      (rowDataChanged)="onAnnotationGridRowDataChanged($event)"
                      [rowSelection]="'multiple'"
@@ -63,8 +62,7 @@
   </div>
   <div appAgGridHeaderA11yFix>
     <ag-grid-angular #customColumnsGrid *ngIf="annotationsFor === FOR_SAMPLES"
-                     style="width: 550px; height: 500px;"
-                     class="ag-theme-fresh"
+                     class="ag-theme-fresh grid-550x500"
                      (gridReady)="onCustomColumnsGridReady($event)"
                      [rowSelection]="'multiple'"
                      [rowData]="customColumnsRowData"
@@ -74,4 +72,4 @@
     </ag-grid-angular>
   </div>
 </div>
-<button mat-button (click)="run()"><img [src]="'./assets/accept.png'" style="margin: 0 0.2rem 0 0">Run</button>
+<button mat-button (click)="run()"><img [src]="'./assets/accept.png'" class="run-icon">Run</button>

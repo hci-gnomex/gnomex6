@@ -21,7 +21,7 @@
     </div>
     <div class="justify-flex-end">
     <label class="leadingLabel label-width padded-right" id="split-by-label">Split By: </label>
-    <mat-radio-group class="custom-mat-radio padded-right" [(ngModel)]="this.splitBy" (change)="this.onSplitByChange()" style="font-size: small;"
+    <mat-radio-group class="custom-mat-radio padded-right small-font" [(ngModel)]="this.splitBy" (change)="this.onSplitByChange()"
                      aria-labelledby="split-by-label">
         <mat-radio-button class="double-padded-left" [value]="SPLIT_BY_PERCENT" aria-label="Split by percentage">%</mat-radio-button>
         <mat-radio-button class="double-padded-left" [value]="SPLIT_BY_DOLLAR" aria-label="Split by dollar amount">$</mat-radio-button>

@@ -81,7 +81,7 @@
       <div *ngIf="isEditMode" class="flex-container-row align-center" role="group" aria-label="Genome build selection">
         <custom-combo-box placeholder="Genome Builds"
                           displayField="display"
-                          style="flex: 5;"
+                          class="genome-build-combo"
                           [formControlName]="'genomeBuildToAdd'"
                           [hidden]="!isEditMode"
                           [options]="genomeBuildList"

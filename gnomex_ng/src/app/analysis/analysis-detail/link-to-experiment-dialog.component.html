@@ -6,7 +6,7 @@
                    placeholder="Filter by experiment number"
                    aria-label="Filter by experiment number"/>
         </mat-form-field>
-        <div class="flex-grow" style="margin-left: 1em">
+        <div class="flex-grow lab-filter">
             <custom-combo-box placeholder="Filter by Lab"
                               [options]="this.labList"
                               displayField="name" valueField="idLab"
@@ -16,8 +16,8 @@
         </div>
     </div>
 
-    <div style="height:25em; width: 100%; margin-top:0.5em;" role="region" aria-label="Experiment selection" appAgGridHeaderA11yFix>
-        <ag-grid-angular #linkExperimentGrid style="width: 100%; height: 100%;" class="ag-theme-fresh"
+    <div class="grid-container" role="region" aria-label="Experiment selection" appAgGridHeaderA11yFix>
+        <ag-grid-angular #linkExperimentGrid class="ag-theme-fresh full-width full-height"
                          [rowData]="rowData"
                          [columnDefs]="columnDefs"
                          [rowSelection]="'single'"

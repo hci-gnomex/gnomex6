@@ -1,6 +1,6 @@
 <form [formGroup]="formGroup" aria-label="Library Prep Protocol">
     <div class="flex-container-col full-height full-width">
-        <div style="margin: 0.5em;">
+        <div class="content-margin">
             <div class="flex-container-row spaced-children-margin align-center">
                 <mat-form-field  class="medium-form-input">
                     <mat-label>Library Prep Protocol</mat-label>
@@ -50,8 +50,8 @@
                                   [formControlName]="'idBarcodeSchemeB'">
                 </custom-combo-box>
             </div>
-            <div class="flex-container-row spaced-children-margin" style="font-size: small">
-                <div class="flex-container-col " style="flex:2">
+            <div class="flex-container-row spaced-children-margin small-font">
+                <div class="flex-container-col flex-2">
                     <label class="gx-label"> Availability </label>
                     <mat-radio-group class="flex-container-col" aria-label="Availability" formControlName="onlyForLabPrepped">
                         <mat-radio-button  value="N">
@@ -63,10 +63,10 @@
                     </mat-radio-group>
                     <span class="flex-grow"></span>
 
-                    <button mat-button class="link-button minimize" style="text-align: left"
+                    <button mat-button class="link-button minimize text-left"
                             (click)="openProtocolEditor()"> Edit Library Prep Materials and Methods </button>
                 </div>
-                <div class="flex-container-col" style="flex:2">
+                <div class="flex-container-col flex-2">
                     <div *ngIf="this.canEnterPrices" class="flex-container-col">
                         <mat-form-field >
                             <mat-label>Internal Pricing</mat-label>
@@ -99,7 +99,7 @@
                                   label="Why can't I edit prices?" popupTitle="Pricing Help"
                                   tooltipPosition="right"></context-help>
                 </div>
-                <div class="flex-container-col" style="align-items:start; flex:1">
+                <div class="flex-container-col items-start-flex-1">
 <!--
                     <button mat-button class="link-button minimize" (click)="openProtocolEditor()"> Edit Protocol </button>
                     <button mat-button class="link-button minimize" (click)="openStepsEditor()" > Configure Lib Prep Steps </button>

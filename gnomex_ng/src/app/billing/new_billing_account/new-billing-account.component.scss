@@ -2,6 +2,51 @@ p {
     margin: 1em 0.5em;
 }
 
+.vert-top { vertical-align: top; }
+
+.account-section {
+    position: relative;
+    width: calc(100% - 1.6em);
+    margin: 0.4em 0.8em;
+}
+
+.billing-panel {
+    width: calc(100% - 8px);
+    margin: 3px 4px;
+}
+
+.combo-small {
+    width: 100%;
+    font-size: small;
+}
+
+.custom-field-item { width: 15%; }
+
+.chartfield-input { width: 3rem; }
+.chartfield-project { width: 4.5rem; }
+
+.date-picker-wrap {
+    display: inline-block;
+    overflow: visible;
+    font-size: small;
+}
+
+.date-spacer { width: 7em; }
+
+.dollar-amount-field { width: 18em; }
+.zip-code-field { width: 10em; }
+.credit-card-combo { width: 40%; }
+
+.agreement-section {
+    position: relative;
+    padding: 0.4em 1.2em 0 1.2em;
+}
+
+.agreement-check {
+    text-align: center;
+    margin: 0.5em;
+}
+
 .label {
     min-width: 13em;
     font-style: italic;

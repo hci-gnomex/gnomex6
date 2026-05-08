@@ -14,6 +14,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: 'my-account',
     templateUrl: "./my-account.component.html",
+    styleUrls: ["./my-account.component.scss"],
 })
 
 export class MyAccountComponent {

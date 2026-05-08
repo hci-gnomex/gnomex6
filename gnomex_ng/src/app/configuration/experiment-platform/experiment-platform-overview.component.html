@@ -35,7 +35,7 @@
                     <div class="flex-grow">
                         <mat-tab-group [(selectedIndex)]="tabIndex" (selectedTabChange)="tabChanged($event)" class="full-height full-width border">
                             <mat-tab [label]="tab.name" *ngFor="let tab of experimentPlatformTabs ">
-                                <ndc-dynamic style="height:100%; width: 100%;" [ndcDynamicComponent]="tab.component" (ndcDynamicCreated)="componentCreated($event)">
+                                <ndc-dynamic class="full-height full-width" [ndcDynamicComponent]="tab.component" (ndcDynamicCreated)="componentCreated($event)">
                                 </ndc-dynamic>
                             </mat-tab>
                         </mat-tab-group>
@@ -46,7 +46,7 @@
                                 <img class="icon" [src]="constService.ICON_REFRESH" alt=""> Refresh
                             </button>
                         </div>
-                        <save-footer *ngIf="!removeSave && selectedPlatformList.length > 0" style="width: 100%"
+                        <save-footer *ngIf="!removeSave && selectedPlatformList.length > 0" class="full-width"
                                      [disableSave]="this.expPlatformService.expPlatformOverviewForm.invalid"
                                      (saveClicked)="save()"
                                      [dirty]="this.expPlatformService.expPlatformOverviewForm.dirty">

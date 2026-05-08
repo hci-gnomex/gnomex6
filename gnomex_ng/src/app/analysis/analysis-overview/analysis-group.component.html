@@ -1,7 +1,7 @@
 <form class="full-height full-width flex-container-col" (ngSubmit)="save()" [formGroup]="projectBrowseForm"
       aria-label="Analysis group form">
 
-    <mat-form-field style="flex:1; width:calc(100% - 2em); margin:1em; "> <!-- accounting for margin space in width percentages -->
+    <mat-form-field class="name-field"> <!-- accounting for margin space in width percentages -->
         <input matInput type="text" formControlName="name" placeholder="Name" aria-label="Analysis group name"
                aria-required="true"/>
         <mat-error *ngIf="projectBrowseForm.get('name').hasError('required')" role="alert">
@@ -9,8 +9,7 @@
         </mat-error>
     </mat-form-field>
 
-    <div style="display:flex; flex-direction:column; flex:5;
-                width:calc(100% - 2em); margin:1em;" role="group" aria-label="Description section"> <!-- accounting for margin space in width percentages -->
+    <div class="flex-container-col desc-section" role="group" aria-label="Description section"> <!-- accounting for margin space in width percentages -->
         <label  for="description" > Description </label>
         <textarea id="description" class="full-width full-height resize-none"
                   formControlName="description" placeholder="Description"

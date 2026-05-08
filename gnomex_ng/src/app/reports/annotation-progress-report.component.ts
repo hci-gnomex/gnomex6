@@ -6,6 +6,7 @@ import {UserPreferencesService} from "../services/user-preferences.service";
 @Component({
     selector: 'annotation-progress-report',
     templateUrl: "./annotation-progress-report.component.html",
+    styleUrls: ["./annotation-progress-report.component.scss"],
 })
 
 export class AnnotationProgressReportComponent {

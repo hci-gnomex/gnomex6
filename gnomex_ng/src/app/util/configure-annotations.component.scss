@@ -1,0 +1,92 @@
+.grid-height { height: 8em; }
+.grid-min-height { min-height: 8em; }
+
+.annotation-background {
+  background-color: #EEEEEE;
+  padding: 0.3em;
+}
+
+.vertical-spacer {
+  height: 0.3em;
+  min-height: 0.3em;
+}
+
+.filter-combo-width .mat-form-field-infix {
+  width: 14em;
+  min-width: 5em;
+}
+
+.custom-mat-radio .mat-radio-label-content {
+  padding-left: 4px;
+  padding-right: 8px;
+}
+
+div.tabContent {
+  padding: 1%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+div.tabRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+}
+
+div.appliesToGroup {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 1;
+}
+
+.propFormField { width: 65%; }
+
+custom-combo-box.appliesToField {
+  width: 40%;
+  margin-right: 2%;
+}
+
+label.leadingLabel {
+  color: darkblue;
+  font-style: italic;
+}
+
+.label-width {
+  min-width: 10em;
+  width: 10em;
+}
+
+img.icon { margin-right: 0.5rem; }
+
+span.dirtyNote {
+  background: #feec89;
+  padding: 0.5rem;
+  margin-left: 1rem;
+}
+
+.annotation-filter-bar { min-height: 3em; }
+
+.radio-filter-group {
+  width: 35em;
+  min-width: 35em;
+  font-size: small;
+}
+
+.mr-2pct { margin-right: 2%; }
+.mr-4pct { margin-right: 4%; }
+.label-width-40 { width: 40%; }
+
+.tab-row-flex-2 { flex: 2; }
+.tab-row-owner { width: 65%; margin-bottom: 1%; }
+.tab-row-type { align-items: flex-start; flex: 3; }
+
+.option-section { margin-left: 2%; }
+
+ag-grid-angular.options-grid {
+  width: 65%;
+  height: 100%;
+  margin-left: 2%;
+}

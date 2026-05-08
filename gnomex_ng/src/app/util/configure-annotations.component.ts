@@ -21,6 +21,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     selector: 'configure-annotations',
     templateUrl: "./configure-annotations.component.html",
+    styleUrls: ["./configure-annotations.component.scss"],
     encapsulation: ViewEncapsulation.None,
 })
 

@@ -25,8 +25,8 @@
         <angular-editor [formControl]="this.bodyFormControl" [config]="this.editorConfig"></angular-editor>
     </div>
     <div class="formField" *ngIf="bodyType === SHOW_FILE_UPLOAD">
-        <input type="file" (change)="fileChange($event)" style="width: 70%;" accept=".txt,.text,.htm,.html">
-        <label *ngIf="fileSize" style="width: 30%;">({{fileSize}} bytes)</label>
+        <input type="file" (change)="fileChange($event)" class="file-input-70" accept=".txt,.text,.htm,.html">
+        <label *ngIf="fileSize" class="file-size-label">({{fileSize}} bytes)</label>
     </div>
 </div>
 

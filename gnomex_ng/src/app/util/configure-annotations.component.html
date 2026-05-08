@@ -1,6 +1,6 @@
 <div class="full-width full-height annotation-background">
 <div class="full-width full-height flex-container-col">
-    <div class="full-width flex-container-row padded foreground overflow-auto" style="min-height: 3em;">
+    <div class="full-width flex-container-row padded foreground overflow-auto annotation-filter-bar">
         <div class="full-width flex-container-col">
             <div *ngIf="!experimentPlatformMode && !isDialog" class="full-width flex-container-row">
                 <label class="padded medium-font min-width" id="configure-annotations-heading">
@@ -19,7 +19,7 @@
             <div class="full-width flex-container-row small-font">
                 <div class="flex-container-row align-center double-left-padded" *ngIf="!experimentPlatformMode">
                     <label class="leadingLabel label-width padded-left" id="show-annotations-for-label">Show Annotations For</label>
-                    <mat-radio-group class="custom-mat-radio padded-left" [(ngModel)]="this.orderType" (change)="this.onCriteriaChange()" style="width: 35em; min-width: 35em; font-size: small;" aria-labelledby="show-annotations-for-label">
+                    <mat-radio-group class="custom-mat-radio padded-left radio-filter-group" [(ngModel)]="this.orderType" (change)="this.onCriteriaChange()" aria-labelledby="show-annotations-for-label">
                         <mat-radio-button [value]="SHOW_FOR_SAMPLES">Samples</mat-radio-button>
                         <mat-radio-button [value]="SHOW_FOR_ANALYSIS">Analysis</mat-radio-button>
                         <mat-radio-button [value]="SHOW_FOR_DATA_TRACKS">Data Tracks</mat-radio-button>
@@ -53,8 +53,8 @@
         <as-split>
             <as-split-area [size]="this.gridSplitSize">
                 <div class="full-height full-width flex-grow" appAgGridHeaderA11yFix>
-                    <ag-grid-angular #annotationsGrid style="width: 100%; height: 100%;"
-                         class="ag-theme-fresh"
+                    <ag-grid-angular #annotationsGrid
+                         class="ag-theme-fresh full-width full-height"
                          (gridReady)="this.onAnnotGridReady($event)"
                          (rowDataChanged)="this.onAnnotGridRowDataChanged()"
                          [rowSelection]="'single'"
@@ -73,11 +73,11 @@
             <as-split-area [size]="100-this.gridSplitSize">
                 <div class="full-height full-width overflow-auto padded">
                     <div class="flex-grow full-height">
-                        <mat-tab-group class="full-height full-width" [(selectedIndex)]="this.selectedTabIndex" *ngIf="this.selectedProperty" style="width:100%; height: 100%;" aria-label="Annotation configuration">
+                        <mat-tab-group class="full-height full-width" [(selectedIndex)]="this.selectedTabIndex" *ngIf="this.selectedProperty" aria-label="Annotation configuration">
                             <mat-tab label="Annotation">
                                 <div class="tabContent">
                                     <div class="tabRow">
-                                        <mat-form-field class="propFormField" style="margin-right: 2%;">
+                                        <mat-form-field class="propFormField mr-2pct">
                                             <input matInput placeholder="Name" [formControl]="this.nameFC" aria-label="Annotation name" aria-required="true">
                                             <mat-error *ngIf="this.nameFC.hasError('required')" role="alert">Required</mat-error>
                                         </mat-form-field>
@@ -91,10 +91,10 @@
                                         </custom-combo-box>
                                     </div>
                                     <div class="tabRow" *ngIf="!experimentPlatformMode">
-                                        <label style="margin-right: 4%;" id="annotates-label">Annotates</label>
-                                        <mat-checkbox style="margin-right: 2%;" [formControl]="this.forSampleFC" aria-label="Annotates samples">Sample</mat-checkbox>
-                                        <mat-checkbox style="margin-right: 2%;" [formControl]="this.forDataTrackFC" aria-label="Annotates data tracks">Data Track</mat-checkbox>
-                                        <mat-checkbox style="margin-right: 2%;" [formControl]="this.forAnalysisFC" aria-label="Annotates analyses">Analysis</mat-checkbox>
+                                        <label class="mr-4pct" id="annotates-label">Annotates</label>
+                                        <mat-checkbox class="mr-2pct" [formControl]="this.forSampleFC" aria-label="Annotates samples">Sample</mat-checkbox>
+                                        <mat-checkbox class="mr-2pct" [formControl]="this.forDataTrackFC" aria-label="Annotates data tracks">Data Track</mat-checkbox>
+                                        <mat-checkbox class="mr-2pct" [formControl]="this.forAnalysisFC" aria-label="Annotates analyses">Analysis</mat-checkbox>
                                         <mat-checkbox [formControl]="this.forRequestFC" [appReadonly]="!this.canAccessAnyObject" appReadonlyType="checkbox" aria-label="Annotates experiments">Experiment</mat-checkbox>
                                     </div>
                                     <div class="tabRow">
@@ -106,36 +106,36 @@
                                             <mat-error *ngIf="this.sortOrderFC.hasError('pattern')" role="alert">Sort order must be a number less than or equal to 9999</mat-error>
                                         </mat-form-field>
                                     </div>
-                                    <div class="tabRow" style="flex: 2;">
+                                    <div class="tabRow tab-row-flex-2">
                                         <mat-form-field class="propFormField">
                                             <textarea matInput placeholder="Description" [formControl]="this.descriptionFC" matTextareaAutosize matAutosizeMinRows="3" matAutosizeMaxRows="3" aria-label="Annotation description"></textarea>
                                             <mat-error *ngIf="this.descriptionFC.hasError('maxlength')" role="alert">Description can be at most 2000 characters</mat-error>
                                         </mat-form-field>
                                     </div>
-                                    <div class="tabRow" style="width: 65%; margin-bottom: 1%;">
+                                    <div class="tabRow tab-row-owner">
                                         <custom-combo-box placeholder="Owner" [options]="this.appUserList"
                                                             valueField="idAppUser" displayField="display"
                                                             [formControl]="this.ownerFC" class="full-height full-width"
                                                             aria-label="Annotation owner">
                                         </custom-combo-box>
                                     </div>
-                                    <div class="tabRow" style="align-items: flex-start; flex: 3;">
-                                        <label style="margin-right: 4%;" id="annotation-type-label">Type</label>
-                                        <mat-radio-group [formControl]="this.propertyTypeFC" style="display: flex; flex-direction: column;" aria-labelledby="annotation-type-label">
+                                    <div class="tabRow tab-row-type">
+                                        <label class="mr-4pct" id="annotation-type-label">Type</label>
+                                        <mat-radio-group [formControl]="this.propertyTypeFC" class="flex-container-col" aria-labelledby="annotation-type-label">
                                             <mat-radio-button [value]="TYPE_TEXT">Text</mat-radio-button>
                                             <mat-radio-button [value]="TYPE_URL">URL</mat-radio-button>
                                             <mat-radio-button [value]="TYPE_CHECKBOX">Checkbox</mat-radio-button>
                                             <mat-radio-button [value]="TYPE_OPTION">Dropdown (single selection)</mat-radio-button>
                                             <mat-radio-button [value]="TYPE_MULTI_OPTION">Dropdown (multiple selection)</mat-radio-button>
                                         </mat-radio-group>
-                                        <div style="height: 100%; width: 100%; display: flex; flex-direction: column;  margin-left: 2%;" *ngIf="this.propertyTypeFC.value === this.TYPE_OPTION || this.propertyTypeFC.value === this.TYPE_MULTI_OPTION"
+                                        <div class="full-height full-width flex-container-col option-section" *ngIf="this.propertyTypeFC.value === this.TYPE_OPTION || this.propertyTypeFC.value === this.TYPE_MULTI_OPTION"
                                              appAgGridHeaderA11yFix>
-                                            <div style="display: flex; flex-direction: row;">
+                                            <div class="flex-container-row">
                                                 <button mat-button [disabled]="!this.canUpdateSelectedProperty" (click)="this.addOption()" aria-label="Add option"><img class="icon" [src]="'./assets/add.png'" alt="" aria-hidden="true">Add option</button>
                                                 <button mat-button [disabled]="!this.canUpdateSelectedProperty || this.selectedOptionIndex == null" (click)="this.deleteOption()" aria-label="Delete selected option"><img class="icon" [src]="'./assets/delete.png'" alt="" aria-hidden="true">Delete option</button>
                                             </div>
-                                            <ag-grid-angular #annotationOptionsGrid style="width: 65%; height: 100%; margin-left: 2%;"
-                                                             class="ag-theme-fresh"
+                                            <ag-grid-angular #annotationOptionsGrid
+                                                             class="ag-theme-fresh options-grid"
                                                              (gridReady)="this.onOptionGridReady($event)"
                                                              [rowSelection]="'single'"
                                                              (rowSelected)="this.onOptionGridRowSelected($event)"
@@ -158,7 +158,7 @@
                                 <div class="tabContent">
                                     <div class="appliesToGroup" *ngIf="!experimentPlatformMode || this.listFilteredApplication.length > 0" appAgGridHeaderA11yFix>
                                         <label class="leadingLabel">Only show for these platforms/experiment types:</label>
-                                        <div class="justify-space-between" style="display: flex; flex-direction: row;">
+                                        <div class="justify-space-between flex-container-row">
                                             <custom-combo-box class="appliesToField" *ngIf="!experimentPlatformMode"
                                                               placeholder="Platform" displayField="display"
                                                               [options]="this.listFilteredExperimentPlatform"
@@ -190,8 +190,8 @@
                                         </ag-grid-angular>
                                     </div>
                                     <div class="appliesToGroup" appAgGridHeaderA11yFix>
-                                        <div class="full-width justify-space-between align-center" style="display: flex; flex-direction: row;">
-                                            <label class="leadingLabel" style="width: 40%; margin-right: 2%;">Only show for these organisms: </label>
+                                        <div class="full-width justify-space-between align-center flex-container-row">
+                                            <label class="leadingLabel label-width-40 mr-2pct">Only show for these organisms: </label>
                                             <custom-combo-box class="appliesToField"
                                                               placeholder="Organism" displayField="display"
                                                               [options]="this.listOrganism"
@@ -217,8 +217,8 @@
                                         </ag-grid-angular>
                                     </div>
                                     <div class="appliesToGroup" *ngIf="!experimentPlatformMode" appAgGridHeaderA11yFix>
-                                        <div class="full-width justify-space-between align-center" style="display: flex; flex-direction: row;">
-                                            <label class="leadingLabel" style="width: 40%; margin-right: 2%;">Only show for these analysis types:</label>
+                                        <div class="full-width justify-space-between align-center flex-container-row">
+                                            <label class="leadingLabel label-width-40 mr-2pct">Only show for these analysis types:</label>
                                             <custom-combo-box class="appliesToField"
                                                               placeholder="Analysis Type" displayField="display"
                                                               [options]="this.listAnalysisType"
@@ -244,8 +244,8 @@
                                         </ag-grid-angular>
                                     </div>
                                     <div class="appliesToGroup" *ngIf="!experimentPlatformMode" appAgGridHeaderA11yFix>
-                                        <div class="full-width justify-space-between align-center" style="display: flex; flex-direction: row;">
-                                            <label class="leadingLabel" style="width: 40%; margin-right: 2%;">Only show for these users (only applies to non-required sample annotations):</label>
+                                        <div class="full-width justify-space-between align-center flex-container-row">
+                                            <label class="leadingLabel label-width-40 mr-2pct">Only show for these users (only applies to non-required sample annotations):</label>
                                             <custom-combo-box class="appliesToField" placeholder="User" [options]="this.appUserList"
                                                               displayField="display"
                                                               [formControl]="this.appliesToUser"
@@ -291,7 +291,7 @@
     <div class="full-width flex-container-row padded justify-space-between align-baseline foreground">
         <label>* Denotes annotations that apply to specific organisms, analysis types, experiment platforms, and/or users</label>
         <div *ngIf="!isDialog">
-            <save-footer *ngIf="this.selectedProperty" style="width: 100%"
+            <save-footer *ngIf="this.selectedProperty" class="full-width"
                          [disableSave]="!this.formGroup.valid || !this.formGroup.dirty || !this.gridsValid"
                          (saveClicked)="this.save()"
                          [dirty]="this.formGroup.dirty">
@@ -300,68 +300,3 @@
     </div>
 </div>
 </div>
-<style>
-    .grid-height {
-        height: 8em;
-    }
-    .grid-min-height {
-        min-height: 8em;
-    }
-    .annotation-background {
-        background-color: #EEEEEE;
-        padding: 0.3em;
-    }
-    .vertical-spacer {
-        height: 0.3em;
-        min-height: 0.3em;
-    }
-    .filter-combo-width .mat-form-field-infix {
-        width: 14em;
-        min-width: 5em;
-    }
-    .custom-mat-radio .mat-radio-label-content {
-        padding-left: 4px;
-        padding-right: 8px;
-    }
-    div.tabContent {
-        padding: 1%;
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-    div.tabRow {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        flex: 1;
-    }
-    div.appliesToGroup {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        flex: 1;
-    }
-    .propFormField {
-        width: 65%;
-    }
-    custom-combo-box.appliesToField {
-        width: 40%;
-        margin-right: 2%;
-    }
-    label.leadingLabel {
-        color: darkblue;
-        font-style: italic;
-    }
-    .label-width {
-        min-width: 10em;
-        width: 10em;
-    }
-    img.icon {
-        margin-right: 0.5rem;
-    }
-    span.dirtyNote {
-        background: #feec89;
-        padding: 0.5rem;
-        margin-left: 1rem;
-    }
-</style>

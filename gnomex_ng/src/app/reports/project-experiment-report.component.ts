@@ -7,6 +7,7 @@ import {UserPreferencesService} from "../services/user-preferences.service";
 @Component({
     selector: 'project-experiment-report',
     templateUrl: "./project-experiment-report.component.html",
+    styleUrls: ["./project-experiment-report.component.scss"],
 })
 
 export class ProjectExperimentReportComponent {

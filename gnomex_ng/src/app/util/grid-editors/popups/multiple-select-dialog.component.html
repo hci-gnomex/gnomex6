@@ -1,15 +1,14 @@
 <div class="full-width full-height flex-vertical-container" role="dialog" aria-labelledby="dialog-title">
-    <div mat-dialog-title class="no-margin" style="padding: 0.5em;">
+    <div mat-dialog-title class="no-margin padding-0-5em">
         <h3 class="no-margin" id="dialog-title">
             {{optionName}}
         </h3>
     </div>
     <div mat-dialog-content class="full-width full-height stretch no-margin no-padding" role="region" aria-label="Selection options">
         <div class="full-width full-height">
-            <div class="full-height full-width" style="padding: .5em 2em;" appAgGridHeaderA11yFix>
+            <div class="full-height full-width grid-padded" appAgGridHeaderA11yFix>
                 <ag-grid-angular
-                        style="width:100%; height:100%;"
-                        class="ag-theme-fresh"
+                        class="ag-theme-fresh full-width full-height"
                         [singleClickEdit]="true"
                         [rowSelection]="gridRowSelection"
                         [suppressRowClickSelection]="allowMultipleSelection"
@@ -25,7 +24,7 @@
             </div>
         </div>
     </div>
-    <div mat-dialog-actions class="no-margin" style="display: block;" role="group" aria-label="Dialog actions">
+    <div mat-dialog-actions class="no-margin display-block" role="group" aria-label="Dialog actions">
         <div class="t full-width">
             <div class="tr">
                 <div class="td right-align horizontal-padding">

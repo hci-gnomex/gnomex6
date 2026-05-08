@@ -2,8 +2,8 @@
 
     <label class="annot-label" for="mainURL" id="url-annot-label"> {{annot?.name}}</label>
     <div *ngFor="let annot of urlAnnotations; let i = index " role="listitem">
-        <div [hidden]="!annot.edit" style="display:flex">
-            <mat-form-field style="margin-right:.5em;" >
+        <div [hidden]="!annot.edit" class="flex-container-row">
+            <mat-form-field class="url-field-mr">
                 <input matInput
                        (blur)="onTouched()"
                        [readonly]="urlDisabled"
@@ -25,7 +25,7 @@
 
             <button mat-button [disabled]="urlDisabled" (click)="toggleMode(annot)" aria-label="Toggle edit mode"> edit </button>
         </div>
-        <div [hidden]="annot.edit" style="display:flex; justify-content: space-between;">
+        <div [hidden]="annot.edit" class="flex-container-row justify-space-between">
             <a [href]="annot.url" target="_blank" [attr.aria-label]="'Open ' + annot.urlAlias + ' in new tab'"> {{annot.urlAlias}}</a>
             <div>
                 <button [disabled]="urlDisabled" mat-button color="primary" (click)="toggleMode(annot)" aria-label="Show URL details"> show </button>
@@ -35,8 +35,8 @@
         </div>
 
     </div>
-    <div style="display:flex" role="group" aria-label="Add new URL">
-        <mat-form-field style="margin-right: .5em;">
+    <div class="flex-container-row" role="group" aria-label="Add new URL">
+        <mat-form-field class="url-field-mr">
             <input  id="mainURL"
                     [(ngModel)]="alias"
                     (blur)="onTouched()"

@@ -1,5 +1,5 @@
-<div class="double-padded overflow-auto" style="display:flex" role="region" aria-label="Annotations">
-    <form [formGroup]="form" style=" height:100%;width:100%; display:flex; flex-direction:column;" aria-label="Annotations form">
+<div class="double-padded overflow-auto flex-container-row" role="region" aria-label="Annotations">
+    <form [formGroup]="form" class="full-height full-width flex-container-col" aria-label="Annotations form">
         <div [ngSwitch]="annot.codePropertyType" *ngFor="let annot of annotations" class="full-width full-height small-font padded"
              role="group" [attr.aria-label]="annot.name + ' annotation'">
             <div class="display-white-space" innerHTML="{{ annot && annot.description ? annot.description : '' }}" aria-hidden="true"></div>
@@ -14,7 +14,7 @@
             <div *ngSwitchCase="'TEXT'" class="annot-control-editor" >
                 <label class="padded-bottom" [attr.id]="'label-' + annot.name">{{annot.name}}</label>
                 <div class="full-width padded enable-bordered">
-                    <textarea style="white-space: pre-line"
+                    <textarea class="pre-line-text"
                               matInput
                               matTextareaAutosize
                               matAutosizeMinRows="8"
@@ -56,7 +56,7 @@
         </div>
     </form>
     <div *ngIf="showConfigureAnnotationsButton" class="flex-grow">
-        <button mat-raised-button class="minimize link-button" [disabled]="this.disabled" style="margin:1em" (click)="loadConfigAnnotations()"
+        <button mat-raised-button class="minimize link-button margin-1em" [disabled]="this.disabled" (click)="loadConfigAnnotations()"
                 aria-label="Configure annotations"> Configure Annotations </button>
     </div>
 </div>

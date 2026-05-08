@@ -1,3 +1,17 @@
 .error-message {
     color: red;
 }
+
+.name-field {
+    flex: 1;
+    width: calc(100% - 2em);
+    margin: 1em;
+}
+
+.desc-section {
+    display: flex;
+    flex-direction: column;
+    flex: 5;
+    width: calc(100% - 2em);
+    margin: 1em;
+}

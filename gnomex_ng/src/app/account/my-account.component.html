@@ -73,8 +73,7 @@
         <label>Select labs for which you would like to receive upload notifications</label>
     </div>
     <div class="formRow" appAgGridHeaderA11yFix>
-        <ag-grid-angular #uploadNotificationsLabsGrid style="width: 550px; height: 350px;"
-                         class="ag-theme-fresh"
+        <ag-grid-angular #uploadNotificationsLabsGrid class="ag-theme-fresh grid-550x350"
                          aria-label="Upload notification labs"
                          (gridReady)="this.onNotifyGridReady($event)"
                          (rowDataChanged)="this.onNotifyGridRowDataChanged()"
