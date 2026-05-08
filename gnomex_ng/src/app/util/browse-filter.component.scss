@@ -1,12 +1,12 @@
-input.filterTextInput {
-    background: gainsboro;
+﻿input.filterTextInput {
+    background: var(--grey-lightest);
 }
 
 .filter {
     font-size: 12px;
     width: 100%;
-    border: 1px solid grey;
-    background-color: white;
+    border: 1px solid var(--grey-dark);
+    background-color: var(--white-lightest);
 }
 
 button.showHideButton {
@@ -16,23 +16,23 @@ button.showHideButton {
 }
 
 button.showHideButton:hover {
-    background: deepskyblue;
+    background: var(--workflow-selected-bg);
 }
 
 button.searchButton {
-    border: 1px solid grey;
+    border: 1px solid var(--grey-dark);
     border-radius: 5px;
-    background: gainsboro;
+    background: var(--grey-lightest);
 }
 
 button.searchButton:hover {
-    background: deepskyblue;
+    background: var(--workflow-selected-bg);
 }
 
 div.inlineDiv {
     display: flex;
     align-items: center;
-    color: #101010;
+    color: var(--black-darker);
 }
 
 div.labelAndIcon {
@@ -40,7 +40,7 @@ div.labelAndIcon {
     align-items: center;
     width: 11em;
     padding-left: 0.5em;
-    color: #101010;
+    color: var(--black-darker);
 }
 
 div.divider {
@@ -64,12 +64,12 @@ div.filter-row-bottom {
 
 label.leading-label {
     margin-right: 0.3em;
-    color: #101010;
+    color: var(--black-darker);
 }
 
 label.following-label {
     margin-left: 0.3em;
-    color: #101010;
+    color: var(--black-darker);
 }
 
 .padding-right {

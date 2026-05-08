@@ -50,7 +50,7 @@ body {
   line-height: 1.125;
   color: var(--black-dark);
   text-align: left;
-  background-color: #fff;
+  background-color: var(--white-lightest);
 }
 
 [tabindex="-1"]:focus {
@@ -145,14 +145,14 @@ sup {
 }
 
 a {
-  color: #004C9E;
+  color: var(--brand-link-blue);
   text-decoration: none;
   background-color: transparent;
   -webkit-text-decoration-skip: objects;
 }
 
 a:hover {
-  color: #0056b3;
+  color: var(--brand-link-blue-hover);
   text-decoration: underline;
 }
 
@@ -206,7 +206,7 @@ table {
 caption {
   padding-top: 0.75rem;
   padding-bottom: 0.75rem;
-  color: #6c757d;
+  color: var(--text-muted);
   text-align: left;
   caption-side: bottom;
 }

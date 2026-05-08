@@ -1,4 +1,4 @@
-li {
+﻿li {
     margin-bottom: 0.7em;
 }
 
@@ -110,7 +110,7 @@ ol.three-depth-numbering li ol li ol li::before {
 .link-button {
     font-size: small;
     text-decoration: underline;
-    color: blue;
+    color: var(--pure-indigo);
 }
 
 .margin-left {

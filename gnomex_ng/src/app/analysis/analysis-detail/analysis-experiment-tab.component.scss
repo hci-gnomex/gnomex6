@@ -1,4 +1,4 @@
-mat-radio-group.filter {
+﻿mat-radio-group.filter {
     display: inline-flex;
     flex-direction: row;
     margin: 1em;
@@ -12,7 +12,7 @@ mat-radio-button.filterOption {
 .flex-column-container {
     display: flex;
     flex-direction: column;
-    background-color: white;
+    background-color: var(--white-lightest);
     height: 100%;
 }
 
@@ -27,7 +27,7 @@ mat-radio-button.filterOption {
 }
 
 .datatracks-panel {
-    border: #C8C8C8 solid thin;
+    border: var(--grey-lighter) solid thin;
 }
 
 .truncate {

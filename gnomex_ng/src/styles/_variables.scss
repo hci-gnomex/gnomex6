@@ -393,4 +393,35 @@
   --grid-selected-even-even-background-color: var(--cyanvivid-light);
 
   --footer-background-color: var(--greycool-lighter);
+
+  /* ---- Accessibility / brand tokens ---- */
+  --focus-blue: #1a73e8;
+  --focus-blue-bg: #e8f4fe;
+  --focus-drop-bg: #d2e9fb;
+  --focus-error-outline: #d93025;
+  --focus-error-bg: #fce8e6;
+  --brand-link-blue: #004C9E;
+  --brand-link-blue-hover: #0056b3;
+
+  /* ---- Semantic application tokens ---- */
+  --footer-bg: #f5f5f5;
+  --navbar-border: #cecece;
+  --workflow-on-bg: #f1eed6;
+  --workflow-selected-bg: #00bfff;
+  --login-page-bg: #ececd9;
+  --login-btn-border: #70bb70;
+  --login-section-bg: #c6ccbe;
+  --login-background: #f9fffc;
+  --login-foreground: #e9efde;
+  --action-link-color: #1601db;
+  --upload-title-bg: #84b278;
+  --unsaved-changes-bg: #feec89;
+  --text-muted: #6c757d;
+  --error-red: #ed0000;
+  --mat-border-color: #e8e8e8;
+  --form-text: #495057;
+  --validation-error: #880000;
+  --label-italic-color: #00008b;
+  --divider-warm: #d7d5d1;
+  --experiment-panel-bg: #0b97c4;
 }

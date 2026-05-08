@@ -1,11 +1,11 @@
-
+﻿
 .primary-button {
   font-family: "Arial", Helvetica, sans-serif;
   font-size: 14pt;
 
-  color: #FFFFFF;
+  color: var(--white-lightest);
   border-radius: 6px;
-  border-color: #70bb70;
+  border-color: var(--login-btn-border);
 
   background-image:linear-gradient(60deg,green,green 40%,#1a1 60%,green 90%,green);
   animation: anim 8s linear infinite alternate;
@@ -17,7 +17,7 @@
 }
 
 .primary-button:active {
-  border-color: darkgreen;
+  border-color: var(--green-darker);
   border-radius: 6px;
 }
 
@@ -37,7 +37,7 @@
   font-family: "Arial", Helvetica, sans-serif;
   font-size: 12pt;
   color: var(--black-dark);
-  background-color: #C6CCBE;
+  background-color: var(--login-section-bg);
   border-radius: 4px
 }
 
@@ -45,13 +45,13 @@
   width: 24em;
   max-width: 24em;
 
-  border: solid 1px #CCCCCC;
+  border: solid 1px var(--grey-lighter);
   padding: 1.25em 2.5em;
 }
 
-.background { background-color: #F9FFFC; }
+.background { background-color: var(--login-background); }
 .foreground {
-  background-color: #E9EFDE;
+  background-color: var(--login-foreground);
   border-radius: 10px;
 
   box-shadow: rgba(0,0,0,0.3) 5px 5px 5px;
@@ -86,19 +86,19 @@
 }
 
 input.username {
-  color: black;
-  background-color: #FFFFFF;
+  color: var(--black-darkest);
+  background-color: var(--white-lightest);
   padding: 0.7em;
-  border: 1px solid #CCCCCC;
+  border: 1px solid var(--grey-lighter);
   border-radius: 4px 4px 0 0;
 }
 
 input.password {
-  color: black;
-  background-color: #FFFFFF;
+  color: var(--black-darkest);
+  background-color: var(--white-lightest);
   padding: 0.7em;
-  border: 1px solid #CCCCCC;
-  border-top: 0 solid #CCCCCC;
+  border: 1px solid var(--grey-lighter);
+  border-top: 0 solid var(--grey-lighter);
   border-radius: 0 0 4px 4px;
 }
 
@@ -107,7 +107,7 @@ input.password {
 }
 
 input[type="text"]:focus, input[type="password"]:focus {
-  background-color: white;
+  background-color: var(--white-lightest);
   transition: all .3s;
 }
 
@@ -117,13 +117,13 @@ input[type="text"]:focus+label {
   left: 0.5em;
   z-index: 5;
   position: relative;
-  background-color: white;
+  background-color: var(--white-lightest);
 
   transition: all .3s;
 }
 
 input[type="password"]:focus+label {
-  background-color: white;
+  background-color: var(--white-lightest);
   top: 5px;
   left: 10px;
   bottom: auto;
@@ -131,7 +131,7 @@ input[type="password"]:focus+label {
   padding-bottom: 2px;
   font-size: 12px;
   border-bottom: 1px solid rgba(0, 0, 0, .1);
-  color: #999;
+  color: var(--grey-medium);
   transition: all .3s;
 }
 
@@ -155,8 +155,8 @@ input:valid {
 }
 
 input:invalid:not:focus~label {
-  color: #800;
-  border-bottom: solid #800 1px;
+  color: var(--validation-error);
+  border-bottom: solid var(--validation-error) 1px;
   transition: all .3s;
 }
 
@@ -175,7 +175,7 @@ input~label {
   left: 1.0em;
   z-index: 5;
   position: relative;
-  background-color: white;
+  background-color: var(--white-lightest);
   transition: all .3s;
 }
 
@@ -205,8 +205,8 @@ input:placeholder-shown~label {
   right: 20px;
   padding: 10px;
   font-size: 14px;
-  background-color: black;
-  color: white;
+  background-color: var(--black-darkest);
+  color: var(--white-lightest);
   box-shadow: 1px 1px 3px 1px black;
   transition: all .3s;
 }
@@ -224,10 +224,10 @@ input:placeholder-shown~label {
 }
 .tooltip > label {
   position: absolute;
-  color: #888;
+  color: var(--grey-meddark);
   font-size: 20px;
   padding: 0 20px;
-  background-color: white;
+  background-color: var(--white-lightest);
   left: 6px;
   top: 20px;
   bottom: 1px;

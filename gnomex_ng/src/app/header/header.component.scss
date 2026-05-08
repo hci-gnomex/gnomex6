@@ -1,14 +1,6 @@
-.red {
+﻿.red {
     /*font-weight: bold;*/
-    color: #ed0000;
-}
-
-.no-padding-dialog .mat-dialog-container {
-    padding: 0;
-}
-
-.no-padding-dialog .mat-dialog-container .mat-dialog-actions {
-    background-color: #eeeeeb;
+    color: var(--error-red);
 }
 
 .header-one {
@@ -17,8 +9,8 @@
 }
 
 .header-two {
-    background-color: #f5fffa;
-    color: black;
+    background-color: var(--green-lightest);
+    color: var(--black-darkest);
 }
 
 .top-menu-item {
@@ -42,7 +34,7 @@
 }
 
 .problem {
-    color: #ed0000 !important;
+    color: var(--error-red) !important;
     text-decoration: underline !important;
 }
 
@@ -53,10 +45,6 @@
 [hidden] {
     display: none !important;
     flex: 0 !important;
-}
-
-.mat-menu-panel.no-max-width {
-    max-width: none;
 }
 
 .horizontal-padding {
@@ -76,8 +64,8 @@
 }
 
 .collapse-bar {
-    background-color: #eeeeee;
-    border-bottom: 1px solid silver;
+    background-color: var(--white-dark);
+    border-bottom: 1px solid var(--grey-lighter);
 }
 
 .animation {

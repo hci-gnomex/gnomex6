@@ -1,4 +1,4 @@
-
+﻿
 .no-overflow {
   overflow: hidden;
 }
@@ -13,7 +13,7 @@
 }
 
 .label {
-  color: #495057;
+  color: var(--form-text);
   width: 100%;
   height: fit-content;
   padding: 0 0.7em 0 0.7em;
@@ -27,9 +27,9 @@
 
 input {
   color: rgba(0,0,0,255);
-  background-color: #FFFFFF;
+  background-color: var(--white-lightest);
   padding: 0.9em 0.7em 0.5em 1.4em;
-  border: 1px solid #CCCCCC;
+  border: 1px solid var(--grey-lighter);
 }
 
 .roundTop {
@@ -41,7 +41,7 @@ input {
 }
 
 .noTopBorder {
-  border-top: 0 solid #CCCCCC;
+  border-top: 0 solid var(--grey-lighter);
 }
 
 .login-form {
@@ -50,7 +50,7 @@ input {
 
 input:focus {
   color: rgba(0,0,0,255);
-  background-color: white;
+  background-color: var(--white-lightest);
   transition: all .3s;
 }
 
@@ -58,13 +58,13 @@ input:focus+div {
   font-size: 8pt;
   z-index: 500;
   position: relative;
-  background-color: white;
+  background-color: var(--white-lightest);
   transition: all .3s;
 }
 
 input:focus+div>div>label {
   border-bottom: 1px solid rgba(222, 222, 222, 255);
-  color: #495057;
+  color: var(--form-text);
   transition: all .3s;
 }
 
@@ -79,7 +79,7 @@ input:not:placeholder-shown+div {
 
 input:not:placeholder-shown+div {
   border-bottom: 1px solid rgba(222, 222, 222, 255);
-  color: #495057;
+  color: var(--form-text);
   transition: all .3s;
 }
 
@@ -106,8 +106,8 @@ input:valid+div {
 
 
 input:invalid:not:focus~div>div>label {
-  color: #800;
-  border-bottom: solid #800 1px;
+  color: var(--validation-error);
+  border-bottom: solid var(--validation-error) 1px;
   transition: all .3s;
 }
 
@@ -126,7 +126,7 @@ input:placeholder-shown ~ .tooltip {
 input~div {
   z-index: 5;
   position: relative;
-  background-color: white;
+  background-color: var(--white-lightest);
   transition: all .3s;
 }
 
@@ -155,8 +155,8 @@ input:placeholder-shown~div {
   right: 20px;
   padding: 10px;
   font-size: 14px;
-  background-color: black;
-  color: white;
+  background-color: var(--black-darkest);
+  color: var(--white-lightest);
   box-shadow: 1px 1px 3px 1px black;
   transition: all .3s;
 }
@@ -174,10 +174,10 @@ input:placeholder-shown~div {
 }
 .tooltip > label {
   position: absolute;
-  color: #888;
+  color: var(--grey-meddark);
   font-size: 20px;
   padding: 0 20px;
-  background-color: white;
+  background-color: var(--white-lightest);
   left: 6px;
   top: 20px;
   bottom: 1px;

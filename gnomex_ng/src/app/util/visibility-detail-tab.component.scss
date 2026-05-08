@@ -1,4 +1,4 @@
-.flex-column-container {
+﻿.flex-column-container {
     display: flex;
     flex-direction: column;
 }
@@ -10,8 +10,8 @@
 }
 
 .annot-border {
-    border-top: 1px solid #e8e8e8;
-    border-bottom: 1px solid #e8e8e8;
+    border-top: 1px solid var(--white-dark);
+    border-bottom: 1px solid var(--white-dark);
 }
 
 .annot-label {

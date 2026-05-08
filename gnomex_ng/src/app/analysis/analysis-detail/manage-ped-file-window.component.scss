@@ -1,9 +1,9 @@
-label.error-action {
-    color: red;
+﻿label.error-action {
+    color: var(--pure-red);
 }
 
 label.info-action {
-    color: blue;
+    color: var(--pure-indigo);
 }
 
 div.grid-container {
@@ -14,7 +14,7 @@ div.grid-container {
 .primary-action {
     background-color: var(--bluewarmvivid-medlight);
     font-weight: bolder;
-    color: white;
+    color: var(--white-lightest);
 }
 
 .secondary-action {

@@ -22,7 +22,7 @@
 }
 
 .fileContainer:hover {
-    background: #F3FFFF;
+    background: var(--teal-lightest);
 }
 
 .fileContainer [type=file]:hover {

@@ -1,4 +1,4 @@
-.horizontal-center { text-align: center; }
+﻿.horizontal-center { text-align: center; }
 
 button.link-button {
     background: none;
@@ -15,5 +15,5 @@ button.link-button:focus {
 
 .message { text-decoration: underline; }
 
-.blue-text { color: blue; }
-.red-text  { color: red; }
+.blue-text { color: var(--pure-indigo); }
+.red-text  { color: var(--pure-red); }

@@ -1,0 +1,27 @@
+{
+  "plugins": ["stylelint-scss"],
+  "rules": {
+    "color-named": ["never", {
+      "severity": "warning",
+      "message": "Use a CSS custom property (var(--...)) instead of a named color."
+    }],
+    "color-no-invalid-hex": true,
+    "declaration-no-important": [true, {
+      "severity": "warning",
+      "message": "Avoid !important. Use it only in _accessibility.scss for forced accessibility overrides."
+    }],
+    "selector-pseudo-element-no-unknown": [true, {
+      "message": "::ng-deep and /deep/ are deprecated. Restructure selectors or use :host-context instead."
+    }],
+    "at-rule-no-unknown": null,
+    "scss/at-rule-no-unknown": true
+  },
+  "overrides": [
+    {
+      "files": ["src/styles/_accessibility.scss"],
+      "rules": {
+        "declaration-no-important": null
+      }
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-.formField {
+﻿.formField {
     margin: 0 2.0%;
     width: 20%
 }
@@ -18,7 +18,7 @@
     min-height: 0.3em;
 }
 
-.border { border: #C8C8C8 solid thin; }
+.border { border: var(--grey-lighter) solid thin; }
 
 .major-border {
     border-radius: 0.3em;

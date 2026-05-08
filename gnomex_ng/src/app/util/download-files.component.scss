@@ -1,4 +1,4 @@
-div.trees-container {
+﻿div.trees-container {
     width: 60em;
     height: 25em;
     border: solid silver 1px;
@@ -7,7 +7,7 @@ div.trees-container {
 .primary-action {
     background-color: var(--bluewarmvivid-medlight);
     font-weight: bolder;
-    color: white;
+    color: var(--white-lightest);
 }
 
 .secondary-action {

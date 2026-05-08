@@ -1,4 +1,4 @@
-button.link-button {
+﻿button.link-button {
     background: none;
     background-color: inherit;
     border: none;
@@ -23,13 +23,13 @@ button.link-button:focus {
 }
 
 .is-active {
-    color: #0000FF;
+    color: var(--pure-indigo);
     font-weight: bold;
     font-style: normal;
 }
 
 .is-not-active {
-    color: #6a6b6e;
+    color: var(--greywarm-meddarker);
     font-weight: normal;
     font-style: italic;
 }

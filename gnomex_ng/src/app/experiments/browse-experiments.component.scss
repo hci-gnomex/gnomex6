@@ -1,4 +1,4 @@
-.horizontal-center {
+﻿.horizontal-center {
     text-align: center;
 }
 
@@ -22,7 +22,7 @@
 }
 
 .border {
-    border: #C8C8C8 solid thin;
+    border: var(--grey-lighter) solid thin;
 }
 
 .no-overflow {
@@ -38,5 +38,49 @@
 }
 
 .background-lightyellow {
-    background-color: lightyellow;
+    background-color: var(--lemon-lighter);
+}
+
+// Rules migrated from browse-experiments-component.less
+
+.inlineComboBox {
+    display: inline-block;
+}
+
+.sidebar {
+    width: 25%;
+    position: relative;
+    left: 0;
+    background-color: var(--grey-lighter);
+    transition: all .25s;
+}
+
+.br-exp-row-one     { flex-grow: 1; }
+.br-exp-item-row-two { flex-grow: 1; }
+
+.br-exp-item {
+    flex: 1 1 auto;
+    font-size: small;
+}
+
+.br-exp-one          { width: 100%; flex-grow: .25; }
+.br-exp-help-drag-drop { width: 100%; flex-grow: .10; }
+.br-exp-three        { width: 100%; height: 6em; flex-grow: 8; }
+.br-exp-four         { width: 100%; flex-grow: .10; }
+.br-exp-five         { width: 100%; flex-grow: .10; }
+
+div.background {
+    width: 100%;
+    height: 100%;
+    background-color: var(--white-darker);
+    padding: 0.3em;
+    border-radius: 0.3em;
+    border: 1px solid var(--grey-medlight);
+    display: flex;
+    flex-direction: column;
+}
+
+.experiment-detail-panel {
+    width: 75%;
+    background-color: var(--experiment-panel-bg);
 }

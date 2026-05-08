@@ -1,4 +1,4 @@
-.string-container {
+﻿.string-container {
     padding-left: 0.3rem;
 }
 
@@ -16,4 +16,4 @@
 
 .fix-table { table-layout: fixed; }
 
-.error { color: red; }
+.error { color: var(--pure-red); }

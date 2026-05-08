@@ -1,4 +1,4 @@
-.horizontal-center { text-align: center; }
+﻿.horizontal-center { text-align: center; }
 
 .flex-grow-large { flex: 4; }
 
@@ -6,7 +6,7 @@
 
 .major-padded-right { padding-right: 1em; }
 
-.experiment-link { color: #004C9E; text-decoration: none; }
+.experiment-link { color: var(--brand-link-blue); text-decoration: none; }
 
 
 .progress-bar-container {
@@ -25,14 +25,14 @@
 }
 
 .info-pane {
-    background: #EEEEEE;
-    border: 0.1em solid #B7BABC;
+    background: var(--white-dark);
+    border: 0.1em solid var(--greywarm-medium);
     padding: 0.3em;
     font-size: 0.8em;
     width: 40em;
 }
 .white-background {
-    background: white;
+    background: var(--white-lightest);
 }
 .padding-small {
     padding: 0.2em;
@@ -44,12 +44,12 @@
     margin-right: 1em;
 }
 .divider-top-small {
-    border-top: 0.02em solid #D7D5D1;
+    border-top: 0.02em solid var(--divider-warm);
 }
 .divider-span {
     width: 1px;
     height: 100%;
-    border-right: 0.02em solid #D7D5D1;
+    border-right: 0.02em solid var(--divider-warm);
 }
 .children-margin-bottom-small > *:not(:last-child) {
     margin-bottom: 0.5em;

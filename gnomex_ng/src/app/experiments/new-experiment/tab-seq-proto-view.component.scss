@@ -1,4 +1,4 @@
-.heading {
+﻿.heading {
     width: 15%;
     min-width: 25em;
     padding-right: 2em;
@@ -12,11 +12,11 @@
 }
 
 .odd {
-    background-color: white;
+    background-color: var(--white-lightest);
 }
 
 .even {
-    background-color: #edede9;
+    background-color: var(--white-dark);
 }
 
 ol.three-depth-numbering {

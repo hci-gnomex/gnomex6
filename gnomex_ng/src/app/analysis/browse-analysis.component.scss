@@ -1,4 +1,4 @@
-.left-right-padded {
+﻿.left-right-padded {
     padding-left: 0.3em;
     padding-right: 0.3em;
 }
@@ -22,7 +22,7 @@
 }
 
 .border {
-    border: #C8C8C8 solid thin;
+    border: var(--grey-lighter) solid thin;
 }
 
 .major-border {

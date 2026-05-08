@@ -1,10 +1,10 @@
-.move-target-list {
+﻿.move-target-list {
     list-style: none;
     margin: 0;
     padding: 0;
     max-height: 20em;
     overflow-y: auto;
-    border: 1px solid #ccc;
+    border: 1px solid var(--grey-lighter);
     border-radius: 4px;
     min-width: 20em;
 }
@@ -21,12 +21,12 @@
 
 .move-target-item:focus {
     background: rgba(26, 115, 232, 0.12);
-    outline: 2px solid #1a73e8;
+    outline: 2px solid var(--focus-blue);
     outline-offset: -2px;
 }
 
 .move-target-path {
-    color: #666;
+    color: var(--grey-darker);
     font-size: 0.85em;
 }
 

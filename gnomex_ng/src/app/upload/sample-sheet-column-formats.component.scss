@@ -1,4 +1,4 @@
-pre {
+﻿pre {
     margin-bottom: 0;
 }
 
@@ -7,7 +7,7 @@ pre {
 }
 
 .title {
-    background-color: #84b278;
-    color: white;
+    background-color: var(--upload-title-bg);
+    color: var(--white-lightest);
     font-size: larger;
 }

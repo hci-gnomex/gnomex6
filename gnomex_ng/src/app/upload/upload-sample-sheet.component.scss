@@ -1,15 +1,15 @@
-.hidden {
+﻿.hidden {
     display: none;
 }
 
 .title {
-    background-color: #84b278;
-    color: white;
+    background-color: var(--upload-title-bg);
+    color: var(--white-lightest);
     font-size: larger;
 }
 
 .link-button {
-    color: blue;
+    color: var(--pure-indigo);
     text-decoration: underline;
 }
 

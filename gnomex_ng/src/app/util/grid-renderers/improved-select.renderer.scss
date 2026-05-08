@@ -12,10 +12,10 @@
 
 .error {
     background: linear-gradient(rgba(255,0,0,0.25), rgba(255,0,0,0.25), rgba(255,0,0,0.25));
-    border: solid red 2px;
+    border: solid var(--pure-red) 2px;
 }
 
 .inactive {
-    color: darkgrey;
+    color: var(--grey-medlight);
     font-style: italic;
 }

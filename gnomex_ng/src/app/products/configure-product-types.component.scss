@@ -1,4 +1,4 @@
-.margin-right {
+﻿.margin-right {
     margin-right: 2rem;
 }
 .margin-bottom {
@@ -20,7 +20,7 @@
     flex: 4;
 }
 span.dirty-note {
-    background: yellow;
+    background: var(--pure-yellow);
     padding: 0.5rem;
     margin-left: 1rem;
 }

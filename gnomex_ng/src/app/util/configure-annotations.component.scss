@@ -1,8 +1,8 @@
-.grid-height { height: 8em; }
+﻿.grid-height { height: 8em; }
 .grid-min-height { min-height: 8em; }
 
 .annotation-background {
-  background-color: #EEEEEE;
+  background-color: var(--white-dark);
   padding: 0.3em;
 }
 
@@ -50,7 +50,7 @@ custom-combo-box.appliesToField {
 }
 
 label.leadingLabel {
-  color: darkblue;
+  color: var(--label-italic-color);
   font-style: italic;
 }
 
@@ -62,7 +62,7 @@ label.leadingLabel {
 img.icon { margin-right: 0.5rem; }
 
 span.dirtyNote {
-  background: #feec89;
+  background: var(--unsaved-changes-bg);
   padding: 0.5rem;
   margin-left: 1rem;
 }

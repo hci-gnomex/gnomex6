@@ -22,7 +22,7 @@ div.sidenav {
   position: fixed;
   left: 0;
   overflow-x: hidden;
-  border-right: 5px solid lightgray;
+  border-right: 5px solid var(--grey-lighter);
 }
 
 div.mainnav {
@@ -259,6 +259,20 @@ div.mainnav {
 .margin-top-1em     { margin-top: 1em; }
 .padding-0-5em      { padding: 0.5em; }
 .padding-1em        { padding: 1em; }
+
+// --- Legacy layout containers (migrated from browse-experiments-component.less) ---
+
+.flex-column-container {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--white-lightest);
+  height: 100%;
+}
+
+.flex-row-container {
+  display: flex;
+  flex-direction: row;
+}
 
 // --- Fixed-width helpers ---
 

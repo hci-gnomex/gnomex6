@@ -3,67 +3,67 @@
 .ag-theme-balham .annotationRequiredRow {
   font-weight: bold !important;
   font-style: italic !important;
-  color: black !important;
+  color: var(--black-darkest) !important;
 }
 
 .ag-theme-balham .annotationActiveRow {
   font-style: normal !important;
-  color: black !important;
+  color: var(--black-darkest) !important;
 }
 
 .ag-theme-balham .annotationInactiveRow {
   font-style: italic !important;
-  color: #647478 !important;
+  color: var(--greywarm-meddarker) !important;
 }
 
 .ag-theme-balham .otherBillingItem {
   font-style: italic !important;
-  color: grey !important;
+  color: var(--grey-medium) !important;
 }
 
 .ag-theme-balham .workFlowOnColor {
-  background-color: #f1eed6 !important;
+  background-color: var(--workflow-on-bg) !important;
 }
 
 .ag-theme-balham .workFlowOffColor {
-  background-color: white !important;
+  background-color: var(--white-lightest) !important;
 }
 
 .ag-theme-balham .workFlowSelectedColor {
-  background-color: deepskyblue !important;
+  background-color: var(--workflow-selected-bg) !important;
 }
 
 .ag-theme-fresh .annotationRequiredRow {
   font-weight: bold !important;
   font-style: italic !important;
-  color: black !important;
+  color: var(--black-darkest) !important;
 }
 
 .ag-theme-fresh .annotationActiveRow {
   font-style: normal !important;
-  color: black !important;
+  color: var(--black-darkest) !important;
 }
 
 .ag-theme-fresh .annotationInactiveRow {
   font-style: italic !important;
-  color: #647478 !important;
+  color: var(--greywarm-meddarker) !important;
 }
 
 .ag-theme-fresh .otherBillingItem {
   font-style: italic !important;
-  color: grey !important;
+  color: var(--grey-medium) !important;
 }
 
 .ag-theme-fresh .workFlowOnColor {
-  background-color: #f1eed6 !important;
+  background-color: var(--workflow-on-bg) !important;
 }
 
 .ag-theme-fresh .workFlowOffColor {
-  background-color: white !important;
+  background-color: var(--white-lightest) !important;
 }
 
 .ag-theme-fresh .workFlowSelectedColor {
-  background-color: deepskyblue !important;
+  background-color: var(--workflow-selected-bg) !important;
 }
 
 .ag-theme-fresh {
@@ -89,7 +89,7 @@
 }
 
 .ag-theme-fresh .ag-row-selected {
-  background-color: deepskyblue !important;
+  background-color: var(--workflow-selected-bg) !important;
 }
 
 .ag-header-cell-text {
@@ -100,11 +100,11 @@
 
 // angular-split gutter styles
 .white-split-gutter .as-split-gutter.ng-star-inserted {
-  background-color: white !important;
+  background-color: var(--white-lightest) !important;
 }
 
 .silver-bordered-gutter .as-split-gutter.ng-star-inserted {
   border-style: solid !important;
-  border-color: silver !important;
+  border-color: var(--grey-lighter) !important;
   border-width: 0 1px 0 1px !important;
 }

@@ -1,11 +1,82 @@
 // Angular Material component overrides
 
-// Disabled radio button label contrast
+// ---- Buttons ----
+
+button.mat-button.minimize {
+  min-width: 0;
+  width: auto;
+  height: auto;
+  line-height: 1rem;
+  padding: 0.3em;
+}
+
+button.mat-raised-button.minimize {
+  min-width: 0;
+  width: auto;
+  height: auto;
+  line-height: 1rem;
+  padding: 0.3em;
+}
+
+button.mat-button.minimize span {
+  min-width: 0;
+  padding: 0.3em;
+}
+
+button.mat-raised-button.minimize span {
+  min-width: 0;
+  padding: 0.3em;
+}
+
+button.mat-button.link-button {
+  color: var(--pure-indigo);
+}
+
+// ---- Form fields ----
+
+input.mat-input-element:disabled {
+  color: var(--grey-darker);
+}
+
+textarea.mat-input-element:disabled {
+  color: var(--grey-darker);
+}
+
+.mat-form-field {
+  line-height: inherit;
+  font: inherit;
+}
+
+mat-form-field.dialogFormField {
+  width: 100%;
+  margin: 0.4rem 0rem;
+}
+
+mat-form-field.moderate-input {
+  width: 10em;
+}
+
+mat-form-field.short-input {
+  width: 10em;
+}
+
+mat-tooltip-component {
+  white-space: pre-line;
+}
+
+// ---- Radio buttons ----
+
+label.mat-radio-label {
+  margin-top: 0.15em !important;
+  margin-bottom: 0.15em !important;
+}
+
 .mat-radio-button.mat-radio-disabled .mat-radio-label-content {
   color: var(--greywarm-darkest) !important;
 }
 
-// Tab body fills its container height
+// ---- Tabs ----
+
 .mat-tab-body-wrapper {
   height: 100%;
 }
@@ -16,14 +87,9 @@ mat-tab-group.flex-style mat-tab-header .mat-tab-label-container .mat-tab-list .
   flex: 1;
 }
 
-// Remove padding from dialog containers when .no-padding is applied to the overlay panel
-.no-padding .mat-dialog-container {
-  padding: 0 !important;
-}
-
 // Tab group border used across browse/detail views
 .mat-tab-group-border {
-  border: 1px solid #e8e8e8;
+  border: 1px solid var(--mat-border-color);
 }
 
 // Tab body stretches to fill height via flex in certain overview layouts
@@ -37,7 +103,30 @@ mat-tab-group.flex-style mat-tab-header .mat-tab-label-container .mat-tab-list .
   font-size: 12px !important;
 }
 
-// Compact checkboxes in grid contexts
+// ---- Dialogs ----
+
+// Remove padding from dialog containers when .no-padding is applied to the overlay panel
+.no-padding .mat-dialog-container {
+  padding: 0 !important;
+}
+
+// Remove padding from dialog containers when .no-padding-dialog is applied to the overlay panel
+.no-padding-dialog .mat-dialog-container {
+  padding: 0;
+}
+
+.no-padding-dialog .mat-dialog-container .mat-dialog-actions {
+  background-color: var(--white-dark);
+}
+
+// ---- Menus ----
+
+.mat-menu-panel.no-max-width {
+  max-width: none;
+}
+
+// ---- Checkboxes ----
+
 .mat-checkbox .mat-checkbox-layout {
   padding: 0;
   margin: 0;

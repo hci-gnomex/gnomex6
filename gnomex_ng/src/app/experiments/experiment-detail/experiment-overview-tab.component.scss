@@ -1,9 +1,9 @@
-.tiny-font {
+﻿.tiny-font {
     font-size: x-small;
 }
 
 .label {
-    color: darkblue;
+    color: var(--label-italic-color);
     font-style: italic;
 }
 
@@ -25,7 +25,7 @@
 }
 
 .bordered {
-    border: solid silver 1px;
+    border: solid var(--grey-lighter) 1px;
     border-radius: 0.3em;
 }
 
@@ -57,7 +57,7 @@
 
 .gnomex-progress-bar {
     height: 1.5rem;
-    background-color: green;
+    background-color: var(--pure-green);
 }
 
 .horizontal-spacing {
@@ -77,7 +77,7 @@
 }
 
 .highlight {
-    color: green;
+    color: var(--pure-green);
     font-weight: bold;
 }
 

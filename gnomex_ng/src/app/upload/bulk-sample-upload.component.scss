@@ -1,4 +1,4 @@
-.no-max-height {
+﻿.no-max-height {
     max-height: none;
 }
 
@@ -7,10 +7,10 @@
 }
 
 .blue-text {
-    color: blue;
+    color: var(--pure-indigo);
 }
 .red-text {
-    color: red;
+    color: var(--pure-red);
 }
 
 .underline {
@@ -22,8 +22,8 @@
 }
 
 .title {
-    background-color: #84b278;
-    color: white;
+    background-color: var(--upload-title-bg);
+    color: var(--white-lightest);
     font-size: larger;
 }
 

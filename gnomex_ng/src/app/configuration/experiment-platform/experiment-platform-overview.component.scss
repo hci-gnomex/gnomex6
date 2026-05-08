@@ -1,17 +1,17 @@
-.active-item {
-    background-color: #c8c8c8;
+﻿.active-item {
+    background-color: var(--grey-lighter);
 }
 
 .background {
-    background-color: whitesmoke;
+    background-color: var(--footer-bg);
 }
 
 .foreground {
-    background-color: white;
+    background-color: var(--white-lightest);
 }
 
 .active-item:hover {
-    border: 0.05rem solid #bfc4c4;
-    background-color: #c8c8c8;
+    border: 0.05rem solid var(--greycool-medlight);
+    background-color: var(--grey-lighter);
     cursor: pointer;
 }

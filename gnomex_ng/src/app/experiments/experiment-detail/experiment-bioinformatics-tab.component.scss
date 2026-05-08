@@ -1,9 +1,9 @@
-.margin-top {
+﻿.margin-top {
     margin-top: 0.5rem;
 }
 
 .label {
-    color: darkblue;
+    color: var(--label-italic-color);
     font-style: italic;
     padding: 0.3em;
 }
@@ -25,22 +25,22 @@
 }
 
 .disabled-color {
-    color: #646464;
+    color: var(--grey-darker);
 }
 
 .highlight {
-    background-color: #FFFEB3;
+    background-color: var(--lemon-medlight);
 }
 
 .disable-bordered {
-    border: 1px solid #E0E0E0;
+    border: 1px solid var(--white-darkest);
 }
 
 .enable-bordered {
-    border: 1px solid #A0A0A0;
+    border: 1px solid var(--grey-medlight);
 }
 
 .link-button {
-    color: blue;
+    color: var(--pure-indigo);
     text-decoration: underline;
 }

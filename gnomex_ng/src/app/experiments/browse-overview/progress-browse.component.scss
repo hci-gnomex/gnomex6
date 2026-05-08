@@ -3,7 +3,7 @@ input[type="radio"] + label:hover {
 }
 
 input[type="radio"]:checked + label {
-    color: #0f24e6;
+    color: var(--pure-indigo);
 }
 
 input[type="radio"] {
@@ -16,7 +16,7 @@ span.radioLikeLink:hover {
 
 div.divider {
     display: inline;
-    border-left: 1px solid lightgrey;
+    border-left: 1px solid var(--grey-lightest);
     height: 2rem;
     margin-left: 1rem;
     padding-left: 1rem;

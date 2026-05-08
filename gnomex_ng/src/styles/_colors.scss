@@ -1,49 +1,49 @@
 // Color utility classes and semantic color assignments
 
 .login-background {
-  background-color: #ececd9;
+  background-color: var(--login-page-bg);
 }
 
 .warningLabelMinor {
-  color: #17871C;
+  color: var(--green-dark);
   font-weight: normal;
 }
 
 .warningLabelSevere {
-  color: #EE2525;
+  color: var(--red-dark);
   font-weight: bold;
   font-size: 10px;
 }
 
 .bordered {
-  border: 1px solid silver;
+  border: 1px solid var(--grey-lighter);
 }
 
 .foreground {
-  background: white;
+  background: var(--white-lightest);
 }
 
 .background {
-  background-color: #EEEEEE;
+  background-color: var(--white-dark);
 }
 
 .background-border {
   border-radius: 0.3em;
-  border: 1px solid darkgrey;
+  border: 1px solid var(--grey-medlight);
 }
 
 .border-subtle {
-  border: 1px solid #EEEEEE;
+  border: 1px solid var(--white-dark);
 }
 
 .dialog-header-colors {
-  background-color: white;
+  background-color: var(--white-lightest);
   color: var(--bluewarmvivid-medlight);
 }
 
 .generic-dialog-header-colors {
   background-color: var(--bluewarmvivid-medlight);
-  color: white;
+  color: var(--white-lightest);
 }
 
 .generic-dialog-footer-colors {
@@ -51,6 +51,6 @@
 }
 
 // Semantic text colors for validation and alerts
-.text-error   { color: #C62828; }
-.text-danger  { color: #ED0000; }
-.text-brand   { color: #004C9E; }
+.text-error   { color: var(--red-dark); }
+.text-danger  { color: var(--red-dark); }
+.text-brand   { color: var(--brand-link-blue); }

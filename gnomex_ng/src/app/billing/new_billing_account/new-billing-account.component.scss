@@ -1,4 +1,4 @@
-p {
+﻿p {
     margin: 1em 0.5em;
 }
 
@@ -51,7 +51,7 @@ p {
     min-width: 13em;
     font-style: italic;
     font-size: small;
-    color: #1601db;
+    color: var(--action-link-color);
 }
 
 .radio-button {
@@ -62,8 +62,8 @@ p {
 .background-sideless {
     display: block;
     position: relative;
-    background-color: white;
-    border-color: #d2d2d2;
+    background-color: var(--white-lightest);
+    border-color: var(--grey-lighter);
     border-style: solid;
     border-top-width: 1px;
     border-bottom-width: 1px;
@@ -90,6 +90,6 @@ p {
     vertical-align: middle;
     height: 3em;
     width: 1px;
-    background-color: #c4cccc;
+    background-color: var(--greycool-medlight);
     margin: 0.5em 0.5em 0.5em 0.5em;
 }

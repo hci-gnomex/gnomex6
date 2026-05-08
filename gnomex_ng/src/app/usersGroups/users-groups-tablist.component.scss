@@ -1,4 +1,4 @@
-.min-width {
+﻿.min-width {
     min-width: 15em;
 }
 
@@ -7,12 +7,12 @@ div.institution-div {
 }
 
 .color-blue {
-    color: blue;
+    color: var(--pure-indigo);
 }
 
 label {
     font-style: italic;
-    color: #1601db;
+    color: var(--action-link-color);
 }
 
 .height-auto { height: auto; }
@@ -27,7 +27,7 @@ label {
 .border-padding {
     padding:       0.3em;
     border-radius: 0.3em;
-    border: 1px solid darkgrey;
+    border: 1px solid var(--greywarm-meddarker);
 }
 
 .right-align { text-align: right; }

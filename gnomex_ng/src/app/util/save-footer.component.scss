@@ -1,7 +1,7 @@
-.primary-action {
+﻿.primary-action {
     background-color: var(--bluewarmvivid-medlight);
     font-weight: bolder;
-    color: white;
+    color: var(--white-lightest);
 }
 
 .secondary-action {
@@ -22,5 +22,5 @@
 }
 
 .warning-background {
-    background: #feec89;
+    background: var(--unsaved-changes-bg);
 }

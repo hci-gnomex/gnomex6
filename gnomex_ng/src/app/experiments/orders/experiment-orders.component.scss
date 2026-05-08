@@ -1,9 +1,9 @@
-.most-width {
+﻿.most-width {
     width: 80%;
 }
 
 .background {
-    background-color: #EEEEEE;
+    background-color: var(--white-dark);
     padding: 0.3em;
     border-radius: 0.3em;
     border: 1px solid darkgrey;
@@ -45,7 +45,7 @@ div.radioGroup input {
 
 div.lower-panel {
     border: 1px solid darkgrey;
-    background-color: white;
+    background-color: var(--white-lightest);
     padding: 0.3em;
     display: block;
 }

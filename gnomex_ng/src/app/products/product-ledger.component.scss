@@ -1,4 +1,4 @@
-.ninety-five-percent-height {
+﻿.ninety-five-percent-height {
     height: 95%;
 }
 .ninety-percent-height {
@@ -32,7 +32,7 @@
     flex: 9;
 }
 span.dirty-note {
-    background: yellow;
+    background: var(--pure-yellow);
     padding: 0.5rem;
     margin-left: 1rem;
 }

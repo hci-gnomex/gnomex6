@@ -1,4 +1,4 @@
-.dirtyWithSave {
+﻿.dirtyWithSave {
     display: flex;
     justify-content: space-between;
     margin-left: auto;
@@ -8,7 +8,7 @@
 }
 
 .error-message {
-    color: red;
+    color: var(--pure-red);
 }
 
 .project-field {

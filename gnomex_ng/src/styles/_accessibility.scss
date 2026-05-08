@@ -38,35 +38,35 @@
   overflow: visible;
   clip: auto;
   white-space: normal;
-  outline: 2px solid #1a73e8;
+  outline: 2px solid var(--focus-blue);
   outline-offset: 1px;
   border-radius: 2px;
   padding: 0 0.25em;
-  background: #fff;
-  color: #1a73e8;
+  background: var(--white-lightest);
+  color: var(--focus-blue);
   font-size: 0.8em;
   z-index: 1;
 }
 
 // Applied by TreeKeyboardMoveService via node.data._kbGrabbed + nodeClass option
 .keyboard-grabbed > .tree-node {
-  outline: 3px solid #1a73e8;
+  outline: 3px solid var(--focus-blue);
   outline-offset: -2px;
-  background-color: #e8f4fe;
+  background-color: var(--focus-blue-bg);
 }
 
 // Applied to the focused node while a keyboard grab is active and the node is a valid drop target
 .keyboard-drop-target > .tree-node {
-  outline: 2px dashed #1a73e8;
+  outline: 2px dashed var(--focus-blue);
   outline-offset: -2px;
-  background-color: #d2e9fb;
+  background-color: var(--focus-drop-bg);
 }
 
 // Applied to the focused node while a keyboard grab is active but the node is NOT a valid drop target
 .keyboard-drop-invalid > .tree-node {
-  outline: 2px dashed #d93025;
+  outline: 2px dashed var(--focus-error-outline);
   outline-offset: -2px;
-  background-color: #fce8e6;
+  background-color: var(--focus-error-bg);
 }
 
 button.skip-link {
@@ -74,8 +74,8 @@ button.skip-link {
   top: -100%;
   left: 0;
   z-index: 9999;
-  background: #004C9E;
-  color: white;
+  background: var(--brand-link-blue);
+  color: var(--white-lightest);
   padding: 8px 16px;
   font-weight: bold;
   border: none;
