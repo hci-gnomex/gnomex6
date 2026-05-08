@@ -1,4 +1,4 @@
-<input type="file" #file style="display: none" (change)="onFilesAdded()" multiple aria-label="File selection input" />
+<input type="file" #file class="hidden" (change)="onFilesAdded()" multiple aria-label="File selection input" />
 <div class="full-height full-width flex-container-col" role="dialog" aria-label="Upload files">
     <!-- This is the content of the dialog, containing a list of the files to upload -->
     <div class="flex-container-row  spaced-children-margin " style="padding: 0.5em" *ngIf="!this.manageData.isFDT" role="toolbar" aria-label="Upload file actions">

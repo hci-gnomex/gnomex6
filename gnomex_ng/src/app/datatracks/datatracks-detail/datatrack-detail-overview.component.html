@@ -1,4 +1,4 @@
-<div style="display:flex; flex-direction:column; height:100%; width:100%;" role="main" aria-label="Data track details">
+<div class="flex-container-col full-height full-width" role="main" aria-label="Data track details">
     <div class="flex-container-row" role="toolbar" aria-label="Data track actions">
         <label class="label label-min-width">
             <img class="icon" [src]="dataTrackService?.datatrackListTreeNode?.icon" alt="" aria-hidden="true">
@@ -60,13 +60,13 @@
     </div>
 
 
-    <div class="overflow-auto" style="display:flex; flex: 1;">
+    <div class="overflow-auto flex-container-row flex-grow">
 
-        <mat-tab-group style="height:100%; width:100%;" class="mat-tab-group-border" aria-label="Data track detail tabs">
-            <mat-tab style="height:100%" label="Summary">
+        <mat-tab-group class="mat-tab-group-border full-height full-width" aria-label="Data track detail tabs">
+            <mat-tab class="full-height" label="Summary">
                 <dt-summary-tab [editable]="!fromTopic && !this.secAdvisorService.isGuest"></dt-summary-tab>
             </mat-tab>
-            <mat-tab style="height:100%" label="Annotations">
+            <mat-tab class="full-height" label="Annotations">
                 <annotation-tab [annotations]="annotations" [orderType]="types.DATATRACK"
                                 [disabled]="fromTopic || !canWrite"
                                 [showConfigureAnnotationsButton] = "!fromTopic && canWrite">
@@ -75,16 +75,16 @@
             <mat-tab class="full-height" label="Files">
                 <datatracks-files-tab></datatracks-files-tab>
             </mat-tab>
-            <mat-tab style="height:100%;" label="Visibility">
+            <mat-tab class="full-height" label="Visibility">
                 <dt-visibility-tab [disabled]="fromTopic"></dt-visibility-tab>
             </mat-tab>
-            <mat-tab *ngIf="showRelatedDataTab" style="height:100%;" label="Related Data">
+            <mat-tab *ngIf="showRelatedDataTab" class="full-height" label="Related Data">
                 <related-data-tab [relatedObjects]="relatedObjects" >
                 </related-data-tab>
             </mat-tab>
         </mat-tab-group>
     </div>
-    <div style="display: flex; justify-content: space-between; ">
+    <div class="flex-container-row justify-space-between">
         <ng-template #folderRef>
             <mat-list>
                 <mat-list-item  *ngFor="let folder of folderList" >

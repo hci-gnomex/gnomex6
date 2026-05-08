@@ -1,12 +1,12 @@
 <div class="padded-inner" role="dialog" aria-labelledby="link-experiment-title">
     <div id="link-experiment-title" class="dialog-title">Link to Experiment</div>
     <div class="flex-container-row" role="search" aria-label="Filter experiments">
-        <mat-form-field style="flex:1;">
+        <mat-form-field class="flex-grow">
             <input matInput [formControl]="numberControl" type="text"
                    placeholder="Filter by experiment number"
                    aria-label="Filter by experiment number"/>
         </mat-form-field>
-        <div style="flex:1; margin-left: 1em ">
+        <div class="flex-grow" style="margin-left: 1em">
             <custom-combo-box placeholder="Filter by Lab"
                               [options]="this.labList"
                               displayField="name" valueField="idLab"

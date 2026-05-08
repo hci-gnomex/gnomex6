@@ -2,3 +2,23 @@
     margin-right: 1em;
     flex: 1 1 0;
 }
+
+mat-form-field.half-field {
+    margin-right: 2em;
+    width: 40%;
+}
+
+mat-form-field.wide-field {
+    margin-right: 2em;
+    width: 80%;
+}
+
+.desc-container {
+    width: 80%;
+}
+
+.checkbox-row {
+    width: 40%;
+    display: flex;
+    margin-top: 1rem;
+}

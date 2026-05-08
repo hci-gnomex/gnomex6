@@ -10,7 +10,7 @@ import {Subscription} from "rxjs";
 @Component({
     selector:'dt-summary-tab',
     templateUrl:'./datatracks-summary-tab.component.html',
-
+    styleUrls: ['./datatracks-summary-tab.component.scss'],
 })
 export class DatatracksSummaryTabComponent implements OnInit, OnDestroy {
     //Override

@@ -49,3 +49,8 @@
 .generic-dialog-footer-colors {
   background-color: var(--sidebar-footer-background-color);
 }
+
+// Semantic text colors for validation and alerts
+.text-error   { color: #C62828; }
+.text-danger  { color: #ED0000; }
+.text-brand   { color: #004C9E; }

@@ -88,6 +88,14 @@ div.mainnav {
   max-height: 100%;
 }
 
+.max-width {
+  max-width: 100%;
+}
+
+.display-block {
+  display: block;
+}
+
 .no-height {
   height: 0;
   min-height: 0;
@@ -230,6 +238,27 @@ div.mainnav {
 .outline-none    { outline: none; }
 .resize-none     { resize: none; }
 .rounded         { border-radius: 0.3em; }
+
+// --- Spacing utilities (Phase 2.2 — values that appear in templates) ---
+
+.mt-4  { margin-top: 4px; }
+.mt-8  { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mb-4  { margin-bottom: 4px; }
+.mb-8  { margin-bottom: 8px; }
+.p-8   { padding: 8px; }
+.p-16  { padding: 16px; }
+
+// em-based spacing (matches actual template patterns)
+.margin-0-5em       { margin: 0.5em; }
+.margin-1em         { margin: 1em; }
+.margin-right-1em   { margin-right: 1em; }
+.margin-right-2em   { margin-right: 2em; }
+.margin-left-auto   { margin-left: auto; }
+.margin-bottom-1em  { margin-bottom: 1em; }
+.margin-top-1em     { margin-top: 1em; }
+.padding-0-5em      { padding: 0.5em; }
+.padding-1em        { padding: 1em; }
 
 // --- Fixed-width helpers ---
 

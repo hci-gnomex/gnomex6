@@ -1,17 +1,17 @@
 <div class="flexbox-column">
     <div class="flex-container-row">
-        <div *ngIf="this.topicNode" style="margin:1em" >
+        <div *ngIf="this.topicNode" class="margin-1em" >
             <img [src]="this.constService.ICON_TOPIC" class="icon" alt="">
             Topic {{'T' + this.topicNode.idTopic + ' -'}} {{(this.topicNode.name.length > 60) ? (this.topicNode.name | slice:0:60) + '...' : this.topicNode.name}}
         </div>
-        <button mat-button color="primary" (click)="onShareLinkClick()" style="margin:1em">
+        <button mat-button color="primary" (click)="onShareLinkClick()" class="margin-1em">
             <img [src]="this.constService.GLOBE_LINK" class="icon" alt="">Share URL
         </button>
-        <button mat-button color="primary" (click)="onEmailClick()" style="margin:1em">
+        <button mat-button color="primary" (click)="onEmailClick()" class="margin-1em">
             <img [src]="this.constService.EMAIL_GO_LINK" class="icon" alt="">Email topic owner
         </button>
     </div>
-    <form class="full-width" style="flex:8" [formGroup]="topicForm">
+    <form class="full-width topic-form" [formGroup]="topicForm">
         <mat-tab-group class="mat-tab-group-border full-height" aria-label="Topic details">
             <mat-tab label="Info" class="full-height">
                 <div class="flexbox-column">
@@ -49,14 +49,14 @@
             </mat-tab>
             <mat-tab label="Visibility" class="full-height">
                 <mat-radio-group class="flexbox-column" formControlName="codeVisibility" [appReadonly]="topicFormReadonly" appReadonlyType="radio" aria-label="Visibility">
-                    <mat-radio-button style="margin: 0.5em" *ngFor="let rad of visRadio" [value]="rad.value">
+                    <mat-radio-button class="margin-0-5em" *ngFor="let rad of visRadio" [value]="rad.value">
                         <img [src]="rad.icon" class="icon" alt="">{{rad.display}}
                     </mat-radio-button>
                 </mat-radio-group>
             </mat-tab>
         </mat-tab-group>
     </form>
-    <div style="flex:1">
+    <div class="flex-spacer">
         <save-footer  (saveClicked)="save()" [dirty]="topicForm.dirty" [showSpinner]="showSpinner"
                       [disableSave]="topicForm.invalid || topicForm.disabled">
         </save-footer>

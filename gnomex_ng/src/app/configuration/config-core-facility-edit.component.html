@@ -1,10 +1,10 @@
 
-<form (ngSubmit)="save()" [formGroup]="coreFacilityForm" aria-label="Core Facility Configuration" style="display:flex;flex-direction: column;">
-    <div style="width:100%;">
+<form (ngSubmit)="save()" [formGroup]="coreFacilityForm" aria-label="Core Facility Configuration" class="flex-container-col">
+    <div class="full-width">
 
 
-        <div style="display:flex;">
-            <mat-form-field style="margin-right: 2em; width:40%;">
+        <div class="flex-container-row">
+            <mat-form-field class="half-field">
                 <mat-label>Director Name</mat-label>
                 <input matInput formControlName="contactName"  type="text" placeholder="Director Name" autocomplete="off"/>
                 <mat-error *ngIf="coreFacilityForm.get('contactName').hasError('required')">
@@ -14,7 +14,7 @@
                     Your field exceeds 100 characters limit
                 </mat-error>
             </mat-form-field>
-            <mat-form-field style="margin-right: 2em; width:40%;">
+            <mat-form-field class="half-field">
                 <mat-label>Director Email</mat-label>
                 <input matInput formControlName="contactEmail"  type="text" placeholder="Director Email" autocomplete="off"/>
                 <mat-error *ngIf="coreFacilityForm.get('contactEmail').hasError('email')">
@@ -26,15 +26,15 @@
             </mat-form-field>
         </div>
 
-        <div style="display:flex;">
-            <mat-form-field style="margin-right: 2em; width:40%;">
+        <div class="flex-container-row">
+            <mat-form-field class="half-field">
                 <mat-label>Director Phone</mat-label>
                 <input matInput formControlName="contactPhone"  type="text" placeholder="Director Phone" autocomplete="off"/>
                 <mat-error *ngIf="coreFacilityForm.get('contactPhone').hasError('maxlength')">
                     Your field exceeds 20 characters limit
                 </mat-error>
             </mat-form-field>
-            <mat-form-field style="margin-right: 2em; width:40%;">
+            <mat-form-field class="half-field">
                 <mat-label>Director Room</mat-label>
                 <input matInput formControlName="contactRoom"  type="text" placeholder="Director Room" autocomplete="off"/>
                 <mat-error *ngIf="coreFacilityForm.get('contactRoom').hasError('maxlength')">
@@ -43,15 +43,15 @@
             </mat-form-field>
 
         </div>
-        <div style="display:flex;">
-            <mat-form-field style="margin-right: 2em; width:40%;">
+        <div class="flex-container-row">
+            <mat-form-field class="half-field">
                 <mat-label>Facility Name</mat-label>
                 <input matInput formControlName="facilityName"  type="text" placeholder="Facility Name" autocomplete="off"/>
                 <mat-error *ngIf="coreFacilityForm.get('facilityName').hasError('maxlength')">
                     Your field exceeds 100 characters limit
                 </mat-error>
             </mat-form-field>
-            <mat-form-field style="margin-right: 2em; width:40%;">
+            <mat-form-field class="half-field">
                 <mat-label>Lab Room</mat-label>
                 <input matInput formControlName="labRoom"  type="text" placeholder="Lab Room" autocomplete="off"/>
                 <mat-error *ngIf="coreFacilityForm.get('labRoom').hasError('maxlength')">
@@ -60,21 +60,21 @@
             </mat-form-field>
         </div>
 
-        <div style="display:flex;">
-            <mat-form-field style="margin-right: 2em; width:40%;">
+        <div class="flex-container-row">
+            <mat-form-field class="half-field">
                 <mat-label>Lab Phone</mat-label>
                 <input matInput formControlName="labPhone"  type="text" placeholder="Lab Phone" autocomplete="off"/>
                 <mat-error *ngIf="coreFacilityForm.get('labPhone').hasError('maxlength')">
                     Your field exceeds 20 characters limit
                 </mat-error>
             </mat-form-field>
-            <mat-form-field style="margin-right: 2em; width:40%;">
+            <mat-form-field class="half-field">
                 <mat-label>Contact Image File Name</mat-label>
                 <input matInput formControlName="contactImage"  type="text" placeholder="Contact Image File Name" autocomplete="off"/>
             </mat-form-field>
         </div>
 
-        <mat-form-field style="margin-right: 2em; width:80%;">
+        <mat-form-field class="wide-field">
             <mat-label>Short Description</mat-label>
             <input matInput formControlName="shortDescription"  type="text" placeholder="Short Description"/>
             <mat-error *ngIf="coreFacilityForm.get('shortDescription').hasError('maxlength')">
@@ -84,17 +84,17 @@
 
 
 
-        <div style="width:80%;">
+        <div class="desc-container">
 
             <angular-editor #descEditorRef id="descEditor" formControlName="description" [config]="this.editorConfig" aria-label="Core facility description">
             </angular-editor>
         </div>
-        <div style="width:100%;display:flex;">
+        <div class="full-width flex-container-row">
 
         </div>
-        <div style="width:40%;display:flex; margin-top:1rem">
-            <mat-checkbox matInput class="example-margin" formControlName="isActive" style="margin-right: 1em;">Active </mat-checkbox>
-            <mat-checkbox matInput class="example-margin" formControlName="acceptOnlineWorkAuth" style="margin-right: 1em;">Accept Online Work Auth </mat-checkbox>
+        <div class="checkbox-row">
+            <mat-checkbox matInput class="example-margin margin-right-1em" formControlName="isActive">Active </mat-checkbox>
+            <mat-checkbox matInput class="example-margin margin-right-1em" formControlName="acceptOnlineWorkAuth">Accept Online Work Auth </mat-checkbox>
             <mat-checkbox matInput class="example-margin" formControlName="showProjectAnnotations">Show Project Annotations  </mat-checkbox>
         </div>
 

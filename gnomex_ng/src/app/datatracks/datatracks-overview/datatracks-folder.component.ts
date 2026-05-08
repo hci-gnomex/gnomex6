@@ -14,6 +14,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
 
 @Component({
     templateUrl: "./datatracks-folder.component.html",
+    styleUrls: ["./datatracks-folder.component.scss"],
 })
 export class DatatracksFolderComponent implements OnInit, AfterViewInit, OnDestroy {
     //Override

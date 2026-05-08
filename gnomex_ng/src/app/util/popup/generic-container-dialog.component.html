@@ -5,7 +5,7 @@
             <div class="flex-container-row align-center padded">
                 <img class="icon" *ngIf="icon && icon.substr(0, 2) !== '<i'" [src]="icon" alt="" aria-hidden="true">
                 <div *ngIf="icon && icon.substr(0, 2) === '<i'" class="i-class" [innerHTML]="icon" aria-hidden="true"></div>
-                <h3 style="margin:0;" id="dialog-title">{{this.title ? this.title : this.dialogContent.innerTitle}}</h3>
+                <h3 class="no-margin" id="dialog-title">{{this.title ? this.title : this.dialogContent.innerTitle}}</h3>
             </div>
             <div class="flex-grow"></div>
             <button class="padded icon-button" (click)="onClose()" aria-label="Close dialog">

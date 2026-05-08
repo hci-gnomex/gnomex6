@@ -1,17 +1,17 @@
 <form (ngSubmit)="save()" [formGroup]="folderFormGroup" class="flex-container-col full-width full-height" aria-label="Data track folder details">
-    <div style="margin-bottom: 1em;">
+    <div class="margin-bottom-1em">
         <img [src]="dtService?.datatrackListTreeNode?.icon" alt="" aria-hidden="true"> Folder {{dtService?.datatrackListTreeNode?.name}}
     </div>
     <div class="full-width full-height">
         <div class="flex-container-row full-width">
-            <mat-form-field style="margin-right: 2em; width:60%;">
+            <mat-form-field class="folder-name-field">
                 <mat-label>Name</mat-label>
                 <input matInput formControlName="folderName"  type="text" placeholder="Name"/>
                 <mat-error *ngIf="folderFormGroup.get('folderName').hasError('required')">
                     The folder name is required
                 </mat-error>
             </mat-form-field>
-            <div style="width:40%">
+            <div class="lab-selector">
                 <custom-combo-box [options]="this.labList"
                                   placeholder="Lab"
                                   valueField="idLab"
