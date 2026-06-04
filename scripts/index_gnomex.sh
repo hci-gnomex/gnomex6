@@ -20,5 +20,8 @@ done
 
 export CLASSPATH
 
-java -Xmx4000M hci.gnomex.lucene.BuildSearchIndex $*
+JAVA_OPTS="--add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.text=ALL-UNNAMED --add-opens java.desktop/java.awt.font=ALL-UNNAMED"
+export JAVA_OPTS
+
+java -Xmx4000M $JAVA_OPTS hci.gnomex.lucene.BuildSearchIndex $*
 

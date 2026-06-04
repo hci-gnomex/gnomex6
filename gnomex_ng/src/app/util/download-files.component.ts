@@ -24,10 +24,6 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                 <div class="flex-container-row align-center justify-space-between">
                     <label id="download-instructions">
                         Drag files or folders that you want to download. Hold CTRL or SHIFT key to select multiple.
-                        Keyboard: navigate with arrow keys and press Space to select a file.
-                        Press F2, then Enter on the Add or Remove button to move it between panels.
-                        You can also press Space to grab, navigate to the other panel, then press Enter to move it.
-                        Press Escape to cancel.
                     </label>
                     <context-help name="downloadhelp"
                                   label="Download Help"
