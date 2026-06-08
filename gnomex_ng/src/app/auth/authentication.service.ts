@@ -315,6 +315,10 @@ export class AuthenticationService {
   }
 
 
+  clearDirectLoginSession(): Observable<HttpResponse<any>> {
+    return this._http.delete(this.directLoginLocation(), {observe: 'response'});
+  }
+
   clearLogin(): Observable<Response> {
     //Front-end logout
     try {
@@ -444,10 +448,10 @@ export class AuthenticationService {
     );
   }
 
-  verifyDuo(sigResponse: string) {
+  verifyDuo(duoCode: string, state: string) {
     return this._http.post<any>(
       `/${this.getContextRoot()}/api/duo/verify`,
-      { sig_response: sigResponse.trim() }
+      { duo_code: duoCode.trim(), state: state.trim() }
     );
   }
 

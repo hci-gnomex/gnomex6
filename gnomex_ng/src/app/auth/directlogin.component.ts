@@ -1,11 +1,12 @@
 import {Component, OnInit, ChangeDetectorRef} from '@angular/core';
 import {AuthenticationService} from './authentication.service';
 import {AbstractControl, FormBuilder, FormControl, FormGroup} from '@angular/forms';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {GnomexService} from '../services/gnomex.service';
 import {DictionaryService} from '../services/dictionary.service';
-import * as Duo from '../services/Duo-Web-v2';
 import {DialogsService, DialogType} from '../util/popup/dialogs.service';
+import {of} from 'rxjs';
+import {catchError} from 'rxjs/operators';
 
 @Component({
   selector: 'hci-login-form',
@@ -24,7 +25,12 @@ import {DialogsService, DialogType} from '../util/popup/dialogs.service';
             <div class="horizontal-centered login-heading">
               <img [src]="this.gnomexService.logoOrMaint" alt="GNomEx">
             </div>
-            <div *ngIf="!this.doDuo" class="full-width major-vertical-spacer flex-container-row align-center">
+            <div *ngIf="duoCompletingSignIn" class="full-width duo-callback-loading" aria-live="polite" aria-busy="true">
+              <div class="duo-callback-spinner"></div>
+              <p class="duo-callback-message">Completing sign-in…</p>
+            </div>
+            <ng-container *ngIf="!duoCompletingSignIn">
+            <div class="full-width major-vertical-spacer flex-container-row align-center">
               <div *ngIf="_errorMsg" class="horizontal-centered small-font full-width {{ errorClasses }}">
                 <div class="full-width">
                   <div class="error">Authentication Failed{{ numberOfAttempts > 1 ? ' (' + numberOfAttempts + ')' : '' }}</div>
@@ -65,32 +71,27 @@ import {DialogsService, DialogType} from '../util/popup/dialogs.service';
                 </button>
                 <div   class="full-width vertical-spacer">
                 </div>
-                <div *ngIf="!this.gnomexService.noGuestAccess && !this.doDuo" class="full-width flex-container-row">
+                <div *ngIf="!this.gnomexService.noGuestAccess" class="full-width flex-container-row">
                   <button class="flex-grow secondary-button padded" (click)="this.onResetPassword()">
                     Reset Password
                   </button>
-                  <div *ngIf="!this.gnomexService.disableUserSignup && !this.doDuo" class="full-height horizontal-spacer">
+                  <div *ngIf="!this.gnomexService.disableUserSignup" class="full-height horizontal-spacer">
                   </div>
-                  <button *ngIf="!this.gnomexService.disableUserSignup && !this.doDuo" class="flex-grow secondary-button padded" (click)="this.onNewAccount()">
+                  <button *ngIf="!this.gnomexService.disableUserSignup" class="flex-grow secondary-button padded" (click)="this.onNewAccount()">
                     New Account
                   </button>
                 </div>
-                <div *ngIf="!this.gnomexService.noGuestAccess && !this.doDuo" class="full-width vertical-spacer">
+                <div *ngIf="!this.gnomexService.noGuestAccess" class="full-width vertical-spacer">
                 </div>
-                <div *ngIf="!this.gnomexService.noGuestAccess && !this.doDuo" class="full-width flex-container-row">
+                <div *ngIf="!this.gnomexService.noGuestAccess" class="full-width flex-container-row">
                   <button class="full-width bold secondary-button padded" (click)="this.guestLogin()">
                     Guest Login
                   </button>
                 </div>
               </form>
 
-              <div *ngIf="this.doDuo" class="full-width flex-grow">
-                <iframe id="duo_iframe" name="duo_iframe" height="384px"
-                >
-                </iframe>"
-              </div>
-
             </div>
+            </ng-container>
           </div>
           <div class="flex-grow">
           </div>
@@ -108,6 +109,32 @@ import {DialogsService, DialogType} from '../util/popup/dialogs.service';
   styles: [`
 
     .small-font { font-size: small; }
+
+    .duo-callback-loading {
+      text-align: center;
+      padding: 2em 0;
+    }
+
+    .duo-callback-message {
+      font-family: "Arial", Helvetica, sans-serif;
+      font-size: 14pt;
+      color: #333;
+      margin-top: 1em;
+    }
+
+    .duo-callback-spinner {
+      width: 36px;
+      height: 36px;
+      margin: 0 auto;
+      border: 3px solid #e0e0e0;
+      border-top-color: green;
+      border-radius: 50%;
+      animation: duo-callback-spin 0.8s linear infinite;
+    }
+
+    @keyframes duo-callback-spin {
+      to { transform: rotate(360deg); }
+    }
 
     .primary-button {
       font-family: "Arial", Helvetica, sans-serif;
@@ -376,21 +403,32 @@ export class DirectLoginComponent implements OnInit {
 
   public errorClasses = '';
 
-  public sig_request = 'not sig_request';
-  public duo_sig = 'not duo_sig';
-  public duo_src = 'not duo_src';
-  public authenticated_username = '';
-  public doDuo = false;
+  public duoCompletingSignIn = false;
+
+  private duoCallbackHandled = false;
 
   constructor(private _authenticationService: AuthenticationService,
               private _formBuilder: FormBuilder,
               public gnomexService: GnomexService,
               private changeDetectorRef: ChangeDetectorRef,
               private dialogsService: DialogsService,
-              private router: Router) {
+              private router: Router,
+              private route: ActivatedRoute) {
+    const duoCode = route.snapshot.queryParamMap.get('duo_code');
+    const state = route.snapshot.queryParamMap.get('state');
+    if (duoCode && state) {
+      this.duoCompletingSignIn = true;
+    }
   }
 
   ngOnInit(): void {
+    const duoCode = this.route.snapshot.queryParamMap.get('duo_code');
+    const state = this.route.snapshot.queryParamMap.get('state');
+    if (duoCode && state && !this.duoCallbackHandled) {
+      this.duoCallbackHandled = true;
+      this.completeDuoCallback(duoCode, state);
+    }
+
     this._loginForm = this._formBuilder.group({
       invalidateWithoutUsernameAndPasswordComponents: new FormControl('', (control: AbstractControl) => {
         if (control
@@ -420,6 +458,15 @@ export class DirectLoginComponent implements OnInit {
       okToLogin = false;
     }
     if (okToLogin) {
+      this._authenticationService.clearDirectLoginSession().pipe(
+        catchError(() => of(null))
+      ).subscribe(() => {
+        this.submitLogin();
+      });
+    }
+  }
+
+  private submitLogin(): void {
       this._authenticationService.login(this._loginForm.value.username, this._loginForm.value.password).subscribe((res) => {
         if (res) {
           this._errorMsg = null;
@@ -434,18 +481,12 @@ export class DirectLoginComponent implements OnInit {
                   if (this.gnomexService.useduo) {
                     this._authenticationService.getDuoInit(this._loginForm.value.username)
                       .subscribe((init: any) => {
-                        this.doDuo = true;
-                        this.changeDetectorRef.detectChanges();
-
-                        Duo.init({
-                          iframe: 'duo_iframe',
-                                            host: init.duohost,          // from /api/duo/sign response
-                                            sig_request: init.sig_request, // from /api/duo/sign response
-                          submit_callback: this.twoFactorVerify.bind(this),
-                        });
-
+                        if (init && init.auth_url) {
+                          window.location.href = init.auth_url;
+                        } else {
+                          this._errorMsg = 'Unable to start Duo. Please try again or contact support.';
+                        }
                       }, () => {
-                        this.doDuo = false;
                         this._errorMsg = 'Unable to start Duo. Please try again or contact support.';
                       });
                   } else {
@@ -477,7 +518,6 @@ export class DirectLoginComponent implements OnInit {
       }, (error: any) => {
         this._errorMsg = 'Please check your credentials (3).';
       });
-    }
   }
 
   guestLogin(): void {
@@ -489,20 +529,27 @@ export class DirectLoginComponent implements OnInit {
     this.router.navigateByUrl('register-user');
   }
 
-  twoFactorVerify(response: any) {
-    let sigResponse = null;
-    if (response && response.elements && response.elements.sig_response) {
-      sigResponse = response.elements.sig_response.value;
-    }
-
-    this._authenticationService.verifyDuo(sigResponse).subscribe((res: any) => {
+  private completeDuoCallback(duoCode: string, state: string): void {
+    this._authenticationService.verifyDuo(duoCode, state).subscribe((res: any) => {
       if (res && res.ok) {
+        this.router.navigate(['authenticate'], {replaceUrl: true});
         this._authenticationService.requestAccessToken(true);
       } else {
-        this.dialogsService.alert('Invalid passcode - please notify gnomex support', null, DialogType.WARNING);
+        this.finishDuoCallbackFailure();
       }
     }, () => {
-      this.dialogsService.alert('Invalid passcode - please notify gnomex support', null, DialogType.WARNING);
+      this.finishDuoCallbackFailure();
+    });
+  }
+
+  private finishDuoCallbackFailure(): void {
+    this._authenticationService.clearDirectLoginSession().pipe(
+      catchError(() => of(null))
+    ).subscribe(() => {
+      this.duoCompletingSignIn = false;
+      this.router.navigate(['authenticate'], {replaceUrl: true});
+      this._errorMsg = 'Duo verification failed. Please try again or contact GNomEx support.';
+      this.dialogsService.alert('Duo verification failed - please notify gnomex support', null, DialogType.WARNING);
     });
   }
 

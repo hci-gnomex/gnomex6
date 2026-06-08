@@ -1,6 +1,7 @@
 package hci.gnomex.api;
 
 import hci.gnomex.model.AppUser;
+import hci.gnomex.security.DuoEligibility;
 import hci.gnomex.security.DuoPolicy;
 import hci.ri.auth.util.JwtGenerator;
 import hci.ri.auth.util.KeystoreRSASignatureConfiguration;
@@ -87,23 +88,24 @@ public class TokenResource {
             }
 
             // ===============================
-            // 4. Duo Gate Check (with exceptions for External Users and Duo exception users)
+            // 4. Account + Duo gates (aligned with DirectLoginComponent / CheckIsGNomExAccount)
             // ===============================
-            if (DuoPolicy.isDuoEnabled()) {
-                AppUser appUser = getAppUserFromPrincipal(principals); // Retrieve the user from principals
+            String authenticatedUsername = getAuthenticatedUsername(principals);
+            if (authenticatedUsername == null || authenticatedUsername.isBlank()) {
+                return error(401, "Unable to determine authenticated user");
+            }
 
-                // For non-external users, only the exception list can bypass Duo verification.
-                if (!"Y".equals(appUser.getIsExternalUser())) {
-                    String authenticatedUsername = getAuthenticatedUsername(principals);
-                    if (!DuoPolicy.isDuoExceptionUser(authenticatedUsername)) {
-                        // Check if Duo authentication is already completed
-                        org.apache.shiro.session.Session shiroSession = subject.getSession(false);
-                        Object duoOk = (shiroSession != null) ? shiroSession.getAttribute("DUO_OK") : null;
+            if (!DuoEligibility.passesAccountGateForToken(authenticatedUsername)) {
+                return error(403, "Account inactive or not registered in GNomEx");
+            }
 
-                        if (!Boolean.TRUE.equals(duoOk)) {
-                            return error(403, "Duo verification required (DUO_OK missing or false)");
-                        }
-                    }
+            AppUser appUser = getAppUserFromPrincipal(principals);
+            if (!"Y".equals(appUser.getIsExternalUser())
+                    && DuoEligibility.requiresDuoMfa(authenticatedUsername)) {
+                org.apache.shiro.session.Session shiroSession = subject.getSession(false);
+                Object duoOk = (shiroSession != null) ? shiroSession.getAttribute("DUO_OK") : null;
+                if (!Boolean.TRUE.equals(duoOk)) {
+                    return error(403, "Duo verification required (DUO_OK missing or false)");
                 }
             }
 
@@ -117,7 +119,6 @@ public class TokenResource {
                 profile.addAttribute("name", getAttributeFromProfile(pjp.getProfile(), "displayName"));
             } else {
                 String login = principals.oneByType(String.class);
-                AppUser appUser = principals.oneByType(AppUser.class);
 
                 if (login != null) {
                     profile.addAttribute("sub", login);

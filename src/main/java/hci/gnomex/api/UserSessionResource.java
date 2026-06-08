@@ -60,10 +60,13 @@ public class UserSessionResource {
         UsernamePasswordToken token = new UsernamePasswordToken(userSessionDTO.getUsername(), userSessionDTO.getPassword());
 
         try {
-            SecurityUtils.getSubject().login(token);
+            Subject subject = SecurityUtils.getSubject();
+            if (subject.isAuthenticated()) {
+                subject.logout();
+            }
+            subject.login(token);
 
             // Check if the session was successfully created and log the result
-            Subject subject = SecurityUtils.getSubject();
             if (subject.isAuthenticated()) {
                 System.out.println("Session created for user: " + userSessionDTO.getUsername());
             } else {

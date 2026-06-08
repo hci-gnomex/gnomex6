@@ -8,39 +8,39 @@ import java.nio.file.Path;
 import java.util.Properties;
 
 /**
- * Server-only Duo configuration.
+ * Server-only Duo configuration (Web SDK v4 / Universal Prompt).
+ *
+ * Legacy property names (ikey, skey, host) are retained for backward compatibility
+ * with existing duo.properties and JVM -Dgnomex.duo.* settings. Values are the same
+ * as Duo's Client ID, Client secret, and API hostname.
  *
  * This class MUST NEVER be returned directly from a JAX-RS resource.
- * Secrets are protected with @JsonIgnore as a defensive safety net.
  */
 public final class DuoConfig {
 
     private final boolean useDuo;
 
-    /** Integration key (safe-ish to expose, but still server-owned) */
+    /** Client ID (legacy name: integration key / ikey) */
     private final String ikey;
 
-    /** Server-only secrets */
+    /** Client secret (legacy name: secret key / skey) */
     @JsonIgnore
     private final String skey;
 
-    @JsonIgnore
-    private final String akey;
-
-    /** Duo API host */
+    /** Duo API hostname (e.g. api-xxxxx.duosecurity.com) */
     private final String host;
 
-    private DuoConfig(boolean useDuo, String ikey, String skey, String akey, String host) {
+    /** OAuth redirect URI registered in the Duo admin panel */
+    @JsonIgnore
+    private final String redirectUri;
+
+    private DuoConfig(boolean useDuo, String ikey, String skey, String host, String redirectUri) {
         this.useDuo = useDuo;
         this.ikey = ikey;
         this.skey = skey;
-        this.akey = akey;
         this.host = host;
+        this.redirectUri = redirectUri;
     }
-
-    /* =========================
-       Public / internal getters
-       ========================= */
 
     public boolean isUseDuo() {
         return useDuo;
@@ -54,53 +54,33 @@ public final class DuoConfig {
         return host;
     }
 
-    /* =========================
-       Server-only getters
-       ========================= */
-
     @JsonIgnore
     public String getSkey() {
         return skey;
     }
 
     @JsonIgnore
-    public String getAkey() {
-        return akey;
+    public String getRedirectUri() {
+        return redirectUri;
     }
 
-    /* =========================
-       Factory loader
-       ========================= */
-
     public static DuoConfig load(boolean useDuoFlagFromDbOrProps) throws Exception {
-
-        // Duo disabled globally → return empty, non-secret config
         if (!useDuoFlagFromDbOrProps) {
             return new DuoConfig(false, "", "", "", "");
         }
 
-        // Prefer JVM system properties (best for prod)
         String ikey = System.getProperty("gnomex.duo.ikey");
         String skey = System.getProperty("gnomex.duo.skey");
-        String akey = System.getProperty("gnomex.duo.akey");
         String host = System.getProperty("gnomex.duo.host");
+        String redirectUri = System.getProperty("gnomex.duo.redirect_uri");
 
-        if (notBlank(ikey) && notBlank(skey) && notBlank(akey) && notBlank(host)) {
-            return new DuoConfig(
-                    true,
-                    ikey.trim(),
-                    skey.trim(),
-                    akey.trim(),
-                    host.trim()
-            );
+        if (notBlank(ikey) && notBlank(skey) && notBlank(host) && notBlank(redirectUri)) {
+            return new DuoConfig(true, ikey.trim(), skey.trim(), host.trim(), redirectUri.trim());
         }
 
-        // Fallback to legacy properties file
         Path propsPath = Path.of("/properties/duo.properties");
         if (!Files.exists(propsPath)) {
-            throw new IllegalStateException(
-                    "Duo properties file not found: " + propsPath
-            );
+            throw new IllegalStateException("Duo properties file not found: " + propsPath);
         }
 
         Properties props = new Properties();
@@ -108,17 +88,25 @@ public final class DuoConfig {
             props.load(in);
         }
 
-        ikey = require(props, "ikey");
-        skey = require(props, "skey");
-        akey = require(props, "akey");
+        ikey = firstPresent(props, "ikey", "client_id");
+        skey = firstPresent(props, "skey", "client_secret");
         host = require(props, "host");
+        redirectUri = firstPresent(props, "redirect_uri", "redirectUri");
 
-        return new DuoConfig(true, ikey, skey, akey, host);
+        return new DuoConfig(true, ikey, skey, host, redirectUri);
     }
 
-    /* =========================
-       Helpers
-       ========================= */
+    private static String firstPresent(Properties props, String... keys) {
+        for (String key : keys) {
+            String val = props.getProperty(key);
+            if (notBlank(val)) {
+                return val.trim();
+            }
+        }
+        throw new IllegalStateException(
+                "Missing required Duo property (one of): " + String.join(", ", keys)
+        );
+    }
 
     private static String require(Properties props, String key) {
         String val = props.getProperty(key);

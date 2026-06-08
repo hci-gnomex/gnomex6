@@ -1,6 +1,7 @@
 package hci.gnomex.controller;
 
 import hci.gnomex.model.PropertyDictionary;
+import hci.gnomex.security.duo.DuoConfig;
 import hci.gnomex.utility.HibernateSession;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -9,22 +10,12 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Properties;
 
 public class GetLoginProperties extends HttpServlet {
 
     private static Logger LOG = Logger.getLogger(GetLoginProperties.class);
-
-    // Properties file keys
-    private static final String IKEY = "ikey";
-    private static final String HOST = "host";
-
-    private Properties duoProperties;
-
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
@@ -94,16 +85,14 @@ public class GetLoginProperties extends HttpServlet {
 
             if (useDuo) {
                 try {
-                    duoProperties = getDuoProperties();
+                    DuoConfig duoConfig = DuoConfig.load(true);
+                    ikey = duoConfig.getIkey();
+                    duoHost = duoConfig.getHost();
                 } catch (Exception e) {
                     System.out.println("[GetLoginProperties TwoFactorAuth] ERROR: " + e);
                     throw new ServletException(e);
                 }
-
-                ikey = duoProperties.getProperty(IKEY);
-                duoHost = duoProperties.getProperty(HOST);
-
-            } // end of useDuo if
+            }
 
 
             String jsonResult = Json.createObjectBuilder()
@@ -136,23 +125,4 @@ public class GetLoginProperties extends HttpServlet {
         }
     }
 
-    private static Properties getDuoProperties() throws FileNotFoundException, IOException, DuoPropertyException {
-        Properties duoProperties = new Properties();
-        duoProperties.load(new FileInputStream("/properties/duo.properties"));
-
-        if (!duoProperties.containsKey(IKEY)) {
-            throw new DuoPropertyException("ikey is a required property");
-        }
-        if (!duoProperties.containsKey(HOST)) {
-            throw new DuoPropertyException("host is a required property");
-        }
-
-        return duoProperties;
-    }
-}
-
-final class DuoPropertyException extends Exception {
-    public DuoPropertyException(String message) {
-        super(message);
-    }
 }
