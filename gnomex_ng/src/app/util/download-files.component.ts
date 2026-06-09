@@ -125,7 +125,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                     <button mat-raised-button
                             color="primary"
                             class="primary-action"
-                            [disabled]="filesToDownloadCount < 1 || filesToDownloadSize > maxsize"
+                            [disabled]="filesToDownloadCount < 1"
                             (click)="download()"
                             aria-label="Download selected files">
                         <img [src]="constantsService.ICON_DOWNLOAD" alt="" aria-hidden="true" class="icon">
@@ -372,9 +372,6 @@ setTimeout(() => {
         setTimeout(() => {
         this.filesToDownloadCount = this.countFilesRecursively(this.filesToDownloadNodes[0], true);
         this.filesToDownloadSize = this.countFileSizeRecursively(this.filesToDownloadNodes[0], true);
-        if (this.filesToDownloadSize > this.maxsize) {
-            this.dialogsService.alert("Download size exceeds 4 GB limit", null, DialogType.WARNING);
-        }
         this.filesToDownloadSizeLabel = FileService.formatFileSize(this.filesToDownloadSize);
 });
     }
@@ -613,6 +610,26 @@ setTimeout(() => {
 
     public download(): void {
         let files: any[] = this.gatherFilesToDownload();
+
+        // too big?
+        if (this.filesToDownloadSize > this.maxsize) {
+            this.dialogsService.alert("Total size exceeds 4 GB limit for browser downloads. Using FDT Command Line.", "Download Size Exceeds Limit", DialogType.SUCCESS);
+
+            this.cacheDownloadListFn(files).subscribe((result: any) => {
+                if (result && result.result === 'SUCCESS') {
+                    this.fdtDownloadFn(this.email, true).subscribe((result: any) => {
+                        if (!result || result.result !== 'SUCCESS') {
+                            this.handleBackendError(result, "retrieving FDT command line instructions");
+                        }
+                    });
+                } else {
+                    this.handleBackendError(result, "caching file download list");
+                }
+            });
+            return;
+        }
+
+        // less than maxsize, proceed with normal download
         this.cacheDownloadListFn(files).subscribe((result: any) => {
             if (result && result.result === 'SUCCESS') {
                 let downloadParams: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
