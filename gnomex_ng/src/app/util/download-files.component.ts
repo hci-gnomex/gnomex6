@@ -611,19 +611,26 @@ setTimeout(() => {
     public download(): void {
         let files: any[] = this.gatherFilesToDownload();
 
+// ************************************************ remove *******************************************
+//        this.filesToDownloadSize = 20000000000;
+// ************************************************ remove *******************************************
+
         // too big?
         if (this.filesToDownloadSize > this.maxsize) {
-            this.dialogsService.alert("Total size exceeds 4 GB limit for browser downloads. Using FDT Command Line.", "Download Size Exceeds Limit", DialogType.SUCCESS);
+            this.dialogsService.confirm("Total size exceeds 4 GB limit for browser downloads. Using FDT Command Line.", "Download Size Exceeds Limit").subscribe((result: any) => {
+                if (result) {
 
-            this.cacheDownloadListFn(files).subscribe((result: any) => {
-                if (result && result.result === 'SUCCESS') {
-                    this.fdtDownloadFn(this.email, true).subscribe((result: any) => {
-                        if (!result || result.result !== 'SUCCESS') {
-                            this.handleBackendError(result, "retrieving FDT command line instructions");
+                    this.cacheDownloadListFn(files).subscribe((result: any) => {
+                        if (result && result.result === 'SUCCESS') {
+                            this.fdtDownloadFn(this.email, true).subscribe((result: any) => {
+                                if (!result || result.result !== 'SUCCESS') {
+                                    this.handleBackendError(result, "retrieving FDT command line instructions");
+                                }
+                            });
+                        } else {
+                            this.handleBackendError(result, "caching file download list");
                         }
                     });
-                } else {
-                    this.handleBackendError(result, "caching file download list");
                 }
             });
             return;
