@@ -1,7 +1,7 @@
 package hci.gnomex.utility;
 
 import hci.gnomex.constants.Constants;
-import org.apache.commons.validator.routines.EmailValidator;
+import hci.gnomex.utility.EmailValidator;
 import org.apache.log4j.Logger;
 
 import jakarta.activation.DataHandler;
