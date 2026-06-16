@@ -20,4 +20,7 @@ CLASSPATH="$CLASSPATH:$JAR"
 done
 export CLASSPATH
 
-java -Xmx6000M hci.gnomex.daemon.RegisterFiles $*
+JAVA_OPTS="--add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.text=ALL-UNNAMED --add-opens java.desktop/java.awt.font=ALL-UNNAMED"
+export JAVA_OPTS
+
+java -Xmx6000M $JAVA_OPTS hci.gnomex.daemon.RegisterFiles $*

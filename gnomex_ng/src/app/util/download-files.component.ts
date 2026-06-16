@@ -24,10 +24,6 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                 <div class="flex-container-row align-center justify-space-between">
                     <label id="download-instructions">
                         Drag files or folders that you want to download. Hold CTRL or SHIFT key to select multiple.
-                        Keyboard: navigate with arrow keys and press Space to select a file.
-                        Press F2, then Enter on the Add or Remove button to move it between panels.
-                        You can also press Space to grab, navigate to the other panel, then press Enter to move it.
-                        Press Escape to cancel.
                     </label>
                     <context-help name="downloadhelp"
                                   label="Download Help"
@@ -129,7 +125,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                     <button mat-raised-button
                             color="primary"
                             class="primary-action"
-                            [disabled]="filesToDownloadCount < 1 || filesToDownloadSize > maxsize"
+                            [disabled]="filesToDownloadCount < 1"
                             (click)="download()"
                             aria-label="Download selected files">
                         <img [src]="constantsService.ICON_DOWNLOAD" alt="" aria-hidden="true" class="icon">
@@ -376,9 +372,6 @@ setTimeout(() => {
         setTimeout(() => {
         this.filesToDownloadCount = this.countFilesRecursively(this.filesToDownloadNodes[0], true);
         this.filesToDownloadSize = this.countFileSizeRecursively(this.filesToDownloadNodes[0], true);
-        if (this.filesToDownloadSize > this.maxsize) {
-            this.dialogsService.alert("Download size exceeds 4 GB limit", null, DialogType.WARNING);
-        }
         this.filesToDownloadSizeLabel = FileService.formatFileSize(this.filesToDownloadSize);
 });
     }
@@ -617,6 +610,33 @@ setTimeout(() => {
 
     public download(): void {
         let files: any[] = this.gatherFilesToDownload();
+
+// ************************************************ remove *******************************************
+//        this.filesToDownloadSize = 20000000000;
+// ************************************************ remove *******************************************
+
+        // too big?
+        if (this.filesToDownloadSize > this.maxsize) {
+            this.dialogsService.confirm("Total size exceeds 4 GB limit for browser downloads. Using FDT Command Line.", "Download Size Exceeds Limit").subscribe((result: any) => {
+                if (result) {
+
+                    this.cacheDownloadListFn(files).subscribe((result: any) => {
+                        if (result && result.result === 'SUCCESS') {
+                            this.fdtDownloadFn(this.email, true).subscribe((result: any) => {
+                                if (!result || result.result !== 'SUCCESS') {
+                                    this.handleBackendError(result, "retrieving FDT command line instructions");
+                                }
+                            });
+                        } else {
+                            this.handleBackendError(result, "caching file download list");
+                        }
+                    });
+                }
+            });
+            return;
+        }
+
+        // less than maxsize, proceed with normal download
         this.cacheDownloadListFn(files).subscribe((result: any) => {
             if (result && result.result === 'SUCCESS') {
                 let downloadParams: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
