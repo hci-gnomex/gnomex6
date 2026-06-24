@@ -9,7 +9,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {UtilModule} from "../util/util.module";
 import {AgGridModule} from "ag-grid-angular";
 import {TrackUsageComponent} from "./track-usage.component";
-import {ChartsModule} from "ng2-charts";
+import {ChartsModule, ThemeService} from "ng2-charts";
 import {EmailAllUsersComponent} from "./email-all-users.component";
 import { HttpClientModule} from '@angular/common/http';
 import {AngularEditorModule} from "@kolkov/angular-editor";
@@ -31,6 +31,9 @@ import {AccessibilityModule} from "../util/accessibility/accessibility.module";
         AngularEditorModule,
         AngularSplitModule,
         AccessibilityModule
+    ],
+    providers: [
+        ThemeService // Add ThemeService to providers
     ],
     declarations: [
         AnnotationProgressReportComponent,
