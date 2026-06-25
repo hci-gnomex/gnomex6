@@ -9,7 +9,7 @@ export interface MoveToTarget {
     label: string;
     /** Optional breadcrumb string shown after the label (e.g., lab or parent folder name). */
     path?: string;
-    /** The original node.data object that will be passed back to the opener on close. */
+
     data: any;
 }
 
