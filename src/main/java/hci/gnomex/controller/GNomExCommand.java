@@ -114,6 +114,7 @@ public abstract class GNomExCommand extends Command implements Serializable {
   public static String getRemoteIP(HttpServletWrappedRequest request) {
     String xff = request.getHeader("X-Forwarded-For");
     if (xff != null) {
+      System.out.println("[GNomExCommand W] xff: " + xff +  " request.getRemoteAddr() " + request.getRemoteAddr()  );
       return xff.split("[\\s,]+")[0];
     }
     return request.getRemoteAddr();
@@ -122,6 +123,7 @@ public abstract class GNomExCommand extends Command implements Serializable {
   public static String getRemoteIP(HttpServletRequest request) {
     String xff = request.getHeader("X-Forwarded-For");
     if (xff != null) {
+      System.out.println("[GNomExCommand] xff: " + xff +  " request.getRemoteAddr() " + request.getRemoteAddr()  );
       return xff.split("[\\s,]+")[0];
     }
     return request.getRemoteAddr();

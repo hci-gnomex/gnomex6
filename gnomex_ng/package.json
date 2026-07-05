@@ -17,7 +17,6 @@
     "clean": "npm cache clean --force && rimraf node_modules dist package-lock.json"
   },
   "dependencies": {
-    "3": "^2.1.0",
     "@angular/animations": "8.2.14",
     "@angular/cdk": "8.2.3",
     "@angular/common": "8.2.14",

@@ -30,6 +30,8 @@ public class FastDataTransferDownloadExpServlet extends HttpServlet {
   private static Logger LOG = Logger.getLogger(FastDataTransferDownloadExpServlet.class);
 
   private static String serverName = "";
+  private static String remoteServerName = "";
+  private static String remoteIP = "";
 
   public void init() {
 
@@ -39,6 +41,9 @@ public class FastDataTransferDownloadExpServlet extends HttpServlet {
   throws ServletException, IOException {
 
     serverName = req.getServerName();
+    remoteServerName = req.getRemoteHost();
+    remoteIP = GNomExCommand.getRemoteIP(req);
+    System.out.println("[FastDataTransferDownloadExpServlet] serverName = " + serverName + " remoteServerName = " + remoteServerName + " remoteIP = " + remoteIP);
 
     String emailAddress = "";
     if (req.getParameter("emailAddress") != null && !req.getParameter("emailAddress").equals("")) {
@@ -130,7 +135,7 @@ public class FastDataTransferDownloadExpServlet extends HttpServlet {
           }
 
           // remember idRequest and idLab
-            theidRequest = "" + request.getIdRequest();
+          theidRequest = "" + request.getIdRequest();
           theidLab = "" + request.getIdLab();
 
           List fileDescriptors = parser.getFileDescriptors(requestNumber);

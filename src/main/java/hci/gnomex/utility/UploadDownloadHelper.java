@@ -30,6 +30,7 @@ public class UploadDownloadHelper {
     File info = new File(baseDir + Constants.FDT_DOWNLOAD_INFO_FILE_NAME);
 //    try {
       if (!info.createNewFile()) {
+        System.out.println ("[UploadDownloadHelper] ERROR Unable to create info file: " + baseDir + Constants.FDT_DOWNLOAD_INFO_FILE_NAME +  " for FDT transfer. ");
         LOG.error("Unable to create info file: " + baseDir + Constants.FDT_DOWNLOAD_INFO_FILE_NAME +  " for FDT transfer. ");
       } else {
         FileWriter fw = new FileWriter(info);
