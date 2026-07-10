@@ -67,7 +67,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                                  [accessibleTreeNodeIdPrefix]="'dictionary-tree'"
                                  [accessibleTreeNodeLabel]="node.data.display"
                                  class="tree-node-font">
-                                <img src="{{node.data.icon}}" class="tree-node-icon icon">
+                              <img *ngIf="node.data.icon" class="icon tree-node-icon" src="{{ node.data.icon }}" alt="" aria-hidden="true">
                                 <span>{{node.data.display}}</span>
                             </div>
                         </ng-template>

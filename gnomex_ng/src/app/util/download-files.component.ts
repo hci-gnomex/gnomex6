@@ -54,7 +54,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                                                  [accessibleTreeNodeRoleDescription]="nodeRoleDesc(node)"
                                                  [accessibleTreeNodeSelected]="isKbDropTarget(node) || node.isActive"
                                                  class="flex-container-row tree-node-font">
-                                                <img [src]="node.data.icon" alt="" aria-hidden="true" class="icon tree-node-icon">
+                                              <img *ngIf="node.data.icon" class="icon tree-node-icon" src="{{ node.data.icon }}" alt="" aria-hidden="true">
                                                 <div>
                                                     {{ node.data.displayName }}
                                                 </div>
@@ -90,7 +90,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
                                                  [accessibleTreeNodeRoleDescription]="nodeRoleDesc(node)"
                                                  [accessibleTreeNodeSelected]="isKbDropTarget(node) || node.isActive"
                                                  class="flex-container-row tree-node-font">
-                                                <img [src]="node.data.icon" alt="" aria-hidden="true" class="icon tree-node-icon">
+                                              <img *ngIf="node.data.icon" class="icon tree-node-icon" src="{{ node.data.icon }}" alt="" aria-hidden="true">
                                                 <div>
                                                     {{ node.data.displayName }}
                                                 </div>

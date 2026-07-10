@@ -26,7 +26,7 @@
                                                  [treeNode]="node"
                                                  [accessibleTreeNodeIdPrefix]="'topics-tree'"
                                                  class="full-width no-word-wrap tree-node-font">
-                                                <img *ngIf="node.data.icon" src="{{node.data.icon}}" alt="" class="tree-node-icon icon">
+                                              <img *ngIf="node.data.icon" class="icon tree-node-icon" src="{{ node.data.icon }}" alt="" aria-hidden="true">
                                                 <span>{{ node.data.label }}</span>
                                             </div>
                                         </ng-template>
@@ -130,7 +130,7 @@
                                                      [treeNode]="node"
                                                      [accessibleTreeNodeIdPrefix]="'topics-data-tree'"
                                                      class="tree-node-font">
-                                                    <img src="{{node.data.icon}}" class="tree-node-icon icon" alt="">
+                                                  <img *ngIf="node.data.icon" class="icon tree-node-icon" src="{{ node.data.icon }}" alt="" aria-hidden="true">
                                                     <span>{{ node.data.label }}</span>
                                                 </div>
                                             </ng-template>

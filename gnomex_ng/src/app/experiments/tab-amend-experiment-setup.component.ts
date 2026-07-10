@@ -79,7 +79,7 @@ import {PropertyService} from "../services/property.service";
                              [treeNode]="node"
                              [accessibleTreeNodeIdPrefix]="'candidate-requests-tree'"
                              class="tree-node-font">
-                            <img src="{{node.data.icon}}" class="icon tree-node-icon">
+                          <img *ngIf="node.data.icon" class="icon tree-node-icon" src="{{ node.data.icon }}" alt="" aria-hidden="true">
                             <span>{{node.data.label}}</span>
                         </div>
                     </ng-template>

@@ -62,7 +62,7 @@
                            [accessibleTreeNodeRoleDescription]="nodeRoleDesc(node)"
                            [accessibleTreeNodeSelected]="isKbDropTarget(node) || node.isActive"
                            class="full-width no-word-wrap tree-node-font">
-                        <img src="{{node.data.icon}}" alt="" aria-hidden="true" class="tree-node-icon icon">
+                        <img *ngIf="node.data.icon" class="icon tree-node-icon" src="{{ node.data.icon }}" alt="" aria-hidden="true">
                         <span>{{ node.data.label }}</span>
                         <button *ngIf="node.data.isDataTrackFolder || node.data.idDataTrack"
                                 appAccessibleTreeAction

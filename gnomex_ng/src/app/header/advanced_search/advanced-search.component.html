@@ -198,7 +198,7 @@
                                              [accessibleTreeNodeLabel]="node.data.name"
                                              style="display: table-cell; vertical-align: middle;"
                                              class="tree-node-font">
-                                            <img src="{{node.data.icon}}" [attr.alt]="node.data.name + ' icon'" class="tree-node-icon icon">
+                                            <img *ngIf="node.data.icon" src="{{node.data.icon}}" [attr.alt]="node.data.name + ' icon'" class="tree-node-icon icon">
                                             <span style="padding-top: 0.2em;">{{ node.data.name }}</span>
                                         </div>
                                     </ng-template>
