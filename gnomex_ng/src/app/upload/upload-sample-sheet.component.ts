@@ -76,7 +76,7 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 
     private readonly SUCCESS_STATUS: string = 'SUCCESS';
 
-    @ViewChild('fileInput', {static: false}) fileInput: ElementRef;
+    @ViewChild('fileInput') fileInput: ElementRef;
 
     public actionType: any = ActionType ;
 

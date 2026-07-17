@@ -53,7 +53,7 @@ export class AuthenticationModule {
         }
     }
 
-    static forRoot(): ModuleWithProviders {
+    static forRoot(): ModuleWithProviders<AuthenticationModule> {
         return {
             providers: [
                 AuthenticationProvider,

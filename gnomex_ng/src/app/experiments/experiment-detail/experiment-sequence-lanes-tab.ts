@@ -74,7 +74,7 @@ import {Experiment} from "../../util/models/experiment.model";
     `],
 })
 export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
-    @ViewChild("lanesGrid", {static: false}) lanesGrid: AgGridAngular;
+    @ViewChild("lanesGrid") lanesGrid: AgGridAngular;
 
     @Input() editMode: boolean;
     @Input() experiment: Experiment;

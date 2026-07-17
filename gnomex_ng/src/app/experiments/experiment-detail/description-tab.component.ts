@@ -127,10 +127,10 @@ export class DescriptionTabComponent implements OnInit, AfterViewInit, OnDestroy
 
     @Input() editMode: boolean;
 
-    @ViewChild("descEditorRef", {static: false}) descEditor: AngularEditorComponent;
-    @ViewChild("notesEditorRef", {static: false}) notesEditor: AngularEditorComponent;
-    @ViewChild("projectDescEditorRef", {static: false}) projectDescEditor: AngularEditorComponent;
-    @ViewChild("adminNotesEditorRef", {static: false}) adminNotesEditor: AngularEditorComponent;
+    @ViewChild("descEditorRef") descEditor: AngularEditorComponent;
+    @ViewChild("notesEditorRef") notesEditor: AngularEditorComponent;
+    @ViewChild("projectDescEditorRef") projectDescEditor: AngularEditorComponent;
+    @ViewChild("adminNotesEditorRef") adminNotesEditor: AngularEditorComponent;
 
     private _showProjectDesc: boolean = false;
     public showCorePrepInstructions: boolean = false;

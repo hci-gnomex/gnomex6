@@ -35,7 +35,7 @@ export class GnomexAppComponent implements OnInit {
 
 
 
-  @ViewChild(HeaderComponent, {static: false})
+  @ViewChild(HeaderComponent)
 
   private _primaryNavEnabled: Observable<boolean>;
 

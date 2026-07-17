@@ -52,10 +52,10 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 })
 export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
 
-    @ViewChild("growToMatch", {static: false})   growToMatch:   ElementRef;
-    @ViewChild("heightToMatch", {static: false}) heightToMatch: ElementRef;
-    @ViewChild('oneEmWidth1', {static: false}) oneEmWidth1: ElementRef;
-    @ViewChild('oneEmWidth2', {static: false}) oneEmWidth2: ElementRef;
+    @ViewChild("growToMatch")   growToMatch:   ElementRef;
+    @ViewChild("heightToMatch") heightToMatch: ElementRef;
+    @ViewChild('oneEmWidth1') oneEmWidth1: ElementRef;
+    @ViewChild('oneEmWidth2') oneEmWidth2: ElementRef;
 
     private emToPxConversionRate1: number = 13;
     private emToPxConversionRate2: number = 13;

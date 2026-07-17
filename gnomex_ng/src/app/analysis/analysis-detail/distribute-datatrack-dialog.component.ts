@@ -40,7 +40,7 @@ import {FileService} from "../../services/file.service";
 
 export class DistributeDatatrackDialogComponent extends BaseGenericContainerDialog implements OnInit {
 
-    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
 
     private emToPxConversionRate: number = 13;
 

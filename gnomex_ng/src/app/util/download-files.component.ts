@@ -204,11 +204,11 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 })
 export class DownloadFilesComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
-    @ViewChild("availableFilesTreeComponent", {static: false}) private availableFilesTreeComponent: TreeComponent;
+    @ViewChild("availableFilesTreeComponent") private availableFilesTreeComponent: TreeComponent;
     public availableFilesNodes: any[] = [];
     public availableFilesCount: number = 0;
 
-    @ViewChild("filesToDownloadTreeComponent", {static: false}) private filesToDownloadTreeComponent: TreeComponent;
+    @ViewChild("filesToDownloadTreeComponent") private filesToDownloadTreeComponent: TreeComponent;
     public filesToDownloadNodes: any[] = [];
     public filesToDownloadCount: number = 0;
     public filesToDownloadSize: number = 0;

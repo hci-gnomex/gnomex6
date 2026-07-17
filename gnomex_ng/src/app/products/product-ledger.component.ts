@@ -78,7 +78,7 @@ export class ProductLedgerComponent implements OnInit {
     public labList: any[];
     public productList: any[];
 
-    @ViewChild(TreeComponent, {static: false}) private treeComponent: TreeComponent;
+    @ViewChild(TreeComponent) private treeComponent: TreeComponent;
     public treeOptions: ITreeOptions;
     public treeNodes: ITreeNode[];
     public selectedProduct: any;

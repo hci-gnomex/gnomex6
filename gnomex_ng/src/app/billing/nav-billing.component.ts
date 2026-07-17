@@ -87,12 +87,12 @@ import {TreeOptions} from "@circlon/angular-tree-component/lib/models/tree-optio
 
 export class NavBillingComponent implements OnInit, OnDestroy {
 
-    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
     private emToPxConversionRate: number = 13;
 
     private lastFilterEvent: BillingFilterEvent = null;
 
-    @ViewChild(TreeComponent, {static: false})
+    @ViewChild(TreeComponent)
     private billingItemsTreeComponent: TreeComponent;
     public billingItemsTreeOptions: ITreeOptions;
     public billingItemsTreeNodes: ITreeNode[] = [];

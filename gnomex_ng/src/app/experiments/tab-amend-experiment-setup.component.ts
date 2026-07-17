@@ -114,7 +114,7 @@ import {PropertyService} from "../services/property.service";
 
 export class TabAmendExperimentSetupComponent implements OnInit, OnDestroy {
 
-    @ViewChild("candidateRequestTree", {static: false}) private candidateRequestTreeComponent: TreeComponent;
+    @ViewChild("candidateRequestTree") private candidateRequestTreeComponent: TreeComponent;
 
     public form: FormGroup;
     public labList: any[] = [];

@@ -1,9 +1,3 @@
-import { Component } from "@angular/core";
-
-@Component({
-	template: `<div></div>`,
-	styles: [``]
-})
 export class DateParserComponent {
 	public static readonly DEFAULT_RECEIVED_DATE_FORMAT: string = "YYYY-MM-DD";
 	public static readonly DEFAULT_DISPLAY_DATE_FORMAT: string = "MM/DD/YYYY";

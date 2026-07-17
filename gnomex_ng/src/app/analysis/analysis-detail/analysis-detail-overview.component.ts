@@ -52,7 +52,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
 })
 export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, OnDestroy {
 
-    @ViewChild(AnnotationTabComponent, {static: false}) annotTab: AnnotationTabComponent;
+    @ViewChild(AnnotationTabComponent) annotTab: AnnotationTabComponent;
 
     public annotations: any = [];
     public analysis: any;

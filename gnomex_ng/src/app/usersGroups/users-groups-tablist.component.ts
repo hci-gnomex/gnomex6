@@ -117,9 +117,9 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 })
 export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, OnDestroy {
 
-    @ViewChild("billingAccountTab", {static: false}) billingAccountTab: BillingAccountTabComponent;
-    @ViewChild("billingAdminTab", {static: false}) billingAdminTab: BillingAdminTabComponent;
-    @ViewChild("membershipTab", {static: false}) membershipTab: MembershipTabComponent;
+    @ViewChild("billingAccountTab") billingAccountTab: BillingAccountTabComponent;
+    @ViewChild("billingAdminTab") billingAdminTab: BillingAdminTabComponent;
+    @ViewChild("membershipTab") membershipTab: MembershipTabComponent;
 
     private readonly DUMMY_UNID: string = "u0000000";
     private readonly DUMMY_USERNAME: string = "_";

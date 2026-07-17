@@ -102,7 +102,7 @@ const VIEW_LIMIT_EXPERIMENTS = 'view_limit_experiments';
 
 export class BrowseExperimentsComponent implements OnInit, OnDestroy, AfterViewInit {
 
-    @ViewChild('tree', {static: false}) treeComponent: TreeComponent;
+    @ViewChild('tree') treeComponent: TreeComponent;
     toggleButton = 'Expand Projects';
 
     /**

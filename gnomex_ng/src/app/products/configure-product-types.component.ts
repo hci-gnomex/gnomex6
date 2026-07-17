@@ -62,7 +62,7 @@ export class ConfigureProductTypesComponent extends BaseGenericContainerDialog i
     public form: FormGroup;
     public selectedProductType;
     public showSpinner: boolean;
-    @ViewChild(TreeComponent, {static: false}) private treeComponent: TreeComponent;
+    @ViewChild(TreeComponent) private treeComponent: TreeComponent;
     public options: ITreeOptions;
     public nodes: ITreeNode[];
     public coreFacilities: any[];

@@ -216,12 +216,12 @@ export class TrackUsageComponent implements OnInit, OnDestroy {
     public readonly AS_OF_2_YEARS: string = "2 Years";
     public readonly AS_OF_ALL: string = "All";
 
-    @ViewChild("barChart", {static: false}) barChartCanvas: ElementRef;
-    @ViewChild("pieChart", {static: false}) pieChartCanvas: ElementRef;
-    @ViewChild("lineChart", {static: false}) lineChartCanvas: ElementRef;
-    @ViewChild("lineChart2", {static: false}) lineChart2Canvas: ElementRef;
-    @ViewChild("pieChart2", {static: false}) pieChart2Canvas: ElementRef;
-    @ViewChild("pieChart3", {static: false}) pieChart3Canvas: ElementRef;
+    @ViewChild("barChart") barChartCanvas: ElementRef;
+    @ViewChild("pieChart") pieChartCanvas: ElementRef;
+    @ViewChild("lineChart") lineChartCanvas: ElementRef;
+    @ViewChild("lineChart2") lineChart2Canvas: ElementRef;
+    @ViewChild("pieChart2") pieChart2Canvas: ElementRef;
+    @ViewChild("pieChart3") pieChart3Canvas: ElementRef;
 
     public coreFacilities: any[] = [];
     public idCoreFacility: string = "";

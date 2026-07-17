@@ -27,7 +27,7 @@ import {RoleCheckUnlessNullDirective} from "./authorization/role-check-unless-nu
   ]
 })
 export class UserModule {
-  static forRoot(): ModuleWithProviders {
+  static forRoot(): ModuleWithProviders<UserModule> {
     return {
       providers: [
         UserService

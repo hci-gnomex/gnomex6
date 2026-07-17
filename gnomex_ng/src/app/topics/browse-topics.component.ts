@@ -67,8 +67,8 @@ import {NavigationService} from "../services/navigation.service";
 })
 
 export class BrowseTopicsComponent implements OnInit, OnDestroy {
-    @ViewChild("topicsTree", {static: false}) treeComponent: TreeComponent;
-    @ViewChild("dataTree", {static: false}) dataTreeComponent: TreeComponent;
+    @ViewChild("topicsTree") treeComponent: TreeComponent;
+    @ViewChild("dataTree") dataTreeComponent: TreeComponent;
 
     public readonly MODE_EXPERIMENT: string = "Experiment";
     public readonly MODE_ANALYSIS: string = "Analysis";

@@ -85,9 +85,9 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
   private isLastSelectOrgTree:boolean;
 
 
-  @ViewChild('organizeTree', {static: false})
+  @ViewChild('organizeTree')
   private organizeTree: TreeComponent;
-  @ViewChild('uploadTree', {static: false})
+  @ViewChild('uploadTree')
   private uploadTree: TreeComponent;
 
   @Output() closeDialog = new EventEmitter<TabChangeEvent>();

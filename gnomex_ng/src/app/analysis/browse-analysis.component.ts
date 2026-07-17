@@ -93,7 +93,7 @@ import {MoveToDialogComponent, MoveToDialogResult, MoveToTarget} from "../util/m
 
 export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit {
 
-    @ViewChild("analysisTree", {static: false}) treeComponent: TreeComponent;
+    @ViewChild("analysisTree") treeComponent: TreeComponent;
     public treeHasDomFocus = false;
 
     public readonly DRAG_AND_DROP_HINT: string =

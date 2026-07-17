@@ -47,7 +47,7 @@ export class SplitStringToMultipleLinesRenderer implements ICellRendererAngularC
 
 	value: string;
 
-	@ViewChild('totalHeightSource', {static: false}) totalHeightSource: ElementRef;
+	@ViewChild('totalHeightSource') totalHeightSource: ElementRef;
 
 	agInit(params: any): void {
 		this.params = params;

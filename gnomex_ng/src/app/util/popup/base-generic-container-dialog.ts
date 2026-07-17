@@ -1,7 +1,8 @@
-import {Input} from "@angular/core";
+import { Input, Directive } from "@angular/core";
 import {GDAction} from "../interfaces/generic-dialog-action.model";
 
 
+@Directive()
 export abstract class BaseGenericContainerDialog {
     @Input() inputData: any;
     public showSpinner: boolean = false;

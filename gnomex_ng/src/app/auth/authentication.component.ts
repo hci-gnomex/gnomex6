@@ -40,7 +40,7 @@ export class AuthenticationComponent {
   public url;
   public _errorMsg: string;
 
-  @ViewChild("iframe", {static: false}) iframe : ElementRef;
+  @ViewChild("iframe") iframe : ElementRef;
 
   private resetSubscription: Subscription;
   private popstateSubscription: Subscription;

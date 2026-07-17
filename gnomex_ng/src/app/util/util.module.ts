@@ -17,7 +17,6 @@ import {NewDataTrackFolderComponent} from "../datatracks/new-datatrackfolder.com
 import {DeleteDataTrackComponent} from "../datatracks/delete-datatrack.component";
 import {NewDataTrackComponent} from "../datatracks/new-datatrack.component";
 import {SaveFooterComponent} from "./save-footer.component";
-import {DateParserComponent} from "./parsers/date-parser.component";
 import {MonthPickerComponent} from "./pickers/month-picker.component";
 import {DatePickerComponent} from "./date-picker.component";
 import {DateRangeFilterComponent} from "./date-range-filter.component";
@@ -65,7 +64,6 @@ import {MoveToDialogComponent} from "./move-to-dialog/move-to-dialog.component";
     declarations: [
         BillingUsageReportComponent,
         BrowseFilterComponent,
-        DateParserComponent,
         DatePickerComponent,
         DateRangeFilterComponent,
         DateRangeFilterPopupComponent,
@@ -119,7 +117,6 @@ import {MoveToDialogComponent} from "./move-to-dialog/move-to-dialog.component";
     exports: [
         BrowseFilterComponent,
         BillingUsageReportComponent,
-        DateParserComponent,
         DatePickerComponent,
         DateRangeFilterComponent,
         DeleteDataTrackComponent,

@@ -11,7 +11,7 @@ import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align
 })
 export class CoreSampleSelectorComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
-    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
 
     private emToPxConversionRate: number = 13;
 

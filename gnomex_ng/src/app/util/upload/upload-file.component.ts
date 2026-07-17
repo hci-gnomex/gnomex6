@@ -50,7 +50,7 @@ import {UtilService} from "../../services/util.service";
     `]
 })
 export class UploadFileComponent implements OnInit {
-    @ViewChild('file', {static: false}) file;
+    @ViewChild('file') file;
     @Input('manageData') manageData: IFileParams;
     @Output() navToTab = new EventEmitter();
     public progressVal = 0;

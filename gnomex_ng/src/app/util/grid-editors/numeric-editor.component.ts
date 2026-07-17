@@ -11,7 +11,7 @@ export class NumericEditor implements ICellEditorAngularComp, AfterViewInit {
     public value: number;
     private cancelBeforeStart: boolean = false;
 
-    @ViewChild('input', {read: ViewContainerRef, static: false}) public input;
+    @ViewChild('input', { read: ViewContainerRef }) public input;
 
 
     agInit(params: any): void {

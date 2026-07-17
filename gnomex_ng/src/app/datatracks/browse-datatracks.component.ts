@@ -73,7 +73,7 @@ import {AriaAnnouncerService} from "../util/accessibility/aria-announcer.service
 
 export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewInit {
 
-  @ViewChild("datatracksTree", {static: false}) treeComponent: TreeComponent;
+  @ViewChild("datatracksTree") treeComponent: TreeComponent;
   @Output() selItem: EventEmitter<ITreeNode> = new EventEmitter();
   private navInitSubscription: Subscription;
 

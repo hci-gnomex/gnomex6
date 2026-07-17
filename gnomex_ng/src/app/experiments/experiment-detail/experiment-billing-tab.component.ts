@@ -46,7 +46,7 @@ import {ActionType} from "../../util/interfaces/generic-dialog-action.model";
 })
 export class ExperimentBillingTabComponent implements OnInit {
 
-    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
 
     public getNodeChildDetails;
     public gridColDefs: any[] = [];

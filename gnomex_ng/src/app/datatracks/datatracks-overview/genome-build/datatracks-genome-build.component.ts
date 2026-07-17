@@ -56,7 +56,7 @@ export class DatatracksGenomeBuildComponent implements OnInit {
     //Override
     public componentNames: Array<String>;
     public state: string = TabContainer.VIEW;
-    @ViewChild(TabContainer, {static: false}) tabs: TabContainer;
+    @ViewChild(TabContainer) tabs: TabContainer;
     public canWrite: boolean = false;
     private datatracksTreeNodeSubscription: Subscription;
 

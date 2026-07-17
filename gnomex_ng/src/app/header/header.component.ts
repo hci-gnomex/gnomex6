@@ -135,9 +135,9 @@ import {BrowseDictionaryComponent} from "../configuration/browse-dictionary.comp
 
 export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
 
-    @ViewChild('headerRef', {static: false}) headerRef: ElementRef;
-    @ViewChild('spacerRef', {static: false}) spacerRef: ElementRef;
-    @ViewChild('bottomNonCollapsing', {static: false}) bottomNonCollapsing: ElementRef;
+    @ViewChild('headerRef') headerRef: ElementRef;
+    @ViewChild('spacerRef') spacerRef: ElementRef;
+    @ViewChild('bottomNonCollapsing') bottomNonCollapsing: ElementRef;
 
     options: FormGroup;
     private readonly serviceParams: any;

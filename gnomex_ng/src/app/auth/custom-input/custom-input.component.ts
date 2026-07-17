@@ -202,9 +202,9 @@ let nextId = 0;
 })
 export class CustomInputComponent implements AfterViewInit {
 
-  @ViewChild("myInput", {static: false})   myInput:   ElementRef;
-  @ViewChild("myLabel", {static: false})   myLabel:   ElementRef;
-  @ViewChild("myTooltip", {static: false}) myTooltip: ElementRef;
+  @ViewChild("myInput")   myInput:   ElementRef;
+  @ViewChild("myLabel")   myLabel:   ElementRef;
+  @ViewChild("myTooltip") myTooltip: ElementRef;
 
   /** Unique id so each instance gets its own <label for="..."> / input id pair. */
   public readonly inputId: string = `custom-input-${++nextId}`;

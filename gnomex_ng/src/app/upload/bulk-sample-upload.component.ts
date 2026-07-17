@@ -99,8 +99,8 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
     `]
 }) export class BulkSampleUploadComponent extends BaseGenericContainerDialog implements OnDestroy {
 
-    @ViewChild('oneEmWidth', {static: false}) oneEmWidth: ElementRef;
-    @ViewChild('fileInput', {static: false}) fileInput: ElementRef;
+    @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
+    @ViewChild('fileInput') fileInput: ElementRef;
 
     public actionType: any = ActionType;
 
