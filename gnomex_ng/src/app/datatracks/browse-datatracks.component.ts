@@ -16,7 +16,7 @@ import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {LabListService} from "../services/lab-list.service";
 import {DataTrackService} from "../services/data-track.service";
 import {MoveDataTrackComponent} from "./move-datatrack.component";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import {MoveToDialogComponent, MoveToDialogResult, MoveToTarget} from "../util/move-to-dialog/move-to-dialog.component";
 import * as _ from "lodash";
 import {GnomexService} from "../services/gnomex.service";

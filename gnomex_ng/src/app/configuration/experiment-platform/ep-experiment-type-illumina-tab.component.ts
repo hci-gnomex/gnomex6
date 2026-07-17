@@ -8,7 +8,7 @@ import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {ConstantsService} from "../../services/constants.service";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {DictionaryService} from "../../services/dictionary.service";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {LibraryPrepDialogComponent} from "./library-prep-dialog.component";
 import {GnomexService} from "../../services/gnomex.service";

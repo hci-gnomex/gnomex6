@@ -13,7 +13,7 @@ import {GnomexService} from "../services/gnomex.service";
 import {ExternalRoute} from "./external-routes.module";
 import * as _ from "lodash";
 import {TopicService} from "../services/topic.service";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {AdvancedSearchComponent} from "./advanced_search/advanced-search.component";
 import {AuthenticationService} from "../auth/authentication.service";
 import {PropertyService} from "../services/property.service";

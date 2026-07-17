@@ -1,5 +1,6 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from "@angular/core";
-import {MatCheckbox, MatDialog, MatDialogConfig} from "@angular/material";
+import { MatCheckbox } from "@angular/material/checkbox";
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import {AbstractControl, FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 
 import {BehaviorSubject, Subscription} from "rxjs";

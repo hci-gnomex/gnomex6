@@ -6,7 +6,8 @@ import {
     OnInit, Output,
     ViewChild,
 } from "@angular/core";
-import {ErrorStateMatcher, MatDialogConfig} from "@angular/material";
+import { ErrorStateMatcher } from "@angular/material/core";
+import { MatDialogConfig } from "@angular/material/dialog";
 
 import {DictionaryService} from "../../services/dictionary.service";
 import {PropertyService} from "../../services/property.service";

@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit} from "@angular/core";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {FormControl, Validators} from "@angular/forms";
 import {ConstantsService} from "../services/constants.service";
 import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";

@@ -1,5 +1,5 @@
 import {Component, Inject} from "@angular/core";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {GetLabService} from "../services/get-lab.service";
 import {TopicService} from "../services/topic.service";
 import {LabListService} from "../services/lab-list.service";

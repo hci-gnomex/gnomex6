@@ -1,5 +1,5 @@
 import {AfterViewInit, Component, OnInit} from "@angular/core";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import {Router} from "@angular/router";
 import {CreateProjectComponent} from "./create-project.component";
 import {GnomexService} from "../services/gnomex.service";

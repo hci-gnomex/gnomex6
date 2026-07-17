@@ -1,7 +1,7 @@
 import {Component, ElementRef, Inject, OnInit, ViewChild} from "@angular/core";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 import {GDAction} from "../../util/interfaces/generic-dialog-action.model";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {ConstantsService} from "../../services/constants.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {DialogsService, DialogType} from "../../util/popup/dialogs.service";

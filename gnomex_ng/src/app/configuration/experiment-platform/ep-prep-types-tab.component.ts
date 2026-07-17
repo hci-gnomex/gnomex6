@@ -8,7 +8,7 @@ import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {ConstantsService} from "../../services/constants.service";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {DictionaryService} from "../../services/dictionary.service";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {PrepTypePricingDialogComponent} from "./prep-type-pricing-dialog.component";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";

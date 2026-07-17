@@ -1,5 +1,5 @@
 import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
-import {MatDialog, MatDialogConfig} from '@angular/material';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 
 import {BillingUsageReportComponent} from "../billing-usage-report.component";
 import {DialogsService, DialogType} from "../popup/dialogs.service";

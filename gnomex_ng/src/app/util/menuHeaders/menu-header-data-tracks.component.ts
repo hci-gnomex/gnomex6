@@ -2,7 +2,7 @@ import {Component, EventEmitter, Inject, Input, OnInit, Output, SimpleChanges} f
 
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {NewGenomeBuildComponent} from "../new-genome-build.component";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {NewOrganismComponent} from "../new-organism.component";
 import {NewDataTrackFolderComponent} from "../../datatracks/new-datatrackfolder.component";
 import {DialogsService, DialogType} from "../popup/dialogs.service";

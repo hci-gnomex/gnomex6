@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit, ViewChild} from "@angular/core";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {FormControl} from "@angular/forms";
 import {HttpClient, HttpHeaders, HttpParams} from "@angular/common/http";
 import {CookieUtilService} from "../services/cookie-util.service";

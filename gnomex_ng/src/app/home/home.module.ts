@@ -7,7 +7,7 @@ import {CommonModule} from "@angular/common";
 import {HomeComponent} from "./home.component";
 import {ProgressService} from "../home/progress.service";
 import {LaunchPropertiesService} from "../services/launch-properites.service";
-import {MatProgressBarModule} from "@angular/material";
+import { MatProgressBarModule } from "@angular/material/progress-bar";
 
 @NgModule({
   imports: [HOME_ROUTING, CommonModule, MatProgressBarModule],

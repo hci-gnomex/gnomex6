@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit} from "@angular/core";
-import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import {WorkflowService} from "../services/workflow.service";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";

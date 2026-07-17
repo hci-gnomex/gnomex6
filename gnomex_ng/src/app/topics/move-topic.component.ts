@@ -1,6 +1,6 @@
 import {Component, Inject} from '@angular/core';
 import {HttpParams} from "@angular/common/http";
-import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {TopicService} from "../services/topic.service";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";

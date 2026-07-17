@@ -1,7 +1,8 @@
 import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
 import {HttpParams} from "@angular/common/http";
 import {FormBuilder, FormControl, FormGroup, FormGroupDirective, NgForm, Validators} from "@angular/forms";
-import {MatDialogRef, MatDialog, ErrorStateMatcher, MatDialogConfig, MAT_DIALOG_DATA } from "@angular/material";
+import { ErrorStateMatcher } from "@angular/material/core";
+import { MatDialogRef, MatDialog, MatDialogConfig, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import {Router} from "@angular/router";
 import {Subscription} from "rxjs";
 

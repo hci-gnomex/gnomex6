@@ -8,7 +8,7 @@ import {ProductsService} from "../services/products.service";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {PropertyService} from "../services/property.service";
 import {HttpParams} from "@angular/common/http";
-import {MatSnackBar} from "@angular/material";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {UtilService} from "../services/util.service";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";

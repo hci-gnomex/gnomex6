@@ -25,7 +25,7 @@ import {Subscription} from 'rxjs';
 import {ActivatedRoute, NavigationEnd, NavigationExtras, ParamMap, Router} from '@angular/router';
 import {CreateSecurityAdvisorService} from '../services/create-security-advisor.service';
 import {CreateProjectComponent} from './create-project.component';
-import {MatDialog, MatDialogConfig} from '@angular/material';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import {MoveToDialogComponent, MoveToDialogResult, MoveToTarget} from '../util/move-to-dialog/move-to-dialog.component';
 import {LabListService} from '../services/lab-list.service';
 import {DialogsService, DialogType} from '../util/popup/dialogs.service';

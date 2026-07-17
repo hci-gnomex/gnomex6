@@ -6,7 +6,8 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ConstantsService} from "../services/constants.service";
 import {DialogsService, DialogType} from "./popup/dialogs.service";
-import {MAT_DIALOG_DATA, MatDialogRef, MatSnackBar} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import {ExperimentPlatformService} from "../services/experiment-platform.service";
 import {first, take} from "rxjs/operators";
 import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";

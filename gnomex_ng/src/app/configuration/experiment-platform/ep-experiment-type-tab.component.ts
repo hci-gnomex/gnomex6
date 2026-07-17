@@ -8,7 +8,7 @@ import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {ConstantsService} from "../../services/constants.service";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {DictionaryService} from "../../services/dictionary.service";
-import {MatDialog} from "@angular/material";
+import { MatDialog } from "@angular/material/dialog";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
 import {TextAlignLeftMiddleEditor} from "../../util/grid-editors/text-align-left-middle.editor";

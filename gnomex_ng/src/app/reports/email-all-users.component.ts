@@ -3,7 +3,7 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {BroadcastEmailService} from "../services/broadcast-email.service";
 import {HttpParams} from "@angular/common/http";
-import {MatDialogRef} from "@angular/material";
+import { MatDialogRef } from "@angular/material/dialog";
 import {AngularEditorConfig} from "@kolkov/angular-editor";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";

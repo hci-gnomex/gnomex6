@@ -6,7 +6,7 @@ import {ExperimentPlatformService} from "../../services/experiment-platform.serv
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {GnomexService} from "../../services/gnomex.service";
 import {DictionaryService} from "../../services/dictionary.service";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {SampleTypeDetailDialogComponent} from "./sample-type-detail-dialog.component";
 import {SelectEditor} from "../../util/grid-editors/select.editor";
 import {Subscription} from "rxjs";

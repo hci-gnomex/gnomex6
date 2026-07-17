@@ -7,7 +7,8 @@ import {
     ViewChild,
 } from "@angular/core";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
-import {MatDialogConfig, MatSnackBar, MatSnackBarConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
+import { MatSnackBar, MatSnackBarConfig } from "@angular/material/snack-bar";
 
 import {GridOptions} from "ag-grid-community/main";
 import {ColDef, GridApi, GridReadyEvent, RowSelectedEvent, RowNode} from "ag-grid-community";

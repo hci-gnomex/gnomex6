@@ -3,7 +3,7 @@ import {ConstantsService} from "../../services/constants.service";
 import {GridReadyEvent, GridSizeChangedEvent} from "ag-grid-community";
 import {ActivatedRoute} from "@angular/router";
 import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {SelectRenderer} from "../../util/grid-renderers/select.renderer";
 import {DictionaryService} from "../../services/dictionary.service";
 import {UtilService} from "../../services/util.service";

@@ -4,7 +4,7 @@ import {ITreeOptions, KEYS, TREE_ACTIONS, TreeComponent, TreeModel, TreeNode,} f
 import * as _ from "lodash";
 import {Subscription} from "rxjs";
 import {ActivatedRoute, NavigationExtras, ParamMap, Router} from "@angular/router";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
 import {TopicService} from "../services/topic.service";

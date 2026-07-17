@@ -1,6 +1,6 @@
 import {Component, EventEmitter, OnInit, Output} from "@angular/core";
 import {DictionaryService} from "../services/dictionary.service";
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import {BillingPeriodSelectorPopupComponent} from "./billing-period-selector-popup.component";
 import {DictionaryEntry} from "../configuration/dictionary-entry.type";
 import {PropertyService} from "../services/property.service";

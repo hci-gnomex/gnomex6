@@ -5,7 +5,7 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 
 import {NgModule} from "@angular/core";
 import {CommonModule} from "@angular/common";
-import {MatDialogModule} from "@angular/material";
+import { MatDialogModule } from "@angular/material/dialog";
 import {HEADER_ROUTING} from "./header.routes";
 import {AgGridModule} from "ag-grid-angular";
 import {AngularMaterialModule} from "../../modules/angular-material.module";

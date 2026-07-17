@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit} from "@angular/core";
-import {MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import {WorkflowService} from "../services/workflow.service";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {TextAlignLeftMiddleRenderer} from "../util/grid-renderers/text-align-left-middle.renderer";

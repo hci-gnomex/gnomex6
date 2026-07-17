@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from "@angular/core";
 import {DictionaryService} from "../services/dictionary.service";
-import {MatDialogConfig, TooltipPosition} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
+import { TooltipPosition } from "@angular/material/tooltip";
 import {ContextHelpPopupComponent} from "./context-help-popup.component";
 import {DialogsService} from "./popup/dialogs.service";
 

@@ -10,7 +10,7 @@ import {BrowseAnalysisComponent} from "./browse-analysis.component";
 import {ANALYSIS_ROUTING} from "./analysis.routes";
 import {DeleteAnalysisComponent} from "./delete-analysis.component";
 import { AngularMaterialModule} from "../../modules/angular-material.module";
-import {MatAutocompleteModule} from '@angular/material';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import {CreateAnalysisComponent} from "./create-analysis.component";
 import {CreateAnalysisGroupComponent} from "./create-analysis-group.component";
 import {DialogsModule} from "../util/popup/dialogs.module";

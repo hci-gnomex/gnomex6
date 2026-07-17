@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit} from "@angular/core";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {BillingService} from "../services/billing.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {DictionaryService} from "../services/dictionary.service";

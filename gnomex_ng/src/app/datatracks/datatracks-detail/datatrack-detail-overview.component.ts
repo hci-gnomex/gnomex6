@@ -7,7 +7,7 @@ import {ConstantsService} from "../../services/constants.service";
 import {GnomexService} from "../../services/gnomex.service";
 import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import {ShareLinkDialogComponent} from "../../util/share-link-dialog.component";
 import {DatatracksSummaryTabComponent} from "./datatracks-summary-tab.component";
 import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";

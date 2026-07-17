@@ -1,5 +1,5 @@
 import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {GridApi, GridReadyEvent, RowClickedEvent} from "ag-grid-community";
 import {BillingService} from "../services/billing.service";
 import {Subscription} from "rxjs";

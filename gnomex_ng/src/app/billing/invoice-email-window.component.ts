@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit} from "@angular/core";
-import {MAT_DIALOG_DATA} from "@angular/material";
+import { MAT_DIALOG_DATA } from "@angular/material/dialog";
 import {BillingService} from "../services/billing.service";
 import {FormControl, Validators} from "@angular/forms";
 import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";

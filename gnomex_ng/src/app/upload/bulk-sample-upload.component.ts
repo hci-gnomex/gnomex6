@@ -1,5 +1,5 @@
 import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
-import {MatDialogConfig, MatDialogRef} from "@angular/material";
+import { MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import {Router} from "@angular/router";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {SampleUploadService} from "./sample-upload.service";

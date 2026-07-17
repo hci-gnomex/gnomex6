@@ -1,5 +1,5 @@
 import {Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {ITreeOptions, KEYS, TREE_ACTIONS, TreeComponent, TreeModel} from "@circlon/angular-tree-component";
 
 import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";

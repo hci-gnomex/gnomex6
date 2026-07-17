@@ -22,7 +22,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {ServicesModule } from './services/services.module';
 import {AnalysisModule} from "./analysis/analysis.module";
 import {DatatracksModule} from "./datatracks/datatracks.module";
-import {MatIconModule} from "@angular/material";
+import { MatIconModule } from "@angular/material/icon";
 import {ReportsModule} from "./reports/reports.module";
 import {CookieService} from "angular2-cookie/core";
 import {TopicsModule} from "./topics/topics.module";
@@ -49,7 +49,7 @@ import {RegisterUserModule} from "./account/register-user/register-user.module";
 import {HTTP_INTERCEPTORS} from "@angular/common/http";
 import {ErrorHandlerInterceptor} from "./services/interceptors/error-handler.interceptor";
 import {WINDOW_PROVIDERS} from "./services/window.service";
-import {MatDialogModule} from "@angular/material";
+import { MatDialogModule } from "@angular/material/dialog";
 import { TreeDraggedElement } from '@circlon/angular-tree-component';
 
 let localStorageServiceConfig: ILocalStorageServiceConfig = {

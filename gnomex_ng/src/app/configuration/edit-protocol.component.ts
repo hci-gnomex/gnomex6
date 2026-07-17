@@ -3,7 +3,7 @@ import {ProtocolService} from "../services/protocol.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {Subscription} from "rxjs";
 import {SpinnerDialogComponent} from "../util/popup/spinner-dialog.component";
-import {MatDialogRef} from "@angular/material";
+import { MatDialogRef } from "@angular/material/dialog";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ActivatedRoute} from "@angular/router";
 import {DictionaryService} from "../services/dictionary.service";

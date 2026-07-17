@@ -6,7 +6,7 @@ import {CellValueChangedEvent, GridApi, NumberFilter} from "ag-grid-community";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {ConstantsService} from "../../services/constants.service";
 import {DictionaryService} from "../../services/dictionary.service";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {QcAssayDialogComponent} from "./qc-assay-dialog.component";
 import {ActionType} from "../../util/interfaces/generic-dialog-action.model";

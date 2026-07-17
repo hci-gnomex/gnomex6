@@ -8,7 +8,7 @@ import {HttpParams} from "@angular/common/http";
 import {first} from "rxjs/operators";
 import {UtilService} from "../services/util.service";
 import * as chartJS from "chart.js";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {TrackUsageDetailComponent} from "./track-usage-detail.component";
 import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-codec";

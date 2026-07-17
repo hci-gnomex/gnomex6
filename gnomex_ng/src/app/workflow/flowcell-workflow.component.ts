@@ -1,6 +1,6 @@
 import {Component, ElementRef, Inject, OnInit, ViewChild} from "@angular/core";
 import {WorkflowService} from "../services/workflow.service";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {GnomexService} from "../services/gnomex.service";
 import {GridApi, GridSizeChangedEvent} from "ag-grid-community";
 import {DictionaryService} from "../services/dictionary.service";

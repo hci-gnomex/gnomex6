@@ -1,5 +1,6 @@
 import {Component, ElementRef, Inject, NgZone, OnInit, ViewChild} from "@angular/core";
-import {MAT_DIALOG_DATA, MatDialogRef, MatTabChangeEvent} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { MatTabChangeEvent } from "@angular/material/tabs";
 import * as _ from "lodash";
 import {ConstantsService} from "../../services/constants.service";
 import {FormBuilder, FormControl, FormGroup} from "@angular/forms";

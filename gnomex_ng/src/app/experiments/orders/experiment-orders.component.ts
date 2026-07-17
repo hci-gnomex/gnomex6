@@ -14,7 +14,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {ExperimentsService} from "../experiments.service";
 import {PropertyService} from "../../services/property.service";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {LinkButtonRenderer} from "../../util/grid-renderers/link-button.renderer";
 import {GnomexService} from "../../services/gnomex.service";
 import {HttpParams} from "@angular/common/http";

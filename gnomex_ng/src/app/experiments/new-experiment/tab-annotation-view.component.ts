@@ -1,7 +1,7 @@
 import {Component, ElementRef, Input, OnDestroy, ViewChild} from "@angular/core";
 import {HttpParams} from "@angular/common/http";
 import {FormBuilder, FormGroup} from "@angular/forms";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 
 import {GridApi} from "ag-grid-community";
 

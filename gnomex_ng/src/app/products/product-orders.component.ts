@@ -8,7 +8,7 @@ import {DateRange} from "../util/date-range-filter.component";
 import {HttpParams} from "@angular/common/http";
 import {ProductsService} from "../services/products.service";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
-import {MatSnackBar} from "@angular/material";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import {ITreeOptions, KEYS, TREE_ACTIONS, TreeComponent} from "@circlon/angular-tree-component";
 import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {UserPreferencesService} from "../services/user-preferences.service";

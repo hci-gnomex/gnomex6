@@ -22,7 +22,7 @@ import {first} from "rxjs/operators";
 import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {TabChangeEvent} from "../tabs/index";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {NameFileDialogComponent} from "./name-file-dialog.component";
 import {FileService} from "../../services/file.service";
 import {IFileParams} from "../interfaces/file-params.model";

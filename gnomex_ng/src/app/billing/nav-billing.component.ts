@@ -14,7 +14,8 @@ import {BillingService} from "../services/billing.service";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {ConstantsService} from "../services/constants.service";
 import {PropertyService} from "../services/property.service";
-import {MatCheckboxChange, MatDialogConfig} from "@angular/material";
+import { MatCheckboxChange } from "@angular/material/checkbox";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {
     CellValueChangedEvent,
     GridApi,

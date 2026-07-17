@@ -5,7 +5,7 @@ import {Observable, Subscription, throwError} from "rxjs";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ConstantsService} from "../services/constants.service";
 import {GnomexService} from "../services/gnomex.service";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {GetLabService} from "../services/get-lab.service";
 import {PropertyService} from "../services/property.service";
 import {HttpParams} from "@angular/common/http";

@@ -5,7 +5,7 @@ import {DateParserComponent} from "../../../util/parsers/date-parser.component";
 import {TextAlignLeftMiddleRenderer} from "../../../util/grid-renderers/text-align-left-middle.renderer";
 import {CheckboxRenderer} from "../../../util/grid-renderers/checkbox.renderer";
 import {SelectRenderer} from "../../../util/grid-renderers/select.renderer";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 
 import * as _ from "lodash";
 import {UploadViewRemoveRenderer} from "../../../util/grid-renderers/upload-view-remove.renderer";

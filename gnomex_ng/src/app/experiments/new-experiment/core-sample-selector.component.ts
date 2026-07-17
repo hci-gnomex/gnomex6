@@ -1,6 +1,6 @@
 import {Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {TextAlignLeftMiddleRenderer} from "../../util/grid-renderers/text-align-left-middle.renderer";
 import {TextAlignRightMiddleRenderer} from "../../util/grid-renderers/text-align-right-middle.renderer";
 

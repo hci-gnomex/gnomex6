@@ -3,7 +3,7 @@ import {ActivatedRoute} from "@angular/router";
 import {IRegisterUser, ISimpleLab} from "../../util/interfaces/register-user.model";
 import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
-import {MatSlideToggleChange} from "@angular/material";
+import { MatSlideToggleChange } from "@angular/material/slide-toggle";
 import {PasswordUtilService} from "../../services/password-util.service";
 import {UserService} from "../../services/user.service";
 import {HttpParams} from "@angular/common/http";

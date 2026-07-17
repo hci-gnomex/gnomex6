@@ -1,5 +1,5 @@
 import {Component, Inject, OnInit} from "@angular/core";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {ConstantsService} from "../../services/constants.service";
 import {AnalysisService} from "../../services/analysis.service";
 import {DialogsService, DialogType} from "../../util/popup/dialogs.service";

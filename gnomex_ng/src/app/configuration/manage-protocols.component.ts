@@ -1,5 +1,5 @@
 import {Component, Inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {ActivatedRoute, Router} from "@angular/router";
 
 import {ITreeOptions, TreeComponent, TreeModel} from "@circlon/angular-tree-component";

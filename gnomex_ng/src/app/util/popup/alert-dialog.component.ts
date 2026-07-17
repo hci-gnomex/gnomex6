@@ -6,7 +6,7 @@ import {
     Inject, OnInit,
     ViewChild,
 } from "@angular/core";
-import {DialogPosition, MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { DialogPosition, MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {ActionType} from "../interfaces/generic-dialog-action.model";
 import {DialogType} from "./dialogs.service";
 

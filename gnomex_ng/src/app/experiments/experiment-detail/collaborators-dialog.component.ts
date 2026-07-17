@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, Inject, ViewChild} from '@angular/core';
 
 import {ConstantsService} from "../../services/constants.service";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {CheckboxRenderer} from "../../util/grid-renderers/checkbox.renderer";
 import {IconLinkButtonRenderer} from "../../util/grid-renderers/icon-link-button.renderer";
 import {GnomexService} from "../../services/gnomex.service";

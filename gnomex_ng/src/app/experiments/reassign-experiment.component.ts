@@ -1,4 +1,4 @@
-import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import {Component, Inject} from "@angular/core";
 import {ExperimentsService} from "./experiments.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";

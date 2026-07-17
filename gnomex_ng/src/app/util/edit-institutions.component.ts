@@ -1,5 +1,5 @@
 import {Component, OnInit} from "@angular/core";
-import {MatDialogRef} from "@angular/material";
+import { MatDialogRef } from "@angular/material/dialog";
 import {ConstantsService} from "../services/constants.service";
 import {DictionaryService} from "../services/dictionary.service";
 import {GridApi, GridReadyEvent, RowSelectedEvent} from "ag-grid-community";

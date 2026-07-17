@@ -1,5 +1,5 @@
 import {Component, OnInit} from "@angular/core";
-import {MatDialogRef} from "@angular/material";
+import { MatDialogRef } from "@angular/material/dialog";
 import {LabListService} from "../services/lab-list.service";
 import {FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";

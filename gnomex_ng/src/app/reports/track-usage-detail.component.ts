@@ -1,6 +1,6 @@
 import {Component, Inject, OnDestroy, OnInit} from "@angular/core";
 import {UsageService} from "../services/usage.service";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {ColDef, AgGridEvent} from "ag-grid-community";
 import {UtilService} from "../services/util.service";
 import {UserPreferencesService} from "../services/user-preferences.service";

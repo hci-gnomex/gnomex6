@@ -6,7 +6,7 @@ import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {GridOptions} from "ag-grid-community/main";
 import {HttpParams} from "@angular/common/http";
 import {LaunchPropertiesService} from "../../services/launch-properites.service";
-import {MatDialogRef} from "@angular/material";
+import { MatDialogRef } from "@angular/material/dialog";
 import {BaseGenericContainerDialog} from "../../util/popup/base-generic-container-dialog";
 import {ConstantsService} from "../../services/constants.service";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";

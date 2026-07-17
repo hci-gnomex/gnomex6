@@ -1,6 +1,6 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {HttpParams} from "@angular/common/http";
-import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import {GetLabService} from "../services/get-lab.service";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";

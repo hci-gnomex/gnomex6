@@ -8,7 +8,7 @@ import {ProductsService} from "../services/products.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {HttpParams} from "@angular/common/http";
 import {ConstantsService} from "../services/constants.service";
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import {
     BillingTemplate, BillingTemplateWindowComponent,
     BillingTemplateWindowParams

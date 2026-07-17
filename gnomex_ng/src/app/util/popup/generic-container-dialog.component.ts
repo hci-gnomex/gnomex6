@@ -7,7 +7,7 @@ import {
     OnDestroy,
     ViewChild, ComponentRef, ChangeDetectorRef
 } from "@angular/core";
-import {MatDialogRef, MatDialog, MAT_DIALOG_DATA, DialogPosition} from "@angular/material";
+import { MatDialogRef, MatDialog, MAT_DIALOG_DATA, DialogPosition } from "@angular/material/dialog";
 
 import {Router} from "@angular/router";
 import {GDAction, ActionType} from "../interfaces/generic-dialog-action.model";

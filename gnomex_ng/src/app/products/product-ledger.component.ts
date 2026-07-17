@@ -8,7 +8,8 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {ITreeOptions, TreeComponent, TreeModel} from "@circlon/angular-tree-component";
 import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {ColumnApi, GridApi, GridReadyEvent} from "ag-grid-community";
-import {MatDialogConfig, MatSnackBar} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import {AddLedgerEntryComponent} from "./add-ledger-entry.component";
 import {HttpParams} from "@angular/common/http";
 import {AddProductWindowComponent} from "./add-product-window.component";

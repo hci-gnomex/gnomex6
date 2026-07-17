@@ -1,7 +1,8 @@
 
 import {Component, forwardRef, Input, ViewChild} from "@angular/core";
 import { FormControl, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
-import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE, MatDatepicker } from '@angular/material';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { MatDatepicker } from '@angular/material/datepicker';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 
 import * as moment from 'moment';

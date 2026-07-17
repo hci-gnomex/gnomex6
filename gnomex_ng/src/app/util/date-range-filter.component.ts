@@ -1,5 +1,5 @@
 import {Component, EventEmitter, OnInit, Output} from '@angular/core';
-import {MatDialog, MatDialogRef} from "@angular/material";
+import { MatDialog, MatDialogRef } from "@angular/material/dialog";
 import {DateRangeFilterPopupComponent} from "./date-range-filter-popup.component";
 
 @Component({

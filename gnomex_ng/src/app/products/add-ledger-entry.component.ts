@@ -1,7 +1,7 @@
 import {Component, Inject, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 import {ProductsService} from "../services/products.service";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {HttpParams} from "@angular/common/http";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";

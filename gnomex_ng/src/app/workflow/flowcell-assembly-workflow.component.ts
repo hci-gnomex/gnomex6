@@ -1,6 +1,6 @@
 import {Component, ElementRef, OnInit, ViewChild} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {HttpParams} from "@angular/common/http";
 
 import {GridApi, GridSizeChangedEvent} from "ag-grid-community";

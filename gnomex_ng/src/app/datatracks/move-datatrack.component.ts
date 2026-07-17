@@ -1,5 +1,5 @@
 import {Component, Inject} from "@angular/core";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {DataTrackService} from "../services/data-track.service";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";

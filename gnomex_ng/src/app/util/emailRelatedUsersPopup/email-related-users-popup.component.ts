@@ -3,7 +3,7 @@ import {Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {EmailRelatedUsersService} from "./email-related-users.service";
 import {Subscription} from "rxjs";
 import {DialogsService, DialogType} from "../popup/dialogs.service";
-import {MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {BaseGenericContainerDialog} from "../popup/base-generic-container-dialog";
 import {GDAction} from "../interfaces/generic-dialog-action.model";
 import {AngularEditorComponent, AngularEditorConfig} from "@kolkov/angular-editor";

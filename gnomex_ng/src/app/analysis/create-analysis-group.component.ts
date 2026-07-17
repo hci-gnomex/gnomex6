@@ -1,4 +1,4 @@
-import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import {AfterViewInit, ChangeDetectorRef, Component, Inject, OnInit, ViewChild} from "@angular/core";
 import {AnalysisService} from "../services/analysis.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";

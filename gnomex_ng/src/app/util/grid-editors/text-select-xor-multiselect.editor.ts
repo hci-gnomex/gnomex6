@@ -1,6 +1,6 @@
 import { Component } from "@angular/core";
 import {ICellEditorAngularComp} from "ag-grid-angular";
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import {MultipleSelectDialogComponent} from "./popups/multiple-select-dialog.component";
 
 @Component({

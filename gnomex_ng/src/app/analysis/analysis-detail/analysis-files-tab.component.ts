@@ -14,7 +14,7 @@ import {ViewerLinkRenderer} from "../../util/grid-renderers/viewer-link.renderer
 import {DataTrackService} from "../../services/data-track.service";
 import {HttpParams} from "@angular/common/http";
 import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import {FormGroup} from "@angular/forms";
 import {FileService} from "../../services/file.service";
 import {Subscription} from "rxjs";

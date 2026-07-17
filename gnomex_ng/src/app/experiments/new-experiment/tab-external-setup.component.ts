@@ -9,7 +9,7 @@ import {TopicService} from "../../services/topic.service";
 import {OrganismService} from "../../services/organism.service";
 import {UtilService} from "../../services/util.service";
 import {DictionaryService} from "../../services/dictionary.service";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import {CreateProjectComponent} from "../create-project.component";
 import {AppUserListService} from "../../services/app-user-list.service";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";

@@ -1,4 +1,4 @@
-import {DialogPosition, MAT_DIALOG_DATA, MatDialogRef} from "@angular/material";
+import { DialogPosition, MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
 import {
     ChangeDetectorRef,
     Component, ElementRef,

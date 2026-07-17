@@ -1,4 +1,4 @@
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import {Component, Inject, OnInit} from "@angular/core";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {DataTrackService} from "../../../services/data-track.service";

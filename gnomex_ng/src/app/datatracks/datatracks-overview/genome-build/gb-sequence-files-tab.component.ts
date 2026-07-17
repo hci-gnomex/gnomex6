@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from "@angular/core";
 import {FormBuilder} from "@angular/forms"
 import {PrimaryTab} from "../../../util/tabs/primary-tab.component"
 import {ActivatedRoute} from "@angular/router";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {CreateSecurityAdvisorService} from "../../../services/create-security-advisor.service";
 import {GridOptions} from "ag-grid-community";
 import {ConstantsService} from "../../../services/constants.service";

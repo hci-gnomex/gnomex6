@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, ElementRef, ViewChild} from "@angular/core";
 
 import { ICellEditorAngularComp } from "ag-grid-angular";
-import { MatDatepicker } from "@angular/material";
+import { MatDatepicker } from "@angular/material/datepicker";
 
 import {DateRenderer} from "../grid-renderers/date.renderer";
 import { DateParserComponent } from "../parsers/date-parser.component";

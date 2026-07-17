@@ -1,6 +1,6 @@
 import {Component, EventEmitter, Input, OnDestroy, OnInit, Output,ChangeDetectorRef} from "@angular/core";
 import {FormBuilder, FormGroup, Validators} from "@angular/forms";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 
 import {BehaviorSubject, Subscription} from "rxjs";
 import {first} from "rxjs/internal/operators";

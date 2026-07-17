@@ -7,7 +7,7 @@ import {Subscription, throwError} from "rxjs";
 import {DialogsService, DialogType} from "../../util/popup/dialogs.service";
 import {PropertyService} from "../../services/property.service";
 import {ConstantsService} from "../../services/constants.service";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {CollaboratorsDialogComponent} from "./collaborators-dialog.component";
 import {ExperimentsService} from "../experiments.service";
 import {UserPreferencesService} from "../../services/user-preferences.service";

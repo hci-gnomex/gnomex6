@@ -11,7 +11,7 @@ import {AnalysisService} from "../../services/analysis.service";
 import {GnomexStringUtilService} from "../../services/gnomex-string-util.service";
 import {LabListService} from "../../services/lab-list.service";
 import {CreateAnalysisComponent} from "../create-analysis.component";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import {DeleteAnalysisComponent} from "../delete-analysis.component";
 import {ConstantsService} from "../../services/constants.service";
 import {DialogsService} from "../../util/popup/dialogs.service";

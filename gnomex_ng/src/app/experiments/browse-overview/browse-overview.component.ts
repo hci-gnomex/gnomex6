@@ -5,7 +5,7 @@ import {TabContainer} from "../../util/tabs/tab-container.component";
 import {ConstantsService} from "../../services/constants.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {Subscription} from "rxjs";
-import {MatTabChangeEvent, MatTabGroup} from "@angular/material";
+import { MatTabChangeEvent, MatTabGroup } from "@angular/material/tabs";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {UserPreferencesService} from "../../services/user-preferences.service";
 import {HttpParams} from "@angular/common/http";

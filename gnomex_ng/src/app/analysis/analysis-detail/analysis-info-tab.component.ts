@@ -9,7 +9,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 import {ProtocolService} from "../../services/protocol.service";
 import {Subscription} from "rxjs";
 import {GridApi, GridReadyEvent, GridSizeChangedEvent, RowNode} from "ag-grid-community";
-import {MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import { MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import {BrowseDictionaryComponent} from "../../configuration/browse-dictionary.component";
 import {ConfigureOrganismsComponent} from "../../configuration/configure-organisms.component";
 import {PropertyService} from "../../services/property.service";

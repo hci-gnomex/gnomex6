@@ -6,7 +6,7 @@ import {DictionaryService} from "../../services/dictionary.service";
 import {ConstantsService} from "../../services/constants.service";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {GnomexService} from "../../services/gnomex.service";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {SortOrderDialogComponent} from "./sort-order-dialog.component";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {numberRange} from "../../util/validators/number-range-validator";

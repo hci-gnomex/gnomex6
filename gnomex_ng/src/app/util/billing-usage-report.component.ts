@@ -1,6 +1,6 @@
 import {Component, Inject} from '@angular/core';
 import {DOCUMENT} from "@angular/common";
-import {MatDialogRef, MAT_DIALOG_DATA} from "@angular/material";
+import { MatDialogRef, MAT_DIALOG_DATA } from "@angular/material/dialog";
 import {BillingPeriod} from "./billing-period-selector.component";
 import {GDAction} from "./interfaces/generic-dialog-action.model";
 import {BaseGenericContainerDialog} from "./popup/base-generic-container-dialog";

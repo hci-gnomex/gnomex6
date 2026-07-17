@@ -5,7 +5,7 @@ import {ConstantsService} from "../../services/constants.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {Subscription} from "rxjs";
 import {AnalysisService} from "../../services/analysis.service";
-import {MatTabChangeEvent, MatTabGroup} from "@angular/material";
+import { MatTabChangeEvent, MatTabGroup } from "@angular/material/tabs";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";
 import {DialogsService} from "../../util/popup/dialogs.service";
 

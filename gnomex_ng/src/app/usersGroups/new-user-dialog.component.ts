@@ -1,6 +1,6 @@
 import {Component, OnInit} from "@angular/core";
 import {HttpParams} from "@angular/common/http";
-import {MatDialogRef} from "@angular/material";
+import { MatDialogRef } from "@angular/material/dialog";
 import {UserService} from "../services/user.service";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";

@@ -2,7 +2,7 @@ import {Component, Input, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {IAnnotation} from "./interfaces/annotation.model";
 import {selectRequired} from "./validators/select-required.validator";
-import {MatDialogConfig} from "@angular/material";
+import { MatDialogConfig } from "@angular/material/dialog";
 import {BrowseOrderValidateService} from "../services/browse-order-validate.service";
 import {IAnnotationOption} from "./interfaces/annotation-option.model";
 import {AnnotationService} from "../services/annotation.service";

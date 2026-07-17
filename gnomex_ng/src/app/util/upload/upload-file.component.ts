@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
-import { MatDialogRef } from '@angular/material';
+import { MatDialogRef } from '@angular/material/dialog';
 import {GridApi, GridReadyEvent} from "ag-grid-community";
 import {UploadFileService} from "../../services/upload-file.service";
 import {IFileParams} from "../interfaces/file-params.model";

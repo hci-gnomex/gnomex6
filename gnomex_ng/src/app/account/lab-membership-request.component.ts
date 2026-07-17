@@ -1,5 +1,6 @@
 import {Component} from "@angular/core";
-import {MatDialogRef, MatSnackBar} from "@angular/material";
+import { MatDialogRef } from "@angular/material/dialog";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import {LabListService} from "../services/lab-list.service";
 import {LabMembershipRequestService} from "../services/lab-membership-request.service";
 import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-dialog";

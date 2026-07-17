@@ -5,7 +5,7 @@ import {ActivatedRoute} from "@angular/router";
 import {DialogsService} from "../../util/popup/dialogs.service";
 import {ExperimentsService} from "../experiments.service";
 import {FileService} from "../../services/file.service";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.component";
 import {Subscription} from "rxjs";
 import {DownloadFilesComponent} from "../../util/download-files.component";

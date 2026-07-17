@@ -4,7 +4,7 @@ import {CreateSecurityAdvisorService} from "../services/create-security-advisor.
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {PasswordUtilService} from "../services/password-util.service";
 import {AppUserPublicService} from "../services/app-user-public.service";
-import {MatSnackBar} from "@angular/material";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import {LabMembershipRequestComponent} from "./lab-membership-request.component";
 import {DialogsService} from "../util/popup/dialogs.service";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";

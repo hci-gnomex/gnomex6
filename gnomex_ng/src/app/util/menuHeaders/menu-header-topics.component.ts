@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output, SimpleChanges} from '@angular/core';
-import {MatDialogConfig} from '@angular/material';
+import { MatDialogConfig } from '@angular/material/dialog';
 import {NewTopicComponent} from "../new-topic.component";
 import {DeleteTopicComponent} from "../../topics/delete-topic.component";
 import {CreateSecurityAdvisorService} from "../../services/create-security-advisor.service";

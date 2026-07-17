@@ -13,7 +13,7 @@ import {AbstractControl, ControlValueAccessor, FormControl, NG_VALUE_ACCESSOR, N
 import {Subscription} from "rxjs";
 import {UtilService} from "../services/util.service";
 import {debounceTime} from "rxjs/operators";
-import {MatSelect} from "@angular/material";
+import { MatSelect } from "@angular/material/select";
 
 @Component({
     selector: "custom-multi-combo-box",

@@ -3,7 +3,7 @@ import {TabContainer} from "../../../util/tabs/tab-container.component";
 import {GenomeBuildValidateService} from "../../../services/genome-build-validate.service";
 import {DataTrackService} from "../../../services/data-track.service";
 import {DialogsService, DialogType} from "../../../util/popup/dialogs.service";
-import {MatTabChangeEvent} from "@angular/material";
+import { MatTabChangeEvent } from "@angular/material/tabs";
 import {HttpParams} from "@angular/common/http";
 import {IGnomexErrorResponse} from "../../../util/interfaces/gnomex-error.response.model";
 import {Subscription} from "rxjs";

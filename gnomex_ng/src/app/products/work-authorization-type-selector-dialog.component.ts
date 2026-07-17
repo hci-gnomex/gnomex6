@@ -3,7 +3,7 @@ import {GnomexService} from "../services/gnomex.service";
 import {PropertyService} from "../services/property.service";
 import {Router} from "@angular/router";
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";
-import {MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialog, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import {NewBillingAccountComponent} from "../billing/new_billing_account/new-billing-account.component";
 import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 import {ConstantsService} from "../services/constants.service";

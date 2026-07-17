@@ -1,7 +1,9 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild, Input} from "@angular/core";
 
 import {MatDatepicker, MatDatepickerInput} from "@angular/material/datepicker";
-import {MatDialog, MatInput, MatSuffix} from "@angular/material";
+import { MatDialog } from "@angular/material/dialog";
+import { MatSuffix } from "@angular/material/form-field";
+import { MatInput } from "@angular/material/input";
 import {TestingDialogComponent} from "./testing-dialog.component";
 
 @Component({

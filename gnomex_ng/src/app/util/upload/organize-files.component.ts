@@ -27,7 +27,7 @@ import {first} from "rxjs/operators";
 import {ITreeModel,ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {TabChangeEvent} from "../tabs/index";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import {MoveToDialogComponent, MoveToDialogResult, MoveToTarget} from "../move-to-dialog/move-to-dialog.component";
 import {NameFileDialogComponent} from "./name-file-dialog.component";
 import {FileService} from "../../services/file.service";

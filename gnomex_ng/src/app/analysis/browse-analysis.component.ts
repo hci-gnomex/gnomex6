@@ -18,7 +18,7 @@ import * as _ from "lodash";
 import {Subscription} from "rxjs";
 import {ActivatedRoute, NavigationEnd, NavigationExtras, ParamMap, Router} from "@angular/router";
 import {AnalysisService} from "../services/analysis.service";
-import {MatDialog, MatDialogConfig} from "@angular/material";
+import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import {DeleteAnalysisComponent} from "./delete-analysis.component";
 import {ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {LabListService} from "../services/lab-list.service";

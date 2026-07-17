@@ -1,5 +1,5 @@
 import {Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
-import {MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import {Subscription} from "rxjs";
 
 import {DialogsService, DialogType} from "../util/popup/dialogs.service";

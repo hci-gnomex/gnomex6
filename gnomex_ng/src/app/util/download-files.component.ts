@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, ChangeDetectionStrategy, Component, Inject, OnDestroy, OnInit, ViewChild} from "@angular/core";
-import {MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef} from "@angular/material";
+import { MAT_DIALOG_DATA, MatDialogConfig, MatDialogRef } from "@angular/material/dialog";
 import {TreeKeyboardMoveService} from "./accessibility/tree-keyboard-move.service";
 import {AriaAnnouncerService} from "./accessibility/aria-announcer.service";
 import {ConstantsService} from "../services/constants.service";
