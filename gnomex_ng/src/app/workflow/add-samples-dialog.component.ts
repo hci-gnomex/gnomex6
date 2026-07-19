@@ -91,7 +91,7 @@ export class AddSamplesDialogComponent extends BaseGenericContainerDialog implem
 
 
 
-    private columnDefs:any[] = [
+    public columnDefs:any[] = [
         {headerName:"ID", field: "number", width: 150, editable:false },
         {headerName:"Sample Name", field: "sampleName", width: 150, editable:false },
         {headerName:"Sample ID", field: "sampleNumber", width: 125, editable:false },

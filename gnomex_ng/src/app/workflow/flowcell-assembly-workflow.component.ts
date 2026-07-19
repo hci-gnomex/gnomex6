@@ -294,18 +294,18 @@ export class FlowcellAssemblyWorkflowComponent implements OnInit {
     public instrumentList: any[] = [];
 
     private barCodes: any[] = [];
-    private sequenceProtocolsList: any[] = [];
+    public sequenceProtocolsList: any[] = [];
     private experimentTypes: any[];
     private lanes: any[] = [];
-    private selectedSeqlanes: any[] = [];
+    public selectedSeqlanes: any[] = [];
     private workItemList: any[] = [];
 
-    private searchText: string;
+    public searchText: string;
 
     private multiExperimentTypeWarningIsOpen: boolean = false;
     private seqProtocolInactiveWarningIsOpen: boolean = false;
     private redrawRequested: boolean = false;
-    private showSpinner: boolean = false;
+    public showSpinner: boolean = false;
 
     public allFG: FormGroup;
 

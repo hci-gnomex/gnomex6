@@ -150,8 +150,8 @@ export class AnalysisTab extends PrimaryTab implements OnInit {
     private selectedTreeNodeSubscript: Subscription;
     private labList = [];
     private createAnalysisData: any;
-    private enableRemoveAnalysis: boolean = false;
-    private enableCreateAnalysis: boolean = true;
+    public enableRemoveAnalysis: boolean = false;
+    public enableCreateAnalysis: boolean = true;
     private labs: any[] = [];
     private analysisTabNode: any;
 

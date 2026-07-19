@@ -57,7 +57,7 @@ export class DatatracksFilesTabComponent implements OnInit {
     public canWrite: boolean = false;
 
     public filesToRemove: FormControl = new FormControl([]);
-    private selectedFiles: any[] = [];
+    public selectedFiles: any[] = [];
 
     constructor(public constantsService: ConstantsService,
                 private dialogsService: DialogsService,

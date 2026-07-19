@@ -198,9 +198,9 @@ export class TabSeqSetupViewComponent implements OnInit {
     public readonly SEPARATE: string = "separate";
     public readonly POOLED: string = "pooled";
 
-    private useNanoGeoMx: boolean = false;
+    public useNanoGeoMx: boolean = false;
 
-    private form: FormGroup;
+    public form: FormGroup;
 
     private _experiment: Experiment;
 

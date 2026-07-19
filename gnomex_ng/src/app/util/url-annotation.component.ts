@@ -45,7 +45,7 @@ export const URL_ANNOT_VALUE_ACCESSOR: any = {
 })
 export class UrlAnnotationComponent implements OnInit, OnDestroy, ControlValueAccessor{
     public annot:IAnnotation;
-    private urlAnnotations: IPropertyEntryValue[] = [];
+    public urlAnnotations: IPropertyEntryValue[] = [];
     private _onTouched = () =>{};
     private _onChange = (val:any)=>{};
     public urlDisabled:boolean = false;

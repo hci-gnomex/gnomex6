@@ -85,7 +85,7 @@ export class ManageProtocolsComponent extends BaseGenericContainerDialog impleme
     private saveProtocolSubscription: Subscription;
     private deleteProtocolSubscription: Subscription;
 
-    private protocolList: any[];
+    public protocolList: any[];
 
     protected protocolType: string = '';
     protected protocolName: string = '';
@@ -95,7 +95,7 @@ export class ManageProtocolsComponent extends BaseGenericContainerDialog impleme
 
     private experimentPlatformList: any[];
 
-    private treeOptions: ITreeOptions = {
+    public treeOptions: ITreeOptions = {
         idField: "idComposite",
         displayField: "label",
         childrenField: "Protocol"
@@ -256,7 +256,7 @@ export class ManageProtocolsComponent extends BaseGenericContainerDialog impleme
         }
     }
 
-    private treeOnSelect(event: any): void {
+    public treeOnSelect(event: any): void {
         this.disableNew = true;
         this.disableDelete = true;
 
@@ -333,7 +333,7 @@ export class ManageProtocolsComponent extends BaseGenericContainerDialog impleme
         });
     }
 
-    private onNewProtocolButtonClicked() {
+    public onNewProtocolButtonClicked() {
 
         let data: any = {
             protocolType: "",
@@ -362,7 +362,7 @@ export class ManageProtocolsComponent extends BaseGenericContainerDialog impleme
         });
     }
 
-    private onDeleteProtocolButtonClicked() {
+    public onDeleteProtocolButtonClicked() {
         if (this.mostRecentlyDisplayedProtocolId
             && this.mostRecentlyDisplayedProtocolProtocolClassName) {
 
@@ -391,7 +391,7 @@ export class ManageProtocolsComponent extends BaseGenericContainerDialog impleme
         }
     }
 
-    private onRefreshButtonClicked() {
+    public onRefreshButtonClicked() {
         this.refresh();
     }
 

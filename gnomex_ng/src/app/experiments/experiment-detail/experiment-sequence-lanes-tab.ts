@@ -87,7 +87,7 @@ export class ExperimentSequenceLanesTab implements OnInit, OnChanges {
     private samplesGridApi: GridApi;
     public samplesGridColDefs: any[] = [];
     public samplesGridData: any[] = [];
-    private selectedSample: any = null;
+    public selectedSample: any = null;
     public seqLaneFormGroup :FormGroup;
 
     private lanesGridApi: GridApi;

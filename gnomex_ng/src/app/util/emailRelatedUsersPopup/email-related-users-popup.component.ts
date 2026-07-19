@@ -56,8 +56,8 @@ export class EmailRelatedUsersPopupComponent extends BaseGenericContainerDialog 
 
 	@ViewChild("emailEditorRef", {static: true}) emailEditor: AngularEditorComponent;
 	public primaryDisable: (action?: GDAction) => boolean;
-	protected subject: string = "";
-	protected body: string = "";
+	public subject: string = "";
+	public body: string = "";
 
     editorConfig: AngularEditorConfig = {
         height: "15em",

@@ -149,11 +149,11 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
 
     private idBillingPeriodString: string;
 
-    private showSearchTextInput: boolean = false;
+    public showSearchTextInput: boolean = false;
     private searchText: string;
 
-    private showMoreSwitch: boolean = false;
-    private showMore: boolean = false;
+    public showMoreSwitch: boolean = false;
+    public showMore: boolean = false;
 
     private showExternalExperimentsCheckbox: boolean = false;
     private externalExperimentsFlag: boolean = false;
@@ -167,7 +167,7 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     private showRequestCategoryComboBox: boolean = false;
     private requestCategoryList: any[] = [];
 
-    private showOrganismComboBox: boolean = false;
+    public showOrganismComboBox: boolean = false;
     public organismList: any[] = [];
 
     public showGenomeBuildComboBox: boolean = false;
@@ -191,13 +191,13 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
     public showOrderNumberInput: boolean = false;
     private orderNumberString: string;
 
-    private showExperimentNumberInput: boolean = false;
+    public showExperimentNumberInput: boolean = false;
     private experimentNumberString: string;
 
-    private showInvoiceNumberInput: boolean = false;
+    public showInvoiceNumberInput: boolean = false;
     private invoiceNumberString: string;
 
-    private showVisibilityCheckboxes: boolean = false;
+    public showVisibilityCheckboxes: boolean = false;
     private visibilityOwnerFlag: boolean = false ;
     private visibilityInstitutionFlag: boolean = false;
     private visibilityAllLabMembersFlag: boolean = false;

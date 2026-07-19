@@ -33,9 +33,9 @@ import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-d
 })
 export class CreateProtocolDialogComponent extends BaseGenericContainerDialog implements OnInit {
 
-    protected protocolName: string = '';
+    public protocolName: string = '';
 
-    protected protocolClassName: string = '';
+    public protocolClassName: string = '';
     protected selectedIdAnalysisType: string = '';
 
     protected selectedExperimentPlatformCodeRequestCategory: string = '';

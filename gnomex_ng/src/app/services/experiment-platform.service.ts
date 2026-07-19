@@ -8,7 +8,7 @@ import {DictionaryService} from "./dictionary.service";
 import {AbstractControl, FormGroup} from "@angular/forms";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {DialogsService} from "../util/popup/dialogs.service";
-import {ValueGetterParams} from "ag-grid-community/src/ts/entities/colDef";
+import {ValueGetterParams} from "ag-grid-community";
 import {DictionaryEntry} from "../configuration/dictionary-entry.type";
 
 @Injectable()

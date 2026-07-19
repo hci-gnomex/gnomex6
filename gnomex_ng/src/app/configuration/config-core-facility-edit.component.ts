@@ -36,7 +36,7 @@ export class ConfigCoreFacilityEditComponent implements OnInit, OnDestroy {
 
     //Override
     public showSpinner: boolean = false;
-    private coreFacilityForm: FormGroup;
+    public coreFacilityForm: FormGroup;
     private idCoreFacility: string = "";
     private coreListSubscription: Subscription;
     private saveCoreFacilitySubscription : Subscription = new Subscription();
@@ -44,7 +44,7 @@ export class ConfigCoreFacilityEditComponent implements OnInit, OnDestroy {
 
     constructor(protected fb: FormBuilder,
                 private route: ActivatedRoute,
-                private secAdvisor: CreateSecurityAdvisorService,
+                public secAdvisor: CreateSecurityAdvisorService,
                 private configService: ConfigurationService,
                 private strUtilService: GnomexStringUtilService,
                 private dictionaryService: DictionaryService) {

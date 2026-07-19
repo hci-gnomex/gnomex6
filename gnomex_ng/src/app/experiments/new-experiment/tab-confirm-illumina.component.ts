@@ -167,7 +167,7 @@ export class TabConfirmIlluminaComponent implements OnInit, OnDestroy {
     private seqLaneTypeLabel: string;
     private gridApi: GridApi;
     private columnApi: any;
-    private samplesGridConfirmColumnDefs: any;
+    public samplesGridConfirmColumnDefs: any;
     private requestPropsColumnDefs: any;
     private organisms: any[] = [];
 

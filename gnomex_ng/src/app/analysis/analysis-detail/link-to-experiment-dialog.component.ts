@@ -36,7 +36,7 @@ export class LinkToExperimentDialogComponent extends BaseGenericContainerDialog 
     public gridApi:GridApi;
     private idAnalysis:string;
     private idLab:string;
-    private labList:Array<any> = [];
+    public labList:Array<any> = [];
     public selectedAnalysisToLink:any[] =[];
     public showSpinner:boolean = false;
     public primaryDisable: (action?: GDAction) => boolean;

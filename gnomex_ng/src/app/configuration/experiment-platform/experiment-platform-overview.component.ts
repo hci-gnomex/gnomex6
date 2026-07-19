@@ -62,7 +62,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
 
     public readonly rowSelection = "single";
     private rowData = [];
-    private gridOpt:GridOptions = {};
+    public gridOpt:GridOptions = {};
     private selectRowIndex:number = -1 ;
     public  selectedPlatformList:any[] = [];
     public experimentPlatformTabs: any[] = [];
@@ -100,7 +100,7 @@ export class ExperimentPlatformOverviewComponent implements OnInit, OnDestroy{
         'EpExperimentTypeQcTabComponent':{name:'QC Assay', component:EpExperimentTypeQcTabComponent}
     };
 
-    constructor(private secAdvisor:CreateSecurityAdvisorService,
+    constructor(public secAdvisor:CreateSecurityAdvisorService,
                 private constService:ConstantsService,
                 public expPlatformService: ExperimentPlatformService,
                 private dialogService:DialogsService,private dialog:MatDialog,

@@ -46,7 +46,7 @@ export class DistributeDatatrackDialogComponent extends BaseGenericContainerDial
 
     public analysis: any;
     public gridData:any[] = [];
-    private selectAll:boolean  = true;
+    public selectAll:boolean  = true;
     public rowSelection:string = "multiple";
     private idAnalysisFileSet: Set<string>;
 

@@ -25,8 +25,8 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 export class PriceCategoryViewComponent extends BaseGenericContainerDialog implements OnInit {
 
     private allSteps: any[];
-    private allChargeKinds: any[];
-    private allFilterTypes: any[];
+    public allChargeKinds: any[];
+    public allFilterTypes: any[];
 
     public innerTitle: string = "Price Category";
     public form: FormGroup;

@@ -29,11 +29,11 @@ export class DatatracksVisibilityTabComponent implements OnInit, OnDestroy{
     //Override
     public edit = false;
     public visibilityForm: FormGroup;
-    private visRadio:Array<any> = [];
-    private labList:Array<any> = [];
+    public visRadio:Array<any> = [];
+    public labList:Array<any> = [];
     private currentIdLab:string;
     private currentDatatrack:any;
-    private possibleCollaborators:Array<any> = [];
+    public possibleCollaborators:Array<any> = [];
     public selectMode:string = "Select All";
     public isSelectable: boolean = true;
     private _disabled: boolean = false;
@@ -55,7 +55,7 @@ export class DatatracksVisibilityTabComponent implements OnInit, OnDestroy{
     constructor(protected fb: FormBuilder, private dtService: DataTrackService,
                 private route: ActivatedRoute, private secAdvisor: CreateSecurityAdvisorService,
                 private propertyService: PropertyService, private constService: ConstantsService,
-                private gnomexService: GnomexService, private getLabService : GetLabService,
+                private gnomexService: GnomexService, public getLabService : GetLabService,
                 public prefService: UserPreferencesService) {
     }
 

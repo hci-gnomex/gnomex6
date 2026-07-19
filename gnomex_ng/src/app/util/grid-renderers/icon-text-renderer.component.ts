@@ -37,8 +37,8 @@ import {DictionaryService} from "../../services/dictionary.service";
 export class IconTextRendererComponent implements ICellRendererAngularComp, AfterViewInit, OnInit {
 
     private params;
-    private text = "";
-    private iconSource = "";
+    public text = "";
+    public iconSource = "";
 
 
     constructor(private dictionaryService:DictionaryService){

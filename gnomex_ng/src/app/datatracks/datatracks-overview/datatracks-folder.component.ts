@@ -29,8 +29,8 @@ export class DatatracksFolderComponent implements OnInit, AfterViewInit, OnDestr
     public canWrite: boolean = false;
     public showSpinner: boolean = false;
     public editorConfig: AngularEditorConfig;
-    private folderFormGroup: FormGroup;
-    private labList: Array<string> = [];
+    public folderFormGroup: FormGroup;
+    public labList: Array<string> = [];
     private datatracksTreeNodeSubscription : Subscription;
     @ViewChild("descEditorRef", {static: true}) descEditor: AngularEditorComponent;
     // todo need a toggle for editable for datatracks overview detail

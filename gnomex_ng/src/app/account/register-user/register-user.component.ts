@@ -221,7 +221,7 @@ import {ConstantsService} from "../../services/constants.service";
 export class RegisterUserComponent  implements OnInit, OnDestroy{
   private registerUser: IRegisterUser;
   private labs: ISimpleLab[];
-  private isUniversityAuthd: string;
+  public isUniversityAuthd: string;
   private publicNotice: string;
   public siteLogo: string;
   public formGroup: FormGroup;

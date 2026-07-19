@@ -53,12 +53,12 @@ export class BillingFilterComponent implements OnInit {
     private previousChangeEvent: BillingFilterEvent;
 
     @Input() public selectedItem: ITreeNode = null;
-    @Input() private isDirty: boolean = false;
-    @Input() private filterByOrderType: string;
-    @Input() private showRelatedCharges: boolean;
-    @Input() private totalPrice: number;
+    @Input() public isDirty: boolean = false;
+    @Input() public filterByOrderType: string;
+    @Input() public showRelatedCharges: boolean;
+    @Input() public totalPrice: number;
 
-    private billingPeriodString: string;
+    public billingPeriodString: string;
 
     public coreFacilityList: any[] = [];
     private labList: any[] = [];

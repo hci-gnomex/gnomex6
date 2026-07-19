@@ -17,7 +17,7 @@ import {TestingDialogComponent} from "./testing-dialog.component";
 
 	constructor(public dialog: MatDialog) { }
 
-	private openDialog(): void {
+	public openDialog(): void {
 		let dialogRef = this.dialog.open(TestingDialogComponent, {
 			width: '250px',
 			data: {name: this.name, animal: this.animal}

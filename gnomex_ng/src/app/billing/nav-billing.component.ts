@@ -1443,7 +1443,7 @@ export class NavBillingComponent implements OnInit, OnDestroy {
         }
     }
 
-    private refreshPricingGrid(): void {
+    public refreshPricingGrid(): void {
         this.priceTreeGridData = [];
         this.selectedPriceTreeGridItem = null;
 

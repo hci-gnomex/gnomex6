@@ -67,8 +67,8 @@ export class GBSequenceFilesTabComponent extends PrimaryTab implements OnInit, O
     public gridOpt:GridOptions = {};
     public newPage:string;
     public removePage:string;
-    private enableUpload:boolean = true;
-    private enableRemove:boolean = false;
+    public enableUpload:boolean = true;
+    public enableRemove:boolean = false;
     private validSubscription:Subscription;
     private idGenomeBuild:string;
     private datatracksTreeNodeSubscription: Subscription;

@@ -24,7 +24,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 })
 
 export class EditFlowcellDialogComponent extends BaseGenericContainerDialog implements OnInit{
-    private flowCell: any;
+    public flowCell: any;
     private idFlowCell: string;
     public sequenceProtocolsList: any[] = [];
     public flowCellChannels: any[];

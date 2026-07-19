@@ -204,7 +204,7 @@ export class NewExperimentSetupComponent implements OnInit, OnDestroy {
 
     private allAuthorizedBillingAccounts: any[] = [];
 
-    private coreFacility: any;
+    public coreFacility: any;
     private defaultCodeRequestCategory: any = null;
 
     private adminState: string;

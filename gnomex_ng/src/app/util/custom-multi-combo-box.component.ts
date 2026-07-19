@@ -63,10 +63,10 @@ export class CustomMultiComboBoxComponent implements AfterViewInit, OnChanges, O
     @Input() public temporaryPlaceholder: boolean = false;
     @Input() public tooltip: string = "";
 
-    @Input() private options: any[] = [];
+    @Input() public options: any[] = [];
     public includeLoadingOption: boolean = true;
     public loadedOptions: any[] = [];
-    private isSelectOpen: boolean = false;
+    public isSelectOpen: boolean = false;
 
     @Input() private valueField: string;
     @Input() private forceEmitObject: boolean = false;

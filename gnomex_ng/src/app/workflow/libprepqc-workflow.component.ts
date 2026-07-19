@@ -59,13 +59,13 @@ export class LibprepQcWorkflowComponent {
     private workingWorkItemList: any[] = [];
     private changedRowMap: Map<string, any> = new Map<string, any>();
     private emptyRequest = {requestNumber: ""};
-    private dirty: boolean = false;
-    private showSpinner: boolean = false;
-    private workItem: any;
+    public dirty: boolean = false;
+    public showSpinner: boolean = false;
+    public workItem: any;
     private gridApi: GridApi;
     private gridColumnApi;
-    private label: string = "Illumina Library Prep QC";
-    private codeStepNext: string = "";
+    public label: string = "Illumina Library Prep QC";
+    public codeStepNext: string = "";
     private preCodeStepNext: string = "";
 
     private get columnDefs(): any[] {

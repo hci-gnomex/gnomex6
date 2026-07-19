@@ -116,10 +116,10 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
 
     @ViewChild('oneEmWidth') oneEmWidth: ElementRef;
 
-    protected gridApi;
+    public gridApi;
     protected gridColumnApi;
 
-    protected experiments: any[] = [];
+    public experiments: any[] = [];
 
 	private messageSubscription: Subscription;
 	private experimentsSubscription: Subscription;
@@ -130,9 +130,9 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
 	private selectedIdRequests: string[];
 	private changeStatusResponsesReceived: number;
 
-	private enableChanges: boolean = false;
+	public enableChanges: boolean = false;
 
-    private changeStatus: string;
+    public changeStatus: string;
 
     private requestCategories: any[] = [];
 
@@ -142,7 +142,7 @@ export class ExperimentOrdersComponent implements OnInit, AfterViewInit, OnDestr
 
     private emToPxConversionRate: number = 1;
 
-	private dropdownChoices: any[] = [
+	public dropdownChoices: any[] = [
 		{value: "COMPLETE", label: "COMPLETE"},
 		{value: "FAILED", label: "FAILED"},
 		{value: "NEW", label: "NEW"},

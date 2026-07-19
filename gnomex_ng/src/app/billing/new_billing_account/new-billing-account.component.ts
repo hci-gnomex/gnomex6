@@ -1561,7 +1561,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		this.handleConditionalValidators();
 	}
 
-	private onLabListSelection(event: any): void {
+	public onLabListSelection(event: any): void {
 		let coreFacilityApplicable: any[] = [];
 
 		if (event && event.coreFacilities) {
@@ -1618,7 +1618,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		}
 	}
 
-	private onCoreFacilitiesSelected(): void {
+	public onCoreFacilitiesSelected(): void {
 		this.showFundingAgencies = false;
 		if (this.selectedCoreFacilities.length) {
 			// Look through for core facilities which use funding agencies, if there are any, show that dropdown

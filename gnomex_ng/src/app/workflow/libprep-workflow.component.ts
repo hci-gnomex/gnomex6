@@ -60,7 +60,7 @@ export class LibprepWorkflowComponent {
     private gridApi: GridApi;
     private barCodes: any[] = [];
     private coreAdmins: any[] = [];
-    private label = "Illumina Library Prep";
+    public label = "Illumina Library Prep";
     public codeStepNext: string = "";
     private preCodeStepNext: string = "";
 

@@ -126,15 +126,15 @@ export class PipelineWorkflowComponent implements OnInit {
     private workItemList: any[] = [];
     public workingWorkItemList: any[] = [];
     private changedRowMap: Map<string, any> = new Map<string, any>();
-    private dirty: boolean = false;
-    private showSpinner: boolean = false;
+    public dirty: boolean = false;
+    public showSpinner: boolean = false;
     private workItem: any;
     private core: any;
     public gridApi: GridApi;
     private gridColumnApi;
     private pipelineProtoList: any[] = [];
 
-    private label = "Illumina Data Pipeline";
+    public label = "Illumina Data Pipeline";
 
     constructor(public workflowService: WorkflowService,
                 private gnomexService: GnomexService,

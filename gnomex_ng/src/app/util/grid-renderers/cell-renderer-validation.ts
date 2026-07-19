@@ -56,7 +56,7 @@ export abstract class CellRendererValidation implements ICellRendererAngularComp
 
     protected params: any;
 
-    protected errorMessage: string = '';
+    public errorMessage: string = '';
 
     formBuilder: FormBuilder;
 

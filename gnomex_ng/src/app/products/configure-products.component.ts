@@ -61,7 +61,7 @@ export class ConfigureProductsComponent implements OnInit {
     @ViewChild(TreeComponent) private treeComponent: TreeComponent;
     public options: ITreeOptions;
     public nodes: ITreeNode[];
-    private productTypes: any[];
+    public productTypes: any[];
     private products: any[];
     private _treeModel: TreeModel | null = null;
     public get treeModel(): TreeModel | null {

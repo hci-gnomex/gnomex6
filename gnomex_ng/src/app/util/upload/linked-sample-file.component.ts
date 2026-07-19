@@ -762,7 +762,7 @@ export class LinkedSampleFileComponent implements OnInit, AfterViewInit {
         }
     }
 
-    private requestSave():void{
+    public requestSave():void{
         this.fileService.emitSaveManageFiles();
     }
 

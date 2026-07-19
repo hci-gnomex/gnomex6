@@ -107,11 +107,11 @@ export class FlowcellWorkflowComponent implements OnInit {
     }
 
 
-    private workItemList: any[] = [];
+    public workItemList: any[] = [];
     private sequenceProtocolsList: any[] = [];
     private changedRowMap: Map<string, any> = new Map<string, any>();
     public label:string = "Flow Cells";
-    private searchText: string;
+    public searchText: string;
     private dirty: boolean = false;
     private gridApi:GridApi;
     public filterForm: FormGroup;

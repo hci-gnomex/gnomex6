@@ -34,20 +34,20 @@ export class MembershipTabComponent implements OnInit {
 
     public membershipForm: FormGroup;
     private showSpinner: boolean = false;
-    private displayedColumns = ['name'];
+    public displayedColumns = ['name'];
     public membersDataSource: MyDataSource;
     public managersDataSource: MyDataSource;
     public collaboratorsDataSource: MyDataSource;
-    private selectedMemberRowIndex: number = -1;
-    private selectedCollRowIndex: number = -1;
-    private selectedManRowIndex: number = -1;
-    private memberUser: string;
-    private collUser: string;
-    private manUser: string;
+    public selectedMemberRowIndex: number = -1;
+    public selectedCollRowIndex: number = -1;
+    public selectedManRowIndex: number = -1;
+    public memberUser: string;
+    public collUser: string;
+    public manUser: string;
     private membersFC: FormControl;
     private collaboratorsFC: FormControl;
     private managersFC: FormControl;
-    private showInactive: boolean = false;
+    public showInactive: boolean = false;
 
     constructor(private securityAdvisor: CreateSecurityAdvisorService,
                 public prefService: UserPreferencesService) {

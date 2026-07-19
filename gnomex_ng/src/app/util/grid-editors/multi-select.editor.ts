@@ -25,7 +25,7 @@ import {first} from "rxjs/operators";
 	`]
 }) export class MultiSelectEditor implements ICellEditorAngularComp, OnDestroy {
     private params: any;
-    private value: any;
+    public value: any;
     private options: any;
     private optionsValueField: string;
     private optionsDisplayField: string;

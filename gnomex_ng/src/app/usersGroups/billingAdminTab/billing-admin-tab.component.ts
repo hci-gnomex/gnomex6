@@ -29,16 +29,16 @@ export class BillingAdminTabComponent implements OnInit {
 
     public billingForm: FormGroup;
 
-    private billingContactFC: FormControl;
-    private billingContactEmailFC: FormControl;
-    private phoneFC: FormControl;
-    private departmentFC: FormControl;
-    private addressFC: FormControl;
-    private address2FC: FormControl;
-    private cityFC: FormControl;
-    private stateFC: FormControl;
-    private zipFC: FormControl;
-    private countryFC: FormControl;
+    public billingContactFC: FormControl;
+    public billingContactEmailFC: FormControl;
+    public phoneFC: FormControl;
+    public departmentFC: FormControl;
+    public addressFC: FormControl;
+    public address2FC: FormControl;
+    public cityFC: FormControl;
+    public stateFC: FormControl;
+    public zipFC: FormControl;
+    public countryFC: FormControl;
     private selectedState: string;
 
     constructor(private dictionaryService: DictionaryService,

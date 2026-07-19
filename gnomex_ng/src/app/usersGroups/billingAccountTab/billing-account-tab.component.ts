@@ -1661,7 +1661,7 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
      * we need to transcribe changes into the full record.
      * @param eventOrDataHaver
      */
-    private translateChangesOntoAccountRecords(eventOrDataHaver: any): void {
+    public translateChangesOntoAccountRecords(eventOrDataHaver: any): void {
         if (!eventOrDataHaver || !eventOrDataHaver.data || !this._labInfo) {
             return;
         }
@@ -1729,7 +1729,7 @@ export class BillingAccountTabComponent implements OnInit, OnDestroy {
     private markAsPristine(): void {
         this.isDirty = false;
     }
-    private markAsDirty(): void {
+    public markAsDirty(): void {
         this.isDirty = true;
     }
 

@@ -103,7 +103,7 @@ export class VisibilityDetailTabComponent implements OnInit, OnDestroy{
     //Override
     public edit = false;
     public visibilityForm: FormGroup;
-    private visRadio:Array<any> = [];
+    public visRadio:Array<any> = [];
     public currentOrder:any;
     private currentLab:any;
 

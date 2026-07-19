@@ -72,7 +72,7 @@ export class OrderProductsComponent implements OnInit {
     public lab: any;
     public idAppUser: string;
     public idBillingAccount: string;
-    private billingTemplate: BillingTemplate;
+    public billingTemplate: BillingTemplate;
     public grandTotal: number = 0;
 
     public labList: any[] = [];

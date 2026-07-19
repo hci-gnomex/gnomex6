@@ -44,8 +44,8 @@ import {ICellRendererAngularComp} from "ag-grid-angular";
 })
 export class TwoButtonRenderer implements ICellRendererAngularComp {
 
-    protected button1Name: string = 'View';
-    protected button2Name: string = 'Edit';
+    public button1Name: string = 'View';
+    public button2Name: string = 'Edit';
 
     protected params: any;
 

@@ -60,7 +60,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     private emToPxConversionRate1: number = 13;
     private emToPxConversionRate2: number = 13;
 
-    private label = "Illumina Finalize Flow Cell";
+    public label = "Illumina Finalize Flow Cell";
 
 
     private get detailColumnDefs(): any[] {
@@ -221,20 +221,20 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
     private lanes: any[] = [];
     private sequenceProtocolsList: any[] = [];
     private workItemList: any[] = [];
-    private workingWorkItemList: any[] = [];
+    public workingWorkItemList: any[] = [];
     private pipelineProtoList: any[] = [];
 
     private flowCell: any;
     private originalProtocol: any;
 
-    private assmFlowCellNumber: number;
+    public assmFlowCellNumber: number;
 
     // private hideFCConcen: boolean = true;
-    private showSpinner: boolean = false;
+    public showSpinner: boolean = false;
 
     private codeSequencingPlatform: string;
-    private flowCellNumber: string;
-    private flowCellRunFolder: string;
+    public flowCellNumber: string;
+    public flowCellRunFolder: string;
     private idFlowCell: string;
 
     private selectionGridApi: GridApi;
@@ -771,7 +771,7 @@ export class FinalizeWorkflowComponent implements OnInit, AfterViewInit {
         return (uniqueBaseCount >= 3);
     }
 
-    private createFlowCellFileName(): void {
+    public createFlowCellFileName(): void {
         let runFolder: string = '';
         if(this.barcodeFC.value
             && this.runFC.value

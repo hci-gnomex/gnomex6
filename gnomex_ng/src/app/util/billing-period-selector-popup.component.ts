@@ -31,8 +31,8 @@ export class BillingPeriodSelectorPopupComponent implements OnInit {
     public billingPeriodList: BillingPeriod[];
     public currentBillingPeriods: BillingPeriod[] = [];
     public currentYear: number;
-    private minYear: number;
-    private maxYear: number;
+    public minYear: number;
+    public maxYear: number;
 
     constructor(private dialogRef: MatDialogRef<BillingPeriodSelectorPopupComponent>,
                 @Inject(MAT_DIALOG_DATA) private data: any) {

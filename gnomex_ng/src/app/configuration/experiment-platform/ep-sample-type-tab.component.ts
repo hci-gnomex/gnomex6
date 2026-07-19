@@ -227,7 +227,7 @@ export class EpSampleTypeTabComponent implements OnInit, OnDestroy {
     }
 
     constructor(private fb: FormBuilder,
-                private constService: ConstantsService,
+                public constService: ConstantsService,
                 private expPlatfromService: ExperimentPlatformService,
                 private gnomexService: GnomexService,
                 private dictionaryService: DictionaryService,

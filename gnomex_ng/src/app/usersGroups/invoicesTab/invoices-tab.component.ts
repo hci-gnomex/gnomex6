@@ -21,24 +21,24 @@ export class InvoicesTabComponent implements OnInit {
     @Input() label = '';
 
     private cores: any[];
-    private monthInputCtrl: FormControl = new FormControl(new Date(2020,0,1));
+    public monthInputCtrl: FormControl = new FormControl(new Date(2020,0,1));
     private billingPeriods: any[] = [];
 
     private coreFacilityComplete: boolean = true;
     private billingPeriodComplete: boolean = false;
     private complete: BehaviorSubject<boolean> = new BehaviorSubject<boolean> (false);
     private selectedBillingPeriod: any;
-    private billingAccounts: any[] = [];
-    private selectedAccounts: any[] = [];
+    public billingAccounts: any[] = [];
+    public selectedAccounts: any[] = [];
     private invoiceBillingAccountList: string = "";
     private invoiceLabList: string = "";
     private monthString: string;
-    private coreFacilityFC: FormControl;
+    public coreFacilityFC: FormControl;
 
     private minYear: number = 20000;
     private maxYear: number = 0;
-    private min: Date;
-    private max: Date;
+    public min: Date;
+    public max: Date;
 
     constructor(public billingService: BillingService,
                 private dictionaryService: DictionaryService,

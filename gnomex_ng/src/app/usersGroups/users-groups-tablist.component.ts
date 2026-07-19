@@ -180,25 +180,25 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     public institutionToRemove: any = null;
     private institutionsChanged: boolean = false;
 
-    private columnDefs;
+    public columnDefs;
     private labColumnDefs;
     private collColumnDefs;
     private manColumnDefs;
-    private groupsColumnDefs;
+    public groupsColumnDefs;
     private getAppUserListSubscription: Subscription;
     private getGroupListSubscription: Subscription;
     public rowData:Array<any> =[];
-    private gridOptions:GridOptions = {};
+    public gridOptions:GridOptions = {};
     private labGridOptions:GridOptions = {};
     private collGridOptions:GridOptions = {};
     private manGridOptions:GridOptions = {};
-    private groupsGridOptions:GridOptions = {};
-    private rowSelection;
+    public groupsGridOptions:GridOptions = {};
+    public rowSelection;
     private idAppUser;
     private idLab;
     private appUser: any;
     private idCoreFacility: string;
-    private groupsData: any[] = [];
+    public groupsData: any[] = [];
     public labs: any[] = [];
     public collaboratingLabs: any[] = [];
     public managingLabs: any[] = [];
@@ -209,8 +209,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     public isGroupsTab: boolean = false;
     private userForm: FormGroup;
     private groupForm: FormGroup;
-    private selectedUser: any = "";
-    private selectedGroup: any = "";
+    public selectedUser: any = "";
+    public selectedGroup: any = "";
     private isActive: boolean;
     public codeUserPermissionKind: string;
     public coreFacilitiesICanSubmitTo: any[];
@@ -225,8 +225,8 @@ export class UsersGroupsTablistComponent implements AfterViewChecked, OnInit, On
     public externalGroup: boolean = false;
     public groupFormDirty: boolean = false;
     public groupFormValid: boolean = false;
-    private userLabel: string;
-    private groupLabel: string;
+    public userLabel: string;
+    public groupLabel: string;
 
     public passwordFC: FormControl;
     public passwordConfirmFC: FormControl;

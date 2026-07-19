@@ -105,9 +105,9 @@ import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.mod
     public actionType: any = ActionType;
 
     public file: any;
-    protected fileParsed: boolean = false;
-    protected fileUploaded: boolean = false;
-    protected fatalErrorsEncountered: boolean = false;
+    public fileParsed: boolean = false;
+    public fileUploaded: boolean = false;
+    public fatalErrorsEncountered: boolean = false;
     protected showErrorsAndSamplesScreen: boolean = false;
     protected showErrorsAboveSamples: boolean = true;
     protected selectedAll: boolean = true;

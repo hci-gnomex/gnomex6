@@ -803,7 +803,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
 
 
-  private requestSave():void{
+  public requestSave():void{
     this.fileService.emitSaveManageFiles();
   }
 

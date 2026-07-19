@@ -86,7 +86,7 @@ export class EditProtocolComponent implements OnInit, OnDestroy, OnChanges {
 
     public form: FormGroup;
 
-    protected selectedProtocol: any;
+    public selectedProtocol: any;
     protected protocolId: string;
     protected protocolClassName: string;
     protected analysisTypeList: any[];

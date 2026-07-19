@@ -68,9 +68,9 @@ import {ConstantsService} from "../services/constants.service";
 export class ConfigCoreFacilityComponent implements OnInit{
 
     public readonly rowSelection = "single";
-    private rowData = [];
+    public rowData = [];
     private currentRow:number=0;
-    private gridOpt:GridOptions = {};
+    public gridOpt:GridOptions = {};
     private selectRowIndex:number;
 
     columnDefs = [
@@ -84,7 +84,7 @@ export class ConfigCoreFacilityComponent implements OnInit{
     ];
 
 
-    constructor(private secAdvisor:CreateSecurityAdvisorService,
+    constructor(public secAdvisor:CreateSecurityAdvisorService,
                 private configService:ConfigurationService,
                 private constService:ConstantsService){
     }

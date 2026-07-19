@@ -741,42 +741,42 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
         }
     }
 
-    private onGridAllObjectsButtonClicked(): void {
+    public onGridAllObjectsButtonClicked(): void {
         this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultGridForAllObjects();
             this.dialogService.stopAllSpinnerDialogs();
         });
     }
-    private onGridExperimentButtonClicked(): void {
+    public onGridExperimentButtonClicked(): void {
         this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultGridForExperiments();
             this.dialogService.stopAllSpinnerDialogs();
         });
     }
-    private onGridAnalyisButtonClicked(): void {
+    public onGridAnalyisButtonClicked(): void {
         this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultGridForAnalyses();
             this.dialogService.stopAllSpinnerDialogs();
         });
     }
-    private onGridProtocolButtonClicked(): void {
+    public onGridProtocolButtonClicked(): void {
         this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultGridForProtocols();
             this.dialogService.stopAllSpinnerDialogs();
         });
     }
-    private onGridDataTrackButtonClicked(): void {
+    public onGridDataTrackButtonClicked(): void {
         this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultGridForDataTracks();
             this.dialogService.stopAllSpinnerDialogs();
         });
     }
-    private onGridTopicButtonClicked(): void {
+    public onGridTopicButtonClicked(): void {
         this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultGridForTopics();
@@ -1199,35 +1199,35 @@ export class AdvancedSearchComponent extends BaseGenericContainerDialog implemen
     }
 
 
-    private onTreeExperimentButtonClicked(): void {
+    public onTreeExperimentButtonClicked(): void {
         this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultTreeForExperiments();
             this.dialogService.stopAllSpinnerDialogs();
         });
     }
-    private onTreeAnalyisButtonClicked(): void {
+    public onTreeAnalyisButtonClicked(): void {
         this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultTreeForAnalyses();
             this.dialogService.stopAllSpinnerDialogs();
         });
     }
-    private onTreeProtocolButtonClicked(): void {
+    public onTreeProtocolButtonClicked(): void {
         this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultTreeForProtocols();
             this.dialogService.stopAllSpinnerDialogs();
         });
     }
-    private onTreeDataTrackButtonClicked(): void {
+    public onTreeDataTrackButtonClicked(): void {
         this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultTreeForDataTracks();
             this.dialogService.stopAllSpinnerDialogs();
         });
     }
-    private onTreeTopicButtonClicked(): void {
+    public onTreeTopicButtonClicked(): void {
         this.dialogService.startDefaultSpinnerDialog();
         setTimeout(() => {
             this.setupResultTreeForTopics();

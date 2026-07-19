@@ -45,7 +45,7 @@ import {ICellRendererAngularComp} from "ag-grid-angular";
 })
 export class ShowErrorsShowSamplesRenderer implements ICellRendererAngularComp {
 
-    protected button1Name: string = 'Samples';
+    public button1Name: string = 'Samples';
     protected button2Name: string = 'Errors/Warnings';
 
     protected params: any;
@@ -53,7 +53,7 @@ export class ShowErrorsShowSamplesRenderer implements ICellRendererAngularComp {
     protected onClickButton1FunctionName: string = '';
     protected onClickButton2FunctionName: string = '';
 
-    protected showErrors: boolean = false;
+    public showErrors: boolean = false;
 
     agInit(params: any): void {
         this.params = params;

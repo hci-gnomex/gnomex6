@@ -41,7 +41,7 @@ import {ICellRendererAngularComp} from "ag-grid-angular";
 })
 export class LinkButtonRenderer implements ICellRendererAngularComp {
 
-    protected buttonName: string = 'View';
+    public buttonName: string = 'View';
 
     protected params: any;
 

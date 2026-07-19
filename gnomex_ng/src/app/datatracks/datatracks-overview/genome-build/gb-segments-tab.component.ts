@@ -73,14 +73,14 @@ export class GBSegmentsTabComponent extends PrimaryTab implements OnInit, OnDest
     //Override
     name = "Segments";
     private value: number = 0;
-    private rowData: Array<any> = [];
-    private gridOpt: GridOptions = {};
-    private newSegment: string;
-    private removeSegment: string;
-    private importSegment: string;
-    private enableNew: boolean = true;
-    private enableRemove: boolean = false;
-    private enableImport: boolean = true;
+    public rowData: Array<any> = [];
+    public gridOpt: GridOptions = {};
+    public newSegment: string;
+    public removeSegment: string;
+    public importSegment: string;
+    public enableNew: boolean = true;
+    public enableRemove: boolean = false;
+    public enableImport: boolean = true;
     private validSubscription: Subscription;
     private idGenomeBuild: string = '';
     private datatracksTreeNodeSubscription: Subscription;
@@ -93,7 +93,7 @@ export class GBSegmentsTabComponent extends PrimaryTab implements OnInit, OnDest
         this.rowData = importValue;
     }
 
-    private columnDefs = [
+    public columnDefs = [
         {
             headerName: "Name",
             editable: this.editable(),

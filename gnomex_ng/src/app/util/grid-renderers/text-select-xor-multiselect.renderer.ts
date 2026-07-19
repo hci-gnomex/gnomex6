@@ -33,7 +33,7 @@ export class TextSelectXorMultiselectRenderer extends SplitStringToMultipleLines
     public readonly MULTISELECT: string = 'MULTISELECT';
 
     private _displayType: string = this.TEXT;
-    private isTextDisplay: boolean = true;
+    public isTextDisplay: boolean = true;
 
     get displayType(): string {
         return this._displayType;

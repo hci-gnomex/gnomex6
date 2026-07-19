@@ -72,7 +72,7 @@ export class QcWorkflowComponent implements OnInit, OnChanges {
     private preSelectedCore: any;
     private hide260230: boolean = true;
     private gridApi: GridApi;
-    private label: string = "Combined Sample Quality";
+    public label: string = "Combined Sample Quality";
     private codeStepNext: string = "ALL";
 
     public allRequestCategories: any[] = [];

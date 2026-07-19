@@ -8,7 +8,7 @@ import {DialogsService} from "../util/popup/dialogs.service";
 import {DateFilter, GridReadyEvent, NumberFilter, SelectionChangedEvent} from "ag-grid-community";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {HttpParams} from "@angular/common/http";
-import {ValueGetterParams} from "ag-grid-community/src/ts/entities/colDef";
+import {ValueGetterParams} from "ag-grid-community";
 import {IGnomexErrorResponse} from "../util/interfaces/gnomex-error.response.model";
 import {UtilService} from "../services/util.service";
 import {CreateSecurityAdvisorService} from "../services/create-security-advisor.service";
@@ -250,7 +250,7 @@ export class BrowseDictionaryComponent extends BaseGenericContainerDialog implem
     public visibleEntryFields: any[] = [];
     public showSpinner: boolean = false;
     public primaryDisable: (action?: GDAction) => boolean;
-    private isDialog: boolean = false;
+    public isDialog: boolean = false;
     private preSelectedDictionary: any[] = [];
     private preSelectedEntry: string = "";
 

@@ -117,7 +117,7 @@ export class BrowseTopicsComponent implements OnInit, OnDestroy {
 
     private itemsCopy: any = [];
     private dataTreeItemsCopy: any[] = [];
-    private selectedItem: ITreeNode;
+    public selectedItem: ITreeNode;
     private qParamMap:ParamMap;
     private paramMap: ParamMap;
 

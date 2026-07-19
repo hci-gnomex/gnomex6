@@ -84,13 +84,13 @@ export class ProgressBrowseTab extends PrimaryTab implements OnInit, OnDestroy{
     private rpSolexaList: Array<any>=[];
     private rpDNASeqList:Array<any>=[];
     private rpList:Array<any> =[];
-    private progressOptions = [];
+    public progressOptions = [];
     public gridApi: GridApi;
     public readonly MICRO = "Microarray, Sample Quality";
     public readonly IllUMINA = "Illumina";
     public readonly DNASEQ = "DNA Sequencing Core Facility";
-    private selectedOpt: string = "Microarray, Sample Quality";
-    private getNodeChildDetails:any;
+    public selectedOpt: string = "Microarray, Sample Quality";
+    public getNodeChildDetails:any;
     private progressRowData:any[];
 
 
