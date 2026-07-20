@@ -24,7 +24,6 @@ import {
 } from "@circlon/angular-tree-component";
 import {ConstantsService} from "../../services/constants.service";
 import {first} from "rxjs/operators";
-import {ITreeModel,ITreeNode} from "@circlon/angular-tree-component/lib/defs/api";
 import {FormBuilder, FormGroup} from "@angular/forms";
 import {TabChangeEvent} from "../tabs/index";
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
@@ -73,8 +72,8 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
   public uploadOpts:ITreeOptions;
   public organizeFiles: any[];
   public uploadFiles:any[];
-  public organizeSelectedNode:ITreeNode;
-  public uploadSelectedNode:ITreeNode;
+  public organizeSelectedNode:TreeNode;
+  public uploadSelectedNode:TreeNode;
   public formGroup: FormGroup;
   public removedChildren: Set<string> = new Set();
   public splitOrgSize:number;
@@ -423,7 +422,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
         return node.level > 1
       },
       allowDrop: (element, item: {parent: any, index}) => {
-        let parent = <ITreeNode>item.parent;
+        let parent = <TreeNode>item.parent;
         if((this.organizeTree.treeModel.roots[0].id === parent.id) || parent.data.type === 'dir' ) {
           return true;
         }else{
@@ -568,7 +567,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
       otherTreeFocusedNode.setIsActive(false);
     }
 
-    this.uploadSelectedNode = (event.node as ITreeNode);
+    this.uploadSelectedNode = (event.node as TreeNode);
     this.disableRemove = false;
   }
   uploadTreeOnUnselect(event:any){
@@ -582,7 +581,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     if(otherTreeFocusedNode){
       otherTreeFocusedNode.setIsActive(false);
     }
-    this.organizeSelectedNode = (event.node as ITreeNode);
+    this.organizeSelectedNode = (event.node as TreeNode);
     const isRoot = this.organizeSelectedNode.parent === null || this.organizeSelectedNode.level === 1;
     this.disableRename = isRoot;
     this.disableRemove = isRoot;
@@ -604,7 +603,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
     }
   };
 
-  datatrackSelectedFile(nodes:ITreeNode[]):boolean{
+  datatrackSelectedFile(nodes:TreeNode[]):boolean{
     let hasDataTrack:boolean = false;
     for(let n of nodes){
       if(n.data.hasDataTrack === 'Y'){
@@ -669,14 +668,14 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
   }
 
-  remove(treeRemovedFrom:string, nodes:ITreeNode[], move:boolean){
+  remove(treeRemovedFrom:string, nodes:TreeNode[], move:boolean){
     for(let node of nodes){
       if(treeRemovedFrom === 'organize' && node.isRoot ){
         continue;
       }
 
       let id:any = '';
-      let parentNode: ITreeNode = node.parent;
+      let parentNode: TreeNode = node.parent;
       //let tree:TreeComponent = null;
       let children: any[] = [];
 
@@ -714,7 +713,7 @@ export class OrganizeFilesComponent implements OnInit, AfterViewInit{
 
   attemptRemove(move:boolean = false){
     let treeRemovedFrom:string = '';
-    let nodes:ITreeNode[] = null;
+    let nodes:TreeNode[] = null;
 
 
     if(this.isLastSelectOrgTree){
