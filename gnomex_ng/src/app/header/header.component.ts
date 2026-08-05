@@ -30,6 +30,7 @@ import {ManageLinksComponent} from "./manageLinks/manage-links.component";
 import {EmailAllUsersComponent} from "../reports/email-all-users.component";
 import {first} from "rxjs/operators";
 import {BrowseDictionaryComponent} from "../configuration/browse-dictionary.component";
+import {environment} from '../../environments/environment';
 
 @Component({
     selector: "gnomex-header",
@@ -141,6 +142,8 @@ export class HeaderComponent implements OnInit, OnDestroy, AfterViewChecked {
 
     options: FormGroup;
     private readonly serviceParams: any;
+
+    currentApplicationVersion = environment.appVersion;
 
     constructor(private authenticationService: AuthenticationService,
                 private progressService: ProgressService,

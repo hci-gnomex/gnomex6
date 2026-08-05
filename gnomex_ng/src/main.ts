@@ -1,8 +1,12 @@
 /*
  * Copyright (c) 2016 Huntsman Cancer Institute at the University of Utah, Confidential and Proprietary
  */
-import {platformBrowserDynamic} from "@angular/platform-browser-dynamic";
-import {enableProdMode} from '@angular/core';
+
+// Add this import at the very top of your main.ts file
+import '@angular/compiler';
+
+import { enableProdMode } from '@angular/core';
+import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { environment } from "./environments/environment";
 import {GnomexAppModule} from "./app/gnomex-app.module";
 import {BootController} from "./boot-control";
