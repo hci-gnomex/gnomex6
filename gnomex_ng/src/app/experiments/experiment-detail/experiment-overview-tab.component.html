@@ -27,24 +27,71 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="field-width align-center flex-container-row padded" role="group" aria-labelledby="projectLabel">
                         <div class="label label-width" id="projectLabel">
                             Project
                         </div>
                         <div class="flex-grow">
-                          <div
-                            [matTooltip]="_experiment?.project?.Project?.name || ''"
-                            [matTooltipDisabled]="false">
-                                <custom-combo-box class="full-width" (optionSelected)="onChange_project($event)"
+                            <div [matTooltip]="_experiment?.project?.Project?.name || ''"
+                                [matTooltipDisabled]="false">
+                                    <custom-combo-box class="full-width" (optionSelected)="onChange_project($event)"
                                                   [disabled]="disableProject"
                                                   [options]="projectsDictionary" displayField="name" valueField="idProject"
                                                   [(ngModel)]="_experiment.idProject" [ngModelOptions]="{standalone: true}"
                                                   aria-labelledby="projectLabel"
                                                   aria-describedby="projectLabel">
-                                </custom-combo-box>
+                                    </custom-combo-box>
                             </div>
                         </div>
                     </div>
+
+                    <div class="field-width align-center flex-container-row padded" role="group" aria-labelledby="ownedByLabel">
+                        <div class="label label-width" id="ownedByLabel">
+                          Owwned by
+                        </div>
+                        <div class="flex-grow">
+                          <div [matTooltip]="_experiment?.ownerName">
+                                <custom-combo-box class="full-width" (optionSelected)="onChange_owner($event)" valueField="idAppUser"
+                                          [options]="possibleOwnersForLabDictionary" [displayField]="this.prefService.userDisplayField"
+                                          formControlName="idAppUser"
+                                          aria-labelledby="ownedByLabel">
+                                </custom-combo-box>
+                          </div>
+                        </div>
+                    </div>
+                    <div class="field-width align-center flex-container-row padded" role="group" aria-labelledby="submittedByLabel">
+                        <div class="label label-width" id="submittedByLabel">
+                          {{ isExternal ? 'Registered by' : 'Submitted by' }}
+                        </div>
+                        <div class="flex-grow">
+                          <div [matTooltip]="_experiment?.submitterName">
+                              <custom-combo-box class="full-width" (optionSelected)="onChange_submitter($event)" valueField="idAppUser"
+                                          [disabled]="disableSubmitter"
+                                          [options]="possibleSubmittersForLabDictionary" [displayField]="this.prefService.userDisplayField"
+                                          [(ngModel)]="_experiment.idSubmitter" [ngModelOptions]="{standalone: true}"
+                                          [attr.aria-labelledby]="'submittedByLabel'">
+                              </custom-combo-box>
+                          </div>
+                        </div>
+                    </div>
+                    <div *ngIf="_experiment?.email" class="field-width align-center flex-container-row padded" role="group" aria-labelledby="emailLabel">
+                        <div class="label label-width" id="emailLabel">
+                          Email
+                        </div>
+                        <div class="flex-grow" aria-labelledby="emailLabel">
+                      `   {{ _experiment?.email }}
+                        </div>
+                    </div>
+                    <div class="field-width align-center flex-container-row padded" role="group" aria-labelledby="phoneLabel">
+                        <div class="label label-width" id="phoneLabel">
+                          Phone
+                        </div>
+                        <div class="flex-grow" aria-labelledby="phoneLabel">
+                          {{ _experiment?.phone }}
+                        </div>
+                    </div>
+
                     <div class="field-width align-center flex-container-row padded" role="group" aria-labelledby="nameLabel">
                         <div class="label label-width" id="nameLabel">
                             Name
@@ -55,13 +102,11 @@
                     </div>
 
                     <div class="field-width align-center flex-container-row padded" role="group" aria-labelledby="experimentLabel">
-                        <div class="full-height label label-width" id="experimentLabel">
+                        <div class="label label-width" id="experimentLabel">
                             Experiment
                         </div>
-                        <div class="flex-grow">
-                            <div class="full-width" aria-labelledby="experimentLabel">
-                                {{ requestCategoryName }}
-                            </div>
+                        <div class="flex-grow" aria-labelledby="experimentLabel">
+                            {{ requestCategoryName }}
                         </div>
                     </div>
                     <div *ngIf="this._experiment.codeRequestCategory == 'XENIUM' && this._experiment.idXeniumGenePanel?.length > 0 && this.xeniumGenePanel?.length > 0" class="field-width align-center flex-container-row padded" role="group" aria-labelledby="genePanelLabel">
@@ -115,6 +160,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="field-width align-center flex-container-row padded" role="group" aria-labelledby="organismLabel">
                         <div class="label label-width" id="organismLabel">
                             Organism
@@ -150,53 +196,7 @@
                 </div>
                 <div class="full-width horizontal-spacing">
                 </div>
-                <div class="flex-container-col" role="group" aria-label="Owner and Contact Information">
-                    <div class="field-width align-center flex-container-row padded" role="group" aria-labelledby="ownedByLabel">
-                        <div class="label label-width" id="ownedByLabel">
-                            Owned by
-                        </div>
-                        <div class="flex-grow">
-                            <div [matTooltip]="_experiment?.ownerName">
-                                <custom-combo-box class="full-width" (optionSelected)="onChange_owner($event)" valueField="idAppUser"
-                                                  [options]="possibleOwnersForLabDictionary" [displayField]="this.prefService.userDisplayField"
-                                                  formControlName="idAppUser"
-                                                  aria-labelledby="ownedByLabel">
-                                </custom-combo-box>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="field-width align-center flex-container-row padded" role="group" aria-labelledby="submittedByLabel">
-                        <div class="label label-width" id="submittedByLabel">
-                            {{ isExternal ? 'Registered by' : 'Submitted by' }}
-                        </div>
-                        <div class="flex-grow">
-                            <div [matTooltip]="_experiment?.submitterName">
-                                <custom-combo-box class="full-width" (optionSelected)="onChange_submitter($event)" valueField="idAppUser"
-                                                  [disabled]="disableSubmitter"
-                                                  [options]="possibleSubmittersForLabDictionary" [displayField]="this.prefService.userDisplayField"
-                                                  [(ngModel)]="_experiment.idSubmitter" [ngModelOptions]="{standalone: true}"
-                                                  [attr.aria-labelledby]="'submittedByLabel'">
-                                </custom-combo-box>
-                            </div>
-                        </div>
-                    </div>
-                    <div *ngIf="_experiment?.email" class="field-width align-center flex-container-row padded" role="group" aria-labelledby="emailLabel">
-                        <div class="label label-width" id="emailLabel">
-                            Email
-                        </div>
-                        <div class="flex-grow" aria-labelledby="emailLabel">
-                            {{ _experiment?.email }}
-                        </div>
-                    </div>
-                    <div class="field-width align-center flex-container-row padded" role="group" aria-labelledby="phoneLabel">
-                        <div class="label label-width" id="phoneLabel">
-                            Phone
-                        </div>
-                        <div class="flex-grow" aria-labelledby="phoneLabel">
-                            {{ _experiment?.phone }}
-                        </div>
-                    </div>
-                </div>
+
             </div>
             <div *ngIf="processedWorkflowSteps && processedWorkflowSteps.length > 0" class="full-width max-width bordered padded margin-top-bottom" role="region" aria-labelledby="orderStatusLabel">
                 <div class="label" id="orderStatusLabel">
@@ -223,5 +223,6 @@
                 </div>
             </div>
         </div>
+
     </div>
 </form>

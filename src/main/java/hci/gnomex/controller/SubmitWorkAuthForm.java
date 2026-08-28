@@ -67,7 +67,7 @@ public class SubmitWorkAuthForm extends GNomExCommand implements Serializable {
 			try {
 				SAXBuilder sax               = new SAXBuilder();
 				Document   coreFacilitiesDoc = sax.build(reader);
-				coreFacilityParser = new LabCoreFacilityParser(coreFacilitiesDoc);
+				coreFacilityParser = new LabCoreFacilityParser(coreFacilitiesDoc);	// **********************************************************
 
 			}
 			catch (JDOMException je) {
