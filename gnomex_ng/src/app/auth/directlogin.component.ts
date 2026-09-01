@@ -493,10 +493,10 @@ export class DirectLoginComponent implements OnInit {
                     this._authenticationService.requestAccessToken(true);
                   }
                 } else {
-                  this._errorMsg = 'UID recognized, but account has been inactivated. Please continue with "Guest Login" and contact your lab\'s Core Administrator or GNomEx Support';
+                  this._errorMsg = 'UnID recognized, but account has been inactivated. Please continue with "Guest Login" and contact your lab\'s Core Administrator or GNomEx Support';
                 }
               } else {
-                this._errorMsg = 'That UID, while valid, does not belong to any labs. Please create an account or click "Guest Login"';
+                this._errorMsg = 'That UnID, while valid, does not belong to any labs. Please create an account or click "Guest Login"';
               }
             });
           } else {

@@ -647,13 +647,15 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 
 			this.formGroup.get("lab").setValue(null);
 
-			for (let lab of this.labList) {
-				if (lab.idLab === this._rowData.idLab) {
-					this.formGroup.get("lab").setValue(lab);
-					this.onLabLoad(lab);
-					break;
+			setTimeout(() => {
+				for (let lab of this.labList) {
+					if (lab.idLab === this._rowData.idLab) {
+						this.formGroup.get("lab").setValue(lab);
+						this.onLabLoad(lab);
+						break;
+					}
 				}
-			}
+			});
 
 			// This timeout is important to the sorting of the Core Facility list, for some reason.
 			setTimeout(() => {
@@ -669,7 +671,7 @@ export class NewBillingAccountComponent extends BaseGenericContainerDialog imple
 		});
 	}
 
-	private onLabLoad(lab: any): void {
+	private onLabLoad(lab: any): void {           //***********************
 		let coreFacilityApplicable: any[] = [];
 
 		if (lab && lab.coreFacilities) {

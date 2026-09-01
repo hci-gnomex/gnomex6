@@ -242,7 +242,7 @@ export class AuthenticationService {
   }
 
   /**
-   * Verifies whether or not a current user session exists.
+   * Verifies whether  a current user session exists.
    *
    * @returns {Observable<boolean>} evaluates to true if the user is authenticated, false otherwise.
    */
@@ -283,7 +283,7 @@ export class AuthenticationService {
   }
 
   /**
-   * A function to authenticated the user with the provided credentials. Failure results in an error that describes the
+   * A function to authenticate the user with the provided credentials. Failure results in an error that describes the
    * server response (status and status message) and should be actionable by the client application.
    *
    * @param _username of the authenticating user to verify

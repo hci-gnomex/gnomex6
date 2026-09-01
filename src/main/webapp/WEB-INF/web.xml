@@ -20,7 +20,7 @@
 
 	<context-param>
 		<param-name>html5-push-state-filter-target</param-name>
-		<param-value>/index.07.01.07.html</param-value>
+		<param-value>/index.html</param-value>
 	</context-param>
 
 	<context-param>
@@ -733,7 +733,7 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
-	<!-- Session timeout set to 4 hours -->
+	<!-- Session timeout set to 24 hours -->
 	<session-config>
 		<session-timeout>1440</session-timeout>
 		<cookie-config>
@@ -746,7 +746,7 @@
 
 
 	<welcome-file-list>
-		<welcome-file>index.07.01.07.html</welcome-file>
+		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>
 
 	<resource-ref>
