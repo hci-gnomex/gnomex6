@@ -359,6 +359,14 @@
 	</servlet>
 
 	<servlet>
+		<servlet-name>MakeChartOScopeLinks</servlet-name>
+		<servlet-class>
+			hci.gnomex.controller.MakeChartOScopeLinks
+		</servlet-class>
+	</servlet>
+
+
+	<servlet>
 		<servlet-name>ApproveUser</servlet-name>
 		<servlet-class>
 			hci.gnomex.controller.ApproveUser
@@ -638,6 +646,11 @@
 	<servlet-mapping>
 		<servlet-name>MakeDataTrackIGVLink</servlet-name>
 		<url-pattern>/MakeDataTrackIGVLink.gx</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>MakeChartOScopeLinks</servlet-name>
+		<url-pattern>/MakeChartOScopeLinks.gx</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>

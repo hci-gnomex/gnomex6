@@ -82,10 +82,7 @@ public class MakeDataTrackLinks extends GNomExCommand implements Serializable {
     try {
 
       Session sess = HibernateSession.currentSession(this.getSecAdvisor().getUsername());
-      baseDir =
-          PropertyDictionaryHelper.getInstance(sess)
-              .getDirectory(
-                  serverName, null, PropertyDictionaryHelper.PROPERTY_DATATRACK_DIRECTORY);
+      baseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null, PropertyDictionaryHelper.PROPERTY_DATATRACK_DIRECTORY);
       analysisBaseDir =
           PropertyDictionaryHelper.getInstance(sess)
               .getDirectory(serverName, null, PropertyDictionaryHelper.PROPERTY_ANALYSIS_DIRECTORY);
@@ -93,13 +90,7 @@ public class MakeDataTrackLinks extends GNomExCommand implements Serializable {
           PropertyDictionaryHelper.getInstance(sess)
               .getProperty(PropertyDictionary.USE_ALT_REPOSITORY);
       if (use_altstr != null && use_altstr.equalsIgnoreCase("yes")) {
-        analysisBaseDir =
-            PropertyDictionaryHelper.getInstance(sess)
-                .getDirectory(
-                    serverName,
-                    null,
-                    PropertyDictionaryHelper.ANALYSIS_DIRECTORY_ALT,
-                    this.getUsername());
+        analysisBaseDir = PropertyDictionaryHelper.getInstance(sess).getDirectory(serverName, null, PropertyDictionaryHelper.ANALYSIS_DIRECTORY_ALT, this.getUsername());
       }
       dataTrackFileServerURL =
           PropertyDictionaryHelper.getInstance(sess)
@@ -132,9 +123,7 @@ public class MakeDataTrackLinks extends GNomExCommand implements Serializable {
       // We have to serve files from Tomcat, so use das2 base url
       baseURL = dataTrackFileServerURL;
 
-      if (pathName != null
-          || this.getSecAdvisor()
-              .canRead((DataTrack) sess.load(DataTrack.class, idDataTrack))) {
+      if (pathName != null || this.getSecAdvisor().canRead((DataTrack) sess.load(DataTrack.class, idDataTrack))) {
 
         // make links fetching url(s)
         ArrayList<String> urlsToLink = makeURLLinks(sess);
@@ -200,8 +189,7 @@ public class MakeDataTrackLinks extends GNomExCommand implements Serializable {
           }
         }
 
-        System.out.println(
-            "\n[MakeDataTrackLinks] requestType: " + requestType + " urlsToLink: " + theURL + "\n");
+        System.out.println("\n[MakeDataTrackLinks] requestType: " + requestType + " urlsToLink: " + theURL + "\n");
         this.jsonResult =
             Json.createObjectBuilder()
                 .add("result", "SUCCESS")
