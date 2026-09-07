@@ -359,9 +359,9 @@
 	</servlet>
 
 	<servlet>
-		<servlet-name>MakeChartOScopeLinks</servlet-name>
+		<servlet-name>MakeCartOScopeLinks</servlet-name>
 		<servlet-class>
-			hci.gnomex.controller.MakeChartOScopeLinks
+			hci.gnomex.controller.MakeCartOScopeLinks
 		</servlet-class>
 	</servlet>
 
@@ -649,8 +649,8 @@
 	</servlet-mapping>
 
 	<servlet-mapping>
-		<servlet-name>MakeChartOScopeLinks</servlet-name>
-		<url-pattern>/MakeChartOScopeLinks.gx</url-pattern>
+		<servlet-name>MakeCartOScopeLinks</servlet-name>
+		<url-pattern>/MakeCartOScopeLinks.gx</url-pattern>
 	</servlet-mapping>
 
 	<servlet-mapping>
