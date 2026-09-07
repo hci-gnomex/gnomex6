@@ -268,6 +268,20 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         });
     }
 
+    makeCartOScopeLinks() {
+
+        this.showSpinner = true;
+        let params: HttpParams = new HttpParams().set("requestType", "CARTOSCOPE")
+            .set("idDataTrack", this.datatrack.idDataTrack);
+
+        this.dataTrackService.makeCartOScopeLinks(params).pipe(first()).subscribe(resp => {
+            this.showSpinner = false;
+            if (resp ) {
+            }
+        }, (err:IGnomexErrorResponse) => {
+            this.showSpinner = false;
+        });
+    }
     destroyLinks(): void {
         this.showSpinner = true;
         this.dataTrackService.destroyLinks().pipe(first())

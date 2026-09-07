@@ -3,7 +3,7 @@
   "description": "The Gnomex Ng application",
   "repository": "https://github.com/hci-gnomex/gnomex.git",
   "private": true,
-  "version": "7.0.23",
+  "version": "7.0.25",
   "scripts": {
     "ng": "ng",
     "start": "ng serve -c developmentTomcat --proxy-config proxy.conf.json",

@@ -24,6 +24,8 @@ import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.*;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 public class MakeCartOScopeLinks extends HttpServlet {
 
@@ -53,6 +55,12 @@ public class MakeCartOScopeLinks extends HttpServlet {
 
     }
 
+    protected void doPOST(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doGet(request, response);
+    }
+
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -60,7 +68,7 @@ public class MakeCartOScopeLinks extends HttpServlet {
         System.out.println("[MakeCartOScopeLinks] serverName " + serverName);
 
         username = request.getRemoteUser();
-        System.out.println("[MakeCartOScopeLinks] username1 " + username);
+        System.out.println("[MakeCartOScopeLinks] username: " + username);
 
         if (request.getParameter("idAnalysis") != null) {
             idAnalysis = Integer.valueOf(request.getParameter("idAnalysis"));
@@ -68,9 +76,11 @@ public class MakeCartOScopeLinks extends HttpServlet {
         }
 
         // the catalog.yaml file
+        String catalogPathEnc = null;
         if (request.getParameter("catalogPath") != null && !request.getParameter("catalogPath").equals("")) {
-            catalogPath = request.getParameter("catalogPath");
-            System.out.println("[MakeCartOScopeLinks] catalogPath: " + catalogPath);
+            catalogPathEnc = request.getParameter("catalogPath");
+            catalogPath = URLDecoder.decode(catalogPathEnc, StandardCharsets.UTF_8.name());
+            System.out.println("[MakeCartOScopeLinks] catalogPath: " + catalogPath + " catalogPathEnc: " + catalogPathEnc);
         }
 
         // the analysisName

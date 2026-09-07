@@ -154,13 +154,13 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
                 }
             },
             {
-                headerName: "IOBIO",
+                headerName: "CARTOSCOPE",
                 field: "BAMIOBIOViewer",
                 width: 90,
                 cellRendererFramework: ViewerLinkRenderer,
                 cellRendererParams: {
-                    icon: this.constantsService.ICON_IOBIO,
-                    clickFunction: this.makeIOBIOLink
+                    icon: this.constantsService.ICON_CARTOSCOPE,
+                    clickFunction: this.makeCartOScopeLinks
                 }
             },
             {
@@ -307,13 +307,12 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         });
     }
 
-    private makeIOBIOLink: (data: any) => void = (data: any) => {
+    private makeCartOScopeLinks: (data: any) => void = (data: any) => {
         let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
-            .set("requestType", "IOBIO")
-            .set("pathName", data.fileName);
-        this.dataTrackService.makeIOBIOLink(params).subscribe((result: any) => {
-            if (result && result.urlsToLink) {
-                window.open(result.urlsToLink, "_blank");
+            .set("requestType", "CARTOSCOPE")
+            .set("catalogPath", data.fileName);
+        this.dataTrackService.makeCartOScopeLinks(params).subscribe((result: any) => {
+            if (result) {
             }
         },(err:IGnomexErrorResponse) =>{
             this.handleBackendLinkError(err.gError);

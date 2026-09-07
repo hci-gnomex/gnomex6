@@ -93,6 +93,7 @@ export class ConstantsService {
     public readonly ICON_UCSC: string = "assets/ucscFavicon.png";
     public readonly ICON_IGV: string = "assets/igv.png";
     public readonly ICON_IOBIO: string = "assets/iobio.png";
+    public readonly ICON_CARTOSCOPE: string = "assets/icon_cartoscope.png";
     public readonly ICON_LINK: string = "assets/icon_link.gif";
     public readonly ICON_DELETE_LINK: string = "assets/link_delete.png";
     public readonly ICON_DOWNLOAD: string = "assets/download.png";
