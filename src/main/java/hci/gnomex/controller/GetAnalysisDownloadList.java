@@ -405,7 +405,7 @@ public class GetAnalysisDownloadList extends GNomExCommand implements Serializab
                     fdNode.setAttribute("IGVViewer", fd.getIsIGVViewerAllowed());
                     fdNode.setAttribute("BAMIOBIOViewer", fd.getIsBAMIOBIOViewerAllowed());
                     fdNode.setAttribute("URLLinkAllowed", fd.getIsURLLinkAllowed());
-                    fdNode.setAttribute("CARTOSCOPEAllowed", fd.getIsCARTOSCOPEViewerAllowed());
+                    fdNode.setAttribute("CARTOSCOPEViewer", fd.getIsCARTOSCOPEViewerAllowed());
                     fdNode.setAttribute("GENEIOBIOViewer", fd.getIsGENELinkAllowed());
                     fdNode.setAttribute("PROTECTED", fd.isProtected());
                     fdNode.setAttribute("viewURL", fd.getViewURL(viewType) != null ? fd.getViewURL(viewType) : "");
@@ -533,7 +533,7 @@ public class GetAnalysisDownloadList extends GNomExCommand implements Serializab
             childFdNode.setAttribute("IGVViewer", childFd.getIsIGVViewerAllowed());
             childFdNode.setAttribute("BAMIOBIOViewer", childFd.getIsBAMIOBIOViewerAllowed());
             childFdNode.setAttribute("URLLinkAllowed", childFd.getIsURLLinkAllowed());
-            childFdNode.setAttribute("CARTOSCOPEAllowed", childFd.getIsCARTOSCOPEViewerAllowed());
+            childFdNode.setAttribute("CARTOSCOPEViewer", childFd.getIsCARTOSCOPEViewerAllowed());
 
             childFdNode.setAttribute("GENEIOBIOViewer", childFd.getIsGENELinkAllowed());
             childFdNode.setAttribute("PROTECTED", childFd.isProtected());

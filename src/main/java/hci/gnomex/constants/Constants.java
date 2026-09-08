@@ -108,7 +108,7 @@ public class Constants {
 	    ".cram.crai",
         ".cram",".crai",
 		".bam", ".bai", ".useq", ".bb", ".bw", ".bed", ".bgr", ".brs", ".gff", ".gtf", ".vcf.gz", ".vcf.gz.tbi",
-		".narrowPeak", ".broadPeak", ".gappedPeak", ".ped", ".bed.gz", ".bed.gz.tbi" };
+		".narrowPeak", ".broadPeak", ".gappedPeak", ".ped",".bed.gz", ".bed.gz.tbi" };
 
   public static final String[] DATATRACK_FILE_EXTENSIONS_NO_INDEX = new String[] { ".bam", ".cram",".useq", ".bb", ".bw", ".bed.gz",".bed",
 		".bgr", ".brs", ".gff", ".gtf", ".vcf.gz", ".narrowPeak", ".broadPeak", ".gappedPeak", ".ped" };

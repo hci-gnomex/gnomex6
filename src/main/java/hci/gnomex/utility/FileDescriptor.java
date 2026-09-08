@@ -103,6 +103,7 @@ public class FileDescriptor extends DetailObject implements Serializable {
 				break;
 			}
 		}
+
 		// any found? if not then do as before
 		if (ext.equals("")) {
 			String[] fileParts = file.getName().split("\\.");
