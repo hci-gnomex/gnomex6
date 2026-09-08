@@ -550,6 +550,19 @@ public class FileDescriptor extends DetailObject implements Serializable {
 		return (found ? "Y" : "N");
 	}
 
+	public String getIsCARTOSCOPEViewerAllowed() {
+		boolean found = false;
+		if (this.getType() != null) {
+			String extension = "." + this.getType();
+
+			if (extension.equalsIgnoreCase(Constants.CARTOSCOPE_FILE_EXTENSION)) {
+				found = true;
+			}
+		}
+
+		return (found ? "Y" : "N");
+	}
+
 	public String getIsGENELinkAllowed() {
 		boolean found = false;
 		if (this.getType() != null) {

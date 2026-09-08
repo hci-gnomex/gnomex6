@@ -73,6 +73,8 @@ public class Constants {
 
   public static final String PED_FILE_EXTENSION = ".ped";
 
+  public static final String CARTOSCOPE_FILE_EXTENSION = ".yaml";
+
   public static final String   GENE_IOBIO_URL                                 = "http://gene.iobio.io";
 
   public static final String   UCSC_URL                                       = "http://genome.ucsc.edu";

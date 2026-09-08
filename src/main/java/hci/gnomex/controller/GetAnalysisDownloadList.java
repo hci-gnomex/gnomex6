@@ -266,6 +266,7 @@ public class GetAnalysisDownloadList extends GNomExCommand implements Serializab
                             fdNode.setAttribute("UCSCViewer", fd.getIsUCSCViewerAllowed());
                             fdNode.setAttribute("IGVViewer", fd.getIsIGVViewerAllowed());
                             fdNode.setAttribute("BAMIOBIOViewer", fd.getIsBAMIOBIOViewerAllowed());
+                            fdNode.setAttribute("CARTOSCOPEViewer", fd.getIsCARTOSCOPEViewerAllowed());
                             fdNode.setAttribute("URLLinkAllowed", fd.getIsURLLinkAllowed());
                             fdNode.setAttribute("GENEIOBIOViewer", fd.getIsGENELinkAllowed());
                             fdNode.setAttribute("PROTECTED", fd.isProtected());
@@ -283,7 +284,7 @@ public class GetAnalysisDownloadList extends GNomExCommand implements Serializab
 
                 doc.getRootElement().addContent(aNode);
 
-                // add vcf, bam and ped info
+                // add vcf, bam, ped and cartoscope info
                 for (Element element : getVcfBamPedInfo(fileMap)) {
                     if (element != null) {
                         doc.getRootElement().addContent(element);
@@ -404,6 +405,7 @@ public class GetAnalysisDownloadList extends GNomExCommand implements Serializab
                     fdNode.setAttribute("IGVViewer", fd.getIsIGVViewerAllowed());
                     fdNode.setAttribute("BAMIOBIOViewer", fd.getIsBAMIOBIOViewerAllowed());
                     fdNode.setAttribute("URLLinkAllowed", fd.getIsURLLinkAllowed());
+                    fdNode.setAttribute("CARTOSCOPEAllowed", fd.getIsCARTOSCOPEViewerAllowed());
                     fdNode.setAttribute("GENEIOBIOViewer", fd.getIsGENELinkAllowed());
                     fdNode.setAttribute("PROTECTED", fd.isProtected());
                     fdNode.setAttribute("viewURL", fd.getViewURL(viewType) != null ? fd.getViewURL(viewType) : "");
@@ -531,6 +533,8 @@ public class GetAnalysisDownloadList extends GNomExCommand implements Serializab
             childFdNode.setAttribute("IGVViewer", childFd.getIsIGVViewerAllowed());
             childFdNode.setAttribute("BAMIOBIOViewer", childFd.getIsBAMIOBIOViewerAllowed());
             childFdNode.setAttribute("URLLinkAllowed", childFd.getIsURLLinkAllowed());
+            childFdNode.setAttribute("CARTOSCOPEAllowed", childFd.getIsCARTOSCOPEViewerAllowed());
+
             childFdNode.setAttribute("GENEIOBIOViewer", childFd.getIsGENELinkAllowed());
             childFdNode.setAttribute("PROTECTED", childFd.isProtected());
 
@@ -575,11 +579,13 @@ public class GetAnalysisDownloadList extends GNomExCommand implements Serializab
     }
 
     private static Element[] getVcfBamPedInfo(Map fileMap) {
-        Element[] vbpInfo = new Element[3];
+        Element[] vbpInfo = new Element[4];
 
         Element vcfInfo = new Element("VCFInfo");
         Element bamInfo = new Element("BAMInfo");
         Element pedInfo = new Element("PEDInfo");
+        Element cartoscopeInfo = new Element("CARTOSCOPEInfo");
+
 
         for (Object key : fileMap.keySet()) {
             String lkey = ((String) key).toLowerCase();
@@ -595,12 +601,17 @@ public class GetAnalysisDownloadList extends GNomExCommand implements Serializab
                 Element piPath = new Element("PEDPath");
                 piPath.setAttribute("path", (String) key);
                 pedInfo.addContent(piPath);
+            } else if (lkey.endsWith(".yaml") || (lkey.endsWith(".yam") )) {
+                Element ciPath = new Element("CARTOSCOPEPath");
+                ciPath.setAttribute("path", (String) key);
+                cartoscopeInfo.addContent(ciPath);
             }
         }
 
         vbpInfo[0] = vcfInfo;
         vbpInfo[1] = bamInfo;
         vbpInfo[2] = pedInfo;
+        vbpInfo[3] = cartoscopeInfo;
 
         return vbpInfo;
     }

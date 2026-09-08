@@ -5,7 +5,7 @@ export class ConstantsService {
 
     public static readonly FILE_EXTENSIONS_FOR_VIEW: string[] = [
         ".pdf", ".jpg", ".png", ".gif", ".rtf", ".txt", ".html", ".htm", ".csv", ".ppt", ".pptx",
-        ".xls", ".xlsx", ".xml", ".ped", ".Rmd", ".md", ".tiff",
+        ".xls", ".xlsx", ".xml", ".ped", ".Rmd", ".md", ".tiff","yaml", ".yml", ".json", ".fasta", ".fa", ".fna", ".fastq", ".fq", ".sam", ".bam", ".vcf",
     ];
 
 //    public static readonly emailRegex: RegExp = /^[a-zA-Z][a-zA-Z\d]*(\.[a-zA-Z\d]+)*@\d*[a-zA-Z](([a-zA-Z\d]*)|([\-a-zA-Z\d]+[a-zA-Z\d]))(\.[a-zA-Z\d]+)+$/;

@@ -38,7 +38,7 @@ import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encodin
                         aria-label="FDT upload command line">
                     <img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon" alt="" aria-hidden="true">FDT Upload Command Line
                 </button>
-                <button mat-button class="minimize" *ngIf="isFDTSupported" (click)="this.handleFDTUploadFiles()" [disabled]="!this.canUpdate"
+                <button mat-button class="minimize" *ngIf="isFDTSupported" (click)="this.handleFDTUploadFiles()" [disabled]="true"
                         aria-label="FDT upload files">
                     <img [src]="this.constantsService.ICON_UPLOAD_LARGE" class="icon" alt="" aria-hidden="true">FDT Upload Files
                 </button>
@@ -155,7 +155,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
             },
             {
                 headerName: "CARTOSCOPE",
-                field: "BAMIOBIOViewer",
+                field: "CARTOSCOPEViewer",
                 width: 90,
                 cellRendererFramework: ViewerLinkRenderer,
                 cellRendererParams: {
