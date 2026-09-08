@@ -55,12 +55,6 @@ public class MakeCartOScopeLinks extends HttpServlet {
 
     }
 
-    protected void doPOST(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        doGet(request, response);
-    }
-
-
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -75,18 +69,20 @@ public class MakeCartOScopeLinks extends HttpServlet {
             System.out.println("[MakeCartOScopeLinks] idAnalysis: " + idAnalysis);
         }
 
+        // the analysisName (must be before catalogfPath)
+        if (request.getParameter("analysisName") != null && !request.getParameter("analysisName").equals("")) {
+            analysisName = request.getParameter("analysisName");
+            System.out.println("[MakeCartOScopeLinks] analysisName: " + analysisName);
+        }
+
         // the catalog.yaml file
         String catalogPathEnc = null;
         if (request.getParameter("catalogPath") != null && !request.getParameter("catalogPath").equals("")) {
             catalogPathEnc = request.getParameter("catalogPath");
             catalogPath = URLDecoder.decode(catalogPathEnc, StandardCharsets.UTF_8.name());
             System.out.println("[MakeCartOScopeLinks] catalogPath: " + catalogPath + " catalogPathEnc: " + catalogPathEnc);
-        }
-
-        // the analysisName
-        if (request.getParameter("analysisName") != null && !request.getParameter("analysisName").equals("")) {
-            analysisName = request.getParameter("analysisName");
-            System.out.println("[MakeCartOScopeLinks] analysisName: " + analysisName);
+            analysisName = catalogPath.substring(30,35);
+            System.out.println("[MakeCartOScopeLinks] (2) analysisName: " + analysisName);
         }
 
         // Get security advisor
@@ -145,11 +141,33 @@ public class MakeCartOScopeLinks extends HttpServlet {
             File cartOScopeDirectory = new File(cartOScopeDirectoryName);
             String catalogURL1 = createSoftLinksToCartOScopeData(cartOScopeDirectory, linkdir, catalogPath);
             String catalogURL = baseURL + "/" + Constants.URL_LINK_DIR_NAME + "/" + linkPath;
-            // tell them what to do next
-//            String theCatalogPath = linkdir.getAbsolutePath() + "/" + catalogPath.substring(catalogPath.lastIndexOf("/") + 1);
-//            String softLinksPath = theCatalogPath.substring(theCatalogPath.indexOf("URLLinks"));
-//            String softLinksURL = baseURL + "/" + softLinksPath;
+            System.out.println("[MakeCartOScopeLinks] catalogURL: " + catalogURL);
+            response.setContentType("text/html");
+/*
+            StringBuilder sb = new StringBuilder();
+            sb.append("<h1>Directions for CartOScope</h1>");
+            sb.append("<p>Copy this URL:</p>");
+            sb.append("<p>" + catalogURL + "</p>");
+            sb.append("<br><p>In a separate tab navigate to https://main.cartoscope.app</p>");
+            sb.append("<p>Click on person icon in upper right hand corner and login.</p>");
+            sb.append("<p>Click on the URL icon and paste the copied URL</p>");
+            sb.append("<br><p>Save any images/results to a local folder and use one of the</p>");
+            sb.append("<p>Upload options to add those files to the analysis if desired.</p>");
 
+//            response.addHeader("instructions", sb.toString());
+
+        response.setContentType("text/html");
+//        response.setContentType("application/json; charset=UTF-8");
+        // Get the printwriter object from response to write the required json object to the output stream
+        PrintWriter out = response.getWriter();
+        // Assuming your json object is **jsonObject**, perform the following, it will return your json object
+        out.print(sb.toString());
+        out.flush();
+        out.close();
+
+*/
+
+            // tell them what to do next
             response.setContentType("text/html");
             response.getOutputStream().println("<h1>Directions for CartOScope</h1>");
             response.getOutputStream().println("<p>Copy this URL:</p>\n");
@@ -160,6 +178,8 @@ public class MakeCartOScopeLinks extends HttpServlet {
             response.getOutputStream().println("<br><p>Save any images/results to a local folder and use one of the</p>");
             response.getOutputStream().println("<p>Upload options to add those files to the analysis if desired.</p>");
             response.getOutputStream().flush();
+
+            System.out.println("[MakeCartOScopeLinks] *** leaving ***");
         } // end of doGet
 
     private File setupDirectory() {

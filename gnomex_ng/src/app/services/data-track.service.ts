@@ -255,11 +255,11 @@ export class DataTrackService {
         return this.httpClient.post("/gnomex/MakeDataTrackLinks.gx", params.toString(), {headers: headers});
     }
 
+/*
     makeCartOScopeLinks(params: HttpParams): Observable<any> {
-        let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
-        return this.httpClient.post("/gnomex/MakeCartOScopeLinks.gx", params.toString(), {headers: headers});
+        return this.httpClient.get("/gnomex/MakeCartOScopeLinks.gx", {params: params});
     }
-
+*/
     makeURLLink(params: HttpParams): Observable<any> {
         let headers: HttpHeaders = new HttpHeaders().set("Content-Type", "application/x-www-form-urlencoded");
         return this.httpClient.post("/gnomex/MakeDataTrackLinks.gx", params.toString(), {headers: headers});

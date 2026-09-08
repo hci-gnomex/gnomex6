@@ -17,13 +17,14 @@ import {ManageFilesDialogComponent} from "../../util/upload/manage-files-dialog.
 import { MatDialog, MatDialogConfig } from "@angular/material/dialog";
 import {FormGroup} from "@angular/forms";
 import {FileService} from "../../services/file.service";
-import {Subscription} from "rxjs";
+import {of, Subscription} from "rxjs";
 import {DownloadFilesComponent} from "../../util/download-files.component";
 import {IGnomexErrorResponse} from "../../util/interfaces/gnomex-error.response.model";
 import {PropertyService} from "../../services/property.service";
 import {DictionaryService} from "../../services/dictionary.service";
 import {UtilService} from "../../services/util.service";
 import {HttpUriEncodingCodec} from "../../services/interceptors/http-uri-encoding-codec";
+import {DOCUMENT} from "@angular/common";
 
 @Component({
     selector: 'analysis-files-tab',
@@ -93,7 +94,8 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
                 private dialogsService: DialogsService,
                 private dataTrackService: DataTrackService,
                 private propertyService: PropertyService,
-                private dialog:MatDialog) {
+                private dialog:MatDialog,
+                @Inject(DOCUMENT) private document: Document) {
     }
 
     ngOnInit() {
@@ -160,7 +162,7 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
                 cellRendererFramework: ViewerLinkRenderer,
                 cellRendererParams: {
                     icon: this.constantsService.ICON_CARTOSCOPE,
-                    clickFunction: this.makeCartOScopeLinks
+                    clickFunction: this.getMakeCartOScopeLinksServlet
                 }
             },
             {
@@ -307,18 +309,47 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
         });
     }
 
+    public getMakeCartOScopeLinksServlet: (data: any) => void = (data: any) => {
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
+            .set("requestType", "CARTOSCOPE")
+            .set("catalogPath", data.fileName);
+        // This does not work on localhost since the back-end is hard-coded for a linux environment
+        // This workaround hopefully works but it cannot be tested until release
+        /*
+        let params: HttpParams = new HttpParams()
+            .set("emailAddress", emailAddress)
+            .set("showCommandLineInstructions", showCommandLineInstructions ? "Y" : "N");
+        return this.httpClient.get("/gnomex/FastDataTransferDownloadAnalysisServlet.gx", {params: params});
+        */
+
+        let url: string = this.document.location.href;
+        url = url.substring(0, url.indexOf("/gnomex") + 7);
+        url += "/MakeCartOScopeLinks.gx";
+        url += "?requestType=" + "CARTOSCOPE";
+        url += "&catalogPath=" + data.fileName;
+        window.open(url, "_blank");
+
+        return of({result: "SUCCESS"});
+    };
+
+
+
+/*
     private makeCartOScopeLinks: (data: any) => void = (data: any) => {
         let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("requestType", "CARTOSCOPE")
             .set("catalogPath", data.fileName);
         this.dataTrackService.makeCartOScopeLinks(params).subscribe((result: any) => {
             if (result) {
+                window.open(result.ucscURL1, "_blank");
             }
-        },(err:IGnomexErrorResponse) =>{
-            this.handleBackendLinkError(err.gError);
-        });
+        }
+ //       ,(err:IGnomexErrorResponse) =>{
+ //           this.handleBackendLinkError(err.gError);
+ //       }
+        );
     }
-
+*/
     private makeGENELink: (data: any) => void = (data: any) => {
         let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idAnalysis", this.analysisService.analysis.idAnalysis)

@@ -288,6 +288,35 @@ export class FileService {
         return this.httpClient.post("/gnomex/CacheAnalysisFileDownloadList.gx", params.toString(), {headers: headers});
     };
 
+
+    public getMakeCartOScopeLinksServlet: (data: any) => void = (data: any) => {
+        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
+            .set("requestType", "CARTOSCOPE")
+            .set("catalogPath", data.fileName);
+        // This does not work on localhost since the back-end is hard-coded for a linux environment
+        // This workaround hopefully works but it cannot be tested until release
+        /*
+        let params: HttpParams = new HttpParams()
+            .set("emailAddress", emailAddress)
+            .set("showCommandLineInstructions", showCommandLineInstructions ? "Y" : "N");
+        return this.httpClient.get("/gnomex/FastDataTransferDownloadAnalysisServlet.gx", {params: params});
+        */
+
+        let url: string = this.document.location.href;
+        url = url.substring(0, url.indexOf("/gnomex") + 7);
+        url += "/MakeCartOScopeLinks.gx";
+        url += "?requestType=" + "CARTOSCOPE";
+        url += "&catalogPath=" + data.fileName;
+        window.open(url, "_blank");
+
+        return of({result: "SUCCESS"});
+    };
+
+
+
+
+
+
     public getFDTDownloadAnalysisServlet: (emailAddress: string, showCommandLineInstructions: boolean) => Observable<any>
         = (emailAddress: string, showCommandLineInstructions: boolean) => {
 

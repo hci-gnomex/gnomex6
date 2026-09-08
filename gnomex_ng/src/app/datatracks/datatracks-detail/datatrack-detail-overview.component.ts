@@ -268,6 +268,7 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
         });
     }
 
+    /*
     makeCartOScopeLinks() {
 
         this.showSpinner = true;
@@ -282,6 +283,8 @@ export class DatatracksDetailOverviewComponent implements OnInit, AfterViewInit,
             this.showSpinner = false;
         });
     }
+
+*/
     destroyLinks(): void {
         this.showSpinner = true;
         this.dataTrackService.destroyLinks().pipe(first())
