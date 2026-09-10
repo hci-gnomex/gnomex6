@@ -140,7 +140,7 @@ public class MakeCartOScopeLinks extends HttpServlet {
 
             File cartOScopeDirectory = new File(cartOScopeDirectoryName);
             String catalogURL1 = createSoftLinksToCartOScopeData(cartOScopeDirectory, linkdir, catalogPath);
-            String catalogURL = baseURL + "/" + Constants.URL_LINK_DIR_NAME + "/" + linkPath;
+            String catalogURL = baseURL + "/" + Constants.URL_LINK_DIR_NAME + "/" + linkPath + "/catalog.yaml";
             System.out.println("[MakeCartOScopeLinks] catalogURL: " + catalogURL);
             response.setContentType("text/html");
 /*

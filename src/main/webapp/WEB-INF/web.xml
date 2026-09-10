@@ -20,7 +20,7 @@
 
 	<context-param>
 		<param-name>html5-push-state-filter-target</param-name>
-		<param-value>/index.html</param-value>
+		<param-value>/index.07.00.31.html</param-value>
 	</context-param>
 
 	<context-param>
@@ -759,7 +759,7 @@
 
 
 	<welcome-file-list>
-		<welcome-file>index.html</welcome-file>
+		<welcome-file>index.07.00.31.html</welcome-file>
 	</welcome-file-list>
 
 	<resource-ref>
