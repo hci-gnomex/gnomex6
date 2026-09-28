@@ -111,20 +111,9 @@
             </li>
         </ol>
         <div *ngIf="bioinformaticsAssist"    class="full-width flex-container-col padded">
-            <context-help name="bioNote" [idCoreFacility]="this._experiment.idCoreFacility" tooltipPosition="left"
-                          [hasEditPermission]="this.createSecurityAdvisorService.isAdmin" popupTitle="Analysis Note Help"
-                          label="Provide a brief description of the requested assistance (required)."></context-help>
-            <div class="full-width padded {{bioinformaticsAssist ? 'enable-bordered' : 'disable-bordered'}}">
-                <textarea matInput
-                          matTextareaAutosize
-                          matAutosizeMinRows="8"
-                          matAutosizeMaxRows="8"
-                          [(ngModel)]="experiment.analysisInstructions"
-                          [disabled]="!bioinformaticsAssist"
-                          placeholder="Description"
-                          aria-label="Analysis notes and instructions">
-                </textarea>
-            </div>
+          <p><a href="https://uofuhealth.utah.edu/huntsman/shared-resources/gcb/cbi/help-requests" target="_blank">Click Here</a>, then click Submit Help Request to
+            describe the requested assistance.
+          </p>
         </div>
     </div>
 </div>

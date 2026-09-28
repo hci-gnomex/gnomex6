@@ -196,6 +196,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
         }
         /*tree-root.tree-viewport {*/
         /*height: 93%;*/
+
         /*}*/
         tree-viewport {
             height: 93%;
@@ -204,11 +205,11 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 })
 export class DownloadFilesComponent extends BaseGenericContainerDialog implements OnInit, OnDestroy {
 
-    @ViewChild("availableFilesTreeComponent") private availableFilesTreeComponent: TreeComponent;
+    @ViewChild("availableFilesTreeComponent", {static: false}) private availableFilesTreeComponent: TreeComponent;
     public availableFilesNodes: any[] = [];
     public availableFilesCount: number = 0;
 
-    @ViewChild("filesToDownloadTreeComponent") private filesToDownloadTreeComponent: TreeComponent;
+    @ViewChild("filesToDownloadTreeComponent", {static: false}) private filesToDownloadTreeComponent: TreeComponent;
     public filesToDownloadNodes: any[] = [];
     public filesToDownloadCount: number = 0;
     public filesToDownloadSize: number = 0;
@@ -356,8 +357,8 @@ setTimeout(() => {
                 });
             }
 });
- }
-    }
+ } // this.securityAdvisor.isGuest
+    } // ngOnInit
 
     ngOnDestroy(): void {
         this.utilService.removeChangeDetectorRef(this.changeDetector);
@@ -571,11 +572,11 @@ setTimeout(() => {
 
     public onDropInDownload(event: any): void {
         setTimeout(() => {
-        this.changeDetector.markForCheck();
-        this.moveNode(this.filesToDownloadTreeComponent.treeModel, null, event, {from: this.availableFilesTreeComponent, to: this.filesToDownloadTreeComponent});
+          this.changeDetector.markForCheck();
+          this.moveNode(this.filesToDownloadTreeComponent.treeModel, null, event, {from: this.availableFilesTreeComponent, to: this.filesToDownloadTreeComponent});
 
-});
-}
+        });
+  }
 
     public onRemoveFromDownload(event: any): void {
         if (this.treeMostRecentlySelectedFrom === this.filesToDownloadTreeComponent.treeModel) {
@@ -610,10 +611,6 @@ setTimeout(() => {
 
     public download(): void {
         let files: any[] = this.gatherFilesToDownload();
-
-// ************************************************ remove *******************************************
-//        this.filesToDownloadSize = 20000000000;
-// ************************************************ remove *******************************************
 
         // too big?
         if (this.filesToDownloadSize > this.maxsize) {

@@ -410,8 +410,8 @@ public class SaveWorkItemSolexaPipeline extends GNomExCommand implements Seriali
     MailUtil.validateAndSendEmail(helper);
     
     // Send email to bioinformatics core
-    if (request.getBioinformaticsAssist() != null && request.getBioinformaticsAssist().equals("Y")) {
-      sendBioinformaticsAssistanceEmail(sess, request);
-    }
+    //if (request.getBioinformaticsAssist() != null && request.getBioinformaticsAssist().equals("Y")) {
+    //  sendBioinformaticsAssistanceEmail(sess, request);
+    //}
   }
 }

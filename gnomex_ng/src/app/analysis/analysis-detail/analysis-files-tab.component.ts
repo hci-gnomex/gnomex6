@@ -333,23 +333,6 @@ export class AnalysisFilesTabComponent implements OnInit, OnDestroy {
     };
 
 
-
-/*
-    private makeCartOScopeLinks: (data: any) => void = (data: any) => {
-        let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
-            .set("requestType", "CARTOSCOPE")
-            .set("catalogPath", data.fileName);
-        this.dataTrackService.makeCartOScopeLinks(params).subscribe((result: any) => {
-            if (result) {
-                window.open(result.ucscURL1, "_blank");
-            }
-        }
- //       ,(err:IGnomexErrorResponse) =>{
- //           this.handleBackendLinkError(err.gError);
- //       }
-        );
-    }
-*/
     private makeGENELink: (data: any) => void = (data: any) => {
         let params: HttpParams = new HttpParams({encoder: new HttpUriEncodingCodec()})
             .set("idAnalysis", this.analysisService.analysis.idAnalysis)

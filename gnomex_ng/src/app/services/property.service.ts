@@ -70,10 +70,10 @@ export class PropertyService {
     public static readonly PROPERTY_DNA_SAMPLES_RNASE: string = 'dna_samples_rnase';
     public static readonly PROPERTY_ASK_LEFTOVER_SAMPLES: string = 'ask_leftover_samples';
 
-    public static readonly PROPERTY_ANALYSIS_ASSISTANCE_GROUP: string  = "analysis_assistance_group";
-    public static readonly PROPERTY_ANALYSIS_ASSISTANCE_HEADER: string = "analysis_assistance_header";
+    public static readonly PROPERTY_ANALYSIS_ASSISTANCE_GROUP: string  = "analysis_assistance_group"; // CBI Shared Resource
+    public static readonly PROPERTY_ANALYSIS_ASSISTANCE_HEADER: string = "analysis_assistance_header";  // The following services are made available through the Cancer Bioinformatics Shared Resource. (https://uofuhealth.utah.edu/huntsman/shared-resources/gcb/cbi)
     public static readonly PROPERTY_REQUEST_BIO_ALIGNMENT_NOTE: string = "request_bio_alignment_note";
-    public static readonly PROPERTY_REQUEST_BIO_ANALYSIS_NOTE: string  = "request_bio_analysis_note";
+    public static readonly PROPERTY_REQUEST_BIO_ANALYSIS_NOTE: string  = "request_bio_analysis_note";  // (These services are restricted to University of Utah investigators and are available on a fee for service basis.)
     public static readonly PROPERTY_EXPERIMENT_FILE_SAMPLE_LINKING_ENABLED:string = "experiment_file_sample_linking_enabled";
 
     public static readonly PROPERTY_QC_INSTRUCTIONS: string = "qc_instructions";

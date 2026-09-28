@@ -91,7 +91,7 @@ export class ExperimentBioinformaticsTabComponent implements OnDestroy {
             this.header        = this.getStringValuedProperty(PropertyService.PROPERTY_ANALYSIS_ASSISTANCE_HEADER,   this._experiment.idCoreFacility);
             this.groupName     = this.getStringValuedProperty(PropertyService.PROPERTY_ANALYSIS_ASSISTANCE_GROUP,    this._experiment.idCoreFacility);
             this.alignmentNote = this.getStringValuedProperty(PropertyService.PROPERTY_REQUEST_BIO_ALIGNMENT_NOTE,   this._experiment.idCoreFacility);
-            this.analysisNote  = this.getStringValuedProperty(PropertyService.PROPERTY_REQUEST_BIO_ANALYSIS_NOTE,    this._experiment.idCoreFacility);
+            this.analysisNote  = this.getStringValuedProperty(PropertyService.PROPERTY_REQUEST_BIO_ANALYSIS_NOTE,    this._experiment.idCoreFacility);  // (These services are restricted to University of Utah investigators and are available on a fee for service basis.)
             this.linkUrl       = this.getStringValuedProperty(PropertyService.PROPERTY_CONTACT_EMAIL_BIOINFORMATICS, this._experiment.idCoreFacility);
         }
 
