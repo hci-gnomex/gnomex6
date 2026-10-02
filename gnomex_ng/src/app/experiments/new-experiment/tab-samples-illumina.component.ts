@@ -68,6 +68,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
     @ViewChild('ccCheckbox') ccCheckbox: MatCheckbox;
     @ViewChild('fileInput') fileInput: ElementRef;
 
+    public readonly sampleSheetFileTypes: string = SampleUploadService.SAMPLE_SHEET_FILE_TYPES;
+
     private emToPxConversionRate: number = 13;
 
     private _isAmendState: boolean = false;
@@ -2911,6 +2913,8 @@ export class TabSamplesIlluminaComponent implements OnInit {
     }
 
     public upload(): void {
+        // Clear the previous selection so choosing the same (corrected) file again still fires (change).
+        this.fileInput.nativeElement.value = null;
         this.fileInput.nativeElement.click();
     }
 

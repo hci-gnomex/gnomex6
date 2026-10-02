@@ -1,6 +1,6 @@
 <div class="full-height full-width flex-container-col padded">
     <div class="full-width flex-grow no-margin no-max-height background padded">
-        <div class="full-height full-width foreground padded bordered">
+        <div class="full-height full-width foreground padded bordered scrollable">
             <pre><b><u>Field Type</u></b>           <b><u>Spreadsheet Column Format</u></b>                   <b><u>Example</u></b>
 
 Text                 Text with correct format (e.g. don't        SS07-041 (e.g Sample name field)
@@ -18,7 +18,21 @@ Dropdown             Exact text of each item to be               blue, hazel
 (mult. selection)    selected, separated by commas
 
 Label                cy3 or cy5                                  cy5
-(2-color Microarray)</pre>
+(2-color Microarray)
+
+
+<b><u>File Types</u></b>
+
+Tab delimited text (.txt)   One row per sample, columns separated by tabs.
+
+Excel workbook (.xlsx, .xls)
+  - Only the first visible sheet is read. Put the samples on the first sheet.
+  - Each cell is imported as the text shown in Excel (formulas are calculated,
+    numbers keep their displayed format).
+  - Cells showing an error (#N/A, #REF!, ...) are imported as blank.
+  - Merged cells: only the top-left cell has a value.
+  - Checkbox columns need Y or N; TRUE / FALSE are not accepted.
+  - Password protected workbooks and binary (.xlsb) workbooks cannot be read.</pre>
         </div>
     </div>
 </div>

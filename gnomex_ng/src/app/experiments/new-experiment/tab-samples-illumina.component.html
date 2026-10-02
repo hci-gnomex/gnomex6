@@ -28,7 +28,7 @@
                 <button *ngIf="_state === this.STATE_NEW || _state === this.STATE_EDIT" mat-button
                         class="padded-right"
                         color="link"
-                        matTooltip="Upload Sample Sheet&#13;tab delimited txt file"
+                        matTooltip="Upload Sample Sheet&#13;tab delimited .txt or Excel (.xlsx, .xls) file"
                         (click)="upload()"
                         aria-label="Upload sample sheet">
                     <img class="icon" [src]="constService.ICON_UPLOAD" alt="" aria-hidden="true">
@@ -39,7 +39,7 @@
                               [hasEditPermission]="this.createSecurityAdvisor.isAdmin"
                               popupTitle="Upload Sample Sheet Instructions">
                 </context-help>
-                <input type="file" #fileInput accept=".txt" class="hidden" (change)="onFileSelected($event)" multiple aria-label="File input for sample sheet">
+                <input type="file" #fileInput [accept]="sampleSheetFileTypes" class="hidden" (change)="onFileSelected($event)" aria-label="File input for sample sheet (tab delimited text or Excel)">
                 <button mat-button
                         class="padded-right"
                         color="link"

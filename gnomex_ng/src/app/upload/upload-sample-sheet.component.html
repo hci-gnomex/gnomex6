@@ -1,5 +1,6 @@
 <div class="full-width full-height bordered foreground small-font">
-    <input type="file" accept=".txt" class="hidden" (change)="onFileSelected($event)" #fileInput>
+    <input type="file" [accept]="sampleSheetFileTypes" class="hidden" (change)="onFileSelected($event)" #fileInput
+           aria-label="File input for sample sheet (tab delimited text or Excel)">
     <div *ngIf="!fileParsed" class="full-height full-width flex-container-col align-center">
         <div class="full-height full-width flex-container-row align-center">
         </div>

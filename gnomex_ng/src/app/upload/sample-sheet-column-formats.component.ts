@@ -7,6 +7,8 @@ import {BaseGenericContainerDialog} from "../util/popup/base-generic-container-d
     styles: [`
         
         pre { margin-bottom: 0; }
+
+        .scrollable { overflow: auto; }
         
         
         .no-margin { margin: 0; }

@@ -37,7 +37,7 @@ dependencies {
 
 
     implementation group: 'servlets.com', name: 'cos', version: '05Nov2002'
-    implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.1'
+    implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.25.0'   // POI 5.2.5 requires >= 1.25
     implementation group: 'org.ostermiller', name: 'utils', version: '1.07.00'
     implementation group: 'net.sf.json-lib', name: 'json-lib', version: '2.4', classifier: 'jdk15'
     implementation group: 'com.itextpdf', name: 'itextpdf', version: '5.5.9'
@@ -45,7 +45,7 @@ dependencies {
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.4.0'
     implementation group: 'org.apache.lucene', name: 'lucene-core', version: '2.9.4'
     implementation group: 'commons-codec', name: 'commons-codec', version: '1.10'
-    implementation group: 'commons-io', name: 'commons-io', version: '2.4'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.15.0'   // POI 5.2.5 requires >= 2.15
     implementation group: 'commons-lang', name: 'commons-lang', version: '2.6'
     implementation group: 'jdom', name: 'jdom', version: '1.0b8'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.7'
@@ -92,12 +92,15 @@ dependencies {
     implementation fileTree(dir: 'libEnv', include: 'HCIReport.jar')
     implementation fileTree(dir: 'libEnv', include: 'jdom-2.0.6.jar')
     implementation fileTree(dir: 'libEnv', include: 'jaxen-1.1.6.jar')
-    implementation fileTree(dir: 'libEnv', include: 'poi-3.10-FINAL.jar')
+    // Apache POI: poi = .xls (HSSF), poi-ooxml = .xlsx (XSSF). Used for Excel sample sheet upload.
+    implementation 'org.apache.poi:poi:5.2.5'
+    implementation 'org.apache.poi:poi-ooxml:5.2.5'
+    testImplementation 'junit:junit:4.13.2'
     implementation fileTree(dir: 'libEnv', include: 'javax.json-api-jdk8-1.1.3.jar')
     implementation fileTree(dir: 'libEnv', include: 'javax.json-jdk8-1.1.3.jar')
     implementation fileTree(dir: 'libEnv', include: 'hci-servlet-filter-xsrf-1.1.3.jar')
     implementation fileTree(dir: 'libEnv', include: 'rsync4j-3.1.2-8.jar')
-    implementation 'com.duosecurity:duo-universal-sdk:1.3.1'
+//    implementation fileTree(dir: 'libEnv', include: 'duo-universal-sdk-1.3.1.jar')
     implementation fileTree(dir: 'libEnv', include: 'processoutput4j-0.0.7.jar')
     implementation fileTree(dir: 'libEnv', include: 'argparse4j-0.6.0.jar')
     implementation fileTree(dir: 'libEnv', include: 'jdk-misc-3.Final.jar')
@@ -121,6 +124,13 @@ dependencies {
     //Tomcat
     implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.2.2.Final'
     implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.+'
+
+    // Source: https://mvnrepository.com/artifact/com.duosecurity/duo-universal-sdk
+    // runtimeOnly("com.duosecurity:duo-universal-sdk:1.3.1")
+
+    implementation fileTree(dir: 'libEnv', include: 'DuoWeb-1.3.jar')
+    // Maven (not libEnv fileTree): Universal SDK needs Retrofit/OkHttp/JWT transitives in WEB-INF/lib
+    implementation 'com.duosecurity:duo-universal-sdk:1.3.1'
 
     // JAX-RS Related
     implementation group: 'org.jboss.resteasy', name: 'resteasy-jaxrs', version: '3.0.19.Final'
@@ -211,7 +221,7 @@ task buildWarOpensource(type: GradleBuild) {
 }
 
 task cleanTomcat(type: Delete) {
-//    delete "${gnomexServerHome}/${gnomexDeployDir}/gnomex"
+//    delete "c:/users/u0974549/apache-tomcat-9.0.10/${gnomexDeployDir}/gnomex"
 }
 
 static void replaceString(String fileName, String fromString, String toString) {
@@ -263,7 +273,7 @@ task copyTomcatJars(type: Copy) {
     dependsOn ':gnomex_tomcat_support:jar', ':gnomex_crypt:jar'
     from 'gnomex_tomcat_support/build/libs'
     from 'gnomex_crypt/build/libs'
-    into "${gnomexServerHome}/lib"
+    into "c:/users/u0974549/apache-tomcat-9.0.10/lib"
 }
 
 war {
@@ -276,8 +286,7 @@ war {
     manifest {
         attributes(
                 'Built-By': 'u0974549',
-                'Implementation-Version': "6.26.12 (07/06/2025)",
-                'Dependencies': 'org.dom4j, org.apache.log4j'
+                'Implementation-Version': "6.26.12 (07/06/2025)"
         )
     }
 
@@ -412,7 +421,7 @@ task copyWar(type: Copy) {
     from ("build/libs") {
         include "${warName}"
     }
-    into "${gnomexServerHome}/${gnomexDeployDir}"
+    into "c:/users/u0974549/apache-tomcat-9.0.10/${gnomexDeployDir}"
 }
 
 task createOpenSourceZip(type: Zip) {

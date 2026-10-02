@@ -90,6 +90,8 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
         this.assignGridContents();
     }
 
+    public readonly sampleSheetFileTypes: string = SampleUploadService.SAMPLE_SHEET_FILE_TYPES;
+
     private allowedToAddAdditionalSamples: boolean = false;
     public appendSamples: boolean = false;
 
@@ -568,7 +570,9 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
 
             let formData: FormData = new FormData();
             formData.append("filename", this.file.name);
-            formData.append("filetype", this.file.type === "text/html" ? "html" : "text");
+            // The server detects the real format from the file contents; this is only a hint.
+            let extension: string = (this.file.name.split('.').pop() || '').toLowerCase();
+            formData.append("filetype", (extension === 'xlsx' || extension === 'xls') ? "excel" : (this.file.type === "text/html" ? "html" : "text"));
             formData.append("value", this.file, this.file.name);
 
             if (!this.uploadSubscription) {
@@ -589,30 +593,29 @@ import {ActionType} from "../util/interfaces/generic-dialog-action.model";
                             data:  '0'
                         }];
 
-                        if (result.SampleSheetData
-                            && Array.isArray(result.SampleSheetData)
-                            && result.SampleSheetData.length > 0
-                            && result.SampleSheetData[0].Column) {
-                                if(Array.isArray(result.SampleSheetData[0].Column)) {
-                                    for (let item of result.SampleSheetData[0].Column) {
-                                        let temp: any = {
-                                            label: item.Value,
-                                            data:  item.Name
-                                        };
-                                        this.headersDictionary.push(temp);
-                                    }
-                                } else {
-                                    this.dialogService.alert("File failed to upload.", null, DialogType.FAILED);
-                                    return;
-                                }
-                        }
-
-
                         if (!result.SampleSheetData) {
                             result.SampleSheetData = [];
                         }
                         if (!Array.isArray(result.SampleSheetData)) {
                             result.SampleSheetData = [ result.SampleSheetData.Row ];
+                        }
+
+                        // The XML-to-JSON conversion turns a single column into an object instead of an array
+                        // (e.g. a one-column Excel sheet), so make every row's Column an array.
+                        for (let row of result.SampleSheetData) {
+                            if (row && row.Column && !Array.isArray(row.Column)) {
+                                row.Column = [ row.Column ];
+                            }
+                        }
+
+                        if (result.SampleSheetData.length > 0 && result.SampleSheetData[0] && result.SampleSheetData[0].Column) {
+                            for (let item of result.SampleSheetData[0].Column) {
+                                let temp: any = {
+                                    label: item.Value,
+                                    data:  item.Name
+                                };
+                                this.headersDictionary.push(temp);
+                            }
                         }
 
                         this.fileData = result.SampleSheetData;

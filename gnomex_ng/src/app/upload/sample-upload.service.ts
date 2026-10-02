@@ -30,6 +30,10 @@ export class SampleUploadService {
 
     private static readonly getUploadSampleSheetURL_URL: string = "/gnomex/UploadSampleSheetURLServlet.gx";
 
+    /** File types accepted by "Upload Sample Sheet": tab delimited text or an Excel workbook. */
+    public static readonly SAMPLE_SHEET_FILE_TYPES: string = ".txt,.tsv,.xlsx,.xls,text/plain,text/tab-separated-values,"
+        + "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel";
+
     private sampleUpload_URL: string = null;
     private bulkSampleUpload_URL: string = null;
 

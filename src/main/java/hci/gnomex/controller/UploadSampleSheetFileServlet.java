@@ -9,6 +9,8 @@ import hci.gnomex.model.PropertyDictionary;
 import hci.gnomex.security.SecurityAdvisor;
 import hci.gnomex.utility.HibernateSession;
 import hci.gnomex.utility.PropertyDictionaryHelper;
+import hci.gnomex.utility.SampleSheetException;
+import hci.gnomex.utility.SampleSheetReader;
 import hci.gnomex.utility.ServletUtil;
 import hci.gnomex.utility.Util;
 import org.apache.log4j.Logger;
@@ -17,12 +19,19 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 
+import javax.json.Json;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.util.List;
+import java.util.Locale;
 
+/**
+ * Receives a sample sheet (tab-delimited .txt, or Excel .xlsx / .xls) and returns its contents as
+ * { ColumnSelector: ..., SampleSheetData: [ { Name, Column: [ { Name, Value } ] } ] }.
+ */
 public class UploadSampleSheetFileServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -44,6 +53,7 @@ public class UploadSampleSheetFileServlet extends HttpServlet {
         }
 
         String fileName = null;
+        File uploadedFile = null;
 
         try {
             Session sess = HibernateSession.currentReadOnlySession((req.getUserPrincipal() != null ? req.getUserPrincipal().getName() : "guest"));
@@ -63,9 +73,6 @@ public class UploadSampleSheetFileServlet extends HttpServlet {
 
             String className = "SampleSheet";
             Document doc = new Document(new Element(className));
-
-            PrintWriter out = res.getWriter();
-            res.setHeader("Cache-Control", "max-age=0, must-revalidate");
 
             MultipartParser mp = new MultipartParser(req, Integer.MAX_VALUE);
             Part part;
@@ -99,7 +106,6 @@ public class UploadSampleSheetFileServlet extends HttpServlet {
                         + directoryName);
             }
 
-            boolean fileWasWritten = false;
             boolean hasColumnNames = false;
             while ((part = mp.readNextPart()) != null) {
                 String name = part.getName();
@@ -120,16 +126,19 @@ public class UploadSampleSheetFileServlet extends HttpServlet {
                     FilePart filePart = (FilePart) part;
                     fileName = filePart.getFileName();
                     if (fileName != null) {
-                        // the part actually contained a file
-                        filePart.writeTo(new File(directoryName));
-                        fileWasWritten = true;
-                    } else {
+                        // Save under a unique name so concurrent uploads of the same file name don't collide.
+                        if (uploadedFile != null) {
+                            uploadedFile.delete();
+                        }
+                        uploadedFile = File.createTempFile("samplesheet_", tempFileSuffix(fileName), dir);
+                        try (OutputStream os = new FileOutputStream(uploadedFile)) {
+                            filePart.writeTo(os);
+                        }
                     }
-                    out.flush();
                 }
             }
 
-            if (fileWasWritten) {
+            if (uploadedFile != null) {
                 Element columnSelector = new Element("ColumnSelector");
                 // Add a blank column selector
                 Element columnSelectorItem = new Element("ColumnSelectorItem");
@@ -143,15 +152,13 @@ public class UploadSampleSheetFileServlet extends HttpServlet {
                 Element currentRow;
                 int rowNum = 1;
 
-                BufferedReader readbuffer = new BufferedReader(new FileReader(directoryName + fileName));
-                String strRead;
-                while ((strRead = readbuffer.readLine()) != null) {
+                List<List<String>> rows = SampleSheetReader.read(uploadedFile, fileName);
+                for (List<String> cells : rows) {
                     currentRow = new Element("Row");
                     currentRow.setAttribute("Name", "" + rowNum);
                     sampleSheetList.addContent(currentRow);
-                    String splitarray[] = strRead.split("\t", -1);
-                    for (int i = 0; i < splitarray.length; i++) {
-                        String thisEntry = splitarray[i];
+                    for (int i = 0; i < cells.size(); i++) {
+                        String thisEntry = sanitizeXml(cells.get(i));
                         int colNum = i + 1;
                         if (rowNum == 1) {
                             columnSelectorItem = new Element("ColumnSelectorItem");
@@ -171,38 +178,24 @@ public class UploadSampleSheetFileServlet extends HttpServlet {
                     }
                     rowNum++;
                 }
-                readbuffer.close();
                 doc.getRootElement().addContent(columnSelector);
                 doc.getRootElement().addContent(sampleSheetList);
             }
 
-            // Delete the file when finished
-            File f = new File(directoryName + fileName);
-            f.delete();
-
-            PrintWriter responseOut = res.getWriter();
-            res.setHeader("Cache-Control", "cache, must-revalidate, proxy-revalidate, s-maxage=0, max-age=0");
-            res.setHeader("Pragma", "public");
-            res.setDateHeader("Expires", 0);
-            res.setContentType("application/json; charset=UTF-8");
-
             XMLOutputter xmlOut = new XMLOutputter();
             String xmlResult = xmlOut.outputString(doc);
             String jsonResult = Util.xmlToJson(xmlResult);
-            responseOut.println(jsonResult);
+            writeJsonResponse(res, jsonResult);
 
-
+        } catch (SampleSheetException e) {
+            // A problem with the file itself. The client shows result/message in an error dialog.
+            LOG.info("UploadSampleSheetFileServlet: unable to read sample sheet " + fileName + " - " + e.getMessage());
+            writeJsonResponse(res, errorJson(e.getMessage()));
         } catch (ServletException e) {
 
             throw new ServletException(e.getMessage());
         } catch (org.jdom.IllegalDataException e) {
-
-            PrintWriter responseOut = res.getWriter();
-            res.setHeader("Cache-Control", "cache, must-revalidate, proxy-revalidate, s-maxage=0, max-age=0");
-            res.setHeader("Pragma", "public");
-            res.setDateHeader("Expires", 0);
-            res.setContentType("application/xml; charset=UTF-8");
-            responseOut.println("<ERROR message=\"Illegal data\"/>");
+            writeJsonResponse(res, errorJson("The sample sheet contains characters that cannot be read."));
         } catch (Exception e) {
             LOG.error("An error has occurred in UploadSampleSheetFileServlet - " + e.toString(), e);
             res.setStatus(ERROR_UPLOAD_MISC);
@@ -210,6 +203,10 @@ public class UploadSampleSheetFileServlet extends HttpServlet {
             throw new ServletException("Unable to upload file " + fileName + " due to a server error.\n\n" + e.toString()
                     + "\n\nPlease contact GNomEx support.");
         } finally {
+            // Delete the file when finished
+            if (uploadedFile != null && uploadedFile.exists() && !uploadedFile.delete()) {
+                LOG.warn("UploadSampleSheetFileServlet: unable to delete temp file " + uploadedFile.getAbsolutePath());
+            }
             try {
                 HibernateSession.closeSession();
             } catch (Exception e1) {
@@ -217,5 +214,52 @@ public class UploadSampleSheetFileServlet extends HttpServlet {
             }
         }
 
+    }
+
+    private static void writeJsonResponse(HttpServletResponse res, String json) throws IOException {
+        // Content type must be set before getWriter() or the response is not encoded as UTF-8.
+        res.setHeader("Cache-Control", "cache, must-revalidate, proxy-revalidate, s-maxage=0, max-age=0");
+        res.setHeader("Pragma", "public");
+        res.setDateHeader("Expires", 0);
+        res.setContentType("application/json; charset=UTF-8");
+        res.setCharacterEncoding("UTF-8");
+
+        PrintWriter responseOut = res.getWriter();
+        responseOut.println(json);
+    }
+
+    private static String errorJson(String message) {
+        return Json.createObjectBuilder()
+                .add("result", "ERROR")
+                .add("message", message)
+                .build()
+                .toString();
+    }
+
+    private static String tempFileSuffix(String fileName) {
+        String lower = fileName.toLowerCase(Locale.ROOT);
+        if (lower.endsWith(".xlsx")) {
+            return ".xlsx";
+        } else if (lower.endsWith(".xls")) {
+            return ".xls";
+        }
+        return ".txt";
+    }
+
+    /** Removes characters that are not allowed in XML 1.0 (JDOM rejects them). */
+    static String sanitizeXml(String value) {
+        if (value == null) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder(value.length());
+        value.codePoints().forEach(cp -> {
+            if (cp == 0x9 || cp == 0xA || cp == 0xD
+                    || (cp >= 0x20 && cp <= 0xD7FF)
+                    || (cp >= 0xE000 && cp <= 0xFFFD)
+                    || (cp >= 0x10000 && cp <= 0x10FFFF)) {
+                sb.appendCodePoint(cp);
+            }
+        });
+        return sb.toString();
     }
 }
