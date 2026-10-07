@@ -143,6 +143,8 @@ dependencies {
     providedCompile group: 'javax.ejb', name: 'javax.ejb-api', version: '3.2'
     providedCompile group: 'javax.enterprise', name: 'cdi-api', version: '1.2'
     runtimeOnly group: 'org.jboss.weld.servlet', name: 'weld-servlet', version: '2.4.1.Final'
+ //   implementation 'org.jboss.weld.servlet:weld-servlet-core:5.1.7.Final'
+
 
 //    implementation group:  'ch.qos.reload4j', name: 'reload4j', version: '1.2.26'
     implementation group: 'org.slf4j', name: 'slf4j-reload4j', version: '1.7.36'
