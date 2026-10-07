@@ -1,0 +1,20 @@
+{
+  "name": "gnomex-e2e",
+  "private": true,
+  "description": "Playwright end-to-end tests that drive a running GNomEx (Tomcat or ng serve).",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report",
+    "typecheck": "tsc"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.6.4",
+    "typescript": "^7.0.2"
+  }
+}
