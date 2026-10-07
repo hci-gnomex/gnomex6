@@ -79,6 +79,21 @@ tasks.register('ngBuildProdTomcat', NpmTask) {
   args = ['run', 'build:prod:tomcat']
 }
 
+// ----- Unit tests (Karma, headless) -----
+// Not wired to npmInstallSmart because `npm ci` wipes node_modules on every run;
+// run `npm install` (or ./gradlew :gnomex_ng:npmInstallSmart) once first.
+// Add -Pcoverage for an istanbul report in gnomex_ng/coverage/gnomex-ng/index.html
+tasks.register('ngTest', NpmTask) {
+  group = 'verification'
+  description = 'Runs Angular unit tests once in headless Chrome/Edge.'
+  args = ['run', project.hasProperty('coverage') ? 'test:coverage' : 'test:ci']
+  doFirst {
+    if (!file("${projectDir}/node_modules").exists()) {
+      throw new GradleException("gnomex_ng/node_modules is missing - run 'npm install' in gnomex_ng first.")
+    }
+  }
+}
+
 // Optional: run dev server from Gradle (for local dev)
 tasks.register('ngServeTomcat', NpmTask) {
   // Runs: "start": "ng serve -c developmentTomcat --proxy-config proxy.conf.json"

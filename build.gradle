@@ -154,6 +154,34 @@ configurations.configureEach {
 //    exclude group: "javax.activation", module: "activation"
 }
 
+// ----- Automated tests -----
+// Backend unit tests:  ./gradlew test        (report: build/reports/tests/test/index.html)
+// Frontend unit tests: ./gradlew :gnomex_ng:ngTest
+// Everything:          ./gradlew testAll
+test {
+    useJUnit()
+    // Re-run when asked for explicitly, even if inputs are unchanged
+    outputs.upToDateWhen { false }
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        exceptionFormat 'full'
+        showStandardStreams = false
+    }
+    afterSuite { desc, result ->
+        if (!desc.parent) {
+            println "\nBackend tests: ${result.resultType} " +
+                    "(${result.testCount} run, ${result.successfulTestCount} passed, " +
+                    "${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
+        }
+    }
+}
+
+task testAll {
+    group = 'verification'
+    description = 'Runs backend JUnit tests and the Angular unit tests (headless).'
+    dependsOn 'test', ':gnomex_ng:ngTest'
+}
+
 
 // Main build tasks are named starting with "gnomex"
 task gnomexWindowsWDS(type: GradleBuild) {

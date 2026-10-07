@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -166,9 +167,10 @@ public class BillingTemplate extends HibernateDetailObject implements DetailObje
 	public Element toXML(Session sess, Set<String> detailParameters, UserPreferences userPreferences) {
 		Element billingTemplateNode = new Element("BillingTemplate");
 		
-		billingTemplateNode.setAttribute("idBillingTemplate", XMLTools.safeXMLValue(this.getIdBillingTemplate()));
-		billingTemplateNode.setAttribute("targetClassIdentifier", XMLTools.safeXMLValue(this.getTargetClassIdentifier()));
-		billingTemplateNode.setAttribute("targetClassName", XMLTools.safeXMLValue(this.getTargetClassName()));
+		// Pass raw values: jdom's XMLOutputter escapes attributes when the document is written.
+		billingTemplateNode.setAttribute("idBillingTemplate", Objects.toString(this.getIdBillingTemplate(), ""));
+		billingTemplateNode.setAttribute("targetClassIdentifier", Objects.toString(this.getTargetClassIdentifier(), ""));
+		billingTemplateNode.setAttribute("targetClassName", Objects.toString(this.getTargetClassName(), ""));
 		
 		boolean usingPercentSplit = false;
 		for (BillingTemplateItem item : this.getItems()) {

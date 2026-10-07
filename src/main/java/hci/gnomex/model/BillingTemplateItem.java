@@ -2,6 +2,7 @@ package hci.gnomex.model;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 import java.util.Set;
 
 import hci.gnomex.utility.UserPreferences;
@@ -10,7 +11,6 @@ import org.hibernate.Session;
 import org.jdom.Element;
 
 import hci.gnomex.utility.DetailObject;
-import hci.gnomex.utility.XMLTools;
 import hci.hibernate5utils.HibernateDetailObject;
 
 @SuppressWarnings("serial")
@@ -132,23 +132,24 @@ public class BillingTemplateItem extends HibernateDetailObject implements Compar
 	public Element toXML(Session sess, Set<String> detailParameters, UserPreferences userPreferences) {
 		Element billingTemplateItemNode = new Element("BillingTemplateItem");
 		
-		billingTemplateItemNode.setAttribute("idBillingTemplateItem", XMLTools.safeXMLValue(this.getIdBillingTemplateItem()));
-		billingTemplateItemNode.setAttribute("idBillingTemplate", XMLTools.safeXMLValue(this.getIdBillingTemplate()));
-		billingTemplateItemNode.setAttribute("idBillingAccount", XMLTools.safeXMLValue(this.getIdBillingAccount()));
+		// Pass raw values: jdom's XMLOutputter escapes attributes when the document is written.
+		billingTemplateItemNode.setAttribute("idBillingTemplateItem", Objects.toString(this.getIdBillingTemplateItem(), ""));
+		billingTemplateItemNode.setAttribute("idBillingTemplate", Objects.toString(this.getIdBillingTemplate(), ""));
+		billingTemplateItemNode.setAttribute("idBillingAccount", Objects.toString(this.getIdBillingAccount(), ""));
 		// Return percent split as a percent instead of a decimal value
-		billingTemplateItemNode.setAttribute("percentSplit", this.getPercentSplit()!=null ? XMLTools.safeXMLValue(this.getPercentSplit().multiply( new BigDecimal(100) )) : "");
-		billingTemplateItemNode.setAttribute("dollarAmount", XMLTools.safeXMLValue(this.getDollarAmount()));
-		billingTemplateItemNode.setAttribute("dollarAmountBalance", XMLTools.safeXMLValue(this.getDollarAmountBalance()));
+		billingTemplateItemNode.setAttribute("percentSplit", this.getPercentSplit()!=null ? this.getPercentSplit().multiply( new BigDecimal(100) ).toString() : "");
+		billingTemplateItemNode.setAttribute("dollarAmount", Objects.toString(this.getDollarAmount(), ""));
+		billingTemplateItemNode.setAttribute("dollarAmountBalance", Objects.toString(this.getDollarAmountBalance(), ""));
 		billingTemplateItemNode.setAttribute("acceptBalance", this.isAcceptingBalance() ? "true" : "false");
 		
 		BillingAccount billingAccount = sess.load(BillingAccount.class, this.getIdBillingAccount());
 		if (billingAccount != null) {
-			billingTemplateItemNode.setAttribute("accountName", XMLTools.safeXMLValue(billingAccount.getAccountName()));
-			billingTemplateItemNode.setAttribute("accountNumber", XMLTools.safeXMLValue(billingAccount.getAccountNumber()));
-			billingTemplateItemNode.setAttribute("accountNumberDisplay", XMLTools.safeXMLValue(billingAccount.getAccountNumberDisplay()));
+			billingTemplateItemNode.setAttribute("accountName", Objects.toString(billingAccount.getAccountName(), ""));
+			billingTemplateItemNode.setAttribute("accountNumber", Objects.toString(billingAccount.getAccountNumber(), ""));
+			billingTemplateItemNode.setAttribute("accountNumberDisplay", Objects.toString(billingAccount.getAccountNumberDisplay(), ""));
 			Lab lab = billingAccount.getLab();
 			if (lab != null) {
-				billingTemplateItemNode.setAttribute("idLab", XMLTools.safeXMLValue(lab.getIdLab()));
+				billingTemplateItemNode.setAttribute("idLab", Objects.toString(lab.getIdLab(), ""));
 				billingTemplateItemNode.setAttribute("labName", Util.getLabDisplayName(lab, userPreferences));
 			}
 		}
