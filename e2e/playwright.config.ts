@@ -45,7 +45,8 @@ export default defineConfig({
     ignoreHTTPSErrors: true,
   },
   projects: [
-    // Logs in once through the UI and saves cookies + the gnomex-jwt token for the browse tests.
+    // Logs in once through the UI and saves cookies + the gnomex-jwt token for the app tests,
+    // then warms the server up.
     { name: 'setup', testMatch: /auth\.setup\.ts/ },
     {
       name: 'login',
@@ -53,13 +54,15 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], channel: browserChannel() },
     },
     {
-      name: 'browse',
-      testMatch: /browse\.spec\.ts/,
+      // Everything that runs inside the app: browse, detail pages, header, topics, protocols.
+      name: 'app',
+      testMatch: /\.spec\.ts$/,
+      testIgnore: /login\.spec\.ts/,
       dependencies: ['setup'],
       use: {
         ...devices['Desktop Chrome'],
         channel: browserChannel(),
-        // Without an account the browse tests sign in as a guest instead (see browse.spec.ts).
+        // Without an account these tests sign in as a guest instead (see browse-pages.ts enterApp).
         storageState: process.env.GNOMEX_USER && process.env.GNOMEX_PASSWORD ? AUTH_STATE : undefined,
       },
     },

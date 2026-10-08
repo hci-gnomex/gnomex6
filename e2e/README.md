@@ -8,6 +8,15 @@ Browser tests that drive a **running** GNomEx (Tomcat backend + Angular front en
 | `tests/browse.spec.ts` | Experiments, Analysis and Data Tracks: open from the header, tree loads, filter-bar Search re-queries, clicking the first tree node shows its details |
 | `tests/auth.setup.ts` | Signs in once and saves the session for the browse tests, then warms the server up by loading each browse list once (up to 3 min each; times are logged as `warm-up:` lines) so a cold first query doesn't time out a browse test |
 | `tests/browse-pages.ts` | The three browse pages (labels, routes, list endpoints) shared by the browse tests and the warm-up |
+| `tests/experiment-detail.spec.ts` | Opens the first experiment: number heading, actions, Order Status; every tab opens and shows content; Experiment Design lists samples |
+| `tests/analysis-detail.spec.ts` | Opens the first analysis: number, name, visibility; every tab opens and shows content |
+| `tests/datatracks.spec.ts` | Selecting an organism; the data track search box narrows the tree; walking to a data track opens its summary |
+| `tests/header.spec.ts` | Lookup by experiment number opens that experiment; text search returns results; Help menu items; About dialog |
+| `tests/topics-protocols.spec.ts` | A topic opens with its Info/Visibility tabs; items linked to a topic open; a protocol opens with its details |
+| `tests/tree-helpers.ts` | Tree walking (expand folders, open the first item that reaches a page), visit-every-tab, and a check that fails on GNomEx's ERROR dialog |
+
+All of these are read-only: they open, search and switch tabs but never save. They run in the `app` project, after
+the sign-in/warm-up step, signed in or as a guest.
 
 These live outside `gnomex_ng` on purpose: Playwright needs **Node 18+**, while the Angular 9 build needs Node 12.
 
@@ -48,6 +57,12 @@ powershell -ExecutionPolicy Bypass -File scripts/run-tests.ps1 -E2E
 Without `GNOMEX_USER`/`GNOMEX_PASSWORD` the sign-in tests skip and the browse tests use **Guest Login**
 (public data only), provided the server allows guest access. To force a guest run even when `.env` has an
 account, blank the variables for that run: `GNOMEX_USER= GNOMEX_PASSWORD= npm test`.
+
+Other settings: `GNOMEX_DATATRACK_SEARCH` (default `hg19`) is the term the data track search test uses, and
+`TREE_DEBUG=1` logs each step of the tree walks when working out why a test found nothing to open.
+
+The header **text search** test fails on servers without a Lucene index, quoting the server's error
+(`directory '.../luceneIndex/global' does not exist`). Build the index with `scripts/index_gnomex.*`.
 
 Failures keep a screenshot, video and trace in `test-results/`; open a trace with
 `npx playwright show-trace <path>/trace.zip`.
