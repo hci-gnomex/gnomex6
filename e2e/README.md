@@ -6,7 +6,8 @@ Browser tests that drive a **running** GNomEx (Tomcat backend + Angular front en
 |---|---|
 | `tests/login.spec.ts` | Login form renders; unauthenticated deep link redirects to sign-in; unknown user is rejected; Guest Login works; valid user reaches Home; session survives reload; Sign out |
 | `tests/browse.spec.ts` | Experiments, Analysis and Data Tracks: open from the header, tree loads, filter-bar Search re-queries, clicking the first tree node shows its details |
-| `tests/auth.setup.ts` | Signs in once and saves the session for the browse tests |
+| `tests/auth.setup.ts` | Signs in once and saves the session for the browse tests, then warms the server up by loading each browse list once (up to 3 min each; times are logged as `warm-up:` lines) so a cold first query doesn't time out a browse test |
+| `tests/browse-pages.ts` | The three browse pages (labels, routes, list endpoints) shared by the browse tests and the warm-up |
 
 These live outside `gnomex_ng` on purpose: Playwright needs **Node 18+**, while the Angular 9 build needs Node 12.
 

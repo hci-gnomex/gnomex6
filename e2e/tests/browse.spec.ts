@@ -1,73 +1,17 @@
 import { expect, Page, test } from '@playwright/test';
-import { guestLogin, hasCredentials, openFromNav, waitForAppReady, waitForSpinner } from './helpers';
+import { waitForSpinner } from './helpers';
+import { BrowsePage, browsePages, enterApp, openBrowsePage as openFromHeader } from './browse-pages';
 
 // With an account, these run with the signed-in state saved by auth.setup.ts.
 // Without one, each test enters as a guest, which covers the public data only.
-
-interface BrowsePage {
-  name: string;
-  navItem: string;
-  /** Set when the header item is a drop-down for signed-in users. */
-  menuItem?: string;
-  route: RegExp;
-  region: string;
-  tree: string;
-  detailsPanel: string;
-  listEndpoint: string;
-  /** URL a node click can lead to (overview of a group or detail of an item). */
-  nodeRoute: RegExp;
-}
-
-const pages: BrowsePage[] = [
-  {
-    name: 'experiments',
-    navItem: 'Experiments',
-    menuItem: 'Browse Experiments',
-    route: /\/experiments/,
-    region: 'Experiments Browser',
-    tree: 'Experiments hierarchy',
-    detailsPanel: 'Experiment details panel',
-    listEndpoint: 'GetProjectRequestList.gx',
-    nodeRoute: /\/experiments\/(overview|detail)/,
-  },
-  {
-    name: 'analysis',
-    navItem: 'Analysis',
-    route: /\/analysis/,
-    region: 'Browse analysis',
-    tree: 'Analysis groups and analyses',
-    detailsPanel: 'Analysis details panel',
-    listEndpoint: 'GetAnalysisGroupList.gx',
-    nodeRoute: /\/analysis\/(overview|detail)/,
-  },
-  {
-    name: 'data tracks',
-    navItem: 'Data Tracks',
-    route: /\/datatracks/,
-    region: 'Data Tracks Browser',
-    tree: 'Data track folders and tracks',
-    detailsPanel: 'Data track details panel',
-    listEndpoint: 'GetDataTrackList.gx',
-    nodeRoute: /\/datatracks\/(organism|genomebuild|folder|detail)/,
-  },
-];
+// auth.setup.ts warms the server up first, so a cold first query doesn't time these out.
 
 async function openBrowsePage(page: Page, p: BrowsePage): Promise<void> {
-  if (hasCredentials) {
-    await page.goto('home');
-    await waitForAppReady(page);
-  } else {
-    await guestLogin(page);
-  }
-
-  const treeLoaded = page.waitForResponse(r => r.url().includes(p.listEndpoint) && r.ok());
-  await openFromNav(page, p.navItem, p.menuItem);
-  await page.waitForURL(p.route);
-  await treeLoaded;
-  await expect(page.getByRole('main', { name: p.region })).toBeVisible();
+  await enterApp(page);
+  await openFromHeader(page, p);
 }
 
-for (const p of pages) {
+for (const p of browsePages) {
   test.describe(`browse ${p.name}`, () => {
     test('opens from the header and loads the tree', async ({ page }) => {
       await openBrowsePage(page, p);
