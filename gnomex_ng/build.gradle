@@ -2,23 +2,8 @@ buildscript {
   repositories { mavenCentral() }
 }
 
-plugins {
-  id "com.github.node-gradle.node" version "7.1.0"
-}
-
 repositories {
   mavenCentral()
-}
-
-node {
-  // Angular 7 works well with Node 10.x (you’re using 10.24.1)
-  // If you want Gradle to manage Node automatically, uncomment these:
-  // version = "10.24.1"
-  // npmVersion = "6.14.12"
-  // download = true
-
-  // If you already have Node installed and want to use system Node, leave download=false (default)
-  // download = false
 }
 
 def isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
