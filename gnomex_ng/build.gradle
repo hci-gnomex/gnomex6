@@ -23,80 +23,120 @@ node {
 
 def isWindows = System.getProperty("os.name").toLowerCase().contains("windows")
 
-// ----- Clean tasks -----
-tasks.register('cleanAngularDist', NpmTask) {
-  //ensure install has ran
-  dependsOn tasks.named('npmInstallSmart')
-  args = ['run', 'clean:dist']
+// ----- Node selection -----
+// Angular 9's webpack 4 fails on Node 17+ ("digital envelope routines::unsupported"), so these tasks
+// can't use whatever Node is the nvm default. Same rule as scripts/run-tests.*: NG_NODE if set,
+// else Node 12 from PATH or an nvm install, else the newest Node 10-16.
+def angularNodeCache = [:]
+def findAngularNode = {
+  if (angularNodeCache.node) {
+    return angularNodeCache.node
+  }
+  if (System.getenv('NG_NODE')) {
+    return angularNodeCache.node = new File(System.getenv('NG_NODE'))
+  }
+  def exeName = isWindows ? 'node.exe' : 'node'
+  def candidates = []
+  System.getenv('PATH')?.split(File.pathSeparator)?.each { candidates << new File(it, exeName) }
+  def nvmRoots = [System.getenv('NVM_HOME'), 'C:/nvm',
+                  System.getenv('APPDATA') ? "${System.getenv('APPDATA')}/nvm" : null,
+                  "${System.getenv('NVM_DIR') ?: System.getProperty('user.home') + '/.nvm'}/versions/node"]
+  nvmRoots.findAll { it }.each { root ->
+    new File(root).listFiles()?.findAll { it.isDirectory() && it.name.startsWith('v') }?.each { dir ->
+      candidates << new File(dir, exeName) << new File(dir, "bin/${exeName}")
+    }
+  }
+  def best = null
+  int bestScore = -1
+  candidates.findAll { it.isFile() }.unique { it.canonicalPath }.each { exe ->
+    def proc = [exe.absolutePath, '-v'].execute()
+    def m = proc.text.trim() =~ /^v(\d+)\./
+    proc.waitFor()
+    if (!m.find()) return
+    int major = m.group(1) as int
+    if (major < 10 || major > 16) return
+    int score = major == 12 ? 1000 : major
+    if (score > bestScore) { best = exe; bestScore = score }
+  }
+  if (!best) {
+    throw new GradleException("The Angular 9 build needs Node 10-16 (12 preferred). Install one (nvm install 12) or set NG_NODE.")
+  }
+  return angularNodeCache.node = best
 }
 
-tasks.register('cleanAngularAll', NpmTask) {
+// Configures an Exec task to run `npm <args>` with that Node and its own npm. Node's directory goes
+// first on PATH because npm scripts (`npm version`, `node ... ng build`, the ng shim, Karma) run
+// whichever `node`/`npm` they find there. npmArgs is a closure so it's evaluated at execution time.
+def runNpmWithAngularNode = { Exec task, Closure<List<String>> npmArgs ->
+  task.workingDir projectDir
+  task.doFirst {
+    File node = findAngularNode()
+    // nvm-windows keeps npm next to node.exe; Unix installs keep it under lib/.
+    File npmCli = [new File(node.parentFile, 'node_modules/npm/bin/npm-cli.js'),
+                   new File(node.parentFile.parentFile, 'lib/node_modules/npm/bin/npm-cli.js')].find { it.isFile() }
+    if (!npmCli) {
+      throw new GradleException("No npm found next to ${node}.")
+    }
+    logger.lifecycle("Using ${node} (${[node.absolutePath, '-v'].execute().text.trim()}) for ${task.name}")
+    // Windows spells it 'Path', so reuse the existing key rather than adding a second one.
+    def pathKey = System.getenv().keySet().find { it.equalsIgnoreCase('PATH') } ?: 'PATH'
+    task.environment pathKey, node.parentFile.absolutePath + File.pathSeparator + System.getenv(pathKey)
+    task.commandLine([node.absolutePath, npmCli.absolutePath] + npmArgs())
+  }
+}
+
+// ----- Clean tasks -----
+tasks.register('cleanAngularDist', Exec) {
+  //ensure install has ran
+  dependsOn tasks.named('npmInstallSmart')
+  runNpmWithAngularNode(it) { ['run', 'clean:dist'] }
+}
+
+tasks.register('cleanAngularAll', Exec) {
   // Uses: "clean": "npm cache clean --force && rimraf node_modules dist"
-  args = ['run', 'clean']
+  runNpmWithAngularNode(it) { ['run', 'clean'] }
 }
 
 // ----- Install task -----
 // Prefer npm ci when there is a package-lock.json, otherwise fallback to npm install
-tasks.register('npmInstallSmart') {
-  dependsOn tasks.named('npmSetup') // from node-gradle plugin (safe even if system node)
-  doLast {
-    File lock = file("${projectDir}/package-lock.json")
-    if (lock.exists()) {
-      // npm ci is reproducible and faster for CI/build servers
-      exec {
-        workingDir projectDir
-        if (isWindows) {
-          commandLine "cmd", "/c", "npm", "ci"
-        } else {
-          commandLine "npm", "ci"
-        }
-      }
-    } else {
-      exec {
-        workingDir projectDir
-        if (isWindows) {
-          commandLine "cmd", "/c", "npm", "install"
-        } else {
-          commandLine "npm", "install"
-        }
-      }
-    }
-  }
+tasks.register('npmInstallSmart', Exec) {
+  // npm ci is reproducible and faster for CI/build servers
+  runNpmWithAngularNode(it) { file("${projectDir}/package-lock.json").exists() ? ['ci'] : ['install'] }
 }
 
 // ----- Build tasks (Angular CLI) -----
-tasks.register('ngBuildDevTomcat', NpmTask) {
+tasks.register('ngBuildDevTomcat', Exec) {
   // Runs: "build:dev:tomcat": "ng build -c developmentTomcat"
   dependsOn tasks.named('npmInstallSmart')
   dependsOn tasks.named('cleanAngularDist')
-  args = ['run', 'build:dev:tomcat']
+  runNpmWithAngularNode(it) { ['run', 'build:dev:tomcat'] }
 }
 
-tasks.register('ngBuildProdTomcat', NpmTask) {
+tasks.register('ngBuildProdTomcat', Exec) {
   // Runs: "build:prod:tomcat": "ng build -c productionTomcat"
   dependsOn tasks.named('npmInstallSmart')
   dependsOn tasks.named('cleanAngularDist')
-  args = ['run', 'build:prod:tomcat']
+  runNpmWithAngularNode(it) { ['run', 'build:prod:tomcat'] }
 }
 
 // ----- Unit tests (Karma, headless) -----
 // Not wired to npmInstallSmart because `npm ci` wipes node_modules on every run;
 // run `npm install` (or ./gradlew :gnomex_ng:npmInstallSmart) once first.
 // Add -Pcoverage for an istanbul report in gnomex_ng/coverage/gnomex-ng/index.html
-tasks.register('ngTest', NpmTask) {
+tasks.register('ngTest', Exec) {
   group = 'verification'
-  description = 'Runs Angular unit tests once in headless Chrome/Edge.'
-  args = ['run', project.hasProperty('coverage') ? 'test:coverage' : 'test:ci']
+  description = 'Runs Angular unit tests once in headless Chromium/Chrome/Edge, using Node 12.'
   doFirst {
     if (!file("${projectDir}/node_modules").exists()) {
       throw new GradleException("gnomex_ng/node_modules is missing - run 'npm install' in gnomex_ng first.")
     }
   }
+  runNpmWithAngularNode(it) { ['run', project.hasProperty('coverage') ? 'test:coverage' : 'test:ci'] }
 }
 
 // Optional: run dev server from Gradle (for local dev)
-tasks.register('ngServeTomcat', NpmTask) {
+tasks.register('ngServeTomcat', Exec) {
   // Runs: "start": "ng serve -c developmentTomcat --proxy-config proxy.conf.json"
   dependsOn tasks.named('npmInstallSmart')
-  args = ['run', 'start']
+  runNpmWithAngularNode(it) { ['run', 'start'] }
 }
