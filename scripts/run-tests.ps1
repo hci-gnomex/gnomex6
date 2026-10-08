@@ -13,6 +13,8 @@
 
 .NOTES
     Exit code is 0 only if every suite that ran passed, so this can gate a CI job or a deploy.
+    Node: the Angular tests use Node 12 (or another 10-16) and Playwright the newest Node 18+,
+    found on PATH or under nvm whatever the current default is. Override with NG_NODE / E2E_NODE.
     Reports:
       build\reports\tests\test\index.html            (JUnit)
       gnomex_ng\coverage\gnomex-ng\index.html        (Angular coverage, with -Coverage)
@@ -50,10 +52,13 @@ function Invoke-Suite([string]$name, [string]$dir, [scriptblock]$command) {
     }
 }
 
-# Playwright needs Node 18+, but the Angular 9 build needs Node 12, so the default `node`
-# may be too old. Use E2E_NODE if set, else the newest of the PATH node and any nvm installs.
-function Find-ModernNode {
-    if ($env:E2E_NODE) { return $env:E2E_NODE }
+# The Angular 9 build (webpack 4) fails on Node 17+ ("digital envelope routines::unsupported"),
+# while Playwright needs Node 18+, so each suite picks its own Node regardless of the nvm default.
+# Searches the PATH node and nvm installs for a major version in [Min, Max]; -Prefer wins if
+# present, otherwise the highest version in range. An explicit override env var always wins.
+function Find-Node([int]$Min, [int]$Max, [int]$Prefer, [string]$OverrideVar, [string]$Purpose) {
+    $override = [Environment]::GetEnvironmentVariable($OverrideVar)
+    if ($override) { return $override }
     $candidates = @()
     $pathNode = Get-Command node -ErrorAction SilentlyContinue
     if ($pathNode) { $candidates += $pathNode.Source }
@@ -62,15 +67,17 @@ function Find-ModernNode {
         $candidates += Get-ChildItem -Path $dir -Filter node.exe -Recurse -Depth 1 -ErrorAction SilentlyContinue |
             ForEach-Object { $_.FullName }
     }
-    $best = $null; $bestMajor = 0
+    $best = $null; $bestScore = -1
     foreach ($exe in $candidates | Select-Object -Unique) {
         $version = & $exe -v 2>$null
-        if ($version -match '^v(\d+)\.' -and [int]$Matches[1] -gt $bestMajor) {
-            $best = $exe; $bestMajor = [int]$Matches[1]
-        }
+        if ($version -notmatch '^v(\d+)\.') { continue }
+        $major = [int]$Matches[1]
+        if ($major -lt $Min -or $major -gt $Max) { continue }
+        $score = if ($major -eq $Prefer) { 1000 } else { $major }
+        if ($score -gt $bestScore) { $best = $exe; $bestScore = $score }
     }
-    if ($bestMajor -ge 18) { return $best }
-    throw "Playwright needs Node 18 or newer. Install one (e.g. 'nvm install 22') or set E2E_NODE to its node.exe."
+    if ($best) { return $best }
+    throw "$Purpose needs Node $Min-$Max. Install one (e.g. 'nvm install $(if ($Prefer) { $Prefer } else { $Min })') or set $OverrideVar to its node.exe."
 }
 
 if ($runAll -or $Backend) {
@@ -79,17 +86,29 @@ if ($runAll -or $Backend) {
 
 if ($runAll -or $Frontend) {
     $ng = Join-Path $root 'gnomex_ng'
-    if (-not (Test-Path (Join-Path $ng 'node_modules'))) {
-        Write-Host "gnomex_ng\node_modules missing - running npm install first" -ForegroundColor Yellow
-        Push-Location $ng; try { npm install } finally { Pop-Location }
+    $savedPath = $env:PATH
+    try {
+        $ngNode = Find-Node -Min 10 -Max 16 -Prefer 12 -OverrideVar 'NG_NODE' -Purpose 'The Angular 9 build'
+        Write-Host "Using $ngNode ($(& $ngNode -v)) for the Angular tests"
+        # npm and the ng shim both run whichever `node` is first on PATH.
+        $env:PATH = "$(Split-Path $ngNode);$savedPath"
+        if (-not (Test-Path (Join-Path $ng 'node_modules'))) {
+            Write-Host "gnomex_ng\node_modules missing - running npm install first" -ForegroundColor Yellow
+            Push-Location $ng; try { npm install } finally { Pop-Location }
+        }
+        $script = if ($Coverage) { 'test:coverage' } else { 'test:ci' }
+        Invoke-Suite 'Frontend (Karma)' $ng { npm run $script }
+    } catch {
+        Write-Host $_ -ForegroundColor Red
+        $results['Frontend (Karma)'] = [pscustomobject]@{ Passed = $false; Seconds = 0 }
+    } finally {
+        $env:PATH = $savedPath
     }
-    $script = if ($Coverage) { 'test:coverage' } else { 'test:ci' }
-    Invoke-Suite 'Frontend (Karma)' $ng { npm run $script }
 }
 
 if ($E2E) {
     $e2eDir = Join-Path $root 'e2e'
-    $node = Find-ModernNode
+    $node = Find-Node -Min 18 -Max 999 -Prefer 0 -OverrideVar 'E2E_NODE' -Purpose 'Playwright'
     Write-Host "Using $node ($(& $node -v)) for Playwright"
     if (-not (Test-Path (Join-Path $e2eDir 'node_modules'))) {
         $npmCli = Join-Path (Split-Path $node) 'node_modules/npm/bin/npm-cli.js'
