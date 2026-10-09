@@ -23,8 +23,6 @@ function browserChannel(): string | undefined {
   return process.platform === 'win32' ? 'msedge' : 'chrome';
 }
 
-export const AUTH_STATE = path.join(__dirname, '.auth', 'user.json');
-
 export default defineConfig({
   testDir: './tests',
   outputDir: './test-results',
@@ -45,26 +43,29 @@ export default defineConfig({
     ignoreHTTPSErrors: true,
   },
   projects: [
-    // Logs in once through the UI and saves cookies + the gnomex-jwt token for the app tests,
-    // then warms the server up.
-    { name: 'setup', testMatch: /auth\.setup\.ts/ },
+    // Loads each browse list once so a cold server doesn't time out the first app tests.
+    { name: 'setup', testMatch: /\.setup\.ts$/ },
     {
       name: 'login',
       testMatch: /login\.spec\.ts/,
       use: { ...devices['Desktop Chrome'], channel: browserChannel() },
     },
     {
-      // Everything that runs inside the app: browse, detail pages, header, topics, protocols.
+      // Everything read-only inside the app: browse, detail pages, header, topics, protocols.
+      // Each test signs in (or enters as a guest) itself; see browse-pages.ts enterApp.
       name: 'app',
       testMatch: /\.spec\.ts$/,
-      testIgnore: /login\.spec\.ts/,
+      testIgnore: [/login\.spec\.ts/, /\.write\.spec\.ts$/],
       dependencies: ['setup'],
-      use: {
-        ...devices['Desktop Chrome'],
-        channel: browserChannel(),
-        // Without an account these tests sign in as a guest instead (see browse-pages.ts enterApp).
-        storageState: process.env.GNOMEX_USER && process.env.GNOMEX_PASSWORD ? AUTH_STATE : undefined,
-      },
+      use: { ...devices['Desktop Chrome'], channel: browserChannel() },
+    },
+    {
+      // Create/edit tests. They change data, so they skip unless GNOMEX_ALLOW_WRITES=yes and the
+      // server is on localhost (a throwaway database); see write-helpers.ts.
+      name: 'writes',
+      testMatch: /\.write\.spec\.ts$/,
+      dependencies: ['setup'],
+      use: { ...devices['Desktop Chrome'], channel: browserChannel() },
     },
   ],
 });

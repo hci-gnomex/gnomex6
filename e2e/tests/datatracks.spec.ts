@@ -20,7 +20,8 @@ test.describe('data tracks', () => {
     const organism = tree.getByRole('treeitem').first();
     await organism.click();
     await waitForSpinner(page);
-    await expect(page).toHaveURL(/\/datatracks\/organism\?idOrganism=\d+/);
+    // Admins' URLs also carry the lab and visibility filter before idOrganism.
+    await expect(page).toHaveURL(/\/datatracks\/organism\?(.*&)?idOrganism=\d+/);
     await expect(organism).toHaveAttribute('aria-selected', 'true');
     await expect(page.getByRole('region', { name: dataTracks.detailsPanel })).not.toBeEmpty();
     await expectNoErrorDialog(page);

@@ -4,9 +4,12 @@ import { waitForSpinner } from './helpers';
 // Helpers for the angular-tree-component trees (role=tree / role=treeitem, with aria-expanded on
 // nodes that have children) and for GNomEx's error dialog.
 
-/** Fails the test if GNomEx showed its "ERROR" dialog, quoting the server's message. */
+/**
+ * Fails the test if GNomEx showed its "ERROR" dialog, or its "INVALID" one (e.g. "Insufficient
+ * permission to access this request or this lab"), quoting the server's message.
+ */
 export async function expectNoErrorDialog(page: Page): Promise<void> {
-  const error = page.getByRole('alertdialog', { name: 'ERROR' });
+  const error = page.getByRole('alertdialog', { name: /^(ERROR|INVALID)$/ });
   if (await error.count() > 0) {
     throw new Error(`GNomEx showed an ERROR dialog: ${(await error.first().innerText()).replace(/\s+/g, ' ').trim()}`);
   }
@@ -73,12 +76,16 @@ export async function visitEveryTab(page: Page, container: Locator): Promise<str
   const names = await tabs.evaluateAll(els =>
     els.map(e => (e.getAttribute('aria-label') || e.textContent || '').trim()));
   for (const name of names) {
+    if (process.env.TREE_DEBUG) console.log(`tab: opening "${name}"`);
     await container.getByRole('tab', { name, exact: true }).click();
-    await waitForSpinner(page);
+    await waitForSpinner(page).catch(() => {
+      throw new Error(`The "${name}" tab was still loading ("Please wait...") after 60 s.`);
+    });
     await expect(container.getByRole('tab', { name, exact: true })).toHaveAttribute('aria-selected', 'true');
     const panel = container.getByRole('tabpanel', { name, exact: true });
     await expect(panel, `the "${name}" tab panel`).toBeVisible();
-    await expect(panel, `the "${name}" tab panel`).not.toBeEmpty();
+    // The panel's content must render, but it may have no text (e.g. an empty description).
+    await expect(panel.locator('*').first(), `the "${name}" tab panel content`).toBeAttached();
     await expectNoErrorDialog(page);
   }
   return names;
