@@ -11,6 +11,7 @@ Browser tests that drive a **running** GNomEx (Tomcat backend + Angular front en
 | `tests/datatracks.spec.ts` | Selecting an organism; the data track search box narrows the tree; walking to a data track opens its summary |
 | `tests/header.spec.ts` | Lookup by experiment number opens that experiment; text search returns results; Help menu items; About dialog |
 | `tests/topics-protocols.spec.ts` | A topic opens with its Info/Visibility tabs; items linked to a topic open; a protocol opens with its details |
+| `tests/accessibility.spec.ts` | Keyboard: arrow keys move through the Experiments tree (aria-activedescendant), ArrowLeft/Right collapse/expand, Enter selects; "Skip to main content" (signed-in only); pin-header and filter collapse toggles report aria-pressed/aria-expanded |
 | `tests/projects.write.spec.ts` | **Changes data.** Creates a project and opens it; renames one; deletes one from the tree |
 | `tests/topics.write.spec.ts` | **Changes data.** Creates a topic and opens it; renames one; deletes one |
 | `tests/analysis-groups.write.spec.ts` | **Changes data.** Creates an analysis group under its lab and opens it; deletes one |
@@ -75,7 +76,9 @@ powershell -ExecutionPolicy Bypass -File scripts/run-tests.ps1 -E2E
 - `GNOMEX_BASE_URL` is on `localhost` (they refuse any other server)
 - an account is set, and `GNOMEX_WRITE_LAB` names a small lab to create data in
 
-Use them only against a **throwaway database**. Everything they create is named `e2e-<kind>-<time>-<random>` and
+Use them only against a **throwaway database**. The `localhost` check only proves Tomcat is local, not its
+database: a local Tomcat can point at a shared server (see `hci.gnomex.url` in Tomcat's `conf/catalina.properties`),
+so confirm that database is disposable before setting `GNOMEX_ALLOW_WRITES=yes`. Everything they create is named `e2e-<kind>-<time>-<random>` and
 deleted again, through the UI or, if a test fails half-way, through GNomEx's own delete call afterwards.
 
 ```bash
