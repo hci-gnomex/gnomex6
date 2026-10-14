@@ -36,6 +36,9 @@ export default defineConfig({
   reporter: [['list'], ['html', { open: 'never', outputFolder: 'playwright-report' }]],
   use: {
     baseURL,
+    // Without these a click or page load whose target never appears waits for the whole test.
+    actionTimeout: 45_000,
+    navigationTimeout: 90_000,
     channel: browserChannel(),
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',

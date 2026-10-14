@@ -14,6 +14,7 @@ Browser tests that drive a **running** GNomEx (Tomcat backend + Angular front en
 | `tests/accessibility.spec.ts` | Keyboard: arrow keys move through the Experiments tree (aria-activedescendant), ArrowLeft/Right collapse/expand, Enter selects; "Skip to main content" (signed-in only); pin-header and filter collapse toggles report aria-pressed/aria-expanded |
 | `tests/dialogs.spec.ts` | Unknown experiment number explains the problem; Report Problem form opens and closes without sending; Contact Us lists email links; the date filter adds/removes `createDateFrom`/`createDateTo` |
 | `tests/security.spec.ts` | API check: `GetLab.gx` must not send password salts, reset GUIDs or passwords to the browser (counts only, values never printed) |
+| `tests/menu-pages.spec.ts` | One test per drop-down menu (New Experiment Order, Experiments, Workflow, Products, Configure, Reports, any other): opens every item and checks for no ERROR/INVALID dialog, no error responses and visible content; dialogs are closed with Cancel/Close; menus the user lacks are skipped |
 | `tests/projects.write.spec.ts` | **Changes data.** Creates a project and opens it; renames one; deletes one from the tree |
 | `tests/topics.write.spec.ts` | **Changes data.** Creates a topic and opens it; renames one; deletes one |
 | `tests/analysis-groups.write.spec.ts` | **Changes data.** Creates an analysis group under its lab and opens it; deletes one |
