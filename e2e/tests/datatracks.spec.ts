@@ -10,6 +10,9 @@ const dataTracks = browsePages.find(p => p.name === 'data tracks')!;
 const SEARCH_TERM = process.env.GNOMEX_DATATRACK_SEARCH || 'hg19';
 
 test.describe('data tracks', () => {
+  // GetDataTrackList.gx can take 50-60 s for a signed-in ordinary user; see browse.spec.ts.
+  test.slow();
+
   test.beforeEach(async ({ page }) => {
     await enterApp(page);
     await openBrowsePage(page, dataTracks);

@@ -13,6 +13,12 @@ async function openBrowsePage(page: Page, p: BrowsePage): Promise<void> {
 
 for (const p of browsePages) {
   test.describe(`browse ${p.name}`, () => {
+    // Seen 2026-10: for a signed-in ordinary user GetDataTrackList.gx takes 50-60 s (a guest gets it in
+    // a few seconds), and the search test loads it twice. Allow for that here; the warm-up's
+    // "warm-up: data tracks list loaded in ..." line shows the actual time.
+    if (p.name === 'data tracks') {
+      test.slow();
+    }
     test('opens from the header and loads the tree', async ({ page }) => {
       await openBrowsePage(page, p);
 

@@ -6,12 +6,14 @@ Browser tests that drive a **running** GNomEx (Tomcat backend + Angular front en
 |---|---|
 | `tests/login.spec.ts` | Login form renders; unauthenticated deep link redirects to sign-in; unknown user is rejected; Guest Login works; valid user reaches Home; session survives reload; Sign out |
 | `tests/browse.spec.ts` | Experiments, Analysis and Data Tracks: open from the header, tree loads, filter-bar Search re-queries, clicking the first tree node shows its details |
-| `tests/experiment-detail.spec.ts` | Opens the first experiment: number heading, actions, Order Status; every tab opens and shows content; Experiment Design lists samples |
+| `tests/experiment-detail.spec.ts` | Opens the first experiment: number heading, actions, Overview; every tab opens and shows content; Experiment Design lists samples; Share URL links to the experiment and copies it |
 | `tests/analysis-detail.spec.ts` | Opens the first analysis: number, name, visibility; every tab opens and shows content |
 | `tests/datatracks.spec.ts` | Selecting an organism; the data track search box narrows the tree; walking to a data track opens its summary |
 | `tests/header.spec.ts` | Lookup by experiment number opens that experiment; text search returns results; Help menu items; About dialog |
 | `tests/topics-protocols.spec.ts` | A topic opens with its Info/Visibility tabs; items linked to a topic open; a protocol opens with its details |
 | `tests/accessibility.spec.ts` | Keyboard: arrow keys move through the Experiments tree (aria-activedescendant), ArrowLeft/Right collapse/expand, Enter selects; "Skip to main content" (signed-in only); pin-header and filter collapse toggles report aria-pressed/aria-expanded |
+| `tests/dialogs.spec.ts` | Unknown experiment number explains the problem; Report Problem form opens and closes without sending; Contact Us lists email links; the date filter adds/removes `createDateFrom`/`createDateTo` |
+| `tests/security.spec.ts` | API check: `GetLab.gx` must not send password salts, reset GUIDs or passwords to the browser (counts only, values never printed) |
 | `tests/projects.write.spec.ts` | **Changes data.** Creates a project and opens it; renames one; deletes one from the tree |
 | `tests/topics.write.spec.ts` | **Changes data.** Creates a topic and opens it; renames one; deletes one |
 | `tests/analysis-groups.write.spec.ts` | **Changes data.** Creates an analysis group under its lab and opens it; deletes one |

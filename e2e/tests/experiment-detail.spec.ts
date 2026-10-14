@@ -16,11 +16,13 @@ test.describe('experiment detail', () => {
 
   test('shows the experiment number and its actions', async ({ page }) => {
     const detail = page.getByRole('main', { name: 'Experiment Detail Overview' });
-    await expect(detail.getByRole('heading', { level: 1 })).toHaveText(/^\s*Experiment \d+R\d*\s*$/);
+    // Numbers may carry a letter prefix, e.g. "S1261R".
+    await expect(detail.getByRole('heading', { level: 1 })).toHaveText(/^\s*Experiment [A-Z]*\d+R\d*\s*$/);
     const actions = detail.getByRole('toolbar', { name: 'Experiment actions' });
     await expect(actions.getByRole('button', { name: 'Download experiment files' })).toBeVisible();
     await expect(actions.getByRole('button', { name: 'Share experiment URL' })).toBeVisible();
-    await expect(detail.getByRole('region', { name: 'Order Status' })).toBeVisible();
+    // Order Status only exists for some experiment types (not e.g. "S" numbers), so check the tab.
+    await expect(detail.getByRole('tabpanel', { name: 'Overview tab' })).not.toBeEmpty();
     await expectNoErrorDialog(page);
   });
 
@@ -37,5 +39,23 @@ test.describe('experiment detail', () => {
     const panel = detail.getByRole('tabpanel', { name: 'Experiment Design tab' });
     await expect(panel.getByRole('button', { name: 'Download sample sheet' })).toBeVisible();
     await expect(panel.getByRole('grid').first().getByRole('row').nth(1)).toBeVisible();
+  });
+
+  test('Share URL gives a link to this experiment and copies it', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    const detail = page.getByRole('main', { name: 'Experiment Detail Overview' });
+    const number = (await detail.getByRole('heading', { level: 1 }).innerText()).replace('Experiment', '').trim();
+
+    await detail.getByRole('toolbar', { name: 'Experiment actions' }).getByRole('button', { name: 'Share experiment URL' }).click();
+    const dialog = page.getByRole('dialog', { name: `Web Link for Experiment ${number}` }).first();
+    const link = dialog.getByRole('textbox', { name: 'Shareable link URL' });
+    await expect(link).toHaveValue(new RegExp(`/gnomex/\\?requestNumber=${number}$`));
+
+    await dialog.getByRole('button', { name: 'Copy To Clipboard' }).click();
+    const copied = await page.evaluate(() => navigator.clipboard.readText());
+    expect(copied).toBe(await link.inputValue());
+
+    await dialog.getByRole('button', { name: 'Close dialog' }).click();
+    await expect(dialog).toBeHidden();
   });
 });
