@@ -1,6 +1,6 @@
 import { expect, Page, test } from '@playwright/test';
 import { waitForSpinner } from './helpers';
-import { BrowsePage, browsePages, enterApp, openBrowsePage as openFromHeader } from './browse-pages';
+import { BrowsePage, browsePages, enterApp, LIST_TIMEOUT, openBrowsePage as openFromHeader } from './browse-pages';
 
 // With an account, these run with the signed-in state saved by auth.setup.ts.
 // Without one, each test enters as a guest, which covers the public data only.
@@ -29,7 +29,7 @@ for (const p of browsePages) {
     test('re-runs the search from the filter bar', async ({ page }) => {
       await openBrowsePage(page, p);
 
-      const reloaded = page.waitForResponse(r => r.url().includes(p.listEndpoint) && r.ok());
+      const reloaded = page.waitForResponse(r => r.url().includes(p.listEndpoint) && r.ok(), { timeout: LIST_TIMEOUT });
       await page.getByRole('search', { name: 'Browse filter' }).getByRole('button', { name: 'Search', exact: true }).click();
       await reloaded;
       await waitForSpinner(page);

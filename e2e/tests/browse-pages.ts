@@ -68,23 +68,30 @@ export async function enterApp(page: Page): Promise<void> {
 export const LAB = process.env.GNOMEX_LAB || '';
 
 /**
+ * How long a browse list may take. Much longer than the default action timeout: seen 2026-10,
+ * GetDataTrackList.gx takes ~57 s for a signed-in ordinary user.
+ */
+export const LIST_TIMEOUT = 150_000;
+
+/**
  * Opens a browse page from the header and waits for its tree data to arrive. Guests and ordinary
  * users get their list straight away; admins see an empty page until they pick a lab and press
  * Search, so for them this picks GNOMEX_LAB.
  */
-export async function openBrowsePage(page: Page, p: BrowsePage, listTimeout?: number): Promise<void> {
+export async function openBrowsePage(page: Page, p: BrowsePage, listTimeout: number = LIST_TIMEOUT): Promise<void> {
   const treeLoaded = page.waitForResponse(r => r.url().includes(p.listEndpoint) && r.ok(), { timeout: listTimeout });
   await openFromNav(page, p.navItem, p.menuItem);
   await page.waitForURL(p.route);
   const main = page.getByRole('main', { name: p.region });
   const filter = main.getByRole('search', { name: 'Browse filter' });
   // Only the admin view has a lab picker or an "All" checkbox; everyone else just waits for the list.
+  // Not finding the admin view is normal, so its wait ending only means "keep waiting for the list".
   const adminView = filter.getByRole('combobox', { name: 'Select a lab...' })
     .or(filter.getByRole('checkbox', { name: 'All', exact: true })).first();
   const loaded = treeLoaded.then(() => 'loaded' as const, () => 'timed out' as const);
   const first = await Promise.race([
     loaded,
-    adminView.waitFor({ timeout: listTimeout }).then(() => 'admin view' as const, () => 'timed out' as const),
+    adminView.waitFor({ timeout: listTimeout }).then(() => 'admin view' as const, () => 'no admin view' as const),
   ]);
   if (first === 'admin view') {
     // Give an auto-loading list a moment before deciding this view needs a lab picked.
@@ -99,8 +106,8 @@ export async function openBrowsePage(page: Page, p: BrowsePage, listTimeout?: nu
       }
       await afterSearch;
     }
-  } else if (first === 'timed out' || (await loaded) === 'timed out') {
-    throw new Error(`The ${p.name} list (${p.listEndpoint}) didn't load.`);
+  } else if ((await loaded) === 'timed out') {
+    throw new Error(`The ${p.name} list (${p.listEndpoint}) didn't load within ${listTimeout / 1000} s.`);
   }
   await expect(main).toBeVisible();
 }

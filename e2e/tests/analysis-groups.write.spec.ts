@@ -1,5 +1,5 @@
 import { expect, Page, test } from '@playwright/test';
-import { searchByLab } from './browse-pages';
+import { LIST_TIMEOUT, searchByLab } from './browse-pages';
 import { login, waitForSpinner } from './helpers';
 import { expectNoErrorDialog } from './tree-helpers';
 import { Cleanup, WRITE_LAB, idFromResponse, requireWritableServer, uniqueName } from './write-helpers';
@@ -28,7 +28,7 @@ async function browseWriteLab(page: Page): Promise<void> {
   // Wait for the filter's lab list to load before typing into it.
   await expect(filter.getByRole('combobox', { name: 'filter' }).or(filter.getByRole('button', { name: 'Show more filter options' })).first()).toBeVisible();
   await page.waitForResponse(r => r.url().includes('GetLabList.gx'), { timeout: 5_000 }).catch(() => {});
-  const listed = page.waitForResponse(r => r.url().includes('GetAnalysisGroupList.gx'));
+  const listed = page.waitForResponse(r => r.url().includes('GetAnalysisGroupList.gx'), { timeout: LIST_TIMEOUT });
   await searchByLab(page, filter, WRITE_LAB);
   await listed;
   await waitForSpinner(page);

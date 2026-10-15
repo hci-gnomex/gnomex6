@@ -1,4 +1,5 @@
 import { expect, Page, test } from '@playwright/test';
+import { LIST_TIMEOUT } from './browse-pages';
 import { login, waitForSpinner } from './helpers';
 import { expectNoErrorDialog } from './tree-helpers';
 import { Cleanup, WRITE_LAB, idFromResponse, pickOption, requireWritableServer, uniqueName } from './write-helpers';
@@ -43,7 +44,7 @@ async function browseWriteLab(page: Page): Promise<void> {
   await page.getByRole('menuitem', { name: 'Browse Experiments', exact: true }).click();
   const filter = page.getByRole('main', { name: 'Experiments Browser' }).getByRole('search', { name: 'Browse filter' });
   await pickOption(page, filter.getByRole('combobox', { name: 'Select a lab...' }), WRITE_LAB);
-  const listed = page.waitForResponse(r => r.url().includes('GetProjectRequestList.gx'));
+  const listed = page.waitForResponse(r => r.url().includes('GetProjectRequestList.gx'), { timeout: LIST_TIMEOUT });
   await filter.getByRole('button', { name: 'Search', exact: true }).click();
   await listed;
   await waitForSpinner(page);
