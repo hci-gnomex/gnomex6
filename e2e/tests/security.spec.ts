@@ -20,17 +20,16 @@ test('GetLab.gx does not expose password salts or reset tokens', async ({ page }
   const labIds = await someLabIds(page.request);
   test.skip(labIds.length === 0, 'this user cannot list any labs');
 
+  const fields = ['salt', 'guid', 'guidExpiration', 'confirmEmailGuid', 'passwordExternal', 'password'];
   const exposed: string[] = [];
   for (const id of labIds) {
     const body = await (await page.request.get(`GetLab.gx?idLab=${id}`)).text();
-    const salts = nonEmpty(body, 'salt');
-    const guids = nonEmpty(body, 'guid');
-    const passwords = nonEmpty(body, 'password');
-    if (salts || guids || passwords) {
-      exposed.push(`idLab ${id}: ${salts} salt, ${guids} guid, ${passwords} password value(s)`);
+    const counts = fields.map(f => [f, nonEmpty(body, f)] as const).filter(([, n]) => n > 0);
+    if (counts.length) {
+      exposed.push(`idLab ${id}: ${counts.map(([f, n]) => `${n} ${f}`).join(', ')}`);
     }
   }
-  // Seen 2026-10: an ordinary user received other users' password salts and password-reset GUIDs
-  // (AppUser objects serialised in full in the members/collaborators/managers lists).
+  // Seen 2026-10 (fixed in AppUser.registerMethodsToExcludeFromXML): an ordinary user received
+  // other users' password salts and password-reset GUIDs in the lab's member and submitter lists.
   expect(exposed, 'lab details sent to the browser should not include credential fields').toEqual([]);
 });

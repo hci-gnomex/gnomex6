@@ -374,8 +374,16 @@ public class AppUser extends HibernateDetailObject implements Serializable, Comp
     this.ucscUrl = ucscUrl;
   }  
 
+  /**
+   * Credentials and one-time tokens never go to the browser. Users are serialised in full by many
+   * commands (e.g. GetLab's member lists), so they are excluded here rather than in each command.
+   */
   public void registerMethodsToExcludeFromXML() {
     this.excludeMethodFromXML("getPasswordExternal");
+    this.excludeMethodFromXML("getSalt");
+    this.excludeMethodFromXML("getGuid");
+    this.excludeMethodFromXML("getGuidExpiration");
+    this.excludeMethodFromXML("getConfirmEmailGuid");
   }
 
   public String getConfirmEmailGuid() {
