@@ -35,14 +35,25 @@ test('Report Problem opens a feedback form that can be cancelled without sending
   await expect(dialog.getByRole('textbox', { name: 'Feedback' })).toBeVisible();
   await expect(dialog.getByRole('button', { name: 'Send Email' })).toBeVisible();
 
-  // Seen 2026-10: the embedded page screenshot makes the dialog taller than a 720px-high window and
-  // it doesn't scroll, so Send Email and Cancel are below the bottom edge and can't be clicked.
-  await expect.soft(dialog.getByRole('button', { name: 'Cancel', exact: true }), 'Cancel should be reachable on screen')
-    .toBeInViewport();
-  await dialog.getByRole('button', { name: 'Close dialog' }).click();
+  await dialog.getByRole('button', { name: 'Cancel', exact: true }).click();
   await expect(dialog).toBeHidden();
   expect(sent.map(r => r.url()), 'cancelling must not send anything').toEqual([]);
 });
+
+// Seen 2026-10: the embedded page screenshot made the dialog taller than a 720px-high window, so
+// Send Email and Cancel were below the bottom edge. The screenshot now shrinks and the form scrolls.
+for (const height of [720, 480]) {
+  test(`Report Problem's buttons stay on screen in a ${height}px-high window`, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height });
+    await page.getByRole('banner').getByRole('button', { name: 'Report Problem' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Send Email to GNomEx Team' }).first();
+    await expect(dialog.getByRole('button', { name: 'Send Email' })).toBeInViewport({ ratio: 1 });
+    await expect(dialog.getByRole('button', { name: 'Cancel', exact: true })).toBeInViewport({ ratio: 1 });
+    await expect(dialog.getByRole('button', { name: 'Close dialog' })).toBeInViewport({ ratio: 1 });
+    await dialog.getByRole('button', { name: 'Cancel', exact: true }).click();
+    await expect(dialog).toBeHidden();
+  });
+}
 
 test('Contact Us lists email links and closes', async ({ page }) => {
   await page.getByRole('button', { name: 'Help menu' }).click();

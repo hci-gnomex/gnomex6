@@ -11,29 +11,62 @@ import {UtilService} from "../../services/util.service";
 @Component({
     selector: "report-problem",
     template: `
-        <div class="flex-container-col full-width full-height double-padded" role="dialog" aria-label="Report a Problem">
-            <div>
+        <div class="report-problem flex-container-col full-width full-height double-padded" role="dialog" aria-label="Report a Problem">
+            <div class="keep-size">
                 <mat-form-field class="dialogFormField">
                     <input matInput [(ngModel)]="emailAddress" placeholder="Email Address" aria-label="Email address" [formControl]="fromFormControl" aria-describedby="emailHint">
                     <mat-error *ngIf="fromFormControl.hasError('email') && emailAddress">Please enter a valid email address</mat-error>
-                    <mat-hint id="emailHint" align="end">Leave blank to submit feedback anonomously</mat-hint>
+                    <mat-hint id="emailHint" align="end">Leave blank to submit feedback anonymously</mat-hint>
                 </mat-form-field>
             </div>
-            <div style="height: 15em">
+            <div class="keep-size" style="height: 15em">
                 <mat-form-field class="full-width" >
                     <textarea matInput rows="7" columns="120" [(ngModel)]="feedback" name="feedback" placeholder="Enter feedback here" aria-label="Feedback" aria-describedby="feedbackHint"> </textarea>
                     <mat-hint id="feedbackHint" align="end">Please enter your feedback. A member of the GNomEx help team will respond right away.</mat-hint>
                 </mat-form-field>
             </div>
-            <div class="padded" style="width: 100%; height: 20em; margin-bottom:.7em;border: 1px solid #333">
+            <div class="screenshot">
                 <img [src]="smallImgData" alt="Screenshot of the reported issue" />
             </div>
-            <div style="font-size:.79em" aria-live="polite">
-                All information will be encripted to protect health information and proprietary research data.
+            <div class="keep-size" style="font-size:.79em" aria-live="polite">
+                All information will be encrypted to protect health information and proprietary research data.
             </div>
         </div>
     `,
-    styles: [``]
+    styles: [`
+        /* Leave room for the dialog's title bar and Send/Cancel footer so they stay on screen.
+           The screenshot shrinks first; on very short windows the form scrolls. */
+        .report-problem {
+            box-sizing: border-box;
+            max-height: calc(100vh - 12em);
+            overflow-y: auto;
+        }
+        .keep-size {
+            flex: none;
+        }
+        .screenshot {
+            box-sizing: border-box;
+            flex: 1 1 20em;
+            min-height: 6em;
+            max-height: 20em;
+            width: 100%;
+            margin-bottom: .7em;
+            border: 1px solid #333;
+            position: relative;
+        }
+        /* Absolutely positioned so it scales to whatever height the box ends up with. */
+        .screenshot img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            box-sizing: border-box;
+            width: 100%;
+            height: 100%;
+            padding: .3em;
+            object-fit: contain;
+            object-position: left top;
+        }
+    `]
 })
 
 export class ReportProblemComponent extends BaseGenericContainerDialog {
