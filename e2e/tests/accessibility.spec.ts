@@ -77,15 +77,21 @@ test.describe('keyboard', () => {
     await expect(skip).toBeVisible();   // visually hidden until it has focus
     await page.keyboard.press('Enter');
 
-    const where = await page.evaluate(() => {
+    const focusIn = () => page.evaluate(() => {
       const active = document.activeElement;
       const inside = (id: string) => { const el = document.getElementById(id); return !!el && !!active && el.contains(active); };
-      return { mainNav: inside('main-nav'), mainContent: inside('main-content'), banner: !!active && !!active.closest('[role=banner], header') };
+      return { mainNav: inside('main-nav'), mainContent: inside('main-content') };
     });
-    expect(where.mainNav || where.mainContent, 'focus should move past the header toolbar').toBe(true);
-    // Seen 2026-10: skipToMain() focuses the first button of the main navigation, not #main-content,
-    // so the link does less than its name says.
-    expect.soft(where.mainContent, 'focus should land in #main-content, as the link\'s name says').toBe(true);
+    // Seen 2026-10: it focused the first button of the main navigation instead.
+    expect(await focusIn(), 'focus should land in #main-content, as the link\'s name says')
+      .toEqual({ mainNav: false, mainContent: true });
+
+    // The next Tab goes to the page's own first control, not back into the header.
+    await page.keyboard.press('Tab');
+    expect(await focusIn(), 'Tab after skipping should stay in the page content')
+      .toEqual({ mainNav: false, mainContent: true });
+    await expect(page.locator('#main-content'), 'main is focusable only while it holds the skip focus')
+      .not.toHaveAttribute('tabindex');
   });
 });
 

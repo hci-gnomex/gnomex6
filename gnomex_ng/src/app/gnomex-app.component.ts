@@ -90,20 +90,19 @@ export class GnomexAppComponent implements OnInit {
 
   }
 
+  /**
+   * Moves focus past both header rows to the <main> landmark (WCAG 2.4.1), so the next Tab
+   * reaches the page's first control. <main> is only focusable while it holds that focus; a
+   * permanent tabindex would let mouse clicks on blank areas focus it.
+   */
   skipToMain(): void {
-    const nav = document.getElementById('main-nav');
-    if (!nav) { return; }
+    const main = document.getElementById('main-content');
+    if (!main) { return; }
 
-    const firstFocusable = nav.querySelector<HTMLElement>(
-      'button:not([disabled]):not([hidden]), a[href]'
-    );
-
-    if (firstFocusable) {
-      firstFocusable.focus();
-    } else {
-      nav.setAttribute('tabindex', '-1');
-      nav.focus();
-    }
+    main.setAttribute('tabindex', '-1');
+    main.addEventListener('blur', () => main.removeAttribute('tabindex'), { once: true });
+    main.focus();
+    main.scrollIntoView({ block: 'start' });
   }
 
 }

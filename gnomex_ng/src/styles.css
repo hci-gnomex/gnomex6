@@ -1031,3 +1031,8 @@ button.skip-link:focus {
   top: 0;
 }
 
+/* The skip link's target: focused only to move the Tab order, so no outline around the whole page. */
+#main-content:focus {
+  outline: none;
+}
+
