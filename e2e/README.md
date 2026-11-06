@@ -11,9 +11,11 @@ Browser tests that drive a **running** GNomEx (Tomcat backend + Angular front en
 | `tests/datatracks.spec.ts` | Selecting an organism; the data track search box narrows the tree; walking to a data track opens its summary |
 | `tests/header.spec.ts` | Lookup by experiment number opens that experiment; text search returns results; Help menu items; About dialog |
 | `tests/topics-protocols.spec.ts` | A topic opens with its Info/Visibility tabs; items linked to a topic open; a protocol opens with its details |
-| `tests/accessibility.spec.ts` | Keyboard: arrow keys move through the Experiments tree (aria-activedescendant), ArrowLeft/Right collapse/expand, Enter selects; "Skip to main content" (signed-in only); pin-header and filter collapse toggles report aria-pressed/aria-expanded |
+| `tests/accessibility.spec.ts` | Keyboard: arrow keys move through the Experiments tree (aria-activedescendant), ArrowLeft/Right collapse/expand, Enter selects; "Skip to main content" (signed-in only); the Help menu opens, moves and closes (returning focus) with the keyboard; a dialog opened from the keyboard takes the focus; pin-header and filter collapse toggles report aria-pressed/aria-expanded |
+| `tests/page-titles.spec.ts` | The browser tab title names the page (sign-in, Home, Experiments list and detail, after Back, Analysis, Topics) |
+| `tests/share-links.spec.ts` | Share URL links for an experiment, an analysis and a topic, followed in the browser, open that item (and select it in the tree); a link to an unknown experiment explains the problem |
 | `tests/dialogs.spec.ts` | Unknown experiment number explains the problem; Report Problem form opens and closes without sending; Contact Us lists email links; the date filter adds/removes `createDateFrom`/`createDateTo` |
-| `tests/security.spec.ts` | API check: `GetLab.gx` must not send password salts, reset GUIDs or passwords to the browser (counts only, values never printed) |
+| `tests/security.spec.ts` | `GetLab.gx`, and every response while opening an experiment and an analysis, must not send password salts, reset GUIDs or passwords to the browser (counts only, values never printed); data commands refuse callers who aren't signed in |
 | `tests/menu-pages.spec.ts` | One test per drop-down menu (New Experiment Order, Experiments, Workflow, Products, Configure, Reports, any other): opens every item and checks for no ERROR/INVALID dialog, no error responses and visible content; dialogs are closed with Cancel/Close; menus the user lacks are skipped |
 | `tests/projects.write.spec.ts` | **Changes data.** Creates a project and opens it; renames one; deletes one from the tree |
 | `tests/topics.write.spec.ts` | **Changes data.** Creates a topic and opens it; renames one; deletes one |

@@ -95,6 +95,43 @@ test.describe('keyboard', () => {
   });
 });
 
+test.describe('menus and dialogs from the keyboard', () => {
+  test.beforeEach(async ({ page }) => {
+    await enterApp(page);
+  });
+
+  test('the Help menu opens, moves and closes with the keyboard', async ({ page }) => {
+    const help = page.getByRole('button', { name: 'Help menu' });
+    await help.focus();
+    await page.keyboard.press('Enter');
+    const menu = page.getByRole('menu');
+    await expect(menu.getByRole('menuitem', { name: 'User Guide' })).toBeFocused();
+    await page.keyboard.press('ArrowDown');
+    await expect(menu.getByRole('menuitem', { name: 'About' })).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(menu).toBeHidden();
+    await expect(help, 'Escape returns focus to the button that opened the menu').toBeFocused();
+  });
+
+  test('a dialog opened from the keyboard takes the focus', async ({ page }) => {
+    await page.getByRole('button', { name: 'Help menu' }).focus();
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('Enter'); // About
+    const about = page.getByRole('dialog', { name: 'About', exact: true });
+    await expect(about).toBeVisible();
+
+    // GNomEx dialogs are non-modal (no backdrop), so nothing else keeps focus in them; WCAG 2.4.3.
+    const inDialog = () => about.evaluate(d => d.contains(document.activeElement));
+    await expect.poll(inDialog, { message: 'focus should move into the About dialog' }).toBe(true);
+    await page.keyboard.press('Tab');
+    expect(await inDialog(), 'Tab should stay in the dialog').toBe(true);
+
+    await about.getByRole('button', { name: 'Close', exact: true }).click();
+    await expect(about).toBeHidden();
+  });
+});
+
 test.describe('toggles report their state', () => {
   test.beforeEach(async ({ page }) => {
     await enterApp(page);
