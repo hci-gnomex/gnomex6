@@ -115,3 +115,18 @@ test('My Account', async ({ page }) => {
   await expect(page.getByRole('region', { name: 'My Account' })).toBeVisible();
   await checkPage(page, 'My Account');
 });
+
+// One page per kind of Reports page; opened from the menu, not run.
+for (const report of ['Project/Experiment Report', 'Annotation Report', 'Annotation Progress Report']) {
+  test(`Reports › ${report}`, async ({ page }) => {
+    await enterApp(page);
+    const reports = page.locator('#main-nav').getByRole('button', { name: /^Reports( \.\.\.)? menu$/ });
+    test.skip(!(await reports.isVisible()), 'this user has no Reports menu');
+    await reports.click();
+    const entry = page.getByRole('menuitem', { name: report, exact: true });
+    test.skip(!(await entry.isVisible()), `no "${report}" in this user's Reports menu`);
+    await entry.click();
+    await waitForSpinner(page);
+    await checkPage(page, report);
+  });
+}
