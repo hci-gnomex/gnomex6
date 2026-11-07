@@ -74,6 +74,13 @@ export const LAB = process.env.GNOMEX_LAB || '';
 export const LIST_TIMEOUT = 150_000;
 
 /**
+ * Accessible name of the "Select a lab..." pickers (browse filter, New Analysis Group). They are
+ * labelled "Group" / "Group:"; before custom-combo-box passed aria-labelledby on to its input
+ * (2026-11) their name was the placeholder, so match both while older builds are around.
+ */
+export const LAB_PICKER = /^(Group:?|Select a lab\.\.\.)$/;
+
+/**
  * Opens a browse page from the header and waits for its tree data to arrive. Guests and ordinary
  * users get their list straight away; admins see an empty page until they pick a lab and press
  * Search, so for them this picks GNOMEX_LAB.
@@ -86,7 +93,7 @@ export async function openBrowsePage(page: Page, p: BrowsePage, listTimeout: num
   const filter = main.getByRole('search', { name: 'Browse filter' });
   // Only the admin view has a lab picker or an "All" checkbox; everyone else just waits for the list.
   // Not finding the admin view is normal, so its wait ending only means "keep waiting for the list".
-  const adminView = filter.getByRole('combobox', { name: 'Select a lab...' })
+  const adminView = filter.getByRole('combobox', { name: LAB_PICKER })
     .or(filter.getByRole('checkbox', { name: 'All', exact: true })).first();
   const loaded = treeLoaded.then(() => 'loaded' as const, () => 'timed out' as const);
   const first = await Promise.race([
@@ -119,7 +126,7 @@ export async function searchByLab(page: Page, filter: Locator, lab: string = LAB
   }
   // Experiments and Data Tracks have a single "Select a lab..." picker; Analysis has a multi-select
   // "Group(s)" list under More... whose type-to-filter box is (only) labelled "filter".
-  const single = filter.getByRole('combobox', { name: 'Select a lab...' });
+  const single = filter.getByRole('combobox', { name: LAB_PICKER });
   if (await single.count()) {
     await single.click();
     await single.fill(lab);

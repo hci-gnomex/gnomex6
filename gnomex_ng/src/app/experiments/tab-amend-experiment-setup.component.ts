@@ -24,8 +24,8 @@ import {PropertyService} from "../services/property.service";
             <ol>
                 <li>
                     <div class="flex-container-row align-center">
-                        <label class="row-label">Verify your lab group</label>
-                        <custom-combo-box [options]="this.labList" class="row-field"
+                        <label class="row-label" id="amendLabGroupLabel">Verify your lab group</label>
+                        <custom-combo-box [options]="this.labList" class="row-field" aria-labelledby="amendLabGroupLabel"
                                           [displayField]="this.prefService.labDisplayField" [valueField]="'idLab'"
                                           [formControl]="this.form.get('idLab')">
                         </custom-combo-box>
@@ -33,8 +33,8 @@ import {PropertyService} from "../services/property.service";
                 </li>
                 <li>
                     <div class="flex-container-row align-center">
-                        <label class="row-label">Select the person who submitted the request (optional)</label>
-                        <custom-combo-box [options]="this.userList" class="row-field"
+                        <label class="row-label" id="amendSubmitterLabel">Select the person who submitted the request (optional)</label>
+                        <custom-combo-box [options]="this.userList" class="row-field" aria-labelledby="amendSubmitterLabel"
                                           [displayField]="this.prefService.userDisplayField" [valueField]="'idAppUser'"
                                           [formControl]="this.form.get('idAppUser')">
                         </custom-combo-box>

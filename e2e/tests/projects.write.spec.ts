@@ -1,5 +1,5 @@
 import { expect, Page, test } from '@playwright/test';
-import { LIST_TIMEOUT } from './browse-pages';
+import { LAB_PICKER, LIST_TIMEOUT } from './browse-pages';
 import { login, waitForSpinner } from './helpers';
 import { expectNoErrorDialog } from './tree-helpers';
 import { Cleanup, WRITE_LAB, idFromResponse, pickOption, requireWritableServer, uniqueName } from './write-helpers';
@@ -23,7 +23,8 @@ async function createProject(page: Page, name: string): Promise<string> {
   await page.getByRole('menuitem', { name: 'New Project', exact: true }).click();
   // Material's dialog container and GNomEx's inner dialog are both named "New Project".
   const dialog = page.getByRole('dialog', { name: 'New Project' }).first();
-  await pickOption(page, dialog.getByRole('combobox', { name: 'Lab' }), WRITE_LAB);
+  // "Select lab" since custom-combo-box passes its aria-label on; "Lab" (the placeholder) before.
+  await pickOption(page, dialog.getByRole('combobox', { name: /^(Select lab|Lab)$/ }), WRITE_LAB);
   await dialog.getByRole('textbox', { name: 'Project name' }).fill(name);
 
   const saved = page.waitForResponse(r => r.url().includes('SaveProject.gx'));
@@ -43,7 +44,7 @@ async function browseWriteLab(page: Page): Promise<void> {
   await page.locator('#main-nav').getByRole('button', { name: 'Experiments menu', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Browse Experiments', exact: true }).click();
   const filter = page.getByRole('main', { name: 'Experiments Browser' }).getByRole('search', { name: 'Browse filter' });
-  await pickOption(page, filter.getByRole('combobox', { name: 'Select a lab...' }), WRITE_LAB);
+  await pickOption(page, filter.getByRole('combobox', { name: LAB_PICKER }), WRITE_LAB);
   const listed = page.waitForResponse(r => r.url().includes('GetProjectRequestList.gx'), { timeout: LIST_TIMEOUT });
   await filter.getByRole('button', { name: 'Search', exact: true }).click();
   await listed;

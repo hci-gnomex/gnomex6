@@ -34,9 +34,10 @@ async function createTopic(page: Page, name: string): Promise<string> {
 
   const dialog = page.getByRole('dialog', { name: 'Add New Top Level Topic' }).first();
   await dialog.getByRole('textbox', { name: 'Topic name' }).fill(name);
-  await pickOption(page, dialog.getByRole('combobox', { name: 'Group' }), WRITE_LAB);
+  // "Select group"/"Select owner" since custom-combo-box passes its aria-label on; the placeholders before.
+  await pickOption(page, dialog.getByRole('combobox', { name: /^(Select group|Group)$/ }), WRITE_LAB);
   // Owner choices are the lab's members; pick the first real person.
-  const owner = dialog.getByRole('combobox', { name: 'Owner' });
+  const owner = dialog.getByRole('combobox', { name: /^(Select owner|Owner)$/ });
   await owner.click();
   // The lab's members load after the group is picked; the list starts out as just "None".
   const people = page.getByRole('option').filter({ hasNotText: /^\s*None\s*$/ });

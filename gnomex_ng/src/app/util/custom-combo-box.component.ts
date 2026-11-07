@@ -29,7 +29,8 @@ import {debounceTime} from "rxjs/operators";
              [attr.cdkFocusInitial]="cdkFocusInitial === undefined ? null : cdkFocusInitial"
              [tabindex]="tabindex"
              [matAutocomplete]="auto" [formControl]="this.innerControl"
-             [attr.aria-label]="placeholder || null"
+             [attr.aria-label]="ariaLabel || placeholder || null"
+             [attr.aria-labelledby]="ariaLabelledby || null"
              [readonly]="readonly"
              [attr.aria-readonly]="readonly ? 'true' : null"
              role="combobox"
@@ -72,6 +73,14 @@ export class CustomComboBoxComponent implements AfterViewInit, OnChanges, OnDest
   // on tab skip the host element and focus the input
   @HostBinding('attr.tabindex') _tabindex = null;
   @Input() public tabindex: number = 0;
+
+  // The name belongs on the inner input, which is what screen readers announce: take aria-label and
+  // aria-labelledby written on <custom-combo-box> and move them there. On the host element (no role)
+  // they were ignored, so fields labelled only that way had no name (WCAG 4.1.2).
+  @HostBinding('attr.aria-label') _ariaLabel = null;
+  @Input('aria-label') public ariaLabel: string = "";
+  @HostBinding('attr.aria-labelledby') _ariaLabelledby = null;
+  @Input('aria-labelledby') public ariaLabelledby: string = "";
 
   public readonly = false;
   public forceShowNone: boolean = false;

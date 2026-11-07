@@ -33,6 +33,17 @@ test.describe('experiment detail', () => {
     expect(tabs).toEqual(expect.arrayContaining(['Overview tab', 'Description tab', 'Experiment Design tab', 'Files tab']));
   });
 
+  test('the Overview drop-downs are named by their labels', async ({ page }) => {
+    const info = page.getByRole('main', { name: 'Experiment Detail Overview' }).getByRole('tabpanel', { name: 'Overview tab' });
+    // Seen 2026-11: custom-combo-box kept aria-labelledby on its outer element, so these inputs had
+    // no accessible name at all (fixed: it now passes aria-label/aria-labelledby on to the input).
+    for (const name of ['Lab Group', 'Project', 'Owned by']) {
+      await expect(info.getByRole('combobox', { name, exact: true }), `the "${name}" drop-down`).toBeVisible();
+    }
+    // "Registered by" for external experiments.
+    await expect(info.getByRole('combobox', { name: /^(Submitted|Registered) by$/ })).toBeVisible();
+  });
+
   test('the experiment design tab lists its samples', async ({ page }) => {
     const detail = page.getByRole('main', { name: 'Experiment Detail Overview' });
     await detail.getByRole('tab', { name: 'Experiment Design tab' }).click();

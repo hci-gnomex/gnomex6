@@ -1,5 +1,5 @@
 import { expect, Page, test } from '@playwright/test';
-import { LIST_TIMEOUT, searchByLab } from './browse-pages';
+import { LAB_PICKER, LIST_TIMEOUT, searchByLab } from './browse-pages';
 import { login, waitForSpinner } from './helpers';
 import { expectNoErrorDialog } from './tree-helpers';
 import { Cleanup, WRITE_LAB, idFromResponse, requireWritableServer, uniqueName } from './write-helpers';
@@ -44,7 +44,7 @@ async function createGroup(page: Page, name: string): Promise<string> {
   await analysisMain(page).getByRole('button', { name: 'Create new analysis group' }).click();
 
   const dialog = page.getByRole('dialog', { name: 'Create Analysis Group' }).last();
-  await expect(dialog.getByRole('combobox', { name: 'Select a lab...' })).toHaveValue(WRITE_LAB);
+  await expect(dialog.getByRole('combobox', { name: LAB_PICKER })).toHaveValue(WRITE_LAB);
   await dialog.getByRole('textbox', { name: 'Analysis group name' }).fill(name);
 
   // The Save/Cancel actions belong to the outer dialog container.

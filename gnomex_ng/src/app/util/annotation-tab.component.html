@@ -47,7 +47,7 @@
                                   (optionSelected)="selectChanged($event,annot)"
                                   [options]="annot.PropertyOption" displayField="name"
                                   [formControl]="this.form.controls[annot.name]"
-                                  [attr.aria-label]="annot.name + ' dropdown'">
+                                  [aria-label]="annot.name">
                 </custom-combo-box>
             </div>
             <div *ngSwitchCase="'URL'" class="annot-control">
