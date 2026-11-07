@@ -160,6 +160,9 @@ export class ProductOrdersComponent implements OnInit {
               }
             },
         };
+
+        // Show the user's orders straight away; before, nothing was listed until a filter changed.
+        this.getProductOrderLists();
     }
 
     public dateRangeChange(event: DateRange): void {

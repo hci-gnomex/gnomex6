@@ -1,4 +1,4 @@
-import { expect, Page, Request, test } from '@playwright/test';
+import { expect, Page, Request, Response, test } from '@playwright/test';
 import { enterApp } from './browse-pages';
 import { waitForSpinner } from './helpers';
 import { expectNoErrorDialog } from './tree-helpers';
@@ -27,6 +27,16 @@ function watchChanges(page: Page): Request[] {
   return changes;
 }
 
+/**
+ * Checks the server's reply to an order list request, then the page. The server answers
+ * {"result":"ERROR","message":...} with HTTP 200 when its query fails, so the status alone says nothing.
+ */
+async function expectListServed(response: Response): Promise<void> {
+  const body = await response.text();
+  const error = body.match(/"result"\s*:\s*"ERROR"[^}]*?"message"\s*:\s*"([^"]{0,120})/);
+  expect(error ? error[1].trim() : null, 'GetProductOrderList.gx should not fail').toBeNull();
+}
+
 /** GNomEx's message when the order list can't be read. */
 async function expectNoListError(page: Page): Promise<void> {
   await expect(page.getByRole('alertdialog').filter({ hasText: 'An error occurred while retrieving the product order list' }),
@@ -35,11 +45,15 @@ async function expectNoListError(page: Page): Promise<void> {
 }
 
 test('Product Orders lists the orders when it opens', async ({ page }) => {
-  const listed = page.waitForRequest(r => r.url().includes('GetProductOrderList.gx'), { timeout: 30_000 }).catch(() => null);
+  // The wait starts before sign-in, which alone can take most of a minute.
+  const listed = page.waitForResponse(r => r.url().includes('GetProductOrderList.gx'), { timeout: 150_000 }).catch(() => null);
   await openProductOrders(page);
-  // Seen in the code 2026-11: the list is only requested when a filter changes, so the page may
-  // open empty until the user touches a filter.
-  expect(await listed, 'opening the page should request the order list').not.toBeNull();
+  // Seen 2026-11: the page only asked for the list when a filter changed, and the unfiltered query
+  // failed on the server for non-admins ("unexpected token: AND", ProductOrderFilter), so it opened
+  // empty. Fixed: the page loads the list on opening, and the query starts its criteria with WHERE.
+  const response = await listed;
+  expect(response, 'opening the page should request the order list').not.toBeNull();
+  await expectListServed(response!);
   await waitForSpinner(page);
   await expectNoListError(page);
 });
@@ -51,13 +65,15 @@ test('the Status filter asks for orders with that status', async ({ page }) => {
   await status.click();
   const options = page.getByRole('option').filter({ hasNotText: /^\s*None\s*$/ });
   test.skip(await options.count() === 0, 'no product order statuses are defined');
-  const listed = page.waitForRequest(r => r.url().includes('GetProductOrderList.gx'));
+  const listed = page.waitForResponse(r => r.url().includes('GetProductOrderList.gx'));
   await options.first().click();
-  const params = new URL((await listed).url()).searchParams;
+  const response = await listed;
+  const params = new URL(response.url()).searchParams;
   expect(params.get('codeProductOrderStatus'), 'the chosen status is sent').toBeTruthy();
+  // Seen 2026-11: this check used to run before the reply arrived, so it missed the server's
+  // "unexpected token: AND" error; it now waits for the reply and reads it.
+  await expectListServed(response);
   await waitForSpinner(page);
-  // Seen in the code 2026-11: a reply with no orders shows "An error occurred while retrieving
-  // the product order list" instead of an empty list.
   await expectNoListError(page);
   expect(changes.map(r => r.url())).toEqual([]);
 });

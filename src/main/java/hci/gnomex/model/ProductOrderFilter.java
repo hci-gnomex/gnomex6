@@ -150,7 +150,8 @@ public class ProductOrderFilter extends DetailObject {
     }
     // Search by billing period
     if (billingPeriod != null) {
-      queryBuf.append(" AND        po.submitDate >= '" + this.formatDateTime(billingPeriod.getStartDate(), this.dateOutputStyle) + "'");
+      this.addWhereOrAnd();
+      queryBuf.append(" po.submitDate >= '" + this.formatDateTime(billingPeriod.getStartDate(), this.dateOutputStyle) + "'");
       queryBuf.append(" AND        po.submitDate <= '" + this.formatDate(billingPeriod.getEndDate(), this.DATE_OUTPUT_SQL) + " 23:59:59'");
     }
     // Search by product order type
@@ -191,7 +192,13 @@ public class ProductOrderFilter extends DetailObject {
     if (this.secAdvisor.hasPermission(SecurityAdvisor.CAN_ADMINISTER_ALL_CORE_FACILITIES)) {
       return;
     } else if (idCoreFacility == null) {
-      secAdvisor.buildSecurityCriteria(queryBuf, classShortName, null, false, false, true, false, false);
+      // Pass whether a WHERE has been written yet. This was hard-coded to false ("not the first
+      // criterion"), so with no other filter the query read "... JOIN po.lab as lab AND ..." and
+      // Hibernate failed with "unexpected token: AND"; Product Orders opened empty for non-admins.
+      // buildSecurityCriteria writes "WHERE " with no leading space, so make sure there is one
+      // (the queries here end with an alias, e.g. "JOIN po.lab as lab").
+      queryBuf.append(" ");
+      addWhere = secAdvisor.buildSecurityCriteria(queryBuf, classShortName, null, addWhere, false, true, false, false);
     }
     return;
 
