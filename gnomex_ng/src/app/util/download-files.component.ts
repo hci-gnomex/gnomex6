@@ -20,7 +20,7 @@ import {HttpUriEncodingCodec} from "../services/interceptors/http-uri-encoding-c
 @Component({
     template: `
         <div class="full-height full-width flex-container-col" role="dialog" aria-label="Download files">
-            <div class="full-height full-width flex-container-col padded" role="main">
+            <div class="full-height full-width flex-container-col padded">
                 <div class="flex-container-row align-center justify-space-between">
                     <label id="download-instructions">
                         Drag files or folders that you want to download. Hold CTRL or SHIFT key to select multiple.

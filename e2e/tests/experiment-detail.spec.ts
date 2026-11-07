@@ -15,7 +15,7 @@ test.describe('experiment detail', () => {
   });
 
   test('shows the experiment number and its actions', async ({ page }) => {
-    const detail = page.getByRole('main', { name: 'Experiment Detail Overview' });
+    const detail = page.getByRole('region', { name: 'Experiment Detail Overview' });
     // Numbers may carry a letter prefix, e.g. "S1261R".
     await expect(detail.getByRole('heading', { level: 1 })).toHaveText(/^\s*Experiment [A-Z]*\d+R\d*\s*$/);
     const actions = detail.getByRole('toolbar', { name: 'Experiment actions' });
@@ -27,14 +27,14 @@ test.describe('experiment detail', () => {
   });
 
   test('every tab opens and shows content', async ({ page }) => {
-    const detail = page.getByRole('main', { name: 'Experiment Detail Overview' });
+    const detail = page.getByRole('region', { name: 'Experiment Detail Overview' });
     const tabs = await visitEveryTab(page, detail.getByRole('region', { name: 'Experiment tabs content' }));
     // These always exist; others (Related Data, Sequence Lanes, Billing...) depend on the experiment.
     expect(tabs).toEqual(expect.arrayContaining(['Overview tab', 'Description tab', 'Experiment Design tab', 'Files tab']));
   });
 
   test('the Overview drop-downs are named by their labels', async ({ page }) => {
-    const info = page.getByRole('main', { name: 'Experiment Detail Overview' }).getByRole('tabpanel', { name: 'Overview tab' });
+    const info = page.getByRole('region', { name: 'Experiment Detail Overview' }).getByRole('tabpanel', { name: 'Overview tab' });
     // Seen 2026-11: custom-combo-box kept aria-labelledby on its outer element, so these inputs had
     // no accessible name at all (fixed: it now passes aria-label/aria-labelledby on to the input).
     for (const name of ['Lab Group', 'Project', 'Owned by']) {
@@ -45,7 +45,7 @@ test.describe('experiment detail', () => {
   });
 
   test('the experiment design tab lists its samples', async ({ page }) => {
-    const detail = page.getByRole('main', { name: 'Experiment Detail Overview' });
+    const detail = page.getByRole('region', { name: 'Experiment Detail Overview' });
     await detail.getByRole('tab', { name: 'Experiment Design tab' }).click();
     const panel = detail.getByRole('tabpanel', { name: 'Experiment Design tab' });
     await expect(panel.getByRole('button', { name: 'Download sample sheet' })).toBeVisible();
@@ -54,7 +54,7 @@ test.describe('experiment detail', () => {
 
   test('Share URL gives a link to this experiment and copies it', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
-    const detail = page.getByRole('main', { name: 'Experiment Detail Overview' });
+    const detail = page.getByRole('region', { name: 'Experiment Detail Overview' });
     const number = (await detail.getByRole('heading', { level: 1 }).innerText()).replace('Experiment', '').trim();
 
     await detail.getByRole('toolbar', { name: 'Experiment actions' }).getByRole('button', { name: 'Share experiment URL' }).click();

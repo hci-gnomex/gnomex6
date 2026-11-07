@@ -43,7 +43,7 @@ async function createProject(page: Page, name: string): Promise<string> {
 async function browseWriteLab(page: Page): Promise<void> {
   await page.locator('#main-nav').getByRole('button', { name: 'Experiments menu', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Browse Experiments', exact: true }).click();
-  const filter = page.getByRole('main', { name: 'Experiments Browser' }).getByRole('search', { name: 'Browse filter' });
+  const filter = page.getByRole('region', { name: 'Experiments Browser' }).getByRole('search', { name: 'Browse filter' });
   await pickOption(page, filter.getByRole('combobox', { name: LAB_PICKER }), WRITE_LAB);
   const listed = page.waitForResponse(r => r.url().includes('GetProjectRequestList.gx'), { timeout: LIST_TIMEOUT });
   await filter.getByRole('button', { name: 'Search', exact: true }).click();
@@ -67,7 +67,7 @@ async function openProject(page: Page, name: string, id: string): Promise<void> 
   await projectNode(page, name).click();
   await waitForSpinner(page);
   await expect(page).toHaveURL(new RegExp(`/experiments/overview\\?.*idProject=${id}`));
-  await expect(page.getByRole('main', { name: 'Browse Overview' }).getByRole('heading', { level: 1 }))
+  await expect(page.getByRole('region', { name: 'Browse Overview' }).getByRole('heading', { level: 1 }))
     .toHaveText(new RegExp(`^\\s*${name}\\s+\\(0 Experiments\\)\\s*$`));
 }
 
@@ -83,7 +83,7 @@ test('a project can be renamed', async ({ page }) => {
   const id = await createProject(page, name);
   await openProject(page, name, id);
 
-  const overview = page.getByRole('main', { name: 'Browse Overview' });
+  const overview = page.getByRole('region', { name: 'Browse Overview' });
   await overview.getByRole('tab', { name: 'Project details tab' }).click();
   const details = overview.getByRole('tabpanel', { name: 'Project details tab' });
   await expect(details.getByRole('textbox', { name: 'Project Name' })).toHaveValue(name);

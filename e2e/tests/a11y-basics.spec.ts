@@ -112,6 +112,6 @@ test('My Account', async ({ page }) => {
   await enterApp(page);
   await page.getByRole('button', { name: 'Account menu' }).click();
   await page.getByRole('menuitem', { name: 'My Account' }).click();
-  await expect(page.getByRole('main', { name: 'My Account' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'My Account' })).toBeVisible();
   await checkPage(page, 'My Account');
 });

@@ -17,7 +17,7 @@ test.afterEach(async ({ page }) => {
   await cleanup.run(page);
 });
 
-const analysisMain = (page: Page) => page.getByRole('main', { name: 'Browse analysis' });
+const analysisMain = (page: Page) => page.getByRole('region', { name: 'Browse analysis' });
 const analysisTree = (page: Page) => analysisMain(page).getByRole('tree', { name: 'Analysis groups and analyses' });
 const groupNode = (page: Page, name: string) => analysisTree(page).getByRole('treeitem', { name, exact: true });
 

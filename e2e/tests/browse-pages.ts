@@ -89,7 +89,7 @@ export async function openBrowsePage(page: Page, p: BrowsePage, listTimeout: num
   const treeLoaded = page.waitForResponse(r => r.url().includes(p.listEndpoint) && r.ok(), { timeout: listTimeout });
   await openFromNav(page, p.navItem, p.menuItem);
   await page.waitForURL(p.route);
-  const main = page.getByRole('main', { name: p.region });
+  const main = page.getByRole('region', { name: p.region });
   const filter = main.getByRole('search', { name: 'Browse filter' });
   // Only the admin view has a lab picker or an "All" checkbox; everyone else just waits for the list.
   // Not finding the admin view is normal, so its wait ending only means "keep waiting for the list".

@@ -27,7 +27,7 @@ function watchFileRequests(page: Page): Request[] {
 test('Download Files builds a download list without downloading', async ({ page }) => {
   await openFirstExperiment(page);
   const fileRequests = watchFileRequests(page);
-  const detail = page.getByRole('main', { name: 'Experiment Detail Overview' });
+  const detail = page.getByRole('region', { name: 'Experiment Detail Overview' });
   await detail.getByRole('button', { name: 'Download experiment files' }).click();
   await waitForSpinner(page);
 
@@ -71,7 +71,7 @@ test('Download Files builds a download list without downloading', async ({ page 
 
 test('the sample sheet downloads as a file with the samples in it', async ({ page }) => {
   await openFirstExperiment(page);
-  const detail = page.getByRole('main', { name: 'Experiment Detail Overview' });
+  const detail = page.getByRole('region', { name: 'Experiment Detail Overview' });
   const number = (await detail.getByRole('heading', { level: 1 }).innerText()).replace('Experiment', '').trim();
   await detail.getByRole('tab', { name: 'Experiment Design tab' }).click();
   const panel = detail.getByRole('tabpanel', { name: 'Experiment Design tab' });

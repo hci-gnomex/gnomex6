@@ -16,7 +16,7 @@ test.describe('header', () => {
     await openBrowsePage(page, experiments);
     const opened = await openFirstMatching(page, page.getByRole('tree', { name: experiments.tree }), /\/experiments\/detail\/\d+/);
     test.skip(!opened, "the user can't see any experiments");
-    const heading = page.getByRole('main', { name: 'Experiment Detail Overview' }).getByRole('heading', { level: 1 });
+    const heading = page.getByRole('region', { name: 'Experiment Detail Overview' }).getByRole('heading', { level: 1 });
     const number = (await heading.innerText()).replace('Experiment ', '').trim();
     const detailUrl = page.url().split('?')[0];
 

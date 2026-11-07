@@ -17,7 +17,7 @@ async function openMyAccount(page: Page) {
   await page.getByRole('menuitem', { name: 'My Account' }).click();
   await loaded;
   await waitForSpinner(page);
-  const form = page.getByRole('main', { name: 'My Account' });
+  const form = page.getByRole('region', { name: 'My Account' });
   await expect(form.getByRole('heading', { name: 'My Account' })).toBeVisible();
   await expect(form.getByRole('textbox', { name: 'First Name' })).not.toHaveValue('');
   return form;

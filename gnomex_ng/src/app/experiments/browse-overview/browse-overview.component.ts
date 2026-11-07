@@ -16,7 +16,7 @@ import {DialogsService} from "../../util/popup/dialogs.service";
 
 @Component({
     template: `
-        <div class="flex-container-col full-height full-width" role="main" aria-label="Browse Overview">
+        <div class="flex-container-col full-height full-width" role="region" aria-label="Browse Overview">
             <div class="flex-container-row justify-space-between align-center" role="banner">
                 <div role="heading" aria-level="1" aria-live="polite">
                     {{ nodeTitle}} &nbsp;&nbsp;&nbsp;&nbsp; {{ "(" + this.experimentsService.experimentList.length + " Experiments)"}}

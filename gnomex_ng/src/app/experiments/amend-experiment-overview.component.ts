@@ -19,7 +19,7 @@ import {TabAmendExperimentSetupComponent} from "./tab-amend-experiment-setup.com
 @Component({
     selector: 'amend-experiment-overview',
     template: `
-        <div class="full-height full-width flex-container-col padded" role="main" aria-label="Amend Experiment">
+        <div class="full-height full-width flex-container-col padded" role="region" aria-label="Amend Experiment">
             <div role="heading" aria-level="1">
                 <img *ngIf="this.amendExpService.experiment?.requestCategory"
                      [src]="this.amendExpService.experiment?.requestCategory.icon" class="icon" alt="" aria-hidden="true">

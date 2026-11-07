@@ -17,7 +17,7 @@ test.describe('analysis detail', () => {
   });
 
   test('shows the analysis number and its details', async ({ page }) => {
-    const detail = page.getByRole('main', { name: 'Analysis detail overview' });
+    const detail = page.getByRole('region', { name: 'Analysis detail overview' });
     const actions = detail.getByRole('toolbar', { name: 'Analysis actions' });
     // Tree labels look like "A1285 (name)"; the toolbar shows "Analysis A1285".
     const number = opened!.match(/^A\d+/)![0];
@@ -30,7 +30,7 @@ test.describe('analysis detail', () => {
   });
 
   test('every tab opens and shows content', async ({ page }) => {
-    const detail = page.getByRole('main', { name: 'Analysis detail overview' });
+    const detail = page.getByRole('region', { name: 'Analysis detail overview' });
     const tabs = await visitEveryTab(page, detail.getByRole('region', { name: 'Analysis details' }));
     expect(tabs).toEqual(expect.arrayContaining([
       'Analysis information tab', 'Analysis description tab', 'Analysis annotations tab', 'Analysis files tab']));

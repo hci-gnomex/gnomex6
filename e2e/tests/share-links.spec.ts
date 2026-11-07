@@ -47,7 +47,7 @@ test('an experiment link opens that experiment', async ({ page }) => {
   const opened = await openFirstMatching(page, page.getByRole('tree', { name: experiments.tree }), /\/experiments\/detail\/\d+/);
   test.skip(!opened, "the user can't see any experiments");
   const id = page.url().match(/\/experiments\/detail\/(\d+)/)![1];
-  const detail = page.getByRole('main', { name: 'Experiment Detail Overview' });
+  const detail = page.getByRole('region', { name: 'Experiment Detail Overview' });
   const number = (await detail.getByRole('heading', { level: 1 }).innerText()).replace('Experiment', '').trim();
 
   const link = await shareLink(page, detail.getByRole('button', { name: 'Share experiment URL' }), `Web Link for Experiment ${number}`);
@@ -68,7 +68,7 @@ test('an analysis link opens that analysis', async ({ page }) => {
   test.skip(!opened, "the user can't see any analyses");
   const id = page.url().match(/\/analysis\/detail\/(\d+)/)![1];
   const number = opened!.match(/^A\d+/)![0];
-  const actions = page.getByRole('main', { name: 'Analysis detail overview' }).getByRole('toolbar', { name: 'Analysis actions' });
+  const actions = page.getByRole('region', { name: 'Analysis detail overview' }).getByRole('toolbar', { name: 'Analysis actions' });
 
   const link = await shareLink(page, actions.getByRole('button', { name: 'Share URL' }), /^(Web Link for Analysis|Share link)/);
   expect(link).toBe(expectedLink(page, 'analysisNumber', number));
