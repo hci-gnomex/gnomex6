@@ -41,6 +41,10 @@ test('the result counts add up', async ({ page }) => {
   for (const category of CATEGORIES) {
     sum += await hits(dialog, category);
   }
+  // Seen 2026-11 on the dev server: "RNA" gave 20 global hits (10 analyses, 8 data tracks, 1 topic,
+  // 1 experiment) but SearchIndex.gx returned every category list (RequestList, AnalysisList...)
+  // empty, so each category showed 0. The categories are searched in separate Lucene indexes;
+  // whether those are stale there or the category queries are built wrongly isn't known yet.
   expect(sum, 'All Results should equal the sum of the categories').toBe(all);
 });
 
@@ -63,21 +67,30 @@ test('a category filter shows only that kind of result', async ({ page }) => {
   }
 });
 
-test('double-clicking an experiment result opens that experiment', async ({ page }) => {
+test('double-clicking a result opens it', async ({ page }) => {
   const dialog = await search(page);
-  test.skip(await hits(dialog, 'Experiments') === 0, `no experiments match "${TERM}"`);
-  await dialog.getByRole('toolbar', { name: 'Filter search results' })
-    .getByRole('button', { name: /^Experiments, \d+ hits$/ }).click();
-
+  test.skip(await hits(dialog, 'All Results') === 0, `nothing matches "${TERM}"`);
+  // All Results is shown first; its rows can be any kind of item.
   const grid = dialog.locator('[aria-label="Search results table"]').first();
-  const numberCell = grid.locator('.ag-center-cols-container [role=row]').first().locator('[col-id="number"]');
-  const number = (await numberCell.innerText()).trim();
-  expect(number, 'the row shows an experiment number').toMatch(/^[A-Z]*\d+R\d*$/);
-  await numberCell.dblclick();
+  const row = grid.locator('.ag-center-cols-container [role=row]').first();
+  const number = (await row.locator('[col-id="number"]').innerText()).trim();
+  const urlBefore = page.url();
+  await row.locator('[col-id="name"], [col-id="number"]').first().dblclick();
   await waitForSpinner(page);
 
-  await expect(page).toHaveURL(/\/experiments\/detail\/\d+/);
-  await expect(page.getByRole('region', { name: 'Experiment Detail Overview' }).getByRole('heading', { level: 1 }))
-    .toHaveText(`Experiment ${number}`);
+  // Experiments, analyses and data tracks open their detail page; topics open under Topics.
+  await expect(page).not.toHaveURL(urlBefore);
+  await expect(page).toHaveURL(/\/(experiments|analysis|datatracks)\/detail\/\d+|\/topics\/detail\/\d+/);
+  // The item opens behind the search dialog, which stays open and hides the page from assistive
+  // technology (aria-hidden) until it's closed.
+  await dialog.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await expect(dialog).toBeHidden();
+  if (/^[A-Z]*\d+R\d*$/.test(number)) {
+    // Experiments registered from outside the core are titled "External Experiment ...".
+    await expect(page.getByRole('region', { name: 'Experiment Detail Overview' }).getByRole('heading', { level: 1 }))
+      .toHaveText(new RegExp(`^\\s*(External )?Experiment ${number}\\s*$`));
+  } else if (/^A\d+$/.test(number)) {
+    await expect(page.getByRole('toolbar', { name: 'Analysis actions' })).toContainText(number);
+  }
   await expectNoErrorDialog(page);
 });

@@ -8,7 +8,8 @@ import { hasCredentials } from './helpers';
 // meanwhile queued behind it. A GetPropertyList.gx started at 07:30:09 only finished after the data
 // track list did, and the next test's GetPropertyList.gx and GetLoginProperties.gx hung and then
 // failed with HTTP 500, so the sign-in page never loaded. Three test runs that day stalled this way,
-// each right after a data track test.
+// each right after a data track test. This test passed when run on its own (the data track list
+// alone doesn't block sign-in), so the stalls need more load than this; it stays as a guard.
 
 test('the sign-in page still loads while another user lists data tracks', async ({ page, playwright }) => {
   test.skip(!hasCredentials, 'needs a signed-in user to make the slow request');
