@@ -25,7 +25,7 @@ test('each main page is titled', async ({ page }) => {
   await expectTitle(page, 'Home — GNomEx');
 
   // Seen 2026-11: the Experiments list (/experiments?expRadio=myLab) and any other page whose URL
-  // has a query string right after its name were titled just "GNomEx".
+  // has a query string right after its name were titled just "GNomEx" (fixed in util/page-title.ts).
   await openBrowsePage(page, experiments);
   await expectTitle(page, 'Experiments — GNomEx');
   const opened = await openFirstMatching(page, page.getByRole('tree', { name: experiments.tree }), /\/experiments\/detail\/\d+/);
