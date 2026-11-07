@@ -8,6 +8,7 @@ import { expectNoErrorDialog, openFirstMatching } from './tree-helpers';
 
 const experiments = browsePages.find(p => p.name === 'experiments')!;
 const analysis = browsePages.find(p => p.name === 'analysis')!;
+const dataTracks = browsePages.find(p => p.name === 'data tracks')!;
 
 /** Opens the share dialog with `button`, returns the link it shows and closes the dialog. */
 async function shareLink(page: Page, button: Locator, dialogTitle: string | RegExp): Promise<string> {
@@ -74,11 +75,34 @@ test('an analysis link opens that analysis', async ({ page }) => {
 
   await follow(page, link);
   await expect(page).toHaveURL(at(`/analysis/detail/${id}`));
-  // Seen 2026-11: the right analysis opens, but nothing is selected in the tree, and the toolbar
-  // (which takes its number from the selected node) reads just "Analysis".
+  // Seen 2026-11 (fixed in browse-filter.component.ts): for a user in a single lab the link never
+  // loaded the analysis list, so the tree stayed empty, nothing was selected, and the toolbar (which
+  // takes its number from the selected node) read just "Analysis".
   await expect.soft(page.getByRole('tree', { name: analysis.tree }).getByRole('treeitem', { selected: true }),
     'the analysis should be selected in the tree').toHaveAttribute('aria-label', new RegExp('^' + number));
   await expect(actions, 'the toolbar should show the analysis number').toContainText(`Analysis ${number}`);
+  await expectNoErrorDialog(page);
+});
+
+test('a data track link opens that data track', async ({ page }) => {
+  // The data track list takes ~1 min for a signed-in ordinary user, and this loads it twice.
+  test.slow();
+  await openBrowsePage(page, dataTracks);
+  const opened = await openFirstMatching(page, page.getByRole('tree', { name: dataTracks.tree }), /\/datatracks\/detail\/\d+/, 150);
+  test.skip(!opened, 'no data track found in the first part of the tree');
+  const id = page.url().match(/\/datatracks\/detail\/(\d+)/)![1];
+  const actions = page.getByRole('region', { name: dataTracks.detailsPanel }).getByRole('toolbar', { name: 'Data track actions' });
+  const number = (await actions.innerText()).match(/Data Track (DT\d+)/)![1];
+
+  const link = await shareLink(page, actions.getByRole('button', { name: /Share URL/ }), /^(Web Link for Data Track|Share link)/);
+  expect(link).toBe(expectedLink(page, 'dataTrackNumber', number));
+
+  // Single-lab users had the same empty-tree problem as analysis links (see above).
+  await follow(page, link);
+  await expect(page).toHaveURL(at(`/datatracks/detail/${id}`));
+  await expect(page.getByRole('tree', { name: dataTracks.tree }).getByRole('treeitem', { selected: true }),
+    'the data track should be selected in the tree').toHaveCount(1, { timeout: 150_000 });
+  await expect(actions, 'the toolbar should show the data track number').toContainText(`Data Track ${number}`);
   await expectNoErrorDialog(page);
 });
 

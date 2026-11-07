@@ -363,6 +363,10 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                         .sort(this.prefService.createLabDisplaySortFunction());
                     if (this.labList.length > 1) {
                         this.showLabComboBox = true;
+                    }
+                    // Once the lab list is in, run the search a link (e.g. ?analysisNumber=) needs, also
+                    // for users in a single lab, or the tree stays empty and the analysis isn't selected.
+                    if (response.length > 0) {
                         this.preselectOnBrowseFilter();
                     }
                 });
@@ -401,9 +405,11 @@ export class BrowseFilterComponent implements OnInit, OnDestroy {
                         .sort(this.prefService.createLabDisplaySortFunction());
                     if (this.labList.length > 1) {
                         this.showLabComboBox = true;
+                    }
+                    // As for analysis: a link (?dataTrackNumber=) needs this search for single-lab users too.
+                    if (response.length > 0) {
                         this.preselectOnBrowseFilter();
                     }
-
                 });
             }
 

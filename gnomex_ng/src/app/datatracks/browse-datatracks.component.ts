@@ -142,6 +142,12 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
     let idName: string = null;
 
     if (this.navService.navMode === NavigationService.URL) {
+      // The page was opened from a link (e.g. ?dataTrackNumber=DT123): read the ids from the route.
+      const activatedRoute = this.navService.getChildActivateRoute(this.route);
+      if (activatedRoute) {
+        this.paramMap = activatedRoute.snapshot.paramMap;
+        this.qParamMap = activatedRoute.snapshot.queryParamMap;
+      }
       const lastSeg = this.navService.getLastRouteSegment();
 
       if (lastSeg === DataTrackService.ORGANISM) {
@@ -353,6 +359,9 @@ export class BrowseDatatracksComponent implements OnInit, OnDestroy, AfterViewIn
    * fires once per refresh cycle.
    */
   treeUpdateData(event) {
+    // The list arrives long after init (up to a minute), so this is when a linked item can be selected.
+    this.trySelectNodeFromState();
+
     const sel = this.datatracksService.activeNodeToSelect;
     if (sel) {
       const node = UtilService.findTreeNode(this.treeModel, sel.attribute, sel.value);
