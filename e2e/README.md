@@ -4,8 +4,9 @@ Browser tests that drive a **running** GNomEx (Tomcat backend + Angular front en
 
 | File | Covers |
 |---|---|
-| `tests/login.spec.ts` | Login form renders; unauthenticated deep link redirects to sign-in; unknown user is rejected; Guest Login works; valid user reaches Home; session survives reload; Sign out |
+| `tests/login.spec.ts` | Login form renders; unauthenticated deep link redirects to sign-in; unknown user is rejected; Guest Login works; valid user reaches Home; Enter in the password box signs in; session survives reload; Sign out; after signing out, Back doesn't reopen the app or load data |
 | `tests/browse.spec.ts` | Experiments, Analysis and Data Tracks: open from the header, tree loads, filter-bar Search re-queries, clicking the first tree node shows its details |
+| `tests/browse-filters.spec.ts` | The Experiments (My experiments / My collaborations / Public data / All / My lab) and Analysis (My analyses / Other labs / All / My lab) filters send the matching list parameters, leave none behind, and the list loads (ordinary users; admins skip) |
 | `tests/experiment-detail.spec.ts` | Opens the first experiment: number heading, actions, Overview; every tab opens and shows content; Experiment Design lists samples; Share URL links to the experiment and copies it |
 | `tests/analysis-detail.spec.ts` | Opens the first analysis: number, name, visibility; every tab opens and shows content |
 | `tests/datatracks.spec.ts` | Selecting an organism; the data track search box narrows the tree; walking to a data track opens its summary |
@@ -16,6 +17,7 @@ Browser tests that drive a **running** GNomEx (Tomcat backend + Angular front en
 | `tests/share-links.spec.ts` | Share URL links for an experiment, an analysis, a data track and a topic, followed in the browser, open that item (and select it in the tree); a link to an unknown experiment explains the problem |
 | `tests/dialogs.spec.ts` | Unknown experiment number explains the problem; Report Problem form opens and closes without sending; Contact Us lists email links; the date filter adds/removes `createDateFrom`/`createDateTo` |
 | `tests/security.spec.ts` | `GetLab.gx`, and every response while opening an experiment and an analysis, must not send password salts, reset GUIDs or passwords to the browser (counts only, values never printed); data commands refuse callers who aren't signed in |
+| `tests/account.spec.ts` | My Account shows the user's own details; the password boxes never hold the real password (compared as true/false, never printed); Save is disabled for a missing name, a bad email or mismatched passwords, and nothing is saved; Request Lab Membership opens and cancels without sending |
 | `tests/menu-pages.spec.ts` | One test per drop-down menu (New Experiment Order, Experiments, Workflow, Products, Configure, Reports, any other): opens every item and checks for no ERROR/INVALID dialog, no error responses, visible content and a page title of its own; dialogs are closed with Cancel/Close; menus the user lacks are skipped |
 | `tests/projects.write.spec.ts` | **Changes data.** Creates a project and opens it; renames one; deletes one from the tree |
 | `tests/topics.write.spec.ts` | **Changes data.** Creates a topic and opens it; renames one; deletes one |

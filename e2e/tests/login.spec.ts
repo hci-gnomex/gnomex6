@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { guestLogin, login, openLoginPage, requireCredentials } from './helpers';
+import { credentials, guestLogin, login, openLoginPage, requireCredentials, requiresDuo, waitForAppReady } from './helpers';
 
 test.describe('login page', () => {
   test('shows the sign-in form', async ({ page }) => {
@@ -50,6 +50,19 @@ test.describe('signing in and out', () => {
     expect(await page.evaluate(() => localStorage.getItem('gnomex-jwt'))).toBeTruthy();
   });
 
+  test('pressing Enter in the password box signs in', async ({ page }) => {
+    const props = await openLoginPage(page);
+    test.skip(requiresDuo(credentials.username, props), `${credentials.username} would go through Duo on this server`);
+    await page.getByLabel('Username', { exact: true }).fill(credentials.username);
+    const password = page.getByLabel('Password', { exact: true });
+    await password.fill(credentials.password);
+    const session = page.waitForResponse(r => r.url().includes('/api/user-session') && r.request().method() === 'POST',
+      { timeout: 15_000 }).catch(() => null);
+    await password.press('Enter');
+    expect(await session, 'Enter should submit the sign-in form, as the Login button does').not.toBeNull();
+    await waitForAppReady(page);
+  });
+
   test('the session survives a page reload', async ({ page }) => {
     await login(page);
     await page.reload();
@@ -72,5 +85,34 @@ test.describe('signing in and out', () => {
     // The old session must not get back in.
     await page.goto('home');
     await page.waitForURL(/\/authenticate/);
+  });
+
+  test('after signing out, Back does not reopen the app', async ({ page }) => {
+    await login(page);
+    await page.locator('#main-nav').getByRole('button', { name: 'Topics', exact: true }).click().catch(() => {});
+    await page.getByRole('button', { name: 'Account menu' }).click();
+    await page.getByRole('menuitem', { name: 'Sign out' }).click();
+    await page.getByRole('alertdialog').getByRole('button', { name: 'Yes', exact: true }).click();
+    await page.waitForURL(/\/authenticate/, { timeout: 60_000 });
+
+    // Someone at a shared computer pressing Back must not get the previous user's pages.
+    const dataRequests: string[] = [];
+    page.on('response', async r => {
+      if (/\.gx(\?|$)/.test(r.url()) && !/GetLoginProperties|GetLaunchProperties/.test(r.url())) {
+        const body = await r.text().catch(() => '');
+        if (/"result"\s*:\s*"SUCCESS"|"id(Lab|Request|Analysis|Topic)"\s*:/.test(body)) {
+          dataRequests.push(new URL(r.url()).pathname.split('/').pop()!);
+        }
+      }
+    });
+    // Back through the pages visited while signed in (Topics, Home); stop before leaving the app.
+    for (let i = 0; i < 2; i++) {
+      await page.goBack().catch(() => {});
+      await page.waitForTimeout(2_000);
+      if (!page.url().includes('/gnomex/')) break;
+      await expect(page, 'a signed-in page reached with Back should send you to sign in').toHaveURL(/\/authenticate/);
+      await expect(page.getByRole('button', { name: 'Account menu' })).toHaveCount(0);
+    }
+    expect(dataRequests, 'no data should load for a signed-out browser').toEqual([]);
   });
 });
