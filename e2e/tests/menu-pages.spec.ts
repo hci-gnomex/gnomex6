@@ -146,6 +146,8 @@ async function openEveryItem(page: Page, items: MenuItem[]): Promise<void> {
         expect.soft(serverErrors, `${label} should not get error responses`).toEqual([]);
         if (!dialogs) {
           await expect.soft(page.locator('#main-content'), `${label} should show something`).not.toBeEmpty();
+          // Every page names itself in the browser tab (WCAG 2.4.2), not just "GNomEx"; see util/page-title.ts.
+          await expect.soft(page, `${label} should have its own page title`).toHaveTitle(/^.+ — GNomEx$/);
         }
       } finally {
         page.off('response', watch);

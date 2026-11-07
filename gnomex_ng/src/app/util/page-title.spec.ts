@@ -29,6 +29,39 @@ describe("pageTitleFor", () => {
 
     it("falls back to the plain app name for pages it doesn't know", () => {
         expect(pageTitleFor("/no-such-page")).toBe(DEFAULT_TITLE);
-        expect(pageTitleFor("/manage-protocols(browsePanel:details/12)")).toBe(DEFAULT_TITLE);
+        expect(pageTitleFor("/testpageland")).toBe(DEFAULT_TITLE);
+    });
+
+    // Route paths are case-sensitive and several menu pages used to have none or a misspelt entry
+    // ("usersGroups", "billing", "workflow"...), so these pages were all titled just "GNomEx".
+    it("titles the menu pages by their real route paths", () => {
+        const expected: {[url: string]: string} = {
+            "/UsersGroups":                                   "Users & Groups — GNomEx",
+            "/browse-billing?idCoreFacility=1":               "Billing — GNomEx",
+            "/manage-protocols/(browsePanel:details/12)":     "Protocols — GNomEx",
+            "/qcWorkFlow":                                    "QC Workflow — GNomEx",
+            "/pipelineWorkFlow":                              "Illumina Data Pipeline Workflow — GNomEx",
+            "/experiments-orders":                            "Orders — GNomEx",
+            "/newExperiment/1":                               "New Experiment Order — GNomEx",
+            "/new-external-experiment":                       "Upload Experiment Data — GNomEx",
+            "/product-ledger":                                "Product Ledger — GNomEx",
+            "/configure-organisms":                           "Configure Organisms and Genome Builds — GNomEx",
+            "/browse-dictionary":                             "Dictionaries — GNomEx",
+            "/ProjectExperimentReport":                       "Project/Experiment Report — GNomEx",
+            "/MyAccount":                                     "My Account — GNomEx",
+            "/register-user/1":                               "Sign Up — GNomEx",
+        };
+        Object.keys(expected).forEach((url: string) => expect(pageTitleFor(url)).toBe(expected[url], url));
+    });
+
+    it("keeps the page's own title while a dialog route is open", () => {
+        expect(pageTitleFor("/experiments(modal:newProject)")).toBe("Experiments — GNomEx");
+        expect(pageTitleFor("/home(modal:BulkSampleUpload)")).toBe("Home — GNomEx");
+    });
+
+    it("has no entries for paths that aren't routes", () => {
+        for (const stale of ["billing", "products", "reports", "workflow", "configuration", "usersGroups", "upload"]) {
+            expect(pageTitleFor("/" + stale)).toBe(DEFAULT_TITLE, stale);
+        }
     });
 });
