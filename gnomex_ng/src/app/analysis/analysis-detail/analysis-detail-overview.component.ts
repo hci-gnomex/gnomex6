@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from "@angular/core";
 import {AnalysisService} from "../../services/analysis.service";
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {IAnnotation} from "../../util/interfaces/annotation.model";
 import {IAnnotationOption} from "../../util/interfaces/annotation-option.model";
 import {AnnotationTabComponent, OrderType} from "../../util/annotation-tab.component";
@@ -77,6 +77,7 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
 
     constructor(public analysisService: AnalysisService,
                 private route: ActivatedRoute,
+                private router: Router,
                 private dialog: MatDialog,
                 private secAdvisor: CreateSecurityAdvisorService,
                 public constService: ConstantsService,
@@ -324,11 +325,22 @@ export class AnalysisDetailOverviewComponent  implements OnInit, AfterViewInit, 
             this.dialogsService.confirm(warningMessage).subscribe((result: any) => {
                 if(result) {
                     this.changeEditMode();
+                    this.reloadSavedAnalysis();
                 }
             });
         } else {
             this.changeEditMode();
         }
+    }
+
+    /**
+     * After the user discards their edits, show the saved analysis again. The tabs only fill their
+     * forms from the route's resolved data, so leaving edit mode alone left the discarded values on
+     * screen as if they had been saved. Navigating to the same URL re-runs AnalysisResolverService
+     * (runGuardsAndResolvers: 'always', onSameUrlNavigation: 'reload'), and every tab refills.
+     */
+    private reloadSavedAnalysis(): void {
+        this.router.navigateByUrl(this.router.url);
     }
 
     changeEditMode() {

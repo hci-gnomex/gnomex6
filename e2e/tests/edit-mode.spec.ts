@@ -98,8 +98,8 @@ test('discarding unsaved changes shows the saved values again', async ({ page })
   await expect(a.edit, 'back in view mode').toBeVisible();
   await waitForSpinner(page);
 
-  // Seen in the code 2026-11: switching back only marks the form clean and doesn't reload it, so
-  // the discarded name may still be shown as if it had been saved.
+  // Seen 2026-11: switching back only marked the form clean, so the discarded name stayed on screen
+  // as if it had been saved. Fixed: AnalysisDetailOverviewComponent reloads the saved analysis.
   await expect(a.name, 'the discarded name should not still be shown').toHaveValue(a.original);
   expect(saves.map(r => r.url()), 'nothing should be saved').toEqual([]);
 
