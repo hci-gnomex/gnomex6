@@ -13,7 +13,7 @@ test.beforeEach(async ({ page }) => {
 /** Opens My Account from the Account menu and waits for the user's details to load. */
 async function openMyAccount(page: Page) {
   const loaded = page.waitForResponse(r => /GetAppUserPublic\.gx/.test(r.url()));
-  await page.locator('#main-nav').getByRole('button', { name: 'Account menu' }).click();
+  await page.getByRole('button', { name: 'Account menu' }).click();
   await page.getByRole('menuitem', { name: 'My Account' }).click();
   await loaded;
   await waitForSpinner(page);
@@ -23,10 +23,10 @@ async function openMyAccount(page: Page) {
   return form;
 }
 
-/** Fails the test if the page tries to save anything. */
+/** Records calls to server Save commands (SaveAppUserPublic.gx...), not e.g. the Save icon image. */
 function forbidSaving(page: Page): Request[] {
   const saves: Request[] = [];
-  page.on('request', r => { if (/Save/i.test(r.url())) saves.push(r); });
+  page.on('request', r => { if (/\/Save\w*\.gx/i.test(new URL(r.url()).pathname)) saves.push(r); });
   return saves;
 }
 
@@ -93,7 +93,9 @@ test('My Account will not save a form with missing or mismatched fields', async 
 
 test('Request Lab Membership opens and can be cancelled without sending', async ({ page }) => {
   const sent: Request[] = [];
-  page.on('request', r => { if (r.method() === 'POST' || /Request.*Membership|Save/i.test(r.url())) sent.push(r); });
+  page.on('request', r => {
+    if (r.method() === 'POST' || /\/(Save\w*|\w*Membership\w*)\.gx/i.test(new URL(r.url()).pathname)) sent.push(r);
+  });
   const form = await openMyAccount(page);
   sent.length = 0;
 

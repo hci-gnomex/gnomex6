@@ -57,10 +57,11 @@ test('the Experiments filter sends the chosen scope', async ({ page }) => {
   expect(params.get('expRadio')).toBe('all');
   expect(params.get('allExperiments')).toBe('Y');
 
-  // Back to the default: none of the other choices' parameters should linger.
+  // Back to the default. "My lab" with no lab member picked is the unfiltered default, so the filter
+  // drops expRadio altogether; none of the other choices' parameters should linger either.
   params = await searchWith(page, experiments, radio('My lab'));
-  expect(params.get('expRadio')).toBe('myLab');
-  for (const leftover of ['allExperiments', 'allCollaborations', 'publicExperimentsInOtherGroups']) {
+  expect(params.get('expRadio') ?? 'myLab').toBe('myLab');
+  for (const leftover of ['allExperiments', 'allCollaborations', 'publicExperimentsInOtherGroups', 'idAppUser']) {
     expect(params.get(leftover), `${leftover} after choosing My lab`).toBeNull();
   }
 });

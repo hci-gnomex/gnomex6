@@ -110,7 +110,7 @@ test('Topics', async ({ page }) => {
 test('My Account', async ({ page }) => {
   test.skip(!hasCredentials, 'My Account needs a signed-in user');
   await enterApp(page);
-  await page.locator('#main-nav').getByRole('button', { name: 'Account menu' }).click();
+  await page.getByRole('button', { name: 'Account menu' }).click();
   await page.getByRole('menuitem', { name: 'My Account' }).click();
   await expect(page.getByRole('main', { name: 'My Account' })).toBeVisible();
   await checkPage(page, 'My Account');

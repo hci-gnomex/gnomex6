@@ -9,12 +9,13 @@ import { expectNoErrorDialog, openFirstMatching } from './tree-helpers';
 
 const experiments = browsePages.find(p => p.name === 'experiments')!;
 
-test.beforeEach(async ({ page }) => {
+/** Opens the first experiment in the tree. */
+async function openFirstExperiment(page: Page): Promise<void> {
   await enterApp(page);
   await openBrowsePage(page, experiments);
   const opened = await openFirstMatching(page, page.getByRole('tree', { name: experiments.tree }), /\/experiments\/detail\/\d+/);
   test.skip(!opened, "the user can't see any experiments");
-});
+}
 
 /** Records requests that would fetch or link files, so a test can check none were sent. */
 function watchFileRequests(page: Page): Request[] {
@@ -24,6 +25,7 @@ function watchFileRequests(page: Page): Request[] {
 }
 
 test('Download Files builds a download list without downloading', async ({ page }) => {
+  await openFirstExperiment(page);
   const fileRequests = watchFileRequests(page);
   const detail = page.getByRole('main', { name: 'Experiment Detail Overview' });
   await detail.getByRole('button', { name: 'Download experiment files' }).click();
@@ -38,23 +40,28 @@ test('Download Files builds a download list without downloading', async ({ page 
   await expect(download, 'nothing chosen yet').toBeDisabled();
   await expect(chosen).toContainText(/^\s*0 file\(s\)/);
 
-  const add = available.getByRole('button', { name: /^Add .+ to download list$/ }).first();
-  test.skip(await add.count() === 0, 'this experiment has no files to download');
-  const what = (await add.getAttribute('aria-label'))!.replace(/^Add | to download list$/g, '');
-  // The per-row actions only show on hover/focus; focus it the way a keyboard user would.
-  await add.focus();
-  await add.press('Enter');
+  // Seen 2026-11: on the dev server no experiment has files on disk (only empty QC folders), so
+  // only the empty state can be checked there; the add/remove steps run wherever files exist.
+  const hasFiles = !/^\s*0 file\(s\)/.test(await dialog.getByLabel('Available files count').innerText());
+  if (hasFiles) {
+    // The first row is the experiment itself; adding it adds all of its files.
+    const add = available.getByRole('button', { name: /^Add .+ to download list$/ }).first();
+    const what = (await add.getAttribute('aria-label'))!.replace(/^Add | to download list$/g, '');
+    // The per-row actions only show on hover/focus; use them the way a keyboard user would.
+    await add.focus();
+    await add.press('Enter');
+    await expect(chosen, 'the chosen files are counted').not.toContainText(/^\s*0 file\(s\)/);
+    await expect(download).toBeEnabled();
 
-  await expect(toDownload.getByRole('treeitem').first()).toBeVisible();
-  await expect(download).toBeEnabled();
-  await expect(chosen).not.toContainText(/^\s*0 file\(s\)/);
-
-  // Take it back out again: the list and the button return to their empty state.
-  const remove = toDownload.getByRole('button', { name: `Remove ${what} from download list` }).first();
-  await remove.focus();
-  await remove.press('Enter');
-  await expect(chosen).toContainText(/^\s*0 file\(s\)/);
-  await expect(download).toBeDisabled();
+    // Take it back out again: the list and the button return to their empty state.
+    const remove = toDownload.getByRole('button', { name: `Remove ${what} from download list` }).first();
+    await remove.focus();
+    await remove.press('Enter');
+    await expect(chosen).toContainText(/^\s*0 file\(s\)/);
+    await expect(download).toBeDisabled();
+  } else {
+    test.info().annotations.push({ type: 'note', description: 'the experiment has no files; only the empty state was checked' });
+  }
 
   await dialog.getByRole('button', { name: 'Cancel download' }).click();
   await expect(dialog).toBeHidden();
@@ -63,6 +70,7 @@ test('Download Files builds a download list without downloading', async ({ page 
 });
 
 test('the sample sheet downloads as a file with the samples in it', async ({ page }) => {
+  await openFirstExperiment(page);
   const detail = page.getByRole('main', { name: 'Experiment Detail Overview' });
   const number = (await detail.getByRole('heading', { level: 1 }).innerText()).replace('Experiment', '').trim();
   await detail.getByRole('tab', { name: 'Experiment Design tab' }).click();
