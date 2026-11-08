@@ -221,7 +221,7 @@ import {ConstantsService} from "../../services/constants.service";
 export class RegisterUserComponent  implements OnInit, OnDestroy{
   private registerUser: IRegisterUser;
   private labs: ISimpleLab[];
-  public isUniversityAuthd: string;
+  public isUniversityAuthd: boolean = false;
   private publicNotice: string;
   public siteLogo: string;
   public formGroup: FormGroup;
@@ -268,13 +268,17 @@ export class RegisterUserComponent  implements OnInit, OnDestroy{
         if(regUserResp && regUserResp.result === "SUCCESS") {
           this.registerUser = <IRegisterUser>regUserResp;
           this.labs = this.registerUser.Labs && this.registerUser.Labs.length > 0 ? this.registerUser.Labs : [];
-          this.isUniversityAuthd = this.registerUser.isUniversityUserAuthentication;
+          // The server sends "Y"/"N"; "N" is a non-empty string, so it must not be tested for truthiness.
+          this.isUniversityAuthd = ('' + this.registerUser.isUniversityUserAuthentication).toUpperCase() === 'Y';
           this.publicNotice = this.registerUser.publicDataNotice ? this.registerUser.publicDataNotice : "";
           this.siteLogo = this.registerUser.siteLogo ? this.registerUser.siteLogo : "";
 
 
           if(!this.isUniversityAuthd) {
+            // Without university sign-in everyone is external: swap the (hidden, required) uNID for
+            // the external username/password fields, or the form could never become valid.
             this.formGroup.get('uofuAffiliate').setValue(false);
+            this.setUniversityAffiliate(false);
           }
 
         } else if(regUserResp && regUserResp.message) {
@@ -304,14 +308,17 @@ export class RegisterUserComponent  implements OnInit, OnDestroy{
     }
   }
   toggledUniversityState(event: MatSlideToggleChange) {
-    if(event.checked) {
-      console.log("is existing university employee");
+    this.setUniversityAffiliate(event.checked);
+  }
+
+  /** University users give a uNID; everyone else picks a username and password. */
+  private setUniversityAffiliate(affiliated: boolean): void {
+    if(affiliated) {
       this.formGroup.removeControl("externalToUniversityGroup");
       if(!this.formGroup.get("uNID")) {
         this.formGroup.addControl("uNID", new FormControl('', [Validators.required, Validators.pattern(/u\d{7}/) ]));
       }
     } else {
-      console.log("is external university");
       this.formGroup.removeControl("uNID");
       if(!this.formGroup.get("externalToUniversityGroup")) {
         this.formGroup.addControl('externalToUniversityGroup', this.fb.group(this.externalToGroupTemplate));
