@@ -231,7 +231,8 @@ export class OrderProductsComponent implements OnInit {
         p.quantity = Math.round(p.quantity);
         if (p.quantity > 0) {
             p.isSelected = true;
-            p.total = p.quantity * parseInt(p.unitPrice);
+            // parseFloat, not parseInt: a $12.50 product must not total as $12.
+            p.total = OrderProductsComponent.toCents(p.quantity * parseFloat(String(p.unitPrice).replace(/,/g, "")));
         } else {
             p.isSelected = false;
             p.total = 0;
@@ -244,6 +245,12 @@ export class OrderProductsComponent implements OnInit {
                 this.enableSubmit = true;
             }
         }
+        this.grandTotal = OrderProductsComponent.toCents(this.grandTotal);
+    }
+
+    /** Rounds a dollar amount to whole cents (0.1 + 0.2 is 0.30000000000000004 in floating point). */
+    private static toCents(amount: number): number {
+        return isNaN(amount) ? 0 : Math.round(amount * 100) / 100;
     }
 
     public submitOrder(): void {

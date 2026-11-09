@@ -1,10 +1,11 @@
-import { expect, Page, Request, Response, test } from '@playwright/test';
-import { enterApp } from './browse-pages';
-import { waitForSpinner } from './helpers';
+import { expect, Locator, Page, Request, Response, test } from '@playwright/test';
+import { enterApp, LAB } from './browse-pages';
+import { chooseOption, openMenuItem, waitForSpinner, watchChanges as watchAnyChanges } from './helpers';
 import { expectNoErrorDialog } from './tree-helpers';
 
-// Products › Product Orders. Read-only: filters and views are changed, but Go (change status) and
-// Delete are never pressed, and any Save/Delete request fails the test.
+// Products › Product Orders, Product Ledger and Order Products. Read-only: filters and views are
+// changed, but Go (change status), Delete, Save and Submit are never pressed, and any Save/Delete
+// request fails the test.
 
 /** Opens Products › Product Orders, or skips if this user doesn't have it. */
 async function openProductOrders(page: Page): Promise<void> {
@@ -98,4 +99,148 @@ test('the Detail view shows the orders by lab', async ({ page }) => {
   }
   await expectNoListError(page);
   expect(changes.map(r => r.url()), 'nothing should be changed').toEqual([]);
+});
+
+// ---- Product Ledger -------------------------------------------------------------------------------
+
+/** Checks a ledger list reply isn't GNomEx's {"result":"ERROR"} (sent with HTTP 200). */
+async function expectLedgerServed(response: Response): Promise<void> {
+  const body = await response.text();
+  const error = body.match(/"result"\s*:\s*"ERROR"[^}]*?"message"\s*:\s*"([^"]{0,120})/);
+  expect(error ? error[1].trim() : null, 'GetProductLedgerList.gx should not fail').toBeNull();
+}
+
+test('the Product Ledger lists products by lab, filtered by the chosen lab and product', async ({ page }) => {
+  const changes = watchAnyChanges(page);
+  await enterApp(page);
+  const opened = page.waitForResponse(r => r.url().includes('GetProductLedgerList.gx'), { timeout: 120_000 });
+  await openMenuItem(page, 'Products', 'Product Ledger');
+  await expectLedgerServed(await opened);
+  await expect(page).toHaveTitle('Product Ledger — GNomEx');
+  const main = page.locator('#main-content');
+  await expect(main.getByRole('tree', { name: 'Products' })).toBeAttached();
+  await expect(main.getByRole('button', { name: 'Save', exact: true }), 'nothing to save').toBeDisabled();
+
+  let listed = page.waitForResponse(r => r.url().includes('GetProductLedgerList.gx'));
+  const lab = await chooseOption(page, main.getByRole('combobox', { name: 'Lab', exact: true }), [LAB]);
+  expect(lab, 'labs are listed').not.toBeNull();
+  let response = await listed;
+  expect(new URL(response.url()).searchParams.get('idLab'), `the list is for ${lab}`).toMatch(/^\d+$/);
+  await expectLedgerServed(response);
+
+  listed = page.waitForResponse(r => r.url().includes('GetProductLedgerList.gx'));
+  const product = await chooseOption(page, main.getByRole('combobox', { name: 'Product', exact: true }));
+  if (product === null) {
+    test.info().annotations.push({ type: 'note', description: 'no products are defined' });
+  } else {
+    response = await listed;
+    const params = new URL(response.url()).searchParams;
+    expect(params.get('idProduct'), `the list is for ${product}`).toMatch(/^\d+$/);
+    expect(params.get('idLab'), 'the lab filter is kept').toMatch(/^\d+$/);
+    await expectLedgerServed(response);
+  }
+  await waitForSpinner(page);
+  await expectNoErrorDialog(page);
+  expect(changes.map(r => r.url()), 'nothing should be saved').toEqual([]);
+});
+
+// ---- Order Products -------------------------------------------------------------------------------
+
+/** Reads "$12.50" as 12.5. */
+function dollars(text: string): number {
+  return Number(text.replace(/[^0-9.\-]/g, ''));
+}
+
+interface OrderForm { main: Locator; items: Locator; quantities: Locator; submit: Locator }
+
+/**
+ * Opens Products › Order Products for the first core listed, chooses a lab and a billing account,
+ * and waits for the products. Skips if the user can't order or the core has nothing to order.
+ */
+async function openOrderForm(page: Page): Promise<OrderForm> {
+  await enterApp(page);
+  const nav = page.locator('#main-nav').getByRole('button', { name: /^Products( \.\.\.)? menu$/ });
+  test.skip(!(await nav.isVisible()), 'this user has no Products menu');
+  await nav.click();
+  const submenu = page.getByRole('menuitem', { name: 'Order Products submenu' });
+  test.skip(!(await submenu.isVisible()), 'this user may not order products');
+  await submenu.hover();
+  const labs = page.waitForResponse(r => r.url().includes('GetLabList.gx'), { timeout: 120_000 }).catch(() => null);
+  await page.getByRole('menu').last().getByRole('menuitem').first().click();
+  await labs;
+  await waitForSpinner(page);
+  await expect(page).toHaveTitle('Order Products — GNomEx');
+  const main = page.locator('#main-content');
+  await expect(main.getByRole('heading', { name: /^Order Products for / })).toBeVisible();
+  const items = main.getByRole('table', { name: 'Product order items' });
+
+  // Only labs that can order from this core are offered.
+  const lab = await chooseOption(page, main.getByRole('combobox', { name: 'Lab group' }));
+  test.skip(lab === null, 'the user has no lab that can order from this core');
+  await expect(main.getByRole('combobox', { name: 'Billing account' }), "the lab's accounts are offered").toBeVisible();
+  await expect(items, 'products wait for a billing account').toBeHidden();
+
+  const account = await chooseOption(page, main.getByRole('combobox', { name: 'Billing account' }));
+  test.skip(account === null, `${lab} has no billing account for this core`);
+  await expect(items).toBeVisible();
+  // The products fill in after GetProductList.gx returns.
+  const quantities = items.getByRole('spinbutton');
+  const hasProducts = await quantities.first().waitFor({ timeout: 15_000 }).then(() => true, () => false);
+  test.skip(!hasProducts, 'this core has no products to order');
+  return { main, items, quantities, submit: main.getByRole('button', { name: 'Submit', exact: true }) };
+}
+
+/** Orders `quantity` of the first product, checks its line total and the grand total, returns its price. */
+async function expectTotals(page: Page, o: OrderForm, quantity: number): Promise<number> {
+  const row = o.items.getByRole('row').filter({ has: page.getByRole('spinbutton') }).first();
+  const price = dollars(await row.getByRole('cell').nth(2).innerText());
+  await o.quantities.first().fill(String(quantity));
+  await o.quantities.first().blur();
+  await expect(row.getByRole('checkbox'), 'the product is selected').toBeChecked();
+  await expect.poll(async () => dollars(await row.getByRole('cell').nth(3).innerText()), `${quantity} x $${price}`)
+    .toBeCloseTo(quantity * price, 2);
+  await expect.poll(async () => dollars(await o.main.getByText(/^Grand Total:/).innerText()), 'the grand total')
+    .toBeCloseTo(quantity * price, 2);
+  return price;
+}
+
+test('Order Products totals the chosen quantities and needs consent before Submit', async ({ page }) => {
+  const changes = watchAnyChanges(page);
+  const o = await openOrderForm(page);
+  await expect(o.submit, 'nothing ordered yet').toBeDisabled();
+
+  await expectTotals(page, o, 2);
+  await expect(o.submit, "the charge needs the user's consent").toBeDisabled();
+
+  const consent = o.main.getByRole('checkbox', { name: /I authorize the Core Facility to charge the account/ });
+  await consent.locator('xpath=ancestor::label[1]').click();
+  await expect(consent).toBeChecked();
+  await expect(o.submit, 'a quantity and consent are enough').toBeEnabled();
+
+  // A negative quantity counts as none.
+  await o.quantities.first().fill('-3');
+  await o.quantities.first().blur();
+  await expect(o.quantities.first()).toHaveValue('0');
+  await expect(o.submit, 'nothing left to order').toBeDisabled();
+
+  await expectNoErrorDialog(page);
+  expect(changes.map(r => r.url()), 'no order should be submitted').toEqual([]);
+});
+
+test('Order Products keeps the cents of a price in the totals', async ({ page }) => {
+  // The products here may all cost whole dollars, so the product list is faked with $12.50 prices.
+  // Seen 2026-11: totals used parseInt(unitPrice), so 2 x $12.50 showed $24. Fixed in
+  // OrderProductsComponent.checkQuantity.
+  await page.route(/GetProductList\.gx/, async route => {
+    const response = await route.fetch();
+    const body = (await response.text())
+      .replace(/("unitPrice(?:Internal|ExternalAcademic|ExternalCommercial)"\s*:\s*)"[^"]*"/g, '$1"12.50"');
+    await route.fulfill({ response, body });
+  });
+  const changes = watchAnyChanges(page);
+  const o = await openOrderForm(page);
+  const price = await expectTotals(page, o, 2);
+  expect(price, 'the faked price is shown').toBeCloseTo(12.5, 2);
+  await expectNoErrorDialog(page);
+  expect(changes.map(r => r.url()), 'no order should be submitted').toEqual([]);
 });

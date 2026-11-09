@@ -68,7 +68,7 @@
                 <label>${{p.unitPrice}}</label>
             </td>
             <td>
-                <label>= ${{p.total}}</label>
+                <label>= ${{p.total | number:'1.2-2'}}</label>
             </td>
             <td>
                 <label>{{p.currentProductCount}}</label>
@@ -76,7 +76,7 @@
         </tr>
     </table>
     <div [hidden]="!this.idLab || !this.idAppUser || (!this.idBillingAccount && !this.billingTemplate)" class="full-width flex-container-row justify-end">
-        <label class="bold-font">Grand Total: ${{this.grandTotal}}</label>
+        <label class="bold-font">Grand Total: ${{this.grandTotal | number:'1.2-2'}}</label>
     </div>
     <div [hidden]="!this.idLab || !this.idAppUser || (!this.idBillingAccount && !this.billingTemplate)" class="full-width flex-container-row justify-space-between padding-top">
         <mat-checkbox [(ngModel)]="this.userConsent">
