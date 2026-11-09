@@ -1,6 +1,6 @@
 import { BrowserContext, expect, Page, Response, test } from '@playwright/test';
 import { enterApp, LAB } from './browse-pages';
-import { waitForSpinner } from './helpers';
+import { chooseOption, waitForSpinner } from './helpers';
 import { expectNoErrorDialog } from './tree-helpers';
 import { WRITE_LAB } from './write-helpers';
 
@@ -72,21 +72,9 @@ async function chooseLabs(page: Page, admin: boolean): Promise<string> {
   if (!admin) {
     return "the user's own labs";
   }
-  await page.getByRole('combobox', { name: 'All Labs...' }).click();
-  const listed = page.getByRole('option').filter({ hasNotText: /^\s*(None|All Labs\.\.\.)\s*$/ });
-  await expect(listed.first(), 'labs are listed').toBeVisible();
-  let option = listed.first();
-  for (const wanted of [LAB, WRITE_LAB].filter(Boolean)) {
-    const match = page.getByRole('option', { name: wanted, exact: true });
-    if (await match.count()) {
-      option = match.first();
-      break;
-    }
-  }
-  const name = (await option.innerText()).trim();
-  await option.click();
-  await waitForSpinner(page);
-  return name;
+  const name = await chooseOption(page, page.getByRole('combobox', { name: 'All Labs...' }), [LAB, WRITE_LAB]);
+  expect(name, 'labs are listed').not.toBeNull();
+  return name!;
 }
 
 test('the Project/Experiment Report runs and returns a spreadsheet', async ({ page, context }) => {

@@ -1,6 +1,6 @@
 import { expect, Locator, Page, test } from '@playwright/test';
 import { enterApp, LAB } from './browse-pages';
-import { openMenuItem, pickRadio, waitForSpinner, watchChanges } from './helpers';
+import { chooseOption, openMenuItem, pickRadio, waitForSpinner, watchChanges } from './helpers';
 import { expectNoErrorDialog } from './tree-helpers';
 import { WRITE_LAB } from './write-helpers';
 
@@ -27,21 +27,9 @@ async function openBillingAccount(page: Page): Promise<Locator> {
  * (seen 2026-11: the write-test lab wasn't offered).
  */
 async function chooseLab(page: Page, dialog: Locator): Promise<string> {
-  await dialog.getByRole('combobox', { name: 'Lab', exact: true }).click();
-  const listed = page.getByRole('option').filter({ hasNotText: /^\s*None\s*$/ });
-  await expect(listed.first(), 'labs are listed').toBeVisible();
-  let option = listed.first();
-  for (const wanted of [WRITE_LAB, LAB].filter(Boolean)) {
-    const match = page.getByRole('option', { name: wanted, exact: true });
-    if (await match.count()) {
-      option = match.first();
-      break;
-    }
-  }
-  const name = (await option.innerText()).trim();
-  await option.click();
-  await waitForSpinner(page);
-  return name;
+  const name = await chooseOption(page, dialog.getByRole('combobox', { name: 'Lab', exact: true }), [WRITE_LAB, LAB]);
+  expect(name, 'labs are listed').not.toBeNull();
+  return name!;
 }
 
 /** Types a value and leaves the field, so its check runs. */

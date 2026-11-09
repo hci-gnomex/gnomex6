@@ -131,3 +131,30 @@ export function watchChanges(page: Page): Request[] {
   });
   return changes;
 }
+
+/**
+ * Opens a drop-down and picks the first of `preferred` it lists (e.g. GNOMEX_LAB), else its first
+ * real option (not "None", "All..." or a blank). Options render in an overlay, so they're found on
+ * the page. Returns the chosen option's text, or null (and closes the list) if there are none.
+ */
+export async function chooseOption(page: Page, dropDown: Locator, preferred: string[] = []): Promise<string | null> {
+  await dropDown.click();
+  const listed = page.getByRole('option').filter({ hasNotText: /^\s*(None|All\b.*)?\s*$/ });
+  // Lists often fill in after the request behind them returns.
+  if (!(await listed.first().waitFor({ timeout: 15_000 }).then(() => true, () => false))) {
+    await page.keyboard.press('Escape');
+    return null;
+  }
+  let option = listed.first();
+  for (const wanted of preferred.filter(Boolean)) {
+    const match = page.getByRole('option', { name: wanted, exact: true });
+    if (await match.count()) {
+      option = match.first();
+      break;
+    }
+  }
+  const text = (await option.innerText()).replace(/\s+/g, ' ').trim();
+  await option.click();
+  await waitForSpinner(page);
+  return text;
+}

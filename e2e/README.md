@@ -29,6 +29,7 @@ Browser tests that drive a **running** GNomEx (Tomcat backend + Angular front en
 | `tests/configure.spec.ts` | Configure › Organisms and Genome Builds: the list loads, an organism opens with its details and genome builds, Sort Order rejects letters and over 5 digits and flags unsaved edits. Configure › Annotations: an annotation opens with its settings on each tab; "Show Annotations For" Samples/Analysis/Data Tracks/Experiments lists only annotations for that kind; an empty name is flagged and can't be saved. Never presses Save, Add or Remove |
 | `tests/new-experiment.spec.ts` | New Experiment Order wizard, Setup step: opens with Back/Next disabled; a service category names the experiment and lists the later steps (disabled); a lab brings the payment method, and an account the project; Cancel asks first (No stays, Yes goes Home). Never submits |
 | `tests/billing-account.spec.ts` | Experiments › New Billing Account: opens for a Chartfield account with Save disabled and core facilities waiting for a lab; each Chartfield segment needs its number of digits (Activity or Project); Save enables only when complete and the terms are agreed to; PO swaps in purchase order details. Never presses Save |
+| `tests/experiments-menu.spec.ts` | Experiments › New Project needs a lab and a name before Save enables, and Cancel saves nothing. Upload Experiment data enables Next only once lab, organism, platform, experiment type and project are chosen. Add Additional Illumina Sequencing Lanes asks for a lab's Illumina experiments only once a service is chosen, for the chosen period (3 months by default), and picking an experiment enables Next. Never saves |
 | `tests/menu-pages.spec.ts` | One test per drop-down menu (New Experiment Order, Experiments, Workflow, Products, Configure, Reports, any other): opens every item and checks for no ERROR/INVALID dialog, no error responses, visible content and a page title of its own; dialogs are closed with Cancel/Close; menus the user lacks are skipped |
 | `tests/projects.write.spec.ts` | **Changes data.** Creates a project and opens it; renames one; deletes one from the tree |
 | `tests/topics.write.spec.ts` | **Changes data.** Creates a topic and opens it; renames one; deletes one |
@@ -139,5 +140,9 @@ Failures keep a screenshot, video and trace in `test-results/`; open a trace wit
 - `openMenuItem(page, 'Configure', 'Configure Annotations')` opens a header menu item and skips if the user
   lacks it; `watchChanges(page)` records Save/Delete/Submit/Change/Update/Approve calls so read-only tests can
   assert nothing was saved (Create* is left out: sign-in calls CreateSecurityAdvisor.gx).
+- `chooseOption(page, dropDown, [LAB])` picks the first preferred option a drop-down lists, else its first real one,
+  and returns its text (null if empty). It waits for the list, which often fills in after its request returns.
+- A GNomEx alert (e.g. "No experiments found") is modal and hides the rest of the page from the accessibility
+  tree, so close it before asserting anything else.
 - ag-grids have no accessible name (their `aria-label` sits on `<ag-grid-angular>`, which has no role), so find a
   grid by one of its column headers.
