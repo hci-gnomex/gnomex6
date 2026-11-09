@@ -217,3 +217,43 @@ test('the sign-up form checks its fields and enables Submit only when complete',
   await expectNoErrorDialog(page);
   expect(sent.map(r => r.url()), 'no account should be created').toEqual([]);
 });
+
+test('without university sign-in the sign-up form asks for a username and can be completed', async ({ page }) => {
+  // Most servers answer one way only, so the core's sign-up data is faked here with "N" (no
+  // university sign-in) to check the front end, whatever this server sends.
+  // Seen 2026-11: "N" was read as true, so the university switch showed (and was on) anyway; and
+  // once off, the hidden uNID stayed required, so Submit could never be enabled. Fixed in
+  // RegisterUserComponent.
+  const sent = forbidSubmitting(page);
+  await page.route(/GetNewAccountServlet\.gx\?.*idCoreFacility=/, route => route.fulfill({
+    contentType: 'application/json',
+    body: JSON.stringify({ result: 'SUCCESS', Labs: [], isUniversityUserAuthentication: 'N', siteLogo: '' }),
+  }));
+  await page.goto('register-user/1');
+  const form = page.locator('form').filter({ has: page.getByRole('heading', { name: 'Sign up for an account' }) });
+  await expect(form).toBeVisible();
+  const submit = form.getByRole('button', { name: 'Submit', exact: true });
+
+  await expect(toggle(form, 'Affiliated with the University of Utah'), 'no university switch').toHaveCount(0);
+  await expect(form.getByRole('textbox', { name: 'uNID', exact: true })).toHaveCount(0);
+  const userName = form.getByRole('textbox', { name: 'User Name', exact: true });
+  await expect(userName, 'external users choose a username').toBeVisible();
+
+  const made = `E2e-${Math.random().toString(36).slice(2, 10)}`;
+  await enter(form.getByRole('textbox', { name: 'First Name', exact: true }), 'E2e');
+  await enter(form.getByRole('textbox', { name: 'Last Name', exact: true }), 'Signup');
+  await enter(form.getByRole('textbox', { name: 'Email', exact: true }), 'e2e-signup@example.com');
+  await enter(form.getByRole('textbox', { name: 'Phone', exact: true }), '555-0100');
+  await enter(userName, `e2e-signup-${Date.now().toString(36)}`);
+  await enter(form.getByLabel('Password', { exact: true }), made);
+  await enter(form.getByLabel('Password (conf)', { exact: true }), made);
+  await flip(page, 'New Lab');
+  await enter(form.getByRole('textbox', { name: 'Lab First Name', exact: true }), 'E2e');
+  await enter(form.getByRole('textbox', { name: 'Lab Last Name', exact: true }), 'Lab');
+  await enter(form.getByRole('textbox', { name: 'PI Email', exact: true }), 'e2e-pi@example.com');
+  await enter(form.getByRole('textbox', { name: 'Pi Phone', exact: true }), '555-0101');
+  await expect(submit, 'every required field is filled in').toBeEnabled();
+
+  await expectNoErrorDialog(page);
+  expect(sent.map(r => r.url()), 'no account should be created').toEqual([]);
+});
