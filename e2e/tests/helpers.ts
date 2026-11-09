@@ -1,4 +1,4 @@
-import { expect, Page, test } from '@playwright/test';
+import { expect, Locator, Page, Request, test } from '@playwright/test';
 
 export const credentials = {
   username: process.env.GNOMEX_USER || '',
@@ -93,4 +93,41 @@ export async function openFromNav(page: Page, item: string, menuItem?: string): 
   } else {
     await nav.getByRole('button', { name: item, exact: true }).click();
   }
+}
+
+/**
+ * Opens an item from one of the header's drop-down menus, e.g. openMenuItem(page, 'Configure',
+ * 'Configure Organisms and Genome Builds'). Skips the test if this user lacks the menu or the item
+ * (menus depend on the user's role; some are labelled "Products ... menu").
+ */
+export async function openMenuItem(page: Page, menu: string, item: string): Promise<void> {
+  const button = page.locator('#main-nav').getByRole('button', { name: new RegExp(`^${menu}( \.\.\.)? menu$`) });
+  test.skip(!(await button.isVisible()), `this user has no ${menu} menu`);
+  await button.click();
+  const entry = page.getByRole('menuitem', { name: item, exact: true });
+  test.skip(!(await entry.isVisible()), `this user's ${menu} menu has no "${item}"`);
+  await entry.click();
+  await waitForSpinner(page);
+}
+
+/**
+ * Picks an Angular Material radio button. Its real input is visually hidden under the label, so
+ * click() and check() on the radio role time out ("mat-radio-button intercepts pointer events").
+ */
+export async function pickRadio(radio: Locator): Promise<void> {
+  await radio.locator('xpath=ancestor::label[1]').click();
+  await expect(radio).toBeChecked();
+}
+
+/**
+ * Records calls to server commands that change data (SaveX.gx, DeleteX.gx...; not Create*, which
+ * sign-in calls for the session itself). Read-only tests assert the list stays empty, so a stray
+ * click on Save fails the test instead of passing quietly.
+ */
+export function watchChanges(page: Page): Request[] {
+  const changes: Request[] = [];
+  page.on('request', r => {
+    if (/\/(Save|Delete|Submit|Change|Update|Approve)\w*\.gx$/i.test(new URL(r.url()).pathname)) changes.push(r);
+  });
+  return changes;
 }

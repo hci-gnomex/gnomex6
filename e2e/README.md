@@ -25,7 +25,10 @@ Browser tests that drive a **running** GNomEx (Tomcat backend + Angular front en
 | `tests/edit-mode.spec.ts` | Analysis edit mode: Edit unlocks the fields and View locks them; leaving with unsaved changes asks first and No keeps editing; discarding shows the saved values again. Nothing is saved (any Save*.gx request fails the test) |
 | `tests/products.spec.ts` | Products › Product Orders: the order list is requested on opening; the Status filter sends the chosen status and an empty result isn't reported as an error; the Detail view shows orders by lab with Delete disabled. Never presses Go or Delete |
 | `tests/signup-reset.spec.ts` | Signed out: Reset Password opens from sign-in, needs a username or email and switches between them; New Account lists each core facility with a link to its sign-up form; that public data names labs and cores only (no contact details); the sign-up form flags a bad email, a u-number as an external username, a weak or mismatched password, and enables Submit only when complete (with or without university sign-in). Never presses Submit |
-| `tests/reports.spec.ts` | Reports › Project/Experiment Report runs and returns an Excel/CSV file, not an error page |
+| `tests/reports.spec.ts` | Reports › Project/Experiment Report, Annotation Report (with an annotation and a custom column chosen) and Annotation Progress Report run and return an Excel/CSV file, not an error or an empty page. Ordinary users report on their own labs ("All Labs..."); admins pick `GNOMEX_LAB` |
+| `tests/configure.spec.ts` | Configure › Organisms and Genome Builds: the list loads, an organism opens with its details and genome builds, Sort Order rejects letters and over 5 digits and flags unsaved edits. Configure › Annotations: an annotation opens with its settings on each tab; "Show Annotations For" Samples/Analysis/Data Tracks/Experiments lists only annotations for that kind; an empty name is flagged and can't be saved. Never presses Save, Add or Remove |
+| `tests/new-experiment.spec.ts` | New Experiment Order wizard, Setup step: opens with Back/Next disabled; a service category names the experiment and lists the later steps (disabled); a lab brings the payment method, and an account the project; Cancel asks first (No stays, Yes goes Home). Never submits |
+| `tests/billing-account.spec.ts` | Experiments › New Billing Account: opens for a Chartfield account with Save disabled and core facilities waiting for a lab; each Chartfield segment needs its number of digits (Activity or Project); Save enables only when complete and the terms are agreed to; PO swaps in purchase order details. Never presses Save |
 | `tests/menu-pages.spec.ts` | One test per drop-down menu (New Experiment Order, Experiments, Workflow, Products, Configure, Reports, any other): opens every item and checks for no ERROR/INVALID dialog, no error responses, visible content and a page title of its own; dialogs are closed with Cancel/Close; menus the user lacks are skipped |
 | `tests/projects.write.spec.ts` | **Changes data.** Creates a project and opens it; renames one; deletes one from the tree |
 | `tests/topics.write.spec.ts` | **Changes data.** Creates a topic and opens it; renames one; deletes one |
@@ -131,3 +134,10 @@ Failures keep a screenshot, video and trace in `test-results/`; open a trace wit
 - Angular Material dialogs appear twice in the accessibility tree (the container and GNomEx's inner dialog
   share the name), so use `.first()`; Material select options render in an overlay, so find them on `page`.
 - Trees are virtually scrolled: only ~50 rows exist in the page. Use a small lab for anything you need to find.
+- Angular Material radio buttons hide their input under the label, so `check()` times out: use `pickRadio()`.
+  In Material 9 a `mat-select` has role `listbox`, not `combobox`.
+- `openMenuItem(page, 'Configure', 'Configure Annotations')` opens a header menu item and skips if the user
+  lacks it; `watchChanges(page)` records Save/Delete/Submit/Change/Update/Approve calls so read-only tests can
+  assert nothing was saved (Create* is left out: sign-in calls CreateSecurityAdvisor.gx).
+- ag-grids have no accessible name (their `aria-label` sits on `<ag-grid-angular>`, which has no role), so find a
+  grid by one of its column headers.
