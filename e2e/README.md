@@ -10,7 +10,7 @@ Browser tests that drive a **running** GNomEx (Tomcat backend + Angular front en
 | `tests/experiment-detail.spec.ts` | Opens the first experiment: number heading, actions, Overview; every tab opens and shows content; Experiment Design lists samples; Share URL links to the experiment and copies it |
 | `tests/analysis-detail.spec.ts` | Opens the first analysis: number, name, visibility; every tab opens and shows content |
 | `tests/datatracks.spec.ts` | Selecting an organism; the data track search box narrows the tree; walking to a data track opens its summary |
-| `tests/header.spec.ts` | Lookup by experiment number opens that experiment; text search returns results; Help menu items; About dialog |
+| `tests/header.spec.ts` | Lookup by experiment number opens that experiment; text search returns results; Help menu items; About dialog; Help › User Guide and each Links menu item (the configured quick links) open their link in a new tab and leave the current page as it was (outside sites are answered with a stub page, not loaded) |
 | `tests/topics-protocols.spec.ts` | A topic opens with its Info/Visibility tabs; items linked to a topic open; a protocol opens with its details |
 | `tests/accessibility.spec.ts` | Keyboard: arrow keys move through the Experiments tree (aria-activedescendant), ArrowLeft/Right collapse/expand, Enter selects; "Skip to main content" (signed-in only); the Help menu opens, moves and closes (returning focus) with the keyboard; a dialog opened from the keyboard takes the focus; pin-header and filter collapse toggles report aria-pressed/aria-expanded |
 | `tests/page-titles.spec.ts` | The browser tab title names the page (sign-in, Home, Experiments list and detail, after Back, Analysis, Topics) |

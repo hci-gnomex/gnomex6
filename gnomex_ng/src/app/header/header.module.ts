@@ -13,7 +13,7 @@ import {NewBillingAccountModule} from "../billing/new_billing_account/new-billin
 
 import {AdvancedSearchComponent} from "./advanced_search/advanced-search.component";
 import {ExternalLinkComponent} from "./external-routes.module";
-import {ExternalLinkResolver} from "./external-routes.module";
+import {ExternalLinkGuard} from "./external-routes.module";
 import {HeaderComponent} from "./header.component";
 import {IconTextRendererComponent} from "../util/grid-renderers/icon-text-renderer.component";
 import {ManageLinksComponent} from "./manageLinks/manage-links.component";
@@ -63,7 +63,7 @@ import {AccessibilityModule} from "../util/accessibility/accessibility.module";
     ],
     providers: [
        AdvancedSearchService,
-       ExternalLinkResolver
+       ExternalLinkGuard
     ],
 
     declarations: [

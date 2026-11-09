@@ -1,5 +1,5 @@
-import { Component, Injectable, NgModule } from '@angular/core';
-import { ActivatedRouteSnapshot, Resolve } from '@angular/router';
+import { Component, Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate } from '@angular/router';
 
 @Component({
     template: ''
@@ -9,11 +9,16 @@ export class ExternalLinkComponent {
     }
 }
 
+/**
+ * Opens an external link (a header quick link or the User Guide) in a new tab and cancels the
+ * navigation, so the user stays on the page they were on. (As a resolver it opened the link but
+ * still routed this tab to ExternalLinkComponent, an empty page.)
+ */
 @Injectable()
-export class ExternalLinkResolver implements Resolve<any> {
-    resolve(route: ActivatedRouteSnapshot): any {
+export class ExternalLinkGuard implements CanActivate {
+    canActivate(route: ActivatedRouteSnapshot): boolean {
         window.open(route.data.targetUri, "_blank");
-        return true;
+        return false;
     }
 }
 
@@ -22,7 +27,7 @@ export class ExternalRoute {
         targetUri: string;
     };
     path: string;
-    resolve = { link: ExternalLinkResolver };
+    canActivate = [ExternalLinkGuard];
     component = ExternalLinkComponent;
 
     constructor(path: string, targetUri: string) {
@@ -30,4 +35,3 @@ export class ExternalRoute {
         this.data = { targetUri: targetUri };
     }
 }
-
