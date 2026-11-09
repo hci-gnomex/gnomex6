@@ -8,7 +8,11 @@
 <%@ page language="java" import="org.apache.poi.hssf.usermodel.HSSFFont"%>
 <%@ page language="java" import="org.apache.poi.hssf.usermodel.HSSFPalette"%>
 <%@ page language="java" import="org.apache.poi.hssf.util.HSSFColor"%>
-<%@ page language="java" import="org.apache.poi.hssf.util.CellRangeAddress"%>
+<%@ page language="java" import="org.apache.poi.ss.util.CellRangeAddress"%>
+<%@ page language="java" import="org.apache.poi.ss.usermodel.BorderStyle"%>
+<%@ page language="java" import="org.apache.poi.ss.usermodel.FillPatternType"%>
+<%@ page language="java" import="org.apache.poi.ss.usermodel.HorizontalAlignment"%>
+<%@ page language="java" import="org.apache.poi.ss.usermodel.VerticalAlignment"%>
 <%@ page language="java" import="java.io.FileNotFoundException"%>
 <%@ page language="java" import="java.io.IOException"%>
 <%@ page language="java" import="java.util.Iterator"%>
@@ -37,35 +41,35 @@ HSSFCell cell;
 
 // Title style
 font = workbook.createFont();
-font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+font.setBold(true);
 HSSFCellStyle titleStyle = workbook.createCellStyle();
 titleStyle.setFont(font);
-titleStyle.setAlignment(HSSFCellStyle.ALIGN_LEFT);
-titleStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+titleStyle.setAlignment(HorizontalAlignment.LEFT);
+titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
 // Header style
 HSSFCellStyle headerStyle = workbook.createCellStyle();
-headerStyle.setAlignment(HSSFCellStyle.ALIGN_LEFT);
-headerStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+headerStyle.setAlignment(HorizontalAlignment.LEFT);
+headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
 // Caption style
 short CAPTION_ROW_HEIGHT = 380;
 font = workbook.createFont();
-font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+font.setBold(true);
 HSSFCellStyle captionStyle = workbook.createCellStyle();
 captionStyle.setFont(font);
-captionStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-captionStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-captionStyle.setBorderBottom(HSSFCellStyle.BORDER_MEDIUM);
+captionStyle.setAlignment(HorizontalAlignment.CENTER);
+captionStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+captionStyle.setBorderBottom(BorderStyle.MEDIUM);
 
 // Data style
 HSSFCellStyle dataStyle = workbook.createCellStyle();
-dataStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-dataStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+dataStyle.setAlignment(HorizontalAlignment.CENTER);
+dataStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
 // Trailing blank style
 HSSFCellStyle trailingBlankStyle = workbook.createCellStyle();
-trailingBlankStyle.setBorderTop(HSSFCellStyle.BORDER_MEDIUM);
+trailingBlankStyle.setBorderTop(BorderStyle.MEDIUM);
 
 int rowNumber = 0;
 int colNumber = 0;
@@ -145,6 +149,10 @@ sheet.createFreezePane(3, 4);
 try {
 	workbook.write(response.getOutputStream());
 	response.getOutputStream().close();
+	// The spreadsheet went out through the output stream, so drop the page's text writer;
+	// otherwise Jasper calls getWriter() afterwards and logs "getOutputStream() has already been called".
+	out.clear();
+	out = pageContext.pushBody();
 } catch (FileNotFoundException e) {
 	e.printStackTrace();
 } catch (IOException e) {

@@ -8,7 +8,11 @@
 <%@ page language="java" import="org.apache.poi.hssf.usermodel.HSSFFont"%>
 <%@ page language="java" import="org.apache.poi.hssf.usermodel.HSSFPalette"%>
 <%@ page language="java" import="org.apache.poi.hssf.util.HSSFColor"%>
-<%@ page language="java" import="org.apache.poi.hssf.util.CellRangeAddress"%>
+<%@ page language="java" import="org.apache.poi.ss.util.CellRangeAddress"%>
+<%@ page language="java" import="org.apache.poi.ss.usermodel.BorderStyle"%>
+<%@ page language="java" import="org.apache.poi.ss.usermodel.FillPatternType"%>
+<%@ page language="java" import="org.apache.poi.ss.usermodel.HorizontalAlignment"%>
+<%@ page language="java" import="org.apache.poi.ss.usermodel.VerticalAlignment"%>
 <%@ page language="java" import="java.io.FileNotFoundException"%>
 <%@ page language="java" import="java.io.IOException"%>
 <%@ page language="java" import="java.util.Iterator"%>
@@ -75,10 +79,10 @@ defaultStyle.setFont(defaultFont);
 //Blank annot style
 HSSFCellStyle defaultAnnotStyle = workbook.createCellStyle();
 defaultAnnotStyle.setFont(defaultFont);
-defaultAnnotStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
-defaultAnnotStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-defaultAnnotStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-defaultAnnotStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+defaultAnnotStyle.setBorderTop(BorderStyle.THIN);
+defaultAnnotStyle.setBorderBottom(BorderStyle.THIN);
+defaultAnnotStyle.setBorderLeft(BorderStyle.THIN);
+defaultAnnotStyle.setBorderRight(BorderStyle.THIN);
 defaultAnnotStyle.setTopBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 defaultAnnotStyle.setBottomBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 defaultAnnotStyle.setLeftBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
@@ -87,47 +91,47 @@ defaultAnnotStyle.setRightBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX
 
 // Title style
 HSSFFont font = workbook.createFont();
-font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+font.setBold(true);
 font.setFontHeightInPoints(fontHeightTitle);
 HSSFCellStyle titleStyle = workbook.createCellStyle();
 titleStyle.setFont(font);
 titleStyle.setFillForegroundColor(palette.getColor(PALLETE_WHITE_INDEX).getIndex());
-titleStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-titleStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-titleStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+titleStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+titleStyle.setAlignment(HorizontalAlignment.CENTER);
+titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
 
 
 // Header style
 font = workbook.createFont();
-font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+font.setBold(true);
 HSSFCellStyle headerStyle = workbook.createCellStyle();
 headerStyle.setFont(font);
 font.setFontHeightInPoints(fontHeightHeading);
 headerStyle.setWrapText(true);
-headerStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-headerStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+headerStyle.setAlignment(HorizontalAlignment.CENTER);
+headerStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 headerStyle.setFillForegroundColor(palette.getColor(PALLETE_LIGHT_GREY_INDEX).getIndex());
-headerStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-headerStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
-headerStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-headerStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-headerStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+headerStyle.setBorderTop(BorderStyle.THIN);
+headerStyle.setBorderBottom(BorderStyle.THIN);
+headerStyle.setBorderLeft(BorderStyle.THIN);
+headerStyle.setBorderRight(BorderStyle.THIN);
 
 //Annotation Header style
 font = workbook.createFont();
-font.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+font.setBold(true);
 HSSFCellStyle annotHeaderStyle = workbook.createCellStyle();
 annotHeaderStyle.setFont(font);
 annotHeaderStyle.setWrapText(true);
-annotHeaderStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-annotHeaderStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+annotHeaderStyle.setAlignment(HorizontalAlignment.CENTER);
+annotHeaderStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 annotHeaderStyle.setFillForegroundColor(palette.getColor(PALLETE_LIGHT_GREY_INDEX).getIndex());
-annotHeaderStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-annotHeaderStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
-annotHeaderStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-annotHeaderStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-annotHeaderStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+annotHeaderStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+annotHeaderStyle.setBorderTop(BorderStyle.THIN);
+annotHeaderStyle.setBorderBottom(BorderStyle.THIN);
+annotHeaderStyle.setBorderLeft(BorderStyle.THIN);
+annotHeaderStyle.setBorderRight(BorderStyle.THIN);
 
 
 
@@ -135,11 +139,11 @@ annotHeaderStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
 // Error cell styles
 HSSFCellStyle errorStyle = workbook.createCellStyle();
 errorStyle.setFillForegroundColor(palette.getColor(PALLETE_RED_INDEX).getIndex());
-errorStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-errorStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
-errorStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-errorStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-errorStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+errorStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+errorStyle.setBorderTop(BorderStyle.THIN);
+errorStyle.setBorderBottom(BorderStyle.THIN);
+errorStyle.setBorderLeft(BorderStyle.THIN);
+errorStyle.setBorderRight(BorderStyle.THIN);
 errorStyle.setTopBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 errorStyle.setBottomBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 errorStyle.setLeftBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
@@ -148,16 +152,16 @@ errorStyle.setRightBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIn
 
 HSSFCellStyle errorLegendStyle = workbook.createCellStyle();
 errorLegendStyle.setFillForegroundColor(palette.getColor(PALLETE_RED_INDEX).getIndex());
-errorLegendStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-errorLegendStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
+errorLegendStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+errorLegendStyle.setBorderTop(BorderStyle.THIN);
 
 HSSFCellStyle errorTopBorderStyle = workbook.createCellStyle();
 errorTopBorderStyle.setFillForegroundColor(palette.getColor(PALLETE_RED_INDEX).getIndex());
-errorTopBorderStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-errorTopBorderStyle.setBorderTop(HSSFCellStyle.BORDER_MEDIUM);
-errorTopBorderStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-errorTopBorderStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-errorTopBorderStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+errorTopBorderStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+errorTopBorderStyle.setBorderTop(BorderStyle.MEDIUM);
+errorTopBorderStyle.setBorderBottom(BorderStyle.THIN);
+errorTopBorderStyle.setBorderLeft(BorderStyle.THIN);
+errorTopBorderStyle.setBorderRight(BorderStyle.THIN);
 errorTopBorderStyle.setBottomBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 errorTopBorderStyle.setLeftBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 errorTopBorderStyle.setRightBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
@@ -167,12 +171,12 @@ errorTopBorderStyle.setRightBorderColor(palette.getColor(PALLETE_CELL_BORDER_IND
 HSSFCellStyle partialErrorStyle = workbook.createCellStyle();
 partialErrorStyle.setFont(defaultFont);
 partialErrorStyle.setFillForegroundColor(palette.getColor(PALLETE_LIGHT_RED_INDEX).getIndex());
-partialErrorStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-partialErrorStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-partialErrorStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
-partialErrorStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-partialErrorStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-partialErrorStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+partialErrorStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+partialErrorStyle.setAlignment(HorizontalAlignment.CENTER);
+partialErrorStyle.setBorderTop(BorderStyle.THIN);
+partialErrorStyle.setBorderBottom(BorderStyle.THIN);
+partialErrorStyle.setBorderLeft(BorderStyle.THIN);
+partialErrorStyle.setBorderRight(BorderStyle.THIN);
 partialErrorStyle.setTopBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 partialErrorStyle.setBottomBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 partialErrorStyle.setLeftBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
@@ -182,18 +186,18 @@ partialErrorStyle.setRightBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX
 
 HSSFCellStyle partialErrorLegendStyle = workbook.createCellStyle();
 partialErrorLegendStyle.setFillForegroundColor(palette.getColor(PALLETE_LIGHT_RED_INDEX).getIndex());
-partialErrorLegendStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-partialErrorLegendStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+partialErrorLegendStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+partialErrorLegendStyle.setAlignment(HorizontalAlignment.CENTER);
 
 HSSFCellStyle partialErrorTopBorderStyle = workbook.createCellStyle();
 partialErrorTopBorderStyle.setFont(defaultFont);
 partialErrorTopBorderStyle.setFillForegroundColor(palette.getColor(PALLETE_LIGHT_RED_INDEX).getIndex());
-partialErrorTopBorderStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-partialErrorTopBorderStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-partialErrorTopBorderStyle.setBorderTop(HSSFCellStyle.BORDER_MEDIUM);
-partialErrorTopBorderStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-partialErrorTopBorderStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-partialErrorTopBorderStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+partialErrorTopBorderStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+partialErrorTopBorderStyle.setAlignment(HorizontalAlignment.CENTER);
+partialErrorTopBorderStyle.setBorderTop(BorderStyle.MEDIUM);
+partialErrorTopBorderStyle.setBorderBottom(BorderStyle.THIN);
+partialErrorTopBorderStyle.setBorderLeft(BorderStyle.THIN);
+partialErrorTopBorderStyle.setBorderRight(BorderStyle.THIN);
 partialErrorTopBorderStyle.setBottomBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 partialErrorTopBorderStyle.setLeftBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 partialErrorTopBorderStyle.setRightBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
@@ -203,11 +207,11 @@ partialErrorTopBorderStyle.setRightBorderColor(palette.getColor(PALLETE_CELL_BOR
 // Warning cell  (grey)
 HSSFCellStyle warningStyle = workbook.createCellStyle();
 warningStyle.setFillForegroundColor(palette.getColor(PALLETE_GREY_INDEX).getIndex());
-warningStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-warningStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
-warningStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-warningStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-warningStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+warningStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+warningStyle.setBorderTop(BorderStyle.THIN);
+warningStyle.setBorderBottom(BorderStyle.THIN);
+warningStyle.setBorderLeft(BorderStyle.THIN);
+warningStyle.setBorderRight(BorderStyle.THIN);
 warningStyle.setTopBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 warningStyle.setBottomBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 warningStyle.setLeftBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
@@ -216,15 +220,15 @@ warningStyle.setRightBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).get
 
 HSSFCellStyle warningLegendStyle = workbook.createCellStyle();
 warningLegendStyle.setFillForegroundColor(palette.getColor(PALLETE_GREY_INDEX).getIndex());
-warningLegendStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+warningLegendStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
 HSSFCellStyle warningTopBorderStyle = workbook.createCellStyle();
 warningTopBorderStyle.setFillForegroundColor(palette.getColor(PALLETE_GREY_INDEX).getIndex());
-warningTopBorderStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-warningTopBorderStyle.setBorderTop(HSSFCellStyle.BORDER_MEDIUM);
-warningTopBorderStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-warningTopBorderStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-warningTopBorderStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+warningTopBorderStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+warningTopBorderStyle.setBorderTop(BorderStyle.MEDIUM);
+warningTopBorderStyle.setBorderBottom(BorderStyle.THIN);
+warningTopBorderStyle.setBorderLeft(BorderStyle.THIN);
+warningTopBorderStyle.setBorderRight(BorderStyle.THIN);
 warningTopBorderStyle.setBottomBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 warningTopBorderStyle.setLeftBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 warningTopBorderStyle.setRightBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
@@ -233,87 +237,87 @@ warningTopBorderStyle.setRightBorderColor(palette.getColor(PALLETE_CELL_BORDER_I
 // Success cell  (green)
 HSSFCellStyle successStyle = workbook.createCellStyle();
 successStyle.setFillForegroundColor(palette.getColor(PALLETE_GREEN_INDEX).getIndex());
-successStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-successStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
-successStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-successStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-successStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+successStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+successStyle.setBorderTop(BorderStyle.THIN);
+successStyle.setBorderBottom(BorderStyle.THIN);
+successStyle.setBorderLeft(BorderStyle.THIN);
+successStyle.setBorderRight(BorderStyle.THIN);
 successStyle.setTopBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 successStyle.setBottomBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 successStyle.setLeftBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 successStyle.setRightBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
-successStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-successStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+successStyle.setAlignment(HorizontalAlignment.CENTER);
+successStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
 HSSFCellStyle successLegendStyle = workbook.createCellStyle();
 successLegendStyle.setFillForegroundColor(palette.getColor(PALLETE_GREEN_INDEX).getIndex());
-successLegendStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-successLegendStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-successLegendStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-successLegendStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+successLegendStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+successLegendStyle.setBorderBottom(BorderStyle.THIN);
+successLegendStyle.setAlignment(HorizontalAlignment.CENTER);
+successLegendStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
 HSSFCellStyle successTopBorderStyle = workbook.createCellStyle();
 successTopBorderStyle.setFillForegroundColor(palette.getColor(PALLETE_GREEN_INDEX).getIndex());
-successTopBorderStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-successTopBorderStyle.setBorderTop(HSSFCellStyle.BORDER_MEDIUM);
-successTopBorderStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-successTopBorderStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-successTopBorderStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+successTopBorderStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+successTopBorderStyle.setBorderTop(BorderStyle.MEDIUM);
+successTopBorderStyle.setBorderBottom(BorderStyle.THIN);
+successTopBorderStyle.setBorderLeft(BorderStyle.THIN);
+successTopBorderStyle.setBorderRight(BorderStyle.THIN);
 successTopBorderStyle.setBottomBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 successTopBorderStyle.setLeftBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 successTopBorderStyle.setRightBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
-successTopBorderStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-successTopBorderStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
+successTopBorderStyle.setAlignment(HorizontalAlignment.CENTER);
+successTopBorderStyle.setVerticalAlignment(VerticalAlignment.CENTER);
 
 // Blank row style
 HSSFCellStyle blankStyle = workbook.createCellStyle();
 blankStyle.setFillForegroundColor(palette.getColor(PALLETE_WHITE_INDEX).getIndex());
-blankStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+blankStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
 
 // Border styles
 HSSFCellStyle  leftTopBorderStyle=workbook.createCellStyle();
-leftTopBorderStyle.setAlignment(HSSFCellStyle.ALIGN_CENTER);
-leftTopBorderStyle.setVerticalAlignment(HSSFCellStyle.VERTICAL_CENTER);
-leftTopBorderStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
-leftTopBorderStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+leftTopBorderStyle.setAlignment(HorizontalAlignment.CENTER);
+leftTopBorderStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+leftTopBorderStyle.setBorderTop(BorderStyle.THIN);
+leftTopBorderStyle.setBorderLeft(BorderStyle.THIN);
 
 HSSFCellStyle  leftBorderStyle=workbook.createCellStyle();
-leftBorderStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+leftBorderStyle.setBorderLeft(BorderStyle.THIN);
 
 HSSFCellStyle  leftBottomBorderStyle=workbook.createCellStyle();
-leftBottomBorderStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-leftBottomBorderStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+leftBottomBorderStyle.setBorderBottom(BorderStyle.THIN);
+leftBottomBorderStyle.setBorderLeft(BorderStyle.THIN);
 
 HSSFCellStyle  rightBorderStyle=workbook.createCellStyle();
-rightBorderStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+rightBorderStyle.setBorderRight(BorderStyle.THIN);
 
 HSSFCellStyle  rightBottomBorderStyle=workbook.createCellStyle();
-rightBottomBorderStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-rightBottomBorderStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+rightBottomBorderStyle.setBorderBottom(BorderStyle.THIN);
+rightBottomBorderStyle.setBorderRight(BorderStyle.THIN);
 
 HSSFCellStyle  rightTopBorderStyle=workbook.createCellStyle();
-rightTopBorderStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
-rightTopBorderStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
+rightTopBorderStyle.setBorderTop(BorderStyle.THIN);
+rightTopBorderStyle.setBorderRight(BorderStyle.THIN);
 
 HSSFCellStyle  bottomBorderStyle=workbook.createCellStyle();
-bottomBorderStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+bottomBorderStyle.setBorderBottom(BorderStyle.THIN);
 
 HSSFCellStyle  topBorderStyle=workbook.createCellStyle();
-topBorderStyle.setBorderTop(HSSFCellStyle.BORDER_THIN);
+topBorderStyle.setBorderTop(BorderStyle.THIN);
 
 
 // Lab break border style
 HSSFCellStyle  labBreakDefaultStyle=workbook.createCellStyle();
 labBreakDefaultStyle.setFont(defaultFont);
-labBreakDefaultStyle.setBorderTop(HSSFCellStyle.BORDER_MEDIUM);
+labBreakDefaultStyle.setBorderTop(BorderStyle.MEDIUM);
 
 HSSFCellStyle  labBreakAnnotStyle=workbook.createCellStyle();
 labBreakAnnotStyle.setFont(defaultFont);
-labBreakAnnotStyle.setBorderTop(HSSFCellStyle.BORDER_MEDIUM);
-labBreakAnnotStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-labBreakAnnotStyle.setBorderRight(HSSFCellStyle.BORDER_THIN);
-labBreakAnnotStyle.setBorderLeft(HSSFCellStyle.BORDER_THIN);
+labBreakAnnotStyle.setBorderTop(BorderStyle.MEDIUM);
+labBreakAnnotStyle.setBorderBottom(BorderStyle.THIN);
+labBreakAnnotStyle.setBorderRight(BorderStyle.THIN);
+labBreakAnnotStyle.setBorderLeft(BorderStyle.THIN);
 labBreakAnnotStyle.setBottomBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 labBreakAnnotStyle.setLeftBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
 labBreakAnnotStyle.setRightBorderColor(palette.getColor(PALLETE_CELL_BORDER_INDEX).getIndex());
@@ -570,7 +574,6 @@ for (ReportTray tray : (java.util.ArrayList<ReportTray>)reportTrayList.getTrays(
 				val = "";
 			  	cell.setCellValue("");
 			} else if (isNumeric) {
-			 	cell.setCellType(HSSFCell.CELL_TYPE_NUMERIC);
 			 	cell.setCellValue(Integer.valueOf(val));
 			} else {
 			 	cell.setCellValue(val);
@@ -672,6 +675,10 @@ for (ReportTray tray : (java.util.ArrayList<ReportTray>)reportTrayList.getTrays(
 try {
     workbook.write(response.getOutputStream());
     response.getOutputStream().close();
+    // The spreadsheet went out through the output stream, so drop the page's text writer;
+    // otherwise Jasper calls getWriter() afterwards and logs "getOutputStream() has already been called".
+    out.clear();
+    out = pageContext.pushBody();
      
 } catch (FileNotFoundException e) {
     e.printStackTrace();
