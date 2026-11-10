@@ -7,7 +7,16 @@ import { expectNoErrorDialog, openFirstMatching } from './tree-helpers';
 
 /** Opens a top-level page from the header, or skips if this user's menu doesn't have it. */
 async function openPage(page: Page, item: string): Promise<void> {
-  const button = page.locator('#main-nav').getByRole('button', { name: item, exact: true });
+  const nav = page.locator('#main-nav');
+  const button = nav.getByRole('button', { name: item, exact: true });
+  // Some roles reach Protocols through Configure › Protocols instead of the main menu.
+  const configure = nav.getByRole('button', { name: /^Configure( \.\.\.)? menu$/ });
+  if (item === 'Protocols' && !(await button.isVisible()) && await configure.isVisible()) {
+    await configure.click();
+    await page.getByRole('menuitem', { name: /^(Manage )?Protocols$/ }).click();
+    await waitForSpinner(page);
+    return;
+  }
   test.skip(!(await button.isVisible()), `"${item}" isn't in this user's main menu`);
   await button.click();
   await waitForSpinner(page);
