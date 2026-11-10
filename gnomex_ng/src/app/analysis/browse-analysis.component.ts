@@ -721,7 +721,15 @@ export class BrowseAnalysisComponent implements OnInit, OnDestroy, AfterViewInit
           navExtras.queryParamsHandling = 'merge';
 
           this.dialogsService.startDefaultSpinnerDialog();
-          this.router.navigate(navArray,navExtras);
+          // The opened page stops the spinner. If it never opens (e.g. the server refuses the
+          // analysis group and the error has been shown), stop it here or it blocks the page.
+          this.router.navigate(navArray, navExtras).then((navigated: boolean) => {
+              if (!navigated) {
+                  this.dialogsService.stopAllSpinnerDialogs();
+              }
+          }, () => {
+              this.dialogsService.stopAllSpinnerDialogs();
+          });
       }else{
           this.navService.emitResetNavModeSubject("detail");
           this.navService.emitResetNavModeSubject("overview");
